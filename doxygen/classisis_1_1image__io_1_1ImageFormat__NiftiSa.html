@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -48,42 +48,42 @@
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::image_io::ImageFormat_NiftiSa Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::image_io::ImageFormat_NiftiSa" -->
+<!-- doxytag: class="isis::image_io::ImageFormat_NiftiSa" --><!-- doxytag: inherits="isis::image_io::FileFormat" -->
+<p><code>#include &lt;<a class="el" href="imageFormat__nifti__sa_8hpp_source.html">imageFormat_nifti_sa.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for isis::image_io::ImageFormat_NiftiSa:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classisis_1_1image__io_1_1ImageFormat__NiftiSa.png" usemap="#isis::image_io::ImageFormat_NiftiSa_map" alt=""/>
+  <map id="isis::image_io::ImageFormat_NiftiSa_map" name="isis::image_io::ImageFormat_NiftiSa_map">
+<area href="classisis_1_1image__io_1_1FileFormat.html" alt="isis::image_io::FileFormat" shape="rect" coords="0,0,208,24"/>
+</map>
+ </div></div>
+
 <p><a href="classisis_1_1image__io_1_1ImageFormat__NiftiSa-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#aa0f2c03c095839140e34b9f930a2182a">dialects</a> (const std::string &amp;) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a4fc2a1f94333c4a40f1034319fa769aa">getName</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#abac02a5a0a75279ddefba6231e0aa9de">ImageFormat_NiftiSa</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#afaa8baba07d100ecf3816a22d9c9976c">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;filename, const std::string &amp;)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the given chunk list.  <a href="#afaa8baba07d100ecf3816a22d9c9976c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a72e29e35f46e6c4690841fc872074277">tainted</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a4fd192a16f8088bd3a2ce01b49933853">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;filename, const std::string &amp;dialect)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single image to a file.  <a href="#a4fd192a16f8088bd3a2ce01b49933853"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a43b19f30417bc0989d6d7d185eeb89b4">suffixes</a> () const </td></tr>
-<tr><td colspan="2"><h2><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a1bccd1adfa9bc5f28406376e3395d979">getHeader</a> (const <a class="el" href="structisis_1_1image__io_1_1__internal_1_1nifti__1__header.html">_internal::nifti_1_header</a> *head, <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &amp;props)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a2061cef33b0436a0e979a7e243e17367">guessSliceOrdering</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> img, char &amp;slice_code, float &amp;slice_duration)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a399ad6a6ec1d8dcfa3581a49e721064e">parseDescripForSPM</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;props, const char desc[])</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a0d427df1136e06823def3406a81d8562">storeHeader</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;props, <a class="el" href="structisis_1_1image__io_1_1__internal_1_1nifti__1__header.html">_internal::nifti_1_header</a> *head)</td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">static unsigned short&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a10e7556128ac645162ef5902a0064ae3">typeFallBack</a> ()</td></tr>
-<tr><td colspan="2"><h2><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned short, short &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a2fe1ad4a0e93a12d8484915e43107789">isis_type2nifti_type</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::map&lt; short, unsigned short &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a26129b11bd988dc47dc60ad1a5de7710">nifti_type2isis_type</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a97c4d3fbc654012f6977170885a0d257">suffixes</a> (<a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a> mode=both) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00116">116</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8hpp_source.html#l00155">155</a> of file <a class="el" href="imageFormat__nifti__sa_8hpp_source.html">imageFormat_nifti_sa.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="abac02a5a0a75279ddefba6231e0aa9de"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::ImageFormat_NiftiSa" ref="abac02a5a0a75279ddefba6231e0aa9de" args="()" -->
 <div class="memitem">
@@ -93,43 +93,36 @@ Protected Attributes</h2></td></tr>
           <td class="memname">isis::image_io::ImageFormat_NiftiSa::ImageFormat_NiftiSa </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00120">120</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8cpp_source.html#l00184">184</a> of file <a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a1bccd1adfa9bc5f28406376e3395d979"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::getHeader" ref="a1bccd1adfa9bc5f28406376e3395d979" args="(const _internal::nifti_1_header *head, data::Chunk &amp;props)" -->
+<a class="anchor" id="aa0f2c03c095839140e34b9f930a2182a"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::dialects" ref="aa0f2c03c095839140e34b9f930a2182a" args="(const std::string &amp;) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">static void isis::image_io::ImageFormat_NiftiSa::getHeader </td>
+          <td class="memname">std::string isis::image_io::ImageFormat_NiftiSa::dialects </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structisis_1_1image__io_1_1__internal_1_1nifti__1__header.html">_internal::nifti_1_header</a> *&#160;</td>
-          <td class="paramname"><em>head</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &amp;&#160;</td>
-          <td class="paramname"><em>props</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline, static, protected]</code></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>a space separated list of the dialects the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00238">238</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aa4124d591577978336c1352adcd1a98a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8hpp_source.html#l00188">188</a> of file <a class="el" href="imageFormat__nifti__sa_8hpp_source.html">imageFormat_nifti_sa.hpp</a>.</p>
 
 </div>
 </div>
@@ -141,48 +134,16 @@ Protected Attributes</h2></td></tr>
           <td class="memname">std::string isis::image_io::ImageFormat_NiftiSa::getName </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the name of the plugin </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00353">353</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aff0eaeb932b67a03194aaf6276ad1d44">isis::image_io::FileFormat</a>.</p>
 
-</div>
-</div>
-<a class="anchor" id="a2061cef33b0436a0e979a7e243e17367"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::guessSliceOrdering" ref="a2061cef33b0436a0e979a7e243e17367" args="(const data::Image img, char &amp;slice_code, float &amp;slice_duration)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool isis::image_io::ImageFormat_NiftiSa::guessSliceOrdering </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a>&#160;</td>
-          <td class="paramname"><em>img</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char &amp;&#160;</td>
-          <td class="paramname"><em>slice_code</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float &amp;&#160;</td>
-          <td class="paramname"><em>slice_duration</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline, static, protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00153">153</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8cpp_source.html#l00534">534</a> of file <a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,94 +167,54 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>dialect</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline]</code></td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00355">355</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Load data into the given chunk list. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">chunks</td><td>the chunk list where the loaded chunks shall be added to </td></tr>
+    <tr><td class="paramname">filename</td><td>the name of the file to load from (the system does NOT check if this file exists) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the amount of loaded chunks. </dd></dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a2692bc1fd170c46232c81a254a56420a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8cpp_source.html#l00613">613</a> of file <a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a399ad6a6ec1d8dcfa3581a49e721064e"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::parseDescripForSPM" ref="a399ad6a6ec1d8dcfa3581a49e721064e" args="(util::PropertyMap &amp;props, const char desc[])" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool isis::image_io::ImageFormat_NiftiSa::parseDescripForSPM </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;&#160;</td>
-          <td class="paramname"><em>props</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char&#160;</td>
-          <td class="paramname"><em>desc</em>[]&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline, static, protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00167">167</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0d427df1136e06823def3406a81d8562"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::storeHeader" ref="a0d427df1136e06823def3406a81d8562" args="(const util::PropertyMap &amp;props, _internal::nifti_1_header *head)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void isis::image_io::ImageFormat_NiftiSa::storeHeader </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;&#160;</td>
-          <td class="paramname"><em>props</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structisis_1_1image__io_1_1__internal_1_1nifti__1__header.html">_internal::nifti_1_header</a> *&#160;</td>
-          <td class="paramname"><em>head</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline, static, protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00197">197</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a43b19f30417bc0989d6d7d185eeb89b4"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::suffixes" ref="a43b19f30417bc0989d6d7d185eeb89b4" args="() const " -->
+<a class="anchor" id="a97c4d3fbc654012f6977170885a0d257"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::suffixes" ref="a97c4d3fbc654012f6977170885a0d257" args="(io_modes mode=both) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">std::string isis::image_io::ImageFormat_NiftiSa::suffixes </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, protected]</code></td>
+          <td class="paramtype"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a>&#160;</td>
+          <td class="paramname"><em>modes</em> = <code>both</code></td><td>)</td>
+          <td> const<code> [protected, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the file-suffixes the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00143">143</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a3f83b544d398742f7bdbe939d0f7d6bf">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8cpp_source.html#l00212">212</a> of file <a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a>.</p>
 
 </div>
 </div>
@@ -305,33 +226,16 @@ Protected Attributes</h2></td></tr>
           <td class="memname">bool isis::image_io::ImageFormat_NiftiSa::tainted </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>if the plugin is not part of the official distribution </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00443">443</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">isis::image_io::FileFormat</a>.</p>
 
-</div>
-</div>
-<a class="anchor" id="a10e7556128ac645162ef5902a0064ae3"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::typeFallBack" ref="a10e7556128ac645162ef5902a0064ae3" args="()" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">static unsigned short isis::image_io::ImageFormat_NiftiSa::typeFallBack </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline, static, protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00148">148</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8hpp_source.html#l00187">187</a> of file <a class="el" href="imageFormat__nifti__sa_8hpp_source.html">imageFormat_nifti_sa.hpp</a>.</p>
 
 </div>
 </div>
@@ -360,52 +264,34 @@ template&lt;typename T &gt; </div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline]</code></td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00383">383</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
+<p>Write a single image to a file. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the name of the file to write (the system does NOT check if this file exists/is writeable) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a9cafcb99bc0063bd528da0278ffff06f">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__nifti__sa_8cpp_source.html#l00758">758</a> of file <a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a>.</p>
 
 </div>
 </div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a2fe1ad4a0e93a12d8484915e43107789"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::isis_type2nifti_type" ref="a2fe1ad4a0e93a12d8484915e43107789" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::map&lt;unsigned short,short&gt; <a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a2fe1ad4a0e93a12d8484915e43107789">isis::image_io::ImageFormat_NiftiSa::isis_type2nifti_type</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00147">147</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a26129b11bd988dc47dc60ad1a5de7710"></a><!-- doxytag: member="isis::image_io::ImageFormat_NiftiSa::nifti_type2isis_type" ref="a26129b11bd988dc47dc60ad1a5de7710" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::map&lt;short,unsigned short&gt; <a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html#a26129b11bd988dc47dc60ad1a5de7710">isis::image_io::ImageFormat_NiftiSa::nifti_type2isis_type</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html#l00146">146</a> of file <a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li>/SCR/isis/lib/ImageIO/<a class="el" href="imageFormat__Nifti__SA_8cpp_source.html">imageFormat_Nifti_SA.cpp</a></li>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>/SCR/isis/lib/ImageIO/<a class="el" href="imageFormat__nifti__sa_8hpp_source.html">imageFormat_nifti_sa.hpp</a></li>
+<li>/SCR/isis/lib/ImageIO/<a class="el" href="imageFormat__nifti__sa_8cpp_source.html">imageFormat_nifti_sa.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:01 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

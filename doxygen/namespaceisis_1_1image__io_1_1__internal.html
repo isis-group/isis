@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,10 +23,9 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
@@ -46,49 +45,17 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::image_io::_internal Namespace Reference</h1>  </div>
 </div>
 <div class="contents">
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1__internal_1_1DicomChunk.html">DicomChunk</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1__internal_1_1Flip.html">Flip</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1image__io_1_1__internal_1_1nifti__1__header.html">nifti_1_header</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1__internal_1_1NiftiChunk.html">NiftiChunk</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io_1_1__internal.html#adfdf02fc676e34bc79e4c063796a580b">dcmtkListString2list</a> (DcmElement *elem)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io_1_1__internal.html#a83d3ecb2865aa4bc1af8c3ad7e7e904e">moreCmp</a> (const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;a, const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;b)</td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename ST , typename DT &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io_1_1__internal.html#ae4d50c52757691d4f295a6e99f0b2ccb">try_cast</a> (const ST &amp;source, DT &amp;dest)</td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="adfdf02fc676e34bc79e4c063796a580b"></a><!-- doxytag: member="isis::image_io::_internal::dcmtkListString2list" ref="adfdf02fc676e34bc79e4c063796a580b" args="(DcmElement *elem)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::list&lt;T&gt; isis::image_io::_internal::dcmtkListString2list </td>
-          <td>(</td>
-          <td class="paramtype">DcmElement *&#160;</td>
-          <td class="paramname"><em>elem</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00028">28</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a83d3ecb2865aa4bc1af8c3ad7e7e904e"></a><!-- doxytag: member="isis::image_io::_internal::moreCmp" ref="a83d3ecb2865aa4bc1af8c3ad7e7e904e" args="(const util::istring &amp;a, const util::istring &amp;b)" -->
 <div class="memitem">
 <div class="memproto">
@@ -118,39 +85,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ae4d50c52757691d4f295a6e99f0b2ccb"></a><!-- doxytag: member="isis::image_io::_internal::try_cast" ref="ae4d50c52757691d4f295a6e99f0b2ccb" args="(const ST &amp;source, DT &amp;dest)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename ST , typename DT &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::image_io::_internal::try_cast </td>
-          <td>(</td>
-          <td class="paramtype">const ST &amp;&#160;</td>
-          <td class="paramname"><em>source</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">DT &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00015">15</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
-
-</div>
-</div>
-</div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

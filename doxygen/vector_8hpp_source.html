@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -92,246 +91,252 @@
 <a name="l00053"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">00053</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> CONTAINER::iterator <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a>;
 <a name="l00054"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a6d62e671ecb1e277dbdac40ddb722b27">00054</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> CONTAINER::const_iterator <a class="code" href="classisis_1_1util_1_1FixedVector.html#a6d62e671ecb1e277dbdac40ddb722b27">const_iterator</a>;
 <a name="l00055"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9aba478fa4be4f8188cdaed0fa0d9e8d">00055</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9aba478fa4be4f8188cdaed0fa0d9e8d">this_class</a>;
-<a name="l00056"></a>00056 <span class="keyword">protected</span>:
-<a name="l00058"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48">00058</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48" title="Generic operations.">binaryOp</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
-<a name="l00059"></a>00059         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
-<a name="l00060"></a>00060         std::transform( CONTAINER::begin(), CONTAINER::end(), src.begin(), ret.begin(), OP() );
-<a name="l00061"></a>00061         <span class="keywordflow">return</span> ret;
-<a name="l00062"></a>00062     }
-<a name="l00063"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a0c2ed6386943b4ee835c93264c5f614b">00063</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a0c2ed6386943b4ee835c93264c5f614b">binaryOp</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{
-<a name="l00064"></a>00064         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
-<a name="l00065"></a>00065         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> dst = ret.begin();
-<a name="l00066"></a>00066         <span class="keyword">const</span> OP op = OP();
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> i = CONTAINER::begin(); i != CONTAINER::end(); i++, dst++ )
-<a name="l00069"></a>00069             *dst = op( *i, src );
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071         <span class="keywordflow">return</span> ret;
-<a name="l00072"></a>00072     }
-<a name="l00073"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ae76ce06b22278e0931490dc5b2b3dae9">00073</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ae76ce06b22278e0931490dc5b2b3dae9">unaryOp</a>()<span class="keyword">const </span>{
-<a name="l00074"></a>00074         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
-<a name="l00075"></a>00075         std::transform( CONTAINER::begin(), CONTAINER::end(), ret.begin(), OP() );
-<a name="l00076"></a>00076         <span class="keywordflow">return</span> ret;
-<a name="l00077"></a>00077     }
-<a name="l00078"></a>00078 <span class="keyword">public</span>:
-<a name="l00080"></a>00080     <span class="comment">// Contructor stuff</span>
-<a name="l00082"></a>00082 <span class="comment"></span>
-<a name="l00086"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad187ce0824853ba3ca448ce2d6c50467">00086</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad187ce0824853ba3ca448ce2d6c50467" title="Default constructor.">FixedVector</a>() {<a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( TYPE() ); }
-<a name="l00087"></a>00087 
-<a name="l00091"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9238459ce4a0f313fdc5e02ef696445">00091</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9238459ce4a0f313fdc5e02ef696445" title="Create a FixedVector out of an array of same type and length.">FixedVector</a>( <span class="keyword">const</span> TYPE src[SIZE] ) {
-<a name="l00092"></a>00092         std::copy( src, src + SIZE, CONTAINER::begin() );
-<a name="l00093"></a>00093     }
-<a name="l00094"></a>00094 
-<a name="l00096"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6">00096</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( <span class="keyword">const</span> TYPE &amp;val ) {
-<a name="l00097"></a>00097         <a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">std::fill</a>( CONTAINER::begin(), CONTAINER::end(), val );
-<a name="l00098"></a>00098     }
-<a name="l00099"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad8c0b98399fe51378bbc5f1867193127">00099</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad8c0b98399fe51378bbc5f1867193127">getBiggestVecElemAbs</a>( )<span class="keyword"> const </span>{
-<a name="l00100"></a>00100         <span class="keywordtype">size_t</span> biggestVecElem = 0;
-<a name="l00101"></a>00101         TYPE tmpValue = 0;
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103         <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> vecElem = 0; vecElem &lt; SIZE; vecElem++ ) {
-<a name="l00104"></a>00104             <span class="keywordflow">if</span> ( fabs( <span class="keyword">operator</span>[]( vecElem ) ) &gt; fabs( tmpValue ) ) {
-<a name="l00105"></a>00105                 biggestVecElem = vecElem;
-<a name="l00106"></a>00106                 tmpValue = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( vecElem );
-<a name="l00107"></a>00107             }
-<a name="l00108"></a>00108         }
-<a name="l00109"></a>00109 
-<a name="l00110"></a>00110         <span class="keywordflow">return</span> biggestVecElem;
-<a name="l00111"></a>00111     }
-<a name="l00113"></a>00113     <span class="comment">// Accessors</span>
-<a name="l00115"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">00115</a> <span class="comment"></span>    <span class="keyword">const</span> TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator []</a>( <span class="keywordtype">size_t</span> idx )<span class="keyword">const </span>{
-<a name="l00116"></a>00116         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( idx &gt;= SIZE, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; idx &lt;&lt; <span class="stringliteral">&quot; exceeds the size of the vector (&quot;</span> &lt;&lt; SIZE &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00117"></a>00117         <span class="keywordflow">return</span> CONTAINER::begin()[idx];
-<a name="l00118"></a>00118     }
-<a name="l00119"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7e3d1b4dadcd711da69d632660bbf324">00119</a>     TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator []</a>( <span class="keywordtype">size_t</span> idx ) {
-<a name="l00120"></a>00120         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( idx &gt;= SIZE, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; idx &lt;&lt; <span class="stringliteral">&quot; exceeds the size of the vector (&quot;</span> &lt;&lt; SIZE &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00121"></a>00121         <span class="keywordflow">return</span> CONTAINER::begin()[idx];
-<a name="l00122"></a>00122     }
-<a name="l00123"></a>00123 
-<a name="l00125"></a>00125     <span class="comment">// Comparison</span>
-<a name="l00128"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a1db243bdd575e925e2ef7ceb3135e87f">00128</a> <span class="comment"></span>    <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a1db243bdd575e925e2ef7ceb3135e87f">lexical_less</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
-<a name="l00129"></a>00129         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> they = src.begin();
-<a name="l00130"></a>00130         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> me = CONTAINER::begin();
-<a name="l00131"></a>00131 
-<a name="l00132"></a>00132         <span class="keywordflow">while</span> ( me != CONTAINER::end() ) {
-<a name="l00133"></a>00133             <span class="keywordflow">if</span> ( *they &lt; *me ) <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00134"></a>00134             <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( *me &lt; *they ) <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136             me++;
-<a name="l00137"></a>00137             they++;
-<a name="l00138"></a>00138         }
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00141"></a>00141     }
-<a name="l00143"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a450ce5ffbd45c0782c750a9d0a55925f">00143</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a450ce5ffbd45c0782c750a9d0a55925f">lexical_less_reverse</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
-<a name="l00144"></a>00144         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> they = src.end();
-<a name="l00145"></a>00145         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> me = CONTAINER::end();
-<a name="l00146"></a>00146 
-<a name="l00147"></a>00147         <span class="keywordflow">while</span> ( me != CONTAINER::begin() ) {
-<a name="l00148"></a>00148             me--;
-<a name="l00149"></a>00149             they--;
-<a name="l00150"></a>00150 
-<a name="l00151"></a>00151             <span class="keywordflow">if</span> ( *they &lt; *me ) <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00152"></a>00152             <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( *me &lt; *they ) <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00153"></a>00153         }
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00156"></a>00156     }
-<a name="l00158"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">00158</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">operator==</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );}
-<a name="l00160"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a71134e94627ac868b3d602e574d1bc0e">00160</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a71134e94627ac868b3d602e574d1bc0e">operator!=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
-<a name="l00161"></a>00161         <span class="keywordflow">return</span> !<a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">operator==</a>( src );
-<a name="l00162"></a>00162     }
-<a name="l00172"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#abdbff5b522b7afe91420118538654df0">00172</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#abdbff5b522b7afe91420118538654df0" title="Fuzzy comparison.">fuzzyEqual</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;other, TYPE thresh = 0 )<span class="keyword">const </span>{
-<a name="l00173"></a>00173         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> b = other.begin();
-<a name="l00174"></a>00174 
-<a name="l00175"></a>00175         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-<a name="l00176"></a>00176             <span class="keywordflow">if</span> ( ! <a class="code" href="namespaceisis_1_1util.html#a3950ca0b230cf43d7c8f759c19946bbc" title="Fuzzy comparison between floating point values.">util::fuzzyEqual</a>( *a, *b, thresh ) )
-<a name="l00177"></a>00177                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00178"></a>00178         }
-<a name="l00179"></a>00179 
-<a name="l00180"></a>00180         <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00181"></a>00181     }
+<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">00056</a>     <span class="keyword">typedef</span> <a class="code" href="classCONTAINER.html">CONTAINER</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">container_type</a>;
+<a name="l00057"></a>00057 <span class="keyword">protected</span>:
+<a name="l00059"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48">00059</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48" title="Generic operations.">binaryOp</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
+<a name="l00060"></a>00060         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
+<a name="l00061"></a>00061         std::transform( CONTAINER::begin(), CONTAINER::end(), src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), OP() );
+<a name="l00062"></a>00062         <span class="keywordflow">return</span> ret;
+<a name="l00063"></a>00063     }
+<a name="l00064"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a0c2ed6386943b4ee835c93264c5f614b">00064</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a0c2ed6386943b4ee835c93264c5f614b">binaryOp</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{
+<a name="l00065"></a>00065         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
+<a name="l00066"></a>00066         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> dst = ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>();
+<a name="l00067"></a>00067         <span class="keyword">const</span> OP op = OP();
+<a name="l00068"></a>00068 
+<a name="l00069"></a>00069         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> i = CONTAINER::begin(); i != <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>(); i++, dst++ )
+<a name="l00070"></a>00070             *dst = op( *i, src );
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072         <span class="keywordflow">return</span> ret;
+<a name="l00073"></a>00073     }
+<a name="l00074"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ae76ce06b22278e0931490dc5b2b3dae9">00074</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ae76ce06b22278e0931490dc5b2b3dae9">unaryOp</a>()<span class="keyword">const </span>{
+<a name="l00075"></a>00075         <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> ret;
+<a name="l00076"></a>00076         std::transform( CONTAINER::begin(), CONTAINER::end(), ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), OP() );
+<a name="l00077"></a>00077         <span class="keywordflow">return</span> ret;
+<a name="l00078"></a>00078     }
+<a name="l00079"></a>00079 <span class="keyword">public</span>:
+<a name="l00081"></a>00081     <span class="comment">// Contructor stuff</span>
+<a name="l00083"></a>00083 <span class="comment"></span>
+<a name="l00087"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad187ce0824853ba3ca448ce2d6c50467">00087</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad187ce0824853ba3ca448ce2d6c50467" title="Default constructor.">FixedVector</a>() {<a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( TYPE() ); }
+<a name="l00088"></a>00088 
+<a name="l00092"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9238459ce4a0f313fdc5e02ef696445">00092</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9238459ce4a0f313fdc5e02ef696445" title="Create a FixedVector out of an array of same type and length.">FixedVector</a>( <span class="keyword">const</span> TYPE src[SIZE] ) {
+<a name="l00093"></a>00093         std::copy( src, src + SIZE, CONTAINER::begin() );
+<a name="l00094"></a>00094     }
+<a name="l00095"></a>00095 
+<a name="l00097"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6">00097</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( <span class="keyword">const</span> TYPE &amp;val ) {
+<a name="l00098"></a>00098         <a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">std::fill</a>( CONTAINER::begin(), CONTAINER::end(), val );
+<a name="l00099"></a>00099     }
+<a name="l00100"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad8c0b98399fe51378bbc5f1867193127">00100</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad8c0b98399fe51378bbc5f1867193127">getBiggestVecElemAbs</a>( )<span class="keyword"> const </span>{
+<a name="l00101"></a>00101         <span class="keywordtype">size_t</span> biggestVecElem = 0;
+<a name="l00102"></a>00102         TYPE tmpValue = 0;
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104         <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> vecElem = 0; vecElem &lt; SIZE; vecElem++ ) {
+<a name="l00105"></a>00105             <span class="keywordflow">if</span> ( fabs( <span class="keyword">operator</span>[]( vecElem ) ) &gt; fabs( tmpValue ) ) {
+<a name="l00106"></a>00106                 biggestVecElem = vecElem;
+<a name="l00107"></a>00107                 tmpValue = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( vecElem );
+<a name="l00108"></a>00108             }
+<a name="l00109"></a>00109         }
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111         <span class="keywordflow">return</span> biggestVecElem;
+<a name="l00112"></a>00112     }
+<a name="l00114"></a>00114     <span class="comment">// Accessors</span>
+<a name="l00116"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">00116</a> <span class="comment"></span>    <span class="keyword">const</span> TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator []</a>( <span class="keywordtype">size_t</span> idx )<span class="keyword">const </span>{
+<a name="l00117"></a>00117         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( idx &gt;= SIZE, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; idx &lt;&lt; <span class="stringliteral">&quot; exceeds the size of the vector (&quot;</span> &lt;&lt; SIZE &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00118"></a>00118         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">CONTAINER::begin</a>()[idx];
+<a name="l00119"></a>00119     }
+<a name="l00120"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7e3d1b4dadcd711da69d632660bbf324">00120</a>     TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator []</a>( <span class="keywordtype">size_t</span> idx ) {
+<a name="l00121"></a>00121         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( idx &gt;= SIZE, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; idx &lt;&lt; <span class="stringliteral">&quot; exceeds the size of the vector (&quot;</span> &lt;&lt; SIZE &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00122"></a>00122         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">CONTAINER::begin</a>()[idx];
+<a name="l00123"></a>00123     }
+<a name="l00124"></a>00124 
+<a name="l00126"></a>00126     <span class="comment">// Comparison</span>
+<a name="l00129"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a1db243bdd575e925e2ef7ceb3135e87f">00129</a> <span class="comment"></span>    <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a1db243bdd575e925e2ef7ceb3135e87f">lexical_less</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
+<a name="l00130"></a>00130         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> they = src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>();
+<a name="l00131"></a>00131         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> me = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">CONTAINER::begin</a>();
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133         <span class="keywordflow">while</span> ( me != CONTAINER::end() ) {
+<a name="l00134"></a>00134             <span class="keywordflow">if</span> ( *they &lt; *me ) <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00135"></a>00135             <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( *me &lt; *they ) <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137             me++;
+<a name="l00138"></a>00138             they++;
+<a name="l00139"></a>00139         }
+<a name="l00140"></a>00140 
+<a name="l00141"></a>00141         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00142"></a>00142     }
+<a name="l00144"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a450ce5ffbd45c0782c750a9d0a55925f">00144</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a450ce5ffbd45c0782c750a9d0a55925f">lexical_less_reverse</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
+<a name="l00145"></a>00145         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> they = src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a>();
+<a name="l00146"></a>00146         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> me = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>();
+<a name="l00147"></a>00147 
+<a name="l00148"></a>00148         <span class="keywordflow">while</span> ( me != CONTAINER::begin() ) {
+<a name="l00149"></a>00149             me--;
+<a name="l00150"></a>00150             they--;
+<a name="l00151"></a>00151 
+<a name="l00152"></a>00152             <span class="keywordflow">if</span> ( *they &lt; *me ) <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00153"></a>00153             <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( *me &lt; *they ) <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00154"></a>00154         }
+<a name="l00155"></a>00155 
+<a name="l00156"></a>00156         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00157"></a>00157     }
+<a name="l00159"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">00159</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">operator==</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::equal( CONTAINER::begin(), CONTAINER::end(), src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>() );}
+<a name="l00161"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a71134e94627ac868b3d602e574d1bc0e">00161</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a71134e94627ac868b3d602e574d1bc0e">operator!=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
+<a name="l00162"></a>00162         <span class="keywordflow">return</span> !<a class="code" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">operator==</a>( src );
+<a name="l00163"></a>00163     }
+<a name="l00171"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9f9a36e15da09c5c3ee4e3f6ea529f79">00171</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9f9a36e15da09c5c3ee4e3f6ea529f79" title="Fuzzy comparison for vectors.">fuzzyEqual</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;other, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> scale = 10 )<span class="keyword">const </span>{
+<a name="l00172"></a>00172         <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> b = other.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>();
+<a name="l00173"></a>00173 
+<a name="l00174"></a>00174         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> a = CONTAINER::begin(); a != <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>(); ++a, ++b ) {
+<a name="l00175"></a>00175             <span class="keywordflow">if</span> ( ! <a class="code" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651" title="Fuzzy comparison between floating point values.">util::fuzzyEqual</a>( *a, *b, scale ) )
+<a name="l00176"></a>00176                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00177"></a>00177         }
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179         <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00180"></a>00180     }
+<a name="l00181"></a>00181 
 <a name="l00182"></a>00182 
 <a name="l00183"></a>00183 
-<a name="l00184"></a>00184 
-<a name="l00186"></a>00186     <span class="comment">// Arithmetic operations</span>
-<a name="l00188"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">00188</a> <span class="comment"></span>    <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">operator-</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::minus&lt;TYPE&gt;      &gt;( src );}
-<a name="l00189"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">00189</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">operator+</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::plus&lt;TYPE&gt;       &gt;( src );}
-<a name="l00190"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa7c2ae057917a602f53e37a5c62a41ab">00190</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa7c2ae057917a602f53e37a5c62a41ab">operator*</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::multiplies&lt;TYPE&gt; &gt;( src );}
-<a name="l00191"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">00191</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">operator/</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::divides&lt;TYPE&gt;    &gt;( src );}
-<a name="l00192"></a>00192 
-<a name="l00193"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aeda5b157cf92b103448578f5af67f8db">00193</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aeda5b157cf92b103448578f5af67f8db">operator-</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::minus&lt;TYPE&gt;      &gt;( src );}
-<a name="l00194"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aae845a738e043df885a5cdcab1367e59">00194</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aae845a738e043df885a5cdcab1367e59">operator+</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::plus&lt;TYPE&gt;       &gt;( src );}
-<a name="l00195"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a47c385bd9ee9055a704acb6d387b4775">00195</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a47c385bd9ee9055a704acb6d387b4775">operator*</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::multiplies&lt;TYPE&gt; &gt;( src );}
-<a name="l00196"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">00196</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">operator/</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::divides&lt;TYPE&gt;    &gt;( src );}
-<a name="l00197"></a>00197 
-<a name="l00199"></a>00199     <span class="comment">// applying Arithmetic operations</span>
-<a name="l00201"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">00201</a> <span class="comment"></span>    <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">operator-=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> - src;}
-<a name="l00202"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a63a5b37304fa35e164f293212b2d0c4b">00202</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a63a5b37304fa35e164f293212b2d0c4b">operator+=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> + src;}
-<a name="l00203"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#af1acc437254956e373d8efe714f5880e">00203</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#af1acc437254956e373d8efe714f5880e">operator*=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> * src;}
-<a name="l00204"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">00204</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">operator/=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / src;}
-<a name="l00205"></a>00205 
-<a name="l00206"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">00206</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">operator-=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> - src;}
-<a name="l00207"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a702c7dfc41be6ebb5768e6b9c009d560">00207</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a702c7dfc41be6ebb5768e6b9c009d560">operator+=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> + src;}
-<a name="l00208"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9871a7b8b609c79e21d78dd36a51e514">00208</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9871a7b8b609c79e21d78dd36a51e514">operator*=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> * src;}
-<a name="l00209"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">00209</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">operator/=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / src;}
-<a name="l00210"></a>00210 
-<a name="l00212"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad4cc82923ac568a6c74a2329514673e7">00212</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad4cc82923ac568a6c74a2329514673e7">negate</a>()<span class="keyword">const </span>{
-<a name="l00213"></a>00213         <span class="keywordflow">return</span> unaryOp&lt;std::negate&lt;float&gt; &gt;();
-<a name="l00214"></a>00214     }
-<a name="l00215"></a>00215 
-<a name="l00220"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192">00220</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192" title="Get the inner product.">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;vect )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::inner_product( CONTAINER::begin(), CONTAINER::end(), vect.begin(), TYPE() );}
-<a name="l00225"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42">00225</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192" title="Get the inner product.">dot</a>( *<span class="keyword">this</span> );}
-<a name="l00230"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d">00230</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d" title="Get the the length of the vector.">len</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> std::sqrt( <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>() );}
-<a name="l00231"></a>00231 
-<a name="l00242"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#adbe27fd269f3eab2107c85f3ee7a92fa">00242</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#adbe27fd269f3eab2107c85f3ee7a92fa" title="Norm the vector (make len()==1).">norm</a>()throw( std::invalid_argument ) {
-<a name="l00243"></a>00243         <span class="keyword">const</span> TYPE d = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d" title="Get the the length of the vector.">len</a>();
-<a name="l00244"></a>00244 
-<a name="l00245"></a>00245         <span class="keywordflow">if</span> ( d == 0 )<span class="keywordflow">throw</span>( std::invalid_argument( <span class="stringliteral">&quot;Trying to normalize a vector of length 0&quot;</span> ) );
-<a name="l00246"></a>00246         <span class="keywordflow">else</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / d;
-<a name="l00247"></a>00247 
-<a name="l00248"></a>00248         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00249"></a>00249     }
-<a name="l00250"></a>00250 
-<a name="l00255"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9">00255</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>()<span class="keyword">const </span>{
-<a name="l00256"></a>00256         TYPE ret = 1;
-<a name="l00257"></a>00257 
-<a name="l00258"></a>00258         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
-<a name="l00259"></a>00259             ret *= *i;
-<a name="l00260"></a>00260 
-<a name="l00261"></a>00261         <span class="keywordflow">return</span> ret;
-<a name="l00262"></a>00262     }
-<a name="l00263"></a>00263 
-<a name="l00268"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a65285e7cfdceb19daeffcf6fbfacda58">00268</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a65285e7cfdceb19daeffcf6fbfacda58" title="Compute the sum of all elements.">sum</a>() {
-<a name="l00269"></a>00269         TYPE ret = 0;
-<a name="l00270"></a>00270 
-<a name="l00271"></a>00271         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
-<a name="l00272"></a>00272             ret += *i;
-<a name="l00273"></a>00273 
-<a name="l00274"></a>00274         <span class="keywordflow">return</span> ret;
-<a name="l00275"></a>00275     }
-<a name="l00276"></a>00276 
-<a name="l00278"></a>00278     <span class="comment">// copy stuff</span>
-<a name="l00281"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6">00281</a> <span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> OutputIterator&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( OutputIterator out )<span class="keyword">const </span>{
-<a name="l00282"></a>00282         std::copy( CONTAINER::begin(), CONTAINER::end(), out );
-<a name="l00283"></a>00283     }
-<a name="l00284"></a>00284 
-<a name="l00286"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd">00286</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( InputIterator iter_start, InputIterator iter_end ) {
-<a name="l00287"></a>00287         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <span class="keywordtype">size_t</span>( std::distance( iter_start, iter_end ) ) &gt; SIZE, <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00288"></a>00288                 &lt;&lt; <span class="stringliteral">&quot;Copying &quot;</span> &lt;&lt; std::distance( iter_start, iter_end ) &lt;&lt; <span class="stringliteral">&quot; Elements into a vector of the size &quot;</span> &lt;&lt; SIZE;
-<a name="l00289"></a>00289         std::copy( iter_start, iter_end, CONTAINER::begin() );
-<a name="l00290"></a>00290     }
-<a name="l00291"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">00291</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">FixedVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, SIZE, CONTAINER2&gt;</a> &amp;src ) {
-<a name="l00292"></a>00292         src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( CONTAINER::begin() );
-<a name="l00293"></a>00293     }
-<a name="l00294"></a>00294 
-<a name="l00296"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#afd5c63f1bcdda29c77db98daba948ff1">00296</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#afd5c63f1bcdda29c77db98daba948ff1" title="write the elements formated to basic_ostream">writeTo</a>( std::basic_ostream&lt;charT, traits&gt; &amp;out )<span class="keyword">const </span>{
-<a name="l00297"></a>00297         <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">util::listToOStream</a>( CONTAINER::begin(), CONTAINER::end(), out, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;&lt;&quot;</span>, <span class="stringliteral">&quot;&gt;&quot;</span> );
-<a name="l00298"></a>00298     }
-<a name="l00299"></a>00299 
-<a name="l00300"></a>00300 };
-<a name="l00301"></a>00301 
-<a name="l00302"></a>00302 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt;
-<a name="l00303"></a><a class="code" href="classisis_1_1util_1_1vector4.html">00303</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1vector4.html">vector4</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, 4&gt;
-<a name="l00304"></a>00304 {
-<a name="l00305"></a>00305 <span class="keyword">public</span>:
-<a name="l00306"></a><a class="code" href="classisis_1_1util_1_1vector4.html#a6b0ba8088895f9fa54bddc0d56cc5259">00306</a>     <a class="code" href="classisis_1_1util_1_1vector4.html#a6b0ba8088895f9fa54bddc0d56cc5259">vector4</a>() {}
-<a name="l00307"></a><a class="code" href="classisis_1_1util_1_1vector4.html#aca1c2ba19655f62825015499a52e856d">00307</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1vector4.html#aca1c2ba19655f62825015499a52e856d">vector4</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4, CONTAINER2&gt;</a> &amp;src ) : <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, 4&gt; ( src ) {}
-<a name="l00308"></a><a class="code" href="classisis_1_1util_1_1vector4.html#a256c8e61899a2e2a5038a77df56f3d18">00308</a>     <a class="code" href="classisis_1_1util_1_1vector4.html#a256c8e61899a2e2a5038a77df56f3d18">vector4</a>( TYPE first, TYPE second, TYPE third = 0, TYPE fourth = 0 ) {
-<a name="l00309"></a>00309         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 3 ) = fourth;
-<a name="l00310"></a>00310         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 2 ) = third;
-<a name="l00311"></a>00311         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 1 ) = second;
-<a name="l00312"></a>00312         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 0 ) = first;
-<a name="l00313"></a>00313     }
-<a name="l00314"></a>00314 };
-<a name="l00315"></a>00315 
-<a name="l00316"></a>00316 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00317"></a><a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">00317</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">maxVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
-<a name="l00318"></a>00318 {
-<a name="l00319"></a>00319     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
-<a name="l00320"></a>00320 
-<a name="l00321"></a>00321     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
-<a name="l00322"></a>00322         <span class="keywordflow">if</span> ( ret[i] &lt; second[i] )ret[i] = second[i];
-<a name="l00323"></a>00323 
-<a name="l00324"></a>00324     <span class="keywordflow">return</span> ret;
-<a name="l00325"></a>00325 }
-<a name="l00326"></a>00326 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00327"></a><a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">00327</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">minVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
-<a name="l00328"></a>00328 {
-<a name="l00329"></a>00329     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
-<a name="l00330"></a>00330 
-<a name="l00331"></a>00331     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
-<a name="l00332"></a>00332         <span class="keywordflow">if</span> ( ret[i] &gt; second[i] )ret[i] = second[i];
-<a name="l00333"></a>00333 
-<a name="l00334"></a>00334     <span class="keywordflow">return</span> ret;
-<a name="l00335"></a>00335 }
-<a name="l00336"></a>00336 
-<a name="l00337"></a><a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">00337</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;float&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>;
-<a name="l00338"></a><a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">00338</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;double&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>;
-<a name="l00339"></a><a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">00339</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;int32_t&gt;</a> <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>;
-<a name="l00340"></a>00340 }
-<a name="l00342"></a>00342 }
-<a name="l00343"></a>00343 
-<a name="l00344"></a>00344 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html"></a>
-<a name="l00345"></a><a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">00345</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">operator-</a>( const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
-<a name="l00346"></a>00346 {
-<a name="l00347"></a>00347     <span class="keywordflow">return</span> s.negate();
-<a name="l00348"></a>00348 }
-<a name="l00349"></a>00349 
-<a name="l00351"></a>00351 <span class="keyword">namespace </span>std
-<a name="l00352"></a>00352 {
+<a name="l00185"></a>00185     <span class="comment">// Arithmetic operations</span>
+<a name="l00187"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">00187</a> <span class="comment"></span>    <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">operator-</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::minus&lt;TYPE&gt;      &gt;( src );}
+<a name="l00188"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">00188</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">operator+</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::plus&lt;TYPE&gt;       &gt;( src );}
+<a name="l00189"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa7c2ae057917a602f53e37a5c62a41ab">00189</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa7c2ae057917a602f53e37a5c62a41ab">operator*</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::multiplies&lt;TYPE&gt; &gt;( src );}
+<a name="l00190"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">00190</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">operator/</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::divides&lt;TYPE&gt;    &gt;( src );}
+<a name="l00191"></a>00191 
+<a name="l00192"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aeda5b157cf92b103448578f5af67f8db">00192</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aeda5b157cf92b103448578f5af67f8db">operator-</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::minus&lt;TYPE&gt;      &gt;( src );}
+<a name="l00193"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aae845a738e043df885a5cdcab1367e59">00193</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#aae845a738e043df885a5cdcab1367e59">operator+</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::plus&lt;TYPE&gt;       &gt;( src );}
+<a name="l00194"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a47c385bd9ee9055a704acb6d387b4775">00194</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a47c385bd9ee9055a704acb6d387b4775">operator*</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::multiplies&lt;TYPE&gt; &gt;( src );}
+<a name="l00195"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">00195</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">operator/</a>( <span class="keyword">const</span> TYPE &amp;src )<span class="keyword">const </span>{<span class="keywordflow">return</span> binaryOp&lt;std::divides&lt;TYPE&gt;    &gt;( src );}
+<a name="l00196"></a>00196 
+<a name="l00198"></a>00198     <span class="comment">// applying Arithmetic operations</span>
+<a name="l00200"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">00200</a> <span class="comment"></span>    <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">operator-=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> - src;}
+<a name="l00201"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a63a5b37304fa35e164f293212b2d0c4b">00201</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a63a5b37304fa35e164f293212b2d0c4b">operator+=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> + src;}
+<a name="l00202"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#af1acc437254956e373d8efe714f5880e">00202</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#af1acc437254956e373d8efe714f5880e">operator*=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> * src;}
+<a name="l00203"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">00203</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">operator/=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / src;}
+<a name="l00204"></a>00204 
+<a name="l00205"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">00205</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">operator-=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> - src;}
+<a name="l00206"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a702c7dfc41be6ebb5768e6b9c009d560">00206</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a702c7dfc41be6ebb5768e6b9c009d560">operator+=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> + src;}
+<a name="l00207"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9871a7b8b609c79e21d78dd36a51e514">00207</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9871a7b8b609c79e21d78dd36a51e514">operator*=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> * src;}
+<a name="l00208"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">00208</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">operator/=</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / src;}
+<a name="l00209"></a>00209 
+<a name="l00211"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ad4cc82923ac568a6c74a2329514673e7">00211</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ad4cc82923ac568a6c74a2329514673e7">negate</a>()<span class="keyword">const </span>{
+<a name="l00212"></a>00212         <span class="keywordflow">return</span> unaryOp&lt;std::negate&lt;float&gt; &gt;();
+<a name="l00213"></a>00213     }
+<a name="l00214"></a>00214 
+<a name="l00219"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192">00219</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192" title="Get the inner product.">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;vect )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::inner_product( CONTAINER::begin(), CONTAINER::end(), vect.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), TYPE() );}
+<a name="l00224"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42">00224</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192" title="Get the inner product.">dot</a>( *<span class="keyword">this</span> );}
+<a name="l00229"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d">00229</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d" title="Get the the length of the vector.">len</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> std::sqrt( <a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>() );}
+<a name="l00230"></a>00230 
+<a name="l00241"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#adbe27fd269f3eab2107c85f3ee7a92fa">00241</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;<a class="code" href="classisis_1_1util_1_1FixedVector.html#adbe27fd269f3eab2107c85f3ee7a92fa" title="Norm the vector (make len()==1).">norm</a>()throw( std::invalid_argument ) {
+<a name="l00242"></a>00242         <span class="keyword">const</span> TYPE d = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d" title="Get the the length of the vector.">len</a>();
+<a name="l00243"></a>00243 
+<a name="l00244"></a>00244         <span class="keywordflow">if</span> ( d == 0 )<span class="keywordflow">throw</span>( std::invalid_argument( <span class="stringliteral">&quot;Trying to normalize a vector of length 0&quot;</span> ) );
+<a name="l00245"></a>00245         <span class="keywordflow">else</span> *<span class="keyword">this</span> = *<span class="keyword">this</span> / d;
+<a name="l00246"></a>00246 
+<a name="l00247"></a>00247         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00248"></a>00248     }
+<a name="l00249"></a>00249 
+<a name="l00254"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9">00254</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>()<span class="keyword">const </span>{
+<a name="l00255"></a>00255         TYPE ret = 1;
+<a name="l00256"></a>00256 
+<a name="l00257"></a>00257         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> i = CONTAINER::begin(); i != <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>(); i++ )
+<a name="l00258"></a>00258             ret *= *i;
+<a name="l00259"></a>00259 
+<a name="l00260"></a>00260         <span class="keywordflow">return</span> ret;
+<a name="l00261"></a>00261     }
+<a name="l00262"></a>00262 
+<a name="l00267"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a65285e7cfdceb19daeffcf6fbfacda58">00267</a>     TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#a65285e7cfdceb19daeffcf6fbfacda58" title="Compute the sum of all elements.">sum</a>() {
+<a name="l00268"></a>00268         TYPE ret = 0;
+<a name="l00269"></a>00269 
+<a name="l00270"></a>00270         <span class="keywordflow">for</span> ( <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> i = CONTAINER::begin(); i != <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>(); i++ )
+<a name="l00271"></a>00271             ret += *i;
+<a name="l00272"></a>00272 
+<a name="l00273"></a>00273         <span class="keywordflow">return</span> ret;
+<a name="l00274"></a>00274     }
+<a name="l00275"></a>00275 
+<a name="l00277"></a>00277     <span class="comment">// copy stuff</span>
+<a name="l00280"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6">00280</a> <span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> OutputIterator&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( OutputIterator out )<span class="keyword">const </span>{
+<a name="l00281"></a>00281         std::copy( CONTAINER::begin(), CONTAINER::end(), out );
+<a name="l00282"></a>00282     }
+<a name="l00283"></a>00283 
+<a name="l00285"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd">00285</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( InputIterator iter_start, InputIterator iter_end ) {
+<a name="l00286"></a>00286         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <span class="keywordtype">size_t</span>( std::distance( iter_start, iter_end ) ) &gt; SIZE, <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00287"></a>00287                 &lt;&lt; <span class="stringliteral">&quot;Copying &quot;</span> &lt;&lt; std::distance( iter_start, iter_end ) &lt;&lt; <span class="stringliteral">&quot; Elements into a vector of the size &quot;</span> &lt;&lt; SIZE;
+<a name="l00288"></a>00288         std::copy( iter_start, iter_end, CONTAINER::begin() );
+<a name="l00289"></a>00289     }
+<a name="l00290"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">00290</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">FixedVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, SIZE, CONTAINER2&gt;</a> &amp;src ) {
+<a name="l00291"></a>00291         src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( CONTAINER::begin() );
+<a name="l00292"></a>00292     }
+<a name="l00293"></a>00293 
+<a name="l00295"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#afd5c63f1bcdda29c77db98daba948ff1">00295</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#afd5c63f1bcdda29c77db98daba948ff1" title="write the elements formated to basic_ostream">writeTo</a>( std::basic_ostream&lt;charT, traits&gt; &amp;out )<span class="keyword">const </span>{
+<a name="l00296"></a>00296         <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">util::listToOStream</a>( CONTAINER::begin(), CONTAINER::end(), out, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;&lt;&quot;</span>, <span class="stringliteral">&quot;&gt;&quot;</span> );
+<a name="l00297"></a>00297     }
+<a name="l00298"></a>00298 
+<a name="l00299"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">00299</a>     <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>() {<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">CONTAINER::begin</a>();}
+<a name="l00300"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">00300</a>     <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a0d1cbc7e559e512e65307cd1b026cbaf">iterator</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a>() {<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>();}
+<a name="l00301"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a45544ddaa43859139b25f28f107aa521">00301</a>     <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a45544ddaa43859139b25f28f107aa521">begin</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">CONTAINER::begin</a>();}
+<a name="l00302"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a88f4582528957e28f23ae49dd3101aa4">00302</a>     <a class="code" href="classisis_1_1util_1_1__internal_1_1array.html#a050f6ae013c774208112df6bb2f1e226">const_iterator</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a88f4582528957e28f23ae49dd3101aa4">end</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">CONTAINER::end</a>();}
+<a name="l00303"></a>00303 };
+<a name="l00304"></a>00304 
+<a name="l00305"></a>00305 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt;
+<a name="l00306"></a><a class="code" href="classisis_1_1util_1_1vector4.html">00306</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1vector4.html">vector4</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, 4&gt;
+<a name="l00307"></a>00307 {
+<a name="l00308"></a>00308 <span class="keyword">public</span>:
+<a name="l00309"></a><a class="code" href="classisis_1_1util_1_1vector4.html#a6b0ba8088895f9fa54bddc0d56cc5259">00309</a>     <a class="code" href="classisis_1_1util_1_1vector4.html#a6b0ba8088895f9fa54bddc0d56cc5259">vector4</a>() {}
+<a name="l00310"></a><a class="code" href="classisis_1_1util_1_1vector4.html#aca1c2ba19655f62825015499a52e856d">00310</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1vector4.html#aca1c2ba19655f62825015499a52e856d">vector4</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4, CONTAINER2&gt;</a> &amp;src ) : <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, 4&gt; ( src ) {}
+<a name="l00311"></a><a class="code" href="classisis_1_1util_1_1vector4.html#a6a78794388aa1460af65a38713b26345">00311</a>     <a class="code" href="classisis_1_1util_1_1vector4.html#a6a78794388aa1460af65a38713b26345">vector4</a>( <span class="keyword">const</span> TYPE src[4] ): <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, 4&gt;( src ) {}
+<a name="l00312"></a><a class="code" href="classisis_1_1util_1_1vector4.html#a256c8e61899a2e2a5038a77df56f3d18">00312</a>     <a class="code" href="classisis_1_1util_1_1vector4.html#a256c8e61899a2e2a5038a77df56f3d18">vector4</a>( TYPE first, TYPE second, TYPE third = 0, TYPE fourth = 0 ) {
+<a name="l00313"></a>00313         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 3 ) = fourth;
+<a name="l00314"></a>00314         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 2 ) = third;
+<a name="l00315"></a>00315         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 1 ) = second;
+<a name="l00316"></a>00316         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 0 ) = first;
+<a name="l00317"></a>00317     }
+<a name="l00318"></a>00318 };
+<a name="l00319"></a>00319 
+<a name="l00320"></a>00320 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00321"></a><a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">00321</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">maxVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
+<a name="l00322"></a>00322 {
+<a name="l00323"></a>00323     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
+<a name="l00324"></a>00324 
+<a name="l00325"></a>00325     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
+<a name="l00326"></a>00326         <span class="keywordflow">if</span> ( ret[i] &lt; second[i] )ret[i] = second[i];
+<a name="l00327"></a>00327 
+<a name="l00328"></a>00328     <span class="keywordflow">return</span> ret;
+<a name="l00329"></a>00329 }
+<a name="l00330"></a>00330 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00331"></a><a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">00331</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">minVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
+<a name="l00332"></a>00332 {
+<a name="l00333"></a>00333     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
+<a name="l00334"></a>00334 
+<a name="l00335"></a>00335     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
+<a name="l00336"></a>00336         <span class="keywordflow">if</span> ( ret[i] &gt; second[i] )ret[i] = second[i];
+<a name="l00337"></a>00337 
+<a name="l00338"></a>00338     <span class="keywordflow">return</span> ret;
+<a name="l00339"></a>00339 }
+<a name="l00340"></a>00340 
+<a name="l00341"></a><a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">00341</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;float&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>;
+<a name="l00342"></a><a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">00342</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;double&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>;
+<a name="l00343"></a><a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">00343</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;int32_t&gt;</a> <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>;
+<a name="l00344"></a>00344 }
+<a name="l00346"></a>00346 }
+<a name="l00347"></a>00347 
+<a name="l00348"></a>00348 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html"></a>
+<a name="l00349"></a><a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">00349</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">operator-</a>( const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
+<a name="l00350"></a>00350 {
+<a name="l00351"></a>00351     <span class="keywordflow">return</span> s.negate();
+<a name="l00352"></a>00352 }
 <a name="l00353"></a>00353 
-<a name="l00354"></a>00354 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits, <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt; basic_ostream&lt;charT, traits&gt;&amp;
-<a name="l00355"></a><a class="code" href="namespacestd.html#a7b7019b02ab8ef8bfaa3c6556a389d78">00355</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
+<a name="l00355"></a>00355 <span class="keyword">namespace </span>std
 <a name="l00356"></a>00356 {
-<a name="l00357"></a>00357     s.writeTo( out );
-<a name="l00358"></a>00358     <span class="keywordflow">return</span> out;
-<a name="l00359"></a>00359 }
-<a name="l00360"></a>00360 }
-<a name="l00361"></a>00361 <span class="preprocessor">#endif //VECTOR_HPP</span>
+<a name="l00357"></a>00357 
+<a name="l00358"></a>00358 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits, <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt; basic_ostream&lt;charT, traits&gt;&amp;
+<a name="l00359"></a><a class="code" href="namespacestd.html#a7b7019b02ab8ef8bfaa3c6556a389d78">00359</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
+<a name="l00360"></a>00360 {
+<a name="l00361"></a>00361     s.writeTo( out );
+<a name="l00362"></a>00362     <span class="keywordflow">return</span> out;
+<a name="l00363"></a>00363 }
+<a name="l00364"></a>00364 }
+<a name="l00365"></a>00365 <span class="preprocessor">#endif //VECTOR_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -60,121 +59,219 @@
 <a name="l00017"></a>00017 <span class="comment">*/</span>
 <a name="l00018"></a>00018 
 <a name="l00019"></a>00019 
-<a name="l00020"></a>00020 <span class="preprocessor">#ifndef MATRIX_HPP</span>
-<a name="l00021"></a>00021 <span class="preprocessor"></span><span class="preprocessor">#define MATRIX_HPP</span>
+<a name="l00020"></a>00020 <span class="preprocessor">#ifndef ISIS_MATRIX_HPP</span>
+<a name="l00021"></a>00021 <span class="preprocessor"></span><span class="preprocessor">#define ISIS_MATRIX_HPP</span>
 <a name="l00022"></a>00022 <span class="preprocessor"></span>
 <a name="l00023"></a>00023 <span class="preprocessor">#include &quot;<a class="code" href="vector_8hpp.html">vector.hpp</a>&quot;</span>
 <a name="l00024"></a>00024 
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026 <span class="keyword">namespace </span>isis
-<a name="l00027"></a>00027 {
-<a name="l00028"></a>00028 <span class="keyword">namespace </span>util
-<a name="l00029"></a>00029 {
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="keyword">template</span> &lt; <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> COLS, <span class="keywordtype">size_t</span> ROWS, <span class="keyword">typename</span> CONTAINER = _<span class="keywordtype">int</span>ernal::array&lt;TYPE, ROWS *COLS&gt; &gt;
-<a name="l00032"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html">00032</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, ROWS *COLS, CONTAINER&gt;
+<a name="l00025"></a>00025 <span class="preprocessor">#include &lt;boost/numeric/ublas/matrix.hpp&gt;</span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;boost/numeric/ublas/lu.hpp&gt;</span>
+<a name="l00027"></a>00027 <span class="preprocessor">#include &lt;iomanip&gt;</span>
+<a name="l00028"></a>00028 
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="keyword">namespace </span>isis
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032 <span class="keyword">namespace </span>util
 <a name="l00033"></a>00033 {
-<a name="l00034"></a>00034 <span class="keyword">public</span>:
-<a name="l00035"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">00035</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a> = ROWS;
-<a name="l00036"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">00036</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a> = COLS;
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00039"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">00039</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> src[ROWS] ) {
-<a name="l00040"></a>00040         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; ROWS; r++ ) {
-<a name="l00041"></a>00041             <span class="keyword">const</span> TYPE2 *ptr = &amp;src[r][0];
-<a name="l00042"></a>00042             std::copy( ptr, ptr + COLS, &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ) );
-<a name="l00043"></a>00043         }
-<a name="l00044"></a>00044     }
-<a name="l00045"></a>00045 
-<a name="l00046"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ae5ca69beaa9d1f488d7ea2a1b85fc3a4">00046</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ae5ca69beaa9d1f488d7ea2a1b85fc3a4">FixedMatrix</a>() {}
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2&gt;
-<a name="l00049"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa7c0ddb8c8087a1919a87a0837600748">00049</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa7c0ddb8c8087a1919a87a0837600748">FixedMatrix</a>( <span class="keyword">const</span> TYPE2 src[ROWS *COLS] ): <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, ROWS *COLS, <a class="code" href="classCONTAINER.html">CONTAINER</a>&gt;( src ) {}
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00052"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ab647c2da6bf202610a7019ed8e6133e6">00052</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ab647c2da6bf202610a7019ed8e6133e6">FixedMatrix</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> src[ROWS] ) {<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a>( src );}
-<a name="l00053"></a>00053 
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035 template &lt; typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type &gt;
+<a name="l00036"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html">00036</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, ROWS *COLS, CONTAINER&gt;
+<a name="l00037"></a>00037 {
+<a name="l00038"></a>00038 <span class="keyword">public</span>:
+<a name="l00039"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">00039</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a> = ROWS;
+<a name="l00040"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">00040</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a> = COLS;
+<a name="l00041"></a>00041 
+<a name="l00042"></a>00042     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00043"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">00043</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> src[ROWS] ) {
+<a name="l00044"></a>00044         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; ROWS; r++ ) {
+<a name="l00045"></a>00045             <span class="keyword">const</span> TYPE2 *ptr = &amp;src[r][0];
+<a name="l00046"></a>00046             std::copy( ptr, ptr + COLS, &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ) );
+<a name="l00047"></a>00047         }
+<a name="l00048"></a>00048     }
+<a name="l00049"></a>00049 
+<a name="l00050"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ae5ca69beaa9d1f488d7ea2a1b85fc3a4">00050</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ae5ca69beaa9d1f488d7ea2a1b85fc3a4">FixedMatrix</a>() {}
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2&gt;
+<a name="l00053"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa7c0ddb8c8087a1919a87a0837600748">00053</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa7c0ddb8c8087a1919a87a0837600748">FixedMatrix</a>( <span class="keyword">const</span> TYPE2 src[ROWS *COLS] ): <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, ROWS *COLS, <a class="code" href="classCONTAINER.html">CONTAINER</a>&gt;( src ) {}
 <a name="l00054"></a>00054 
-<a name="l00055"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">00055</a>     TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( <span class="keywordtype">size_t</span> column, <span class="keywordtype">size_t</span> row ) {<span class="keywordflow">return</span> ( *<span class="keyword">this</span> )[column+row*COLS];}
-<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ad285eeac5ff84b742511495407df94c4">00056</a>     <span class="keyword">const</span> TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ad285eeac5ff84b742511495407df94c4">elem</a>( <span class="keywordtype">size_t</span> column, <span class="keywordtype">size_t</span> row )<span class="keyword">const </span>{<span class="keywordflow">return</span> ( *<span class="keyword">this</span> )[column+row*COLS];}
+<a name="l00055"></a>00055     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ab647c2da6bf202610a7019ed8e6133e6">00056</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ab647c2da6bf202610a7019ed8e6133e6">FixedMatrix</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> src[ROWS] ) {<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a>( src );}
 <a name="l00057"></a>00057 
-<a name="l00058"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">00058</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, ROWS, COLS&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">transpose</a>()<span class="keyword">const </span>{
-<a name="l00059"></a>00059         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, ROWS, COLS&gt;</a> ret;
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> m = 0; m &lt; COLS; m++ )
-<a name="l00062"></a>00062             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> n = 0; n &lt; ROWS; n++ ) {
-<a name="l00063"></a>00063                 ret.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m ) = this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( m, n );
+<a name="l00058"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a09015a7d559066a7a01596e0cb331209">00058</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a09015a7d559066a7a01596e0cb331209">FixedMatrix</a>( <span class="keyword">const</span> boost::numeric::ublas::matrix&lt;TYPE&gt; &amp;boost_matrix ) <span class="keywordflow">throw</span> ( std::logic_error &amp; ) {
+<a name="l00059"></a>00059         <span class="keywordflow">if</span>( boost_matrix.size1() == ROWS &amp;&amp; boost_matrix.size2() == COLS ) {
+<a name="l00060"></a>00060             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> m = 0; m &lt; ROWS; m++ ) {
+<a name="l00061"></a>00061                 <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> n = 0; n &lt; COLS; n++ ) {
+<a name="l00062"></a>00062                     this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m ) = boost_matrix( m, n );
+<a name="l00063"></a>00063                 }
 <a name="l00064"></a>00064             }
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066         <span class="keywordflow">return</span> ret;
-<a name="l00067"></a>00067     }
-<a name="l00068"></a>00068     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keywordtype">size_t</span> COLS2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, ROWS, CONTAINER2&gt;</a>
-<a name="l00069"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#abeafe3fd60bc78822f2a82679e921a56">00069</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#abeafe3fd60bc78822f2a82679e921a56">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, COLS, CONTAINER2&gt;</a> &amp;right )<span class="keyword">const </span>{
-<a name="l00070"></a>00070         <span class="comment">// transpose the right, so we can use columns as rows</span>
-<a name="l00071"></a>00071         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS, COLS2, CONTAINER2&gt;</a> rightT = right.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">transpose</a>();
-<a name="l00072"></a>00072         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS, CONTAINER&gt;</a> &amp;left = *<span class="keyword">this</span>;
-<a name="l00073"></a>00073         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, ROWS, CONTAINER2&gt;</a> ret;
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> c = 0; c &lt; right.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>; c++ ) { <span class="comment">//result has as much columns as right</span>
-<a name="l00076"></a>00076             <span class="keyword">const</span> TYPE2 *rstart = &amp;rightT.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, c );
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a>; r++ ) { <span class="comment">//result has as much rows as left</span>
-<a name="l00079"></a>00079                 <span class="keyword">const</span> TYPE *lstart = &amp;left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ), *lend = lstart + left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>;
-<a name="l00080"></a>00080                 ret.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( c, r ) = std::inner_product( lstart, lend, rstart, TYPE2() );
-<a name="l00081"></a>00081             }
-<a name="l00082"></a>00082         }
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084         <span class="keywordflow">return</span> ret;
-<a name="l00085"></a>00085     }
-<a name="l00086"></a>00086 
-<a name="l00087"></a>00087     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a>
-<a name="l00088"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a1a0889d57fe64a7af554424381a0290a">00088</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a1a0889d57fe64a7af554424381a0290a">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> &amp;right )<span class="keyword">const </span>{
-<a name="l00089"></a>00089         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS, CONTAINER&gt;</a> &amp;left = *<span class="keyword">this</span>;
-<a name="l00090"></a>00090         <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, ROWS, CONTAINER2&gt;</a> ret;
-<a name="l00091"></a>00091         <span class="keyword">const</span> TYPE2 *rstart = &amp;right[0];
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a>; r++ ) { <span class="comment">//result has as much rows as left</span>
-<a name="l00094"></a>00094             <span class="keyword">const</span> TYPE *lstart = &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ), *lend = lstart + left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>;
-<a name="l00095"></a>00095             ret[r] = std::inner_product( lstart, lend, rstart, TYPE2() );
-<a name="l00096"></a>00096         }
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098         <span class="keywordflow">return</span> ret;
-<a name="l00099"></a>00099     }
-<a name="l00100"></a>00100 
-<a name="l00101"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa648d9df8c08b23ddf8e3875b1357ded">00101</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, COLS, CONTAINER&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aa648d9df8c08b23ddf8e3875b1357ded">getRow</a>( <span class="keywordtype">size_t</span> rownum )<span class="keyword">const </span>{
-<a name="l00102"></a>00102         <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, COLS, CONTAINER&gt;</a> ret;
-<a name="l00103"></a>00103         <span class="keyword">const</span> TYPE *start = &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, rownum ), *end = start + COLS;
-<a name="l00104"></a>00104         ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( start, end );
-<a name="l00105"></a>00105         <span class="keywordflow">return</span> ret;
-<a name="l00106"></a>00106     }
-<a name="l00107"></a>00107 };
-<a name="l00108"></a>00108 
-<a name="l00109"></a>00109 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt;
-<a name="l00110"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html">00110</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;
-<a name="l00111"></a>00111 {
-<a name="l00112"></a>00112 <span class="keyword">public</span>:
-<a name="l00113"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">00113</a>     <a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">Matrix4x4</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, 4, 4&gt;</a> &amp;src ): <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;( src ) {}
-<a name="l00114"></a>00114 
-<a name="l00115"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a48606c11371bc7d73cbcda37218f0d61">00115</a>     <a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a48606c11371bc7d73cbcda37218f0d61">Matrix4x4</a>( <span class="keyword">const</span> TYPE src[16] ): <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;( src ) {}
-<a name="l00116"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a02deb7aabb869391fe274c043643e710">00116</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2&gt; <a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">Matrix4x4</a>(
-<a name="l00117"></a>00117         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> &amp;row1,
-<a name="l00118"></a>00118         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> &amp;row2,
-<a name="l00119"></a>00119         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> &amp;row3 = <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a>( 0, 0, 1, 0 ),
-<a name="l00120"></a>00120         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> &amp;row4 = <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a>( 0, 0, 0, 1 )
-<a name="l00121"></a>00121     ) {
-<a name="l00122"></a>00122         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> src[4] = {row1, row2, row3, row4};
-<a name="l00123"></a>00123         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a>( src );
-<a name="l00124"></a>00124     }
-<a name="l00125"></a>00125 };
-<a name="l00126"></a>00126 
-<a name="l00127"></a>00127 }
-<a name="l00128"></a>00128 }
+<a name="l00065"></a>00065         } <span class="keywordflow">else</span> {
+<a name="l00066"></a>00066             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The size of the boost matrix (&quot;</span>
+<a name="l00067"></a>00067                                   &lt;&lt; boost_matrix.size1() &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; boost_matrix.size2()
+<a name="l00068"></a>00068                                   &lt;&lt; <span class="stringliteral">&quot;) does not coincide with the size of the isis matrix (&quot;</span> &lt;&lt; ROWS &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; COLS &lt;&lt; <span class="stringliteral">&quot;).&quot;</span>;
+<a name="l00069"></a>00069             <span class="keywordflow">throw</span>( std::logic_error( <span class="stringliteral">&quot;Size mismatch&quot;</span> ) );
+<a name="l00070"></a>00070         }
+<a name="l00071"></a>00071     };
+<a name="l00072"></a>00072 
+<a name="l00073"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">00073</a>     TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( <span class="keywordtype">size_t</span> column, <span class="keywordtype">size_t</span> row ) {<span class="keywordflow">return</span> ( *<span class="keyword">this</span> )[column + row * COLS];}
+<a name="l00074"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ad285eeac5ff84b742511495407df94c4">00074</a>     <span class="keyword">const</span> TYPE &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#ad285eeac5ff84b742511495407df94c4">elem</a>( <span class="keywordtype">size_t</span> column, <span class="keywordtype">size_t</span> row )<span class="keyword">const </span>{<span class="keywordflow">return</span> ( *<span class="keyword">this</span> )[column + row * COLS];}
+<a name="l00075"></a>00075 
+<a name="l00076"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#af46a0cf3c44d46203b1b5fcb3d498570">00076</a>     boost::numeric::ublas::matrix&lt;TYPE&gt; <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#af46a0cf3c44d46203b1b5fcb3d498570">getBoostMatrix</a>()<span class="keyword"> const </span>{
+<a name="l00077"></a>00077         boost::numeric::ublas::matrix&lt;TYPE&gt; ret = boost::numeric::ublas::matrix&lt;TYPE&gt;( ROWS, COLS );
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> m = 0; m &lt; ROWS; m++ ) {
+<a name="l00080"></a>00080             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> n = 0; n &lt; COLS; n++ ) {
+<a name="l00081"></a>00081                 ret( m, n ) = this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m );
+<a name="l00082"></a>00082             }
+<a name="l00083"></a>00083         }
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085         <span class="keywordflow">return</span> ret;
+<a name="l00086"></a>00086     }
+<a name="l00087"></a>00087 
+<a name="l00088"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">00088</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, ROWS, COLS&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">transpose</a>()<span class="keyword">const </span>{
+<a name="l00089"></a>00089         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, ROWS, COLS&gt;</a> ret;
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> m = 0; m &lt; COLS; m++ )
+<a name="l00092"></a>00092             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> n = 0; n &lt; ROWS; n++ ) {
+<a name="l00093"></a>00093                 ret.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m ) = this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( m, n );
+<a name="l00094"></a>00094             }
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096         <span class="keywordflow">return</span> ret;
+<a name="l00097"></a>00097     }
+<a name="l00098"></a>00098 
+<a name="l00099"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a9abfb4911cf2a52051eba137a19f01ec">00099</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a9abfb4911cf2a52051eba137a19f01ec">inverse</a>( <span class="keywordtype">bool</span> &amp;invertible )<span class="keyword">const</span> <span class="keywordflow">throw</span> ( std::logic_error &amp; ) {
+<a name="l00100"></a>00100         <span class="keywordflow">if</span>( COLS != ROWS ) {
+<a name="l00101"></a>00101             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Matrix is not a square matrix so is not invertible!&quot;</span>;
+<a name="l00102"></a>00102             <span class="keywordflow">throw</span>( std::logic_error( <span class="stringliteral">&quot;Matrix is not a square matrix so is not invertible!&quot;</span> ) );
+<a name="l00103"></a>00103         }
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105         <span class="keyword">using namespace </span>boost::numeric::ublas;
+<a name="l00106"></a>00106         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS&gt;</a> ret;
+<a name="l00107"></a>00107         matrix&lt;TYPE&gt; boost_matrix_in = this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#af46a0cf3c44d46203b1b5fcb3d498570">getBoostMatrix</a>();
+<a name="l00108"></a>00108         matrix&lt;TYPE&gt; boost_matrix_inverse = matrix&lt;TYPE&gt;( ROWS, COLS );
+<a name="l00109"></a>00109         permutation_matrix&lt;TYPE&gt; pm( boost_matrix_in.size1() );
+<a name="l00110"></a>00110         <span class="comment">//check if det is 0 -&gt; singular</span>
+<a name="l00111"></a>00111         invertible = lu_factorize( boost_matrix_in, pm ) == 0;
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113         <span class="keywordflow">if</span>( invertible ) {
+<a name="l00114"></a>00114             boost_matrix_inverse.assign( identity_matrix&lt;TYPE&gt;( boost_matrix_in.size1() ) ) ;
+<a name="l00115"></a>00115             lu_substitute( boost_matrix_in, pm, boost_matrix_inverse );
+<a name="l00116"></a>00116             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS&gt;</a>( boost_matrix_inverse );
+<a name="l00117"></a>00117         } <span class="keywordflow">else</span> {
+<a name="l00118"></a>00118             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Matrix is singular. Returning initial matrix.&quot;</span>;
+<a name="l00119"></a>00119             <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00120"></a>00120         }
+<a name="l00121"></a>00121     }
+<a name="l00122"></a>00122 
+<a name="l00123"></a>00123     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keywordtype">size_t</span> COLS2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, ROWS, CONTAINER2&gt;</a>
+<a name="l00124"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#abeafe3fd60bc78822f2a82679e921a56">00124</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#abeafe3fd60bc78822f2a82679e921a56">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, COLS, CONTAINER2&gt;</a> &amp;right )<span class="keyword">const </span>{
+<a name="l00125"></a>00125         <span class="comment">// transpose the right, so we can use columns as rows</span>
+<a name="l00126"></a>00126         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS, COLS2, CONTAINER2&gt;</a> rightT = right.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#aec9c9a8893dd57372cc7ac1d43ea572f">transpose</a>();
+<a name="l00127"></a>00127         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS, CONTAINER&gt;</a> &amp;left = *<span class="keyword">this</span>;
+<a name="l00128"></a>00128         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE2, COLS2, ROWS, CONTAINER2&gt;</a> ret;
 <a name="l00129"></a>00129 
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131 <span class="preprocessor">#endif // MATRIX_HPP</span>
+<a name="l00130"></a>00130         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> c = 0; c &lt; right.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>; c++ ) { <span class="comment">//result has as much columns as right</span>
+<a name="l00131"></a>00131             <span class="keyword">const</span> TYPE2 *rstart = &amp;rightT.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, c );
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a>; r++ ) { <span class="comment">//result has as much rows as left</span>
+<a name="l00134"></a>00134                 <span class="keyword">const</span> TYPE *lstart = &amp;left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ), *lend = lstart + left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>;
+<a name="l00135"></a>00135                 ret.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( c, r ) = std::inner_product( lstart, lend, rstart, TYPE2() );
+<a name="l00136"></a>00136             }
+<a name="l00137"></a>00137         }
+<a name="l00138"></a>00138 
+<a name="l00139"></a>00139         <span class="keywordflow">return</span> ret;
+<a name="l00140"></a>00140     }
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a>
+<a name="l00144"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a1a0889d57fe64a7af554424381a0290a">00144</a>     <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a1a0889d57fe64a7af554424381a0290a">dot</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, COLS, CONTAINER2&gt;</a> &amp;right )<span class="keyword">const </span>{
+<a name="l00145"></a>00145         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, COLS, ROWS, CONTAINER&gt;</a> &amp;left = *<span class="keyword">this</span>;
+<a name="l00146"></a>00146         <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, ROWS, CONTAINER2&gt;</a> ret;
+<a name="l00147"></a>00147         <span class="keyword">const</span> TYPE2 *rstart = &amp;right[0];
+<a name="l00148"></a>00148 
+<a name="l00149"></a>00149         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> r = 0; r &lt; <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a>; r++ ) { <span class="comment">//result has as much rows as left</span>
+<a name="l00150"></a>00150             <span class="keyword">const</span> TYPE *lstart = &amp;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( 0, r ), *lend = lstart + left.<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a>;
+<a name="l00151"></a>00151             ret[r] = std::inner_product( lstart, lend, rstart, TYPE2() );
+<a name="l00152"></a>00152         }
+<a name="l00153"></a>00153 
+<a name="l00154"></a>00154         <span class="keywordflow">return</span> ret;
+<a name="l00155"></a>00155     }
+<a name="l00156"></a>00156 
+<a name="l00157"></a><a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a6b993e9ccbf8c34263a306fd48ac072b">00157</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, COLS&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a6b993e9ccbf8c34263a306fd48ac072b">getRow</a>( <span class="keywordtype">size_t</span> rownum )<span class="keyword">const </span>{
+<a name="l00158"></a>00158         <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, COLS&gt;</a> ret;
+<a name="l00159"></a>00159         <span class="keyword">const</span> <span class="keyword">typename</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, ROWS *COLS, CONTAINER&gt;::const_iterator</a> start = <a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">FixedVector&lt;TYPE, ROWS * COLS, CONTAINER&gt;::begin</a>() + rownum * COLS;
+<a name="l00160"></a>00160         <span class="keyword">const</span> <span class="keyword">typename</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, ROWS *COLS, CONTAINER&gt;::const_iterator</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a> = start + COLS;
+<a name="l00161"></a>00161         ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( start, end );
+<a name="l00162"></a>00162         <span class="keywordflow">return</span> ret;
+<a name="l00163"></a>00163     }
+<a name="l00164"></a>00164 
+<a name="l00165"></a>00165 
+<a name="l00166"></a>00166 };
+<a name="l00167"></a>00167 
+<a name="l00168"></a>00168 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> ELEMS&gt;
+<a name="l00169"></a><a class="code" href="classisis_1_1util_1_1IdentityMatrix.html">00169</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1IdentityMatrix.html">IdentityMatrix</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, ELEMS, ELEMS&gt;
+<a name="l00170"></a>00170 {
+<a name="l00171"></a>00171 <span class="keyword">public</span>:
+<a name="l00172"></a><a class="code" href="classisis_1_1util_1_1IdentityMatrix.html#a2a322691f6faa2486b51887fa386601c">00172</a>     <a class="code" href="classisis_1_1util_1_1IdentityMatrix.html#a2a322691f6faa2486b51887fa386601c">IdentityMatrix</a>( TYPE value = 1 ) {
+<a name="l00173"></a>00173         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> m = 0; m &lt; ELEMS; m++ ) {
+<a name="l00174"></a>00174             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> n = 0; n &lt; ELEMS; n++ ) {
+<a name="l00175"></a>00175                 <span class="keywordflow">if</span>( m == n ) {
+<a name="l00176"></a>00176                     this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m ) = <span class="keyword">static_cast&lt;</span>TYPE<span class="keyword">&gt;</span>( value );
+<a name="l00177"></a>00177                 } <span class="keywordflow">else</span> {
+<a name="l00178"></a>00178                     this-&gt;<a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a>( n, m ) = <span class="keyword">static_cast&lt;</span>TYPE<span class="keyword">&gt;</span>( 0 );
+<a name="l00179"></a>00179                 }
+<a name="l00180"></a>00180             }
+<a name="l00181"></a>00181         }
+<a name="l00182"></a>00182     }
+<a name="l00183"></a>00183 };
+<a name="l00184"></a>00184 
+<a name="l00185"></a>00185 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt;
+<a name="l00186"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html">00186</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;
+<a name="l00187"></a>00187 {
+<a name="l00188"></a>00188 <span class="keyword">public</span>:
+<a name="l00189"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">00189</a>     <a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">Matrix4x4</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix&lt;TYPE, 4, 4&gt;</a> &amp;src ): <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;( src ) {}
+<a name="l00190"></a>00190 
+<a name="l00191"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a48606c11371bc7d73cbcda37218f0d61">00191</a>     <a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a48606c11371bc7d73cbcda37218f0d61">Matrix4x4</a>( <span class="keyword">const</span> TYPE src[16] ): <a class="code" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, 4, 4&gt;( src ) {}
+<a name="l00192"></a><a class="code" href="classisis_1_1util_1_1Matrix4x4.html#a396d40d87bcb082374feba1651152899">00192</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2&gt; <a class="code" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a>(
+<a name="l00193"></a>00193         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4&gt;</a> &amp;row1,
+<a name="l00194"></a>00194         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4&gt;</a> &amp;row2,
+<a name="l00195"></a>00195         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4&gt;</a> &amp;row3 = <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a>( 0, 0, 1, 0 ),
+<a name="l00196"></a>00196         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 4&gt;</a> &amp;row4 = <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a>( 0, 0, 0, 1 )
+<a name="l00197"></a>00197     ) {
+<a name="l00198"></a>00198         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;TYPE2&gt;</a> src[4] = {row1, row2, row3, row4};
+<a name="l00199"></a>00199         <a class="code" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">FixedMatrix&lt;TYPE, 4, 4&gt;::copyFrom</a>( src );
+<a name="l00200"></a>00200     }
+<a name="l00201"></a>00201 };
+<a name="l00202"></a>00202 
+<a name="l00203"></a>00203 }
+<a name="l00204"></a>00204 }
+<a name="l00206"></a>00206 <span class="keyword">namespace </span>std
+<a name="l00207"></a>00207 {
+<a name="l00208"></a>00208 
+<a name="l00209"></a>00209 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits, <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> COLS, <span class="keywordtype">size_t</span> ROWS, <span class="keyword">typename</span> CONTAINER &gt; basic_ostream&lt;charT, traits&gt;&amp;
+<a name="l00210"></a><a class="code" href="namespacestd.html#a110738b20ede015795bab70ed557c325">00210</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, const ::isis::util::FixedMatrix&lt;TYPE, COLS, ROWS, CONTAINER&gt;&amp; m )
+<a name="l00211"></a>00211 {
+<a name="l00212"></a>00212     out &lt;&lt; <span class="stringliteral">&quot;FixedMatrix of size (&quot;</span> &lt;&lt; m.columns &lt;&lt; <span class="stringliteral">&quot; columns, &quot;</span> &lt;&lt; m.rows &lt;&lt; <span class="stringliteral">&quot; rows):&quot;</span> &lt;&lt; std::endl;
+<a name="l00213"></a>00213 
+<a name="l00214"></a>00214     <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> row = 0; row &lt; ROWS; row++ ) {
+<a name="l00215"></a>00215         out &lt;&lt; <span class="stringliteral">&quot;&lt;&quot;</span>;
+<a name="l00216"></a>00216 
+<a name="l00217"></a>00217         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> col = 0; col &lt; COLS; col++ ) {
+<a name="l00218"></a>00218             out &lt;&lt; m.elem( col, row );
+<a name="l00219"></a>00219 
+<a name="l00220"></a>00220             <span class="keywordflow">if</span>( col &lt; COLS - 1 ) out &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;
+<a name="l00221"></a>00221         }
+<a name="l00222"></a>00222 
+<a name="l00223"></a>00223         out &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span> &lt;&lt; std::endl;
+<a name="l00224"></a>00224     }
+<a name="l00225"></a>00225 
+<a name="l00226"></a>00226     <span class="keywordflow">return</span> out;
+<a name="l00227"></a>00227 }
+<a name="l00228"></a>00228 }
+<a name="l00229"></a>00229 
+<a name="l00230"></a>00230 <span class="preprocessor">#endif // ISIS_MATRIX_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

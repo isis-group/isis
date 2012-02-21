@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,61 +23,55 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <h1>/SCR/isis/lib/Core/DataStorage/io_interface.h File Reference</h1>  </div>
 </div>
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;string&gt;</code><br/>
+<code>#include &lt;boost/system/system_error.hpp&gt;</code><br/>
+<code>#include &quot;<a class="el" href="image_8hpp_source.html">image.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="istring_8hpp_source.html">../CoreUtils/istring.hpp</a>&quot;</code><br/>
+</div>
 <p><a href="io__interface_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a></td></tr>
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for image-io-plugins.  <a href="classisis_1_1image__io_1_1FileFormat.html#_details">More...</a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis.html">isis</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io.html">isis::image_io</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__interface_8h.html#aa8b483f374fb36a1a13eccaa9e5e70ab">factory</a> ()</td></tr>
 </table>
-<hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="ad534fde7b54f25d7d340da0fbc40753f"></a><!-- doxytag: member="io_interface.h::FileFormat" ref="ad534fde7b54f25d7d340da0fbc40753f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> <a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00118">118</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
-
-</div>
-</div>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="a9fe54fdfd8fa19863f55927c0d089847"></a><!-- doxytag: member="io_interface.h::factory" ref="a9fe54fdfd8fa19863f55927c0d089847" args="()" -->
+<a class="anchor" id="aa8b483f374fb36a1a13eccaa9e5e70ab"></a><!-- doxytag: member="io_interface.h::factory" ref="aa8b483f374fb36a1a13eccaa9e5e70ab" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>* factory </td>
+          <td class="memname"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a>* factory </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -86,12 +80,10 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00518">518</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
-
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -55,39 +55,91 @@
 <h1>isis::image_io::ImageFormat_Dicom Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::image_io::ImageFormat_Dicom" -->
+<!-- doxytag: class="isis::image_io::ImageFormat_Dicom" --><!-- doxytag: inherits="isis::image_io::FileFormat" -->
 <p><code>#include &lt;<a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for isis::image_io::ImageFormat_Dicom:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classisis_1_1image__io_1_1ImageFormat__Dicom.png" usemap="#isis::image_io::ImageFormat_Dicom_map" alt=""/>
+  <map id="isis::image_io::ImageFormat_Dicom_map" name="isis::image_io::ImageFormat_Dicom_map">
+<area href="classisis_1_1image__io_1_1FileFormat.html" alt="isis::image_io::FileFormat" shape="rect" coords="0,0,206,24"/>
+</map>
+ </div></div>
 
 <p><a href="classisis_1_1image__io_1_1ImageFormat__Dicom-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#adebbb55239237b20f418542b77a52217">addDicomDict</a> (DcmDataDictionary &amp;dict)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#ac9eb5853b4d60bec99a7dc318a0c43e8">dcmObject2PropMap</a> (DcmObject *master_obj, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map, const std::string &amp;dialect) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a9470c1dfb8ea8cae2c29b0d1ad08f425">dialects</a> (const std::string &amp;filename) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a64e5346c4ec7b7fbf27c0761f116674f">getName</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#ae4e6dd8536e9657ed83f3ac9ce14aa03">ImageFormat_Dicom</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a59470658a27d47b7e65672069c0c230f">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;filename, const std::string &amp;dialect)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the given chunk list.  <a href="#a59470658a27d47b7e65672069c0c230f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#ae9a2768b7e75e4d7f042fe958581624a">tainted</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#aa9c62a3d21d8ca1e3d4a049dc088465c">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;filename, const std::string &amp;dialect)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single image to a file.  <a href="#aa9c62a3d21d8ca1e3d4a049dc088465c"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a7b6dac9c76de5fa2ea1d0b00e9628a92">dcmObject2PropMap</a> (DcmObject *master_obj, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map, const std::string &amp;dialect)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a007f0c819f6bfe5bf1d9fb37922d2d8f">parseCSA</a> (DcmElement *elem, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map, const std::string &amp;dialect)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a96238116a69c63380ef92e436828f360">parseList</a> (DcmElement *elem, const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#ac62174e2b24b0487fe638cf4e131f136">parseScalar</a> (DcmElement *elem, const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;map)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#adb6360ce78941f15410a9bc690a1f7bb">parseVector</a> (DcmElement *elem, const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a652a830e006adc2ad25c0b4053368601">parseList</a> (DcmElement *elem, const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a9a8e5d03c25baf8151cb01ddc6f6da9f">parseScalar</a> (DcmElement *elem, const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;map)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a4a6edeae69ee2fb57a42490bc0330cd5">parseVector</a> (DcmElement *elem, const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;name, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;map)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a5a76ce1596e1b2ca47939b6ddf9784d5">sanitise</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;object, std::string dialect)</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a08d3571b8ee52daa3d28c41b1bced88b">dicomTagTreeName</a> [] = &quot;DICOM&quot;</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#aa3b0071d72c531c6dd34c3c14be4d1db">unknownTagName</a> [] = &quot;Unknown Tag&quot;</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#aa3b0071d72c531c6dd34c3c14be4d1db">unknownTagName</a> [] = &quot;UnknownTag/&quot;</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a16f6732c9042788e7f2cd40241c0a286">suffixes</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a18ec192110852e87c95eebb836104e52">suffixes</a> (<a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a> modes=both) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#a9dccd82c67af7d27078df1166aaf3de2">tag2Name</a> (const DcmTagKey &amp;tag) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00039">39</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
-</div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a7b6dac9c76de5fa2ea1d0b00e9628a92"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::dcmObject2PropMap" ref="a7b6dac9c76de5fa2ea1d0b00e9628a92" args="(DcmObject *master_obj, isis::util::PropertyMap &amp;map, const std::string &amp;dialect)" -->
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00037">37</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ae4e6dd8536e9657ed83f3ac9ce14aa03"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::ImageFormat_Dicom" ref="ae4e6dd8536e9657ed83f3ac9ce14aa03" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">isis::image_io::ImageFormat_Dicom::ImageFormat_Dicom </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00514">514</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="adebbb55239237b20f418542b77a52217"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::addDicomDict" ref="adebbb55239237b20f418542b77a52217" args="(DcmDataDictionary &amp;dict)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::image_io::ImageFormat_Dicom::addDicomDict </td>
+          <td>(</td>
+          <td class="paramtype">DcmDataDictionary &amp;&#160;</td>
+          <td class="paramname"><em>dict</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00156">156</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac9eb5853b4d60bec99a7dc318a0c43e8"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::dcmObject2PropMap" ref="ac9eb5853b4d60bec99a7dc318a0c43e8" args="(DcmObject *master_obj, isis::util::PropertyMap &amp;map, const std::string &amp;dialect) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -112,13 +164,13 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td><code> [static]</code></td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00532">532</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00536">536</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
 
 </div>
 </div>
@@ -130,14 +182,17 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">std::string isis::image_io::ImageFormat_Dicom::dialects </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>a space separated list of the dialects the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00141">141</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aa4124d591577978336c1352adcd1a98a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00147">147</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -149,13 +204,16 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">std::string isis::image_io::ImageFormat_Dicom::getName </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the name of the plugin </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00140">140</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aff0eaeb932b67a03194aaf6276ad1d44">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00146">146</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -184,13 +242,27 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )</td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00477">477</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Load data into the given chunk list. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">chunks</td><td>the chunk list where the loaded chunks shall be added to </td></tr>
+    <tr><td class="paramname">filename</td><td>the name of the file to load from (the system does NOT check if this file exists) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the amount of loaded chunks. </dd></dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a2692bc1fd170c46232c81a254a56420a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00475">475</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -225,11 +297,11 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00409">409</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00410">410</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a96238116a69c63380ef92e436828f360"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseList" ref="a96238116a69c63380ef92e436828f360" args="(DcmElement *elem, const util::istring &amp;name, isis::util::PropertyMap &amp;map)" -->
+<a class="anchor" id="a652a830e006adc2ad25c0b4053368601"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseList" ref="a652a830e006adc2ad25c0b4053368601" args="(DcmElement *elem, const util::PropertyMap::PropPath &amp;name, isis::util::PropertyMap &amp;map)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -242,7 +314,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
@@ -260,11 +332,11 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00341">341</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00342">342</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac62174e2b24b0487fe638cf4e131f136"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseScalar" ref="ac62174e2b24b0487fe638cf4e131f136" args="(DcmElement *elem, const util::istring &amp;name, util::PropertyMap &amp;map)" -->
+<a class="anchor" id="a9a8e5d03c25baf8151cb01ddc6f6da9f"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseScalar" ref="a9a8e5d03c25baf8151cb01ddc6f6da9f" args="(DcmElement *elem, const util::PropertyMap::PropPath &amp;name, util::PropertyMap &amp;map)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -277,7 +349,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
@@ -295,11 +367,11 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00172">172</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00173">173</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="adb6360ce78941f15410a9bc690a1f7bb"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseVector" ref="adb6360ce78941f15410a9bc690a1f7bb" args="(DcmElement *elem, const util::istring &amp;name, isis::util::PropertyMap &amp;map)" -->
+<a class="anchor" id="a4a6edeae69ee2fb57a42490bc0330cd5"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::parseVector" ref="a4a6edeae69ee2fb57a42490bc0330cd5" args="(DcmElement *elem, const util::PropertyMap::PropPath &amp;name, isis::util::PropertyMap &amp;map)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -312,7 +384,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
@@ -330,7 +402,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00259">259</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__DicomParser_8cpp_source.html#l00260">260</a> of file <a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,25 +431,48 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00151">151</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00167">167</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a16f6732c9042788e7f2cd40241c0a286"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::suffixes" ref="a16f6732c9042788e7f2cd40241c0a286" args="() const " -->
+<a class="anchor" id="a18ec192110852e87c95eebb836104e52"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::suffixes" ref="a18ec192110852e87c95eebb836104e52" args="(io_modes modes=both) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">std::string isis::image_io::ImageFormat_Dicom::suffixes </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a>&#160;</td>
+          <td class="paramname"><em>modes</em> = <code>both</code></td><td>)</td>
+          <td> const<code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the file-suffixes the plugin supports </dd></dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a3f83b544d398742f7bdbe939d0f7d6bf">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00139">139</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9dccd82c67af7d27078df1166aaf3de2"></a><!-- doxytag: member="isis::image_io::ImageFormat_Dicom::tag2Name" ref="a9dccd82c67af7d27078df1166aaf3de2" args="(const DcmTagKey &amp;tag) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">util::PropertyMap::PropPath</a> isis::image_io::ImageFormat_Dicom::tag2Name </td>
+          <td>(</td>
+          <td class="paramtype">const DcmTagKey &amp;&#160;</td>
+          <td class="paramname"><em>tag</em></td><td>)</td>
           <td> const<code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00139">139</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00543">543</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -389,13 +484,16 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">bool isis::image_io::ImageFormat_Dicom::tainted </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>if the plugin is not part of the official distribution </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00515">515</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00512">512</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -424,13 +522,25 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )</td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00510">510</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
+<p>Write a single image to a file. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the name of the file to write (the system does NOT check if this file exists/is writeable) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a9cafcb99bc0063bd528da0278ffff06f">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8cpp_source.html#l00507">507</a> of file <a class="el" href="imageFormat__Dicom_8cpp_source.html">imageFormat_Dicom.cpp</a>.</p>
 
 </div>
 </div>
@@ -446,7 +556,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00066">66</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00068">68</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
 
 </div>
 </div>
@@ -455,13 +565,13 @@ Protected Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char <a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#aa3b0071d72c531c6dd34c3c14be4d1db">isis::image_io::ImageFormat_Dicom::unknownTagName</a> = &quot;Unknown Tag&quot;<code> [static]</code></td>
+          <td class="memname">const char <a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html#aa3b0071d72c531c6dd34c3c14be4d1db">isis::image_io::ImageFormat_Dicom::unknownTagName</a> = &quot;UnknownTag/&quot;<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00067">67</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__Dicom_8hpp_source.html#l00069">69</a> of file <a class="el" href="imageFormat__Dicom_8hpp_source.html">imageFormat_Dicom.hpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +581,7 @@ Protected Member Functions</h2></td></tr>
 <li>/SCR/isis/lib/ImageIO/<a class="el" href="imageFormat__DicomParser_8cpp_source.html">imageFormat_DicomParser.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:01 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

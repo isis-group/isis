@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -48,7 +47,8 @@
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#pub-attribs">Data Fields</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::data::IOApplication Class Reference</h1>  </div>
 </div>
@@ -61,12 +61,9 @@ Inheritance diagram for isis::data::IOApplication:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1IOApplication.png" usemap="#isis::data::IOApplication_map" alt=""/>
   <map id="isis::data::IOApplication_map" name="isis::data::IOApplication_map">
-<area href="classisis_1_1util_1_1Application.html" alt="isis::util::Application" shape="rect" coords="0,0,147,24"/>
-<area href="classisis_1_1qt4_1_1IOQtApplication.html" alt="isis::qt4::IOQtApplication" shape="rect" coords="0,112,147,136"/>
+<area href="classisis_1_1util_1_1Application.html" alt="isis::util::Application" shape="rect" coords="0,0,142,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1data_1_1IOApplication-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -85,8 +82,12 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual function to display a short help text.  <a href="#af8b156d0d3852a92a7b3f82b94ebffe4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">~IOApplication</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
+Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a></td></tr>
+<tr><td colspan="2"><h2><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual boost::shared_ptr<br class="typebreak"/>
+&lt; util::_internal::MessageHandlerBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">getLogHandler</a> (std::string module, <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
@@ -165,35 +166,6 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af072cbccdec4174e85c1b585f744d3a7"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="af072cbccdec4174e85c1b585f744d3a7" args="(Image out_image, bool exitOnError=false)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::data::IOApplication::autowrite </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a>&#160;</td>
-          <td class="paramname"><em>out_image</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>exitOnError</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00169">169</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a968bb7b48ae28d516b6327acb096aeab"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="a968bb7b48ae28d516b6327acb096aeab" args="(std::list&lt; data::Image &gt; out_images, bool exitOnError=false)" -->
 <div class="memitem">
 <div class="memproto">
@@ -219,7 +191,36 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00174">174</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00177">177</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af072cbccdec4174e85c1b585f744d3a7"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="af072cbccdec4174e85c1b585f744d3a7" args="(Image out_image, bool exitOnError=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOApplication::autowrite </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a>&#160;</td>
+          <td class="paramname"><em>out_image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exitOnError</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00172">172</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -241,7 +242,7 @@ Public Attributes</h2></td></tr>
 <p>This removes the currently first image in the input list, and returns a cheap copy of this image. If the input image list is empty, an exception is thrown. You might want to check the amount of available images via images.size(). </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the currently first image in the input chain </dd></dl>
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00205">205</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00208">208</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -273,6 +274,37 @@ template&lt;typename TYPE &gt; </div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the currently first image in the input chain represented in the given type </dd></dl>
 
 <p>Definition at line <a class="el" href="io__application_8hpp_source.html#l00064">64</a> of file <a class="el" href="io__application_8hpp_source.html">io_application.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3f672c3df1ee97cfdfa754875d3b28fd"></a><!-- doxytag: member="isis::data::IOApplication::getLogHandler" ref="a3f672c3df1ee97cfdfa754875d3b28fd" args="(std::string module, isis::LogLevel level) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::shared_ptr&lt; util::_internal::MessageHandlerBase &gt; isis::data::IOApplication::getLogHandler </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
+          <td class="paramname"><em>level</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const<code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">isis::util::Application</a>.</p>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00216">216</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -320,8 +352,6 @@ template&lt;typename TYPE &gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">isis::util::Application</a>.</p>
 
-<p>Reimplemented in <a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#a7c5e67fb1ac909e7920d6e62fc2c6598">isis::qt4::IOQtApplication</a>.</p>
-
 <p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00100">100</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
@@ -350,7 +380,7 @@ template&lt;typename TYPE &gt; </div>
 
 </div>
 </div>
-<hr/><h2>Member Data Documentation</h2>
+<hr/><h2>Field Documentation</h2>
 <a class="anchor" id="a295873952f1587e88009428c859b1da0"></a><!-- doxytag: member="isis::data::IOApplication::images" ref="a295873952f1587e88009428c859b1da0" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -371,7 +401,7 @@ template&lt;typename TYPE &gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="io__application_8cpp_source.html">io_application.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

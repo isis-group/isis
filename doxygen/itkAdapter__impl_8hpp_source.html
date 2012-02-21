@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -65,314 +65,332 @@
 <a name="l00022"></a>00022 
 <a name="l00023"></a>00023 <span class="preprocessor">#include &quot;<a class="code" href="itkAdapter_8hpp.html">itkAdapter.hpp</a>&quot;</span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;DataStorage/chunk.hpp&gt;</span>
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026 <span class="keyword">namespace </span>isis
-<a name="l00027"></a>00027 {
-<a name="l00028"></a>00028 
-<a name="l00029"></a>00029 <span class="keyword">namespace </span>adapter
-<a name="l00030"></a>00030 {
-<a name="l00031"></a>00031 
-<a name="l00032"></a>00032 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; <span class="keyword">typename</span> TImage::Pointer
-<a name="l00033"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#acab3b22b94a63a56bde1dc1e287fb712">00033</a> <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#acab3b22b94a63a56bde1dc1e287fb712" title="Converts an isis image object in an itk image.">itkAdapter::makeItkImageObject</a>( <span class="keyword">const</span> boost::shared_ptr&lt;data::Image&gt; src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader )
-<a name="l00034"></a>00034 {
-<a name="l00035"></a>00035     <span class="keyword">typedef</span> TImage OutputImageType;
-<a name="l00036"></a>00036     m_ImageISIS = *src;
-<a name="l00037"></a>00037     m_TypeID = m_ImageISIS.<a class="code" href="classisis_1_1data_1_1Image.html#a27cfa5f9ced2077e578ad4bcc064e028" title="Get a chunk via index (and the lookup table).">getChunkAt</a>( 0 ).getTypeID();
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039     <span class="keywordflow">switch</span> ( m_TypeID ) {
-<a name="l00040"></a>00040     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int8_t&gt;::staticID</a>:
-<a name="l00041"></a>00041         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int8_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00042"></a>00042         <span class="keywordflow">break</span>;
-<a name="l00043"></a>00043     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint8_t&gt;::staticID</a>:
-<a name="l00044"></a>00044         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;uint8_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00045"></a>00045         <span class="keywordflow">break</span>;
-<a name="l00046"></a>00046     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int16_t&gt;::staticID</a>:
-<a name="l00047"></a>00047         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int16_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00048"></a>00048         <span class="keywordflow">break</span>;
-<a name="l00049"></a>00049     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint16_t&gt;::staticID</a>:
-<a name="l00050"></a>00050         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;uint16_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00051"></a>00051         <span class="keywordflow">break</span>;
-<a name="l00052"></a>00052     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int32_t&gt;::staticID</a>:
-<a name="l00053"></a>00053         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int32_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00054"></a>00054         <span class="keywordflow">break</span>;
-<a name="l00055"></a>00055     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint32_t&gt;::staticID</a>:
-<a name="l00056"></a>00056         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;uint32_t, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00057"></a>00057         <span class="keywordflow">break</span>;
-<a name="l00058"></a>00058     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;float&gt;::staticID</a>:
-<a name="l00059"></a>00059         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;float, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00060"></a>00060         <span class="keywordflow">break</span>;
-<a name="l00061"></a>00061     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;double&gt;::staticID</a>:
-<a name="l00062"></a>00062         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;double, OutputImageType&gt;( behaveAsItkReader );
-<a name="l00063"></a>00063         <span class="keywordflow">break</span>;
-<a name="l00064"></a>00064     <span class="keywordflow">default</span>:
-<a name="l00065"></a>00065         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( DataLog, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Unknown pixel data type&quot;</span>;
-<a name="l00066"></a>00066         <span class="keywordflow">return</span> 0;
-<a name="l00067"></a>00067     }
-<a name="l00068"></a>00068 }
-<a name="l00069"></a>00069 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; data::ImageList
-<a name="l00070"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#af825439ea0817c7668416d96e6b17256">00070</a> <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#af825439ea0817c7668416d96e6b17256" title="Converts an itk image object in an isis image object.">itkAdapter::makeIsisImageObject</a>( <span class="keyword">const</span> <span class="keyword">typename</span> TImage::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter )
-<a name="l00071"></a>00071 {
-<a name="l00072"></a>00072     <span class="keywordflow">if</span>( m_TypeID ) {
-<a name="l00073"></a>00073         <span class="keywordflow">switch</span> ( m_TypeID ) {
-<a name="l00074"></a>00074         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int8_t&gt;::staticID</a>:
-<a name="l00075"></a>00075             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int8_t&gt;( src, behaveAsItkWriter );
-<a name="l00076"></a>00076             <span class="keywordflow">break</span>;
-<a name="l00077"></a>00077         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint8_t&gt;::staticID</a>:
-<a name="l00078"></a>00078             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, uint8_t&gt;( src, behaveAsItkWriter );
-<a name="l00079"></a>00079             <span class="keywordflow">break</span>;
-<a name="l00080"></a>00080         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int16_t&gt;::staticID</a>:
-<a name="l00081"></a>00081             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int16_t&gt;( src, behaveAsItkWriter );
-<a name="l00082"></a>00082             <span class="keywordflow">break</span>;
-<a name="l00083"></a>00083         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint16_t&gt;::staticID</a>:
-<a name="l00084"></a>00084             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, uint16_t&gt;( src, behaveAsItkWriter );
-<a name="l00085"></a>00085             <span class="keywordflow">break</span>;
-<a name="l00086"></a>00086         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int32_t&gt;::staticID</a>:
-<a name="l00087"></a>00087             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int32_t&gt;( src, behaveAsItkWriter );
-<a name="l00088"></a>00088             <span class="keywordflow">break</span>;
-<a name="l00089"></a>00089         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;uint32_t&gt;::staticID</a>:
-<a name="l00090"></a>00090             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, uint32_t&gt;( src, behaveAsItkWriter );
-<a name="l00091"></a>00091             <span class="keywordflow">break</span>;
-<a name="l00092"></a>00092         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;float&gt;::staticID</a>:
-<a name="l00093"></a>00093             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, float&gt;( src, behaveAsItkWriter );
-<a name="l00094"></a>00094             <span class="keywordflow">break</span>;
-<a name="l00095"></a>00095         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;double&gt;::staticID</a>:
-<a name="l00096"></a>00096             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, double&gt;( src, behaveAsItkWriter );
-<a name="l00097"></a>00097             <span class="keywordflow">break</span>;
-<a name="l00098"></a>00098         <span class="keywordflow">default</span>:
-<a name="l00099"></a>00099             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, typename TImage::PixelType&gt;( src, behaveAsItkWriter );
-<a name="l00100"></a>00100             <span class="keywordflow">break</span>;
-<a name="l00101"></a>00101         }
-<a name="l00102"></a>00102     } <span class="keywordflow">else</span> {
-<a name="l00103"></a>00103         <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, typename TImage::PixelType&gt;( src, behaveAsItkWriter );
-<a name="l00104"></a>00104     }
-<a name="l00105"></a>00105 }
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TInput, <span class="keyword">typename</span> TOutput&gt;
-<a name="l00108"></a>00108 <span class="keyword">typename</span> TOutput::Pointer itkAdapter::internCreateItk( <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader )
-<a name="l00109"></a>00109 {
-<a name="l00110"></a>00110     <span class="keyword">typedef</span> itk::Image&lt;TInput, TOutput::ImageDimension&gt; InputImageType;
-<a name="l00111"></a>00111     <span class="keyword">typedef</span> TOutput OutputImageType;
-<a name="l00112"></a>00112     <span class="keyword">typedef</span> itk::ImportImageFilter&lt;typename InputImageType::PixelType, OutputImageType::ImageDimension&gt; MyImporterType;
-<a name="l00113"></a>00113     <span class="keyword">typedef</span> itk::RescaleIntensityImageFilter&lt;InputImageType, OutputImageType&gt; MyRescaleType;
-<a name="l00114"></a>00114     <span class="keyword">typedef</span> std::set&lt;util::istring&gt; PropKeyListType;
-<a name="l00115"></a>00115     <span class="keyword">typename</span> MyImporterType::Pointer importer = MyImporterType::New();
-<a name="l00116"></a>00116     <span class="keyword">typename</span> MyRescaleType::Pointer rescaler = MyRescaleType::New();
-<a name="l00117"></a>00117     <span class="keyword">typename</span> OutputImageType::Pointer outputImage = OutputImageType::New();
-<a name="l00118"></a>00118     <span class="keyword">typename</span> OutputImageType::SpacingType itkSpacing;
-<a name="l00119"></a>00119     <span class="keyword">typename</span> OutputImageType::PointType itkOrigin;
-<a name="l00120"></a>00120     <span class="keyword">typename</span> OutputImageType::DirectionType itkDirection;
-<a name="l00121"></a>00121     <span class="keyword">typename</span> OutputImageType::SizeType itkSize;
-<a name="l00122"></a>00122     <span class="keyword">typename</span> OutputImageType::RegionType itkRegion;
-<a name="l00123"></a>00123     PropKeyListType propKeyList;
-<a name="l00124"></a>00124     <span class="comment">//itk::MetaDataDictionary myItkDict;</span>
-<a name="l00125"></a>00125     <span class="comment">// since ITK uses a dialect of the Nifti image space, we need to transform</span>
-<a name="l00126"></a>00126     <span class="comment">// the image metadata into a nifti coordinate system</span>
-<a name="l00127"></a>00127     <span class="comment">//declare transformation matrix T (NIFTI -&gt; DICOM)</span>
-<a name="l00128"></a>00128     <span class="comment">// -1  1  0</span>
-<a name="l00129"></a>00129     <span class="comment">//  0 -1  0</span>
-<a name="l00130"></a>00130     <span class="comment">//  0  0  1</span>
-<a name="l00131"></a>00131     boost::numeric::ublas::matrix&lt;float&gt; T( 3, 3 );
-<a name="l00132"></a>00132     T( 0, 0 ) = -1;
-<a name="l00133"></a>00133     T( 0, 1 ) = 0;
-<a name="l00134"></a>00134     T( 0, 2 ) = 0;
-<a name="l00135"></a>00135     T( 1, 0 ) = 0;
-<a name="l00136"></a>00136     T( 1, 1 ) = -1;
-<a name="l00137"></a>00137     T( 1, 2 ) = 0;
-<a name="l00138"></a>00138     T( 2, 0 ) = 0;
-<a name="l00139"></a>00139     T( 2, 1 ) = 0;
-<a name="l00140"></a>00140     T( 2, 2 ) = 1;
-<a name="l00141"></a>00141     <span class="comment">// apply transformation to local isis image copy</span>
-<a name="l00142"></a>00142     m_ImageISIS.<a class="code" href="classisis_1_1data_1_1Image.html#a10667fe639484021089fd983caaf58ea" title="Transforms the image coordinate system into an other system by multiplying the orientation matrix wit...">transformCoords</a>( T );
-<a name="l00143"></a>00143     <span class="comment">//getting the required metadata from the isis image</span>
-<a name="l00144"></a>00144     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>( m_ImageISIS.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>() );
-<a name="l00145"></a>00145     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> indexOrigin( m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) );
-<a name="l00146"></a>00146     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> spacing( m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;voxelSize&quot;</span> ) );
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148     <span class="keywordflow">if</span>( spacing[3] == 0 ) { spacing[3] = 1; }
+<a name="l00025"></a>00025 <span class="preprocessor">#include &lt;DataStorage/io_factory.hpp&gt;</span>
+<a name="l00026"></a>00026 
+<a name="l00027"></a>00027 <span class="keyword">namespace </span>isis
+<a name="l00028"></a>00028 {
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="keyword">namespace </span>adapter
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032 
+<a name="l00033"></a>00033 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; <span class="keyword">typename</span> TImage::Pointer
+<a name="l00034"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a574f81e97c45f9bea500524f3c35e14a">00034</a> <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a574f81e97c45f9bea500524f3c35e14a" title="Converts an isis image object in an itk image.">itkAdapter::makeItkImageObject</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader )
+<a name="l00035"></a>00035 {
+<a name="l00036"></a>00036     <span class="keyword">typedef</span> TImage OutputImageType;
+<a name="l00037"></a>00037     m_ImageISIS = boost::shared_ptr&lt; data::Image &gt;( <span class="keyword">new</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a>( src ) );
+<a name="l00038"></a>00038     m_TypeID = m_ImageISIS-&gt;getChunkAt( 0 ).getTypeID();
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040     <span class="keywordflow">switch</span> ( m_TypeID ) {
+<a name="l00041"></a>00041     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int8_t&gt;::staticID</a>:
+<a name="l00042"></a>00042         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int8_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00043"></a>00043         <span class="keywordflow">break</span>;
+<a name="l00044"></a>00044     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int8_t&gt;::staticID</a>:
+<a name="l00045"></a>00045         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;u_int8_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00046"></a>00046         <span class="keywordflow">break</span>;
+<a name="l00047"></a>00047     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int16_t&gt;::staticID</a>:
+<a name="l00048"></a>00048         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int16_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00049"></a>00049         <span class="keywordflow">break</span>;
+<a name="l00050"></a>00050     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int16_t&gt;::staticID</a>:
+<a name="l00051"></a>00051         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;u_int16_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00052"></a>00052         <span class="keywordflow">break</span>;
+<a name="l00053"></a>00053     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int32_t&gt;::staticID</a>:
+<a name="l00054"></a>00054         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;int32_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00055"></a>00055         <span class="keywordflow">break</span>;
+<a name="l00056"></a>00056     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int32_t&gt;::staticID</a>:
+<a name="l00057"></a>00057         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;u_int32_t, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00058"></a>00058         <span class="keywordflow">break</span>;
+<a name="l00059"></a>00059     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;float&gt;::staticID</a>:
+<a name="l00060"></a>00060         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;float, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00061"></a>00061         <span class="keywordflow">break</span>;
+<a name="l00062"></a>00062     <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;double&gt;::staticID</a>:
+<a name="l00063"></a>00063         <span class="keywordflow">return</span> this-&gt;internCreateItk&lt;double, OutputImageType&gt;( behaveAsItkReader );
+<a name="l00064"></a>00064         <span class="keywordflow">break</span>;
+<a name="l00065"></a>00065     <span class="keywordflow">default</span>:
+<a name="l00066"></a>00066         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( DataLog, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Unknown pixel data type&quot;</span>;
+<a name="l00067"></a>00067         <span class="keywordflow">return</span> 0;
+<a name="l00068"></a>00068     }
+<a name="l00069"></a>00069 }
+<a name="l00070"></a>00070 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; std::list&lt;data::Image&gt;
+<a name="l00071"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a7f6117e703cd4f20c6786f1999d82ac7">00071</a> <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a7f6117e703cd4f20c6786f1999d82ac7" title="Converts an itk image object in an isis image object.">itkAdapter::makeIsisImageObject</a>( <span class="keyword">const</span> <span class="keyword">typename</span> TImage::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter )
+<a name="l00072"></a>00072 {
+<a name="l00073"></a>00073     <span class="keywordflow">if</span>( m_TypeID ) {
+<a name="l00074"></a>00074         <span class="keywordflow">switch</span> ( m_TypeID ) {
+<a name="l00075"></a>00075         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int8_t&gt;::staticID</a>:
+<a name="l00076"></a>00076             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int8_t&gt;( src, behaveAsItkWriter );
+<a name="l00077"></a>00077             <span class="keywordflow">break</span>;
+<a name="l00078"></a>00078         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int8_t&gt;::staticID</a>:
+<a name="l00079"></a>00079             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, u_int8_t&gt;( src, behaveAsItkWriter );
+<a name="l00080"></a>00080             <span class="keywordflow">break</span>;
+<a name="l00081"></a>00081         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int16_t&gt;::staticID</a>:
+<a name="l00082"></a>00082             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int16_t&gt;( src, behaveAsItkWriter );
+<a name="l00083"></a>00083             <span class="keywordflow">break</span>;
+<a name="l00084"></a>00084         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int16_t&gt;::staticID</a>:
+<a name="l00085"></a>00085             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, u_int16_t&gt;( src, behaveAsItkWriter );
+<a name="l00086"></a>00086             <span class="keywordflow">break</span>;
+<a name="l00087"></a>00087         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;int32_t&gt;::staticID</a>:
+<a name="l00088"></a>00088             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, int32_t&gt;( src, behaveAsItkWriter );
+<a name="l00089"></a>00089             <span class="keywordflow">break</span>;
+<a name="l00090"></a>00090         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;u_int32_t&gt;::staticID</a>:
+<a name="l00091"></a>00091             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, u_int32_t&gt;( src, behaveAsItkWriter );
+<a name="l00092"></a>00092             <span class="keywordflow">break</span>;
+<a name="l00093"></a>00093         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;float&gt;::staticID</a>:
+<a name="l00094"></a>00094             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, float&gt;( src, behaveAsItkWriter );
+<a name="l00095"></a>00095             <span class="keywordflow">break</span>;
+<a name="l00096"></a>00096         <span class="keywordflow">case</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;double&gt;::staticID</a>:
+<a name="l00097"></a>00097             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, double&gt;( src, behaveAsItkWriter );
+<a name="l00098"></a>00098             <span class="keywordflow">break</span>;
+<a name="l00099"></a>00099         <span class="keywordflow">default</span>:
+<a name="l00100"></a>00100             <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, typename TImage::PixelType&gt;( src, behaveAsItkWriter );
+<a name="l00101"></a>00101             <span class="keywordflow">break</span>;
+<a name="l00102"></a>00102         }
+<a name="l00103"></a>00103     } <span class="keywordflow">else</span> {
+<a name="l00104"></a>00104         <span class="keywordflow">return</span> this-&gt;internCreateISIS&lt;TImage, typename TImage::PixelType&gt;( src, behaveAsItkWriter );
+<a name="l00105"></a>00105     }
+<a name="l00106"></a>00106 }
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TInput, <span class="keyword">typename</span> TOutput&gt;
+<a name="l00109"></a>00109 <span class="keyword">typename</span> TOutput::Pointer itkAdapter::internCreateItk( <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader )
+<a name="l00110"></a>00110 {
+<a name="l00111"></a>00111     <span class="keyword">typedef</span> itk::Image&lt;TInput, TOutput::ImageDimension&gt; InputImageType;
+<a name="l00112"></a>00112     <span class="keyword">typedef</span> TOutput OutputImageType;
+<a name="l00113"></a>00113     <span class="keyword">typedef</span> itk::ImportImageFilter&lt;typename InputImageType::PixelType, OutputImageType::ImageDimension&gt; MyImporterType;
+<a name="l00114"></a>00114     <span class="keyword">typedef</span> itk::RescaleIntensityImageFilter&lt;InputImageType, OutputImageType&gt; MyRescaleType;
+<a name="l00115"></a>00115     <span class="keyword">typedef</span> std::set&lt;util::istring&gt; PropKeyListType;
+<a name="l00116"></a>00116     <span class="keyword">typename</span> MyImporterType::Pointer importer = MyImporterType::New();
+<a name="l00117"></a>00117     <span class="keyword">typename</span> MyRescaleType::Pointer rescaler = MyRescaleType::New();
+<a name="l00118"></a>00118     <span class="keyword">typename</span> OutputImageType::Pointer outputImage = OutputImageType::New();
+<a name="l00119"></a>00119     <span class="keyword">typename</span> OutputImageType::SpacingType itkSpacing;
+<a name="l00120"></a>00120     <span class="keyword">typename</span> OutputImageType::PointType itkOrigin;
+<a name="l00121"></a>00121     <span class="keyword">typename</span> OutputImageType::DirectionType itkDirection;
+<a name="l00122"></a>00122     <span class="keyword">typename</span> OutputImageType::SizeType itkSize;
+<a name="l00123"></a>00123     <span class="keyword">typename</span> OutputImageType::RegionType itkRegion;
+<a name="l00124"></a>00124     <span class="comment">// util::DefaultMsgPrint::stopBelow( warning );</span>
+<a name="l00125"></a>00125     PropKeyListType propKeyList;
+<a name="l00126"></a>00126     <span class="comment">//itk::MetaDataDictionary myItkDict;</span>
+<a name="l00127"></a>00127     <span class="comment">// since ITK uses a dialect of the Nifti image space, we need to transform</span>
+<a name="l00128"></a>00128     <span class="comment">// the image metadata into a nifti coordinate system</span>
+<a name="l00129"></a>00129     <span class="comment">//declare transformation matrix T (NIFTI -&gt; DICOM)</span>
+<a name="l00130"></a>00130     <span class="comment">// -1  1  0</span>
+<a name="l00131"></a>00131     <span class="comment">//  0 -1  0</span>
+<a name="l00132"></a>00132     <span class="comment">//  0  0  1</span>
+<a name="l00133"></a>00133     boost::numeric::ublas::matrix&lt;float&gt; T( 3, 3 );
+<a name="l00134"></a>00134     T( 0, 0 ) = -1;
+<a name="l00135"></a>00135     T( 0, 1 ) = 0;
+<a name="l00136"></a>00136     T( 0, 2 ) = 0;
+<a name="l00137"></a>00137     T( 1, 0 ) = 0;
+<a name="l00138"></a>00138     T( 1, 1 ) = -1;
+<a name="l00139"></a>00139     T( 1, 2 ) = 0;
+<a name="l00140"></a>00140     T( 2, 0 ) = 0;
+<a name="l00141"></a>00141     T( 2, 1 ) = 0;
+<a name="l00142"></a>00142     T( 2, 2 ) = 1;
+<a name="l00143"></a>00143     <span class="comment">// apply transformation to local isis image copy</span>
+<a name="l00144"></a>00144     m_ImageISIS-&gt;transformCoords( T );
+<a name="l00145"></a>00145     <span class="comment">//getting the required metadata from the isis image</span>
+<a name="l00146"></a>00146     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>( m_ImageISIS-&gt;getSizeAsVector() );
+<a name="l00147"></a>00147     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> indexOrigin( m_ImageISIS-&gt;getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) );
+<a name="l00148"></a>00148     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> spacing( m_ImageISIS-&gt;getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;voxelSize&quot;</span> ) );
 <a name="l00149"></a>00149 
-<a name="l00150"></a>00150     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> rowVec = m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;rowVec&quot;</span> );
+<a name="l00150"></a>00150     <span class="keywordflow">if</span>( spacing[3] == 0 ) { spacing[3] = 1; }
 <a name="l00151"></a>00151 
-<a name="l00152"></a>00152     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> columnVec = m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;columnVec&quot;</span> );
+<a name="l00152"></a>00152     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> readVec = m_ImageISIS-&gt;getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;rowVec&quot;</span> );
 <a name="l00153"></a>00153 
-<a name="l00154"></a>00154     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> sliceVec = m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;sliceVec&quot;</span> );
+<a name="l00154"></a>00154     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> phaseVec = m_ImageISIS-&gt;getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;columnVec&quot;</span> );
 <a name="l00155"></a>00155 
-<a name="l00156"></a>00156     <span class="comment">//  std::cout &lt;&lt; &quot;indexOrigin: &quot; &lt;&lt; indexOrigin &lt;&lt; std::endl;</span>
-<a name="l00157"></a>00157     <span class="comment">//  std::cout &lt;&lt; &quot;rowVec: &quot; &lt;&lt; rowVec &lt;&lt; std::endl;</span>
-<a name="l00158"></a>00158     <span class="comment">//  std::cout &lt;&lt; &quot;columnVec: &quot; &lt;&lt; columnVec &lt;&lt; std::endl;</span>
-<a name="l00159"></a>00159     <span class="comment">//  std::cout &lt;&lt; &quot;sliceVec: &quot; &lt;&lt; sliceVec &lt;&lt; std::endl;</span>
-<a name="l00160"></a>00160     <span class="comment">//  std::cout &lt;&lt; &quot;spacing: &quot; &lt;&lt; spacing &lt;&lt; std::endl;</span>
-<a name="l00161"></a>00161     <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = 0; i &lt; 3; i++ ) {
-<a name="l00162"></a>00162         itkOrigin[i] = indexOrigin[i];
-<a name="l00163"></a>00163         itkSize[i] = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>[i];
-<a name="l00164"></a>00164         itkSpacing[i] = spacing[i];
-<a name="l00165"></a>00165         itkDirection[i][0] = rowVec[i];
-<a name="l00166"></a>00166         itkDirection[i][1] = columnVec[i];
-<a name="l00167"></a>00167         itkDirection[i][2] = sliceVec[i];
-<a name="l00168"></a>00168     }
-<a name="l00169"></a>00169 
-<a name="l00170"></a>00170     <span class="comment">// To mimic the behavior of the itk nifti image io plugin the</span>
-<a name="l00171"></a>00171     <span class="comment">// orientation matrix will be transformed this way:</span>
-<a name="l00172"></a>00172 
-<a name="l00173"></a>00173     <span class="comment">/*</span>
-<a name="l00174"></a>00174 <span class="comment">    -1 -1 -1 -1</span>
-<a name="l00175"></a>00175 <span class="comment">    -1 -1 -1 -1</span>
-<a name="l00176"></a>00176 <span class="comment">     1  1  1  1</span>
-<a name="l00177"></a>00177 <span class="comment">     */</span>
-<a name="l00178"></a>00178     <span class="keywordflow">if</span> ( behaveAsItkReader ) {
-<a name="l00179"></a>00179         itkOrigin[0] = -indexOrigin[0];
-<a name="l00180"></a>00180         itkOrigin[1] = -indexOrigin[1];
-<a name="l00181"></a>00181         itkDirection[0][0] = -rowVec[0];
-<a name="l00182"></a>00182         itkDirection[0][1] = -columnVec[0];
-<a name="l00183"></a>00183         itkDirection[0][2] = -sliceVec[0];
-<a name="l00184"></a>00184         itkDirection[1][0] = -rowVec[1];
-<a name="l00185"></a>00185         itkDirection[1][1] = -columnVec[1];
-<a name="l00186"></a>00186         itkDirection[1][2] = -sliceVec[1];
-<a name="l00187"></a>00187     }
-<a name="l00188"></a>00188 
-<a name="l00189"></a>00189     <span class="comment">//if the user requests a 4d image we need to set these parameters</span>
-<a name="l00190"></a>00190     <span class="keywordflow">if</span> ( OutputImageType::ImageDimension == 4 ) {
-<a name="l00191"></a>00191         itkSpacing[3] = spacing[3];
-<a name="l00192"></a>00192         itkSize[3] = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>[3];
-<a name="l00193"></a>00193         itkDirection[3][3] = 1; <span class="comment">//ensures determinant is unequal 0</span>
-<a name="l00194"></a>00194     }
-<a name="l00195"></a>00195 
-<a name="l00196"></a>00196     itkRegion.SetSize( itkSize );
-<a name="l00197"></a>00197     importer-&gt;SetRegion( itkRegion );
-<a name="l00198"></a>00198     importer-&gt;SetSpacing( itkSpacing );
-<a name="l00199"></a>00199     importer-&gt;SetOrigin( itkOrigin );
-<a name="l00200"></a>00200     importer-&gt;SetDirection( itkDirection );
-<a name="l00201"></a>00201     m_ImagePropMap = <span class="keyword">static_cast&lt;</span>util::PropertyMap<span class="keyword">&gt;</span>( m_ImageISIS );
-<a name="l00202"></a>00202     m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).getRelevantDims();
-<a name="l00203"></a>00203     <span class="comment">//reorganisation of memory according to the chunk organisiation</span>
-<a name="l00204"></a>00204     <span class="keywordtype">void</span> *targePtr = malloc( m_ImageISIS.getBytesPerVoxel() * m_ImageISIS.getVolume() );
-<a name="l00205"></a>00205     <span class="keyword">typename</span> InputImageType::PixelType *refTarget = ( <span class="keyword">typename</span> InputImageType::PixelType * ) targePtr;
-<a name="l00206"></a>00206     std::vector&lt; boost::shared_ptr&lt; data::Chunk&gt; &gt; chList = m_ImageISIS.getChunksAsVector();
-<a name="l00207"></a>00207     <span class="keywordtype">size_t</span> chunkIndex = 0;
-<a name="l00208"></a>00208     BOOST_FOREACH( boost::shared_ptr&lt; data::Chunk&gt; &amp; ref, chList ) {
-<a name="l00209"></a>00209         data::Chunk &amp;chRef = *ref;
-<a name="l00210"></a>00210         <span class="keyword">typename</span> InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
-<a name="l00211"></a>00211         chRef.getValuePtr&lt;<span class="keyword">typename</span> InputImageType::PixelType&gt;().copyToMem( 0, ( chRef.getVolume() - 1 ), target );
-<a name="l00212"></a>00212         boost::shared_ptr&lt;util::PropertyMap&gt; tmpMap ( <span class="keyword">new</span> util::PropertyMap ( static_cast&lt;util::PropertyMap&gt;( chRef ) ) );
-<a name="l00213"></a>00213         m_ChunkPropMapVector.push_back( tmpMap );
-<a name="l00214"></a>00214     }
-<a name="l00215"></a>00215     importer-&gt;SetImportPointer( refTarget, itkSize[0], <span class="keyword">false</span> );
-<a name="l00216"></a>00216     rescaler-&gt;SetInput( importer-&gt;GetOutput() );
-<a name="l00217"></a>00217     <span class="keyword">typename</span> InputImageType::PixelType minIn, maxIn;
-<a name="l00218"></a>00218     m_ImageISIS.getMinMax( minIn, maxIn );
-<a name="l00219"></a>00219     rescaler-&gt;SetOutputMinimum( minIn );
-<a name="l00220"></a>00220     rescaler-&gt;SetOutputMaximum( maxIn );
-<a name="l00221"></a>00221     rescaler-&gt;Update();
-<a name="l00222"></a>00222     outputImage = rescaler-&gt;GetOutput();
-<a name="l00223"></a>00223     <span class="keywordflow">return</span> outputImage;
-<a name="l00224"></a>00224 }
-<a name="l00225"></a>00225 
-<a name="l00226"></a>00226 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImageITK, <span class="keyword">typename</span> TOutputISIS&gt; data::ImageList itkAdapter::internCreateISIS( <span class="keyword">const</span> <span class="keyword">typename</span> TImageITK::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter )
-<a name="l00227"></a>00227 {
-<a name="l00228"></a>00228     <span class="keyword">typename</span> TImageITK::PointType indexOrigin = src-&gt;GetOrigin();
-<a name="l00229"></a>00229     <span class="keyword">typename</span> TImageITK::SizeType imageSize = src-&gt;GetBufferedRegion().GetSize();
-<a name="l00230"></a>00230     <span class="keyword">typename</span> TImageITK::SpacingType imageSpacing = src-&gt;GetSpacing();
-<a name="l00231"></a>00231     <span class="keyword">typename</span> TImageITK::DirectionType imageDirection = src-&gt;GetDirection();
-<a name="l00232"></a>00232     <span class="keyword">typedef</span> <span class="keyword">typename</span> TImageITK::PixelType ITKRepn;
-<a name="l00233"></a>00233     <span class="keyword">typedef</span> TOutputISIS ISISRepn;
-<a name="l00234"></a>00234 
-<a name="l00235"></a>00235     <span class="keywordflow">if</span> ( TImageITK::ImageDimension &lt; 4 ) {
-<a name="l00236"></a>00236         imageSize[3] = 1;
-<a name="l00237"></a>00237     }
-<a name="l00238"></a>00238 
-<a name="l00239"></a>00239     <span class="keywordflow">if</span> ( behaveAsItkWriter ) {
-<a name="l00240"></a>00240         imageDirection[0][0] = -imageDirection[0][0];
-<a name="l00241"></a>00241         imageDirection[0][1] = -imageDirection[0][1];
-<a name="l00242"></a>00242         imageDirection[0][2] = -imageDirection[0][2];
-<a name="l00243"></a>00243         imageDirection[1][0] = -imageDirection[1][0];
-<a name="l00244"></a>00244         imageDirection[1][1] = -imageDirection[1][1];
-<a name="l00245"></a>00245         imageDirection[1][2] = -imageDirection[1][2];
-<a name="l00246"></a>00246         indexOrigin[0] = -indexOrigin[0];
-<a name="l00247"></a>00247         indexOrigin[1] = -indexOrigin[1];
-<a name="l00248"></a>00248     }
-<a name="l00249"></a>00249 
-<a name="l00250"></a>00250     <span class="comment">//TODO adopt conversion to the new interface</span>
-<a name="l00251"></a>00251 <span class="preprocessor">#warning conversion has changed</span>
-<a name="l00252"></a>00252 <span class="preprocessor"></span>    boost::shared_ptr&lt;data::Chunk &gt;
-<a name="l00253"></a>00253     tmpChunk ( <span class="keyword">new</span> data::MemChunk&lt; ITKRepn &gt;( src-&gt;GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
-<a name="l00254"></a>00254     <span class="comment">//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling</span>
-<a name="l00255"></a>00255     boost::shared_ptr&lt;data::Chunk &gt; retChunk ( <span class="keyword">new</span> data::MemChunk&lt;ISISRepn&gt;( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
-<a name="l00256"></a>00256     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">data::scaling_pair</a> scale = tmpChunk-&gt;getScalingTo( data::ValuePtr&lt;ISISRepn&gt;::staticID, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c">data::noscale</a> );
-<a name="l00257"></a>00257     <span class="comment">//</span>
-<a name="l00258"></a>00258     data::numeric_convert&lt;ITKRepn, ISISRepn&gt;(
-<a name="l00259"></a>00259         tmpChunk-&gt;asValuePtr&lt;ITKRepn&gt;(),
-<a name="l00260"></a>00260         retChunk-&gt;asValuePtr&lt;ISISRepn&gt;(),
-<a name="l00261"></a>00261         scale.first-&gt;as&lt;<span class="keywordtype">double</span>&gt;(),
-<a name="l00262"></a>00262         scale.second-&gt;as&lt;<span class="keywordtype">double</span>&gt;() );
-<a name="l00263"></a>00263     <span class="comment">//dummy join to allow creating this chunk</span>
-<a name="l00264"></a>00264     retChunk-&gt;join( m_ImagePropMap );
+<a name="l00156"></a>00156     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> sliceVec = m_ImageISIS-&gt;getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;sliceVec&quot;</span> );
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158     <span class="comment">//  std::cout &lt;&lt; &quot;indexOrigin: &quot; &lt;&lt; indexOrigin &lt;&lt; std::endl;</span>
+<a name="l00159"></a>00159     <span class="comment">//  std::cout &lt;&lt; &quot;readVec: &quot; &lt;&lt; readVec &lt;&lt; std::endl;</span>
+<a name="l00160"></a>00160     <span class="comment">//  std::cout &lt;&lt; &quot;phaseVec: &quot; &lt;&lt; phaseVec &lt;&lt; std::endl;</span>
+<a name="l00161"></a>00161     <span class="comment">//  std::cout &lt;&lt; &quot;sliceVec: &quot; &lt;&lt; sliceVec &lt;&lt; std::endl;</span>
+<a name="l00162"></a>00162     <span class="comment">//  std::cout &lt;&lt; &quot;spacing: &quot; &lt;&lt; spacing &lt;&lt; std::endl;</span>
+<a name="l00163"></a>00163     <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = 0; i &lt; 3; i++ ) {
+<a name="l00164"></a>00164         itkOrigin[i] = indexOrigin[i];
+<a name="l00165"></a>00165         itkSize[i] = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>[i];
+<a name="l00166"></a>00166         itkSpacing[i] = spacing[i];
+<a name="l00167"></a>00167         itkDirection[i][0] = readVec[i];
+<a name="l00168"></a>00168         itkDirection[i][1] = phaseVec[i];
+<a name="l00169"></a>00169         itkDirection[i][2] = sliceVec[i];
+<a name="l00170"></a>00170     }
+<a name="l00171"></a>00171 
+<a name="l00172"></a>00172     <span class="comment">// To mimic the behavior of the itk nifti image io plugin the</span>
+<a name="l00173"></a>00173     <span class="comment">// orientation matrix will be transformed this way:</span>
+<a name="l00174"></a>00174 
+<a name="l00175"></a>00175     <span class="comment">/*</span>
+<a name="l00176"></a>00176 <span class="comment">    -1 -1 -1 -1</span>
+<a name="l00177"></a>00177 <span class="comment">    -1 -1 -1 -1</span>
+<a name="l00178"></a>00178 <span class="comment">     1  1  1  1</span>
+<a name="l00179"></a>00179 <span class="comment">     */</span>
+<a name="l00180"></a>00180     <span class="keywordflow">if</span> ( behaveAsItkReader ) {
+<a name="l00181"></a>00181         itkOrigin[0] = -indexOrigin[0];
+<a name="l00182"></a>00182         itkOrigin[1] = -indexOrigin[1];
+<a name="l00183"></a>00183         itkDirection[0][0] = -readVec[0];
+<a name="l00184"></a>00184         itkDirection[0][1] = -phaseVec[0];
+<a name="l00185"></a>00185         itkDirection[0][2] = -sliceVec[0];
+<a name="l00186"></a>00186         itkDirection[1][0] = -readVec[1];
+<a name="l00187"></a>00187         itkDirection[1][1] = -phaseVec[1];
+<a name="l00188"></a>00188         itkDirection[1][2] = -sliceVec[1];
+<a name="l00189"></a>00189     }
+<a name="l00190"></a>00190 
+<a name="l00191"></a>00191     <span class="comment">//if the user requests a 4d image we need to set these parameters</span>
+<a name="l00192"></a>00192     <span class="keywordflow">if</span> ( OutputImageType::ImageDimension == 4 ) {
+<a name="l00193"></a>00193         itkSpacing[3] = spacing[3];
+<a name="l00194"></a>00194         itkSize[3] = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>[3];
+<a name="l00195"></a>00195         itkDirection[3][3] = 1; <span class="comment">//ensures determinant is unequal 0</span>
+<a name="l00196"></a>00196     }
+<a name="l00197"></a>00197 
+<a name="l00198"></a>00198     itkRegion.SetSize( itkSize );
+<a name="l00199"></a>00199     importer-&gt;SetRegion( itkRegion );
+<a name="l00200"></a>00200     importer-&gt;SetSpacing( itkSpacing );
+<a name="l00201"></a>00201     importer-&gt;SetOrigin( itkOrigin );
+<a name="l00202"></a>00202     importer-&gt;SetDirection( itkDirection );
+<a name="l00203"></a>00203     m_ImagePropertyMap = <span class="keyword">static_cast&lt;</span>util::PropertyMap<span class="keyword">&gt;</span>( *m_ImageISIS );
+<a name="l00204"></a>00204     m_RelevantDim = m_ImageISIS-&gt;getChunkAt( 0 ).getRelevantDims();
+<a name="l00205"></a>00205     <span class="comment">//reorganisation of memory according to the chunk organisiation</span>
+<a name="l00206"></a>00206     <span class="keywordtype">void</span> *targePtr = malloc( m_ImageISIS-&gt;getBytesPerVoxel() * m_ImageISIS-&gt;getVolume() );
+<a name="l00207"></a>00207     <span class="keyword">typename</span> InputImageType::PixelType *refTarget = ( <span class="keyword">typename</span> InputImageType::PixelType * ) targePtr;
+<a name="l00208"></a>00208     std::vector&lt; data::Chunk&gt; chList = m_ImageISIS-&gt;copyChunksToVector();
+<a name="l00209"></a>00209     <span class="keywordtype">size_t</span> chunkIndex = 0;
+<a name="l00210"></a>00210     BOOST_FOREACH(  std::vector&lt;data::Chunk &gt;::reference ref, chList ) {
+<a name="l00211"></a>00211         data::Chunk &amp;chRef = ref;
+<a name="l00212"></a>00212         <span class="keyword">typename</span> InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
+<a name="l00213"></a>00213         chRef.getValuePtr&lt;<span class="keyword">typename</span> InputImageType::PixelType&gt;().copyToMem( target,  chRef.getVolume() );
+<a name="l00214"></a>00214         boost::shared_ptr&lt;util::PropertyMap&gt; tmpMap ( <span class="keyword">new</span> util::PropertyMap ( static_cast&lt;util::PropertyMap&gt;( chRef ) ) );
+<a name="l00215"></a>00215         m_ChunkPropertyMapVector.push_back( tmpMap );
+<a name="l00216"></a>00216     }
+<a name="l00217"></a>00217     importer-&gt;SetImportPointer( refTarget, itkSize[0], <span class="keyword">false</span> );
+<a name="l00218"></a>00218     rescaler-&gt;SetInput( importer-&gt;GetOutput() );
+<a name="l00219"></a>00219     std::pair&lt;util::ValueReference, util::ValueReference&gt; minMaxPair = m_ImageISIS-&gt;getMinMax();
+<a name="l00220"></a>00220     rescaler-&gt;SetOutputMinimum( minMaxPair.first-&gt;as&lt;<span class="keyword">typename</span> InputImageType::PixelType&gt;() );
+<a name="l00221"></a>00221     rescaler-&gt;SetOutputMaximum( minMaxPair.second-&gt;as&lt;<span class="keyword">typename</span> InputImageType::PixelType&gt;() );
+<a name="l00222"></a>00222     rescaler-&gt;Update();
+<a name="l00223"></a>00223     outputImage = rescaler-&gt;GetOutput();
+<a name="l00224"></a>00224     <span class="keywordflow">return</span> outputImage;
+<a name="l00225"></a>00225 }
+<a name="l00226"></a>00226 
+<a name="l00227"></a>00227 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImageITK, <span class="keyword">typename</span> TOutputISIS&gt; std::list&lt;data::Image&gt; itkAdapter::internCreateISIS( <span class="keyword">const</span> <span class="keyword">typename</span> TImageITK::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter )
+<a name="l00228"></a>00228 {
+<a name="l00229"></a>00229     <span class="keyword">typename</span> TImageITK::PointType indexOrigin = src-&gt;GetOrigin();
+<a name="l00230"></a>00230     <span class="keyword">typename</span> TImageITK::SizeType imageSize = src-&gt;GetBufferedRegion().GetSize();
+<a name="l00231"></a>00231     <span class="keyword">typename</span> TImageITK::SpacingType imageSpacing = src-&gt;GetSpacing();
+<a name="l00232"></a>00232     <span class="keyword">typename</span> TImageITK::DirectionType imageDirection = src-&gt;GetDirection();
+<a name="l00233"></a>00233     <span class="keyword">typedef</span> <span class="keyword">typename</span> TImageITK::PixelType ITKRepn;
+<a name="l00234"></a>00234     <span class="keyword">typedef</span> TOutputISIS ISISRepn;
+<a name="l00235"></a>00235 
+<a name="l00236"></a>00236     <span class="keywordflow">if</span> ( behaveAsItkWriter ) {
+<a name="l00237"></a>00237         imageDirection[0][0] = -imageDirection[0][0];
+<a name="l00238"></a>00238         imageDirection[0][1] = -imageDirection[0][1];
+<a name="l00239"></a>00239         imageDirection[0][2] = -imageDirection[0][2];
+<a name="l00240"></a>00240         imageDirection[1][0] = -imageDirection[1][0];
+<a name="l00241"></a>00241         imageDirection[1][1] = -imageDirection[1][1];
+<a name="l00242"></a>00242         imageDirection[1][2] = -imageDirection[1][2];
+<a name="l00243"></a>00243         indexOrigin[0] = -indexOrigin[0];
+<a name="l00244"></a>00244         indexOrigin[1] = -indexOrigin[1];
+<a name="l00245"></a>00245     }
+<a name="l00246"></a>00246 
+<a name="l00247"></a>00247     data::Chunk
+<a name="l00248"></a>00248     tmpChunk ( data::MemChunk&lt; ITKRepn &gt;( src-&gt;GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) ) ;
+<a name="l00249"></a>00249     <span class="comment">//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling</span>
+<a name="l00250"></a>00250     data::Chunk retChunk ( data::MemChunk&lt;ISISRepn&gt;( imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) );
+<a name="l00251"></a>00251     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">data::scaling_pair</a> scale = tmpChunk.getScalingTo( data::ValuePtr&lt;ISISRepn&gt;::staticID, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c">data::noscale</a> );
+<a name="l00252"></a>00252     <span class="comment">//</span>
+<a name="l00253"></a>00253     data::numeric_convert&lt;ITKRepn, ISISRepn&gt;(
+<a name="l00254"></a>00254         tmpChunk.asValuePtr&lt;ITKRepn&gt;(),
+<a name="l00255"></a>00255         retChunk.asValuePtr&lt;ISISRepn&gt;(),
+<a name="l00256"></a>00256         scale.first-&gt;as&lt;<span class="keywordtype">double</span>&gt;(),
+<a name="l00257"></a>00257         scale.second-&gt;as&lt;<span class="keywordtype">double</span>&gt;() );
+<a name="l00258"></a>00258     <span class="comment">//dummy join to allow creating this chunk</span>
+<a name="l00259"></a>00259     retChunk.join( m_ImagePropertyMap );
+<a name="l00260"></a>00260 
+<a name="l00261"></a>00261     <span class="comment">//since the acquisitionNumber is not stored in the PropertyMap of the image, we have</span>
+<a name="l00262"></a>00262     <span class="comment">//to create a dummy acquisitionNumber</span>
+<a name="l00263"></a>00263     <span class="keywordflow">if</span> ( !retChunk.hasProperty( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> ) )
+<a name="l00264"></a>00264         retChunk.setPropertyAs( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, static_cast&lt;u_int32_t&gt;( 1 ) );
 <a name="l00265"></a>00265 
-<a name="l00266"></a>00266     <span class="comment">//since the acquisitionNumber is not stored in the PropMap of the image, we have</span>
-<a name="l00267"></a>00267     <span class="comment">//to create a dummy acquisitionNumber</span>
-<a name="l00268"></a>00268     <span class="keywordflow">if</span> ( !retChunk-&gt;hasProperty( <span class="stringliteral">&quot;acqisitionNumber&quot;</span> ) )
-<a name="l00269"></a>00269         retChunk-&gt;setPropertyAs( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, static_cast&lt;uint32_t&gt;( 1 ) );
-<a name="l00270"></a>00270 
-<a name="l00271"></a>00271     <span class="comment">//do not try to grasp that in a sober state!!</span>
-<a name="l00272"></a>00272     <span class="comment">//workaround to create a TypedImage out of a MemChunk</span>
-<a name="l00273"></a>00273     data::ChunkList chunkList;
-<a name="l00274"></a>00274     chunkList.push_back( boost::shared_ptr&lt;data::Chunk&gt; ( retChunk ) );
-<a name="l00275"></a>00275     data::ImageList isisImageList( chunkList );
-<a name="l00276"></a>00276     boost::shared_ptr&lt; data::TypedImage&lt; TOutputISIS &gt; &gt; retImage (
-<a name="l00277"></a>00277         <span class="keyword">new</span> data::TypedImage&lt;TOutputISIS&gt;  ( *isisImageList.front().get() ) );
-<a name="l00278"></a>00278     <span class="comment">//these are properties eventually manipulated by itk. So we can not take the</span>
-<a name="l00279"></a>00279     <span class="comment">//parameters from the isis image which was handed over to the itkAdapter</span>
-<a name="l00280"></a>00280     retImage-&gt;setPropertyAs( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-<a name="l00281"></a>00281     retImage-&gt;setPropertyAs( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-<a name="l00282"></a>00282     retImage-&gt;setPropertyAs( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-<a name="l00283"></a>00283     retImage-&gt;setPropertyAs( <span class="stringliteral">&quot;sliceVec&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-<a name="l00284"></a>00284     retImage-&gt;setPropertyAs( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
-<a name="l00285"></a>00285     <span class="comment">//this will splice down the image the same way it was handed over to the itkAdapter</span>
-<a name="l00286"></a>00286     retImage-&gt;spliceDownTo( static_cast&lt;data::dimensions&gt; ( m_RelevantDim ) );
-<a name="l00287"></a>00287     <span class="comment">//add the residual parameters to the image</span>
-<a name="l00288"></a>00288     retImage-&gt;join( m_ImagePropMap, <span class="keyword">false</span> );
-<a name="l00289"></a>00289     std::vector&lt; boost::shared_ptr&lt; data::Chunk&gt; &gt; chList = retImage-&gt;getChunksAsVector();
-<a name="l00290"></a>00290     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( chList.size() != m_ChunkPropMapVector.size(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">data::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The image size has changed. The chunk-specific metadata will be interpolated.&quot;</span>;
-<a name="l00291"></a>00291     <span class="comment">//iterate through the spliced chunks of the image and set all the chunk specific parameters</span>
-<a name="l00292"></a>00292     <span class="keywordtype">size_t</span> chunkCounter = 0;
-<a name="l00293"></a>00293     BOOST_FOREACH( std::vector&lt; boost::shared_ptr&lt; data::Chunk &gt; &gt;::reference chRef, chList ) {
-<a name="l00294"></a>00294         <span class="comment">//TODO if the number of chunks gained by the splice method differs from</span>
-<a name="l00295"></a>00295         <span class="comment">//the size of the m_ChunkPropMapVector the size of the image was changed in itk.</span>
-<a name="l00296"></a>00296         <span class="comment">//Thus we have to interpolate the parameters (sliceTime so far)</span>
-<a name="l00297"></a>00297         chRef-&gt;join( static_cast&lt;util::PropertyMap &amp;&gt;( *retImage ), <span class="keyword">false</span> );
+<a name="l00266"></a>00266     <span class="comment">//do not try to grasp that in a sober state!!</span>
+<a name="l00267"></a>00267     <span class="comment">//workaround to create a TypedImage out of a MemChunk</span>
+<a name="l00268"></a>00268     std::list&lt;data::Chunk&gt; tmpChList = std::list&lt;data::Chunk&gt;( 1, retChunk );
+<a name="l00269"></a>00269     std::list&lt;data::Image&gt; isisImageList = <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">data::IOFactory::chunkListToImageList</a>( tmpChList );
+<a name="l00270"></a>00270     data::TypedImage&lt; TOutputISIS &gt;  retImage ( data::TypedImage&lt;TOutputISIS&gt; ( isisImageList.front() ) );
+<a name="l00271"></a>00271     <span class="comment">//these are properties eventually manipulated by itk. So we can not take the</span>
+<a name="l00272"></a>00272     <span class="comment">//parameters from the isis image which was handed over to the itkAdapter</span>
+<a name="l00273"></a>00273     retImage.setPropertyAs( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( static_cast&lt;float&gt;( indexOrigin[0] ),
+<a name="l00274"></a>00274                             static_cast&lt;float&gt;( indexOrigin[1] ),
+<a name="l00275"></a>00275                             static_cast&lt;float&gt;( indexOrigin[2] ),
+<a name="l00276"></a>00276                             static_cast&lt;float&gt;( indexOrigin[3] ) ) );
+<a name="l00277"></a>00277     retImage.setPropertyAs( <span class="stringliteral">&quot;rowVec&quot;</span>     , <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( static_cast&lt;float&gt;( imageDirection[0][0] ),
+<a name="l00278"></a>00278                             static_cast&lt;float&gt;( imageDirection[1][0] ),
+<a name="l00279"></a>00279                             static_cast&lt;float&gt;( imageDirection[2][0] ),
+<a name="l00280"></a>00280                             0 ) );
+<a name="l00281"></a>00281     retImage.setPropertyAs( <span class="stringliteral">&quot;columnVec&quot;</span>  , <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( ( imageDirection[0][1] ),
+<a name="l00282"></a>00282                             ( imageDirection[1][1] ),
+<a name="l00283"></a>00283                             ( imageDirection[2][1] ),
+<a name="l00284"></a>00284                             0 ) );
+<a name="l00285"></a>00285     retImage.setPropertyAs( <span class="stringliteral">&quot;sliceVec&quot;</span>   , <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( static_cast&lt;float&gt;( imageDirection[0][2] ),
+<a name="l00286"></a>00286                             static_cast&lt;float&gt;( imageDirection[1][2] ),
+<a name="l00287"></a>00287                             static_cast&lt;float&gt;( imageDirection[2][2] ),
+<a name="l00288"></a>00288                             0 ) );
+<a name="l00289"></a>00289     retImage.setPropertyAs( <span class="stringliteral">&quot;voxelSize&quot;</span>  , <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( static_cast&lt;float&gt;( imageSpacing[0] ),
+<a name="l00290"></a>00290                             static_cast&lt;float&gt;( imageSpacing[1] ),
+<a name="l00291"></a>00291                             static_cast&lt;float&gt;( imageSpacing[2] ),
+<a name="l00292"></a>00292                             static_cast&lt;float&gt;( imageSpacing[3] ) ) );
+<a name="l00293"></a>00293 
+<a name="l00294"></a>00294     <span class="comment">//this will splice down the image the same way it was handed over to the itkAdapter</span>
+<a name="l00295"></a>00295     <span class="keywordflow">if</span> ( 0 &lt; m_RelevantDim ) {
+<a name="l00296"></a>00296         retImage.spliceDownTo( static_cast&lt;data::dimensions&gt; ( m_RelevantDim ) );
+<a name="l00297"></a>00297     }
 <a name="l00298"></a>00298 
-<a name="l00299"></a>00299         <span class="keywordflow">if</span>( chunkCounter &lt; ( m_ChunkPropMapVector.size() - 1 ) ) {
-<a name="l00300"></a>00300             chunkCounter++;
-<a name="l00301"></a>00301         }
-<a name="l00302"></a>00302 
-<a name="l00303"></a>00303         chRef-&gt;join( *m_ChunkPropMapVector[chunkCounter], <span class="keyword">false</span> );
-<a name="l00304"></a>00304     }
-<a name="l00305"></a>00305     data::ImageList retList;
-<a name="l00306"></a>00306     retList.push_back( retImage );
-<a name="l00307"></a>00307     <span class="comment">//declare transformation matrix T (NIFTI -&gt; DICOM)</span>
-<a name="l00308"></a>00308     <span class="comment">// -1  1  0</span>
-<a name="l00309"></a>00309     <span class="comment">//  0 -1  0</span>
-<a name="l00310"></a>00310     <span class="comment">//  0  0  1</span>
-<a name="l00311"></a>00311     boost::numeric::ublas::matrix&lt;float&gt; T( 3, 3 );
-<a name="l00312"></a>00312     T( 0, 0 ) = -1;
-<a name="l00313"></a>00313     T( 0, 1 ) = 0;
-<a name="l00314"></a>00314     T( 0, 2 ) = 0;
-<a name="l00315"></a>00315     T( 1, 0 ) = 0;
-<a name="l00316"></a>00316     T( 1, 1 ) = -1;
-<a name="l00317"></a>00317     T( 1, 2 ) = 0;
-<a name="l00318"></a>00318     T( 2, 0 ) = 0;
-<a name="l00319"></a>00319     T( 2, 1 ) = 0;
-<a name="l00320"></a>00320     T( 2, 2 ) = 1;
-<a name="l00321"></a>00321     <span class="comment">// apply transformation to local isis image copy</span>
-<a name="l00322"></a>00322     BOOST_FOREACH( data::ImageList::const_reference ref, retList ) {
-<a name="l00323"></a>00323         ref-&gt;transformCoords( T );
-<a name="l00324"></a>00324     }
-<a name="l00325"></a>00325     <span class="keywordflow">return</span> retList;
-<a name="l00326"></a>00326 }
-<a name="l00327"></a>00327 
-<a name="l00328"></a>00328 }
-<a name="l00329"></a>00329 }
+<a name="l00299"></a>00299     <span class="comment">//add the residual parameters to the image</span>
+<a name="l00300"></a>00300     <span class="keywordflow">if</span> ( <span class="keyword">false</span> == m_ImagePropertyMap.isEmpty() ) {
+<a name="l00301"></a>00301         retImage.join( m_ImagePropertyMap, <span class="keyword">false</span> );
+<a name="l00302"></a>00302     }
+<a name="l00303"></a>00303 
+<a name="l00304"></a>00304     std::vector&lt; data::Chunk &gt; chList = retImage.copyChunksToVector();
+<a name="l00305"></a>00305     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( chList.size() != m_ChunkPropertyMapVector.size(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">data::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The image size has changed. The chunk-specific metadata will be interpolated.&quot;</span>;
+<a name="l00306"></a>00306     <span class="comment">//iterate through the spliced chunks of the image and set all the chunk specific parameters</span>
+<a name="l00307"></a>00307     <span class="keywordtype">size_t</span> chunkCounter = 0;
+<a name="l00308"></a>00308     BOOST_FOREACH( std::vector&lt; data::Chunk &gt;::reference chRef, chList ) {
+<a name="l00309"></a>00309         <span class="comment">//TODO if the number of chunks gained by the splice method differs from</span>
+<a name="l00310"></a>00310         <span class="comment">//the size of the m_ChunkPropertyMapVector the size of the image was changed in itk.</span>
+<a name="l00311"></a>00311         <span class="comment">//Thus we have to interpolate the parameters (sliceTime so far)</span>
+<a name="l00312"></a>00312         chRef.join( static_cast&lt;util::PropertyMap &amp;&gt;( retImage ), <span class="keyword">false</span> );
+<a name="l00313"></a>00313 
+<a name="l00314"></a>00314         <span class="keywordflow">if</span> ( !m_ChunkPropertyMapVector.empty() ) {
+<a name="l00315"></a>00315             chRef.join( *m_ChunkPropertyMapVector[chunkCounter], <span class="keyword">false</span> );
+<a name="l00316"></a>00316         }
+<a name="l00317"></a>00317 
+<a name="l00318"></a>00318         <span class="keywordflow">if</span>( chunkCounter &lt; ( m_ChunkPropertyMapVector.size() - 1 ) ) {
+<a name="l00319"></a>00319             chunkCounter++;
+<a name="l00320"></a>00320         }
+<a name="l00321"></a>00321     }
+<a name="l00322"></a>00322     std::list&lt;data::Image&gt; retList;
+<a name="l00323"></a>00323     retList.push_back( retImage );
+<a name="l00324"></a>00324     <span class="comment">//declare transformation matrix T (NIFTI -&gt; DICOM)</span>
+<a name="l00325"></a>00325     <span class="comment">// -1  1  0</span>
+<a name="l00326"></a>00326     <span class="comment">//  0 -1  0</span>
+<a name="l00327"></a>00327     <span class="comment">//  0  0  1</span>
+<a name="l00328"></a>00328 
+<a name="l00329"></a>00329     boost::numeric::ublas::matrix&lt;float&gt; T( 3, 3 );
+<a name="l00330"></a>00330     T( 0, 0 ) = -1;
+<a name="l00331"></a>00331     T( 0, 1 ) = 0;
+<a name="l00332"></a>00332     T( 0, 2 ) = 0;
+<a name="l00333"></a>00333     T( 1, 0 ) = 0;
+<a name="l00334"></a>00334     T( 1, 1 ) = -1;
+<a name="l00335"></a>00335     T( 1, 2 ) = 0;
+<a name="l00336"></a>00336     T( 2, 0 ) = 0;
+<a name="l00337"></a>00337     T( 2, 1 ) = 0;
+<a name="l00338"></a>00338     T( 2, 2 ) = 1;
+<a name="l00339"></a>00339     <span class="comment">// apply transformation to local isis image copy</span>
+<a name="l00340"></a>00340     BOOST_FOREACH( std::list&lt;data::Image&gt;::reference ref, retList ) {
+<a name="l00341"></a>00341         ref.transformCoords( T );
+<a name="l00342"></a>00342     }
+<a name="l00343"></a>00343     <span class="keywordflow">return</span> retList;
+<a name="l00344"></a>00344 }
+<a name="l00345"></a>00345 
+<a name="l00346"></a>00346 }
+<a name="l00347"></a>00347 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:30:59 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

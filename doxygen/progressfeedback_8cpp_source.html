@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -74,32 +73,34 @@
 <a name="l00031"></a>00031     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
 <a name="l00032"></a>00032 }
 <a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917" title="(Re)Set the progress display to the given maximum value and &amp;quot;show&amp;quot; it.">ConsoleFeedback::show</a>( <span class="keywordtype">size_t</span> max, std::string header )
-<a name="l00035"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917">00035</a> {
-<a name="l00036"></a>00036     header += <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00037"></a>00037     disp.reset( <span class="keyword">new</span> boost::progress_display( max, std::cout, header ) );
-<a name="l00038"></a>00038 }
-<a name="l00039"></a>00039 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf" title="Close/undisplay a progress display.">ConsoleFeedback::close</a>()
-<a name="l00040"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf">00040</a> {
-<a name="l00041"></a>00041     disp.reset();
-<a name="l00042"></a>00042 }
-<a name="l00043"></a>00043 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">ConsoleFeedback::getMax</a>()
-<a name="l00044"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">00044</a> {
-<a name="l00045"></a>00045     <span class="keywordflow">return</span> disp ? disp-&gt;expected_count() : 0;
-<a name="l00046"></a>00046 }
-<a name="l00047"></a>00047 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089" title="Set the actual &amp;quot;progress&amp;quot;.">ConsoleFeedback::progress</a>( <span class="keyword">const</span> std::string message, <span class="keywordtype">size_t</span> step )
-<a name="l00048"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089">00048</a> {
-<a name="l00049"></a>00049     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !disp, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot call progress on a not displayed ConsoleFeedBack.&quot;</span>;
-<a name="l00050"></a>00050     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !message.empty(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;ConsoleFeedBack does ignore the message string&quot;</span>;
-<a name="l00051"></a>00051     <span class="keywordflow">return</span> disp-&gt;operator+=( step );
-<a name="l00052"></a>00052 }
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 }
-<a name="l00056"></a>00056 }
+<a name="l00034"></a>00034 <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#a998e0b80c50c5551d8d868fd30db42d4">ProgressFeedback::~ProgressFeedback</a>() {}
+<a name="l00035"></a><a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#a998e0b80c50c5551d8d868fd30db42d4">00035</a> 
+<a name="l00036"></a>00036 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917" title="(Re)Set the progress display to the given maximum value and &amp;quot;show&amp;quot; it.">ConsoleFeedback::show</a>( <span class="keywordtype">size_t</span> max, std::string header )
+<a name="l00037"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917">00037</a> {
+<a name="l00038"></a>00038     header += <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00039"></a>00039     disp.reset( <span class="keyword">new</span> boost::progress_display( max, std::cout, header ) );
+<a name="l00040"></a>00040 }
+<a name="l00041"></a>00041 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf" title="Close/undisplay a progress display.">ConsoleFeedback::close</a>()
+<a name="l00042"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf">00042</a> {
+<a name="l00043"></a>00043     disp.reset();
+<a name="l00044"></a>00044 }
+<a name="l00045"></a>00045 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">ConsoleFeedback::getMax</a>()
+<a name="l00046"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">00046</a> {
+<a name="l00047"></a>00047     <span class="keywordflow">return</span> disp ? disp-&gt;expected_count() : 0;
+<a name="l00048"></a>00048 }
+<a name="l00049"></a>00049 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089" title="Set the actual &amp;quot;progress&amp;quot;.">ConsoleFeedback::progress</a>( <span class="keyword">const</span> std::string message, <span class="keywordtype">size_t</span> step )
+<a name="l00050"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089">00050</a> {
+<a name="l00051"></a>00051     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !disp, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot call progress on a not displayed ConsoleFeedBack.&quot;</span>;
+<a name="l00052"></a>00052     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !message.empty(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;ConsoleFeedBack does ignore the message string&quot;</span>;
+<a name="l00053"></a>00053     <span class="keywordflow">return</span> disp-&gt;operator+=( step );
+<a name="l00054"></a>00054 }
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

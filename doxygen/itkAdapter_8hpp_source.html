@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -67,11 +67,11 @@
 <a name="l00024"></a>00024 <span class="preprocessor">#ifndef ITKADAPTER_HPP_</span>
 <a name="l00025"></a>00025 <span class="preprocessor"></span><span class="preprocessor">#define ITKADAPTER_HPP_</span>
 <a name="l00026"></a>00026 <span class="preprocessor"></span>
-<a name="l00027"></a>00027 <span class="preprocessor">#include &lt;DataStorage/image.hpp&gt;</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;CoreUtils/log.hpp&gt;</span>
-<a name="l00029"></a>00029 <span class="preprocessor">#include &lt;CoreUtils/common.hpp&gt;</span>
-<a name="l00030"></a>00030 <span class="preprocessor">#include &lt;CoreUtils/vector.hpp&gt;</span>
-<a name="l00031"></a>00031 <span class="preprocessor">#include &lt;DataStorage/numeric_convert.hpp&gt;</span>
+<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;DataStorage/image.hpp&quot;</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;CoreUtils/log.hpp&quot;</span>
+<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;CoreUtils/common.hpp&quot;</span>
+<a name="l00030"></a>00030 <span class="preprocessor">#include &quot;CoreUtils/vector.hpp&quot;</span>
+<a name="l00031"></a>00031 <span class="preprocessor">#include &quot;DataStorage/numeric_convert.hpp&quot;</span>
 <a name="l00032"></a>00032 
 <a name="l00033"></a>00033 <span class="comment">//external includes</span>
 <a name="l00034"></a>00034 <span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span>
@@ -92,30 +92,30 @@
 <a name="l00053"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html">00053</a> <span class="keyword">class </span><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html" title="ITKAdapter is capable of taking an isis image object and return an itkImage object.">itkAdapter</a>
 <a name="l00054"></a>00054 {
 <a name="l00055"></a>00055 <span class="keyword">public</span>:
-<a name="l00056"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#ad56615feeb6ca77409d8b74c3b8e04fd">00056</a>     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#ad56615feeb6ca77409d8b74c3b8e04fd">itkAdapter</a>() : m_TypeID( 0 ) {};
+<a name="l00056"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#ad56615feeb6ca77409d8b74c3b8e04fd">00056</a>     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#ad56615feeb6ca77409d8b74c3b8e04fd">itkAdapter</a>() : m_TypeID( 0 ), m_ChunkPropertyMapVector( NULL ), m_ImagePropertyMap( util::PropertyMap() ), m_RelevantDim( 0 ) {};
 <a name="l00068"></a>00068     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; <span class="keyword">typename</span> TImage::Pointer
-<a name="l00069"></a>00069     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#acab3b22b94a63a56bde1dc1e287fb712" title="Converts an isis image object in an itk image.">makeItkImageObject</a>( <span class="keyword">const</span> boost::shared_ptr&lt;data::Image&gt; src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader = <span class="keyword">true</span> );
+<a name="l00069"></a>00069     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a574f81e97c45f9bea500524f3c35e14a" title="Converts an isis image object in an itk image.">makeItkImageObject</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader = <span class="keyword">true</span> );
 <a name="l00070"></a>00070 
-<a name="l00084"></a>00084     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; data::ImageList
-<a name="l00085"></a>00085     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#af825439ea0817c7668416d96e6b17256" title="Converts an itk image object in an isis image object.">makeIsisImageObject</a>( <span class="keyword">const</span> <span class="keyword">typename</span> TImage::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter = <span class="keyword">true</span> );
+<a name="l00084"></a>00084     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImage&gt; std::list&lt;data::Image&gt;
+<a name="l00085"></a>00085     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a7f6117e703cd4f20c6786f1999d82ac7" title="Converts an itk image object in an isis image object.">makeIsisImageObject</a>( <span class="keyword">const</span> <span class="keyword">typename</span> TImage::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter = <span class="keyword">true</span> );
 <a name="l00086"></a>00086 
 <a name="l00087"></a>00087 <span class="keyword">protected</span>:
 <a name="l00088"></a>00088     <span class="comment">//should not be loaded directly</span>
-<a name="l00089"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a576dc0de72acd7a0c5830b103ecaf2cd">00089</a>     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a576dc0de72acd7a0c5830b103ecaf2cd">itkAdapter</a>( <span class="keyword">const</span> boost::shared_ptr&lt;data::Image&gt; src ) : m_ImageISIS( *src ) {};
+<a name="l00089"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a576dc0de72acd7a0c5830b103ecaf2cd">00089</a>     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a576dc0de72acd7a0c5830b103ecaf2cd">itkAdapter</a>( <span class="keyword">const</span> boost::shared_ptr&lt;data::Image&gt; src ) : m_ImageISIS( src ) {};
 <a name="l00090"></a><a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a7831b51461b221d824751eae4ed43368">00090</a>     <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html#a7831b51461b221d824751eae4ed43368">itkAdapter</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1adapter_1_1itkAdapter.html" title="ITKAdapter is capable of taking an isis image object and return an itkImage object.">itkAdapter</a> &amp; ) {};
 <a name="l00091"></a>00091 
 <a name="l00092"></a>00092 <span class="keyword">private</span>:
 <a name="l00093"></a>00093 
-<a name="l00094"></a>00094     <span class="comment">//  boost::shared_ptr&lt;data::Image&gt; m_ImageISIS;</span>
-<a name="l00095"></a>00095     <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> m_ImageISIS;
+<a name="l00094"></a>00094     boost::shared_ptr&lt;data::Image&gt; m_ImageISIS;
+<a name="l00095"></a>00095     <span class="comment">//  data::Image m_ImageISIS;</span>
 <a name="l00096"></a>00096     <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> m_TypeID;
-<a name="l00097"></a>00097     std::vector&lt; boost::shared_ptr&lt;util::PropertyMap&gt; &gt; m_ChunkPropMapVector;
-<a name="l00098"></a>00098     <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">util::PropertyMap</a> m_ImagePropMap;
+<a name="l00097"></a>00097     std::vector&lt; boost::shared_ptr&lt;util::PropertyMap&gt; &gt; m_ChunkPropertyMapVector;
+<a name="l00098"></a>00098     <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">util::PropertyMap</a> m_ImagePropertyMap;
 <a name="l00099"></a>00099     <span class="keywordtype">size_t</span> m_RelevantDim;
 <a name="l00100"></a>00100 
 <a name="l00101"></a>00101     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TInput, <span class="keyword">typename</span> TOutput&gt; <span class="keyword">typename</span> TOutput::Pointer internCreateItk( <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkReader );
 <a name="l00102"></a>00102 
-<a name="l00103"></a>00103     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImageITK, <span class="keyword">typename</span> TOutputISIS&gt; data::ImageList internCreateISIS( <span class="keyword">const</span> <span class="keyword">typename</span> TImageITK::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter );
+<a name="l00103"></a>00103     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TImageITK, <span class="keyword">typename</span> TOutputISIS&gt; std::list&lt;data::Image&gt; internCreateISIS( <span class="keyword">const</span> <span class="keyword">typename</span> TImageITK::Pointer src, <span class="keyword">const</span> <span class="keywordtype">bool</span> behaveAsItkWriter );
 <a name="l00104"></a>00104 };
 <a name="l00105"></a>00105 
 <a name="l00106"></a>00106 }
@@ -126,7 +126,7 @@
 <a name="l00111"></a>00111 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:30:59 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

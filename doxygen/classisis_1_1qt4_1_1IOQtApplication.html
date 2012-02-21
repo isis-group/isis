@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -47,7 +47,8 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::qt4::IOQtApplication Class Reference</h1>  </div>
 </div>
@@ -70,9 +71,13 @@ Inheritance diagram for isis::qt4::IOQtApplication:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">QApplication &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#aeb0add6b09785bd6ab32df3ee9a73f2b">getQApplication</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#a7c5e67fb1ac909e7920d6e62fc2c6598">init</a> (int argc, char **argv, bool exitOnError=true)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the programm parameter map using argc/argv.  <a href="#a7c5e67fb1ac909e7920d6e62fc2c6598"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#a3cf28f7afd99b65958447c6358071657">init</a> (int &amp;argc, char **argv, bool exitOnError=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">see <a href="http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication</a>  <a href="#a3cf28f7afd99b65958447c6358071657"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#ae1010155dc3a61e7d6cf3961048ba427">IOQtApplication</a> (const char name[], bool have_input=true, bool have_output=true)</td></tr>
+<tr><td colspan="2"><h2><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual boost::shared_ptr<br class="typebreak"/>
+&lt; util::_internal::MessageHandlerBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#a2e3bf9cf19c91df697dba48300d21cc1">getLogHandler</a> (std::string module, <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
@@ -109,11 +114,42 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00045">45</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
+<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00043">43</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a2e3bf9cf19c91df697dba48300d21cc1"></a><!-- doxytag: member="isis::qt4::IOQtApplication::getLogHandler" ref="a2e3bf9cf19c91df697dba48300d21cc1" args="(std::string module, isis::LogLevel level) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::shared_ptr&lt; isis::util::_internal::MessageHandlerBase &gt; isis::qt4::IOQtApplication::getLogHandler </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
+          <td class="paramname"><em>level</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const<code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">isis::data::IOApplication</a>.</p>
+
+<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00065">65</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aeb0add6b09785bd6ab32df3ee9a73f2b"></a><!-- doxytag: member="isis::qt4::IOQtApplication::getQApplication" ref="aeb0add6b09785bd6ab32df3ee9a73f2b" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -128,18 +164,18 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00049">49</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
+<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00047">47</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7c5e67fb1ac909e7920d6e62fc2c6598"></a><!-- doxytag: member="isis::qt4::IOQtApplication::init" ref="a7c5e67fb1ac909e7920d6e62fc2c6598" args="(int argc, char **argv, bool exitOnError=true)" -->
+<a class="anchor" id="a3cf28f7afd99b65958447c6358071657"></a><!-- doxytag: member="isis::qt4::IOQtApplication::init" ref="a3cf28f7afd99b65958447c6358071657" args="(int &amp;argc, char **argv, bool exitOnError=true)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool isis::qt4::IOQtApplication::init </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">int &amp;&#160;</td>
           <td class="paramname"><em>argc</em>, </td>
         </tr>
         <tr>
@@ -163,20 +199,9 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Initializes the programm parameter map using argc/argv. </p>
-<p>For every entry in parameters an corresponding command line parameter is searched and parsed. A command line parameter corresponds to an entry of parameters if it string-equals caseless to this entry and is preceded by "-".</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">argc</td><td>ammount of command line parameters in argv </td></tr>
-    <tr><td class="paramname">argv</td><td>array of const char[] containing the command line parameters </td></tr>
-    <tr><td class="paramname">exitOnError</td><td>if true the programm will exit, if there is a problem during the initialisation (like missing parameters). </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>see <a href="http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication</a> </p>
 
-<p>Reimplemented from <a class="el" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">isis::data::IOApplication</a>.</p>
-
-<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00055">55</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
+<p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00053">53</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
 
 </div>
 </div>
@@ -185,7 +210,7 @@ Public Member Functions</h2></td></tr>
 <li>/SCR/isis/lib/Adapter/qt4/<a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:01 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,23 +23,22 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -58,21 +57,29 @@
 <p><a href="propmap_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>isis::util::PropertyMap::invalidP</b></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true when entry is a leaf, needed and empty <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>isis::util::PropertyMap::listP</b></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true when entry is not a scalar <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This class contains a mapping tree to store all kinds of properties (path/key : value) It's also a generic class to have the probability to handle different modalities in upper levels (in our special case we'll have to handle things like images or other time series of data each having different properties in its standard or wherever from).  <a href="classisis_1_1util_1_1PropertyMap.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This class forms a mapping tree to store all kinds of properties (path : value), where:</p>
+<ul>
+<li>value is:<ul>
+<li>a <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a>-container holding the value of the property (this may be empty/unset)</li>
+<li>another <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> containing a subtree (a branch of the mapping tree)</li>
+</ul>
+</li>
+<li>path is one or more case insensitive key names separated by "/" to locate both, branches or properties, in the tree. </li>
+</ul>
+ <a href="classisis_1_1util_1_1PropertyMap.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">isis::util::PropertyMap::PropPath</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">"Path" type used to locate entries in the tree  <a href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>isis::util::PropertyMap::treeInvalidP</b></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true when entry is a leaf, needed and empty of entry is a invalid branch <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1treeNode.html">isis::util::_internal::treeNode</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Class <a class="el" href="classisis_1_1util_1_1__internal_1_1treeNode.html" title="Class treeNode is a basic class for PropertyMap to check some basic graph stuff for each node of the ...">treeNode</a> is a basic class for <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&#39;s also ...">PropertyMap</a> to check some basic graph stuff for each node of the property tree.  <a href="classisis_1_1util_1_1__internal_1_1treeNode.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>isis::util::PropertyMap::trueP</b></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">allways true <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html">isis::util::PropertyMap::walkTree&lt; Predicate &gt;</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Walks the whole tree and inserts any key into out for which the given scalar predicate is true.  <a href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis.html">isis</a></td></tr>
@@ -80,20 +87,23 @@ Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util_1_1__internal.html">isis::util::_internal</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestd.html">std</a></td></tr>
 
-<p><tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Streaming output for FixedVector. </p>
+<p><tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Streaming output for FixedMatrix. </p>
 <br/></td></tr>
 </p>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename charT , typename traits &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">basic_ostream&lt; charT, traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestd.html#ae66600f70287f8712cb65ba511719d23">std::operator&lt;&lt;</a> (basic_ostream&lt; charT, traits &gt; &amp;out, const <a class="el" href="classisis_1_1util_1_1__internal_1_1treeNode.html">isis::util::_internal::treeNode</a> &amp;s)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">basic_ostream&lt; charT, traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestd.html#ae66600f70287f8712cb65ba511719d23">std::operator&lt;&lt;</a> (basic_ostream&lt; charT, traits &gt; &amp;out, const isis::util::_internal::treeNode &amp;s)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming output for PropertyMap::node.  <a href="#ae66600f70287f8712cb65ba511719d23"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename charT , typename traits &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">basic_ostream&lt; charT, traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestd.html#a453554af0dee138a52cc9a1b400fe0c3">std::operator&lt;&lt;</a> (basic_ostream&lt; charT, traits &gt; &amp;out, const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">isis::util::PropertyMap::PropPath</a> &amp;s)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming output for PropertyMap::PropPath.  <a href="#a453554af0dee138a52cc9a1b400fe0c3"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename charT , typename traits &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">basic_ostream&lt; charT, traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestd.html#ab69440ac0016aade0ec7dd58520657bb">std::operator&lt;&lt;</a> (basic_ostream&lt; charT, traits &gt; &amp;out, const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;s)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming output for PropertyMap.  <a href="#ab69440ac0016aade0ec7dd58520657bb"></a><br/></td></tr>
 </table>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

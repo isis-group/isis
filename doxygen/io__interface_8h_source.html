@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -68,82 +67,84 @@
 <a name="l00025"></a>00025 <span class="keyword">namespace </span>image_io
 <a name="l00026"></a>00026 {
 <a name="l00027"></a>00027 
-<a name="l00029"></a>00029 <span class="keyword">class </span><a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>
+<a name="l00029"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html">00029</a> <span class="keyword">class </span><a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">FileFormat</a>
 <a name="l00030"></a>00030 {
-<a name="l00031"></a>00031 <span class="keyword">protected</span>:
-<a name="l00037"></a>00037     <span class="keyword">static</span> <span class="keywordtype">bool</span> hasOrTell( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;name, <span class="keyword">const</span> util::PropertyMap &amp;<span class="keywordtype">object</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level );
-<a name="l00043"></a>00043     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> <span class="keywordtype">bool</span>
-<a name="l00044"></a>00044     transformOrTell( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;from, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;to, util::PropertyMap &amp;<span class="keywordtype">object</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
-<a name="l00045"></a>00045         <span class="keywordflow">if</span> ( hasOrTell( from, <span class="keywordtype">object</span>, level ) and <span class="keywordtype">object</span>.transform&lt;TYPE&gt;( from, to ) ) {
-<a name="l00046"></a>00046             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Transformed &quot;</span> &lt;&lt; from &lt;&lt; <span class="stringliteral">&quot; into &quot;</span> &lt;&lt; <span class="keywordtype">object</span>.propertyValue( to );
-<a name="l00047"></a>00047             <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00048"></a>00048         }
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00051"></a>00051     }
-<a name="l00053"></a>00053     <span class="keyword">virtual</span> std::string suffixes()<span class="keyword">const</span> = 0;
-<a name="l00054"></a>00054     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">float</span> invalid_float;
-<a name="l00055"></a>00055 <span class="keyword">public</span>:
-<a name="l00056"></a>00056     <span class="keyword">static</span> <span class="keywordtype">void</span> throwGenericError( std::string desc );
-<a name="l00057"></a>00057     <span class="keyword">static</span> <span class="keywordtype">void</span> throwSystemError( <span class="keywordtype">int</span> err, std::string desc = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00058"></a>00058     boost::filesystem::path plugin_file;
-<a name="l00059"></a>00059 
-<a name="l00061"></a>00061     <span class="keyword">virtual</span> std::pair&lt;std::string, std::string&gt; makeBasename( <span class="keyword">const</span> std::string &amp;filename )<span class="keyword">const</span>;
-<a name="l00062"></a>00062 
-<a name="l00063"></a>00063     <span class="keyword">static</span> std::string makeFilename(<span class="keyword">const</span> util::PropertyMap &amp;img,std::string namePattern);
-<a name="l00064"></a>00064     std::list&lt;std::string&gt; makeUniqueFilenames( <span class="keyword">const</span> std::list&lt;data::Image&gt; &amp;images, <span class="keyword">const</span> std::string &amp;namePattern )<span class="keyword">const</span>;
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066 
-<a name="l00068"></a>00068     <span class="keyword">virtual</span> std::string getName()<span class="keyword">const</span> = 0;
-<a name="l00069"></a>00069 
-<a name="l00077"></a>00077     std::list&lt;util::istring&gt; getSuffixes()<span class="keyword">const</span>;
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079 
-<a name="l00081"></a>00081     <span class="keyword">virtual</span> std::string dialects( <span class="keyword">const</span> std::string &amp;<span class="comment">/*filename*/</span> )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::string();};
-<a name="l00082"></a>00082 
-<a name="l00084"></a>00084     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> tainted()<span class="keyword">const </span>{<span class="keywordflow">return</span> <span class="keyword">true</span>;}
-<a name="l00085"></a>00085 
-<a name="l00094"></a>00094     <span class="keyword">virtual</span> <span class="keywordtype">int</span> load( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; ) = 0; <span class="comment">//@todo should be locked</span>
-<a name="l00095"></a>00095 
-<a name="l00102"></a>00102     <span class="keyword">virtual</span> <span class="keywordtype">void</span> write( <span class="keyword">const</span> data::Image &amp;image, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; ) = 0;
-<a name="l00103"></a>00103 
-<a name="l00111"></a>00111     <span class="keyword">virtual</span> <span class="keywordtype">void</span> write( <span class="keyword">const</span> std::list&lt;data::Image&gt; &amp;images, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; );
-<a name="l00112"></a>00112 
-<a name="l00113"></a>00113     <span class="keyword">virtual</span> ~<a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>() {}
-<a name="l00114"></a>00114 };
-<a name="l00115"></a>00115 }
-<a name="l00116"></a>00116 }
-<a name="l00117"></a>00117 <span class="preprocessor">#else</span>
-<a name="l00118"></a><a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">00118</a> <span class="preprocessor"></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>;
-<a name="l00119"></a>00119 <span class="preprocessor">#endif</span>
-<a name="l00120"></a>00120 <span class="preprocessor"></span>
-<a name="l00121"></a>00121 
-<a name="l00122"></a>00122 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00123"></a>00123 <span class="preprocessor"></span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {
-<a name="l00124"></a>00124 <span class="preprocessor">#endif</span>
-<a name="l00125"></a>00125 <span class="preprocessor"></span>
-<a name="l00126"></a>00126 <span class="preprocessor">#if defined(__STDC__) || defined(__cplusplus)</span>
-<a name="l00127"></a>00127 <span class="preprocessor"></span><span class="preprocessor">#ifdef WIN32</span>
-<a name="l00128"></a>00128 <span class="preprocessor"></span>    <span class="keyword">extern</span> __declspec( dllexport ) isis::image_io::<a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> *<a class="code" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a>();
-<a name="l00129"></a>00129 <span class="preprocessor">#else</span>
-<a name="l00130"></a>00130 <span class="preprocessor"></span>    <span class="keyword">extern</span> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">isis::image_io::FileFormat</a> *<a class="code" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a>();
+<a name="l00031"></a>00031 <span class="keyword">public</span>:
+<a name="l00032"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7cad07912ae6388326178ff2a09df79340b">00032</a>     <span class="keyword">enum</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a>{<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7ca0b8132e5381392fe4901a025125d8c0e">read_only</a>=1,<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7cad07912ae6388326178ff2a09df79340b">write_only</a>=2,<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7ca43671bece44347f278a1637c7c01b418">both</a>=3};
+<a name="l00033"></a>00033 <span class="keyword">protected</span>:
+<a name="l00039"></a>00039     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a8fe18b623f97871aad19aa96c44d7034" title="Check if a given property exists in the given PropMap.">hasOrTell</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;name, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;<span class="keywordtype">object</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level );
+<a name="l00045"></a>00045     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> <span class="keywordtype">bool</span>
+<a name="l00046"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a869ecd86d5f3eb0b8838abbb59b030bc">00046</a>     <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a869ecd86d5f3eb0b8838abbb59b030bc" title="Transform a given property into another and remove the original in the given PropMap.">transformOrTell</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;from, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;to, <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;<span class="keywordtype">object</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
+<a name="l00047"></a>00047         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a8fe18b623f97871aad19aa96c44d7034" title="Check if a given property exists in the given PropMap.">hasOrTell</a>( from, <span class="keywordtype">object</span>, level ) and <span class="keywordtype">object</span>.transform&lt;TYPE&gt;( from, to ) ) {
+<a name="l00048"></a>00048             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Transformed &quot;</span> &lt;&lt; from &lt;&lt; <span class="stringliteral">&quot; into &quot;</span> &lt;&lt; <span class="keywordtype">object</span>.propertyValue( to );
+<a name="l00049"></a>00049             <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00050"></a>00050         }
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00053"></a>00053     }
+<a name="l00055"></a>00055     <span class="keyword">virtual</span> std::string <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a3f83b544d398742f7bdbe939d0f7d6bf">suffixes</a>(<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a> modes=<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7ca43671bece44347f278a1637c7c01b418">both</a>)<span class="keyword">const</span> = 0;
+<a name="l00056"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a1254f161f3100ef4a96709f170a3df41">00056</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">float</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a1254f161f3100ef4a96709f170a3df41">invalid_float</a>;
+<a name="l00057"></a>00057 <span class="keyword">public</span>:
+<a name="l00058"></a>00058     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#afa895e4283f39c344f5daf4796f2d877">throwGenericError</a>( std::string desc );
+<a name="l00059"></a>00059     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aa660866500c64ef4946c8408fde88bf0">throwSystemError</a>( <span class="keywordtype">int</span> err, std::string desc = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00060"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aaa2bcce8f196ce9a8ee6e8c8de5c683a">00060</a>     boost::filesystem::path <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aaa2bcce8f196ce9a8ee6e8c8de5c683a">plugin_file</a>;
+<a name="l00061"></a>00061 
+<a name="l00063"></a>00063     <span class="keyword">virtual</span> std::pair&lt;std::string, std::string&gt; <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a9055b81aa6f91a4853991b01e6905f84" title="splits the suffix (and the &amp;quot;.&amp;quot;) from the filename (or path) and returns a pair made of both...">makeBasename</a>( <span class="keyword">const</span> std::string &amp;filename )<span class="keyword">const</span>;
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065     <span class="keyword">static</span> std::string <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aacb868f6f251559b2b5f88a5bee9f5e9">makeFilename</a>(<span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;img,std::string namePattern);
+<a name="l00066"></a>00066     std::list&lt;std::string&gt; <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a8f2c618a080412b0802d7fa42635e900">makeUniqueFilenames</a>( <span class="keyword">const</span> std::list&lt;data::Image&gt; &amp;images, <span class="keyword">const</span> std::string &amp;namePattern )<span class="keyword">const</span>;
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068 
+<a name="l00070"></a>00070     <span class="keyword">virtual</span> std::string <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aff0eaeb932b67a03194aaf6276ad1d44">getName</a>()<span class="keyword">const</span> = 0;
+<a name="l00071"></a>00071 
+<a name="l00082"></a>00082     std::list&lt;util::istring&gt; <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#afb7636984df37d50beedff0da1ba211d" title="get all file suffixes a plugin suggests to handle The string returned by suffixes is tokenized at the...">getSuffixes</a>(<a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a> mode = <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7ca43671bece44347f278a1637c7c01b418">both</a>)<span class="keyword">const</span>;
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084 
+<a name="l00086"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aa4124d591577978336c1352adcd1a98a">00086</a>     <span class="keyword">virtual</span> std::string <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#aa4124d591577978336c1352adcd1a98a">dialects</a>( <span class="keyword">const</span> std::string &amp;<span class="comment">/*filename*/</span> )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::string();};
+<a name="l00087"></a>00087 
+<a name="l00089"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">00089</a>     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">tainted</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <span class="keyword">true</span>;}
+<a name="l00090"></a>00090 
+<a name="l00099"></a>00099     <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a2692bc1fd170c46232c81a254a56420a" title="Load data into the given chunk list.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; ) = 0; <span class="comment">//@todo should be locked</span>
+<a name="l00100"></a>00100 
+<a name="l00108"></a>00108     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a9cafcb99bc0063bd528da0278ffff06f" title="Write a single image to a file.">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; ) = 0;
+<a name="l00109"></a>00109 
+<a name="l00118"></a>00118     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a9cafcb99bc0063bd528da0278ffff06f" title="Write a single image to a file.">write</a>( <span class="keyword">const</span> std::list&lt;data::Image&gt; &amp;images, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; );
+<a name="l00119"></a>00119 
+<a name="l00120"></a><a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a0d737a7f7f9fbe268cc0dbee23537ac8">00120</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html#a0d737a7f7f9fbe268cc0dbee23537ac8">~FileFormat</a>() {}
+<a name="l00121"></a>00121 };
+<a name="l00122"></a>00122 }
+<a name="l00123"></a>00123 }
+<a name="l00124"></a>00124 <span class="preprocessor">#else</span>
+<a name="l00125"></a>00125 <span class="preprocessor"></span><span class="keyword">typedef</span> <span class="keyword">struct </span>FileFormat FileFormat;
+<a name="l00126"></a>00126 <span class="preprocessor">#endif</span>
+<a name="l00127"></a>00127 <span class="preprocessor"></span>
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00130"></a>00130 <span class="preprocessor"></span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {
 <a name="l00131"></a>00131 <span class="preprocessor">#endif</span>
-<a name="l00132"></a>00132 <span class="preprocessor"></span><span class="preprocessor">#else</span>
-<a name="l00133"></a>00133 <span class="preprocessor"></span><span class="preprocessor">#ifdef WIN32</span>
-<a name="l00134"></a>00134 <span class="preprocessor"></span>    <span class="keyword">extern</span> __declspec( dllexport ) <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> *factory();
-<a name="l00135"></a>00135 <span class="preprocessor">#else</span>
-<a name="l00136"></a>00136 <span class="preprocessor"></span>    <span class="keyword">extern</span> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a> *<a class="code" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a>();
-<a name="l00137"></a>00137 <span class="preprocessor">#endif</span>
-<a name="l00138"></a>00138 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
-<a name="l00139"></a>00139 <span class="preprocessor"></span>
-<a name="l00140"></a>00140 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00141"></a>00141 <span class="preprocessor"></span>}
-<a name="l00142"></a>00142 <span class="preprocessor">#endif</span>
-<a name="l00143"></a>00143 <span class="preprocessor"></span>
-<a name="l00144"></a>00144 <span class="preprocessor">#endif //IO_INTERFACE_H</span>
+<a name="l00132"></a>00132 <span class="preprocessor"></span>
+<a name="l00133"></a>00133 <span class="preprocessor">#if defined(__STDC__) || defined(__cplusplus)</span>
+<a name="l00134"></a>00134 <span class="preprocessor"></span><span class="preprocessor">#ifdef WIN32</span>
+<a name="l00135"></a>00135 <span class="preprocessor"></span>    <span class="keyword">extern</span> __declspec( dllexport ) isis::image_io::FileFormat *<a class="code" href="io__interface_8h.html#aa8b483f374fb36a1a13eccaa9e5e70ab">factory</a>();
+<a name="l00136"></a>00136 <span class="preprocessor">#else</span>
+<a name="l00137"></a>00137 <span class="preprocessor"></span>    <span class="keyword">extern</span> <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">isis::image_io::FileFormat</a> *<a class="code" href="io__interface_8h.html#aa8b483f374fb36a1a13eccaa9e5e70ab">factory</a>();
+<a name="l00138"></a>00138 <span class="preprocessor">#endif</span>
+<a name="l00139"></a>00139 <span class="preprocessor"></span><span class="preprocessor">#else</span>
+<a name="l00140"></a>00140 <span class="preprocessor"></span><span class="preprocessor">#ifdef WIN32</span>
+<a name="l00141"></a>00141 <span class="preprocessor"></span>    <span class="keyword">extern</span> __declspec( dllexport ) FileFormat *factory();
+<a name="l00142"></a>00142 <span class="preprocessor">#else</span>
+<a name="l00143"></a>00143 <span class="preprocessor"></span>    <span class="keyword">extern</span> FileFormat *<a class="code" href="io__interface_8h.html#aa8b483f374fb36a1a13eccaa9e5e70ab">factory</a>();
+<a name="l00144"></a>00144 <span class="preprocessor">#endif</span>
+<a name="l00145"></a>00145 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
+<a name="l00146"></a>00146 <span class="preprocessor"></span>
+<a name="l00147"></a>00147 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00148"></a>00148 <span class="preprocessor"></span>}
+<a name="l00149"></a>00149 <span class="preprocessor">#endif</span>
+<a name="l00150"></a>00150 <span class="preprocessor"></span>
+<a name="l00151"></a>00151 <span class="preprocessor">#endif //IO_INTERFACE_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

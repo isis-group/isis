@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -81,26 +80,27 @@
 <a name="l00050"></a>00050     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#a4df847f33b92b3f03ae3ffd4e2e28382" title="Close/undisplay a progress display.">close</a>() = 0;
 <a name="l00052"></a>00052     <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#abd064a62a2a77777b3a00f93e2139599">getMax</a>() = 0;
 <a name="l00054"></a>00054     <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">ProgressFeedback</a> &amp;<a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#ae8ebb9c7558e5fe080c5cbb7ffcb2e47" title="Increment the &amp;quot;progress&amp;quot; by one.">operator++</a>();
-<a name="l00055"></a>00055 };
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057 <span class="comment">/*</span>
-<a name="l00058"></a>00058 <span class="comment"> * Most simple implementation of a progress bar on the console</span>
-<a name="l00059"></a>00059 <span class="comment"> */</span>
-<a name="l00060"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html">00060</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html">ConsoleFeedback</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">ProgressFeedback</a>
-<a name="l00061"></a>00061 {
-<a name="l00062"></a>00062     boost::scoped_ptr&lt;boost::progress_display&gt; disp;
-<a name="l00063"></a>00063 <span class="keyword">public</span>:
-<a name="l00064"></a>00064     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf" title="Close/undisplay a progress display.">close</a>();
-<a name="l00065"></a>00065     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">getMax</a>();
-<a name="l00066"></a>00066     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089" title="Set the actual &amp;quot;progress&amp;quot;.">progress</a>( <span class="keyword">const</span> std::string message = <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">size_t</span> step = 1 );
-<a name="l00067"></a>00067     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917" title="(Re)Set the progress display to the given maximum value and &amp;quot;show&amp;quot; it.">show</a>( <span class="keywordtype">size_t</span> max, std::string header );
-<a name="l00068"></a>00068 };
-<a name="l00069"></a>00069 }
+<a name="l00055"></a>00055     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html#a998e0b80c50c5551d8d868fd30db42d4">~ProgressFeedback</a>();
+<a name="l00056"></a>00056 };
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 <span class="comment">/*</span>
+<a name="l00059"></a>00059 <span class="comment"> * Most simple implementation of a progress bar on the console</span>
+<a name="l00060"></a>00060 <span class="comment"> */</span>
+<a name="l00061"></a><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html">00061</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html">ConsoleFeedback</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">ProgressFeedback</a>
+<a name="l00062"></a>00062 {
+<a name="l00063"></a>00063     boost::scoped_ptr&lt;boost::progress_display&gt; disp;
+<a name="l00064"></a>00064 <span class="keyword">public</span>:
+<a name="l00065"></a>00065     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf" title="Close/undisplay a progress display.">close</a>();
+<a name="l00066"></a>00066     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#a973b4298105e1d69ca3e56cc8da3f70b">getMax</a>();
+<a name="l00067"></a>00067     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#aea5d1013c45a5e841df763b27fc2a089" title="Set the actual &amp;quot;progress&amp;quot;.">progress</a>( <span class="keyword">const</span> std::string message = <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">size_t</span> step = 1 );
+<a name="l00068"></a>00068     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917" title="(Re)Set the progress display to the given maximum value and &amp;quot;show&amp;quot; it.">show</a>( <span class="keywordtype">size_t</span> max, std::string header );
+<a name="l00069"></a>00069 };
 <a name="l00070"></a>00070 }
-<a name="l00071"></a>00071 <span class="preprocessor">#endif // PROGRESSFEEDBACK_HPP</span>
+<a name="l00071"></a>00071 }
+<a name="l00072"></a>00072 <span class="preprocessor">#endif // PROGRESSFEEDBACK_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

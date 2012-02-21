@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -101,14 +100,14 @@
 <a name="l00063"></a>00063     <span class="keywordflow">return</span> <span class="keyword">true</span>;
 <a name="l00064"></a>00064 }
 <a name="l00065"></a>00065 
-<a name="l00066"></a>00066 <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a1ad04bf8bb562413f0a02065bfe4b721">transformCoords</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">isis::util::PropertyMap</a> &amp;, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt;size_t, 4&gt;</a> size, boost::numeric::ublas::matrix&lt;float&gt;, <span class="keywordtype">bool</span> transformCenterIsImageCenter = <span class="keyword">false</span> );
+<a name="l00066"></a>00066 <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a5e0873965e56d7bad760f2e34b9a1f57">transformCoords</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">isis::util::PropertyMap</a> &amp;, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">isis::util::vector4&lt;size_t&gt;</a> size, boost::numeric::ublas::matrix&lt;float&gt;, <span class="keywordtype">bool</span> transformCenterIsImageCenter = <span class="keyword">false</span> );
 <a name="l00067"></a>00067 
 <a name="l00068"></a>00068 }
 <a name="l00069"></a>00069 
 <a name="l00070"></a><a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">00070</a> <span class="keyword">typedef</span> DataLog <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>;
 <a name="l00071"></a><a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">00071</a> <span class="keyword">typedef</span> DataDebug <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>;
 <a name="l00072"></a><a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">00072</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> {<a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> = 0, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4d76e19bcda99794dc317e4dfacb2f3c">columnDim</a>, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a5ac8c76240726965f794dcedcb675d8e">sliceDim</a>, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">timeDim</a>};
-<a name="l00073"></a><a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">00073</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> { <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = 0, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> };
+<a name="l00073"></a><a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">00073</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> { <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = 0, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a>, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a6b3eda41d68306590168fc6ed31d84e9">t</a> };
 <a name="l00074"></a>00074 
 <a name="l00083"></a><a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">00083</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18" title="Set logging level for the namespace data.">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
 <a name="l00084"></a>00084 {
@@ -120,7 +119,7 @@
 <a name="l00091"></a>00091 <span class="preprocessor">#endif //DATA_COMMON_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

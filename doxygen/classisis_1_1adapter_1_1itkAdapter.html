@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -65,11 +65,11 @@
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#ad56615feeb6ca77409d8b74c3b8e04fd">itkAdapter</a> ()</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TImage &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">data::ImageList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#af825439ea0817c7668416d96e6b17256">makeIsisImageObject</a> (const typename TImage::Pointer src, const bool behaveAsItkWriter=true)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an itk image object in an isis image object.  <a href="#af825439ea0817c7668416d96e6b17256"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#a7f6117e703cd4f20c6786f1999d82ac7">makeIsisImageObject</a> (const typename TImage::Pointer src, const bool behaveAsItkWriter=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an itk image object in an isis image object.  <a href="#a7f6117e703cd4f20c6786f1999d82ac7"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TImage &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">TImage::Pointer&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#acab3b22b94a63a56bde1dc1e287fb712">makeItkImageObject</a> (const boost::shared_ptr&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; src, const bool behaveAsItkReader=true)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an isis image object in an itk image.  <a href="#acab3b22b94a63a56bde1dc1e287fb712"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">TImage::Pointer&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#a574f81e97c45f9bea500524f3c35e14a">makeItkImageObject</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;src, const bool behaveAsItkReader=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an isis image object in an itk image.  <a href="#a574f81e97c45f9bea500524f3c35e14a"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1adapter_1_1itkAdapter.html#a576dc0de72acd7a0c5830b103ecaf2cd">itkAdapter</a> (const boost::shared_ptr&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; src)</td></tr>
@@ -137,14 +137,14 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="af825439ea0817c7668416d96e6b17256"></a><!-- doxytag: member="isis::adapter::itkAdapter::makeIsisImageObject" ref="af825439ea0817c7668416d96e6b17256" args="(const typename TImage::Pointer src, const bool behaveAsItkWriter=true)" -->
+<a class="anchor" id="a7f6117e703cd4f20c6786f1999d82ac7"></a><!-- doxytag: member="isis::adapter::itkAdapter::makeIsisImageObject" ref="a7f6117e703cd4f20c6786f1999d82ac7" args="(const typename TImage::Pointer src, const bool behaveAsItkWriter=true)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename TImage &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">data::ImageList isis::adapter::itkAdapter::makeIsisImageObject </td>
+          <td class="memname">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; isis::adapter::itkAdapter::makeIsisImageObject </td>
           <td>(</td>
           <td class="paramtype">const typename TImage::Pointer&#160;</td>
           <td class="paramname"><em>src</em>, </td>
@@ -180,11 +180,11 @@ template&lt;typename TImage &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>an isis::data::ImageList. </dd></dl>
 
-<p>Definition at line <a class="el" href="itkAdapter__impl_8hpp_source.html#l00070">70</a> of file <a class="el" href="itkAdapter__impl_8hpp_source.html">itkAdapter_impl.hpp</a>.</p>
+<p>Definition at line <a class="el" href="itkAdapter__impl_8hpp_source.html#l00071">71</a> of file <a class="el" href="itkAdapter__impl_8hpp_source.html">itkAdapter_impl.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="acab3b22b94a63a56bde1dc1e287fb712"></a><!-- doxytag: member="isis::adapter::itkAdapter::makeItkImageObject" ref="acab3b22b94a63a56bde1dc1e287fb712" args="(const boost::shared_ptr&lt; data::Image &gt; src, const bool behaveAsItkReader=true)" -->
+<a class="anchor" id="a574f81e97c45f9bea500524f3c35e14a"></a><!-- doxytag: member="isis::adapter::itkAdapter::makeItkImageObject" ref="a574f81e97c45f9bea500524f3c35e14a" args="(const data::Image &amp;src, const bool behaveAsItkReader=true)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -193,7 +193,7 @@ template&lt;typename TImage &gt; </div>
         <tr>
           <td class="memname">TImage::Pointer isis::adapter::itkAdapter::makeItkImageObject </td>
           <td>(</td>
-          <td class="paramtype">const boost::shared_ptr&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -226,7 +226,7 @@ template&lt;typename TImage &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>an itk smartpointer on the itkImage object </dd></dl>
 
-<p>Definition at line <a class="el" href="itkAdapter__impl_8hpp_source.html#l00033">33</a> of file <a class="el" href="itkAdapter__impl_8hpp_source.html">itkAdapter_impl.hpp</a>.</p>
+<p>Definition at line <a class="el" href="itkAdapter__impl_8hpp_source.html#l00034">34</a> of file <a class="el" href="itkAdapter__impl_8hpp_source.html">itkAdapter_impl.hpp</a>.</p>
 
 </div>
 </div>
@@ -235,7 +235,7 @@ template&lt;typename TImage &gt; </div>
 <li>/SCR/isis/lib/Adapter/itk/<a class="el" href="itkAdapter__impl_8hpp_source.html">itkAdapter_impl.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:00 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

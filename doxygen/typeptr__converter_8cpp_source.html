@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -97,7 +96,7 @@
 <a name="l00055"></a>00055 }
 <a name="l00056"></a>00056 
 <a name="l00057"></a>00057 <span class="comment">//default implementation of ValuePtrConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling</span>
-<a name="l00058"></a>00058 <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a3afb8ef0eab23d21c7e997c697103475" title="Helper to sanitise scaling.">ValuePtrConverterBase::getScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">isis::util::_internal::ValueBase</a>&amp; <span class="comment">/*min*/</span>, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">isis::util::_internal::ValueBase</a>&amp; <span class="comment">/*max*/</span>, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> <span class="comment">/*scaleopt*/</span> )<span class="keyword"> const</span>
+<a name="l00058"></a>00058 <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a3afb8ef0eab23d21c7e997c697103475" title="Helper to sanitise scaling.">ValuePtrConverterBase::getScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">isis::util::_internal::ValueBase</a> &amp; <span class="comment">/*min*/</span>, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">isis::util::_internal::ValueBase</a> &amp; <span class="comment">/*max*/</span>, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> <span class="comment">/*scaleopt*/</span> )<span class="keyword"> const</span>
 <a name="l00059"></a>00059 <span class="keyword"></span>{
 <a name="l00060"></a>00060     <span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> ret( <a class="code" href="group__util.html#ga7cad51817557d1d098285151ec313850">util::ValueReference</a>( util::Value&lt;uint8_t&gt;( 1 ) ), <a class="code" href="group__util.html#ga7cad51817557d1d098285151ec313850">util::ValueReference</a>( util::Value&lt;uint8_t&gt;( 0 ) ) );
 <a name="l00061"></a>00061     <span class="keywordflow">return</span> ret;
@@ -313,7 +312,7 @@
 <a name="l00286"></a>00286 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

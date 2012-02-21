@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -78,36 +77,32 @@
 <a name="l00048"></a>00048 {
 <a name="l00049"></a>00049     <span class="keyword">const</span> std::string m_name;
 <a name="l00050"></a>00050     std::string m_filename;
-<a name="l00051"></a>00051     <span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> LLMap[];
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 <span class="keyword">protected</span>:
-<a name="l00054"></a>00054     <span class="keyword">virtual</span> boost::shared_ptr&lt;_internal::MessageHandlerBase&gt; <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( std::string module, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>;
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056 <span class="keyword">public</span>:
-<a name="l00057"></a>00057 
-<a name="l00058"></a><a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">00058</a>     <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a> <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>;
-<a name="l00059"></a>00059 
-<a name="l00068"></a>00068     <a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373" title="Default Constructor.">Application</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[] );
-<a name="l00069"></a>00069     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">~Application</a>();
-<a name="l00070"></a>00070 
-<a name="l00080"></a>00080     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">true</span> );
-<a name="l00085"></a>00085     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keywordtype">bool</span> withHidden = <span class="keyword">false</span> )<span class="keyword">const</span>;
-<a name="l00087"></a><a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204">00087</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MODULE&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204" title="Set the logging level for the specified module.">setLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
-<a name="l00088"></a>00088         <span class="keywordflow">if</span> ( !MODULE::use );
-<a name="l00089"></a>00089         <span class="keywordflow">else</span> _internal::Log&lt;MODULE&gt;::setHandler( <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( MODULE::name(), level ) );
-<a name="l00090"></a>00090     }
-<a name="l00091"></a>00091     <span class="comment">//get the version of the coreutils</span>
-<a name="l00092"></a>00092     <span class="keyword">static</span> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>( <span class="keywordtype">void</span> );
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094     <span class="comment">//get the LLMap</span>
-<a name="l00095"></a><a class="code" href="classisis_1_1util_1_1Application.html#a1735a920f193264ff9d3a6fed948ddce">00095</a>     <span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> *<a class="code" href="classisis_1_1util_1_1Application.html#a1735a920f193264ff9d3a6fed948ddce">getLLMap</a>( <span class="keywordtype">void</span> ) { <span class="keywordflow">return</span> LLMap; }
-<a name="l00096"></a>00096 };
-<a name="l00097"></a>00097 }
-<a name="l00098"></a>00098 }
-<a name="l00099"></a>00099 <span class="preprocessor">#endif // APPLICATION_HPP</span>
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="keyword">protected</span>:
+<a name="l00053"></a>00053     <span class="keyword">virtual</span> boost::shared_ptr&lt;_internal::MessageHandlerBase&gt; <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( std::string module, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>;
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055 <span class="keyword">public</span>:
+<a name="l00056"></a>00056 
+<a name="l00057"></a><a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">00057</a>     <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a> <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>;
+<a name="l00058"></a>00058 
+<a name="l00067"></a>00067     <a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373" title="Default Constructor.">Application</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[] );
+<a name="l00068"></a>00068     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">~Application</a>();
+<a name="l00069"></a>00069 
+<a name="l00079"></a>00079     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">true</span> );
+<a name="l00084"></a>00084     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keywordtype">bool</span> withHidden = <span class="keyword">false</span> )<span class="keyword">const</span>;
+<a name="l00086"></a><a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204">00086</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MODULE&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204" title="Set the logging level for the specified module.">setLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
+<a name="l00087"></a>00087         <span class="keywordflow">if</span> ( !MODULE::use );
+<a name="l00088"></a>00088         <span class="keywordflow">else</span> _internal::Log&lt;MODULE&gt;::setHandler( <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( MODULE::name(), level ) );
+<a name="l00089"></a>00089     }
+<a name="l00090"></a>00090     <span class="comment">//get the version of the coreutils</span>
+<a name="l00091"></a>00091     <span class="keyword">static</span> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>( <span class="keywordtype">void</span> );
+<a name="l00092"></a>00092 };
+<a name="l00093"></a>00093 }
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095 <span class="preprocessor">#endif // APPLICATION_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -49,7 +48,7 @@
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-attribs">Data Fields</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::util::Application Class Reference</h1>  </div>
@@ -66,13 +65,9 @@ Inheritance diagram for isis::util::Application:</div>
  <div class="center">
   <img src="classisis_1_1util_1_1Application.png" usemap="#isis::util::Application_map" alt=""/>
   <map id="isis::util::Application_map" name="isis::util::Application_map">
-<area href="classisis_1_1data_1_1IOApplication.html" alt="isis::data::IOApplication" shape="rect" coords="0,56,147,80"/>
-<area href="classisis_1_1qt4_1_1QtApplication.html" alt="isis::qt4::QtApplication" shape="rect" coords="157,56,304,80"/>
-<area href="classisis_1_1qt4_1_1IOQtApplication.html" alt="isis::qt4::IOQtApplication" shape="rect" coords="0,112,147,136"/>
+<area href="classisis_1_1data_1_1IOApplication.html" alt="isis::data::IOApplication" shape="rect" coords="0,56,142,80"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1util_1_1Application-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -89,9 +84,8 @@ Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a> (void)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a1735a920f193264ff9d3a6fed948ddce">getLLMap</a> (void)</td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
+Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1ParameterMap.html">ParameterMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -103,7 +97,7 @@ Protected Member Functions</h2></td></tr>
 <p>To speed up the creation of new command line tools, the ISIS core library contains a number of helper classes based on <a class="el" href="classisis_1_1util_1_1Application.html" title="The ISIS base application class.">Application</a>. An ISIS application class provides a parameter parser that tokenizes the program argument list according to given parameter names and types and saves the results in an internal parameter map.</p>
 <p>An application needs to be initialized explicitly with a call to <a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init()</a>.</p>
 <p>Usage instructions and a short paramter list can be shown with the method <a class="el" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp()</a>.</p>
-<p>See also: <a class="el" href="classisis_1_1data_1_1IOApplication.html">isis::data::IOApplication</a>, <a class="el" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">isis::util::ParameterMap</a>, <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel </a> </p>
+<p>See also: <a class="el" href="classisis_1_1data_1_1IOApplication.html">isis::data::IOApplication</a>, <a class="el" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">isis::util::ParameterMap</a> and <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel </a> </p>
 
 <p>Definition at line <a class="el" href="application_8hpp_source.html#l00047">47</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
@@ -131,7 +125,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00036">36</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00034">34</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -149,7 +143,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00057">57</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00055">55</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -169,26 +163,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00145">145</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a1735a920f193264ff9d3a6fed948ddce"></a><!-- doxytag: member="isis::util::Application::getLLMap" ref="a1735a920f193264ff9d3a6fed948ddce" args="(void)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a>* isis::util::Application::getLLMap </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline, static]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="application_8hpp_source.html#l00095">95</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00143">143</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +192,9 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00141">141</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">isis::data::IOApplication</a>.</p>
+
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00139">139</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -263,9 +240,9 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classisis_1_1qt4_1_1QtApplication.html#ac4bf4bd1133a3cd92341ab8cc6a085eb">isis::qt4::QtApplication</a>, <a class="el" href="classisis_1_1qt4_1_1IOQtApplication.html#a7c5e67fb1ac909e7920d6e62fc2c6598">isis::qt4::IOQtApplication</a>, and <a class="el" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">isis::data::IOApplication</a>.</p>
+<p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">isis::data::IOApplication</a>.</p>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00059">59</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00057">57</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +266,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4">isis::data::IOApplication</a>.</p>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00111">111</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00109">109</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -312,11 +289,11 @@ template&lt;typename MODULE &gt; </div>
 
 <p>Set the logging level for the specified module. </p>
 
-<p>Definition at line <a class="el" href="application_8hpp_source.html#l00087">87</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00086">86</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
 
 </div>
 </div>
-<hr/><h2>Member Data Documentation</h2>
+<hr/><h2>Field Documentation</h2>
 <a class="anchor" id="aa6e216ac203dc3c981ed73f794145d1b"></a><!-- doxytag: member="isis::util::Application::parameters" ref="aa6e216ac203dc3c981ed73f794145d1b" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -328,7 +305,7 @@ template&lt;typename MODULE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8hpp_source.html#l00058">58</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00057">57</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
 
 </div>
 </div>
@@ -337,7 +314,7 @@ template&lt;typename MODULE &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="application_8cpp_source.html">application.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -60,19 +59,17 @@ Inheritance diagram for isis::util::Matrix4x4&lt; TYPE &gt;:</div>
  <div class="center">
   <img src="classisis_1_1util_1_1Matrix4x4.png" usemap="#isis::util::Matrix4x4&lt; TYPE &gt;_map" alt=""/>
   <map id="isis::util::Matrix4x4&lt; TYPE &gt;_map" name="isis::util::Matrix4x4&lt; TYPE &gt;_map">
-<area href="classisis_1_1util_1_1FixedMatrix.html" alt="isis::util::FixedMatrix&lt; TYPE, 4, 4 &gt;" shape="rect" coords="0,112,518,136"/>
-<area href="classisis_1_1util_1_1FixedVector.html" alt="isis::util::FixedVector&lt; TYPE, ROWS *COLS, _internal::array&lt; TYPE, ROWS *COLS &gt; &gt;" shape="rect" coords="0,56,518,80"/>
-<area href="classisis_1_1util_1_1__internal_1_1array.html" alt="isis::util::_internal::array&lt; TYPE, ROWS *COLS &gt;" shape="rect" coords="0,0,518,24"/>
+<area href="classisis_1_1util_1_1FixedMatrix.html" alt="isis::util::FixedMatrix&lt; TYPE, 4, 4 &gt;" shape="rect" coords="0,112,650,136"/>
+<area href="classisis_1_1util_1_1FixedVector.html" alt="isis::util::FixedVector&lt; TYPE, ROWS *COLS, typename FixedVector&lt; TYPE, ROWS *COLS &gt;::container_type &gt;" shape="rect" coords="0,56,650,80"/>
+<area href="classtypename_01FixedVector_1_1container__type.html" alt="container_type" shape="rect" coords="0,0,650,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1util_1_1Matrix4x4-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">Matrix4x4</a> (const <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; TYPE, 4, 4 &gt; &amp;src)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html#a02deb7aabb869391fe274c043643e710">Matrix4x4</a> (const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;row1, const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;row2, const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;row3=<a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt;(0, 0, 1, 0), const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;row4=<a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt;(0, 0, 0, 1))</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html#a396d40d87bcb082374feba1651152899">Matrix4x4</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;row1, const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;row2, const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;row3=<a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt;(0, 0, 1, 0), const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;row4=<a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt;(0, 0, 0, 1))</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html#a48606c11371bc7d73cbcda37218f0d61">Matrix4x4</a> (const TYPE src[16])</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
@@ -80,13 +77,13 @@ Public Member Functions</h2></td></tr>
  class isis::util::Matrix4x4&lt; TYPE &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00110">110</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00186">186</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a58a4d5109d91b4d5abf6957b3d75642a"></a><!-- doxytag: member="isis::util::Matrix4x4::Matrix4x4" ref="a58a4d5109d91b4d5abf6957b3d75642a" args="(const FixedMatrix&lt; TYPE, 4, 4 &gt; &amp;src)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename TYPE&gt; </div>
+template&lt;typename TYPE &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html">isis::util::Matrix4x4</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a> </td>
@@ -99,7 +96,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00113">113</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00189">189</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -107,7 +104,7 @@ template&lt;typename TYPE&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename TYPE&gt; </div>
+template&lt;typename TYPE &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html">isis::util::Matrix4x4</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a> </td>
@@ -120,40 +117,40 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00115">115</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00191">191</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a02deb7aabb869391fe274c043643e710"></a><!-- doxytag: member="isis::util::Matrix4x4::Matrix4x4" ref="a02deb7aabb869391fe274c043643e710" args="(const vector4&lt; TYPE2 &gt; &amp;row1, const vector4&lt; TYPE2 &gt; &amp;row2, const vector4&lt; TYPE2 &gt; &amp;row3=vector4&lt; TYPE2 &gt;(0, 0, 1, 0), const vector4&lt; TYPE2 &gt; &amp;row4=vector4&lt; TYPE2 &gt;(0, 0, 0, 1))" -->
+<a class="anchor" id="a396d40d87bcb082374feba1651152899"></a><!-- doxytag: member="isis::util::Matrix4x4::Matrix4x4" ref="a396d40d87bcb082374feba1651152899" args="(const FixedVector&lt; TYPE2, 4 &gt; &amp;row1, const FixedVector&lt; TYPE2, 4 &gt; &amp;row2, const FixedVector&lt; TYPE2, 4 &gt; &amp;row3=vector4&lt; TYPE2 &gt;(0, 0, 1, 0), const FixedVector&lt; TYPE2, 4 &gt; &amp;row4=vector4&lt; TYPE2 &gt;(0, 0, 0, 1))" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename TYPE&gt; </div>
+template&lt;typename TYPE &gt; </div>
 <div class="memtemplate">
 template&lt;typename TYPE2 &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html">isis::util::Matrix4x4</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>row1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>row2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>row3</em> = <code><a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt;TYPE2&gt;(&#160;0,&#160;0,&#160;1,&#160;0&#160;)</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt; TYPE2 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>row4</em> = <code><a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a>&lt;TYPE2&gt;(&#160;0,&#160;0,&#160;0,&#160;1&#160;)</code>&#160;</td>
         </tr>
         <tr>
@@ -165,7 +162,7 @@ template&lt;typename TYPE2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00116">116</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00192">192</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -173,7 +170,7 @@ template&lt;typename TYPE2 &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="matrix_8hpp_source.html">matrix.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

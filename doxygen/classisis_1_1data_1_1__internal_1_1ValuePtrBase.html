@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -48,7 +47,7 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
@@ -73,25 +72,31 @@ Inheritance diagram for isis::data::_internal::ValuePtrBase:</div>
 <area href="classisis_1_1data_1_1FilePtr.html" alt="isis::data::FilePtr" shape="rect" coords="208,168,406,192"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1data_1_1__internal_1_1ValuePtrBase-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase_1_1DelProxy.html">DelProxy</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr.  <a href="classisis_1_1data_1_1__internal_1_1ValuePtrBase_1_1DelProxy.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">GenericValueIterator</a><br class="typebreak"/>
+&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a9e4a0d2d80bf37059364a303c327d73e">const_value_iterator</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#af72db01d4808fbbbdacbfb925974b6f5">const_value_reference</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
 ValuePtrConverterMap::mapped_type::mapped_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a91f699d35035e681cefba14256217332">Converter</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
 <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::_internal::ValueReference</a><br class="typebreak"/>
 &lt; <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">ValuePtrBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aef292535995c5ed0ac146656bb82b3f5">Reference</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">GenericValueIterator</a><br class="typebreak"/>
+&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#afd754a2531e6e331f8b669ba91f7fef3">value_iterator</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aa5b76052bb5a81d83dfb3e346eccc21b">value_reference</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a2bf4e9cc1ffc8ac662e3aac3fd0d8ae1">as</a> (<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>())</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get this as a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> of a specific type.  <a href="#a2bf4e9cc1ffc8ac662e3aac3fd0d8ae1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a7e9ec0485153f4def57a6ea9791e0126">beginGeneric</a> ()=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ab93697c01f67c332f25d1f1be8d89b9b">beginGeneric</a> () const =0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#af2699cc78c91ebc74e724dfeaff6407b">bytesPerElem</a> () const =0</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a7a2198cd211bc56c8c3477c781b17bef">castToValuePtr</a> () const </td></tr>
@@ -109,6 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ada3fafae7863b379260347f66477289f">copyAs</a> (<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy this to a new <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>&lt;T&gt; using newly allocated memory.  <a href="#ada3fafae7863b379260347f66477289f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">Reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ab1336fff3e8085e211fec8837b5314d4">copyByID</a> (unsigned short ID, <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create new data in memory containg a (converted) copy of this.  <a href="#ab1336fff3e8085e211fec8837b5314d4"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a81878b6d897e8bcfc290d98cb1bb4958">copyFromMem</a> (const T *const src, size_t len, <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>())</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies elements from raw memory into this.  <a href="#a81878b6d897e8bcfc290d98cb1bb4958"></a><br/></td></tr>
@@ -119,6 +125,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aa7a5baa0e458f2d91e2473d722e6046e">copyToMem</a> (T *dst, size_t len, <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies elements from this into raw memory.  <a href="#aa7a5baa0e458f2d91e2473d722e6046e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a1f06e504a6b260fa79f2f86eef4d7b0b">endGeneric</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a4143092867ee718c29fce10c7429631f">endGeneric</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a91f699d35035e681cefba14256217332">Converter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ad5b0b784a61685334439ad9a76b0cbd6">getConverterTo</a> (unsigned short ID) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::pair<br class="typebreak"/>
@@ -129,9 +137,9 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual boost::shared_ptr<br class="typebreak"/>
 &lt; const void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a2e7dc25df6fc915321f78118fad1b596">getRawAddress</a> (size_t offset=0) const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the raw address the <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> points to.  <a href="#a2e7dc25df6fc915321f78118fad1b596"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ae036c05a1a2782e80dc567355fcc52a3">getScalingTo</a> (unsigned short typeID, const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt; &amp;minmax, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a73785845e502284467ea8684ca5ef4a5">getScalingTo</a> (unsigned short typeID, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale) const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get the scaling (and offset) which would be used in an conversion  <a href="#a73785845e502284467ea8684ca5ef4a5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ae036c05a1a2782e80dc567355fcc52a3">getScalingTo</a> (unsigned short typeID, const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt; &amp;minmax, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a614226bbd6eae811fd27a04d08a5da1c">is</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">Reference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8d776ecb43227d021c880e616e2a9f26">splice</a> (size_t size) const =0</td></tr>
@@ -156,8 +164,38 @@ Friends</h2></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00033">33</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00121">121</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 </div><hr/><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="a9e4a0d2d80bf37059364a303c327d73e"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::const_value_iterator" ref="a9e4a0d2d80bf37059364a303c327d73e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">GenericValueIterator</a>&lt;true&gt; <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::_internal::ValuePtrBase::const_value_iterator</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00135">135</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af72db01d4808fbbbdacbfb925974b6f5"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::const_value_reference" ref="af72db01d4808fbbbdacbfb925974b6f5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a> <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::_internal::ValuePtrBase::const_value_reference</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00137">137</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a91f699d35035e681cefba14256217332"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::Converter" ref="a91f699d35035e681cefba14256217332" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -169,7 +207,7 @@ Friends</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00073">73</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00170">170</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -184,7 +222,37 @@ Friends</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00072">72</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00169">169</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afd754a2531e6e331f8b669ba91f7fef3"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::value_iterator" ref="afd754a2531e6e331f8b669ba91f7fef3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">GenericValueIterator</a>&lt;false&gt; <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::_internal::ValuePtrBase::value_iterator</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00134">134</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa5b76052bb5a81d83dfb3e346eccc21b"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::value_reference" ref="aa5b76052bb5a81d83dfb3e346eccc21b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a> <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::_internal::ValuePtrBase::value_reference</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00136">136</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +328,43 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>eigther a cheap copy or a newly created <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00208">208</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00306">306</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7e9ec0485153f4def57a6ea9791e0126"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::beginGeneric" ref="a7e9ec0485153f4def57a6ea9791e0126" args="()=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a> isis::data::_internal::ValuePtrBase::beginGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implemented in <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a448d025e667a8986dc2bc19b34ed9715">isis::data::ValuePtr&lt; TYPE &gt;</a>, and <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a448d025e667a8986dc2bc19b34ed9715">isis::data::ValuePtr&lt; uint8_t &gt;</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab93697c01f67c332f25d1f1be8d89b9b"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::beginGeneric" ref="ab93697c01f67c332f25d1f1be8d89b9b" args="() const =0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a> isis::data::_internal::ValuePtrBase::beginGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implemented in <a class="el" href="classisis_1_1data_1_1ValuePtr.html#aab609293f04f7e642cdcb1fdee7f7341">isis::data::ValuePtr&lt; TYPE &gt;</a>, and <a class="el" href="classisis_1_1data_1_1ValuePtr.html#aab609293f04f7e642cdcb1fdee7f7341">isis::data::ValuePtr&lt; uint8_t &gt;</a>.</p>
 
 </div>
 </div>
@@ -303,7 +407,7 @@ template&lt;typename T &gt; </div>
 <p>Constant version. Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a constant reference of the <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>. </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00084">84</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00181">181</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -327,7 +431,7 @@ template&lt;typename T &gt; </div>
 <p>Referenced version. Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference of the <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>. </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00093">93</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00190">190</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -429,7 +533,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the amount of elements which actually differ in both <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> or the whole length of the range when the types are not equal. </dd></dl>
 
-<p>Definition at line <a class="el" href="istring_8cpp_source.html#l00036">36</a> of file <a class="el" href="istring_8cpp_source.html">istring.cpp</a>.</p>
+<p>Definition at line <a class="el" href="istring_8cpp_source.html#l00037">37</a> of file <a class="el" href="istring_8cpp_source.html">istring.cpp</a>.</p>
 
 </div>
 </div>
@@ -500,7 +604,7 @@ template&lt;typename T &gt; </div>
 <p>This will create a new <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> of type T and the length of this. The memory will be allocated and the data of this will be copy-converted to T using min/max as value range. If the conversion fails, an error will be send to CoreLog and the data of the newly created <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> will be undefined. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a the newly created <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00177">177</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00275">275</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -528,14 +632,10 @@ template&lt;typename T &gt; </div>
       </table>
 </div>
 <div class="memdoc">
- <dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">ID</td><td>the ID of the type the new <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> (referenced by the Reference returned) should have </td></tr>
-    <tr><td class="paramname">scaling</td><td>the scaling to be used if a conversion is necessary (computed automatically if not given) </td></tr>
-  </table>
-  </dd>
-</dl>
- <dl><dt><b>Parameters:</b></dt><dd>
+
+<p>Create new data in memory containg a (converted) copy of this. </p>
+<p>Allocates new memory of the requested type and copies the (converted) content of this into that memory. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">ID</td><td>the ID of the type the new <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> (referenced by the Reference returned) should have </td></tr>
     <tr><td class="paramname">scaling</td><td>the scaling to be used if a conversion is necessary (computed automatically if not given) </td></tr>
@@ -595,7 +695,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00158">158</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00256">256</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -742,7 +842,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00143">143</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00241">241</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -776,6 +876,42 @@ template&lt;typename T &gt; </div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a Reference to a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> pointing to the allocated memory. Or an empty Reference if the creation failed. </dd></dl>
 
 <p>Definition at line <a class="el" href="typeptr__base_8cpp_source.html#l00130">130</a> of file <a class="el" href="typeptr__base_8cpp_source.html">typeptr_base.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1f06e504a6b260fa79f2f86eef4d7b0b"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::endGeneric" ref="a1f06e504a6b260fa79f2f86eef4d7b0b" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">ValuePtrBase::value_iterator</a> isis::data::_internal::ValuePtrBase::endGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8cpp_source.html#l00208">208</a> of file <a class="el" href="typeptr__base_8cpp_source.html">typeptr_base.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4143092867ee718c29fce10c7429631f"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::endGeneric" ref="a4143092867ee718c29fce10c7429631f" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">ValuePtrBase::const_value_iterator</a> isis::data::_internal::ValuePtrBase::endGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr__base_8cpp_source.html#l00212">212</a> of file <a class="el" href="typeptr__base_8cpp_source.html">typeptr_base.cpp</a>.</p>
 
 </div>
 </div>
@@ -981,7 +1117,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00283">283</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00352">352</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1045,11 +1181,11 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00035">35</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00123">123</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
-<hr/><h2>Member Data Documentation</h2>
+<hr/><h2>Field Documentation</h2>
 <a class="anchor" id="abee69127367d7a8cef739fe35d125147"></a><!-- doxytag: member="isis::data::_internal::ValuePtrBase::m_len" ref="abee69127367d7a8cef739fe35d125147" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1061,7 +1197,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00039">39</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00127">127</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1073,7 +1209,7 @@ template&lt;typename T &gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="typeptr__base_8cpp_source.html">typeptr_base.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

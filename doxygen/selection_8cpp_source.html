@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -86,15 +85,15 @@
 <a name="l00043"></a>00043     <span class="keywordflow">return</span> std::string( buff.begin(), buff.end() );
 <a name="l00044"></a>00044 }
 <a name="l00045"></a>00045 
-<a name="l00046"></a><a class="code" href="classisis_1_1util_1_1Selection.html#a6e176a6d6a1f954903f19856d448e1d8">00046</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Selection.html#ad8ef91f793e07c3ed886869eb0829c94" title="Set the selection to the given type.">Selection::set</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> entry ) 
+<a name="l00046"></a><a class="code" href="classisis_1_1util_1_1Selection.html#a6e176a6d6a1f954903f19856d448e1d8">00046</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Selection.html#ad8ef91f793e07c3ed886869eb0829c94" title="Set the selection to the given type.">Selection::set</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> entry )
 <a name="l00047"></a>00047 {
 <a name="l00048"></a>00048     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1util_1_1Selection.html#aa785573ad3feea331d30e2b0ece21a02">getEntries</a>().size() &gt; entry ) {
-<a name="l00049"></a>00049     m_set = entry; 
-<a name="l00050"></a>00050     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00049"></a>00049         m_set = entry;
+<a name="l00050"></a>00050         <span class="keywordflow">return</span> <span class="keyword">true</span>;
 <a name="l00051"></a>00051     } <span class="keywordflow">else</span> {
-<a name="l00052"></a>00052     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00052"></a>00052         <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00053"></a>00053     }
-<a name="l00054"></a>00054     
+<a name="l00054"></a>00054 
 <a name="l00055"></a>00055 }
 <a name="l00056"></a><a class="code" href="classisis_1_1util_1_1Selection.html#ad8ef91f793e07c3ed886869eb0829c94">00056</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Selection.html#ad8ef91f793e07c3ed886869eb0829c94" title="Set the selection to the given type.">Selection::set</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> *entry )
 <a name="l00057"></a>00057 {
@@ -135,7 +134,7 @@
 <a name="l00092"></a>00092 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
@@ -76,7 +75,8 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">isis::data::scannerAxis</a> { <a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">isis::data::x</a> =  0, 
 <a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">isis::data::y</a>, 
-<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">isis::data::z</a>
+<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">isis::data::z</a>, 
+<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a6b3eda41d68306590168fc6ed31d84e9">isis::data::t</a>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -87,10 +87,10 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set logging level for the namespace data.  <a href="#a465a70c53d5fc5a7be8916b70c37df18"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html#a35d55c3b417bd1a0153c928b42fe09aa">isis::data::_internal::inverseMatrix</a> (const matrix&lt; TYPE &gt; &amp;inMatrix, matrix&lt; TYPE &gt; &amp;inverse)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html#a1ad04bf8bb562413f0a02065bfe4b721">isis::data::_internal::transformCoords</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;properties, util::FixedVector&lt; size_t, 4 &gt; size, boost::numeric::ublas::matrix&lt; float &gt; transform, bool transformCenterIsImageCenter)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html#a5e0873965e56d7bad760f2e34b9a1f57">isis::data::_internal::transformCoords</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;properties, util::vector4&lt; size_t &gt; size, boost::numeric::ublas::matrix&lt; float &gt; transform, bool transformCenterIsImageCenter)</td></tr>
 </table>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

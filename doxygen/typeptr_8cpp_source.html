@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -66,7 +65,7 @@
 <a name="l00024"></a>00024 
 <a name="l00026"></a>00026 <span class="comment">// some voodoo to get the vector types into the templates /</span>
 <a name="l00028"></a>00028 <span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>_VectorUnion {
-<a name="l00029"></a>00029     <span class="keyword">union </span>{__m128i reg; T elem[16/<span class="keyword">sizeof</span>( T )];} vec;
+<a name="l00029"></a>00029     <span class="keyword">union </span>{__m128i reg; T elem[16 / <span class="keyword">sizeof</span>( T )];} vec;
 <a name="l00030"></a>00030     _VectorUnion( <span class="keyword">const</span> T *el ) {std::copy( el, el + 16 / <span class="keyword">sizeof</span>( T ), vec.elem );}
 <a name="l00031"></a>00031     _VectorUnion( __m128i _reg ) {vec.reg = _reg;}
 <a name="l00032"></a>00032     _VectorUnion() {}
@@ -245,13 +244,13 @@
 <a name="l00207"></a>00207 
 <a name="l00209"></a>00209 <span class="comment">// specialize calcMinMax for (u)int(8,16,32)_t /</span>
 <a name="l00211"></a>00211 <span class="comment"></span>
-<a name="l00212"></a>00212 <span class="keyword">template</span>&lt;&gt; std::pair&lt; uint8_t,  uint8_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span>  uint8_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
-<a name="l00213"></a>00213 <span class="keyword">template</span>&lt;&gt; std::pair&lt;uint16_t, uint16_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span> uint16_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
-<a name="l00214"></a>00214 <span class="keyword">template</span>&lt;&gt; std::pair&lt;uint32_t, uint32_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span> uint32_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00212"></a>00212 <span class="keyword">template</span>&lt;&gt; std::pair&lt; uint8_t,  uint8_t&gt; calcMinMax( <span class="keyword">const</span>  uint8_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00213"></a>00213 <span class="keyword">template</span>&lt;&gt; std::pair&lt;uint16_t, uint16_t&gt; calcMinMax( <span class="keyword">const</span> uint16_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00214"></a>00214 <span class="keyword">template</span>&lt;&gt; std::pair&lt;uint32_t, uint32_t&gt; calcMinMax( <span class="keyword">const</span> uint32_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
 <a name="l00215"></a>00215 
-<a name="l00216"></a>00216 <span class="keyword">template</span>&lt;&gt; std::pair&lt; int8_t,  int8_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span>  int8_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
-<a name="l00217"></a>00217 <span class="keyword">template</span>&lt;&gt; std::pair&lt;int16_t, int16_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span> int16_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
-<a name="l00218"></a>00218 <span class="keyword">template</span>&lt;&gt; std::pair&lt;int32_t, int32_t&gt; <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a0e3d1a4a421d6266f5473afa6af89e59">calcMinMax</a>( <span class="keyword">const</span> int32_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00216"></a>00216 <span class="keyword">template</span>&lt;&gt; std::pair&lt; int8_t,  int8_t&gt; calcMinMax( <span class="keyword">const</span>  int8_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00217"></a>00217 <span class="keyword">template</span>&lt;&gt; std::pair&lt;int16_t, int16_t&gt; calcMinMax( <span class="keyword">const</span> int16_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
+<a name="l00218"></a>00218 <span class="keyword">template</span>&lt;&gt; std::pair&lt;int32_t, int32_t&gt; calcMinMax( <span class="keyword">const</span> int32_t *data, <span class="keywordtype">size_t</span> len ) {<span class="keywordflow">return</span> _getMinMax( data, len );}
 <a name="l00219"></a>00219 
 <a name="l00220"></a>00220 } <span class="comment">//namepace _internal</span>
 <a name="l00221"></a>00221 <span class="preprocessor">#else</span>
@@ -263,7 +262,7 @@
 <a name="l00227"></a>00227 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

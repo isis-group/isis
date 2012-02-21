@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -73,7 +72,7 @@
 <a name="l00030"></a>00030 {
 <a name="l00031"></a>00031 
 <a name="l00033"></a>00033 <span class="comment">// sorting algorithm implementation</span>
-<a name="l00035"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">00035</a> <span class="comment"></span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">SortedChunkList::scalarPropCompare::scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;prop_name ): propertyName( prop_name ) {}
+<a name="l00035"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">00035</a> <span class="comment"></span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">SortedChunkList::scalarPropCompare::scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name ): propertyName( prop_name ) {}
 <a name="l00036"></a>00036 
 <a name="l00037"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">00037</a> <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">SortedChunkList::posCompare::operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;posA, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;posB )<span class="keyword"> const</span>
 <a name="l00038"></a>00038 <span class="keyword"></span>{
@@ -103,7 +102,7 @@
 <a name="l00065"></a>00065 <span class="comment">// SortedChunkList implementation</span>
 <a name="l00067"></a>00067 <span class="comment"></span>
 <a name="l00068"></a>00068 <span class="comment">// constructor</span>
-<a name="l00069"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a">00069</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList::SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> comma_separated_equal_props ):
+<a name="l00069"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a">00069</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList::SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props ):
 <a name="l00070"></a>00070     equalProps( util::<a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>&lt;util::PropertyMap::KeyType&gt;( comma_separated_equal_props, <span class="stringliteral">&#39;,&#39;</span> ) )
 <a name="l00071"></a>00071 {}
 <a name="l00072"></a>00072 
@@ -123,7 +122,7 @@
 <a name="l00086"></a>00086 <span class="comment">// low level insert</span>
 <a name="l00087"></a>00087 std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; SortedChunkList::secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> Chunk &amp;ch )
 <a name="l00088"></a>00088 {
-<a name="l00089"></a>00089     <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> propName = map.key_comp().propertyName;
+<a name="l00089"></a>00089     <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> propName = map.key_comp().propertyName;
 <a name="l00090"></a>00090 
 <a name="l00091"></a>00091     <span class="keywordflow">if</span>( ch.hasProperty( propName ) ) {
 <a name="l00092"></a>00092         <span class="comment">//check, if there is already a chunk</span>
@@ -181,9 +180,9 @@
 <a name="l00144"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a1a1cb0783be4cb78d82c798b12507088">00144</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a1a1cb0783be4cb78d82c798b12507088" title="Tries to insert a chunk (a cheap copy of the chunk is done when inserted)">SortedChunkList::insert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch )
 <a name="l00145"></a>00145 {
 <a name="l00146"></a>00146     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( secondarySort.empty(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.&quot;</span>;
-<a name="l00147"></a>00147     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every needed property is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You&#39;re trying insert an invalid chunk. The missing properties are &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
-<a name="l00148"></a>00148     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every needed property is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..&quot;</span>;
-<a name="l00149"></a>00149     assert( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every needed property is set.">isValid</a>() );
+<a name="l00147"></a>00147     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You&#39;re trying insert an invalid chunk. The missing properties are &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
+<a name="l00148"></a>00148     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..&quot;</span>;
+<a name="l00149"></a>00149     assert( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>() );
 <a name="l00150"></a>00150 
 <a name="l00151"></a>00151     <span class="keywordflow">if</span>( !<a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>() ) {
 <a name="l00152"></a>00152         <span class="comment">// compare some attributes of the first chunk and the one which shall be inserted</span>
@@ -195,12 +194,12 @@
 <a name="l00158"></a>00158             <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00159"></a>00159         }
 <a name="l00160"></a>00160 
-<a name="l00161"></a>00161         BOOST_FOREACH( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp; ref, equalProps ) { <span class="comment">// check all properties which where given to the constructor of the list</span>
+<a name="l00161"></a>00161         BOOST_FOREACH( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp; ref, equalProps ) { <span class="comment">// check all properties which where given to the constructor of the list</span>
 <a name="l00162"></a>00162             <span class="comment">// if at least one of them has the property and they are not equal - do not insert</span>
-<a name="l00163"></a>00163             <span class="keywordflow">if</span> ( ( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c5d3ce156eed680db8883694be2bb67" title="check if property is available">hasProperty</a>( ref ) || ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c5d3ce156eed680db8883694be2bb67" title="check if property is available">hasProperty</a>( ref ) ) &amp;&amp; first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( ref ) != ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( ref ) ) {
+<a name="l00163"></a>00163             <span class="keywordflow">if</span> ( ( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( ref ) || ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( ref ) ) &amp;&amp; first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) != ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) ) {
 <a name="l00164"></a>00164                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00165"></a>00165                         &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different &quot;</span> &lt;&lt; ref &lt;&lt; <span class="stringliteral">&quot;. Is &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( ref ) )
-<a name="l00166"></a>00166                         &lt;&lt; <span class="stringliteral">&quot; but chunks already in the list have &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( ref ) );
+<a name="l00165"></a>00165                         &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different &quot;</span> &lt;&lt; ref &lt;&lt; <span class="stringliteral">&quot;. Is &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) )
+<a name="l00166"></a>00166                         &lt;&lt; <span class="stringliteral">&quot; but chunks already in the list have &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) );
 <a name="l00167"></a>00167                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00168"></a>00168             }
 <a name="l00169"></a>00169         }
@@ -208,8 +207,8 @@
 <a name="l00171"></a>00171         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting 1st chunk&quot;</span>;
 <a name="l00172"></a>00172         std::stack&lt;scalarPropCompare&gt; backup = secondarySort;
 <a name="l00173"></a>00173 
-<a name="l00174"></a>00174         <span class="keywordflow">while</span>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c5d3ce156eed680db8883694be2bb67" title="check if property is available">hasProperty</a>( secondarySort.top().propertyName ) ) {
-<a name="l00175"></a>00175             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> temp = secondarySort.top().propertyName;
+<a name="l00174"></a>00174         <span class="keywordflow">while</span>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( secondarySort.top().propertyName ) ) {
+<a name="l00175"></a>00175             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> temp = secondarySort.top().propertyName;
 <a name="l00176"></a>00176 
 <a name="l00177"></a>00177             <span class="keywordflow">if</span> ( secondarySort.size() &gt; 1 ) {
 <a name="l00178"></a>00178                 secondarySort.pop();
@@ -224,25 +223,25 @@
 <a name="l00187"></a>00187         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )  &lt;&lt; <span class="stringliteral">&quot;Using &quot;</span> &lt;&lt; secondarySort.top().propertyName &lt;&lt; <span class="stringliteral">&quot; for secondary sorting, determined by the first chunk&quot;</span>;
 <a name="l00188"></a>00188     }
 <a name="l00189"></a>00189 
-<a name="l00190"></a>00190     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;prop2 = secondarySort.top().propertyName;
+<a name="l00190"></a>00190     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop2 = secondarySort.top().propertyName;
 <a name="l00191"></a>00191 
 <a name="l00192"></a>00192     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; inserted = primaryInsert( ch );
 <a name="l00193"></a>00193 
 <a name="l00194"></a>00194     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( inserted.first &amp;&amp; !inserted.second, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00195"></a>00195             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is already a Chunk at the same position (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
-<a name="l00196"></a>00196             &lt;&lt; std::make_pair( prop2, ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( prop2 ) );
+<a name="l00195"></a>00195             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is already a Chunk at the same position (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
+<a name="l00196"></a>00196             &lt;&lt; std::make_pair( prop2, ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( prop2 ) );
 <a name="l00197"></a>00197 
 <a name="l00198"></a>00198     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(
 <a name="l00199"></a>00199         inserted.first &amp;&amp; !inserted.second &amp;&amp;
-<a name="l00200"></a>00200         ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c5d3ce156eed680db8883694be2bb67" title="check if property is available">hasProperty</a>( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp; inserted.first-&gt;hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp;
-<a name="l00201"></a>00201         !( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ) == inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ) ),
+<a name="l00200"></a>00200         ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp; inserted.first-&gt;hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp;
+<a name="l00201"></a>00201         !( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ) == inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ) ),
 <a name="l00202"></a>00202         <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00203"></a>00203             &lt;&lt; <span class="stringliteral">&quot;The conflicting chunks where &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a056afb492b1bba931399de18b7faa7e8" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> );
+<a name="l00203"></a>00203             &lt;&lt; <span class="stringliteral">&quot;The conflicting chunks where &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> );
 <a name="l00204"></a>00204 
 <a name="l00205"></a>00205     <span class="keywordflow">return</span> inserted.second;
 <a name="l00206"></a>00206 }
 <a name="l00207"></a>00207 
-<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb">00208</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">SortedChunkList::addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;cmp )
+<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb">00208</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">SortedChunkList::addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp )
 <a name="l00209"></a>00209 {
 <a name="l00210"></a>00210     secondarySort.push( <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">scalarPropCompare</a>( cmp ) );
 <a name="l00211"></a>00211 }
@@ -287,7 +286,7 @@
 <a name="l00250"></a>00250 
 <a name="l00251"></a>00251             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> v = 0; v &lt; vertical; v++, iS++ ) { <span class="comment">// inner loop iterates verticaly (through the secondary sorting)</span>
 <a name="l00252"></a>00252                 assert( iS != iP-&gt;second.end() );
-<a name="l00253"></a>00253                 ret[h + v *horizontal] = iS-&gt;second;  <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
+<a name="l00253"></a>00253                 ret[h + v * horizontal] = iS-&gt;second; <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
 <a name="l00254"></a>00254             }
 <a name="l00255"></a>00255         }
 <a name="l00256"></a>00256 
@@ -311,7 +310,7 @@
 <a name="l00274"></a>00274 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

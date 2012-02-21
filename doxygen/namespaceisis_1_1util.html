@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,10 +23,9 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
@@ -46,7 +45,7 @@
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -58,7 +57,7 @@
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util_1_1__internal.html">_internal</a></td></tr>
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html">Application</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The ISIS base application class.  <a href="classisis_1_1util_1_1Application.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1checkType.html">checkType</a></td></tr>
@@ -70,6 +69,7 @@ Classes</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default message output class.  <a href="classisis_1_1util_1_1DefaultMsgPrint.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1IdentityMatrix.html">IdentityMatrix</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Matrix4x4.html">Matrix4x4</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1MSubject.html">MSubject</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html">ParameterMap</a></td></tr>
@@ -78,7 +78,16 @@ Classes</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Container class for programm parameters (commandline parameters) given to applications derived from isis.  <a href="classisis_1_1util_1_1ProgParameter.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">ProgressFeedback</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This class contains a mapping tree to store all kinds of properties (path/key : value) It's also a generic class to have the probability to handle different modalities in upper levels (in our special case we'll have to handle things like images or other time series of data each having different properties in its standard or wherever from).  <a href="classisis_1_1util_1_1PropertyMap.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This class forms a mapping tree to store all kinds of properties (path : value), where:</p>
+<ul>
+<li>value is:<ul>
+<li>a <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a>-container holding the value of the property (this may be empty/unset)</li>
+<li>another <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> containing a subtree (a branch of the mapping tree)</li>
+</ul>
+</li>
+<li>path is one or more case insensitive key names separated by "/" to locate both, branches or properties, in the tree. </li>
+</ul>
+ <a href="classisis_1_1util_1_1PropertyMap.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A very generic class to store values of properties.  <a href="classisis_1_1util_1_1PropertyValue.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Selection.html">Selection</a></td></tr>
@@ -113,8 +122,9 @@ Functions</h2></td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#ae28b2248d6b0eceaf7387b53cc78da30">enableLog</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set logging level for the namespace util.  <a href="#ae28b2248d6b0eceaf7387b53cc78da30"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a3950ca0b230cf43d7c8f759c19946bbc">fuzzyEqual</a> (T a, T b, float thresh=0)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Fuzzy comparison between floating point values.  <a href="#a3950ca0b230cf43d7c8f759c19946bbc"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651">fuzzyEqual</a> (T a, T b, unsigned short scale=10)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Fuzzy comparison between floating point values.  <a href="#aaecd6bf63106060c5021502e97956651"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">getLastSystemError</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <br class="typebreak"/>
 unsigned short &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a5a52ca08d3380ec9ccba8cb17d9e5b7f">getTransposedTypeMap</a> (bool withValues=true, bool withValuePtrs=true)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned short, <br class="typebreak"/>
@@ -122,13 +132,13 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T , typename InputIterator &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#aaabe116f9a5b282137e0b558f624493c">listToList</a> (InputIterator start, InputIterator end)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">do lexical_cast&lt;T&gt; on the elements of a list and return them  <a href="#aaabe116f9a5b282137e0b558f624493c"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename _CharT , typename _Traits &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">std::basic_ostream&lt; _CharT, <br class="typebreak"/>
-_Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a0dcfcb5d19fbf9b102f441a5fdd657a1">listToOStream</a> (const unsigned char *start, const unsigned char *end, std::basic_ostream&lt; _CharT, _Traits &gt; &amp;o, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class InputIterator , typename _CharT , typename _Traits &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">std::basic_ostream&lt; _CharT, <br class="typebreak"/>
 _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c">listToOStream</a> (InputIterator start, InputIterator end, std::basic_ostream&lt; _CharT, _Traits &gt; &amp;o, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a list of elements to a std::basic_ostream.  <a href="#a29c9506962af37e8c3cabc8843d2b69c"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename _CharT , typename _Traits &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">std::basic_ostream&lt; _CharT, <br class="typebreak"/>
+_Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a0dcfcb5d19fbf9b102f441a5fdd657a1">listToOStream</a> (const unsigned char *start, const unsigned char *end, std::basic_ostream&lt; _CharT, _Traits &gt; &amp;o, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class InputIterator &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648">listToString</a> (InputIterator start, InputIterator end, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">use listToOStream to create a string from a list  <a href="#a8eedeaea8a5e6fb7849880fc5b4d4648"></a><br/></td></tr>
@@ -137,14 +147,14 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE , size_t SIZE, typename CONTAINER1 , typename CONTAINER2 &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, SIZE &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">minVector</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, SIZE, CONTAINER1 &gt; &amp;first, const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, SIZE, CONTAINER2 &gt; &amp;second)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TARGET &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; TARGET &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263">stringToList</a> (std::string source, const boost::regex &amp;separator, boost::regex prefix, boost::regex postfix)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic tokenizer.  <a href="#a9245736ae5d5dc1b001f2f3021b61263"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; TARGET &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#af3100265b61a66f41d810a948529a72b">stringToList</a> (std::string source, const boost::regex separator=boost::regex(&quot;[[:space:]]&quot;))</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple tokenizer (regexp version).  <a href="#af3100265b61a66f41d810a948529a72b"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TARGET , typename charT , typename traits &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; TARGET &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a5c7207cad38ddcfdf28b4b16a8908b9a">stringToList</a> (const std::basic_string&lt; charT, traits &gt; &amp;source, charT separator)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Very Simple tokenizer.  <a href="#a5c7207cad38ddcfdf28b4b16a8908b9a"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TARGET &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; TARGET &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#af3100265b61a66f41d810a948529a72b">stringToList</a> (std::string source, const boost::regex separator=boost::regex(&quot;[[:space:]]&quot;))</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple tokenizer (regexp version).  <a href="#af3100265b61a66f41d810a948529a72b"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; TARGET &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263">stringToList</a> (std::string source, const boost::regex &amp;separator, boost::regex prefix, boost::regex postfix)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic tokenizer.  <a href="#a9245736ae5d5dc1b001f2f3021b61263"></a><br/></td></tr>
 </table>
 <hr/><h2>Typedef Documentation</h2>
 <a class="anchor" id="af67f6409e672ff9ee92439de9e21ad9c"></a><!-- doxytag: member="isis::util::color24" ref="af67f6409e672ff9ee92439de9e21ad9c" args="" -->
@@ -188,7 +198,7 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00237">237</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00258">258</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -218,7 +228,7 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00338">338</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00342">342</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -233,7 +243,7 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00337">337</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00341">341</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -278,7 +288,7 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00339">339</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00343">343</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +303,7 @@ _Traits &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a cl
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00238">238</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00259">259</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -333,11 +343,11 @@ template&lt;typename HANDLE &gt; </div>
 <p>Set logging level for the namespace util. </p>
 <p>This logging level will be used for every LOG(Debug,...) and LOG(Runtime,...) within the util namespace. This is affected by by the _ENABLE_LOG and _ENABLE_DEBUG settings of the current compile and won't have an effect on the Debug or Runtime logging if the corresponding define is set to "0". So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1", you won't be able to change the logging level of the debug messages of these library. </p>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00248">248</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00269">269</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3950ca0b230cf43d7c8f759c19946bbc"></a><!-- doxytag: member="isis::util::fuzzyEqual" ref="a3950ca0b230cf43d7c8f759c19946bbc" args="(T a, T b, float thresh=0)" -->
+<a class="anchor" id="aaecd6bf63106060c5021502e97956651"></a><!-- doxytag: member="isis::util::fuzzyEqual" ref="aaecd6bf63106060c5021502e97956651" args="(T a, T b, unsigned short scale=10)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -358,8 +368,8 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>thresh</em> = <code>0</code>&#160;</td>
+          <td class="paramtype">unsigned short&#160;</td>
+          <td class="paramname"><em>scale</em> = <code>10</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -377,7 +387,7 @@ template&lt;typename T &gt; </div>
   <table class="params">
     <tr><td class="paramname">a</td><td>first value to compare with </td></tr>
     <tr><td class="paramname">b</td><td>second value to compare with </td></tr>
-    <tr><td class="paramname">thresh</td><td>a threshold factor to set a minimal difference to be still considered equal independent of the values itself. Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal. If any of the values is greater than "1" the "allowed" difference will be bigger. </td></tr>
+    <tr><td class="paramname">scale</td><td>scaling factor to determine which multiplies of the types floating point resolution (epsilon) should be considered equal Eg. "1" means any difference less than the epsilon of the used floating point type will be considered equal. If any of the values is greater than "1" the "allowed" difference will be bigger. </td></tr>
   </table>
   </dd>
 </dl>
@@ -388,7 +398,25 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00228">228</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00233">233</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac1e695999a4166e9f8a4ff5835aef5aa"></a><!-- doxytag: member="isis::util::getLastSystemError" ref="ac1e695999a4166e9f8a4ff5835aef5aa" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string isis::util::getLastSystemError </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="CoreUtils_2common_8cpp_source.html#l00012">12</a> of file <a class="el" href="CoreUtils_2common_8cpp_source.html">common.cpp</a>.</p>
 
 </div>
 </div>
@@ -475,62 +503,7 @@ template&lt;typename T , typename InputIterator &gt; </div>
 
 <p>do lexical_cast&lt;T&gt; on the elements of a list and return them </p>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00118">118</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0dcfcb5d19fbf9b102f441a5fdd657a1"></a><!-- doxytag: member="isis::util::listToOStream" ref="a0dcfcb5d19fbf9b102f441a5fdd657a1" args="(const unsigned char *start, const unsigned char *end, std::basic_ostream&lt; _CharT, _Traits &gt; &amp;o, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename _CharT , typename _Traits &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::basic_ostream&lt;_CharT, _Traits&gt;&amp; isis::util::listToOStream </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned char *&#160;</td>
-          <td class="paramname"><em>start</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const unsigned char *&#160;</td>
-          <td class="paramname"><em>end</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::basic_ostream&lt; _CharT, _Traits &gt; &amp;&#160;</td>
-          <td class="paramname"><em>o</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>delim</em> = <code>&quot;,&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>prefix</em> = <code>&quot;{&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>suffix</em> = <code>&quot;}&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00088">88</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00123">123</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +571,62 @@ template&lt;class InputIterator , typename _CharT , typename _Traits &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00066">66</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00071">71</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0dcfcb5d19fbf9b102f441a5fdd657a1"></a><!-- doxytag: member="isis::util::listToOStream" ref="a0dcfcb5d19fbf9b102f441a5fdd657a1" args="(const unsigned char *start, const unsigned char *end, std::basic_ostream&lt; _CharT, _Traits &gt; &amp;o, const std::string delim=&quot;,&quot;, const std::string prefix=&quot;{&quot;, const std::string suffix=&quot;}&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename _CharT , typename _Traits &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::basic_ostream&lt;_CharT, _Traits&gt;&amp; isis::util::listToOStream </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned char *&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned char *&#160;</td>
+          <td class="paramname"><em>end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::basic_ostream&lt; _CharT, _Traits &gt; &amp;&#160;</td>
+          <td class="paramname"><em>o</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>delim</em> = <code>&quot;,&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>prefix</em> = <code>&quot;{&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;}&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00093">93</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -649,7 +677,7 @@ template&lt;class InputIterator &gt; </div>
 
 <p>use listToOStream to create a string from a list </p>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00108">108</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00113">113</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -680,7 +708,7 @@ template&lt;typename TYPE , size_t SIZE, typename CONTAINER1 , typename CONTAINE
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00317">317</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00321">321</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -711,7 +739,92 @@ template&lt;typename TYPE , size_t SIZE, typename CONTAINER1 , typename CONTAINE
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00327">327</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00331">331</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af3100265b61a66f41d810a948529a72b"></a><!-- doxytag: member="isis::util::stringToList" ref="af3100265b61a66f41d810a948529a72b" args="(std::string source, const boost::regex separator=boost::regex(&quot;[[:space:]]&quot;))" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TARGET &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::list&lt;TARGET&gt; isis::util::stringToList </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const boost::regex&#160;</td>
+          <td class="paramname"><em>separator</em> = <code>boost::regex(&#160;&quot;[[:space:]]&quot;&#160;)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Simple tokenizer (regexp version). </p>
+<p>Splits source into tokens and tries to lexically cast them to TARGET. If that fails, boost::bad_lexical_cast is thrown. Before the string is split up leading and rear separators will be cut. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>the source string to be split up </td></tr>
+    <tr><td class="paramname">separator</td><td>string to delimit the tokens </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a list of the casted tokens </dd></dl>
+
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00184">184</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5c7207cad38ddcfdf28b4b16a8908b9a"></a><!-- doxytag: member="isis::util::stringToList" ref="a5c7207cad38ddcfdf28b4b16a8908b9a" args="(const std::basic_string&lt; charT, traits &gt; &amp;source, charT separator)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TARGET , typename charT , typename traits &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::list&lt;TARGET&gt; isis::util::stringToList </td>
+          <td>(</td>
+          <td class="paramtype">const std::basic_string&lt; charT, traits &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">charT&#160;</td>
+          <td class="paramname"><em>separator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Very Simple tokenizer. </p>
+<p>Splits source into tokens and tries to lexically cast them to TARGET. If that fails, boost::bad_lexical_cast is thrown. Leading and trailing seperators are ignored.</p>
+<p>In contrast to the versions based on regular expressions, this can handle any basic_string as input.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>the source string to be split up </td></tr>
+    <tr><td class="paramname">separator</td><td>string to delimit the tokens </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a list of the casted tokens </dd></dl>
+
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00205">205</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -767,97 +880,12 @@ template&lt;typename TARGET &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of the casted tokens </dd></dl>
 
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00140">140</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5c7207cad38ddcfdf28b4b16a8908b9a"></a><!-- doxytag: member="isis::util::stringToList" ref="a5c7207cad38ddcfdf28b4b16a8908b9a" args="(const std::basic_string&lt; charT, traits &gt; &amp;source, charT separator)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename TARGET , typename charT , typename traits &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::list&lt;TARGET&gt; isis::util::stringToList </td>
-          <td>(</td>
-          <td class="paramtype">const std::basic_string&lt; charT, traits &gt; &amp;&#160;</td>
-          <td class="paramname"><em>source</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">charT&#160;</td>
-          <td class="paramname"><em>separator</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Very Simple tokenizer. </p>
-<p>Splits source into tokens and tries to lexically cast them to TARGET. If that fails, boost::bad_lexical_cast is thrown. Leading and trailing seperators are ignored.</p>
-<p>In contrast to the versions based on regular expressions, this can handle any basic_string as input.</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">source</td><td>the source string to be split up </td></tr>
-    <tr><td class="paramname">separator</td><td>string to delimit the tokens </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a list of the casted tokens </dd></dl>
-
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00200">200</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af3100265b61a66f41d810a948529a72b"></a><!-- doxytag: member="isis::util::stringToList" ref="af3100265b61a66f41d810a948529a72b" args="(std::string source, const boost::regex separator=boost::regex(&quot;[[:space:]]&quot;))" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename TARGET &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::list&lt;TARGET&gt; isis::util::stringToList </td>
-          <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>source</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const boost::regex&#160;</td>
-          <td class="paramname"><em>separator</em> = <code>boost::regex(&#160;&quot;[[:space:]]&quot;&#160;)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Simple tokenizer (regexp version). </p>
-<p>Splits source into tokens and tries to lexically cast them to TARGET. If that fails, boost::bad_lexical_cast is thrown. Before the string is split up leading and rear separators will be cut. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">source</td><td>the source string to be split up </td></tr>
-    <tr><td class="paramname">separator</td><td>string to delimit the tokens </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a list of the casted tokens </dd></dl>
-
-<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00179">179</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="CoreUtils_2common_8hpp_source.html#l00145">145</a> of file <a class="el" href="CoreUtils_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

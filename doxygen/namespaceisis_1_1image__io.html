@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,10 +23,9 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
@@ -46,7 +45,7 @@
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -58,25 +57,13 @@
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io_1_1__internal.html">_internal</a></td></tr>
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__CompProxy.html">ImageFormat_CompProxy</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Dicom.html">ImageFormat_Dicom</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Nifti.html">ImageFormat_Nifti</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__NiftiSa.html">ImageFormat_NiftiSa</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html">ImageFormat_Null</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__png.html">ImageFormat_png</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__raw.html">ImageFormat_raw</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__TarProxy.html">ImageFormat_TarProxy</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">IO-Proxy handling tar files.  <a href="classisis_1_1image__io_1_1ImageFormat__TarProxy.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Vista.html">ImageFormat_Vista</a></td></tr>
+Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html">FileFormat</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for image-io-plugins.  <a href="classisis_1_1image__io_1_1FileFormat.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef ImageIoDebug&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef ImageIoLog&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io.html#ad95ad94c644019674b1532c4a2ac05c8">Runtime</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef boost::mpl::if_<br class="typebreak"/>
-&lt; boost::is_unsigned&lt; VBit &gt;<br class="typebreak"/>
-::type, uint8_t, int8_t &gt;<br class="typebreak"/>
-::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1image__io.html#aeb2bde9f121525acfbfa68a5d38fbdfa">vista_bitmask_type</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename HANDLE &gt; </td></tr>
@@ -113,21 +100,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aeb2bde9f121525acfbfa68a5d38fbdfa"></a><!-- doxytag: member="isis::image_io::vista_bitmask_type" ref="aeb2bde9f121525acfbfa68a5d38fbdfa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef boost::mpl::if_&lt;boost::is_unsigned&lt;VBit&gt;::type, uint8_t, int8_t &gt;::type <a class="el" href="namespaceisis_1_1image__io.html#aeb2bde9f121525acfbfa68a5d38fbdfa">isis::image_io::vista_bitmask_type</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="imageFormat__Vista_8cpp_source.html#l00047">47</a> of file <a class="el" href="imageFormat__Vista_8cpp_source.html">imageFormat_Vista.cpp</a>.</p>
-
-</div>
-</div>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="a6ba1dc7a299f51eafa3de8b5b16bee4a"></a><!-- doxytag: member="isis::image_io::enableLog" ref="a6ba1dc7a299f51eafa3de8b5b16bee4a" args="(LogLevel level)" -->
 <div class="memitem">
@@ -151,7 +123,7 @@ template&lt;typename HANDLE &gt; </div>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

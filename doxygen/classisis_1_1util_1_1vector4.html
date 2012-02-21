@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -64,13 +63,12 @@ Inheritance diagram for isis::util::vector4&lt; TYPE &gt;:</div>
 <area href="classisis_1_1util_1_1__internal_1_1array.html" alt="isis::util::_internal::array&lt; TYPE, SIZE &gt;" shape="rect" coords="0,0,237,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1util_1_1vector4-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1vector4.html#a6b0ba8088895f9fa54bddc0d56cc5259">vector4</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1vector4.html#a256c8e61899a2e2a5038a77df56f3d18">vector4</a> (TYPE first, TYPE second, TYPE third=0, TYPE fourth=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1vector4.html#a6a78794388aa1460af65a38713b26345">vector4</a> (const TYPE src[4])</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1vector4.html#aca1c2ba19655f62825015499a52e856d">vector4</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, 4, CONTAINER2 &gt; &amp;src)</td></tr>
 </table>
@@ -79,7 +77,7 @@ Public Member Functions</h2></td></tr>
  class isis::util::vector4&lt; TYPE &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00303">303</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00306">306</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a6b0ba8088895f9fa54bddc0d56cc5259"></a><!-- doxytag: member="isis::util::vector4::vector4" ref="a6b0ba8088895f9fa54bddc0d56cc5259" args="()" -->
 <div class="memitem">
@@ -97,7 +95,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00306">306</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00309">309</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -120,7 +118,28 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00307">307</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00310">310</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6a78794388aa1460af65a38713b26345"></a><!-- doxytag: member="isis::util::vector4::vector4" ref="a6a78794388aa1460af65a38713b26345" args="(const TYPE src[4])" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">isis::util::vector4</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1util_1_1vector4.html">vector4</a> </td>
+          <td>(</td>
+          <td class="paramtype">const TYPE&#160;</td>
+          <td class="paramname"><em>src</em>[4]</td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00311">311</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -163,7 +182,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00308">308</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00312">312</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -171,7 +190,7 @@ template&lt;typename TYPE&gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="vector_8hpp_source.html">vector.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

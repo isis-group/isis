@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -83,8 +82,8 @@
 <a name="l00040"></a>00040 {
 <a name="l00041"></a>00041 <span class="keyword">public</span>:
 <a name="l00042"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">00042</a>     <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">scalarPropCompare</a> {
-<a name="l00043"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">00043</a>         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">propertyName</a>;
-<a name="l00044"></a>00044         <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;prop_name );
+<a name="l00043"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">00043</a>         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">propertyName</a>;
+<a name="l00044"></a>00044         <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name );
 <a name="l00045"></a>00045         <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a26ffc959c82f67ee9c4a33e988fcf645">operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;a, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;b ) <span class="keyword">const</span>;
 <a name="l00046"></a>00046     };
 <a name="l00047"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html">00047</a>     <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html">posCompare</a> {
@@ -114,9 +113,9 @@
 <a name="l00071"></a>00071 <span class="keyword">public</span>:
 <a name="l00072"></a>00072 
 <a name="l00073"></a>00073     <span class="comment">//initialisation</span>
-<a name="l00077"></a>00077 <span class="comment"></span>    <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> comma_separated_equal_props );
+<a name="l00077"></a>00077 <span class="comment"></span>    <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props );
 <a name="l00078"></a>00078 
-<a name="l00083"></a>00083     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the used keys">util::PropertyMap::KeyType</a> &amp;cmp );
+<a name="l00083"></a>00083     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp );
 <a name="l00084"></a>00084 
 <a name="l00085"></a>00085     <span class="comment">// utils</span>
 <a name="l00086"></a>00086 
@@ -143,7 +142,7 @@
 <a name="l00114"></a>00114 <span class="preprocessor">#endif // SORTEDCHUNKLIST_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

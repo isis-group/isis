@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,10 +23,9 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
@@ -46,7 +45,7 @@
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
@@ -59,7 +58,7 @@
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html">_internal</a></td></tr>
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Main class for four-dimensional random-access data blocks.  <a href="classisis_1_1data_1_1Chunk.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ChunkOp.html">ChunkOp</a></td></tr>
@@ -104,13 +103,18 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> { <a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> =  0, 
 <a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>, 
-<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a>
+<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a>, 
+<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a6b3eda41d68306590168fc6ed31d84e9">t</a>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename HANDLE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">enableLog</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set logging level for the namespace data.  <a href="#a465a70c53d5fc5a7be8916b70c37df18"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">endianSwap</a> (const T &amp;var)</td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename ITER , typename TITER &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">endianSwapArray</a> (const ITER begin, const ITER end, TITER target)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename SRC , typename DST &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; double, double &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84">getNumericScaling</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes scaling and offset between two scalar value domains.  <a href="#a0d2323b3e931946a3fd24d1198ecbd84"></a><br/></td></tr>
@@ -177,7 +181,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00266">266</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00364">364</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,6 +257,8 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55"></a><!-- doxytag: member="z" ref="addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55" args="" -->z</em>&nbsp;</td><td>
 </td></tr>
+<tr><td valign="top"><em><a class="anchor" id="addc0484ee8054d9e855bbd264c978b99a6b3eda41d68306590168fc6ed31d84e9"></a><!-- doxytag: member="t" ref="addc0484ee8054d9e855bbd264c978b99a6b3eda41d68306590168fc6ed31d84e9" args="" -->t</em>&nbsp;</td><td>
+</td></tr>
 </table>
 </dd>
 </dl>
@@ -283,6 +289,64 @@ template&lt;typename HANDLE &gt; </div>
 <p>This logging level will be used for every LOG(Debug,...) and LOG(Runtime,...) within the data namespace. This is affected by by the _ENABLE_LOG and _ENABLE_DEBUG settings of the current compile and won't have an effect on the Debug or Runtime logging if the corresponding define is set to "0". So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1", you won't be able to change the logging level of the debug messages of these library. </p>
 
 <p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00083">83</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a649709edd7e060b1335e840f5a1ba639"></a><!-- doxytag: member="isis::data::endianSwap" ref="a649709edd7e060b1335e840f5a1ba639" args="(const T &amp;var)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">static T isis::data::endianSwap </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>var</em></td><td>)</td>
+          <td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="endianess_8hpp_source.html#l00080">80</a> of file <a class="el" href="endianess_8hpp_source.html">endianess.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab0a1078db56fe21f750d1b2b58a6aa4b"></a><!-- doxytag: member="isis::data::endianSwapArray" ref="ab0a1078db56fe21f750d1b2b58a6aa4b" args="(const ITER begin, const ITER end, TITER target)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ITER , typename TITER &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">static void isis::data::endianSwapArray </td>
+          <td>(</td>
+          <td class="paramtype">const ITER&#160;</td>
+          <td class="paramname"><em>begin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ITER&#160;</td>
+          <td class="paramname"><em>end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TITER&#160;</td>
+          <td class="paramname"><em>target</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="endianess_8hpp_source.html#l00084">84</a> of file <a class="el" href="endianess_8hpp_source.html">endianess.hpp</a>.</p>
 
 </div>
 </div>
@@ -450,7 +514,7 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

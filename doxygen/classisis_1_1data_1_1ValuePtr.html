@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -47,7 +46,8 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
@@ -71,20 +71,32 @@ Inheritance diagram for isis::data::ValuePtr&lt; TYPE &gt;:</div>
 <area href="classisis_1_1util_1_1__internal_1_1GenericValue.html" alt="isis::util::_internal::GenericValue" shape="rect" coords="0,0,198,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1data_1_1ValuePtr-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1ValuePtr_1_1BasicDeleter.html">BasicDeleter</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default delete-functor for c-arrays (uses free()).  <a href="structisis_1_1data_1_1ValuePtr_1_1BasicDeleter.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1ValuePtr_1_1NonDeleter.html">NonDeleter</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">delete-functor which does nothing (in case someone else manages the data).  <a href="structisis_1_1data_1_1ValuePtr_1_1NonDeleter.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1ValuePtr_1_1ObjectArrayDeleter.html">ObjectArrayDeleter</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default delete-functor for arrays of objects (uses delete[]).  <a href="structisis_1_1data_1_1ValuePtr_1_1ObjectArrayDeleter.html#_details">More...</a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
+<a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">_internal::ValuePtrIterator</a><br class="typebreak"/>
+&lt; const TYPE &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#aac7b2b0f22b4ff2d27845e414d9200c2">const_iterator</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef const_iterator::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ada440071308fc294d986ee989034c8f2">const_reference</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
+<a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">_internal::ValuePtrIterator</a><br class="typebreak"/>
+&lt; TYPE &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a80e01bddd0cbf832db83954ee72be9b1">iterator</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef iterator::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a99991217ecfb11bcd1c1fa9340f26eec">reference</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ac7878f9b214a6f7c2efe35c6469d1ca9">begin</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#af598413585e42503fd04dac49ccafc9d">begin</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a448d025e667a8986dc2bc19b34ed9715">beginGeneric</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#aab609293f04f7e642cdcb1fdee7f7341">beginGeneric</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ab8384c8cbb5f61685beb00d5f68ff7a3">bytesPerElem</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ad1debccbb68d345b0aee031f276a574c">end</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#aa55dd0333af5eb959e44b3e45b8fa39c">end</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::pair<br class="typebreak"/>
 &lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <br class="typebreak"/>
 <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a59da53e38a246552ad516e505ac962f6">getMinMax</a> () const </td></tr>
@@ -101,9 +113,9 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a8a307eca934ade3dfccbc7e41fb01208">operator boost::shared_ptr&lt; TYPE &gt; &amp;</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit conversion to boost::shared_ptr&lt;TYPE&gt; The returned smart pointer will be part of the reference-counting and will correctly delete the data (using the given deleter) if required.  <a href="#a8a307eca934ade3dfccbc7e41fb01208"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a869d6aa942d986d201d6d4255401845b">operator const boost::shared_ptr&lt; TYPE &gt; &amp;</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const TYPE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a8e4c8ddd427bb142ef5d88e636f7932e">operator[]</a> (size_t idx) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TYPE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a042d66ffcc5985b998096722446c3bb7">operator[]</a> (size_t idx)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference element at at given index.  <a href="#a042d66ffcc5985b998096722446c3bb7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const TYPE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a8e4c8ddd427bb142ef5d88e636f7932e">operator[]</a> (size_t idx) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">Reference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a9f8ecd913db39413ce3fee2dc1d7c002">splice</a> (size_t size) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Splice up the <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> into equal sized blocks.  <a href="#a9f8ecd913db39413ce3fee2dc1d7c002"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ac13d1b521078490e35dd8201af1899be">toString</a> (bool labeled=false) const </td></tr>
@@ -113,7 +125,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a6136626a335c6998c5ee5fd3cce57496">ValuePtr</a> (TYPE *const ptr, size_t length, D d)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a pointer of type TYPE.  <a href="#a6136626a335c6998c5ee5fd3cce57496"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ac0be806ada68648eacb2fe03fb5982ac">ValuePtr</a> (const boost::shared_ptr&lt; TYPE &gt; &amp;ptr, size_t length)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a boost:shared_ptr of the same type.  <a href="#ac0be806ada68648eacb2fe03fb5982ac"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a boost::shared_ptr of the same type.  <a href="#ac0be806ada68648eacb2fe03fb5982ac"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#ab9a93ea4e4f3495185f14a2a6b62fcd9">ValuePtr</a> (size_t length)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> pointing to a newly allocated array of elements of the given type.  <a href="#ab9a93ea4e4f3495185f14a2a6b62fcd9"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html#a09d9be41ed5d473805eede680fcd2452">~ValuePtr</a> ()</td></tr>
@@ -136,8 +148,77 @@ Protected Member Functions</h2></td></tr>
 <p>Generic class for type (and length) - aware pointers. </p>
 <p>The class is designed for arrays, but you can also "point" to an single element by just use "1" for the length. The pointers are reference counted and will be deleted automatically by a customizable deleter. The copy is cheap, thus the copy of a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> will reference the same data. The usual pointer dereferencing interface ("*", "-&gt;" and "[]") is supported. </p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00087">87</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00144">144</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+</div><hr/><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="aac7b2b0f22b4ff2d27845e414d9200c2"></a><!-- doxytag: member="isis::data::ValuePtr::const_iterator" ref="aac7b2b0f22b4ff2d27845e414d9200c2" args="" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">_internal::ValuePtrIterator</a>&lt;const TYPE&gt; <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">const_iterator</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00160">160</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ada440071308fc294d986ee989034c8f2"></a><!-- doxytag: member="isis::data::ValuePtr::const_reference" ref="ada440071308fc294d986ee989034c8f2" args="" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const_iterator::reference <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1data_1_1ValuePtr.html#ada440071308fc294d986ee989034c8f2">const_reference</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00162">162</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a80e01bddd0cbf832db83954ee72be9b1"></a><!-- doxytag: member="isis::data::ValuePtr::iterator" ref="a80e01bddd0cbf832db83954ee72be9b1" args="" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">_internal::ValuePtrIterator</a>&lt;TYPE&gt; <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">iterator</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00159">159</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a99991217ecfb11bcd1c1fa9340f26eec"></a><!-- doxytag: member="isis::data::ValuePtr::reference" ref="a99991217ecfb11bcd1c1fa9340f26eec" args="" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef iterator::reference <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::<a class="el" href="classisis_1_1data_1_1ValuePtr.html#a99991217ecfb11bcd1c1fa9340f26eec">reference</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00161">161</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2afd1139ab3b8e91e882fbe61ec6c5fb"></a><!-- doxytag: member="isis::data::ValuePtr::ValuePtr" ref="a2afd1139ab3b8e91e882fbe61ec6c5fb" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -154,7 +235,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00091">91</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00154">154</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -184,7 +265,7 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00126">126</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00186">186</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -215,7 +296,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a boost:shared_ptr of the same type. </p>
+<p>Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a boost::shared_ptr of the same type. </p>
 <p>It will inherit the deleter of the shared_ptr. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
@@ -225,7 +306,7 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00142">142</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00202">202</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +338,7 @@ template&lt;typename TYPE&gt; </div>
 <div class="memdoc">
 
 <p>Creates <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> from a pointer of type TYPE. </p>
-<p>The pointers are automatically deleted by an instance of <a class="el" href="structisis_1_1data_1_1ValuePtr_1_1BasicDeleter.html" title="Default delete-functor for c-arrays (uses free()).">BasicDeleter</a> and should not be used outside once used here. If ptr is a pointer to C++ objects (delete[] needed) you must use <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>(ptr,len,<a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>&lt;TYPE&gt;::ObjectArrayDeleter())! </p>
+<p>The pointers are automatically deleted by an instance of <a class="el" href="structisis_1_1data_1_1ValuePtr_1_1BasicDeleter.html" title="Default delete-functor for c-arrays (uses free()).">BasicDeleter</a> and should not be used outside once used here. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">ptr</td><td>the pointer to the used array </td></tr>
@@ -266,7 +347,7 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00153">153</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00211">211</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -316,7 +397,7 @@ template&lt;typename D &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00165">165</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00223">223</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -336,11 +417,95 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00167">167</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00225">225</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ac7878f9b214a6f7c2efe35c6469d1ca9"></a><!-- doxytag: member="isis::data::ValuePtr::begin" ref="ac7878f9b214a6f7c2efe35c6469d1ca9" args="()" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00245">245</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af598413585e42503fd04dac49ccafc9d"></a><!-- doxytag: member="isis::data::ValuePtr::begin" ref="af598413585e42503fd04dac49ccafc9d" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">const_iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00247">247</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aab609293f04f7e642cdcb1fdee7f7341"></a><!-- doxytag: member="isis::data::ValuePtr::beginGeneric" ref="aab609293f04f7e642cdcb1fdee7f7341" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">const_value_iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::beginGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ab93697c01f67c332f25d1f1be8d89b9b">isis::data::_internal::ValuePtrBase</a>.</p>
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00241">241</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a448d025e667a8986dc2bc19b34ed9715"></a><!-- doxytag: member="isis::data::ValuePtr::beginGeneric" ref="a448d025e667a8986dc2bc19b34ed9715" args="()" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">value_iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::beginGeneric </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a7e9ec0485153f4def57a6ea9791e0126">isis::data::_internal::ValuePtrBase</a>.</p>
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00238">238</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="ab8384c8cbb5f61685beb00d5f68ff7a3"></a><!-- doxytag: member="isis::data::ValuePtr::bytesPerElem" ref="ab8384c8cbb5f61685beb00d5f68ff7a3" args="() const " -->
 <div class="memitem">
 <div class="memproto">
@@ -360,7 +525,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#af2699cc78c91ebc74e724dfeaff6407b">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00227">227</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00296">296</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +549,47 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a67a01586958fb8c49d361ba7bbf546b8">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00092">92</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00155">155</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa55dd0333af5eb959e44b3e45b8fa39c"></a><!-- doxytag: member="isis::data::ValuePtr::end" ref="aa55dd0333af5eb959e44b3e45b8fa39c" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">const_iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00248">248</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad1debccbb68d345b0aee031f276a574c"></a><!-- doxytag: member="isis::data::ValuePtr::end" ref="ad1debccbb68d345b0aee031f276a574c" args="()" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html">iterator</a> <a class="el" href="classisis_1_1data_1_1ValuePtr.html">isis::data::ValuePtr</a>&lt; TYPE &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00246">246</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -413,7 +618,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a4fd1648eeedd918b1c22fd166bfa4b4a">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00229">229</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00298">298</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -446,7 +651,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a2e7dc25df6fc915321f78118fad1b596">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00169">169</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00227">227</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -478,7 +683,7 @@ template&lt;typename TYPE&gt; </div>
  
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aee280aac05a3e26d320894bc6948815e">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00177">177</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00235">235</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -513,7 +718,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a73785845e502284467ea8684ca5ef4a5">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00266">266</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00335">335</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +741,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00198">198</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00267">267</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -559,7 +764,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00197">197</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00266">266</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -582,7 +787,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#aa929b28db7f737a5329d023b1857afec">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00199">199</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00268">268</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +810,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ae9a0682484b9213f564a3cb117f94dfc">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00200">200</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00269">269</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +833,7 @@ template&lt;typename TYPE&gt; </div>
 <p>Implicit conversion to boost::shared_ptr&lt;TYPE&gt; The returned smart pointer will be part of the reference-counting and will correctly delete the data (using the given deleter) if required. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>boost::shared_ptr&lt;TYPE&gt; handling same data as the object. </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00224">224</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00293">293</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -648,7 +853,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00225">225</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00294">294</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +874,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00215">215</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00284">284</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +899,7 @@ template&lt;typename TYPE&gt; </div>
 <p>If index is invalid, behaviour is undefined. Probably it will crash. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>reference to element at at given index. </dd></dl>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00212">212</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00281">281</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -727,7 +932,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8d776ecb43227d021c880e616e2a9f26">isis::data::_internal::ValuePtrBase</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00241">241</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00310">310</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +953,7 @@ template&lt;typename TYPE&gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the name of the type </dd></dl>
  
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00203">203</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00272">272</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -779,11 +984,11 @@ template&lt;typename TYPE&gt; </div>
  
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#a54e2a61ebef7a0b7c07cd6e579c5f64a">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00182">182</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00251">251</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
-<hr/><h2>Member Data Documentation</h2>
+<hr/><h2>Field Documentation</h2>
 <a class="anchor" id="afaf56a4a73ada017a6eefbdb03cb82a2"></a><!-- doxytag: member="isis::data::ValuePtr::staticID" ref="afaf56a4a73ada017a6eefbdb03cb82a2" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -797,7 +1002,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00096">96</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="typeptr_8hpp_source.html#l00164">164</a> of file <a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>.</p>
 
 </div>
 </div>
@@ -805,7 +1010,7 @@ template&lt;typename TYPE&gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

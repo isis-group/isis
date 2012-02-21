@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -53,7 +53,16 @@
 <h1>isis::image_io::ImageFormat_Null Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::image_io::ImageFormat_Null" -->
+<!-- doxytag: class="isis::image_io::ImageFormat_Null" --><!-- doxytag: inherits="isis::image_io::FileFormat" --><div class="dynheader">
+Inheritance diagram for isis::image_io::ImageFormat_Null:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classisis_1_1image__io_1_1ImageFormat__Null.png" usemap="#isis::image_io::ImageFormat_Null_map" alt=""/>
+  <map id="isis::image_io::ImageFormat_Null_map" name="isis::image_io::ImageFormat_Null_map">
+<area href="classisis_1_1image__io_1_1FileFormat.html" alt="isis::image_io::FileFormat" shape="rect" coords="0,0,193,24"/>
+</map>
+ </div></div>
+
 <p><a href="classisis_1_1image__io_1_1ImageFormat__Null-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
@@ -61,11 +70,14 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2e9410eae71771c9383458c241d54cc4">dialects</a> (const std::string &amp;) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a53ac357a80ed2707eb4c721bdafe4904">getName</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#aba86977424dfebd764f0492b1317ab12">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;, const std::string &amp;dialect)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the given chunk list.  <a href="#aba86977424dfebd764f0492b1317ab12"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ae41c8faaca4e7f30f1869b2dc051b0b2">tainted</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a4bd37c9b807a63300f53cf04c058b3e2">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;, const std::string &amp;)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ad9b6c1ee2f742ee35386e22a51bfe13c">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;img, const std::string &amp;, const std::string &amp;)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single image to a file.  <a href="#ad9b6c1ee2f742ee35386e22a51bfe13c"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a92e30d345cb832f32fea08a407b3ac08">suffixes</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ac1e0e775c29b7b73fef420dc2c62b10b">getSize</a> (const std::string &amp;dialect)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a0458f760093cbd6e9aa152f9927c3674">suffixes</a> (<a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a>) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
@@ -80,13 +92,16 @@ Protected Member Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>a space separated list of the dialects the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00020">20</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aa4124d591577978336c1352adcd1a98a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00060">60</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
@@ -98,13 +113,35 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">std::string isis::image_io::ImageFormat_Null::getName </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the name of the plugin </dd></dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aff0eaeb932b67a03194aaf6276ad1d44">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00057">57</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac1e0e775c29b7b73fef420dc2c62b10b"></a><!-- doxytag: member="isis::image_io::ImageFormat_Null::getSize" ref="ac1e0e775c29b7b73fef420dc2c62b10b" args="(const std::string &amp;dialect)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t isis::image_io::ImageFormat_Null::getSize </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>dialect</em></td><td>)</td>
+          <td><code> [inline, protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00017">17</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00047">47</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
@@ -122,7 +159,7 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>filename</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -133,31 +170,49 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline]</code></td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00024">24</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Load data into the given chunk list. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">chunks</td><td>the chunk list where the loaded chunks shall be added to </td></tr>
+    <tr><td class="paramname">filename</td><td>the name of the file to load from (the system does NOT check if this file exists) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the amount of loaded chunks. </dd></dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a2692bc1fd170c46232c81a254a56420a">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00064">64</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a92e30d345cb832f32fea08a407b3ac08"></a><!-- doxytag: member="isis::image_io::ImageFormat_Null::suffixes" ref="a92e30d345cb832f32fea08a407b3ac08" args="() const " -->
+<a class="anchor" id="a0458f760093cbd6e9aa152f9927c3674"></a><!-- doxytag: member="isis::image_io::ImageFormat_Null::suffixes" ref="a0458f760093cbd6e9aa152f9927c3674" args="(io_modes) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">std::string isis::image_io::ImageFormat_Null::suffixes </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, protected]</code></td>
+          <td class="paramtype"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a>&#160;</td>
+          <td class="paramname"><em>modes</em></td><td>)</td>
+          <td> const<code> [inline, protected, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>the file-suffixes the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00013">13</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a3f83b544d398742f7bdbe939d0f7d6bf">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00044">44</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
@@ -169,17 +224,20 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">bool isis::image_io::ImageFormat_Null::tainted </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<dl class="return"><dt><b>Returns:</b></dt><dd>if the plugin is not part of the official distribution </dd></dl>
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00118">118</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00172">172</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a4bd37c9b807a63300f53cf04c058b3e2"></a><!-- doxytag: member="isis::image_io::ImageFormat_Null::write" ref="a4bd37c9b807a63300f53cf04c058b3e2" args="(const data::Image &amp;image, const std::string &amp;, const std::string &amp;)" -->
+<a class="anchor" id="ad9b6c1ee2f742ee35386e22a51bfe13c"></a><!-- doxytag: member="isis::image_io::ImageFormat_Null::write" ref="ad9b6c1ee2f742ee35386e22a51bfe13c" args="(const data::Image &amp;img, const std::string &amp;, const std::string &amp;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -193,24 +251,36 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>filename</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>dialect</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline]</code></td>
+          <td></td><td>  throw ( std::runtime_error &amp; )<code> [inline, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00108">108</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
+<p>Write a single image to a file. </p>
+<p>I case of an error std::runtime_error will be thrown. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the name of the file to write (the system does NOT check if this file exists/is writeable) </td></tr>
+    <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a9cafcb99bc0063bd528da0278ffff06f">isis::image_io::FileFormat</a>.</p>
+
+<p>Definition at line <a class="el" href="imageFormat__Null_8cpp_source.html#l00098">98</a> of file <a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a>.</p>
 
 </div>
 </div>
@@ -218,7 +288,7 @@ Protected Member Functions</h2></td></tr>
 <li>/SCR/isis/lib/ImageIO/<a class="el" href="imageFormat__Null_8cpp_source.html">imageFormat_Null.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:01 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

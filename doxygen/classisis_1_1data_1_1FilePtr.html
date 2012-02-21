@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -47,7 +46,7 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <h1>isis::data::FilePtr Class Reference</h1>  </div>
@@ -69,24 +68,24 @@ Inheritance diagram for isis::data::FilePtr:</div>
 <area href="classisis_1_1util_1_1__internal_1_1GenericValue.html" alt="isis::util::_internal::GenericValue" shape="rect" coords="0,0,198,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1data_1_1FilePtr-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>Closer</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>GeneratorMap</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#ad02f08468afaaabce0933d51455a8b16">at</a> (size_t offset, size_t len=0)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> representing the data in the file.  <a href="#ad02f08468afaaabce0933d51455a8b16"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">data::ValuePtrReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#a7d6c697583f387058dc0d5afb1e587f8">atByID</a> (unsigned short ID, size_t offset, size_t len=0)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a ValuePtrReference to a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> of the requested type.  <a href="#a7d6c697583f387058dc0d5afb1e587f8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#a3b57ebe1460fa05eeb6f06f5ea42dbc2">close</a> ()</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#acefaa068f3f5932d109009560912b318">at</a> (size_t offset, size_t len=0, bool swap_endianess=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> representing the data in the file.  <a href="#acefaa068f3f5932d109009560912b318"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">data::ValuePtrReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#a7301c37340f98591f769c26b796d81f1">atByID</a> (unsigned short ID, size_t offset, size_t len=0, bool swap_endianess=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a ValuePtrReference to a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> of the requested type.  <a href="#a7301c37340f98591f769c26b796d81f1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#aa63c0ca1ac7d96f35be0811f046af0bd">FilePtr</a> (const boost::filesystem::path &amp;filename, size_t len=0, bool write=false)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a>, mapping the given file.  <a href="#aa63c0ca1ac7d96f35be0811f046af0bd"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#af1ee15743695634a1aa168dabd3efaf8">FilePtr</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">empty creator - result will not be usefull until filled  <a href="#af1ee15743695634a1aa168dabd3efaf8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#aef7b8afaf8f6f390c77fb1f9c76876d8">good</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html#aef29b46c689353bbdd43b1ea73597da0">release</a> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class to map files into memory. </p>
@@ -94,8 +93,28 @@ Public Member Functions</h2></td></tr>
 <p>Writing to a <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a> mapping a file read-only is valid. It will not change the mapped file.</p>
 <p>This is inherting from <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>. Thus this, and all <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> created from it will be managed. The mapped file will automatically unmapped and closed after all pointers a deleted. </p>
 
-<p>Definition at line <a class="el" href="fileptr_8hpp_source.html#l00030">30</a> of file <a class="el" href="fileptr_8hpp_source.html">fileptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="fileptr_8hpp_source.html#l00038">38</a> of file <a class="el" href="fileptr_8hpp_source.html">fileptr.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="af1ee15743695634a1aa168dabd3efaf8"></a><!-- doxytag: member="isis::data::FilePtr::FilePtr" ref="af1ee15743695634a1aa168dabd3efaf8" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">isis::data::FilePtr::FilePtr </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>empty creator - result will not be usefull until filled </p>
+
+<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00169">169</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aa63c0ca1ac7d96f35be0811f046af0bd"></a><!-- doxytag: member="isis::data::FilePtr::FilePtr" ref="aa63c0ca1ac7d96f35be0811f046af0bd" args="(const boost::filesystem::path &amp;filename, size_t len=0, bool write=false)" -->
 <div class="memitem">
 <div class="memproto">
@@ -154,12 +173,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00106">106</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00172">172</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ad02f08468afaaabce0933d51455a8b16"></a><!-- doxytag: member="isis::data::FilePtr::at" ref="ad02f08468afaaabce0933d51455a8b16" args="(size_t offset, size_t len=0)" -->
+<a class="anchor" id="acefaa068f3f5932d109009560912b318"></a><!-- doxytag: member="isis::data::FilePtr::at" ref="acefaa068f3f5932d109009560912b318" args="(size_t offset, size_t len=0, bool swap_endianess=false)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -175,7 +194,13 @@ template&lt;typename T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>len</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>len</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>swap_endianess</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -194,15 +219,16 @@ template&lt;typename T &gt; </div>
   <table class="params">
     <tr><td class="paramname">offset</td><td>the position in the file to start from (in bytes) </td></tr>
     <tr><td class="paramname">len</td><td>the requested length of the resulting <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> in elements (if that will go behind the end of the file, a warning will be issued). </td></tr>
+    <tr><td class="paramname">swap_endianess</td><td>if endianess should be swapped when reading data file (ignored when used on files opened for writing) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fileptr_8hpp_source.html#l00088">88</a> of file <a class="el" href="fileptr_8hpp_source.html">fileptr.hpp</a>.</p>
+<p>Definition at line <a class="el" href="fileptr_8hpp_source.html#l00103">103</a> of file <a class="el" href="fileptr_8hpp_source.html">fileptr.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7d6c697583f387058dc0d5afb1e587f8"></a><!-- doxytag: member="isis::data::FilePtr::atByID" ref="a7d6c697583f387058dc0d5afb1e587f8" args="(unsigned short ID, size_t offset, size_t len=0)" -->
+<a class="anchor" id="a7301c37340f98591f769c26b796d81f1"></a><!-- doxytag: member="isis::data::FilePtr::atByID" ref="a7301c37340f98591f769c26b796d81f1" args="(unsigned short ID, size_t offset, size_t len=0, bool swap_endianess=false)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -222,7 +248,13 @@ template&lt;typename T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>len</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>len</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>swap_endianess</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -235,35 +267,19 @@ template&lt;typename T &gt; </div>
 
 <p>Get a ValuePtrReference to a <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> of the requested type. </p>
 <p>The resulting <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> will use a proxy deleter to keep track of the mapped file. So the file will be unmapped and closed if, and only if all <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> created by this function and the <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a> are closed.</p>
-<p>If the <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a> was opened writing, writing access to this <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> objects will result in writes to the file. Otherwise it will just write into memory. </p>
+<p>If the <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a> was opened writing, writing access to this <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> objects will result in writes to the file. Otherwise it will just write into memory.</p>
+<p>If the <a class="el" href="classisis_1_1data_1_1FilePtr.html" title="Class to map files into memory.">FilePtr</a> was opened reading and the assumed endianess of the file (see parameter) does not fit the endianess of the system an (endianess-converted) deep copy is created.</p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">ID</td><td>the requested type (note that there is no conversion done, just reinterpretation of the raw data in the file) </td></tr>
     <tr><td class="paramname">offset</td><td>the position in the file to start from (in bytes) </td></tr>
     <tr><td class="paramname">len</td><td>the requested length of the resulting <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a> in elements (if that will go behind the end of the file, a warning will be issued). </td></tr>
+    <tr><td class="paramname">swap_endianess</td><td>if endianess should be swapped when reading data file (ignored when used on files opened for writing) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00135">135</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a3b57ebe1460fa05eeb6f06f5ea42dbc2"></a><!-- doxytag: member="isis::data::FilePtr::close" ref="a3b57ebe1460fa05eeb6f06f5ea42dbc2" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void isis::data::FilePtr::close </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00129">129</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00214">214</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +297,25 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00127">127</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
+<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00206">206</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aef29b46c689353bbdd43b1ea73597da0"></a><!-- doxytag: member="isis::data::FilePtr::release" ref="aef29b46c689353bbdd43b1ea73597da0" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::data::FilePtr::release </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="fileptr_8cpp_source.html#l00208">208</a> of file <a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +324,7 @@ template&lt;typename T &gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="fileptr_8cpp_source.html">fileptr.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

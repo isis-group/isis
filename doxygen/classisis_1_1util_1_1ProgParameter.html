@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -67,8 +66,6 @@ Inheritance diagram for isis::util::ProgParameter:</div>
 <area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="0,0,290,24"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1util_1_1ProgParameter-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -83,6 +80,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit cast to <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> T.  <a href="#a539a4f231f449cac2534537f96b1d9e6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgParameter.html#a30cfb474b5266b6bb3c1779bd381a482">parse</a> (const <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; std::string &gt; &amp;props)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Put the given value into this parameter.  <a href="#a30cfb474b5266b6bb3c1779bd381a482"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgParameter.html#afdb9a8c2c3637f150e33d67e044bda73">parse_list</a> (const <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; <a class="el" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &gt; &amp;props_list)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgParameter.html#af34312120d8e68c8e1dbbc1ac54d027a">ProgParameter</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <a href="#af34312120d8e68c8e1dbbc1ac54d027a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgParameter.html#af5a595466d87b175770f5610b2480199">ProgParameter</a> (const <a class="el" href="classisis_1_1util_1_1ProgParameter.html">ProgParameter</a> &amp;ref)</td></tr>
@@ -193,7 +191,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the description string </dd></dl>
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00063">63</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00084">84</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +249,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true, if the parameter was ever successfully parsed </dd></dl>
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00071">71</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00092">92</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -269,7 +267,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00139">139</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00167">167</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +290,7 @@ template&lt;typename T &gt; </div>
 <p>Implicit cast to <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> T. </p>
 <p>If the parameter does not contain T, a rutime error will be raised </p>
 
-<p>Definition at line <a class="el" href="progparameter_8hpp_source.html#l00074">74</a> of file <a class="el" href="progparameter_8hpp_source.html">progparameter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8hpp_source.html#l00075">75</a> of file <a class="el" href="progparameter_8hpp_source.html">progparameter.hpp</a>.</p>
 
 </div>
 </div>
@@ -325,6 +323,25 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="afdb9a8c2c3637f150e33d67e044bda73"></a><!-- doxytag: member="isis::util::ProgParameter::parse_list" ref="afdb9a8c2c3637f150e33d67e044bda73" args="(const isis::util::Value&lt; util::slist &gt; &amp;props_list)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::util::ProgParameter::parse_list </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; <a class="el" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>props_list</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00063">63</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a2f742aacfbcdf9c695033d5e9e4f1feb"></a><!-- doxytag: member="isis::util::ProgParameter::setDescription" ref="a2f742aacfbcdf9c695033d5e9e4f1feb" args="(const std::string &amp;desc)" -->
 <div class="memitem">
 <div class="memproto">
@@ -340,7 +357,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00067">67</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00088">88</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -349,7 +366,7 @@ template&lt;typename T &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

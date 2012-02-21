@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -66,17 +65,15 @@ Inheritance diagram for isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;
  <div class="center">
   <img src="classisis_1_1util_1_1__internal_1_1ValueReference.png" usemap="#isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;_map" alt=""/>
   <map id="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;_map" name="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;_map">
+<area href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html" alt="isis::data::_internal::ConstValueAdapter" shape="rect" coords="0,56,300,80"/>
 <area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="465,56,765,80"/>
-<area href="classisis_1_1util_1_1PropertyValue.html" alt="isis::util::PropertyValue" shape="rect" coords="1240,56,1540,80"/>
-<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,112,300,136"/>
-<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="310,112,610,136"/>
-<area href="classisis_1_1image__io_1_1__internal_1_1DicomChunk.html" alt="isis::image_io::_internal::DicomChunk" shape="rect" coords="620,112,920,136"/>
-<area href="classisis_1_1image__io_1_1__internal_1_1NiftiChunk.html" alt="isis::image_io::_internal::NiftiChunk" shape="rect" coords="930,112,1230,136"/>
-<area href="classisis_1_1util_1_1ProgParameter.html" alt="isis::util::ProgParameter" shape="rect" coords="1240,112,1540,136"/>
+<area href="classisis_1_1util_1_1PropertyValue.html" alt="isis::util::PropertyValue" shape="rect" coords="930,56,1230,80"/>
+<area href="classisis_1_1data_1_1__internal_1_1WritingValueAdapter.html" alt="isis::data::_internal::WritingValueAdapter" shape="rect" coords="0,112,300,136"/>
+<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="310,112,610,136"/>
+<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="620,112,920,136"/>
+<area href="classisis_1_1util_1_1ProgParameter.html" alt="isis::util::ProgParameter" shape="rect" coords="930,112,1230,136"/>
 </map>
  </div></div>
-
-<p><a href="classisis_1_1util_1_1__internal_1_1ValueReference-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -109,7 +106,7 @@ Friends</h2></td></tr>
 <p>Base class to store and handle references to <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> and ValuePtr objects. </p>
 <p>The values are refernced as smart pointers to their base class. So the references are counted and data are automatically deleted if necessary. The usual dereferencing pointer interface ("*" and "-&gt;") is supported. This class is designed as base class for specialisations, it should not be used directly. Because of that, the contructors of this class are protected. </p>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00081">81</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00083">83</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2351d32945227b9ed34ce74faf29d450"></a><!-- doxytag: member="isis::util::_internal::ValueReference::ValueReference" ref="a2351d32945227b9ed34ce74faf29d450" args="(TYPE_TYPE *t)" -->
 <div class="memitem">
@@ -128,7 +125,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00087">87</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00089">89</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -150,7 +147,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 
 <p>Default contructor. Creates an empty reference. </p>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00093">93</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00095">95</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -174,7 +171,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 <p>Copy constructor This operator creates a copy of the referenced Value-Object. </p>
 <p>So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap) </p>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00099">99</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00101">101</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -195,7 +192,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00102">102</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00104">104</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +214,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if "contained" type has no value (a.k.a. is undefined) </dd></dl>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00126">126</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00128">128</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -237,7 +234,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00091">91</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00093">93</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +256,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 
 <p>reexport parts of scoped_ptr's interface </p>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00090">90</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00092">92</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +280,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 <p>Copy operator This operator replaces the current content by a copy of src. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>reference to the (just changed) target </dd></dl>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00121">121</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00123">123</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +305,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 <p>So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap) If the source is empty the target will drop its content. Thus it will become empty as well. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>reference to the (just changed) target </dd></dl>
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00112">112</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00114">114</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +326,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00129">129</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00131">131</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -347,7 +344,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00083">83</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00085">85</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +361,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00084">84</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="generic__type_8hpp_source.html#l00086">86</a> of file <a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,7 +369,7 @@ template&lt;typename TYPE_TYPE&gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="generic__type_8hpp_source.html">generic_type.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

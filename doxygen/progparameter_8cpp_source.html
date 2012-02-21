@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -103,96 +102,124 @@
 <a name="l00060"></a>00060 
 <a name="l00061"></a>00061     <span class="keywordflow">return</span> ret;
 <a name="l00062"></a>00062 }
-<a name="l00063"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">00063</a> <span class="keyword">const</span> std::string &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">ProgParameter::description</a>()<span class="keyword">const</span>
-<a name="l00064"></a>00064 <span class="keyword"></span>{
-<a name="l00065"></a>00065     <span class="keywordflow">return</span> m_description;
-<a name="l00066"></a>00066 }
-<a name="l00067"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">00067</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">ProgParameter::setDescription</a>( <span class="keyword">const</span> std::string &amp;desc )
-<a name="l00068"></a>00068 {
-<a name="l00069"></a>00069     m_description = desc;
-<a name="l00070"></a>00070 }
-<a name="l00071"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">00071</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">ProgParameter::isSet</a>()<span class="keyword"> const</span>
-<a name="l00072"></a>00072 <span class="keyword"></span>{
-<a name="l00073"></a>00073     <span class="keywordflow">return</span> m_set;
-<a name="l00074"></a>00074 }
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076 
-<a name="l00077"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">00077</a> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">ParameterMap::ParameterMap</a>(): parsed( false ) {}
-<a name="l00078"></a>00078 
-<a name="l00079"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b">00079</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">ParameterMap::parse</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv )
-<a name="l00080"></a>00080 {
-<a name="l00081"></a>00081     parsed = <span class="keyword">true</span>;
-<a name="l00082"></a>00082     std::string pName;
+<a name="l00063"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#afdb9a8c2c3637f150e33d67e044bda73">00063</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#afdb9a8c2c3637f150e33d67e044bda73">ProgParameter::parse_list</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">isis::util::Value&lt; slist &gt;</a>&amp; props_list )
+<a name="l00064"></a>00064 {
+<a name="l00065"></a>00065     <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;me = **<span class="keyword">this</span>;
+<a name="l00066"></a>00066     <span class="keywordtype">bool</span> ret = <span class="keyword">false</span>;
+<a name="l00067"></a>00067     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;theList = props_list.<a class="code" href="group__util.html#gae3a0bd53d46c15c537e85b934080d0ff" title="Dynamically cast the ValueBase up to its actual value of type T.">castTo</a>&lt;<a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a>&gt;();
+<a name="l00068"></a>00068 
+<a name="l00069"></a>00069     <span class="keywordflow">if</span> ( theList.empty() ) {
+<a name="l00070"></a>00070         <span class="comment">//there is nothing like a bool-list (yet)</span>
+<a name="l00071"></a>00071     } <span class="keywordflow">else</span> {
+<a name="l00072"></a>00072         ret = <a class="code" href="group__util.html#gade70635b58d5b7940fbd8cd3b92ae1c2" title="Convert the content of one Value to another.">_internal::ValueBase::convert</a>( props_list, me );
+<a name="l00073"></a>00073     }
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ret, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00076"></a>00076             &lt;&lt; <span class="stringliteral">&quot;Parsed parameter list &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( theList.begin(), theList.end(), <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) ) &lt;&lt; <span class="stringliteral">&quot; as &quot;</span> &lt;&lt; me.<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#a54e2a61ebef7a0b7c07cd6e579c5f64a">toString</a>( <span class="keyword">true</span> );
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078     <span class="keywordflow">if</span>( ret )m_set = <span class="keyword">true</span>;
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080     <span class="keywordflow">return</span> ret;
+<a name="l00081"></a>00081 }
+<a name="l00082"></a>00082 
 <a name="l00083"></a>00083 
-<a name="l00084"></a>00084     <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> i = 1; i &lt; argc; ) { <span class="comment">// scan through the command line, to find next parameter</span>
-<a name="l00085"></a>00085         <span class="keywordflow">if</span> ( argv[i][0] == <span class="charliteral">&#39;-&#39;</span> ) { <span class="comment">//seems like we found a new parameter here</span>
-<a name="l00086"></a>00086             pName = argv[i];
-<a name="l00087"></a>00087             pName.erase( 0, pName.find_first_not_of( <span class="charliteral">&#39;-&#39;</span> ) );
-<a name="l00088"></a>00088         } <span class="keywordflow">else</span> {
-<a name="l00089"></a>00089             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unexpected non-parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( argv[i] );
-<a name="l00090"></a>00090         }
-<a name="l00091"></a>00091 
-<a name="l00092"></a>00092         i++;
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094         <span class="keywordflow">if</span>( !pName.empty() ) { <span class="comment">// if we got a parameter before</span>
-<a name="l00095"></a>00095             <span class="keyword">const</span> <span class="keywordtype">int</span> start = i;
+<a name="l00084"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">00084</a> <span class="keyword">const</span> std::string &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">ProgParameter::description</a>()<span class="keyword">const</span>
+<a name="l00085"></a>00085 <span class="keyword"></span>{
+<a name="l00086"></a>00086     <span class="keywordflow">return</span> m_description;
+<a name="l00087"></a>00087 }
+<a name="l00088"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">00088</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">ProgParameter::setDescription</a>( <span class="keyword">const</span> std::string &amp;desc )
+<a name="l00089"></a>00089 {
+<a name="l00090"></a>00090     m_description = desc;
+<a name="l00091"></a>00091 }
+<a name="l00092"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">00092</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">ProgParameter::isSet</a>()<span class="keyword"> const</span>
+<a name="l00093"></a>00093 <span class="keyword"></span>{
+<a name="l00094"></a>00094     <span class="keywordflow">return</span> m_set;
+<a name="l00095"></a>00095 }
 <a name="l00096"></a>00096 
-<a name="l00097"></a>00097             <span class="keywordflow">while</span>( i &lt; argc &amp;&amp; argv[i][0] != <span class="charliteral">&#39;-&#39;</span> ) { <span class="comment">//collect its properties, while there are some ..</span>
-<a name="l00098"></a>00098                 i++;
-<a name="l00099"></a>00099             }
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101             std::list&lt;std::string&gt; matchingStrings;
-<a name="l00102"></a>00102             BOOST_FOREACH( ParameterMap::const_reference parameterRef, *<span class="keyword">this</span> ) {
-<a name="l00103"></a>00103                 <span class="keywordflow">if</span>( parameterRef.first.find( pName ) == 0 ) {
-<a name="l00104"></a>00104                     matchingStrings.push_back( parameterRef.first );
-<a name="l00105"></a>00105                 }
-<a name="l00106"></a>00106             }
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108             <span class="keywordflow">if</span>( matchingStrings.size() &gt; 1 ) {
-<a name="l00109"></a>00109                 std::stringstream matchingStringStream;
-<a name="l00110"></a>00110                 BOOST_FOREACH( std::list&lt;std::string&gt;::const_reference stringRef, matchingStrings ) {
-<a name="l00111"></a>00111                     matchingStringStream &lt;&lt; stringRef &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;
-<a name="l00112"></a>00112                 }
-<a name="l00113"></a>00113                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00114"></a>00114                         &lt;&lt; <span class="stringliteral">&quot;The parameter \&quot;&quot;</span> &lt;&lt; pName &lt;&lt; <span class="stringliteral">&quot;\&quot; is ambiguous. The parameters \&quot;&quot;</span>
-<a name="l00115"></a>00115                         &lt;&lt; matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
-<a name="l00116"></a>00116                         &lt;&lt; <span class="stringliteral">&quot;\&quot; are possible. Ignoring this parameter!&quot;</span>;
-<a name="l00117"></a>00117             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( !matchingStrings.size() ) {
-<a name="l00118"></a>00118                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unknown parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( std::string( <span class="stringliteral">&quot;-&quot;</span> ) + pName + <span class="stringliteral">&quot; &quot;</span> + <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) );
-<a name="l00119"></a>00119             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( at( matchingStrings.front() ).<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot;,&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) ) ) { <span class="comment">// parse the collected properties</span>
-<a name="l00120"></a>00120                 at( matchingStrings.front() ).needed() = <span class="keyword">false</span>; <span class="comment">//remove needed flag, because the value is set (aka &quot;not needed anymore&quot;)</span>
-<a name="l00121"></a>00121             } <span class="keywordflow">else</span> {
-<a name="l00122"></a>00122                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00123"></a>00123                         &lt;&lt; <span class="stringliteral">&quot;Failed to parse value(s) &quot;</span>
-<a name="l00124"></a>00124                         &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) )
-<a name="l00125"></a>00125                         &lt;&lt; <span class="stringliteral">&quot; for &quot;</span>  &lt;&lt; matchingStrings.front() &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; at( matchingStrings.front() )-&gt;getTypeName() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00126"></a>00126                 parsed = <span class="keyword">false</span>;
+<a name="l00097"></a>00097 
+<a name="l00098"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">00098</a> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">ParameterMap::ParameterMap</a>(): parsed( false ) {}
+<a name="l00099"></a>00099 
+<a name="l00100"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b">00100</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">ParameterMap::parse</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv )
+<a name="l00101"></a>00101 {
+<a name="l00102"></a>00102     parsed = <span class="keyword">true</span>;
+<a name="l00103"></a>00103     std::string pName;
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> i = 1; i &lt; argc; ) { <span class="comment">// scan through the command line, to find next parameter</span>
+<a name="l00106"></a>00106         <span class="keywordflow">if</span> ( argv[i][0] == <span class="charliteral">&#39;-&#39;</span> ) { <span class="comment">//seems like we found a new parameter here</span>
+<a name="l00107"></a>00107             pName = argv[i];
+<a name="l00108"></a>00108             pName.erase( 0, pName.find_first_not_of( <span class="charliteral">&#39;-&#39;</span> ) );
+<a name="l00109"></a>00109         } <span class="keywordflow">else</span> {
+<a name="l00110"></a>00110             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unexpected non-parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( argv[i] );
+<a name="l00111"></a>00111         }
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113         i++;
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115         <span class="keywordflow">if</span>( !pName.empty() ) { <span class="comment">// if we got a parameter before</span>
+<a name="l00116"></a>00116             <span class="keyword">const</span> <span class="keywordtype">int</span> start = i;
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118             <span class="keywordflow">while</span>( i &lt; argc &amp;&amp; argv[i][0] != <span class="charliteral">&#39;-&#39;</span> ) { <span class="comment">//collect its properties, while there are some ..</span>
+<a name="l00119"></a>00119                 i++;
+<a name="l00120"></a>00120             }
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122             std::list&lt;std::string&gt; matchingStrings;
+<a name="l00123"></a>00123             BOOST_FOREACH( ParameterMap::const_reference parameterRef, *<span class="keyword">this</span> ) {
+<a name="l00124"></a>00124                 <span class="keywordflow">if</span>( parameterRef.first.find( pName ) == 0 ) {
+<a name="l00125"></a>00125                     matchingStrings.push_back( parameterRef.first );
+<a name="l00126"></a>00126                 }
 <a name="l00127"></a>00127             }
-<a name="l00128"></a>00128         }
-<a name="l00129"></a>00129     }
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131     <span class="keywordflow">return</span> parsed ;
-<a name="l00132"></a>00132 }
-<a name="l00133"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">00133</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">ParameterMap::isComplete</a>()<span class="keyword">const</span>
-<a name="l00134"></a>00134 <span class="keyword"></span>{
-<a name="l00135"></a>00135     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! parsed, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You did not run parse() yet. This is very likely an error&quot;</span>;
-<a name="l00136"></a>00136     <span class="keywordflow">return</span> std::find_if( begin(), end(), neededP() ) == end();
-<a name="l00137"></a>00137 }
-<a name="l00138"></a>00138 
-<a name="l00139"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">00139</a> ProgParameter::operator boost::scoped_ptr&lt;_internal::ValueBase&gt;::unspecified_bool_type()<span class="keyword">const</span>
-<a name="l00140"></a>00140 <span class="keyword"></span>{
-<a name="l00141"></a>00141     boost::scoped_ptr&lt;_internal::ValueBase&gt; dummy;
-<a name="l00142"></a>00142 
-<a name="l00143"></a>00143     <span class="keywordflow">if</span>( ( *this )-&gt;castTo&lt;<span class="keywordtype">bool</span>&gt;() )dummy.reset( <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value&lt;int16_t&gt;</a> );
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145     <span class="keywordflow">return</span>  dummy;
-<a name="l00146"></a>00146 }
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148 }
-<a name="l00149"></a>00149 }
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129             <span class="keywordflow">if</span>( matchingStrings.size() &gt; 1 ) {
+<a name="l00130"></a>00130                 std::stringstream matchingStringStream;
+<a name="l00131"></a>00131                 BOOST_FOREACH( std::list&lt;std::string&gt;::const_reference stringRef, matchingStrings ) {
+<a name="l00132"></a>00132                     matchingStringStream &lt;&lt; stringRef &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;
+<a name="l00133"></a>00133                 }
+<a name="l00134"></a>00134                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00135"></a>00135                         &lt;&lt; <span class="stringliteral">&quot;The parameter \&quot;&quot;</span> &lt;&lt; pName &lt;&lt; <span class="stringliteral">&quot;\&quot; is ambiguous. The parameters \&quot;&quot;</span>
+<a name="l00136"></a>00136                         &lt;&lt; matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
+<a name="l00137"></a>00137                         &lt;&lt; <span class="stringliteral">&quot;\&quot; are possible. Ignoring this parameter!&quot;</span>;
+<a name="l00138"></a>00138             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( !matchingStrings.size() ) {
+<a name="l00139"></a>00139                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unknown parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( std::string( <span class="stringliteral">&quot;-&quot;</span> ) + pName + <span class="stringliteral">&quot; &quot;</span> + <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) );
+<a name="l00140"></a>00140             } <span class="keywordflow">else</span> {
+<a name="l00141"></a>00141                 <span class="keywordflow">if</span>( at( matchingStrings.front() )-&gt;is&lt;util::slist&gt;() &amp;&amp;
+<a name="l00142"></a>00142                     at( matchingStrings.front() ).parse_list( <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a>( argv + start, argv + i ) )
+<a name="l00143"></a>00143                   ) { <span class="comment">//dont do tokenizing if the target is an slist (is already done by the shell)</span>
+<a name="l00144"></a>00144                     at( matchingStrings.front() ).needed() = <span class="keyword">false</span>; <span class="comment">//remove needed flag, because the value is set (aka &quot;not needed anymore&quot;)</span>
+<a name="l00145"></a>00145                 } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( at( matchingStrings.front() ).<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot;,&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) ) ) { <span class="comment">// parse the collected properties</span>
+<a name="l00146"></a>00146                     at( matchingStrings.front() ).needed() = <span class="keyword">false</span>; <span class="comment">//remove needed flag, because the value is set (aka &quot;not needed anymore&quot;)</span>
+<a name="l00147"></a>00147                 } <span class="keywordflow">else</span> {
+<a name="l00148"></a>00148                     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00149"></a>00149                             &lt;&lt; <span class="stringliteral">&quot;Failed to parse the parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( std::string( <span class="stringliteral">&quot;-&quot;</span> ) + matchingStrings.front() ) &lt;&lt; <span class="stringliteral">&quot;: &quot;</span>
+<a name="l00150"></a>00150                             &lt;&lt; ( start == i ? <span class="stringliteral">&quot;nothing&quot;</span> : <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span> ) )
+<a name="l00151"></a>00151                             &lt;&lt; <span class="stringliteral">&quot; was given, but a &quot;</span> &lt;&lt; at( matchingStrings.front() )-&gt;getTypeName() &lt;&lt; <span class="stringliteral">&quot; was expected.&quot;</span>;
+<a name="l00152"></a>00152                     parsed = <span class="keyword">false</span>;
+<a name="l00153"></a>00153                 }
+<a name="l00154"></a>00154 
+<a name="l00155"></a>00155             }
+<a name="l00156"></a>00156         }
+<a name="l00157"></a>00157     }
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159     <span class="keywordflow">return</span> parsed ;
+<a name="l00160"></a>00160 }
+<a name="l00161"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">00161</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">ParameterMap::isComplete</a>()<span class="keyword">const</span>
+<a name="l00162"></a>00162 <span class="keyword"></span>{
+<a name="l00163"></a>00163     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! parsed, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You did not run parse() yet. This is very likely an error&quot;</span>;
+<a name="l00164"></a>00164     <span class="keywordflow">return</span> std::find_if( begin(), end(), neededP() ) == end();
+<a name="l00165"></a>00165 }
+<a name="l00166"></a>00166 
+<a name="l00167"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">00167</a> ProgParameter::operator boost::scoped_ptr&lt;_internal::ValueBase&gt;::unspecified_bool_type()<span class="keyword">const</span>
+<a name="l00168"></a>00168 <span class="keyword"></span>{
+<a name="l00169"></a>00169     boost::scoped_ptr&lt;_internal::ValueBase&gt; dummy;
+<a name="l00170"></a>00170 
+<a name="l00171"></a>00171     <span class="keywordflow">if</span>( ( *this )-&gt;castTo&lt;<span class="keywordtype">bool</span>&gt;() )dummy.reset( <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value&lt;int16_t&gt;</a> );
+<a name="l00172"></a>00172 
+<a name="l00173"></a>00173     <span class="keywordflow">return</span>  dummy;
+<a name="l00174"></a>00174 }
+<a name="l00175"></a>00175 
+<a name="l00176"></a>00176 }
+<a name="l00177"></a>00177 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

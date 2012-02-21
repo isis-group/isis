@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,18 +23,17 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
   <div id="nav-path" class="navpath">
@@ -57,28 +56,37 @@
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="image_8hpp_source.html">image.hpp</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for isis::data::ChunkOp:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classisis_1_1data_1_1ChunkOp.png" usemap="#isis::data::ChunkOp_map" alt=""/>
-  <map id="isis::data::ChunkOp_map" name="isis::data::ChunkOp_map">
-<area href="classisis_1_1image__io_1_1__internal_1_1Flip.html" alt="isis::image_io::_internal::Flip" shape="rect" coords="0,56,168,80"/>
-</map>
- </div></div>
-
-<p><a href="classisis_1_1data_1_1ChunkOp-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ChunkOp.html#a5064ce14579d4ec643b21fd4e869ebf6">operator()</a> (<a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;, <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, 4 &gt; posInImage)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ChunkOp.html#ab1fae7b38670d42cd15b7e0355725aea">operator()</a> (<a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;, <a class="el" href="classisis_1_1util_1_1vector4.html">util::vector4</a>&lt; size_t &gt; posInImage)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ChunkOp.html#a9ecfcc2d9c70c41ed93ab0f5b1f7f493">~ChunkOp</a> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Base class for operators used for foreachChunk. </p>
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00034">34</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-</div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a5064ce14579d4ec643b21fd4e869ebf6"></a><!-- doxytag: member="isis::data::ChunkOp::operator()" ref="a5064ce14579d4ec643b21fd4e869ebf6" args="(Chunk &amp;, util::FixedVector&lt; size_t, 4 &gt; posInImage)=0" -->
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00178">178</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a9ecfcc2d9c70c41ed93ab0f5b1f7f493"></a><!-- doxytag: member="isis::data::ChunkOp::~ChunkOp" ref="a9ecfcc2d9c70c41ed93ab0f5b1f7f493" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">isis::data::ChunkOp::~ChunkOp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00034">34</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ab1fae7b38670d42cd15b7e0355725aea"></a><!-- doxytag: member="isis::data::ChunkOp::operator()" ref="ab1fae7b38670d42cd15b7e0355725aea" args="(Chunk &amp;, util::vector4&lt; size_t &gt; posInImage)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -91,7 +99,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, 4 &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1vector4.html">util::vector4</a>&lt; size_t &gt;&#160;</td>
           <td class="paramname"><em>posInImage</em>&#160;</td>
         </tr>
         <tr>
@@ -103,15 +111,14 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classisis_1_1image__io_1_1__internal_1_1Flip.html#abd22cf2caae1e3a9a16420c9e5a68d2f">isis::image_io::_internal::Flip</a>.</p>
-
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="image_8hpp_source.html">image.hpp</a></li>
+<li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="image_8cpp_source.html">image.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

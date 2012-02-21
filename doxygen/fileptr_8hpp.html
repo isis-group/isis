@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,23 +23,22 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Defines</a>  </div>
   <div class="headertitle">
@@ -47,12 +46,14 @@
 </div>
 <div class="contents">
 <div class="textblock"><code>#include &lt;boost/filesystem.hpp&gt;</code><br/>
+<code>#include &lt;boost/detail/endian.hpp&gt;</code><br/>
 <code>#include &quot;<a class="el" href="typeptr_8hpp_source.html">typeptr.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="endianess_8hpp_source.html">endianess.hpp</a>&quot;</code><br/>
 </div>
 <p><a href="fileptr_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
+Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>isis::data::FilePtr::Closer</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1FilePtr.html">isis::data::FilePtr</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Class to map files into memory.  <a href="classisis_1_1data_1_1FilePtr.html#_details">More...</a><br/></td></tr>
@@ -65,6 +66,7 @@ Namespaces</h2></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fileptr_8hpp.html#a7b03a7555e481d771c4ca8c611e331b0">BOOST_FILESYSTEM_VERSION</a>&#160;&#160;&#160;2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fileptr_8hpp.html#ab00d7bdead70fa34f855541305b0c89e">FILE_HANDLE</a>&#160;&#160;&#160;int</td></tr>
 </table>
 <hr/><h2>Define Documentation</h2>
 <a class="anchor" id="a7b03a7555e481d771c4ca8c611e331b0"></a><!-- doxytag: member="fileptr.hpp::BOOST_FILESYSTEM_VERSION" ref="a7b03a7555e481d771c4ca8c611e331b0" args="" -->
@@ -82,8 +84,23 @@ Defines</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab00d7bdead70fa34f855541305b0c89e"></a><!-- doxytag: member="fileptr.hpp::FILE_HANDLE" ref="ab00d7bdead70fa34f855541305b0c89e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FILE_HANDLE&#160;&#160;&#160;int</td>
+        </tr>
+      </table>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="fileptr_8hpp_source.html#l00022">22</a> of file <a class="el" href="fileptr_8hpp_source.html">fileptr.hpp</a>.</p>
+
+</div>
+</div>
+</div>
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

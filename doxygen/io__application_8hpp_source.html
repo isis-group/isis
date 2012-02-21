@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -95,15 +94,17 @@
 <a name="l00068"></a>00068     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">autoload</a>( <span class="keywordtype">bool</span> exitOnError = <span class="keyword">false</span> );
 <a name="l00069"></a>00069     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">autowrite</a>( std::list&lt;data::Image&gt; out_images, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">false</span> );
 <a name="l00070"></a>00070     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">autowrite</a>( <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> out_image, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">false</span> );
-<a name="l00071"></a>00071 };
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073 }
-<a name="l00074"></a>00074 }
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076 <span class="preprocessor">#endif // DATA_IOAPPLICATION_HPP</span>
+<a name="l00071"></a>00071 <span class="keyword">protected</span>:
+<a name="l00072"></a>00072     <span class="keyword">virtual</span> boost::shared_ptr&lt;util::_internal::MessageHandlerBase&gt; <a class="code" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">getLogHandler</a>( std::string module, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>;
+<a name="l00073"></a>00073 };
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 }
+<a name="l00076"></a>00076 }
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078 <span class="preprocessor">#endif // DATA_IOAPPLICATION_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,17 +23,16 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 <div class="header">
@@ -88,8 +87,8 @@
 <a name="l00053"></a>00053     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
 <a name="l00062"></a>00062     <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
 <a name="l00063"></a>00063 
-<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
-<a name="l00065"></a>00065     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
+<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00065"></a>00065     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
 <a name="l00066"></a>00066 
 <a name="l00068"></a>00068     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">getFormats</a>();
 <a name="l00069"></a>00069 
@@ -98,8 +97,8 @@
 <a name="l00078"></a>00078     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( std::string filename, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
 <a name="l00086"></a>00086     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;chunks );
 <a name="l00087"></a>00087 <span class="keyword">protected</span>:
-<a name="l00088"></a>00088     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a66970ee301e281306619f58765abf218">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, std::string suffix_override, std::string dialect );
-<a name="l00089"></a>00089     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aabb0a1715ead2136c83f8f3601d3c863">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, std::string suffix_override, std::string dialect );
+<a name="l00088"></a>00088     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00089"></a>00089     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ab3176d2de75afc665712eb9fd3cde9df">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
 <a name="l00090"></a>00090 
 <a name="l00091"></a>00091     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<span class="keyword">get</span>();
 <a name="l00092"></a>00092     <a class="code" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">IOFactory</a>();<span class="comment">//shall not be created directly</span>
@@ -124,7 +123,7 @@
 <a name="l00115"></a>00115 <span class="preprocessor">#endif //IO_FACTORY_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:30 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

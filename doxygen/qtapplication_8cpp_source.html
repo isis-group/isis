@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -71,47 +71,48 @@
 <a name="l00028"></a>00028     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( not m_qapp, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication was not yet created, you should run init() before using getQApplication.&quot;</span>;
 <a name="l00029"></a>00029     <span class="keywordflow">return</span> *m_qapp;
 <a name="l00030"></a>00030 }
-<a name="l00031"></a><a class="code" href="classisis_1_1qt4_1_1QtApplication.html#ac4bf4bd1133a3cd92341ab8cc6a085eb">00031</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1qt4_1_1QtApplication.html#ac4bf4bd1133a3cd92341ab8cc6a085eb" title="Initializes the programm parameter map using argc/argv.">isis::qt4::QtApplication::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
+<a name="l00031"></a><a class="code" href="classisis_1_1qt4_1_1QtApplication.html#ab5850ef807ef536ad9eb522b7de62581">00031</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1qt4_1_1QtApplication.html#ab5850ef807ef536ad9eb522b7de62581" title="see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">isis::qt4::QtApplication::init</a>( <span class="keywordtype">int</span> &amp;argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
 <a name="l00032"></a>00032 {
 <a name="l00033"></a>00033     <span class="keywordflow">if</span> ( m_qapp ) {
 <a name="l00034"></a>00034         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication allready exists. This should not happen. I&#39;ll not touch it&quot;</span>;
 <a name="l00035"></a>00035     } <span class="keywordflow">else</span> {
-<a name="l00036"></a>00036         m_argc = argc; <span class="comment">// create local copies</span>
-<a name="l00037"></a>00037         m_argv = argv;
-<a name="l00038"></a>00038         m_qapp.reset( <span class="keyword">new</span> QApplication( m_argc, m_argv ) );
-<a name="l00039"></a>00039     }
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">util::Application::init</a>( argc, argv, exitOnError );
-<a name="l00042"></a>00042 }
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044 
-<a name="l00045"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#ae1010155dc3a61e7d6cf3961048ba427">00045</a> <a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#ae1010155dc3a61e7d6cf3961048ba427">isis::qt4::IOQtApplication::IOQtApplication</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[], <span class="keywordtype">bool</span> have_input, <span class="keywordtype">bool</span> have_output ):
-<a name="l00046"></a>00046     IOApplication( name, have_input, have_output )
-<a name="l00047"></a>00047 {}
-<a name="l00048"></a>00048 
-<a name="l00049"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#aeb0add6b09785bd6ab32df3ee9a73f2b">00049</a> QApplication &amp;<a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#aeb0add6b09785bd6ab32df3ee9a73f2b">isis::qt4::IOQtApplication::getQApplication</a>()
-<a name="l00050"></a>00050 {
-<a name="l00051"></a>00051     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( not m_qapp, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication was not yet created, you should run init() before using getQApplication.&quot;</span>;
-<a name="l00052"></a>00052     <span class="keywordflow">return</span> *m_qapp;
-<a name="l00053"></a>00053 }
-<a name="l00054"></a>00054 
-<a name="l00055"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a7c5e67fb1ac909e7920d6e62fc2c6598">00055</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a7c5e67fb1ac909e7920d6e62fc2c6598" title="Initializes the programm parameter map using argc/argv.">isis::qt4::IOQtApplication::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
-<a name="l00056"></a>00056 {
-<a name="l00057"></a>00057     <span class="keywordflow">if</span>( m_qapp ) {
-<a name="l00058"></a>00058         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication allready exists. This should not happen. I&#39;ll not touch it&quot;</span>;
-<a name="l00059"></a>00059     } <span class="keywordflow">else</span> {
-<a name="l00060"></a>00060         m_argc = argc;
-<a name="l00061"></a>00061         m_argv = argv;
-<a name="l00062"></a>00062         m_qapp.reset( <span class="keyword">new</span> QApplication( m_argc, m_argv ) );
-<a name="l00063"></a>00063     }
+<a name="l00036"></a>00036         m_qapp.reset( <span class="keyword">new</span> QApplication( argc, argv ) );
+<a name="l00037"></a>00037     }
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">util::Application::init</a>( argc, argv, exitOnError );
+<a name="l00040"></a>00040 }
+<a name="l00041"></a>00041 
+<a name="l00042"></a>00042 
+<a name="l00043"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#ae1010155dc3a61e7d6cf3961048ba427">00043</a> <a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#ae1010155dc3a61e7d6cf3961048ba427">isis::qt4::IOQtApplication::IOQtApplication</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[], <span class="keywordtype">bool</span> have_input, <span class="keywordtype">bool</span> have_output ):
+<a name="l00044"></a>00044     IOApplication( name, have_input, have_output )
+<a name="l00045"></a>00045 {}
+<a name="l00046"></a>00046 
+<a name="l00047"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#aeb0add6b09785bd6ab32df3ee9a73f2b">00047</a> QApplication &amp;<a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#aeb0add6b09785bd6ab32df3ee9a73f2b">isis::qt4::IOQtApplication::getQApplication</a>()
+<a name="l00048"></a>00048 {
+<a name="l00049"></a>00049     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( not m_qapp, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication was not yet created, you should run init() before using getQApplication.&quot;</span>;
+<a name="l00050"></a>00050     <span class="keywordflow">return</span> *m_qapp;
+<a name="l00051"></a>00051 }
+<a name="l00052"></a>00052 
+<a name="l00053"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a3cf28f7afd99b65958447c6358071657">00053</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a3cf28f7afd99b65958447c6358071657" title="see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">isis::qt4::IOQtApplication::init</a>( <span class="keywordtype">int</span> &amp;argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
+<a name="l00054"></a>00054 {
+<a name="l00055"></a>00055     <span class="keywordflow">if</span>( m_qapp ) {
+<a name="l00056"></a>00056         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">util::Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The QApplication allready exists. This should not happen. I&#39;ll not touch it&quot;</span>;
+<a name="l00057"></a>00057     } <span class="keywordflow">else</span> {
+<a name="l00058"></a>00058         m_qapp.reset( <span class="keyword">new</span> QApplication( argc, argv ) );
+<a name="l00059"></a>00059     }
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">isis::data::IOApplication::init</a>( argc, argv, exitOnError );
+<a name="l00062"></a>00062 }
+<a name="l00063"></a>00063 
 <a name="l00064"></a>00064 
-<a name="l00065"></a>00065     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">isis::data::IOApplication::init</a>( argc, argv, exitOnError );
-<a name="l00066"></a>00066 }
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068 
+<a name="l00065"></a><a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a2e3bf9cf19c91df697dba48300d21cc1">00065</a> boost::shared_ptr&lt; isis::util::_internal::MessageHandlerBase &gt; <a class="code" href="classisis_1_1qt4_1_1IOQtApplication.html#a2e3bf9cf19c91df697dba48300d21cc1">isis::qt4::IOQtApplication::getLogHandler</a>( std::string <span class="comment">/*module*/</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>
+<a name="l00066"></a>00066 <span class="keyword"></span>{
+<a name="l00067"></a>00067     <span class="keywordflow">return</span> boost::shared_ptr&lt; isis::util::_internal::MessageHandlerBase &gt;( level ? <span class="keyword">new</span> <a class="code" href="classisis_1_1qt4_1_1QDefaultMessagePrint.html">isis::qt4::QDefaultMessagePrint</a>( level ) : 0 );
+<a name="l00068"></a>00068 }
+<a name="l00069"></a>00069 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:29 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:30:59 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

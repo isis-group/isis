@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r115-gcf9c9cc)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">(r)</span></div>
   </td>
  </tr>
  </tbody>
@@ -69,13 +69,13 @@ Inheritance diagram for isis::qt4::QtApplication:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">QApplication &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1QtApplication.html#ae76ddbd86f5828412c2ac66e90de290d">getQApplication</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1QtApplication.html#ac4bf4bd1133a3cd92341ab8cc6a085eb">init</a> (int argc, char **argv, bool exitOnError=true)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the programm parameter map using argc/argv.  <a href="#ac4bf4bd1133a3cd92341ab8cc6a085eb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1QtApplication.html#ab5850ef807ef536ad9eb522b7de62581">init</a> (int &amp;argc, char **argv, bool exitOnError=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">see <a href="http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication</a>  <a href="#ab5850ef807ef536ad9eb522b7de62581"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1qt4_1_1QtApplication.html#a634060843da15d894d7d449b2884fab0">QtApplication</a> (const char name[])</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="qtapplication_8hpp_source.html#l00033">33</a> of file <a class="el" href="qtapplication_8hpp_source.html">qtapplication.hpp</a>.</p>
+<p>Definition at line <a class="el" href="qtapplication_8hpp_source.html#l00034">34</a> of file <a class="el" href="qtapplication_8hpp_source.html">qtapplication.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a634060843da15d894d7d449b2884fab0"></a><!-- doxytag: member="isis::qt4::QtApplication::QtApplication" ref="a634060843da15d894d7d449b2884fab0" args="(const char name[])" -->
 <div class="memitem">
@@ -115,14 +115,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac4bf4bd1133a3cd92341ab8cc6a085eb"></a><!-- doxytag: member="isis::qt4::QtApplication::init" ref="ac4bf4bd1133a3cd92341ab8cc6a085eb" args="(int argc, char **argv, bool exitOnError=true)" -->
+<a class="anchor" id="ab5850ef807ef536ad9eb522b7de62581"></a><!-- doxytag: member="isis::qt4::QtApplication::init" ref="ab5850ef807ef536ad9eb522b7de62581" args="(int &amp;argc, char **argv, bool exitOnError=true)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool isis::qt4::QtApplication::init </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">int &amp;&#160;</td>
           <td class="paramname"><em>argc</em>, </td>
         </tr>
         <tr>
@@ -146,18 +146,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Initializes the programm parameter map using argc/argv. </p>
-<p>For every entry in parameters an corresponding command line parameter is searched and parsed. A command line parameter corresponds to an entry of parameters if it string-equals caseless to this entry and is preceded by "-".</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">argc</td><td>ammount of command line parameters in argv </td></tr>
-    <tr><td class="paramname">argv</td><td>array of const char[] containing the command line parameters </td></tr>
-    <tr><td class="paramname">exitOnError</td><td>if true the programm will exit, if there is a problem during the initialisation (like missing parameters). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">isis::util::Application</a>.</p>
+<p>see <a href="http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication">http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication</a> </p>
 
 <p>Definition at line <a class="el" href="qtapplication_8cpp_source.html#l00031">31</a> of file <a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a>.</p>
 
@@ -168,7 +157,7 @@ Public Member Functions</h2></td></tr>
 <li>/SCR/isis/lib/Adapter/qt4/<a class="el" href="qtapplication_8cpp_source.html">qtapplication.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Fri Oct 7 2011 18:02:31 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:31:01 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>
