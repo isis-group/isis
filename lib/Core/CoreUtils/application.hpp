@@ -42,7 +42,7 @@ namespace util
  *
  * Usage instructions and a short paramter list can be shown with the method printHelp().
  *
- * See also: isis::data::IOApplication, isis::util::ParameterMap, \link isis::LogLevel isis::LogLevel \endlink
+ * See also: isis::data::IOApplication, isis::util::ParameterMap and \link isis::LogLevel isis::LogLevel \endlink
  */
 class Application
 {

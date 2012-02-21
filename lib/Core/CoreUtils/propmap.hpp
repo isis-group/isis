@@ -36,33 +36,34 @@ namespace _internal
 class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
 /**
- * This class contains a mapping tree to store all kinds of properties (path/key : value)
- * It's also a generic class to have the probability to handle
- * different modalities in upper levels (in our special case we'll have to handle things like images or other
- * time series of data each having different properties in its standard or wherever from). Here, you can hierarchilly
- * setup a property tree to sort all these things. To ensure essential properties for a special case, you'll need to define
- * the needed properties. For all the other play-around with PropertyMaps see extensive documentation below!!!
+ * This class forms a mapping tree to store all kinds of properties (path : value), where:
+ * - value is:
+ *   - a util::PropertyValue-container holding the value of the property (this may be empty/unset)
+ *   - another PropertyMap containing a subtree (a branch of the mapping tree)
+ * - path is one or more case insensitive key names separated by "/" to locate both, branches or properties, in the tree
  *
+ * Nevertheless there are separate access functions for branches and properties.
+ * Trying to access a branch as a property value,or to access a property value as a branch will cause error messages and give empty results.
+ *
+ * Paths can be created from other paths and from strings (c-strings and util::istring, but not std::string). 
+ * So both can be used for functions which expect paths, but the usage of c-strings is slower.
+ *
+ * To describe the minimum of needed metadata needed by specific data structures / subclasses
+ * properties can be marked as "needed" and there are functions to verify that they are not empty.
  */
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
 public:
-	/**
-	 * type of the used keys
-	 */
+	/// type of the keys forming a path
 	typedef key_type KeyType;
-	/**
-	 * a list to store keys only (without the corresponding values)
-	 */
+	///a list to store keys only (without the corresponding values)
 	typedef std::set<KeyType, key_compare> KeyList;
-	/**
-	 * a map to match keys to pairs of values
-	 */
+	///a flat map matching keys to pairs of values
 	typedef std::map<KeyType, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
-	/**
-	 * a map, using complete key-paths as keys for the corresponding values
-	 */
+	///a flat map, matching complete paths as keys to the corresponding values
 	typedef std::map<KeyType, PropertyValue> FlatMap;
+
+	/// "Path" type used to locate entries in the tree
 	struct PropPath: public std::list<KeyType> {
 		PropPath() {}
 		PropPath( const char *key ): std::list<KeyType>( util::stringToList<KeyType>( util::istring( key ), pathSeperator ) ) {}
@@ -121,34 +122,34 @@ protected:
 		return k;
 	}
 	/**
-	* Make Properties given by a space separated list needed.
-	* \param needed string made of space serparated property-names which
-	* will (if neccessary) be added to the PropertyMap and flagged as needed.
-	*/
+	 * Make Properties given by a space separated list needed.
+	 * \param needed string made of space serparated property-names which
+	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
+	 */
 	void addNeededFromString( const std::string &needed );
 	/**
-	* Adds a property with status needed.
-	* \param key identifies the property to be added or if already existsing to be flagged as needed
-	*/
-	void addNeeded( const KeyType &key );
+	 * Adds a property with status needed.
+	 * \param path identifies the property to be added or if already existsing to be flagged as needed
+	 */
+	void addNeeded( const KeyType &path );
 
 	/**
 	 * Remove every PropertyValue which is also in the other PropertyMap and where operator== returns true.
-	 * \param other the other PropertyMap to compare to
-	 * \param removeNeeded if a PropertyValue should also be deleted if they're needed
+	 * \param other the other property tree to compare to
+	 * \param removeNeeded if a property should also be deleted it is needed
 	 */
 	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
 
 	/**
-	 * Get common and unique properties from the map.
-	 * For every entry of the map this checks if it is common/unique and removes/adds it accordingly.
+	 * Get common and unique properties from the tree.
+	 * For every entry of the tree this checks if it is common/unique and removes/adds it accordingly.
 	 * This is done by:
-	 * - generating a difference (using diff) between the current common and the map
-	 * - the resulting diff_map contains all newly unique properties (properties which has been in common, but are not euqual in the map)
+	 * - generating a difference (using diff) between the current common and the tree
+	 *   - the resulting diff_map contains all newly unique properties (properties which has been in common, but are not euqual in the tree)
 	 * - these newly diffent properties are removed from common and added to unique.
-	 * - if init is true uniques is cleared and common is replaced by a copy of the map (shall be done at first step/map)
-	 * \param common reference of the common-map
-	 * \param uniques reference of the unique-map
+	 * - if init is true uniques is cleared and common is replaced by a copy of the tree (shall be done at first step)
+	 * \param common reference of the common-tree
+	 * \param uniques reference of the unique-tree
 	 * \param init if initialisation shall be done instead of normal seperation
 	 */
 	void toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const;
@@ -157,16 +158,16 @@ protected:
 	void makeFlatMap( FlatMap &out, KeyType key_prefix = "" )const;
 
 	/**
-	 * Access the property vector referenced by the path-key.
-	 * If the property does not exist, an empty dummy will returned.
-	 * \param path the "path" to the property
+	 * Access the property vector referenced by the path.
+	 * If the property does not exist, an empty dummy will be returned.
+	 * \param path the path to the property
 	 * \returns a reference to the PropertyValue
 	 */
 	const std::vector<PropertyValue> &propertyValueVec( const PropPath &path )const;
 
 	/**
 	 * Access the property vector referenced by the path-key, create it if its not there.
-	 * \param path the "path" to the property
+	 * \param path the path to the property
 	 * \returns a reference to the PropertyValue
 	 */
 	std::vector<PropertyValue> &propertyValueVec( const PropPath &path );
@@ -183,74 +184,74 @@ public:
 	// Common rw-accessors
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * Access the property referenced by the path-key.
+	 * Access the property referenced by the path.
 	 * If the property does not exist, an empty dummy will returned.
-	 * \param key the "path" to the property
+	 * \param path the path to the property
 	 * \returns a reference to the PropertyValue
 	 */
 	const PropertyValue &propertyValue( const PropPath &path )const;
 
 	/**
-	 * Access the property referenced by the path-key, create it if its not there.
-	 * \param key the "path" to the property
+	 * Access the property referenced by the path, create it if its not there.
+	 * \param path the path to the property
 	 * \returns a reference to the PropertyValue
 	 */
 	PropertyValue &propertyValue( const PropPath &path );
 
 	/**
-	 * Access the branch referenced by the path-key, create it if its not there.
-	 * \param key the "path" to the branch
+	 * Access the branch referenced by the path, create it if its not there.
+	 * \param path the path to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
 	PropertyMap &branch( const PropPath &path );
 
 	/**
-	 * Access the branch referenced by the path-key.
+	 * Access the branch referenced by the path.
 	 * If the branch does not exist, an empty dummy will returned.
-	 * \param key the "path" to the branch
+	 * \param path the path to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
 	const PropertyMap &branch( const PropPath &path )const;
 
 	/**
-	 * Remove the property adressed by the key.
+	 * Remove the property adressed by the path.
 	 * This actually only removes properties.
 	 * Non-empty branches are not deleted.
 	 * And if an branch becomes empty after deletion of its last entry, it is deleted automatically.
-	 * \param key the "path" to the property
+	 * \param path the path to the property
 	 * \returns true if successful, false otherwise
 	 */
 	bool remove( const PropPath &path );
 
 	/**
-	 * remove every property which is also in the given map (regardless of the value)
-	 * \param removeMap the map of properties to be removed
-	 * \param keep_needed flag
+	 * remove every property which is also in the given tree (regardless of the value)
+	 * \param removeMap the tree of properties to be removed
+	 * \param keep_needed when true needed properties are kept even if they would be removed otherwise
 	 * \returns true if all properties removed succesfully, false otherwise
 	 */
 	bool remove( const PropertyMap &removeMap, bool keep_needed = false );
 
 	/**
 	 * remove every property which is also in the given list (regardless of the value)
-	 * \param removeMap the map of properties to be removed
-	 * \param keep_needed flag
+	 * \param removeList a list of paths naming the properties to be removed
+	 * \param keep_needed when true needed properties are kept even if they would be removed otherwise
 	 * \returns true if all properties removed succesfully, false otherwise
 	 */
 	bool remove( const KeyList &removeList, bool keep_needed = false );
 
 	/**
-	 * check if property is available
-	 * \param key the "path" to the property
+	 * check if a property is available
+	 * \param path the path to the property
 	 * \returns true if the given property does exist and is not empty, false otherwise
 	 */
 	bool hasProperty( const PropPath &path )const;
 
 	/**
-	 * Search for the property/branch in the whole Tree.
+	 * Search for a property/branch in the whole Tree.
 	 * \param key the single key for the branch/property to search for (paths will be stripped to the rightmost key)
 	 * \param allowProperty if false the search will ignore properties
 	 * \param allowBranch if false the search will ignore branches (it will still search into the branches, but the branches themself won't be considered a valid finding)
-	 * \returns full "path" to the property (including the properties name) if it is found, empty string elsewhise
+	 * \returns full path to the property (including the properties name) if it is found, empty string elsewhise
 	 */
 	KeyType find( KeyType key, bool allowProperty = true, bool allowBranch = false )const;
 
@@ -259,7 +260,7 @@ public:
 
 	/**
 	 * check if branch of the tree is available
-	 * \param key the "path" to the branch
+	 * \param path the path to the branch
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
 	bool hasBranch( const PropPath &path )const;
@@ -268,72 +269,70 @@ public:
 	// tools
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	* Check if every needed property is set.
+	* Check if every property marked as needed is set.
 	* \returns true if ALL needed properties are NOT empty, false otherwhise.
 	*/
 	bool isValid()const;
 
-	/**
-	 * \returns true if the PropertyMap is empty, false otherwhise
-	 */
+	/// \returns true if the PropertyMap is empty, false otherwhise
 	bool isEmpty()const;
 
 	/**
-	 * Get a list of all properties.
-	 * \returns a flat list of the "paths" to all properties in the PropertyMap
+	 * Get a list of the paths of all properties.
+	 * \returns a flat list of the paths to all properties in the PropertyMap
 	 */
 	const KeyList getKeys()const;
 
 	/**
 	 * Get a list of missing properties.
-	 * \returns a list of all needed and empty properties.
+	 * \returns a list of the paths for all properties which are marked as needed and but are empty.
 	 */
 	const KeyList getMissing()const;
 
 	/**
-	 * Get a difference map of actual object and another PropertyMap.
-	 * Out of the names of differing properties a map of std::pair\<PropertyValue,PropertyValue\> is created with following rules:
-	 * - If a Property is empty in actual object but set in second,
-	 *   it will be added with the first PropertyValue emtpy and the second PropertyValue
+	 * Get a difference map of this tree and another.
+	 * Out of the names of differing properties a mapping from paths to std::pair\<PropertyValue,PropertyValue\> is created with following rules:
+	 * - if a Property is empty in this tree but set in second,
+	 *   - it will be added with the first PropertyValue emtpy and the second PropertyValue
 	 *   taken from second
-	 * - If a Property is set in actual object but empty in second,
-	 *   it will be added with the first PropertyValue taken from this and the second PropertyValue empty
-	 * - If a Property is set in both, but not equal, it will be added with the first PropertyValue taken from this
-	 *   and the second PropertyValue taken from second
-	 * - If a Property is set in both and equal, it wont be added
-	 * - If a Property is empty in both, it wont be added
-	 * \param second the "other" PropertyMap to compare with
-	 * \returns a map of property keys and pairs of the corresponding different values
+	 * - if a Property is set in this tree but empty in second,
+	 *   - it will be added with the first PropertyValue taken from this and the second PropertyValue empty
+	 * - if a Property is set in both, but not equal,
+	 *   - it will be added with the first PropertyValue taken from this and the second PropertyValue taken from second
+	 * - if a Property is set in both and equal, or is empty in both,
+	 *   - it wont be added
+	 * \param second the other tree to compare with
+	 * \returns a map of property paths and pairs of the corresponding different values
 	 */
 	DiffMap getDifference( const PropertyMap &second )const;
 
 	/**
-	* Add Properties from another PropertyMap.
-	* \param other the "other" PropertyMap to join with
-	* \param overwrite if existing properties shall be replaced
-	* \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
-	*/
+	 * Add Properties from another tree.
+	 * \param other the other tree to join with
+	 * \param overwrite if existing properties shall be replaced
+	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
+	 */
 	PropertyMap::KeyList join( const isis::util::PropertyMap &other, bool overwrite = false );
 
 	/**
 	 * Transform an existing property into another.
-	 * Converts the value of the given property into the requested type and stores it with the given new key.
-	 * \param from the key of the property to be transformed
-	 * \param to the key for the new property
+	 * Converts the value of the given property into the requested type and stores it with the given new path.
+	 * \param from the path of the property to be transformed
+	 * \param to the path for the new property
 	 * \param dstID the type-ID of the new property value
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
-	 * \returns true if the transformation was done
+	 * \returns true if the transformation was done, false it failed
 	 */
 	bool transform( const PropPath &from, const PropPath &to, int dstID, bool delSource = true );
 
 	/**
 	 * Transform an existing property into another (statically typed version).
-	 * Converts the value of the given property into the requested type and stores it with the given new key.
+	 * Converts the value of the given property into the requested type and stores it with the given new path.
 	 * A compile-time check is done to test if the requested type is available.
-	 * \param from the key of the property to be transformed
-	 * \param to the key for the new property
+	 * \param from the path of the property to be transformed
+	 * \param to the path for the new property
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
-	 * \returns true if the transformation was done, false otherwise
+	 * \returns true if the transformation was done, false it failed
 	 */
 	template<typename DST> bool transform( const PropPath &from, const PropPath &to, bool delSource = true ) {
 		checkType<DST>();
@@ -348,13 +347,14 @@ public:
 	 * Set the given property to a given value/type.
 	 * The needed flag (if set) will be kept.
 	 * If the property is already set to a value of another type an error is send to Runtime and nothing will be set.
+	 * But a property of the same type will be overwritten.
 	 * \code
 	 * setPropertyAs("MyPropertyName", isis::util::fvector4(1,0,1,0))
 	 * \endcode
-	 * \param key the "path" to the property
+	 * \param path the path to the property
 	 * \param val the value to set of type T
 	 * \returns a reference to the PropertyValue (this can be used later, e.g. if a vector is filled step by step
-	 * the reference can be used to not ask for the Property everytime)
+	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setPropertyAs( const PropPath &path, const T &val ) {
 		PropertyValue &ret = propertyValue( path );
@@ -374,10 +374,11 @@ public:
 	/**
 	 * Request a property via the given key in the given type.
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
+	 * If that conversion failes an error is send to Runtime.
 	 * \code
 	 * getPropertyAs<isis::util::fvector4>( "MyPropertyName" );
 	 * \endcode
-	 * \param key the "path" to the property
+	 * \param path the path to the property
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getPropertyAs( const PropPath &path )const;
@@ -387,17 +388,17 @@ public:
 	 * This is implemented as copy+delete and can also be used between branches.
 	 * - if the target exist a warning will be send, but it will still be overwritten
 	 * - if the source does not exist a warning will be send and nothing is done
+	 * \param from the path of the existing property to be moved
+	 * \param to the destinaton path of the move
 	 * \returns true if renaming/moving was successful
 	 */
 	bool rename( const PropPath &from, const PropPath &to );
 
-	/**
-	 * \returns a flat representation of the whole property tree
-	 */
+	/// \returns a flat representation of the whole property tree
 	FlatMap getFlatMap( )const;
 
 	/**
-	 * "Print" the PropertyMap.
+	 * "Print" the property tree.
 	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
 	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
@@ -425,10 +426,12 @@ namespace isis
 {
 namespace util
 {
+/// @cond _hidden
 namespace _internal
 {
 /**
- * Class treeNode is a basic class for PropertyMap to check some basic graph stuff for each node of the property tree
+ * Basic container class for the "values" inside the property tree.
+ * This can hold a list of PropertyValues or another PropertyMap.
  */
 class treeNode
 {
@@ -467,14 +470,13 @@ public:
 	}
 };
 }
+/// @endcond
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // and now we can define walkTree (needs treeNode to be defined)
 ////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
- */
+/// Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
 template<class Predicate> struct PropertyMap::walkTree {
 	KeyList &m_out;
 	const KeyType m_prefix;
