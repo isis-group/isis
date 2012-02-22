@@ -209,7 +209,8 @@ public:
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 	/**
-	 * @copydoc copyByID
+	 * Create new data in memory containg a (converted) copy of this.
+	 * Allocates new memory of the requested type and copies the (converted) content of this into that memory.
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */

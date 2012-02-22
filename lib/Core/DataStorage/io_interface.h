@@ -101,6 +101,7 @@ public:
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
+	 * \param image the image to be written
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
@@ -110,6 +111,7 @@ public:
 	 * Write a image list.
 	 * I case of an error std::runtime_error will be thrown.
 	 * The default implementation will call write( const data::Image &, const std::string&, const std::string&) for every image using a generated unique filename.
+	 * \param images a list of the images to be written
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
