@@ -30,6 +30,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 {
 	//  data::enableLog<util::DefaultMsgPrint>(info);
 	//  image_io::enableLog<util::DefaultMsgPrint>( info );
+	util::DefaultMsgPrint::stopBelow( warning );
 	util::Selection formCode = formCodes;
 	formCode.set( "SCANNER_ANAT" );
 

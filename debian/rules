@@ -45,6 +45,7 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_RUNTIME_LOG:BOOL=ON \
             -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_DEBUG_LOG:BOOL=OFF \
+            -DMANPAGES:BOOL=ON \
             -DGIT_REVISION="Debian-$(debver)"
 
 override_dh_auto_test:

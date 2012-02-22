@@ -4,11 +4,11 @@ Priority: extra
 Maintainer: ISIS Group <gr_isis@cbs.mpg.de>
 Uploaders: Enrico Reimer <reimer@cbs.mpg.de>, Michael Hanke <mih@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), doxygen, cmake, libbz2-dev,
- libmuparser-dev, libnifti-dev, libvia-dev, libboost-python-dev,
+ libmuparser-dev, libnifti-dev, libvia-dev (>= 2.0.0~), libboost-python-dev,
  liboil0.3-dev | liboil-dev, python-all-dev, libqt4-dev,
  libpng12-dev | libpng-dev, libtiff4-dev | libtiff-dev,
  libdcmtk2-dev | libdcmtk1-dev, libboost-iostreams-dev, libboost-filesystem-dev,
- libboost-system-dev, libboost-date-time-dev
+ libboost-system-dev, libboost-date-time-dev, help2man
 Standards-Version: 3.9.2
 Homepage: https://github.com/isis-group
 Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git
@@ -19,6 +19,7 @@ Package: libisis-core0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libisis-ioplugins-common, libisis-ioplugins-dicom
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -28,7 +29,7 @@ Description: I/O framework for neuroimaging data
  are build upon ISIS.
 
 
-Package: libisis-ioplugins
+Package: libisis-ioplugins-common
 Section: libs
 Architecture: any
 Depends: libisis-core0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
@@ -37,10 +38,21 @@ Description: data format plugins for the ISIS framework
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.
  .
- This package provides plugins for data in DICOM, NIfTI, PNG, VISTA format,
+ This package provides plugins for data in NIfTI, PNG, VISTA format,
  raw-data access, as well as plugins for gzip-compression and tar-archive
  support.
 
+Package: libisis-ioplugins-dicom
+Section: science
+Architecture: any
+Depends: libisis-core0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: dicom io plugin for the ISIS framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+ .
+ This package provides a plugin to read data from dicom datasets.
+ It reads single files, or whole directories (a DICOMDIR is not needed).
 
 Package: libisis-core-dev
 Section: libdevel

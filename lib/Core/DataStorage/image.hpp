@@ -795,7 +795,7 @@ public:
 			std::vector<data::ValuePtr<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValuePtr<T>();
 
 			return iterator ( vec );
 		} else {
@@ -811,7 +811,7 @@ public:
 			std::vector<const data::ValuePtr<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValuePtr<T>();
 
 			return const_iterator ( vec );
 		} else {
