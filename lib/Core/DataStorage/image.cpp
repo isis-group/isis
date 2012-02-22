@@ -691,6 +691,7 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 	return ret;
 }
 
+// @todo this wont work with images of more 2 two different data types
 std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
 	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";

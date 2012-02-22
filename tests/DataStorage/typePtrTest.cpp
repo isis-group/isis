@@ -237,6 +237,25 @@ BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 	}
 }
 
+BOOST_AUTO_TEST_CASE( ValuePtr_color_minmax_test )
+{
+
+	const util::color48 init[] = {
+		{ 20, 180, 150},
+		{130,  60,  20},
+		{ 20, 180, 150},
+		{130,  60,  20}
+	};
+	data::ValuePtr<util::color48> ccArray(4);
+	ccArray.copyFromMem( init, 4 );
+	std::pair< util::ValueReference, util::ValueReference > minmax=ccArray.getMinMax();
+	const util::color48 colmin={20,60,20},colmax={130,180,150};
+	
+	BOOST_CHECK_EQUAL(minmax.first->as<util::color48>(),colmin);
+	BOOST_CHECK_EQUAL(minmax.second->as<util::color48>(),colmax);
+}
+
+
 BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, 0, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
