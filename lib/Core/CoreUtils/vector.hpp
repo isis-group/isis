@@ -162,13 +162,11 @@ public:
 		return !operator==( src );
 	}
 	/**
-	 * Fuzzy comparison.
-	 * Will raise a compiler error when not used with floating point vectors.
-	 * @param other the other vector that should be compared with the current vector.
-	 * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
-	 * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
-	 * If any of the values is greater than "1" the "allowed" difference will be bigger.
-	 * \returns true if the difference between the two types is significantly small compared to the values.
+	 * Fuzzy comparison for vectors.
+	 * Does util::fuzzyEqual for the associated elements of the two vectors.
+	 * @param other the "other" vector to compare to
+	 * @param scale scaling factor forwarded to util::fuzzyEqual
+	 * \returns true if util::fuzzyEqual for all elements
 	 */
 	bool fuzzyEqual( const this_class &other, unsigned short scale = 10 )const {
 		const_iterator b = other.begin();
