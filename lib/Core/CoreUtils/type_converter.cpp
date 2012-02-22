@@ -490,7 +490,7 @@ template<typename DST> class ValueConverter<false, false, std::string, vector4<D
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
+			<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -509,16 +509,26 @@ public:
 	virtual ~ValueConverter() {}
 };
 
-
-// @todo we cannot parse this stuff yet
-template<> class ValueConverter<false, false, std::string, color24 >: public ValueGenerator<std::string, color24 >  //string => color
+template<typename T> class ValueConverter<false, false, std::string, color<T> >: public ValueGenerator<std::string, color<T> >  //string => color
 {
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+			<< "Creating from-string converter for " << Value<color<T> >::staticName();
+	};
 public:
-	virtual ~ValueConverter() {}
-};
-template<> class ValueConverter<false, false, std::string, color48 >: public ValueGenerator<std::string, color48 >  //string => color
-{
-public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, color<T> > *ret = new ValueConverter<false, false, std::string, color<T> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		color<T> &dstVal = dst.castTo<color<T> >();
+		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<T>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+		std::list< std::string >::const_iterator end = srcList.begin();
+		std::advance( end, std::min<size_t>( srcList.size(), 3 ) ); // use a max of 3 tokens
+		StrTransformer<T> transformer; // create a transformer from string to DST
+		std::transform( srcList.begin(), end, &dstVal.r, transformer ); // transform the found strings to the destination
+		return transformer.range_ok;
+	}
 	virtual ~ValueConverter() {}
 };
 
