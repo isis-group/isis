@@ -183,6 +183,15 @@ BOOST_AUTO_TEST_CASE( complex_conversion_test )
 	BOOST_CHECK_EQUAL( Value<int>( -5 ).as<std::complex<float> >(), std::complex<float>( -5, 0 ) );
 }
 
+BOOST_AUTO_TEST_CASE( color_conversion_test )
+{
+	const util::color24 c24={10,20,30};
+	const util::color48 c48={10,20,30};
+	const util::Value<util::color24> vc24=c24;
+	BOOST_CHECK_EQUAL(vc24.as<std::string>(), "{10,20,30}"); // conversion to string
+	BOOST_CHECK_EQUAL(vc24.as<util::color48>(), c48); // conversion to 16bit color
+}
+
 BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 {
 	// convert a string into a list of strings
