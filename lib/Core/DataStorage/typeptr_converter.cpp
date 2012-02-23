@@ -53,6 +53,26 @@ size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst )
 	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
 	return std::min( src.getLength(), dst.getLength() );
 }
+template<typename SRC,typename DST>
+scaling_pair getScalingToColor( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale ) {
+	double scalMin,scalMax;
+	if(min.isFloat() || min.isInteger())scalMin=min.as<double>(); // if min is allready a scalar
+		else{ // of not, determine the scalar min from the elements
+			const util::color48 minCol=min.as<util::color48>(); //use the "biggest" known color type
+			scalMin =*std::min_element(&minCol.r,&minCol.b); // take the lowest value
+		}
+		if(max.isFloat() || max.isInteger())scalMax=max.as<double>(); // if max is allready a scalar
+		else { // of not, determine the scalar min from the elements
+			const util::color48 maxCol=max.as<util::color48>(); //use the "biggest" known color type
+			scalMax =*std::max_element(&maxCol.r,&maxCol.b); // take the lowest value
+		}
+		
+		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( util::Value<double>(scalMin), util::Value<double>(scalMax), scaleopt );
+		return std::make_pair(
+			util::ValueReference( util::Value<double>( scale.first ) ),
+			util::ValueReference( util::Value<double>( scale.second ) )
+		);
+}
 
 //default implementation of ValuePtrConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling
 scaling_pair ValuePtrConverterBase::getScaling( const isis::util::_internal::ValueBase & /*min*/, const isis::util::_internal::ValueBase & /*max*/, autoscaleOption /*scaleopt*/ ) const
@@ -234,6 +254,41 @@ public:
 			++dp;
 		}
 	}
+	virtual ~ValuePtrConverter() {}
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// color version - using numeric_convert on each color with a global scaling
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> > : public ValuePtrGenerator<util::color<SRC>, util::color<DST> >
+{
+	ValuePtrConverter() {
+		LOG( Debug, verbose_info )
+		<< "Creating complex converter from "
+		<< ValuePtr<util::color<SRC> >::staticName() << " to " << ValuePtr<util::color<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> > *ret = new ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> >;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
+	}
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
+		double scale=scaling.first->as<double>(), offset= scaling.second->as<double>();
+		
+		const SRC *sp = &src.castToValuePtr<util::color<SRC> >().begin()->r;
+		DST *dp = &dst.castToValuePtr<util::color<DST> >().begin()->r;
+
+		if ( ( scale != 1. || offset ) )
+			_internal::numeric_convert_impl( sp, dp, _internal::getConvertSize( src, dst )*3, scale, offset );
+		else
+			_internal::numeric_convert_impl( sp, dp, _internal::getConvertSize( src, dst )*3 );
+		
+	}
+	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToColor<SRC,DST>(min,max,scaleopt);
+	}
+	
 	virtual ~ValuePtrConverter() {}
 };
 

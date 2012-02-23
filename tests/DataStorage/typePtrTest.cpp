@@ -255,6 +255,28 @@ BOOST_AUTO_TEST_CASE( ValuePtr_color_minmax_test )
 	BOOST_CHECK_EQUAL(minmax.second->as<util::color48>(),colmax);
 }
 
+BOOST_AUTO_TEST_CASE( ValuePtr_color_conversion_test )
+{
+	const util::color48 init[] = { {0,0,0}, {100,2,4}, {200,200,200}, {510,4,2}};
+	data::ValuePtr<util::color48 > c16Array( 4 );
+	c16Array.copyFromMem( init, 4 );
+	
+	data::ValuePtr<util::color24 > c8Array = c16Array.copyAs<util::color24 >();// should downscale (by 2)
+	
+	for( size_t i = 0; i < 4; i++ ) { 
+		BOOST_REQUIRE_EQUAL( c16Array[i], init[i] );
+		BOOST_CHECK_EQUAL( c8Array[i].r, init[i].r/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].g, init[i].g/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].b, init[i].b/2 );
+	}
+
+	c16Array = c8Array.copyAs<util::color48>();//should not scale
+
+	for( size_t i = 0; i < 4; i++ ) {
+		BOOST_CHECK_EQUAL( c16Array[i], c8Array[i] );
+	}
+	
+}
 
 BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 {
