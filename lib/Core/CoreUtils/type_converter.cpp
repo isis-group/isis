@@ -290,6 +290,33 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// Conversion between color -- uses num2num
+/////////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValueConverter<false, false, color<SRC>, color<DST> > : public ValueGenerator<color<SRC>, color<DST> >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating color converter from " << Value<color<SRC> >::staticName() << " to " << Value<color<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, color<SRC>, color<DST>  > *ret = new ValueConverter<false, false, color<SRC>, color<DST>  >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		boost::numeric::range_check_result res=boost::numeric::cInRange;
+		const SRC *srcVal=&src.castTo<color<SRC> >().r;
+		DST *dstVal=&dst.castTo<color<DST> >().r;
+
+		for(uint_fast8_t i=0;i<3;i++){
+			const boost::numeric::range_check_result result=num2num( srcVal[i], dstVal[i] );
+			if(result!=boost::numeric::cInRange)res=result;
+		}
+		return res;
+	}
+	virtual ~ValueConverter() {}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Conversion for "all" to complex numbers -- uses ValueConverter on the real part
 /////////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST> class ValueConverter<false, false, SRC, std::complex<DST> > :
@@ -320,7 +347,7 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vector4 version -- uses ValueConverter on every element
+// vector4 to vector4 version -- uses ValueConverter on every element
 /////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector4<DST> >:
 	public ValueGenerator<vector4<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
@@ -356,7 +383,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// list version -- uses ValueConverter on every element
+// list to list version -- uses ValueConverter on every element
 /////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, std::list<DST> >:
 	public ValueGenerator<std::list<SRC>, std::list<DST> >, private SubValueConv<SRC, DST >
@@ -396,7 +423,7 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// string to all -- uses lexical_cast (and in some cases mumeric conversion) to convert from string
+// string to scalar -- uses lexical_cast (and in some cases mumeric conversion) to convert from string
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename DST> class ValueConverter<false, false, std::string, DST> : public ValueGenerator<std::string, DST>
 {
@@ -413,7 +440,7 @@ public:
 	}
 	virtual ~ValueConverter() {}
 };
-// cannot use the general str to all because the would be ambiguous with "all to complex"
+// cannot use the general str to all because that would be ambiguous with "all to complex"
 template<typename DST> class ValueConverter<false, false, std::string, std::complex<DST> > :
 	public ValueGenerator<std::string, std::complex<DST> >, private SubValueConv<std::complex<double>, std::complex<DST> >
 {
@@ -462,7 +489,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// string => list/vector version -- uses util::stringToList
+// string => list/vector/color version -- uses util::stringToList
 /////////////////////////////////////////////////////////////////////////////
 template<typename DST> class ValueConverter<false, false, std::string, std::list<DST> >:
 	public ValueGenerator<std::string, std::list<DST> >
@@ -490,7 +517,7 @@ template<typename DST> class ValueConverter<false, false, std::string, vector4<D
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
+			<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -509,16 +536,26 @@ public:
 	virtual ~ValueConverter() {}
 };
 
-
-// @todo we cannot parse this stuff yet
-template<> class ValueConverter<false, false, std::string, color24 >: public ValueGenerator<std::string, color24 >  //string => color
+template<typename T> class ValueConverter<false, false, std::string, color<T> >: public ValueGenerator<std::string, color<T> >  //string => color
 {
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+			<< "Creating from-string converter for " << Value<color<T> >::staticName();
+	};
 public:
-	virtual ~ValueConverter() {}
-};
-template<> class ValueConverter<false, false, std::string, color48 >: public ValueGenerator<std::string, color48 >  //string => color
-{
-public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, color<T> > *ret = new ValueConverter<false, false, std::string, color<T> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		color<T> &dstVal = dst.castTo<color<T> >();
+		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<T>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+		std::list< std::string >::const_iterator end = srcList.begin();
+		std::advance( end, std::min<size_t>( srcList.size(), 3 ) ); // use a max of 3 tokens
+		StrTransformer<T> transformer; // create a transformer from string to DST
+		std::transform( srcList.begin(), end, &dstVal.r, transformer ); // transform the found strings to the destination
+		return transformer.range_ok;
+	}
 	virtual ~ValueConverter() {}
 };
 

@@ -183,6 +183,15 @@ BOOST_AUTO_TEST_CASE( complex_conversion_test )
 	BOOST_CHECK_EQUAL( Value<int>( -5 ).as<std::complex<float> >(), std::complex<float>( -5, 0 ) );
 }
 
+BOOST_AUTO_TEST_CASE( color_conversion_test )
+{
+	const util::color24 c24={10,20,30};
+	const util::color48 c48={10,20,30};
+	const util::Value<util::color24> vc24=c24;
+	BOOST_CHECK_EQUAL(vc24.as<std::string>(), "{10,20,30}"); // conversion to string
+	BOOST_CHECK_EQUAL(vc24.as<util::color48>(), c48); // conversion to 16bit color
+}
+
 BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 {
 	// convert a string into a list of strings
@@ -194,12 +203,18 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 	const int inumbers[] = {1, 2, 3, 4, 5};
 	const double dnumbers[] = {1, 2, 3, 4.4, 4.6};
 	Value<std::string> sNumbers( "1, 2, 3 and 4.4 or maybe 4.6" );
+	const util::color24 col24={1, 2, 3};
+	const util::color48 col48={100, 200, 300};
+	
 	BOOST_CHECK_EQUAL( sNumbers.as<util::ilist>(), std::list<int>( inumbers, inumbers + 5 ) ); // 4.4 and 4.6 will be rounded
 	BOOST_CHECK_EQUAL( sNumbers.as<util::dlist>(), std::list<double>( dnumbers, dnumbers + 5 ) );
 
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3 ) ); //should also work for fvector
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3|4|5>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "1,2,3,4,5>" ).as<util::ivector4>(), util::ivector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
+
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
 }
 
 }
