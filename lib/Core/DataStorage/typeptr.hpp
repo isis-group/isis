@@ -44,7 +44,7 @@ template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsup
 };
 template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_MPL_ASSERT_RELATION( std::numeric_limits<T>::has_denorm, != , std::denorm_indeterminate ); //well we're pretty f**ed in this case
+	BOOST_STATIC_ASSERT( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
 		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value

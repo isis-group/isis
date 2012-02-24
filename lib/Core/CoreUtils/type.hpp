@@ -169,7 +169,7 @@ protected:
 public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
 	Value(): m_val() {
-		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
+		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
 	}
 	/**
@@ -181,7 +181,7 @@ public:
 	 */
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
-		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
+		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
 	}
 	/**
