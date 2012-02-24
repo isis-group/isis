@@ -86,7 +86,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numb
 	}
 };
 
-template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
+template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic min-max for color (get bounding box in color space)
 std::pair<util::color<T> , util::color<T> > operator()( const ValuePtr<util::color<T> > &ref ) const {
 	std::pair<util::color<T> , util::color<T> > ret;
 	for(uint_fast8_t i=0;i<3;i++){
@@ -95,6 +95,15 @@ std::pair<util::color<T> , util::color<T> > operator()( const ValuePtr<util::col
 		*(&ret.second.r+i)=buff.second;
 	}
 	return ret;
+}
+};
+template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
+std::pair<std::complex<T> , std::complex<T> > operator()( const ValuePtr<std::complex<T> > &ref ) const {
+	BOOST_STATIC_ASSERT(sizeof(std::complex<T>)==sizeof(T)*2); // we need this for the calcMinMax-hack below
+	const std::pair<T, T > real=calcMinMax<T,2>( &ref[0].real(), ref.getLength()*2 );
+	const std::pair<T, T > imag=calcMinMax<T,2>( &ref[0].imag(), ref.getLength()*2 );
+	
+	return std::make_pair(std::complex<T>(real.first,imag.first),std::complex<T>(real.second,imag.second));
 }
 };
 /// @endcond
