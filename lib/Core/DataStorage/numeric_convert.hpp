@@ -259,13 +259,9 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 			std::numeric_limits<double>::max();
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
-		if ( scale < 1 ) {
-			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
-		} else if ( scaleopt == noupscale ) {
-			if ( scale > 1 ) {
-				LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
-				scale = 1;
-			}
+		if ( scaleopt == noupscale && scale > 1 ) {
+			LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
+			scale = 1;
 		}
 
 		if( scale == 1 ) {

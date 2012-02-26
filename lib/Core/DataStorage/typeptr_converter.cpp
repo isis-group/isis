@@ -83,13 +83,15 @@ struct NumConvImplBase{
 template<typename SRC,typename DST> struct NumConvImpl:NumConvImplBase{
 	static void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling ) {
 		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		numeric_convert( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
+		const double scale =scaling.first->as<double>(),offset =scaling.second->as<double>();
+		LOG_IF(scale < 1, Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
+		numeric_convert( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(),scale , offset );
 	}
 	static scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt ) {
 		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
 		return std::make_pair(
 			util::ValueReference( util::Value<double>( scale.first ) ),
-							  util::ValueReference( util::Value<double>( scale.second ) )
+			util::ValueReference( util::Value<double>( scale.second ) )
 		);
 	}
 };
