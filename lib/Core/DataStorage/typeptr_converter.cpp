@@ -161,7 +161,7 @@ void ValuePtrConverterBase::convert( const ValuePtrBase &src, ValuePtrBase &dst,
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing and returns 1/0 as scaling
 /////////////////////////////////////////////////////////////////////////////
-template<bool SRC_NUM,bool DST_NUM, bool SAME, typename SRC, typename DST> class ValuePtrConverter : public ValuePtrGenerator<SRC, DST>
+template<bool SRC_NUM,bool DST_NUM, typename SRC, typename DST> class ValuePtrConverter : public ValuePtrGenerator<SRC, DST>
 {
 public:
 	virtual ~ValuePtrConverter() {}
@@ -170,14 +170,14 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // trivial version -- for conversion of the same non numeric type (scaling will fail)
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class ValuePtrConverter<false,false, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
+template<typename SRC, typename DST> class ValuePtrConverter<false,false, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<false,false, true, SRC, DST> *ret = new ValuePtrConverter<false,false, true, SRC, DST>;
+		ValuePtrConverter<false,false, SRC, DST> *ret = new ValuePtrConverter<false,false, SRC, DST>;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
@@ -193,23 +193,23 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses numeric_convert
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST,bool SAME> class ValuePtrConverter<true,true, SAME, SRC, DST> : public ValuePtrGenerator<SRC, DST>
+template<typename SRC, typename DST> class ValuePtrConverter<true,true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info ) << "Creating numeric converter from " << ValuePtr<SRC>::staticName() << " to " << ValuePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<true,true, SAME, SRC, DST> *ret = new ValuePtrConverter<true,true, SAME, SRC, DST>;
+		ValuePtrConverter<true,true, SRC, DST> *ret = new ValuePtrConverter<true,true, SRC, DST>;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
 		const SRC *srcPtr=&src.castToValuePtr<SRC>()[0];
 		DST *dstPtr= &dst.castToValuePtr<DST>()[0];
-		NumConvImpl<SRC,DST,SAME>::convert(srcPtr,dstPtr,scaling,getConvertSize(src,dst));
+		NumConvImpl<SRC,DST,boost::is_same<SRC,DST>::value>::convert(srcPtr,dstPtr,scaling,getConvertSize(src,dst));
 	}
 	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
-		return NumConvImpl<SRC,DST,SAME>::getScaling(min,max,scaleopt);
+		return NumConvImpl<SRC,DST,boost::is_same<SRC,DST>::value >::getScaling(min,max,scaleopt);
 	}
 	virtual ~ValuePtrConverter() {}
 };
@@ -217,7 +217,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // complex to complex version
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class ValuePtrConverter<false,false, false, std::complex<SRC>, std::complex<DST> > : public ValuePtrGenerator<std::complex<SRC>, std::complex<DST> >
+template<typename SRC, typename DST> class ValuePtrConverter<false,false, std::complex<SRC>, std::complex<DST> > : public ValuePtrGenerator<std::complex<SRC>, std::complex<DST> >
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info )
@@ -226,7 +226,7 @@ template<typename SRC, typename DST> class ValuePtrConverter<false,false, false,
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<false,false, false, std::complex<SRC>, std::complex<DST> > *ret = new ValuePtrConverter<false,false, false, std::complex<SRC>, std::complex<DST> >;
+		ValuePtrConverter<false,false, std::complex<SRC>, std::complex<DST> > *ret = new ValuePtrConverter<false,false, std::complex<SRC>, std::complex<DST> >;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
@@ -248,7 +248,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // color to color version - using numeric_convert on each color with a global scaling
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class ValuePtrConverter<false,false, false, util::color<SRC>, util::color<DST> > : public ValuePtrGenerator<util::color<SRC>, util::color<DST> >
+template<typename SRC, typename DST> class ValuePtrConverter<false,false, util::color<SRC>, util::color<DST> > : public ValuePtrGenerator<util::color<SRC>, util::color<DST> >
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info )
@@ -257,7 +257,7 @@ template<typename SRC, typename DST> class ValuePtrConverter<false,false, false,
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<false,false, false, util::color<SRC>, util::color<DST> > *ret = new ValuePtrConverter<false,false, false, util::color<SRC>, util::color<DST> >;
+		ValuePtrConverter<false,false, util::color<SRC>, util::color<DST> > *ret = new ValuePtrConverter<false,false, util::color<SRC>, util::color<DST> >;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
@@ -283,9 +283,8 @@ template<typename SRC> struct inner_ValuePtrConverter {
 	inner_ValuePtrConverter( std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValuePtrConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
-		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const ValuePtrConverterBase> conv =
-			ValuePtrConverter<boost::is_arithmetic<SRC>::value,boost::is_arithmetic<DST>::value, is_same::value, SRC, DST>::get();
+			ValuePtrConverter<boost::is_arithmetic<SRC>::value,boost::is_arithmetic<DST>::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( ValuePtr<DST>::staticID, conv ) );
 	}
