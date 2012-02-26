@@ -80,6 +80,26 @@ scaling_pair getScalingToColor( const util::_internal::ValueBase &min, const uti
 			util::ValueReference( util::Value<double>( scale.second ) )
 		);
 }
+template<typename SRC,typename DST>
+scaling_pair getScalingToComplex( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale ) {
+	double scalMin,scalMax;
+	if(min.isFloat() || min.isInteger())scalMin=min.as<double>(); // if min is allready a scalar
+		else{ // of not, determine the scalar min from the elements
+			const std::complex<double> minCpl=min.as<std::complex<double> >(); //use the "biggest" known color type
+			scalMin =*std::min_element(&minCpl.real(),&minCpl.imag()); // take the lowest value
+		}
+		if(max.isFloat() || max.isInteger())scalMax=max.as<double>(); // if max is allready a scalar
+		else { // of not, determine the scalar min from the elements
+			const std::complex<double> maxCpl=max.as<std::complex<double> >(); //use the "biggest" known color type
+			scalMax =*std::max_element(&maxCpl.real(),&maxCpl.imag()); // take the lowest value
+		}
+		
+		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( util::Value<double>(scalMin), util::Value<double>(scalMax), scaleopt );
+		return std::make_pair(
+			util::ValueReference( util::Value<double>( scale.first ) ),
+			util::ValueReference( util::Value<double>( scale.second ) )
+		);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // basic numeric conversion class
@@ -230,17 +250,17 @@ public:
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( checkScale(scaling), Debug, warning ) << "Sorry scaling of complex values is not supportet yet";
+		//we do an evil hack here assuming std::complex is POD - at least check if the size of std::complex is reasonable
+		BOOST_STATIC_ASSERT(sizeof(std::complex<SRC>) == sizeof(SRC)*2);
+		BOOST_STATIC_ASSERT(sizeof(std::complex<DST>) == sizeof(DST)*2);
+		
+		const SRC *sp = &src.castToValuePtr<std::complex<SRC> >().begin()->real();
+		DST *dp = &dst.castToValuePtr<std::complex<DST> >().begin()->real();
 
-		const std::complex<SRC> *sp = &src.castToValuePtr<std::complex<SRC> >()[0];
-		const std::complex<SRC> *end = sp + getConvertSize( src, dst );
-		std::complex<DST> *dp = &dst.castToValuePtr<std::complex<DST> >()[0];
-
-		while( sp != end ) {
-			*dp = std::complex<DST>( _internal::round<DST>( sp->real() ), _internal::round<DST>( sp->imag() ) );
-			++sp;
-			++dp;
-		}
+		NumConvImpl<SRC,DST,boost::is_same<SRC,DST>::value>::convert(sp,dp,scaling,getConvertSize(src,dst)*2);
+	}
+	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToComplex<SRC,DST>(min,max,scaleopt);
 	}
 	virtual ~ValuePtrConverter() {}
 };
