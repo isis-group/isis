@@ -23,12 +23,12 @@
 #include "common.hpp"
 
 
-/*! \addtogroup util
-*  Additional documentation for group `mygrp'
-*  @{
-*/
 namespace isis
 {
+/*! \addtogroup util
+	*  Additional documentation for group `mygrp'
+	*  @{
+	*/
 namespace util
 {
 
@@ -182,6 +182,7 @@ public:
 
 typedef ValueBase::Reference ValueReference;
 
+/// }@
 }
 }
 
@@ -200,7 +201,5 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::Gene
 	return out << s.toString( true );
 }
 }
-
-/// }@
 
 #endif //ISISTYPE_BASE_HPP

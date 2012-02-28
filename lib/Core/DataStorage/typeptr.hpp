@@ -42,16 +42,16 @@ template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsup
 		return std::pair<T, T>();
 	}
 };
-template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
+template<typename T,uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_MPL_ASSERT_RELATION( std::numeric_limits<T>::has_denorm, != , std::denorm_indeterminate ); //well we're pretty f**ed in this case
+	BOOST_STATIC_ASSERT( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
 		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
 	);
 	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
 
-	for ( const T *i = data; i < data + len; ++i ) {
+	for ( const T *i = data; i < data + len; i+=STEPSIZE ) {
 		if(
 			std::numeric_limits<T>::has_infinity &&
 			( *i == std::numeric_limits<T>::infinity() || *i == -std::numeric_limits<T>::infinity() )
@@ -71,19 +71,40 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 // specialize calcMinMax for (u)int(8,16,32)_t /
 ////////////////////////////////////////////////
 
-template<> std::pair< uint8_t,  uint8_t> calcMinMax( const  uint8_t *data, size_t len );
-template<> std::pair<uint16_t, uint16_t> calcMinMax( const uint16_t *data, size_t len );
-template<> std::pair<uint32_t, uint32_t> calcMinMax( const uint32_t *data, size_t len );
+template<> std::pair< uint8_t,  uint8_t> calcMinMax< uint8_t,1>( const  uint8_t *data, size_t len );
+template<> std::pair<uint16_t, uint16_t> calcMinMax<uint16_t,1>( const uint16_t *data, size_t len );
+template<> std::pair<uint32_t, uint32_t> calcMinMax<uint32_t,1>( const uint32_t *data, size_t len );
 
-template<> std::pair< int8_t,  int8_t> calcMinMax( const  int8_t *data, size_t len );
-template<> std::pair<int16_t, int16_t> calcMinMax( const int16_t *data, size_t len );
-template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t len );
+template<> std::pair< int8_t,  int8_t> calcMinMax< int8_t,1>( const  int8_t *data, size_t len );
+template<> std::pair<int16_t, int16_t> calcMinMax<int16_t,1>( const int16_t *data, size_t len );
+template<> std::pair<int32_t, int32_t> calcMinMax<int32_t,1>( const int32_t *data, size_t len );
 #endif //__SSE2__
 
 template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		return calcMinMax( &ref[0], ref.getLength() );
+		return calcMinMax<T,1>( &ref[0], ref.getLength() );
 	}
+};
+
+template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic min-max for color (get bounding box in color space)
+std::pair<util::color<T> , util::color<T> > operator()( const ValuePtr<util::color<T> > &ref ) const {
+	std::pair<util::color<T> , util::color<T> > ret;
+	for(uint_fast8_t i=0;i<3;i++){
+		const std::pair<T,T> buff=calcMinMax<T,3>( &ref[0].r+i, ref.getLength()*3 );
+		*(&ret.first.r +i)=buff.first;
+		*(&ret.second.r+i)=buff.second;
+	}
+	return ret;
+}
+};
+template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
+std::pair<std::complex<T> , std::complex<T> > operator()( const ValuePtr<std::complex<T> > &ref ) const {
+	BOOST_STATIC_ASSERT(sizeof(std::complex<T>)==sizeof(T)*2); // we need this for the calcMinMax-hack below
+	const std::pair<T, T > real=calcMinMax<T,2>( &ref[0].real(), ref.getLength()*2 );
+	const std::pair<T, T > imag=calcMinMax<T,2>( &ref[0].imag(), ref.getLength()*2 );
+	
+	return std::make_pair(std::complex<T>(real.first,imag.first),std::complex<T>(real.second,imag.second));
+}
 };
 /// @endcond
 

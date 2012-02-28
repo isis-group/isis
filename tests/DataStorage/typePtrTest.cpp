@@ -224,6 +224,17 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
 }
 
+BOOST_AUTO_TEST_CASE( ValuePtr_complex_minmax_test )
+{
+	const std::complex<float> init[] = { {-2,1}, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, {0.2,-5}};
+	data::ValuePtr<std::complex<float> > cfArray( 12 );
+	cfArray.copyFromMem( init, 12 );
+	std::pair< util::ValueReference, util::ValueReference > minmax=cfArray.getMinMax();
+	
+	BOOST_CHECK_EQUAL( minmax.first->as<std::complex<double> >(),  std::complex< double >(-2,-5) );
+	BOOST_CHECK_EQUAL( minmax.second->as<std::complex<double> >(), std::complex< double >(2,1) );
+}
+
 BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 {
 	const std::complex<float> init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
@@ -234,6 +245,95 @@ BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 	for( size_t i = 0; i < 12; i++ ) {
 		BOOST_CHECK_EQUAL( cfArray[i], init[i] );
 		BOOST_CHECK_EQUAL( cdArray[i], std::complex<double>( init[i] ) );
+	}
+}
+BOOST_AUTO_TEST_CASE( ValuePtr_numeric_to_complex_conversion_test )
+{
+	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
+	data::ValuePtr<float> fArray( sizeof(init)/sizeof(float) );
+	fArray.copyFromMem( init, sizeof(init)/sizeof(float) );
+
+	data::ValuePtr<std::complex<float> > cfArray = fArray.copyAs<std::complex<float> >();
+	data::ValuePtr<std::complex<double> > cdArray = fArray.copyAs<std::complex<double> >();
+
+	// scalar values should be in real, imag should be 0
+	for( size_t i = 0; i < sizeof(init)/sizeof(float); i++ ) {
+		BOOST_CHECK_EQUAL( cfArray[i].real(), init[i] );
+		BOOST_CHECK_EQUAL( cdArray[i].real(), init[i] );
+		BOOST_CHECK_EQUAL( cfArray[i].imag(), 0 );
+		BOOST_CHECK_EQUAL( cdArray[i].imag(), 0 );
+	}
+	
+}
+
+
+BOOST_AUTO_TEST_CASE( ValuePtr_color_minmax_test )
+{
+
+	const util::color48 init[] = {
+		{ 20, 180, 150},
+		{130,  60,  20},
+		{ 20, 180, 150},
+		{130,  60,  20}
+	};
+	data::ValuePtr<util::color48> ccArray(4);
+	ccArray.copyFromMem( init, 4 );
+	std::pair< util::ValueReference, util::ValueReference > minmax=ccArray.getMinMax();
+	const util::color48 colmin={20,60,20},colmax={130,180,150};
+	
+	BOOST_CHECK_EQUAL(minmax.first->as<util::color48>(),colmin);
+	BOOST_CHECK_EQUAL(minmax.second->as<util::color48>(),colmax);
+}
+
+BOOST_AUTO_TEST_CASE( ValuePtr_color_conversion_test )
+{
+	const util::color48 init[] = { {0,0,0}, {100,2,4}, {200,200,200}, {510,4,2}};
+	data::ValuePtr<util::color48 > c16Array( 4 );
+	c16Array.copyFromMem( init, 4 );
+	
+	data::ValuePtr<util::color24 > c8Array = c16Array.copyAs<util::color24 >();// should downscale (by 2)
+	
+	for( size_t i = 0; i < 4; i++ ) { 
+		BOOST_REQUIRE_EQUAL( c16Array[i], init[i] );
+		BOOST_CHECK_EQUAL( c8Array[i].r, init[i].r/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].g, init[i].g/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].b, init[i].b/2 );
+	}
+
+	c16Array = c8Array.copyAs<util::color48>();//should not scale
+
+	for( size_t i = 0; i < 4; i++ ) {
+		BOOST_CHECK_EQUAL( c16Array[i], c8Array[i] );
+	}
+	
+}
+
+
+BOOST_AUTO_TEST_CASE( ValuePtr_numeric_to_color_conversion_test )
+{
+	const short init[] = {0,0,0, 100,2,4, 200,200,200, 510,4,2};
+	data::ValuePtr<uint16_t> i16Array( sizeof(init)/sizeof(uint16_t) );
+	i16Array.copyFromMem( init, sizeof(init)/sizeof(uint16_t) );
+
+	//scaling should be 0.5/0
+	data::scaling_pair scale=i16Array.getScalingTo(data::ValuePtr<util::color24 >::staticID);
+	BOOST_CHECK_EQUAL(scale.first->as<double>(),0.5);
+	BOOST_CHECK_EQUAL(scale.second->as<double>(),0);
+	
+	data::ValuePtr<util::color24 > c8Array = i16Array.copyAs<util::color24 >();// should downscale (by 2)
+	
+	for( size_t i = 0; i < sizeof(init)/sizeof(uint16_t); i++ ) {
+		BOOST_CHECK_EQUAL( c8Array[i].r, init[i]/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].g, init[i]/2 );
+		BOOST_CHECK_EQUAL( c8Array[i].b, init[i]/2 );
+	}
+	
+	data::ValuePtr<util::color48 > c16Array= i16Array.copyAs<util::color48 >();//should not scale
+	
+	for( size_t i = 0; i < sizeof(init)/sizeof(uint16_t); i++ ) {
+		BOOST_CHECK_EQUAL( c16Array[i].r, init[i] );
+		BOOST_CHECK_EQUAL( c16Array[i].g, init[i] );
+		BOOST_CHECK_EQUAL( c16Array[i].b, init[i] );
 	}
 }
 

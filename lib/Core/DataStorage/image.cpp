@@ -691,6 +691,7 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 	return ret;
 }
 
+// @todo this wont work with images of more 2 two different data types
 std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
 	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";
@@ -829,11 +830,19 @@ std::string Image::getMajorTypeName() const
 
 bool Image::convertToType( short unsigned int ID )
 {
+	bool retVal = true;
+	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
+		retVal &= ( ref->getTypeID() == ID );
+	}
+
+	if( retVal ) // if all chunks allready have the requested type we can skip the rest
+		return true;
+
 	// get value range of the image for the conversion
 	scaling_pair scale = getScalingTo( ID );
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
-	bool retVal = true;
+	retVal = true;
 	//we want all chunks to be of type ID - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
 		retVal &= ref->convertToType( ID, scale );

@@ -35,8 +35,6 @@ template<typename T> T round( double x )
 	return round_impl<T>( x, boost::mpl::bool_<std::numeric_limits<T>::is_integer>() ); //we do use overloading intead of (forbidden) partial specialization
 }
 
-size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst );
-
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
@@ -264,13 +262,9 @@ getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autos
 			std::numeric_limits<double>::max();
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
-		if ( scale < 1 ) {
-			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
-		} else if ( scaleopt == noupscale ) {
-			if ( scale > 1 ) {
-				LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
-				scale = 1;
-			}
+		if ( scaleopt == noupscale && scale > 1 ) {
+			LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
+			scale = 1;
 		}
 
 		if( scale == 1 ) {
@@ -298,23 +292,16 @@ getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autos
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
+template<typename SRC, typename DST> void numeric_convert( const SRC *src, DST *dst,size_t size, const double scale, const double offset )
 {
-	const size_t size = _internal::getConvertSize( src, dst );
-
 	if ( ( scale != 1. || offset ) )
-		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
+		_internal::numeric_convert_impl( src, dst, size, scale, offset );
 	else
-		_internal::numeric_convert_impl( &src[0], &dst[0], size );
+		_internal::numeric_convert_impl( src, dst, size );
 }
-template<typename T> void numeric_copy( const ValuePtr<T> &src, ValuePtr<T> &dst, const double scale, const double offset )
+template<typename T> void numeric_copy( const T *src, T *dst,size_t size)
 {
-	const size_t size = _internal::getConvertSize( src, dst );
-
-	if ( ( scale != 1. || offset ) )
-		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size, scale, offset );
-	else
-		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size );
+	_internal::numeric_copy_impl<T>( src, dst, size );
 }
 
 }

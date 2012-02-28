@@ -211,7 +211,8 @@ public:
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 	/**
-	 * @copydoc copyByID
+	 * Create new data in memory containg a (converted) copy of this.
+	 * Allocates new memory of the requested type and copies the (converted) content of this into that memory.
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
@@ -336,7 +337,11 @@ public:
 	/**
 	 * Get minimum/maximum of a ValuePtr.
 	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.
-	 * The computes min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
+	 * This actually returns the bounding box of the values in the value space of the type. This means:
+	 * - min/max numbers for numbers from a 1-D value space (aka real numbers)
+	 * - complex(lowest real value,lowest imaginary value) / complex(biggest real value,biggest imaginary value) for complex numbers
+	 * - color(lowest red value,lowest green value, lowest blue value)/color(biggest red value,biggest green value, biggest blue value) for color
+	 * The computed min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
 	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
 	 * \code
 	 * std::pair<util::ValueReference,util::ValueReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
@@ -353,7 +358,7 @@ public:
 	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
 	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
 	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
-	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
+	 * \param end the first element in this, which should _not_ be compared anymore to the given TyprPtr
 	 * \param dst the given ValuePtr this should be compared to
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
 	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.

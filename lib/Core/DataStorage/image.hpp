@@ -325,7 +325,7 @@ public:
 	 * \returns amount of successfully inserted chunks
 	 */
 	template<typename T> size_t insertChunksFromContainer ( T &chunks ) {
-		BOOST_STATIC_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
+		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type > ) );
 		size_t cnt = 0;
 
 		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks

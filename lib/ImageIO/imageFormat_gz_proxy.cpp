@@ -74,7 +74,7 @@ private:
 		) {
 			if ( len < 0 ) {
 				int err;
-				gzerror( out, &err );
+				gzerror( in, &err );
 
 				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
 				if ( err == Z_ERRNO ) {
