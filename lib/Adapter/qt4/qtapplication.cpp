@@ -104,3 +104,4 @@ isis::util::Matrix4x4< qreal > isis::qt4::QMatrix2FixedMatrix4x4 ( const QMatrix
 	}
 	return ret;
 }
+

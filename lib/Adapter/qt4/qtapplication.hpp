@@ -66,6 +66,28 @@ QMatrix FixedMatrix2QMatrix2x2( const util::FixedMatrix<qreal,2,2> &matrix );
 isis::util::Matrix4x4<qreal> QMatrix2FixedMatrix4x4( const QMatrix4x4& matrix );
 QMatrix4x4 FixedMatrix2QMatrix4x4( const util::Matrix4x4<qreal> &matrix );
 
+template<typename TYPE, unsigned int COLUMN, unsigned int ROW>
+isis::util::FixedMatrix<TYPE, COLUMN, ROW> QMatrix2FixedMatrix( const QGenericMatrix<ROW, COLUMN, TYPE> &matrix ) {
+	isis::util::FixedMatrix<TYPE, COLUMN, ROW> ret;
+	for( unsigned int column = 0; column < COLUMN; column++ ) {
+		for( unsigned int row = 0; row < ROW; row++ ) {
+			ret.elem( column, row ) = matrix(row, column );
+		}
+	}
+	return ret;
+}
+
+template< typename TYPE, unsigned int COLUMN, unsigned int ROW >
+QGenericMatrix< ROW, COLUMN, TYPE > FixedMatrix2QMatrix( const util::FixedMatrix<TYPE, COLUMN, ROW> &matrix ) {
+	QGenericMatrix<ROW, COLUMN, TYPE> ret;
+	for( unsigned int column = 0; column < COLUMN; column++ ) {
+		for( unsigned int row = 0; row < ROW; row++ ) {
+			ret( row, column ) = matrix( column, row );
+		}
+	}
+	return ret;
+}
+
 }
 }
 
