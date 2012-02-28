@@ -39,6 +39,9 @@ class IOApplication: public util::Application
 
 public:
 	std::list<data::Image> images;
+	static void addInput (util::ParameterMap& pmap, bool needed=true, const std::string& suffix="", const std::string& desc="" );
+	static void addOutput(util::ParameterMap& pmap, bool needed=true, const std::string& suffix="", const std::string& desc = "" );
+	
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
@@ -66,8 +69,14 @@ public:
 	}
 
 	bool autoload( bool exitOnError = false );
-	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
+	static bool autoload( const util::ParameterMap& parameters, std::list< Image >& images, bool exitOnError=false, const std::string& suffix="", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
+
 	bool autowrite( Image out_image, bool exitOnError = false );
+	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
+	
+	static bool autowrite( const util::ParameterMap& parameters, Image out_image, bool exitOnError = false, const std::string& suffix="", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
+	static bool autowrite( const util::ParameterMap& parameters, std::list< Image > out_images, bool exitOnError = false, const std::string& suffix="", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
+	
 protected:
 	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };

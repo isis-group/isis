@@ -163,6 +163,16 @@ bool ParameterMap::isComplete()const
 	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
+const ProgParameter ParameterMap::operator[] ( const std::string key ) const{
+	std::map<std::string, ProgParameter>::const_iterator at=find(key);
+	if(at!=end())
+		return at->second;
+	else{
+		LOG(Debug,error) << "The requested parameter " << util::MSubject(key) << " does not exist";
+		return ProgParameter();
+	}
+}
+ProgParameter& ParameterMap::operator[] ( const std::string key ){return std::map<std::string, ProgParameter>::operator[](key);}
 
 ProgParameter::operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const
 {
