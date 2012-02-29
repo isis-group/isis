@@ -692,9 +692,11 @@ public:
 
 	/**
 	* Get a sorted list of the chunks of the image.
-	* Note: These chunks are cheap copies, so changing their voxels will change the voxels of the image.
-	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
+	* \note These chunks will be cheap copies, so changing their voxels will change the voxels of the image. But you can for example use \code
+	* std::vector< data::Chunk > cheapchunks=img.copyChunksToVector(); //this is a cheap copy
+	* std::vector< data::MemChunk<float> > memchunks(cheapchunks.begin(),cheapchunks.end()); // this is not not
+	* \endcode to get deep copies.
 	*/
 	std::vector<isis::data::Chunk> copyChunksToVector ( bool copy_metadata = true ) const;
 
