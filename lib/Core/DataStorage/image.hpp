@@ -531,8 +531,19 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::KeyType &key, bool unique = false ) const;
 
-	/// get the voxelsize (in bytes) for the major type in the image
-	size_t getBytesPerVoxel() const;
+	/**
+	 * Get the size (in bytes) for the voxels in the image
+	 * \warning As each Chunk of the image can have a different type (and thus bytesize),
+	 * this does not neccesarly return the correct size for all voxels in the image. It
+	 * will rather return the biggest size.
+	 * \note The easiest (and most expensive) way to make sure you have the same bytesize accross the whole Image, is to run:
+	 * \code
+	 * image.convertToType(image.getMajorTypeID());
+	 * \endcode
+	 * assuming "image" is your image.
+	 * \returns Get the biggest size (in bytes) accross all voxels in the image.
+	 */
+	size_t getMaxBytesPerVoxel() const;
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.

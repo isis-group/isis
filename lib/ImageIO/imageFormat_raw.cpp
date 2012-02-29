@@ -89,7 +89,7 @@ public:
 			}
 			bool operator()( data::Chunk &ref, util::vector4<size_t> /*posInImage*/ ) {
 				const boost::shared_ptr<const void> data( ref.getValuePtrBase().getRawAddress() );
-				const size_t data_size = ref.bytesPerVoxel() * ref.getVolume();
+				const size_t data_size = ref.getBytesPerVoxel() * ref.getVolume();
 				out.write( static_cast<const char *>( data.get() ), data_size );
 				return true;
 			}

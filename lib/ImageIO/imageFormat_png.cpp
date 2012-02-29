@@ -114,7 +114,7 @@ public:
 		row_pointers[0] = ( png_byte * )buff.getValuePtrBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0] + ( buff.bytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
+			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -222,7 +222,7 @@ public:
 		case data::ValuePtr<util::color48>::staticID:
 			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
-			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).bytesPerVoxel() * 8 / 3;
+			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;
 			break;
 		default:
 			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";

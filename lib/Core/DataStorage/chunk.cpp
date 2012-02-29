@@ -71,7 +71,7 @@ bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 	return true;
 }
 
-size_t Chunk::bytesPerVoxel()const
+size_t Chunk::getBytesPerVoxel()const
 {
 	return getValuePtrBase().bytesPerElem();
 }
@@ -267,7 +267,7 @@ size_t Chunk::useCount() const
 
 void Chunk::swapAlong( const dimensions dim ) const
 {
-	const size_t elSize = bytesPerVoxel();
+	const size_t elSize = getBytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();
 
 	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );

@@ -200,7 +200,7 @@ public:
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
-	size_t bytesPerVoxel()const;
+	size_t getBytesPerVoxel()const;
 	std::string getTypeName()const;
 	unsigned short getTypeID()const;
 	template<typename T> bool is()const {return getValuePtrBase().is<T>();}

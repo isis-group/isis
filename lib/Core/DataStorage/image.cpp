@@ -655,15 +655,15 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 	return ret;
 }
 
-size_t Image::getBytesPerVoxel() const
+size_t Image::getMaxBytesPerVoxel() const
 {
-	size_t bytes = chunkPtrAt( 0 )->bytesPerVoxel();
+	size_t bytes = chunkPtrAt( 0 )->getBytesPerVoxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( bytes != ref->bytesPerVoxel(), Debug, warning )
-				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->bytesPerVoxel() << "). Using the biggest.";
+		LOG_IF( bytes != ref->getBytesPerVoxel(), Debug, warning )
+				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->getBytesPerVoxel() << "). Using the biggest.";
 
-		if( bytes < ref->bytesPerVoxel() ) {
-			bytes = ref->bytesPerVoxel();
+		if( bytes < ref->getBytesPerVoxel() ) {
+			bytes = ref->getBytesPerVoxel();
 		}
 	}
 	return bytes;

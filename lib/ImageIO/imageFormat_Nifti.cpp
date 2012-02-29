@@ -578,7 +578,7 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
-		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
+		ni.data = malloc( image.getMaxBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
 		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::vector4<size_t> isize = image.getSizeAsVector();
@@ -598,7 +598,7 @@ private:
 		}
 
 		// data dependent information added
-		ni.nbyper = image.getBytesPerVoxel();
+		ni.nbyper = image.getMaxBytesPerVoxel();
 		std::pair<double, double> minmax = image.getMinMaxAs<double>();
 		ni.cal_min = minmax.first;
 		ni.cal_max = minmax.second;
