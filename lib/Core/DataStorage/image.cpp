@@ -274,6 +274,42 @@ bool Image::updateOrientationMatrices()
 	return true;
 }
 
+bool Image::transformCoords(boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+{
+	//for transforming we have to ensure to have the below properties in our chunks and image
+	std::list<std::string > neededProps;
+	neededProps.push_back ( "indexOrigin" );
+	neededProps.push_back ( "rowVec" );
+	neededProps.push_back ( "columnVec" );
+	neededProps.push_back ( "sliceVec" );
+	neededProps.push_back ( "voxelSize" );
+	//propagate needed properties to chunks
+	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+		BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
+			if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
+				chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
+			}
+		}
+
+		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
+			return false;
+		}
+	}
+	//      establish initial state
+
+	if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+		LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
+		return false;
+	}
+
+	if ( !updateOrientationMatrices() ) {
+		LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
+		return false;
+	}
+
+	deduplicateProperties();
+	return true;
+}
 
 dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 {
