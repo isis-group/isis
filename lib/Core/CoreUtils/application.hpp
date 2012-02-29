@@ -50,7 +50,7 @@ class Application
 	std::string m_filename;
 
 protected:
-	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual boost::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 public:
 

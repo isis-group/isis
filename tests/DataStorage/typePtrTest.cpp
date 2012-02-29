@@ -26,13 +26,13 @@ struct Deleter {
 };
 
 // Handlers must not be local classes
-class TestHandler : public util::_internal::MessageHandlerBase
+class TestHandler : public util::MessageHandlerBase
 {
 public:
 	static int hit;
-	TestHandler( LogLevel level ): util::_internal::MessageHandlerBase( level ) {}
+	TestHandler( LogLevel level ): util::MessageHandlerBase( level ) {}
 	virtual ~TestHandler() {}
-	void commit( const util::_internal::Message &mesg ) {
+	void commit( const util::Message &mesg ) {
 		if ( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
 			hit++;
 		else

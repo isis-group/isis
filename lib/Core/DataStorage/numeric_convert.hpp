@@ -289,6 +289,7 @@ getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autos
  * The conversion itself is equivalent to dst[i] = round( src[i] * scale + offset )
  * \param src data to be converted
  * \param dst target where to convert src to
+ * \param size the amount of elements to be converted
  * \param scale the scaling factor
  * \param offset the offset
  */

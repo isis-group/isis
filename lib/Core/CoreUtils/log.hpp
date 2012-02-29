@@ -36,7 +36,7 @@ template<class MODULE> class Log
 	friend class util::Singletons;
 	boost::shared_ptr<MessageHandlerBase> m_handle;
 	static boost::shared_ptr<MessageHandlerBase> &getHandle() {
-		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
+		boost::shared_ptr<util::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
 		return handle;
 	}
 	Log(): m_handle( new DefaultMsgPrint( notice ) ) {}
@@ -48,7 +48,7 @@ public:
 		getHandle() = handler;
 	}
 	static Message send( const char file[], const char object[], int line, LogLevel level ) {
-		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle = getHandle();
+		boost::shared_ptr<util::MessageHandlerBase> &handle = getHandle();
 		return Message( object, MODULE::name(), file, line, level, handle );
 	}
 };

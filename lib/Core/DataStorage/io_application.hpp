@@ -78,7 +78,7 @@ public:
 	static bool autowrite( const util::ParameterMap& parameters, std::list< Image > out_images, bool exitOnError = false, const std::string& suffix="", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
 	
 protected:
-	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };
 
 }

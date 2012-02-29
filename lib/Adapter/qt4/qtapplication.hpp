@@ -52,7 +52,7 @@ public:
 	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 protected:
-	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 }
