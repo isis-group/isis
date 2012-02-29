@@ -574,7 +574,7 @@ public:
 	 * function only changes the orientation information (rowVec, columnVec, sliceVec, indexOrigin)
 	 * of the image but will not change the image itself.
 	 *
-	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
+	 * \warning If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
@@ -585,41 +585,7 @@ public:
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
-	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		//for transforming we have to ensure to have the below properties in our chunks and image
-		std::list<std::string > neededProps;
-		neededProps.push_back ( "indexOrigin" );
-		neededProps.push_back ( "rowVec" );
-		neededProps.push_back ( "columnVec" );
-		neededProps.push_back ( "sliceVec" );
-		neededProps.push_back ( "voxelSize" );
-		//propagate needed properties to chunks
-		BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
-				if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
-					chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
-				}
-			}
-
-			if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
-				return false;
-			}
-		}
-		//      establish initial state
-
-		if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
-			return false;
-		}
-
-		if ( !updateOrientationMatrices() ) {
-			LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
-			return false;
-		}
-
-		deduplicateProperties();
-		return true;
-	}
+	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false );
 
 	/** Maps the given scanner Axis to the dimension with the minimal angle.
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
