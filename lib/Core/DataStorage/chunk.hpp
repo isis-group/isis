@@ -170,8 +170,12 @@ public:
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
+
 	/// Creates a new empty Chunk of different size and without properties, but of the same datatype as this.
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
+
+	/// Creates a new empty Chunk without properties but of specified type and specified size.
+	static Chunk createByID( short unsigned int ID, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
