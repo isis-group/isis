@@ -225,6 +225,7 @@ public:
 			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;
 			break;
 		default:
+			color_type=bit_depth=0;
 			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
 			throwGenericError( "unsupported data type" );
 		}
