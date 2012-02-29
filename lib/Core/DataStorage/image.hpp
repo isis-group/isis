@@ -694,7 +694,7 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
 	 */
-	template<typename T> MemChunk<T> copyToMemChunk() const {
+	template<typename T> MemChunk<T> copyAsMemChunk() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
 		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
