@@ -15,7 +15,7 @@ namespace isis
 namespace util
 {
 
-Selection::Selection( const char *entries ): m_set( 0 )
+Selection::Selection( const char *entries,const char *init_val ): m_set( 0 )
 {
 	int ID = 1;
 	BOOST_FOREACH( const util::istring & ref, stringToList<util::istring>( util::istring( entries ), ',' ) ) {
@@ -25,6 +25,8 @@ Selection::Selection( const char *entries ): m_set( 0 )
 			LOG( Debug, error ) << "Entry " << util::MSubject( pair ) << " could not be inserted";
 		}
 	}
+	if(init_val[0])
+		set(init_val);
 }
 Selection::Selection(): m_set( 0 ) {}
 

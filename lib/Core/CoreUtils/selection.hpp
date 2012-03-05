@@ -47,7 +47,7 @@ public:
 	 * Creates a selection with the given options.
 	 * \param entries comma separated list of the options as a string
 	 */
-	Selection( const char *entries );
+	Selection( const char* entries, const char* init_val="" );
 	/**
 	 * Default constructor.
 	 * Creates a selection from a number-option map.
