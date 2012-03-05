@@ -27,7 +27,7 @@ namespace data
 {
 namespace _internal
 {
-/// @cond _hidden
+/// @cond _internal
 
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {

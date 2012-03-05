@@ -274,7 +274,7 @@ bool Image::updateOrientationMatrices()
 	return true;
 }
 
-bool Image::transformCoords(boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
 	//for transforming we have to ensure to have the below properties in our chunks and image
 	std::list<std::string > neededProps;

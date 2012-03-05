@@ -20,10 +20,6 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
 
@@ -125,7 +121,6 @@ public:
 };
 
 }
-/** @} */
 }
 
 #endif

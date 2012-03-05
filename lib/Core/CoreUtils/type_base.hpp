@@ -25,16 +25,12 @@
 
 namespace isis
 {
-/*! \addtogroup util
-	*  Additional documentation for group `mygrp'
-	*  @{
-	*/
 namespace util
 {
-
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
-/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
@@ -60,8 +56,9 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 		return value; //special version types are same - so just return the value
 	}
 };
-/// @endcond
 }
+/// @endcond
+API_EXCLUDE_END
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
@@ -182,7 +179,6 @@ public:
 
 typedef ValueBase::Reference ValueReference;
 
-/// }@
 }
 }
 

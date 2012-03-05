@@ -25,6 +25,7 @@
 #endif
 #include <algorithm>
 
+/// @cond _internal
 namespace isis
 {
 namespace util
@@ -71,6 +72,7 @@ const char *ichar_traits::find( const char *s, size_t n, const char &a )
 }
 }
 }
+/// @endcond _internal
 
 namespace boost
 {

@@ -119,8 +119,8 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 	}
 	bool parsed;
 public:
-	const ProgParameter operator[](const std::string key)const;
- 	ProgParameter& operator[](const std::string key);
+	const ProgParameter operator[]( const std::string key )const;
+	ProgParameter &operator[]( const std::string key );
 	/*
 	 * Default constructor to create an empty parameter map
 	 */

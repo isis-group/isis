@@ -31,6 +31,7 @@ namespace data
 
 class Chunk;
 
+/// @cond _internal
 namespace _internal
 {
 class ChunkBase : public NDimensional<4>, public util::PropertyMap
@@ -46,6 +47,7 @@ public:
 	virtual ~ChunkBase(); //needed to make it polymorphic
 };
 }
+/// @endcond _internal
 
 /// Base class for operators used for foreachVoxel
 template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>

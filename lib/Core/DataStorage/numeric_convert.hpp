@@ -14,9 +14,8 @@ namespace isis
 namespace data
 {
 enum autoscaleOption;
-#ifndef WIN32
-#pragma GCC visibility push(hidden)
-#endif
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 
@@ -194,9 +193,8 @@ DECL_SCALED_CONVERT( uint8_t, double );
 #endif //ISIS_USE_LIBOIL
 
 }
-#ifndef WIN32
-#pragma GCC visibility pop
-#endif
+/// @endcond _internal
+API_EXCLUDE_END
 /**
  * Computes scaling and offset between two scalar value domains.
  * The rules are:
@@ -293,14 +291,14 @@ getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autos
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const SRC *src, DST *dst,size_t size, const double scale, const double offset )
+template<typename SRC, typename DST> void numeric_convert( const SRC *src, DST *dst, size_t size, const double scale, const double offset )
 {
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_convert_impl( src, dst, size, scale, offset );
 	else
 		_internal::numeric_convert_impl( src, dst, size );
 }
-template<typename T> void numeric_copy( const T *src, T *dst,size_t size)
+template<typename T> void numeric_copy( const T *src, T *dst, size_t size )
 {
 	_internal::numeric_copy_impl<T>( src, dst, size );
 }

@@ -22,6 +22,7 @@
 
 #include "sortedchunklist.hpp"
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -272,3 +273,4 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 }
 }
 }
+/// @endcond _internal

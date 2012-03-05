@@ -22,10 +22,6 @@
 /// @cond _internal
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
 namespace _internal
@@ -55,7 +51,6 @@ public:
 
 }
 }
-/** @} */
 }
 /// @endcond
 

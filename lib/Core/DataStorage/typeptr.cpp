@@ -4,7 +4,7 @@ namespace isis
 {
 namespace data
 {
-/// @cond _hidden
+/// @cond _internal
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const
 {
@@ -21,6 +21,7 @@ template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned 
 namespace _internal
 {
 
+API_EXCLUDE_BEGIN
 
 ///////////////////////////////////////////////////////////
 // some voodoo to get the vector types into the templates /
@@ -205,17 +206,19 @@ template<typename T> std::pair<T, T> _getMinMax( const T *data, size_t len )
 	}
 }
 
+API_EXCLUDE_END
+
 ////////////////////////////////////////////////
 // specialize calcMinMax for (u)int(8,16,32)_t /
 ////////////////////////////////////////////////
 
-template<> std::pair< uint8_t,  uint8_t> calcMinMax< uint8_t,1>( const  uint8_t *data, size_t len ) {return _getMinMax( data, len );}
-template<> std::pair<uint16_t, uint16_t> calcMinMax<uint16_t,1>( const uint16_t *data, size_t len ) {return _getMinMax( data, len );}
-template<> std::pair<uint32_t, uint32_t> calcMinMax<uint32_t,1>( const uint32_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair< uint8_t,  uint8_t> calcMinMax< uint8_t, 1>( const  uint8_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair<uint16_t, uint16_t> calcMinMax<uint16_t, 1>( const uint16_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair<uint32_t, uint32_t> calcMinMax<uint32_t, 1>( const uint32_t *data, size_t len ) {return _getMinMax( data, len );}
 
-template<> std::pair< int8_t,  int8_t> calcMinMax< int8_t,1>( const  int8_t *data, size_t len ) {return _getMinMax( data, len );}
-template<> std::pair<int16_t, int16_t> calcMinMax<int16_t,1>( const int16_t *data, size_t len ) {return _getMinMax( data, len );}
-template<> std::pair<int32_t, int32_t> calcMinMax<int32_t,1>( const int32_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair< int8_t,  int8_t> calcMinMax< int8_t, 1>( const  int8_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair<int16_t, int16_t> calcMinMax<int16_t, 1>( const int16_t *data, size_t len ) {return _getMinMax( data, len );}
+template<> std::pair<int32_t, int32_t> calcMinMax<int32_t, 1>( const int32_t *data, size_t len ) {return _getMinMax( data, len );}
 
 } //namepace _internal
 #else

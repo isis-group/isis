@@ -29,6 +29,7 @@ namespace isis
 {
 namespace data
 {
+/// @cond _internal
 namespace _internal
 {
 class ConstValueAdapter: public util::ValueReference
@@ -119,6 +120,7 @@ template<> GenericValueIterator<true>::reference GenericValueIterator<true>::ope
 template<> GenericValueIterator<false>::reference GenericValueIterator<false>::operator*() const;
 
 } //namespace _internal
+/// @endcond _internal
 
 class ValuePtrBase : public util::_internal::GenericValue
 {

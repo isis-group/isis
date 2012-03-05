@@ -24,7 +24,9 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/numeric/conversion/converter.hpp>
 #include "log.hpp"
+#include "../config.hpp"
 
+/// @cond _internal
 
 namespace isis
 {
@@ -44,9 +46,7 @@ public:
 	virtual ~ValueConverterBase() {}
 };
 
-#ifndef WIN32
-#pragma GCC visibility push(hidden)
-#endif
+API_EXCLUDE_BEGIN
 class ValueConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > >
 {
 public:
@@ -54,9 +54,8 @@ public:
 };
 
 }
-#ifndef WIN32
-#pragma GCC visibility pop
-#endif
+API_EXCLUDE_END
 }
 }
+/// @endcond _internal
 #endif // CONVERTER_HPP

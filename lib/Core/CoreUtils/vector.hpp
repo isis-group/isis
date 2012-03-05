@@ -25,12 +25,9 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
 template<typename TYPE, size_t SIZE> class array
@@ -45,6 +42,7 @@ protected:
 	const_iterator end()const {return cont + SIZE;}
 };
 }
+/// @endcond _internal
 
 template < typename TYPE, size_t SIZE, typename CONTAINER = _internal::array<TYPE, SIZE> >
 class FixedVector: protected CONTAINER
@@ -342,7 +340,6 @@ typedef vector4<float> fvector4;
 typedef vector4<double> dvector4;
 typedef vector4<int32_t> ivector4;
 }
-/** @} */
 }
 
 template<typename TYPE, size_t SIZE, typename CONTAINER >

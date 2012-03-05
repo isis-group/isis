@@ -17,6 +17,7 @@ namespace isis
 {
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
 bool GenericValue::isSameType ( const GenericValue &second ) const
@@ -24,6 +25,7 @@ bool GenericValue::isSameType ( const GenericValue &second ) const
 	return getTypeID() == second.getTypeID();
 }
 }
+/// @endcond _internal
 
 ValueBase::~ValueBase() {}
 

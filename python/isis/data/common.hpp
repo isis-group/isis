@@ -13,11 +13,6 @@
 #include "DataStorage/typeptr.hpp"
 #include <boost/python.hpp>
 
-/*! \addtogroup python
-*  Additional documentation for group `mygrp'
-*  @{
-*/
-
 using namespace isis::data;
 namespace isis
 {
@@ -119,7 +114,6 @@ struct VoxelOp {
 } //namespace python
 
 } //namespace isis
-/** @} */
 #endif /* PYTHON_COMMON_HPP_ */
 
 

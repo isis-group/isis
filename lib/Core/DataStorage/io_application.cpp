@@ -37,10 +37,10 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	m_input( have_input ), m_output( have_output ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input )
-		addInput(parameters);
+		addInput( parameters );
 
 	if ( have_output )
-		addOutput(parameters);
+		addOutput( parameters );
 }
 
 IOApplication::~IOApplication()
@@ -60,23 +60,23 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 	return true;
 }
 
-void IOApplication::addInput ( util::ParameterMap& parameters, bool needed, const std::string &suffix, const std::string &desc )
+void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
 {
-	parameters[std::string("in")+suffix] = util::slist();
-	parameters[std::string("in")+suffix].setDescription( std::string("input file(s) or directory(s)")+desc );
-	parameters[std::string("in")+suffix].needed()=needed;
-	
-	parameters[std::string("rf")+suffix] = std::string();
-	parameters[std::string("rf")+suffix].needed() = false;
-	parameters[std::string("rf")+suffix].hidden() = true;
-	
-	parameters[std::string("rf")+suffix].setDescription( std::string("Override automatic detection of file suffix for reading"+desc+" with given value") );
-	parameters[std::string("rdialect")+suffix] = std::string();
-	parameters[std::string("rdialect")+suffix].needed() = false;
-	parameters[std::string("rdialect")+suffix].setDescription(
-		std::string("choose dialect for reading")+desc+" . The available dialects depend on the capabilities of IO plugins" );
+	parameters[std::string( "in" )+suffix] = util::slist();
+	parameters[std::string( "in" )+suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
+	parameters[std::string( "in" )+suffix].needed() = needed;
 
-	if(parameters.find("np")==parameters.end()){
+	parameters[std::string( "rf" )+suffix] = std::string();
+	parameters[std::string( "rf" )+suffix].needed() = false;
+	parameters[std::string( "rf" )+suffix].hidden() = true;
+
+	parameters[std::string( "rf" )+suffix].setDescription( std::string( "Override automatic detection of file suffix for reading" + desc + " with given value" ) );
+	parameters[std::string( "rdialect" )+suffix] = std::string();
+	parameters[std::string( "rdialect" )+suffix].needed() = false;
+	parameters[std::string( "rdialect" )+suffix].setDescription(
+		std::string( "choose dialect for reading" ) + desc + " . The available dialects depend on the capabilities of IO plugins" );
+
+	if( parameters.find( "np" ) == parameters.end() ) {
 		parameters["np"] = false;
 		parameters["np"].needed() = false;
 		parameters["np"].setDescription( "suppress progress bar" );
@@ -84,20 +84,20 @@ void IOApplication::addInput ( util::ParameterMap& parameters, bool needed, cons
 	}
 }
 
-void IOApplication::addOutput ( util::ParameterMap& parameters, bool needed, const std::string &suffix, const std::string &desc )
+void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
 {
-	parameters[std::string("out")+suffix] = std::string();
-	parameters[std::string("out")+suffix].setDescription( "output filename"+desc );
-	parameters[std::string("out")+suffix].needed()=needed;
-	
-	parameters[std::string("wf")+suffix] = std::string();
-	parameters[std::string("wf")+suffix].needed() = false;
-	parameters[std::string("wf")+suffix].setDescription( "Override automatic detection of file suffix for writing"+desc+" with given value" );
-	parameters[std::string("wf")+suffix].hidden() = true;
-	
-	parameters[std::string("wdialect")+suffix] = std::string();
-	parameters[std::string("wdialect")+suffix].needed() = false;
-	parameters[std::string("wdialect")+suffix].setDescription( "Choose dialect for writing"+desc+". Use \"--help\" for a list of the plugins and their supported dialects" );
+	parameters[std::string( "out" )+suffix] = std::string();
+	parameters[std::string( "out" )+suffix].setDescription( "output filename" + desc );
+	parameters[std::string( "out" )+suffix].needed() = needed;
+
+	parameters[std::string( "wf" )+suffix] = std::string();
+	parameters[std::string( "wf" )+suffix].needed() = false;
+	parameters[std::string( "wf" )+suffix].setDescription( "Override automatic detection of file suffix for writing" + desc + " with given value" );
+	parameters[std::string( "wf" )+suffix].hidden() = true;
+
+	parameters[std::string( "wdialect" )+suffix] = std::string();
+	parameters[std::string( "wdialect" )+suffix].needed() = false;
+	parameters[std::string( "wdialect" )+suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help\" for a list of the plugins and their supported dialects" );
 	std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 	// remove some types which are useless as representation
 	// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
@@ -108,17 +108,17 @@ void IOApplication::addOutput ( util::ParameterMap& parameters, bool needed, con
 	types.erase( ( unsigned short )data::ValuePtr<util::ilist>::staticID );
 	types.erase( ( unsigned short )data::ValuePtr<util::dlist>::staticID );
 	types.erase( ( unsigned short )data::ValuePtr<util::slist>::staticID );
-	
+
 	for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
 		i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
 	}
-	
-	parameters[std::string("repn")+suffix] = util::Selection( types );
-	parameters[std::string("repn")+suffix].needed() = false;
-	parameters[std::string("repn")+suffix].setDescription(
-		"Representation in which the data"+desc+" shall be written" );
-	
-	if(parameters.find("np")==parameters.end()){
+
+	parameters[std::string( "repn" )+suffix] = util::Selection( types );
+	parameters[std::string( "repn" )+suffix].needed() = false;
+	parameters[std::string( "repn" )+suffix].setDescription(
+		"Representation in which the data" + desc + " shall be written" );
+
+	if( parameters.find( "np" ) == parameters.end() ) {
 		parameters["np"] = false;
 		parameters["np"].needed() = false;
 		parameters["np"].setDescription( "suppress progress bar" );
@@ -147,31 +147,32 @@ void IOApplication::printHelp( bool withHidden ) const
 	}
 }
 
-bool IOApplication::autoload( bool exitOnError ){
-	const bool no_progress = parameters["np"];
-	return autoload(parameters,images,exitOnError,"",no_progress ? boost::shared_ptr<util::ConsoleFeedback>():feedback);
-	
-}
-bool IOApplication::autoload ( const util::ParameterMap& parameters,std::list<Image> &images, bool exitOnError,const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback)
+bool IOApplication::autoload( bool exitOnError )
 {
-	util::slist input = parameters[std::string("in")+suffix];
-	std::string rf = parameters[std::string("rf")+suffix];
-	std::string dl = parameters[std::string("rdialect")+suffix];
+	const bool no_progress = parameters["np"];
+	return autoload( parameters, images, exitOnError, "", no_progress ? boost::shared_ptr<util::ConsoleFeedback>() : feedback );
+
+}
+bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback )
+{
+	util::slist input = parameters[std::string( "in" )+suffix];
+	std::string rf = parameters[std::string( "rf" )+suffix];
+	std::string dl = parameters[std::string( "rdialect" )+suffix];
 	LOG( Runtime, info )
-	<< "loading " << util::MSubject( input )
-	<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
-	<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
-	<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-	
+			<< "loading " << util::MSubject( input )
+			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
+			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
+			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+
 	if( feedback ) {
 		data::IOFactory::setProgressFeedback( feedback );
 	}
-	
+
 	BOOST_FOREACH( util::slist::const_reference ref, input ) {
 		const std::list< Image > tImages = data::IOFactory::load( ref, rf, dl );
 		images.insert( images.end(), tImages.begin(), tImages.end() );
 	}
-	
+
 	if ( images.empty() ) {
 		if ( exitOnError )
 			exit( 1 );
@@ -182,53 +183,55 @@ bool IOApplication::autoload ( const util::ParameterMap& parameters,std::list<Im
 			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != images.end(); ) {
 				const util::PropertyMap &aref = *a, bref = *b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-				<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
-				<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
-				<< " are equal. Maybe they are duplicates.";
+						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
+						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
+						<< " are equal. Maybe they are duplicates.";
 			}
 		}
 	}
-	
+
 	return true;
 }
 
 
-bool IOApplication::autowrite( Image out_image, bool exitOnError ){return autowrite(std::list<Image>( 1, out_image ), exitOnError );}
-bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError ){
+bool IOApplication::autowrite( Image out_image, bool exitOnError ) {return autowrite( std::list<Image>( 1, out_image ), exitOnError );}
+bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
+{
 	const bool no_progress = parameters["np"];
-	return autowrite(parameters,out_images,exitOnError,"",no_progress ? boost::shared_ptr<util::ConsoleFeedback>():feedback);
+	return autowrite( parameters, out_images, exitOnError, "", no_progress ? boost::shared_ptr<util::ConsoleFeedback>() : feedback );
 }
 
-bool IOApplication::autowrite (const util::ParameterMap& parameters, Image out_image, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback ){
-	return autowrite(parameters, std::list<Image>( 1, out_image ), exitOnError, suffix, feedback );
-}
-bool IOApplication::autowrite (const util::ParameterMap& parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
 {
-	const util::Selection repn = parameters[std::string("repn")+suffix];
-	const std::string output = parameters[std::string("out")+suffix];
-	const std::string wf = parameters[std::string("wf")+suffix];
-	const std::string dl = parameters[std::string("wdialect")+suffix];
+	return autowrite( parameters, std::list<Image>( 1, out_image ), exitOnError, suffix, feedback );
+}
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+{
+	const util::Selection repn = parameters[std::string( "repn" )+suffix];
+	const std::string output = parameters[std::string( "out" )+suffix];
+	const std::string wf = parameters[std::string( "wf" )+suffix];
+	const std::string dl = parameters[std::string( "wdialect" )+suffix];
 	LOG( Runtime, info )
-	<< "Writing " << out_images.size() << " images"
-	<< ( repn ? std::string( " as " ) + ( std::string )repn : "" )
-	<< " to " << util::MSubject( output )
-	<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
-	<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
-	<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-	
+			<< "Writing " << out_images.size() << " images"
+			<< ( repn ? std::string( " as " ) + ( std::string )repn : "" )
+			<< " to " << util::MSubject( output )
+			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
+			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
+			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+
 	if( repn != 0 ) {
 		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
 			ref.convertToType( repn );
 		}
 	}
 
-	if(feedback)
+	if( feedback )
 		data::IOFactory::setProgressFeedback( feedback );
-	
+
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
 		if ( exitOnError )
 			exit( 1 );
-		
+
 		return false;
 	} else
 		return true;

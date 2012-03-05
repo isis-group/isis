@@ -25,6 +25,7 @@
 #include "log.hpp"
 
 
+/// @cond _internal
 namespace isis
 {
 namespace data {template<typename TYPE> class ValuePtr;}
@@ -139,4 +140,5 @@ public:
 }
 }
 }
+/// @endcond _internal
 #endif // GENERIC_TYPE_HPP

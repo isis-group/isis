@@ -22,6 +22,7 @@ namespace isis
 {
 namespace data
 {
+/// @cond _internal
 namespace _internal
 {
 
@@ -37,6 +38,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 ChunkBase::~ChunkBase() { }
 
 }
+/// @endcond _internal
 
 Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ):
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
@@ -47,14 +49,14 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
-	return createByID(getTypeID(),nrOfColumns,nrOfRows,nrOfSlices,nrOfTimesteps);
+	return createByID( getTypeID(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
 }
 
-Chunk Chunk::createByID (unsigned short ID,size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps)
+Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	util::vector4<size_t> newSize(nrOfColumns,nrOfRows,nrOfSlices,nrOfTimesteps);
-	assert(newSize.product());
-	const ValuePtrReference created(ValuePtrBase::createByID(ID, newSize.product() ) );
+	util::vector4<size_t> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+	assert( newSize.product() );
+	const ValuePtrReference created( ValuePtrBase::createByID( ID, newSize.product() ) );
 	return Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 

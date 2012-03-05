@@ -668,14 +668,14 @@ public:
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
 		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
-		static_cast<util::PropertyMap&>(ret)=static_cast<const util::PropertyMap&>(getChunkAt(0));
+		static_cast<util::PropertyMap &>( ret ) = static_cast<const util::PropertyMap &>( getChunkAt( 0 ) );
 		return ret;
 	}
 
 	/**
 	 * Copy all voxel data into a new ValuePtr.
 	 * This creates a ValuePtr of the requested type and the same length as the images volume and then copies all voxeldata of the image into that ValuePtr.
-	 * 
+	 *
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \note This is a deep copy, no data will be shared between the Image and the ValuePtr. It will waste a lot of memory, use it wisely.
 	 * \returns a ValuePtr containing the voxeldata of the Image (but not its Properties)
@@ -686,7 +686,7 @@ public:
 		copyToMem<T> ( &ret[0], ret.getVolume() );
 		return ret;
 	}
-	
+
 	/**
 	* Get a sorted list of the chunks of the image.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.

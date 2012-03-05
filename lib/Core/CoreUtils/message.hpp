@@ -25,10 +25,6 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 enum LogLevel {error = 1, warning, notice, info, verbose_info};
 namespace util
 {
@@ -107,6 +103,5 @@ public:
 };
 
 }
-/** @} */
 }
 #endif //MESSAGE_H

@@ -213,6 +213,7 @@ ValuePtrBase::const_value_iterator ValuePtrBase::endGeneric()const
 	return beginGeneric() + m_len;
 }
 
+/// @cond _internal
 namespace _internal
 {
 template<> GenericValueIterator<true>::reference GenericValueIterator<true>::operator*() const
@@ -240,6 +241,7 @@ WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &
 	setValueFunc( const_cast<uint8_t * const>( p ), *val );
 	return *this;
 }
-} // namespace _internl
+} // namespace _internal
+/// @endcond _internal
 }
 }

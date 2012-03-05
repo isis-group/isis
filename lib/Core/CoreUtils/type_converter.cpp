@@ -40,9 +40,7 @@ namespace isis
 {
 namespace util
 {
-#ifndef WIN32
-#pragma GCC visibility push(hidden)
-#endif
+API_EXCLUDE_BEGIN
 namespace _internal
 {
 
@@ -306,14 +304,16 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		boost::numeric::range_check_result res=boost::numeric::cInRange;
-		const SRC *srcVal=&src.castTo<color<SRC> >().r;
-		DST *dstVal=&dst.castTo<color<DST> >().r;
+		boost::numeric::range_check_result res = boost::numeric::cInRange;
+		const SRC *srcVal = &src.castTo<color<SRC> >().r;
+		DST *dstVal = &dst.castTo<color<DST> >().r;
 
-		for(uint_fast8_t i=0;i<3;i++){
-			const boost::numeric::range_check_result result=num2num( srcVal[i], dstVal[i] );
-			if(result!=boost::numeric::cInRange)res=result;
+		for( uint_fast8_t i = 0; i < 3; i++ ) {
+			const boost::numeric::range_check_result result = num2num( srcVal[i], dstVal[i] );
+
+			if( result != boost::numeric::cInRange )res = result;
 		}
+
 		return res;
 	}
 	virtual ~ValueConverter() {}
@@ -520,7 +520,7 @@ template<typename DST> class ValueConverter<false, false, std::string, vector4<D
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
-			<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
+				<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -543,7 +543,7 @@ template<typename T> class ValueConverter<false, false, std::string, color<T> >:
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
-			<< "Creating from-string converter for " << Value<color<T> >::staticName();
+				<< "Creating from-string converter for " << Value<color<T> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -591,7 +591,6 @@ struct outer_TypeConverter {
 		);
 	}
 };
-/// @endcond
 
 ValueConverterMap::ValueConverterMap()
 {
@@ -600,8 +599,7 @@ ValueConverterMap::ValueConverterMap()
 }
 
 }
-#ifndef WIN32
-#pragma GCC visibility pop
-#endif
+API_EXCLUDE_END
 }
 }
+/// @endcond

@@ -21,8 +21,8 @@ typedef boost::uint64_t uint64_t;
 
 namespace isis
 {
-	// dear microsoft, if I 'ld mean "boost::mpl::size_t", I 'ld write "boost::mpl::size_t" *argl*
-	typedef ::size_t size_t;
+// dear microsoft, if I 'ld mean "boost::mpl::size_t", I 'ld write "boost::mpl::size_t" *argl*
+typedef ::size_t size_t;
 }
 #else
 #include <stdint.h>

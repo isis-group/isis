@@ -25,16 +25,14 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
 class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
+/// @endcond _internal
 /**
  * This class forms a mapping tree to store all kinds of properties (path : value), where:
  * - value is:
@@ -45,7 +43,7 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
  * Nevertheless there are separate access functions for branches and properties.
  * Trying to access a branch as a property value,or to access a property value as a branch will cause error messages and give empty results.
  *
- * Paths can be created from other paths and from strings (c-strings and util::istring, but not std::string). 
+ * Paths can be created from other paths and from strings (c-strings and util::istring, but not std::string).
  * So both can be used for functions which expect paths, but the usage of c-strings is slower.
  *
  * To describe the minimum of needed metadata needed by specific data structures / subclasses
@@ -407,7 +405,6 @@ public:
 	std::ostream &print( std::ostream &out, bool label = false )const;
 };
 }
-/** @} */
 }
 
 namespace std //predeclare streaming output -- we'll need it in treeNode
@@ -426,7 +423,8 @@ namespace isis
 {
 namespace util
 {
-/// @cond _hidden
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 /**
@@ -471,6 +469,7 @@ public:
 };
 }
 /// @endcond
+API_EXCLUDE_END
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // and now we can define walkTree (needs treeNode to be defined)

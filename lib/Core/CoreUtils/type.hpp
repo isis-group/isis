@@ -22,19 +22,16 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
 
 template<class TYPE > class Value;
 
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 
-/// @cond _hidden
 /**
  * Generic value comparison class for Value.
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
@@ -144,8 +141,9 @@ public: // c++11 says we need a user defined constructor here
 	type_greater() {}
 };
 
-/// @endcond _hidden
 }
+/// @endcond _internal
+API_EXCLUDE_END
 
 /**
  * Generic class for type aware variables.
@@ -322,7 +320,6 @@ template<typename T> bool ValueBase::is()const
 }
 
 }
-/// @}
 }
 
 #endif //DATATYPE_INC
