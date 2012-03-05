@@ -67,3 +67,4 @@ boost::shared_ptr< isis::util::MessageHandlerBase > isis::qt4::IOQtApplication::
 	return boost::shared_ptr< isis::util::MessageHandlerBase >( level ? new isis::qt4::QDefaultMessagePrint( level ) : 0 );
 }
 
+

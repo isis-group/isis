@@ -21,7 +21,11 @@
 #define QT_APPLICATION_HPP
 
 #include <QApplication>
+#include <QMatrix>
+#include <QMatrix4x4>
+
 #include <CoreUtils/application.hpp>
+#include <CoreUtils/matrix.hpp>
 #include <DataStorage/io_application.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "qdefaultmessageprint.hpp"
@@ -55,6 +59,7 @@ protected:
 	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
+
 }
 }
 

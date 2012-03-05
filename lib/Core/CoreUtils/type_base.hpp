@@ -26,9 +26,9 @@
 namespace isis
 {
 /*! \addtogroup util
-	*  Additional documentation for group `mygrp'
-	*  @{
-	*/
+    *  Additional documentation for group `mygrp'
+    *  @{
+    */
 namespace util
 {
 
