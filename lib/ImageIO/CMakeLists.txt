@@ -227,7 +227,7 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST)
 # PROCESS proxy plugin
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS)
-	add_library(isisImageFormat_process SHARED isisImageFormat_process.cpp)
+	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
 	target_link_libraries(isisImageFormat_process isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
 	set(TARGETS ${TARGETS} isisImageFormat_process)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS)
