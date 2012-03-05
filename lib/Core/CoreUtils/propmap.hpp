@@ -45,7 +45,7 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
  * Nevertheless there are separate access functions for branches and properties.
  * Trying to access a branch as a property value,or to access a property value as a branch will cause error messages and give empty results.
  *
- * Paths can be created from other paths and from strings (c-strings and util::istring, but not std::string). 
+ * Paths can be created from other paths and from strings (c-strings and util::istring, but not std::string).
  * So both can be used for functions which expect paths, but the usage of c-strings is slower.
  *
  * To describe the minimum of needed metadata needed by specific data structures / subclasses
