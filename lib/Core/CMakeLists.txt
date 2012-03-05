@@ -98,6 +98,7 @@ install (TARGETS ${target_list}
 )
 
 # install header files
+install(FILES "config.hpp" DESTINATION include/isis COMPONENT Development)
 install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/CoreUtils COMPONENT Development)
 install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/DataStorage COMPONENT Development)
 
