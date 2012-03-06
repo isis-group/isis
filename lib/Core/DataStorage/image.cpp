@@ -678,7 +678,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 			if ( unique && prop.isEmpty() ) //if unique is requested and the property is empty
 				continue; //skip it
-			else if ( unique && !( ret.empty() ||  prop == ret.back() ) )
+			else if ( unique && !ret.empty() &&  prop == ret.back() )
 				//if unique is requested and the property is equal to the one added before
 				continue;//skip it
 			else
