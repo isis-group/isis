@@ -21,8 +21,6 @@
 #pragma warning(disable:4996)
 #endif
 
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
-
 #include "io_application.hpp"
 #include "io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
@@ -149,8 +147,7 @@ void IOApplication::printHelp( bool withHidden ) const
 
 bool IOApplication::autoload( bool exitOnError )
 {
-	const bool no_progress = parameters["np"];
-	return autoload( parameters, images, exitOnError, "", no_progress ? boost::shared_ptr<util::ConsoleFeedback>() : feedback );
+	return autoload( parameters, images, exitOnError, "", feedback );
 
 }
 bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback )
@@ -164,7 +161,9 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
-	if( feedback ) {
+	bool no_progress = parameters["np"];
+
+	if( !no_progress && feedback ) {
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 

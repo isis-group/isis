@@ -48,11 +48,11 @@ class Application
 {
 	const std::string m_name;
 	std::string m_filename;
-	void addLoggingParameter(std::string name);
-	
+	void addLoggingParameter( std::string name );
+
 protected:
-	typedef void (Application::*setLogFunction)( LogLevel level )const;
-	std::map<std::string,std::list<setLogFunction> > logs;
+	typedef void ( Application::*setLogFunction )( LogLevel level )const;
+	std::map<std::string, std::list<setLogFunction> > logs;
 	virtual boost::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 public:
@@ -88,22 +88,23 @@ public:
 	 * addLogging<MyLogModule>("MyLog");
 	 * addLogging<MyDebugModule>("MyLog");
 	 * \endcode will control \code LOG(MyLogModule,...) << ... \endcode and \code LOG(MyDebugModule,...) << ... \endcode through the parameter "-dMyLog".
-	 * 
+	 *
 	 * \param name the name used for the program parameters and their description
-	 * 
-	 * \note This does not set the logging handler. That is done by reimplementing getLogHandler( std::string module, isis::LogLevel level )const .
+	 *
+	 * \note This does not set the logging handler. That is done by reimplementing getLogHandler( std::string module, isis::LogLevel level )const.
+	 * \note If name is an empty string (""), its assumed as the logging for the application.
 	 */
-	template<typename MODULE> void addLogging(std::string name){
-		addLoggingParameter(name);
-		logs[name].push_back(&Application::setLog<MODULE>);
+	template<typename MODULE> void addLogging( std::string name ) {
+		addLoggingParameter( name );
+		logs[name].push_back( &Application::setLog<MODULE> );
 	}
 	/**
 	 * Removes a logging parameter from the application.
 	 * \param name the parameter name without "-d"
 	 * \note the logging module cannot be removed at runtime - its usage is controled by the _ENABLE_LOG / _ENABLE_DEBUG defines at compile time.
 	 */
-	void removeLogging(std::string name);
-	
+	void removeLogging( std::string name );
+
 	/**
 	 * Initializes the programm parameter map using argc/argv.
 	 * For every entry in parameters an corresponding command line parameter is searched and parsed.
@@ -120,10 +121,11 @@ public:
 	 */
 	virtual void printHelp( bool withHidden = false )const;
 	/// Set the logging level for the specified module
-	template<typename MODULE> void setLog( LogLevel level ) const{
+	template<typename MODULE> void setLog( LogLevel level ) const {
 		if ( !MODULE::use );
 		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );
-		LOG(Debug,info) << "Setting logging for module " << MSubject(MODULE::name()) << " to level " << level;
+
+		LOG( Debug, info ) << "Setting logging for module " << MSubject( MODULE::name() ) << " to level " << level;
 	}
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void );

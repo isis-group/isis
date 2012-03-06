@@ -274,10 +274,12 @@ public:
 	}
 
 	boost::numeric::ublas::vector<TYPE> getBoostVector() const {
-		boost::numeric::ublas::vector<TYPE> ret = boost::numeric::ublas::vector<TYPE>(SIZE);
+		boost::numeric::ublas::vector<TYPE> ret = boost::numeric::ublas::vector<TYPE>( SIZE );
+
 		for( size_t i = 0; i < SIZE; i++ ) {
-			ret(i) = operator[](i);
+			ret( i ) = operator[]( i );
 		}
+
 		return ret;
 	}
 

@@ -33,33 +33,39 @@ namespace util
 
 Application::Application( const char name[] ): m_name( name )
 {
-	addLogging<CoreLog>("Core");
-	addLogging<CoreDebug>("Core");
-	addLogging<DataLog>("Data");
-	addLogging<DataDebug>("Data");
-	addLogging<ImageIoLog>("ImageIO");
-	addLogging<ImageIoDebug>("ImageIO");
+	addLogging<CoreLog>( "Core" );
+	addLogging<CoreDebug>( "Core" );
+	addLogging<DataLog>( "Data" );
+	addLogging<DataDebug>( "Data" );
+	addLogging<ImageIoLog>( "ImageIO" );
+	addLogging<ImageIoDebug>( "ImageIO" );
 
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
-	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
-	ref.second.needed() = false;
+	parameters["help"].needed() = false;
 }
 Application::~Application() {}
 
-void Application::addLoggingParameter(std::string name)
+void Application::addLoggingParameter( std::string name )
 {
-	static const Selection dbg_levels( "error,warning,notice,info,verbose_info","warning" );
-	if(parameters.find(std::string("d")+name)==parameters.end()){ //only add the parameter if it does not exist yet
-		parameters[std::string("d")+name] = dbg_levels;
-		parameters[std::string("d")+name].setDescription( "Debugging level for the \""+name+"\" module" );
-		parameters[std::string("d")+name].hidden() = true;
+	static const Selection dbg_levels( "error,warning,notice,info,verbose_info", "warning" );
+
+	if( parameters.find( std::string( "d" ) + name ) == parameters.end() ) { //only add the parameter if it does not exist yet
+		parameters[std::string( "d" )+name] = dbg_levels;
+
+		if( name.empty() )
+			parameters[std::string( "d" )+name].setDescription( "Log level for \"" + m_name + "\" itself" );
+		else
+			parameters[std::string( "d" )+name].setDescription( "Log level for the \"" + name + "\" module(s)" );
+
+		parameters[std::string( "d" )+name].hidden() = true;
+		parameters[std::string( "d" )+name].needed() = false;
 	}
 }
-void Application::removeLogging(std::string name)
+void Application::removeLogging( std::string name )
 {
-	parameters.erase(name);
-	logs.erase(name);
+	parameters.erase( name );
+	logs.erase( name );
 }
 
 bool Application::init( int argc, char **argv, bool exitOnError )
@@ -78,12 +84,12 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	BOOST_FOREACH(logger_ref ref,logs){
-		const std::string dname=std::string("d")+ref.first;
-		assert(!parameters[dname].isEmpty()); // this must have been set by addLoggingParameter (called via addLogging)
-		const LogLevel level=(LogLevel)( uint16_t )parameters[dname]->as<Selection>();
-		BOOST_FOREACH(setLogFunction setter,ref.second){
-			(this->*setter)(level);
+	BOOST_FOREACH( logger_ref ref, logs ) {
+		const std::string dname = std::string( "d" ) + ref.first;
+		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
+		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname]->as<Selection>();
+		BOOST_FOREACH( setLogFunction setter, ref.second ) {
+			( this->*setter )( level );
 		}
 	}
 
