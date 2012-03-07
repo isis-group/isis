@@ -39,7 +39,7 @@ template<typename T> struct _TypeVector;
 	template<> struct _TypeVector<TYPE>{                         \
 		static __m128i gt(__m128i a,__m128i b){return _mm_cmpgt_epi ## KEY (a, b);}                                                        \
 		static __m128i lt(__m128i a,__m128i b){return _mm_cmplt_epi ## KEY (a, b);}                                                        \
-	};
+	}
 DEF_VECTOR_SI( int8_t, 8 );
 DEF_VECTOR_SI( int16_t, 16 );
 DEF_VECTOR_SI( int32_t, 32 );
@@ -60,7 +60,7 @@ template<typename T> __m128i _getAddV()
 		static inline __m128i gt(__m128i a,__m128i b){return _mm_cmpgt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
 		static inline __m128i lt(__m128i a,__m128i b){return _mm_cmplt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
 	};\
-	__m128i _TypeVector<TYPE>::addv=_getAddV<TYPE>();
+	__m128i _TypeVector<TYPE>::addv=_getAddV<TYPE>()
 
 DEF_VECTOR_UI( uint8_t, 8 );
 DEF_VECTOR_UI( uint16_t, 16 );
@@ -77,7 +77,7 @@ template<typename T> std::pair<__m128i, __m128i> _getMinMaxBlockLoop( const __m1
 {
 	std::pair<__m128i, __m128i> ret( _mm_loadu_si128( data ), _mm_loadu_si128( data ) );
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<T>::staticName() << " (masked mode)";
-	static const __m128i one = _mm_set_epi16( 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF );
+	static const __m128i one = _mm_set_epi16( -1, -1, -1, -1, -1, -1, -1, -1 );
 
 	while ( --blocks ) {
 		const __m128i at = _mm_loadu_si128( ++data );

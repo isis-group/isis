@@ -11,26 +11,6 @@ struct DiffDebug {static const char *name() {return "DiffDebug";}; enum {use = _
 
 using namespace isis;
 
-void dropDuplicate( std::list<data::Image> &list )
-{
-	for( std::list<data::Image>::iterator a = list.begin(); a != list.end(); a++ ) {
-		std::list<data::Image>::iterator b = a;
-		b++;
-
-		while( b != list.end() ) {
-			const util::PropertyMap &aref = *a, &bref = *b;
-
-			if( aref.getDifference( bref ).empty() ) {
-				LOG( DiffLog, notice ) << "Duplicate found in data from "
-									   << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance( list.begin(), b )
-									   << ", dropping..";
-				list.erase( b++ );
-			} else
-				++b;
-		}
-	}
-}
-
 boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources )
 {
 	sources.erase( std::unique( sources.begin(), sources.end() ), sources.end() );
@@ -137,6 +117,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	}
 	const std::string name1 = identify( img1 );
 	const std::string name2 = identify( img2 );
+	LOG( DiffLog, info ) << "Comparing " << name1 << " and " << name2;
 
 	if ( ! diff.empty() ) {
 		std::cout
@@ -163,12 +144,24 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	return ret;
 }
 
+void dropWith( util::slist props, std::list< data::Image > &images )
+{
+	BOOST_FOREACH( util::slist::const_reference propStr, props ) {
+		const std::list< std::string > ppair = util::stringToList<std::string>( propStr, '=' );
+		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), ppair.back() ) );
+	}
+}
+
 int main( int argc, char *argv[] )
 {
 	util::Application app( "isis data diff" );
 	app.parameters["ignore"] = util::slist();
 	app.parameters["ignore"].needed() = false;
 	app.parameters["ignore"].setDescription( "List of properties which should be ignored when comparing" );
+
+	app.parameters["skipwith"] = util::slist( 1, "sequenceDescription=localizer" );
+	app.parameters["skipwith"].needed() = false;
+	app.parameters["skipwith"].setDescription( "List of property=value sets which should should make the program skip the according image" );
 
 	app.addLogging<DiffLog>( "" );
 	app.addLogging<DiffDebug>( "" );
@@ -216,11 +209,12 @@ int main( int argc, char *argv[] )
 			ret = 1;
 
 	} else if( in1.second <= 0 && in2.second <= 0 ) {
-		LOG( DiffLog, info ) << "Comparing whole image sets from \"" << in1.first << "\" and from \"" << in2.first << "\"";
-		data::IOApplication::autoload( app.parameters, images1, true, "1", feedback );
-		data::IOApplication::autoload( app.parameters, images2, true, "2", feedback );
-		dropDuplicate( images1 );
-		dropDuplicate( images2 );
+		data::IOApplication::autoload( app.parameters, images1, false, "1", feedback );
+		data::IOApplication::autoload( app.parameters, images2, false, "2", feedback );
+		dropWith( app.parameters["skipwith"], images1 );
+		dropWith( app.parameters["skipwith"], images2 );
+
+		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << in1.first << "\" and " << images2.size() << " from \"" << in2.first << "\"";
 
 		for (
 			std::list< data::Image >::iterator first = images1.begin();
@@ -228,7 +222,8 @@ int main( int argc, char *argv[] )
 		) {
 			const std::list<data::Image> candidates = findFitting( *first, images2 );
 			LOG_IF( candidates.size() > 1 || candidates.empty(), DiffLog, warning )
-					<< "Could not find a unique image fitting " << identify( *first );
+					<< "Could not find a unique image fitting " << identify( *first )
+					<< ". " << candidates.size() << " where found";
 
 			BOOST_FOREACH( const data::Image & second, candidates ) {
 				if( diff( *first, second, ignore ) )
@@ -242,12 +237,12 @@ int main( int argc, char *argv[] )
 		}
 
 		if( !images1.empty() ) {
-			std::cout << "there are " << images1.size() << " images left from " << in1.first << std::endl;
+			std::cout << "there are " << images1.size() << " images left uncompared from " << util::MSubject( in1.first ) << std::endl;
 			ret += images1.size();
 		}
 
 		if( !images2.empty() ) {
-			std::cout << "there are " << images2.size() << " images left from " << in2.first << std::endl;
+			std::cout << "there are " << images2.size() << " images left uncompared from " << util::MSubject( in2.first ) << std::endl;
 			ret += images2.size();
 		}
 	} else {

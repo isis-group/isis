@@ -526,9 +526,10 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 	}
-	if(head->cal_max!=0 || head->cal_min!=0){ // maybe someone needs that, we dont ...
-		props.setPropertyAs("nifti/cal_max",head->cal_max);
-		props.setPropertyAs("nifti/cal_min",head->cal_min);
+
+	if( head->cal_max != 0 || head->cal_min != 0 ) { // maybe someone needs that, we dont ...
+		props.setPropertyAs( "nifti/cal_max", head->cal_max );
+		props.setPropertyAs( "nifti/cal_min", head->cal_min );
 	}
 
 	return parseSliceOrdering( head, props );
