@@ -170,8 +170,8 @@ int main( int argc, char *argv[] )
 	app.parameters["ignore"].needed() = false;
 	app.parameters["ignore"].setDescription( "List of properties which should be ignored when comparing" );
 
-	app.addLogging<DiffLog>( "Diff" );
-	app.addLogging<DiffDebug>( "Diff" );
+	app.addLogging<DiffLog>( "" );
+	app.addLogging<DiffDebug>( "" );
 
 	data::IOApplication::addInput( app.parameters, true, "1", " of the first image" );
 	data::IOApplication::addInput( app.parameters, true, "2", " of the second image" );

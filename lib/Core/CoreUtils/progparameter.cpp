@@ -122,7 +122,11 @@ bool ParameterMap::parse( int argc, char **argv )
 			std::list<std::string> matchingStrings;
 			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
-					matchingStrings.push_back( parameterRef.first );
+					if( parameterRef.first.length() == pName.length() ) { //if its an exact match
+						matchingStrings = std::list<std::string>( 1, pName ); //use that
+						break;// and stop searching for partial matches
+					} else
+						matchingStrings.push_back( parameterRef.first );
 				}
 			}
 
