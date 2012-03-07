@@ -116,6 +116,13 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 	parameters[std::string( "repn" )+suffix].setDescription(
 		"Representation in which the data" + desc + " shall be written" );
 
+	parameters[std::string( "scale_mode" )+suffix] = util::Selection( "noscale,autoscale,noupscale,upscale", "autoscale" );
+	parameters[std::string( "scale_mode" )+suffix].needed() = false;
+	parameters[std::string( "scale_mode" )+suffix].hidden() = true;
+
+	parameters[std::string( "scale_mode" )+suffix].setDescription(
+		"Scaling strategy to be used when converting into the datatype given in with -repn" + suffix );
+
 	if( parameters.find( "np" ) == parameters.end() ) {
 		parameters["np"] = false;
 		parameters["np"].needed() = false;
@@ -207,6 +214,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_
 bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	const util::Selection repn = parameters[std::string( "repn" )+suffix];
+	const util::Selection scale_mode = parameters[std::string( "scale_mode" )+suffix];
 	const std::string output = parameters[std::string( "out" )+suffix];
 	const std::string wf = parameters[std::string( "wf" )+suffix];
 	const std::string dl = parameters[std::string( "wdialect" )+suffix];
@@ -218,9 +226,14 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
+
+	LOG_IF( scale_mode != 0 && repn == 0, Runtime, warning )
+			<< "Ignoring -scale_mode" << suffix << " " << util::MSubject( scale_mode )
+			<<  ", because -repn" << suffix << " was not given";
+
 	if( repn != 0 ) {
 		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
-			ref.convertToType( repn );
+			ref.convertToType( repn, static_cast<autoscaleOption>( scale_mode - 1 ) ); //noscale is 0 but 1 in the selection
 		}
 	}
 
