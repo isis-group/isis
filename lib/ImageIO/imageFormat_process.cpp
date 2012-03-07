@@ -48,6 +48,7 @@ public:
 
 		char got;
 		std::string fname;
+		size_t fcnt = 0;
 
 		while( ( got = fgetc( in ) ) != EOF ) {
 			if( got == '\n' ) {
@@ -55,6 +56,7 @@ public:
 					LOG( Runtime, info ) << "Got " << util::MSubject( fname ) << " from " << util::MSubject( filename );
 					red += data::IOFactory::load( chunks, fname, dialect, "" );
 					fname.clear();
+					fcnt++;
 				}
 			} else {
 				fname += got;
@@ -62,6 +64,7 @@ public:
 		}
 
 		pclose( in );
+		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from " << util::MSubject( filename );
 		return red;
 	}
 

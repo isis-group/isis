@@ -38,24 +38,28 @@ public:
 		size_t red = 0;
 		const boost::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
+		size_t fcnt = 0;
 
 		while( !in.eof() ) {
 			in >> fnames ;
 			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
 				LOG( Runtime, info ) << "loading " << fname;
 				red += data::IOFactory::load( chunks, fname, "", dialect );
+				fcnt++;
 			}
 		}
+
+		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from the input list";
 
 		return red;
 	}
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		if( filename.empty() ) {
-			LOG( Runtime, info ) << "Getting filelist from stdin";
+			LOG( Runtime, info ) << "getting filelist from stdin";
 			return doLoad( std::cin, chunks, dialect );
 		} else {
-			LOG( Runtime, info ) << "Getting filelist from " << filename;
+			LOG( Runtime, info ) << "getting filelist from " << filename;
 			std::ifstream in( filename.c_str() );
 			in.exceptions( std::ios::badbit );
 			return doLoad( in, chunks, dialect );
