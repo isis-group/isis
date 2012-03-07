@@ -703,7 +703,7 @@ public:
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool convertToType ( unsigned short ID );
+	bool convertToType ( short unsigned int ID, isis::data::autoscaleOption scaleopt = autoscale );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.

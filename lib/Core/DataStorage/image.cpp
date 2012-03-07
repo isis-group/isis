@@ -864,7 +864,7 @@ std::string Image::getMajorTypeName() const
 	return util::getTypeMap()[getMajorTypeID()];
 }
 
-bool Image::convertToType( short unsigned int ID )
+bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 {
 	bool retVal = true;
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
@@ -875,7 +875,7 @@ bool Image::convertToType( short unsigned int ID )
 		return true;
 
 	// get value range of the image for the conversion
-	scaling_pair scale = getScalingTo( ID );
+	scaling_pair scale = getScalingTo( ID, scaleopt );
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	retVal = true;
