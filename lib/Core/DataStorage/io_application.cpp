@@ -180,9 +180,10 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 	}
 
 	if ( images.empty() ) {
-		if ( exitOnError )
+		if ( exitOnError ) {
+			LOG( Runtime, notice ) << "No data acquired, exiting...";
 			exit( 1 );
-		else
+		} else
 			return false;
 	} else {
 		for( std::list<data::Image>::const_iterator a = images.begin(); a != images.end(); a++ ) {
@@ -227,7 +228,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 
-	LOG_IF( scale_mode != 0 && repn == 0, Runtime, warning )
+	LOG_IF( parameters[std::string( "scale_mode" )+suffix].isSet() && repn == 0, Runtime, warning )
 			<< "Ignoring -scale_mode" << suffix << " " << util::MSubject( scale_mode )
 			<<  ", because -repn" << suffix << " was not given";
 
@@ -241,8 +242,10 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 		data::IOFactory::setProgressFeedback( feedback );
 
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
-		if ( exitOnError )
+		if ( exitOnError ){
+			LOG( Runtime, notice ) << "Failed to write, exiting...";
 			exit( 1 );
+		}
 
 		return false;
 	} else

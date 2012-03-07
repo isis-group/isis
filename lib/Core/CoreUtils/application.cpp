@@ -48,7 +48,7 @@ Application::~Application() {}
 
 void Application::addLoggingParameter( std::string name )
 {
-	static const Selection dbg_levels( "error,warning,notice,info,verbose_info", "warning" );
+	static const Selection dbg_levels( "error,warning,notice,info,verbose_info", "notice" );
 
 	if( parameters.find( std::string( "d" ) + name ) == parameters.end() ) { //only add the parameter if it does not exist yet
 		parameters[std::string( "d" )+name] = dbg_levels;
