@@ -325,7 +325,7 @@ public:
 	 * \returns amount of successfully inserted chunks
 	 */
 	template<typename T> size_t insertChunksFromContainer ( T &chunks ) {
-		BOOST_STATIC_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
+		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type > ) );
 		size_t cnt = 0;
 
 		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
@@ -531,8 +531,19 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::KeyType &key, bool unique = false ) const;
 
-	/// get the voxelsize (in bytes) for the major type in the image
-	size_t getBytesPerVoxel() const;
+	/**
+	 * Get the size (in bytes) for the voxels in the image
+	 * \warning As each Chunk of the image can have a different type (and thus bytesize),
+	 * this does not neccesarly return the correct size for all voxels in the image. It
+	 * will rather return the biggest size.
+	 * \note The easiest (and most expensive) way to make sure you have the same bytesize accross the whole Image, is to run:
+	 * \code
+	 * image.convertToType(image.getMajorTypeID());
+	 * \endcode
+	 * assuming "image" is your image.
+	 * \returns Get the biggest size (in bytes) accross all voxels in the image.
+	 */
+	size_t getMaxBytesPerVoxel() const;
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
@@ -563,7 +574,7 @@ public:
 	 * function only changes the orientation information (rowVec, columnVec, sliceVec, indexOrigin)
 	 * of the image but will not change the image itself.
 	 *
-	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
+	 * \warning If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
@@ -574,41 +585,7 @@ public:
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
-	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		//for transforming we have to ensure to have the below properties in our chunks and image
-		std::list<std::string > neededProps;
-		neededProps.push_back ( "indexOrigin" );
-		neededProps.push_back ( "rowVec" );
-		neededProps.push_back ( "columnVec" );
-		neededProps.push_back ( "sliceVec" );
-		neededProps.push_back ( "voxelSize" );
-		//propagate needed properties to chunks
-		BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
-				if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
-					chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
-				}
-			}
-
-			if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
-				return false;
-			}
-		}
-		//      establish initial state
-
-		if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
-			return false;
-		}
-
-		if ( !updateOrientationMatrices() ) {
-			LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
-			return false;
-		}
-
-		deduplicateProperties();
-		return true;
-	}
+	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false );
 
 	/** Maps the given scanner Axis to the dimension with the minimal angle.
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
@@ -679,22 +656,44 @@ public:
 
 	/**
 	 * Copy all voxel data into a new MemChunk.
-	 * This creates a MemChunk\<T\> of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 * This creates a MemChunk of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 *
 	 * If neccessary a conversion into T is done using min/max of the image.
-	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
+	 *
+	 * Also the properties of the first chunk are \link util::PropertyMap::join join\endlink-ed with those of the image and copied.
+	 * \note This is a deep copy, no data will be shared between the Image and the MemChunk. It will waste a lot of memory, use it wisely.
+	 * \returns a MemChunk containing the voxeldata and the properties of the Image
 	 */
-	template<typename T> MemChunk<T> copyToMemChunk() const {
+	template<typename T> MemChunk<T> copyAsMemChunk() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
 		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
+		static_cast<util::PropertyMap &>( ret ) = static_cast<const util::PropertyMap &>( getChunkAt( 0 ) );
+		return ret;
+	}
+
+	/**
+	 * Copy all voxel data into a new ValuePtr.
+	 * This creates a ValuePtr of the requested type and the same length as the images volume and then copies all voxeldata of the image into that ValuePtr.
+	 *
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \note This is a deep copy, no data will be shared between the Image and the ValuePtr. It will waste a lot of memory, use it wisely.
+	 * \returns a ValuePtr containing the voxeldata of the Image (but not its Properties)
+	 */
+	template<typename T> ValuePtr<T> copyAsValuePtr() const {
+		const util::vector4<size_t> size = getSizeAsVector();
+		data::ValuePtr<T> ret ( getVolume() );
+		copyToMem<T> ( &ret[0], ret.getVolume() );
 		return ret;
 	}
 
 	/**
 	* Get a sorted list of the chunks of the image.
-	* Note: These chunks are cheap copies, so changing their voxels will change the voxels of the image.
-	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
+	* \note These chunks will be cheap copies, so changing their voxels will change the voxels of the image. But you can for example use \code
+	* std::vector< data::Chunk > cheapchunks=img.copyChunksToVector(); //this is a cheap copy
+	* std::vector< data::MemChunk<float> > memchunks(cheapchunks.begin(),cheapchunks.end()); // this is not not
+	* \endcode to get deep copies.
 	*/
 	std::vector<isis::data::Chunk> copyChunksToVector ( bool copy_metadata = true ) const;
 

@@ -114,7 +114,7 @@ public:
 		row_pointers[0] = ( png_byte * )buff.getValuePtrBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0] + ( buff.bytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
+			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -199,31 +199,39 @@ public:
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
-		tImg.convertToType( isis_data_type ); // make image have unique type
 
 		if( image.getRelevantDims() < 2 ) { // ... make sure its made of slices
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
 
-		tImg.spliceDownTo( data::sliceDim );
-		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
-
-		png_byte color_type, bit_depth = ( png_byte )chunks.front().bytesPerVoxel() * 8;
+		png_byte color_type, bit_depth; ;
 
 		switch( isis_data_type ) {
+		case data::ValuePtr< int8_t>::staticID: // if its signed, fall "back" to unsigned
 		case data::ValuePtr<uint8_t>::staticID:
-		case data::ValuePtr<uint16_t>::staticID:
+			tImg.convertToType( data::ValuePtr<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
+			bit_depth = 8;
+		case data::ValuePtr< int16_t>::staticID: // if its signed, fall "back" to unsigned
+		case data::ValuePtr<uint16_t>::staticID:
+			tImg.convertToType( data::ValuePtr<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
+			color_type = PNG_COLOR_TYPE_GRAY;
+			bit_depth = 16;
 			break;
 		case data::ValuePtr<util::color24>::staticID:
 		case data::ValuePtr<util::color48>::staticID:
+			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
-			bit_depth /= 3;
+			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;
 			break;
 		default:
+			color_type = bit_depth = 0;
 			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
 			throwGenericError( "unsupported data type" );
 		}
+
+		tImg.spliceDownTo( data::sliceDim );
+		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
 
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle

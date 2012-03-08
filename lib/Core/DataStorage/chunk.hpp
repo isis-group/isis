@@ -31,6 +31,7 @@ namespace data
 
 class Chunk;
 
+/// @cond _internal
 namespace _internal
 {
 class ChunkBase : public NDimensional<4>, public util::PropertyMap
@@ -40,12 +41,13 @@ protected:
 	ChunkBase() {}; //do not use this
 public:
 	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
-	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
+	typedef isis::util::_internal::GenericReference<ChunkBase > Reference;
 
 	ChunkBase( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps );
 	virtual ~ChunkBase(); //needed to make it polymorphic
 };
 }
+/// @endcond _internal
 
 /// Base class for operators used for foreachVoxel
 template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
@@ -80,8 +82,8 @@ protected:
 	Chunk() {}; //do not use this
 public:
 
-	typedef _internal::ValuePtrBase::value_iterator iterator;
-	typedef _internal::ValuePtrBase::const_value_iterator const_iterator;
+	typedef ValuePtrBase::value_iterator iterator;
+	typedef ValuePtrBase::const_value_iterator const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
 
@@ -162,16 +164,20 @@ public:
 	const_iterator begin()const;
 	const_iterator end()const;
 
-	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
-	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
+	ValuePtrBase &asValuePtrBase() {return operator*();}
+	const ValuePtrBase &getValuePtrBase()const {return operator*();}
 
 	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {return asValuePtrBase().castToValuePtr<TYPE>();}
 	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {return getValuePtrBase().castToValuePtr<TYPE>();}
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
+
 	/// Creates a new empty Chunk of different size and without properties, but of the same datatype as this.
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
+
+	/// Creates a new empty Chunk without properties but of specified type and specified size.
+	static Chunk createByID( short unsigned int ID, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
@@ -196,7 +202,7 @@ public:
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
-	size_t bytesPerVoxel()const;
+	size_t getBytesPerVoxel()const;
 	std::string getTypeName()const;
 	unsigned short getTypeID()const;
 	template<typename T> bool is()const {return getValuePtrBase().is<T>();}
@@ -214,10 +220,10 @@ public:
 	 * Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.
 	 * This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets
 	 * for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices.
-	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0
-	 * will result in 128 chunks of the size 512x512x1, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
-	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
-	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
+	 *
+	 * E.g. autoSplice() on a chunk of the size 512x512x128, with rowVec 1,0,0, columnVec 0,1,0 and indexOrigin 0,0,0
+	 * will result in 128 chunks of the size 512x512x1, with constant rowVec's 1,0,0, and columnVec's 0,1,0  while the indexOrigin will be going from 0,0,0 to 0,0,128
+	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0). The acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset.
 	 */
 	std::list<Chunk> autoSplice( uint32_t acquisitionNumberStride = 0 )const;
 
@@ -372,7 +378,7 @@ public:
 	 * \param min
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
-	MemChunkNonDel( const Chunk &ref, const util::_internal::ValueBase &min, const  util::_internal::ValueBase &max ): Chunk( ref ) {
+	MemChunkNonDel( const Chunk &ref, const util::ValueBase &min, const  util::ValueBase &max ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, min, max ) );
 	}

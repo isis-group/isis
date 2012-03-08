@@ -174,6 +174,27 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::vector4<size_t>( size ) ) );
 }
 
+BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
+{
+	data::Chunk ch = genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
+	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
+	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
+	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
+
+	data::Image img( chunks );
+
+	// this is shared
+	std::vector< data::Chunk > cheapchunks = img.copyChunksToVector();
+	cheapchunks[0].voxel<float>( 0 ) = M_PI;
+	BOOST_CHECK_EQUAL( img.voxel<float>( 0 ), ( float )M_PI ); //so image will be changed
+
+	// this is not
+	std::vector< data::MemChunk<float> > memchunks( cheapchunks.begin(), cheapchunks.end() );
+	memchunks[0].voxel<float>( 0 ) = M_PI_2;
+	BOOST_CHECK_EQUAL( memchunks[0].voxel<float>( 0 ), ( float )M_PI_2 ); //so image will _not_ be changed
+	BOOST_CHECK_EQUAL( img.voxel<float>( 0 ), ( float )M_PI ); //so image will _not_ be changed
+}
+
 BOOST_AUTO_TEST_CASE ( proplist_image_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4

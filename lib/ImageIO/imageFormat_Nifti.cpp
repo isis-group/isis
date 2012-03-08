@@ -578,7 +578,7 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
-		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
+		ni.data = malloc( image.getMaxBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
 		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::vector4<size_t> isize = image.getSizeAsVector();
@@ -598,7 +598,7 @@ private:
 		}
 
 		// data dependent information added
-		ni.nbyper = image.getBytesPerVoxel();
+		ni.nbyper = image.getMaxBytesPerVoxel();
 		std::pair<double, double> minmax = image.getMinMaxAs<double>();
 		ni.cal_min = minmax.first;
 		ni.cal_max = minmax.second;
@@ -615,7 +615,7 @@ private:
 	}
 	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {
 		//all the other information for the nifti header
-		BOOST_ASSERT( data::Image::dims == 4 );
+		BOOST_STATIC_ASSERT( data::Image::dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
 

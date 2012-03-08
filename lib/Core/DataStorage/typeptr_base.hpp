@@ -29,13 +29,14 @@ namespace isis
 {
 namespace data
 {
+/// @cond _internal
 namespace _internal
 {
 class ConstValueAdapter: public util::ValueReference
 {
 public:
 	typedef const util::ValueReference ( *Getter )( const void * );
-	typedef void ( *Setter )( void *, const util::_internal::ValueBase & );
+	typedef void ( *Setter )( void *, const util::ValueBase & );
 protected:
 	const uint8_t *const p;
 public:
@@ -118,9 +119,12 @@ public:
 template<> GenericValueIterator<true>::reference GenericValueIterator<true>::operator*() const;
 template<> GenericValueIterator<false>::reference GenericValueIterator<false>::operator*() const;
 
+} //namespace _internal
+/// @endcond _internal
+
 class ValuePtrBase : public util::_internal::GenericValue
 {
-	friend class util::_internal::ValueReference<ValuePtrBase>;
+	friend class util::_internal::GenericReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();
 	scaling_pair getScaling( const scaling_pair &scale, unsigned short ID )const;
 protected:
@@ -131,8 +135,8 @@ protected:
 	virtual ValuePtrBase *clone()const = 0;
 
 public:
-	typedef GenericValueIterator<false> value_iterator;
-	typedef GenericValueIterator<true> const_value_iterator;
+	typedef _internal::GenericValueIterator<false> value_iterator;
+	typedef _internal::GenericValueIterator<true> const_value_iterator;
 	typedef value_iterator value_reference;
 	typedef const_value_iterator const_value_reference;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
@@ -166,8 +170,8 @@ public:
 	virtual const_value_iterator beginGeneric()const = 0;
 	const_value_iterator endGeneric()const;
 
-	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
-	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
+	typedef util::_internal::GenericReference<ValuePtrBase> Reference;
+	typedef _internal::ValuePtrConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -226,7 +230,7 @@ public:
 	 * \param dst the ValuePtr-object to copy into
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	bool copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
+	bool copyTo( isis::data::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
 
 	/**
 	 * Copies elements from this into raw memory.
@@ -335,7 +339,11 @@ public:
 	/**
 	 * Get minimum/maximum of a ValuePtr.
 	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.
-	 * The computes min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
+	 * This actually returns the bounding box of the values in the value space of the type. This means:
+	 * - min/max numbers for numbers from a 1-D value space (aka real numbers)
+	 * - complex(lowest real value,lowest imaginary value) / complex(biggest real value,biggest imaginary value) for complex numbers
+	 * - color(lowest red value,lowest green value, lowest blue value)/color(biggest red value,biggest green value, biggest blue value) for color
+	 * The computed min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
 	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
 	 * \code
 	 * std::pair<util::ValueReference,util::ValueReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
@@ -352,16 +360,16 @@ public:
 	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
 	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
 	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
-	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
+	 * \param end the first element in this, which should _not_ be compared anymore to the given TyprPtr
 	 * \param dst the given ValuePtr this should be compared to
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
 	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
 	size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const;
 };
-}
 
-typedef _internal::ValuePtrBase::Reference ValuePtrReference;
+
+typedef ValuePtrBase::Reference ValuePtrReference;
 
 }
 }

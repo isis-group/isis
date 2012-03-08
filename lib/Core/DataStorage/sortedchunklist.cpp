@@ -22,6 +22,7 @@
 
 #include "sortedchunklist.hpp"
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -45,8 +46,8 @@ bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const 
 }
 bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::_internal::ValueBase &aScal = *a;
-	const util::_internal::ValueBase &bScal = *b;
+	const util::ValueBase &aScal = *a;
+	const util::ValueBase &bScal = *b;
 
 	if ( aScal.lt( bScal ) ) {
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aScal.toString( false ) << " before " << bScal.toString( false ) << ")";
@@ -272,3 +273,4 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 }
 }
 }
+/// @endcond _internal

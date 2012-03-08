@@ -9,7 +9,7 @@ namespace isis
 {
 namespace data
 {
-#pragma GCC visibility push(hidden)
+/// @cond _internal
 namespace _internal
 {
 
@@ -74,7 +74,7 @@ template<typename TYPE, size_t SIZE> struct EndianSwapper<util::FixedVector<TYPE
 	}
 };
 } //_internal
-#pragma GCC visibility pop
+/// @endcond _internal
 
 // public interface
 template<typename T> static  T endianSwap( const T &var )

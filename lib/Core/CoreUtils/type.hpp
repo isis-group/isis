@@ -22,19 +22,16 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
 
 template<class TYPE > class Value;
 
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 
-/// @cond _hidden
 /**
  * Generic value comparison class for Value.
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
@@ -144,8 +141,9 @@ public: // c++11 says we need a user defined constructor here
 	type_greater() {}
 };
 
-/// @endcond _hidden
 }
+/// @endcond _internal
+API_EXCLUDE_END
 
 /**
  * Generic class for type aware variables.
@@ -158,7 +156,7 @@ public: // c++11 says we need a user defined constructor here
  * limitations see type_converter.hpp
  */
 
-template<typename TYPE> class Value: public _internal::ValueBase
+template<typename TYPE> class Value: public ValueBase
 {
 	TYPE m_val;
 	static const char m_typeName[];
@@ -169,7 +167,7 @@ protected:
 public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
 	Value(): m_val() {
-		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
+		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
 	}
 	/**
@@ -181,7 +179,7 @@ public:
 	 */
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
-		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
+		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
 	}
 	/**
@@ -258,7 +256,7 @@ public:
 	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
-	bool gt( const _internal::ValueBase &ref )const {
+	bool gt( const ValueBase &ref )const {
 		static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
 		return greater.operator()( *this, ref );
 	}
@@ -272,7 +270,7 @@ public:
 	 * \retval true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
-	bool lt( const _internal::ValueBase &ref )const {
+	bool lt( const ValueBase &ref )const {
 		static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
 		return less( *this, ref );
 	}
@@ -286,7 +284,7 @@ public:
 	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
-	bool eq( const _internal::ValueBase &ref )const {
+	bool eq( const ValueBase &ref )const {
 		static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;
 		return equal( *this, ref );
 	}
@@ -294,35 +292,34 @@ public:
 	virtual ~Value() {}
 };
 
-template<typename T> const util::Value<T>& _internal::ValueBase::castToType() const
+template<typename T> const util::Value<T>& ValueBase::castToType() const
 {
 	checkType<T>();
 	return m_cast_to<util::Value<T> >();
 }
-template<typename T> const T &_internal::ValueBase::castTo() const
+template<typename T> const T &ValueBase::castTo() const
 {
 	const util::Value<T> &ret = castToType<T>();
 	return ret.operator const T & ();
 }
-template<typename T> util::Value<T>& _internal::ValueBase::castToType()
+template<typename T> util::Value<T>& ValueBase::castToType()
 {
 	checkType<T>();
 	return m_cast_to<util::Value<T> >();
 }
-template<typename T> T &_internal::ValueBase::castTo()
+template<typename T> T &ValueBase::castTo()
 {
 	util::Value<T> &ret = castToType<T>();
 	return ret.operator T & ();
 }
 
-template<typename T> bool _internal::ValueBase::is()const
+template<typename T> bool ValueBase::is()const
 {
 	checkType<T>();
 	return getTypeID() == util::Value<T>::staticID;
 }
 
 }
-/// @}
 }
 
 #endif //DATATYPE_INC

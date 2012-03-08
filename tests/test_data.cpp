@@ -37,7 +37,7 @@ int main()
 	//  iUtil::DefaultMsgPrint::stopBelow(warning);
 	Value<float> float_0_5( 0.5 );//will implicitly convert the double to float
 	std::cout << "float_0_5.toString():" <<  float_0_5.toString() << std::endl;
-	::isis::util::_internal::ValueBase *mephisto = new Value<std::string>( "666" );
+	::isis::util::ValueBase *mephisto = new Value<std::string>( "666" );
 	int devil = mephisto->as<int>();
 	std::string lucifer = mephisto->as<std::string>();
 

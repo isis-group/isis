@@ -25,16 +25,12 @@
 
 namespace isis
 {
-/*! \addtogroup util
-    *  Additional documentation for group `mygrp'
-    *  @{
-    */
 namespace util
 {
-
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
-/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
@@ -60,7 +56,9 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 		return value; //special version types are same - so just return the value
 	}
 };
+}
 /// @endcond
+API_EXCLUDE_END
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
@@ -68,10 +66,10 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
  * Both are derived from GenericValue containing the description of the actual value type.
  */
 
-class ValueBase : public GenericValue
+class ValueBase : public _internal::GenericValue
 {
-	static const ValueConverterMap &converters();
-	friend class ValueReference<ValueBase>;
+	static const _internal::ValueConverterMap &converters();
+	friend class _internal::GenericReference<ValueBase>;
 protected:
 	/**
 	* Create a copy of this.
@@ -81,8 +79,8 @@ protected:
 	*/
 	virtual ValueBase *clone()const = 0;
 public:
-	typedef ValueReference<ValueBase> Reference;
-	typedef ValueConverterMap::mapped_type::mapped_type Converter;
+	typedef _internal::GenericReference<ValueBase> Reference;
+	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -173,16 +171,14 @@ public:
 
 	virtual ~ValueBase();
 
-	virtual bool gt( const _internal::ValueBase &ref )const = 0;
-	virtual bool lt( const _internal::ValueBase &ref )const = 0;
-	virtual bool eq( const _internal::ValueBase &ref )const = 0;
+	virtual bool gt( const ValueBase &ref )const = 0;
+	virtual bool lt( const ValueBase &ref )const = 0;
+	virtual bool eq( const ValueBase &ref )const = 0;
 };
 
-}
 
-typedef _internal::ValueBase::Reference ValueReference;
+typedef ValueBase::Reference ValueReference;
 
-/// }@
 }
 }
 
@@ -196,7 +192,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::Gene
 }
 /// /// Streaming output for Value referencing classes
 template<typename charT, typename traits, typename TYPE_TYPE> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::ValueReference<TYPE_TYPE> &s )
+operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericReference<TYPE_TYPE> &s )
 {
 	return out << s.toString( true );
 }

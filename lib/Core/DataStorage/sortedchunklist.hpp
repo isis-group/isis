@@ -24,6 +24,7 @@
 #include <stack>
 #include <boost/shared_ptr.hpp>
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -110,5 +111,6 @@ public:
 }
 }
 }
+/// @endcond _internal
 
 #endif // SORTEDCHUNKLIST_HPP

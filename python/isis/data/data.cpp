@@ -31,7 +31,7 @@ BOOST_PYTHON_MODULE ( _data )
 	//  IOApplication
 	//#######################################################################################
 	class_<isis::data::IOApplication, _IOApplication, bases< isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
-	.def ( "autoload", &isis::data::IOApplication::autoload )
+	.def ( "autoload", &_IOApplication::_autoload )
 	.def ( "autowrite", ( bool ( ::IOApplication:: * ) ( std::list<isis::data::Image>, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg ( "imageList" ), arg ( "exitOnError" ) ) )
 	.def ( "autowrite", ( bool ( ::IOApplication:: * ) ( isis::data::Image, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg ( "image" ), arg ( "exitOnError" ) ) )
 	//wrappings for standard values
@@ -98,7 +98,7 @@ BOOST_PYTHON_MODULE ( _data )
 	.def ( "insertChunk", &isis::data::Image::insertChunk )
 	.def ( "reIndex", &isis::data::Image::reIndex )
 	.def ( "isEmpty", &isis::data::Image::isEmpty )
-	.def ( "bytesPerVoxel", &isis::data::Image::getBytesPerVoxel )
+	.def ( "bytesPerVoxel", &isis::data::Image::getMaxBytesPerVoxel )
 	.def ( "getMin", &_Image::_getMin )
 	.def ( "getMax", &_Image::_getMax )
 	.def ( "compare", &isis::data::Image::compare )

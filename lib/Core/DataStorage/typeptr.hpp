@@ -35,23 +35,17 @@ namespace data
 
 namespace _internal
 {
-/// @cond _hidden
-template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
-	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
-		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
-		return std::pair<T, T>();
-	}
-};
-template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
+/// @cond _internal
+template<typename T, uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_MPL_ASSERT_RELATION( std::numeric_limits<T>::has_denorm, != , std::denorm_indeterminate ); //well we're pretty f**ed in this case
+	BOOST_STATIC_ASSERT( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
 		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
 	);
 	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
 
-	for ( const T *i = data; i < data + len; ++i ) {
+	for ( const T *i = data; i < data + len; i += STEPSIZE ) {
 		if(
 			std::numeric_limits<T>::has_infinity &&
 			( *i == std::numeric_limits<T>::infinity() || *i == -std::numeric_limits<T>::infinity() )
@@ -71,21 +65,53 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 // specialize calcMinMax for (u)int(8,16,32)_t /
 ////////////////////////////////////////////////
 
-template<> std::pair< uint8_t,  uint8_t> calcMinMax( const  uint8_t *data, size_t len );
-template<> std::pair<uint16_t, uint16_t> calcMinMax( const uint16_t *data, size_t len );
-template<> std::pair<uint32_t, uint32_t> calcMinMax( const uint32_t *data, size_t len );
+template<> std::pair< uint8_t,  uint8_t> calcMinMax< uint8_t, 1>( const  uint8_t *data, size_t len );
+template<> std::pair<uint16_t, uint16_t> calcMinMax<uint16_t, 1>( const uint16_t *data, size_t len );
+template<> std::pair<uint32_t, uint32_t> calcMinMax<uint32_t, 1>( const uint32_t *data, size_t len );
 
-template<> std::pair< int8_t,  int8_t> calcMinMax( const  int8_t *data, size_t len );
-template<> std::pair<int16_t, int16_t> calcMinMax( const int16_t *data, size_t len );
-template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t len );
+template<> std::pair< int8_t,  int8_t> calcMinMax< int8_t, 1>( const  int8_t *data, size_t len );
+template<> std::pair<int16_t, int16_t> calcMinMax<int16_t, 1>( const int16_t *data, size_t len );
+template<> std::pair<int32_t, int32_t> calcMinMax<int32_t, 1>( const int32_t *data, size_t len );
 #endif //__SSE2__
+
+API_EXCLUDE_BEGIN
+template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
+	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
+		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
+		return std::pair<T, T>();
+	}
+};
 
 template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		return calcMinMax( &ref[0], ref.getLength() );
+		return calcMinMax<T, 1>( &ref[0], ref.getLength() );
+	}
+};
+
+template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic min-max for color (get bounding box in color space)
+	std::pair<util::color<T> , util::color<T> > operator()( const ValuePtr<util::color<T> > &ref ) const {
+		std::pair<util::color<T> , util::color<T> > ret;
+
+		for( uint_fast8_t i = 0; i < 3; i++ ) {
+			const std::pair<T, T> buff = calcMinMax<T, 3>( &ref[0].r + i, ref.getLength() * 3 );
+			*( &ret.first.r + i ) = buff.first;
+			*( &ret.second.r + i ) = buff.second;
+		}
+
+		return ret;
+	}
+};
+template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
+	std::pair<std::complex<T> , std::complex<T> > operator()( const ValuePtr<std::complex<T> > &ref ) const {
+		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
+		const std::pair<T, T > real = calcMinMax<T, 2>( &ref[0].real(), ref.getLength() * 2 );
+		const std::pair<T, T > imag = calcMinMax<T, 2>( &ref[0].imag(), ref.getLength() * 2 );
+
+		return std::make_pair( std::complex<T>( real.first, imag.first ), std::complex<T>( real.second, imag.second ) );
 	}
 };
 /// @endcond
+API_EXCLUDE_END
 
 /**
  * Basic iterator for ValuePtr.
@@ -141,13 +167,13 @@ public:
  * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
  * The usual pointer dereferencing interface ("*", "->" and "[]") is supported.
  */
-template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
+template<typename TYPE> class ValuePtr: public ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 	static const util::ValueReference getValueFrom( const void *p ) {
 		return util::Value<TYPE>( *reinterpret_cast<const TYPE *>( p ) );
 	}
-	static void setValueInto( void *p, const util::_internal::ValueBase &val ) {
+	static void setValueInto( void *p, const util::ValueBase &val ) {
 		*reinterpret_cast<TYPE *>( p ) = val.as<TYPE>();
 	}
 protected:
@@ -183,7 +209,7 @@ public:
 	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
 	 * \param length amount of elements in the new array
 	 */
-	ValuePtr( size_t length ): _internal::ValuePtrBase( length ) {
+	ValuePtr( size_t length ): ValuePtrBase( length ) {
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
@@ -199,7 +225,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr ) {}
+	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValuePtrBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -208,7 +234,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( TYPE *const ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValuePtr( TYPE *const ptr, size_t length ): ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -220,7 +246,7 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): _internal::ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
@@ -344,12 +370,12 @@ public:
 		}
 	}
 };
-/// @cond _hidden
+/// @cond _internal
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 /// @endcond
-template<typename T> bool _internal::ValuePtrBase::is()const
+template<typename T> bool ValuePtrBase::is()const
 {
 	util::checkType<T>();
 	return getTypeID() == ValuePtr<T>::staticID;

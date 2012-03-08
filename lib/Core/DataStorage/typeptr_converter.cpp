@@ -43,6 +43,7 @@ namespace isis
 {
 namespace data
 {
+API_EXCLUDE_BEGIN
 namespace _internal
 {
 
@@ -53,12 +54,146 @@ size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst )
 	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
 	return std::min( src.getLength(), dst.getLength() );
 }
+static bool checkScale( const scaling_pair &scaling )
+{
+	assert( !scaling.first.isEmpty() && !scaling.first.isEmpty() );
+	const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
+	LOG_IF( scale < 1, Runtime, warning ) << "Downscaling your values by Factor " << scaling.first->as<double>() << " you might lose information.";
+	return ( scale != 1 || offset );
+}
+
+template<typename SRC, typename DST>
+scaling_pair getScalingToColor( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )
+{
+	double scalMin, scalMax;
+
+	if( min.isFloat() || min.isInteger() )scalMin = min.as<double>(); // if min is allready a scalar
+	else { // of not, determine the scalar min from the elements
+		const util::color48 minCol = min.as<util::color48>(); //use the "biggest" known color type
+		scalMin = *std::min_element( &minCol.r, &minCol.b ); // take the lowest value
+	}
+
+	if( max.isFloat() || max.isInteger() )scalMax = max.as<double>(); // if max is allready a scalar
+	else { // of not, determine the scalar min from the elements
+		const util::color48 maxCol = max.as<util::color48>(); //use the "biggest" known color type
+		scalMax = *std::max_element( &maxCol.r, &maxCol.b ); // take the lowest value
+	}
+
+	const std::pair<double, double> scale = getNumericScaling<SRC, DST>( util::Value<double>( scalMin ), util::Value<double>( scalMax ), scaleopt );
+
+	return std::make_pair(
+			   util::ValueReference( util::Value<double>( scale.first ) ),
+			   util::ValueReference( util::Value<double>( scale.second ) )
+		   );
+}
+template<typename SRC, typename DST>
+scaling_pair getScalingToComplex( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )
+{
+	double scalMin, scalMax;
+
+	if( min.isFloat() || min.isInteger() )scalMin = min.as<double>(); // if min is allready a scalar
+	else { // of not, determine the scalar min from the elements
+		const std::complex<double> minCpl = min.as<std::complex<double> >(); //use the "biggest" known color type
+		scalMin = *std::min_element( &minCpl.real(), &minCpl.imag() ); // take the lowest value
+	}
+
+	if( max.isFloat() || max.isInteger() )scalMax = max.as<double>(); // if max is allready a scalar
+	else { // of not, determine the scalar min from the elements
+		const std::complex<double> maxCpl = max.as<std::complex<double> >(); //use the "biggest" known color type
+		scalMax = *std::max_element( &maxCpl.real(), &maxCpl.imag() ); // take the lowest value
+	}
+
+	const std::pair<double, double> scale = getNumericScaling<SRC, DST>( util::Value<double>( scalMin ), util::Value<double>( scalMax ), scaleopt );
+
+	return std::make_pair(
+			   util::ValueReference( util::Value<double>( scale.first ) ),
+			   util::ValueReference( util::Value<double>( scale.second ) )
+		   );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// basic numeric conversion class
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct NumConvImplBase {
+	static scaling_pair getScaling( const util::ValueBase &/*min*/, const util::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ ) {
+		return scaling_pair( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) ) );
+	}
+};
+// default generic conversion between numeric types
+template<typename SRC, typename DST, bool SAME> struct NumConvImpl: NumConvImplBase {
+	static void convert( const SRC *src, DST *dst, const scaling_pair &scaling, size_t size ) {
+		checkScale( scaling );
+		const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
+		numeric_convert( src, dst, size, scale , offset );
+	}
+	static scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt ) {
+		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
+		return std::make_pair(
+				   util::ValueReference( util::Value<double>( scale.first ) ),
+				   util::ValueReference( util::Value<double>( scale.second ) )
+			   );
+	}
+};
+// special generic conversion between equal numeric types (maybe we can copy / scaling will be 1/0)
+template<typename T> struct NumConvImpl<T, T, true>: NumConvImplBase {
+	static void convert( const T *src, T *dst, const scaling_pair &scaling, size_t size ) {
+		if( checkScale( scaling ) ) {
+			const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
+			numeric_convert( src, dst, size, scale , offset );
+		} else { // if there is no scaling - we can copy
+			numeric_copy( src, dst, size );
+		}
+	}
+};
+
+// specialisation for bool
+template<typename SRC> struct NumConvImpl<SRC, bool, false>: NumConvImplBase {
+	static void convert( const SRC *src, bool *dst, const scaling_pair &/*scaling*/, size_t size ) {
+		while( size-- )
+			*( dst++ ) = ( *( src++ ) != 0 );
+	}
+};
+template<typename DST> struct NumConvImpl<bool, DST, false>: NumConvImplBase {
+	static void convert( const bool *src, DST *dst, const scaling_pair &/*scaling*/, size_t size ) {
+		while( size-- )
+			*( dst++ ) = *( src++ ) ? 1 : 0 ;
+	}
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// scalar to container functors
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename S, typename D> struct copy_op_base {
+	typedef D dst_type;
+	typedef typename ValuePtr<S>::const_iterator iter_type;
+	iter_type s;
+	copy_op_base( iter_type _s ): s( _s ) {}
+	D getScal() {
+		return round<D>( *( s++ ) );
+	}
+};
+template<typename S, typename D> struct scaling_op_base : copy_op_base<S, D> {
+	double scale, offset;
+	scaling_op_base( typename copy_op_base<S, D>::iter_type s ): copy_op_base<S, D>( s ) {}
+	void setScale( scaling_pair scaling ) {
+		scale = scaling.first->as<double>();
+		offset = scaling.second->as<double>();
+	}
+	D getScal() {
+		return round<D>( *( copy_op_base<S, D>::s++ ) * scale + offset );
+	}
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// OK, now the converter classes
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //default implementation of ValuePtrConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling
-scaling_pair ValuePtrConverterBase::getScaling( const isis::util::_internal::ValueBase & /*min*/, const isis::util::_internal::ValueBase & /*max*/, autoscaleOption /*scaleopt*/ ) const
+scaling_pair ValuePtrConverterBase::getScaling( const isis::util::ValueBase &min, const isis::util::ValueBase &max, autoscaleOption scaleopt ) const
 {
-	static const scaling_pair ret( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) ) );
-	return ret;
+	return NumConvImplBase::getScaling( min, max, scaleopt );
 }
 
 //Define generator - this can be global because its using convert internally
@@ -86,48 +221,29 @@ void ValuePtrConverterBase::convert( const ValuePtrBase &src, ValuePtrBase &dst,
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing and returns 1/0 as scaling
 /////////////////////////////////////////////////////////////////////////////
-template<bool NUMERIC, bool SAME, typename SRC, typename DST> class ValuePtrConverter : public ValuePtrGenerator<SRC, DST>
+template<bool SRC_NUM, bool DST_NUM, typename SRC, typename DST> class ValuePtrConverter : public ValuePtrGenerator<SRC, DST>
 {
 public:
 	virtual ~ValuePtrConverter() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// trivial version -- for conversion of the same type
+// trivial version -- for conversion of the same non numeric type (scaling will fail)
 /////////////////////////////////////////////////////////////////////////////
-// numeric values (use numeric_copy - that can do scaling)
-template<typename SRC, typename DST> class ValuePtrConverter<true, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
+template<typename SRC, typename DST> class ValuePtrConverter<false, false, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<true, true, SRC, DST> *ret = new ValuePtrConverter<true, true, SRC, DST>;
+		ValuePtrConverter<false, false, SRC, DST> *ret = new ValuePtrConverter<false, false, SRC, DST>;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running copy with invalid scaling (" << scaling << ") this won't work";
-		numeric_copy( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
-	}
-	virtual ~ValuePtrConverter() {}
-};
-// non numeric values (scaling will fail)
-template<typename SRC, typename DST> class ValuePtrConverter<false, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
-{
-	ValuePtrConverter() {
-		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<false, true, SRC, DST> *ret = new ValuePtrConverter<false, true, SRC, DST>;
-		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
-	}
-	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		static const util::Value<uint8_t> one( 1 ), zero( 0 );
 		SRC *dstPtr = &dst.castToValuePtr<SRC>()[0];
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
-		LOG_IF( !( scaling.first->eq( one ) && scaling.second->eq( zero ) ), Runtime, error ) << "Scaling is ignored when copying data of type " << src.getTypeName();
+		LOG_IF( checkScale( scaling ),  Runtime, error )  << "Scaling is ignored when copying data of type "  << src.getTypeName() << " to " << dst.getTypeName() ;
 		memcpy( dstPtr, srcPtr, getConvertSize( src, dst )*src.bytesPerElem() );
 	}
 	virtual ~ValuePtrConverter() {}
@@ -135,78 +251,31 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
-// VC90 thinks bool is numeric - so tell him it isn't
-/////////////////////////////////////////////////////////////////////////////
-template<typename SRC> class ValuePtrConverter<true, false, SRC, bool> : public ValuePtrGenerator<SRC, bool>
-{
-	ValuePtrConverter() {
-		LOG( Debug, verbose_info )  << "Creating to-boolean converter for " << ValuePtr<SRC>::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<true, false, SRC, bool> *ret = new ValuePtrConverter<true, false, SRC, bool>;
-		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
-	}
-	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
-		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
-		bool *dstPtr = &dst.castToValuePtr<bool>()[0];
-		size_t i = getConvertSize( src, dst );
-
-		while( i-- )
-			*( dstPtr++ ) = ( *( srcPtr++ ) != 0 );
-	}
-	virtual ~ValuePtrConverter() {}
-};
-template<typename DST> class ValuePtrConverter<true, false, bool, DST> : public ValuePtrGenerator<bool, DST>
-{
-	ValuePtrConverter() {
-		LOG( Debug, verbose_info )  << "Creating from-boolean converter for " << ValuePtr<DST>::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<true, false, bool, DST> *ret = new ValuePtrConverter<true, false, bool, DST>;
-		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
-	}
-	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
-		const bool *srcPtr = &src.castToValuePtr<bool>()[0];
-		DST *dstPtr = &dst.castToValuePtr<DST>()[0];
-		size_t i = getConvertSize( src, dst );
-
-		while( i-- )
-			*( dstPtr++ ) = *( srcPtr++ ) ? 1 : 0 ;
-	}
-	virtual ~ValuePtrConverter() {}
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses numeric_convert
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class ValuePtrConverter<true, false, SRC, DST> : public ValuePtrGenerator<SRC, DST>
+template<typename SRC, typename DST> class ValuePtrConverter<true, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info ) << "Creating numeric converter from " << ValuePtr<SRC>::staticName() << " to " << ValuePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
-		ValuePtrConverter<true, false, SRC, DST> *ret = new ValuePtrConverter<true, false, SRC, DST>;
+		ValuePtrConverter<true, true, SRC, DST> *ret = new ValuePtrConverter<true, true, SRC, DST>;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		numeric_convert( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
+		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
+		DST *dstPtr = &dst.castToValuePtr<DST>()[0];
+		NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value>::convert( srcPtr, dstPtr, scaling, getConvertSize( src, dst ) );
 	}
-	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
-		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
-		return std::make_pair(
-				   util::ValueReference( util::Value<double>( scale.first ) ),
-				   util::ValueReference( util::Value<double>( scale.second ) )
-			   );
+	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value >::getScaling( min, max, scaleopt );
 	}
 	virtual ~ValuePtrConverter() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// complex version
+// complex to complex version
 /////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST> class ValuePtrConverter<false, false, std::complex<SRC>, std::complex<DST> > : public ValuePtrGenerator<std::complex<SRC>, std::complex<DST> >
 {
@@ -221,19 +290,132 @@ public:
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		LOG_IF( scaling.first->as<float>() != 1 || scaling.second->as<float>() != 0, Debug, warning ) << "Sorry scaling of complex values is not supportet yet";
+		//we do an evil hack here assuming std::complex is POD - at least check if the size of std::complex is reasonable
+		BOOST_STATIC_ASSERT( sizeof( std::complex<SRC> ) == sizeof( SRC ) * 2 );
+		BOOST_STATIC_ASSERT( sizeof( std::complex<DST> ) == sizeof( DST ) * 2 );
 
-		const std::complex<SRC> *sp = &src.castToValuePtr<std::complex<SRC> >()[0];
-		const std::complex<SRC> *end = sp + _internal::getConvertSize( src, dst );
-		std::complex<DST> *dp = &dst.castToValuePtr<std::complex<DST> >()[0];
+		const SRC *sp = &src.castToValuePtr<std::complex<SRC> >().begin()->real();
+		DST *dp = &dst.castToValuePtr<std::complex<DST> >().begin()->real();
 
-		while( sp != end ) {
-			*dp = std::complex<DST>( _internal::round<DST>( sp->real() ), _internal::round<DST>( sp->imag() ) );
-			++sp;
-			++dp;
+		NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value>::convert( sp, dp, scaling, getConvertSize( src, dst ) * 2 );
+	}
+	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToComplex<SRC, DST>( min, max, scaleopt );
+	}
+	virtual ~ValuePtrConverter() {}
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// numeric to complex version
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValuePtrConverter<true, false, SRC, std::complex<DST> > : public ValuePtrGenerator<std::complex<SRC>, std::complex<DST> >
+{
+	ValuePtrConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating converter from scalar "
+				<< ValuePtr<SRC>::staticName() << " complex to " << ValuePtr<std::complex<DST> >::staticName();
+	};
+	template<typename BASE> struct num2complex: BASE {
+		num2complex( typename BASE::iter_type s ): BASE( s ) {}
+		std::complex<typename BASE::dst_type> operator()() {
+			return BASE::getScal();
+		}
+	};
+public:
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<true, false, SRC, std::complex<DST> > *ret = new ValuePtrConverter<true, false, SRC, std::complex<DST> >;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
+	}
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+
+		size_t size = getConvertSize( src, dst );
+		typename ValuePtr<SRC>::const_iterator s = src.castToValuePtr<SRC>().begin();
+		typename ValuePtr<std::complex<DST> >::iterator d = dst.castToValuePtr<std::complex<DST> >().begin();
+
+		if( checkScale( scaling ) ) {
+			num2complex<scaling_op_base<SRC, DST> > op( s );
+			op.setScale( scaling );
+			std::generate_n( d, size, op );
+		} else { // if there is no scaling - we can copy
+			num2complex<copy_op_base<SRC, DST> > op( s );
+			std::generate_n( d, size, op );
+		}
+
+	}
+	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToComplex<SRC, DST>( min, max, scaleopt );
+	}
+	virtual ~ValuePtrConverter() {}
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// color to color version - using numeric_convert on each color with a global scaling
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> > : public ValuePtrGenerator<util::color<SRC>, util::color<DST> >
+{
+	ValuePtrConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating color converter from "
+				<< ValuePtr<util::color<SRC> >::staticName() << " to " << ValuePtr<util::color<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> > *ret = new ValuePtrConverter<false, false, util::color<SRC>, util::color<DST> >;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
+	}
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+		const SRC *sp = &src.castToValuePtr<util::color<SRC> >().begin()->r;
+		DST *dp = &dst.castToValuePtr<util::color<DST> >().begin()->r;
+		NumConvImpl<SRC, DST, false>::convert( sp, dp, scaling, getConvertSize( src, dst ) * 3 );
+	}
+	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToColor<SRC, DST>( min, max, scaleopt );
+	}
+
+	virtual ~ValuePtrConverter() {}
+};
+/////////////////////////////////////////////////////////////////////////////
+// numeric to color version
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValuePtrConverter<true, false, SRC, util::color<DST> > : public ValuePtrGenerator<util::color<SRC>, util::color<DST> >
+{
+	ValuePtrConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating converter from scalar "
+				<< ValuePtr<SRC >::staticName() << " to color " << ValuePtr<util::color<DST> >::staticName();
+	};
+	template<typename BASE> struct num2color: BASE {
+		num2color( typename BASE::iter_type s ): BASE( s ) {}
+		util::color<typename BASE::dst_type> operator()() {
+			const typename BASE::dst_type val = BASE::getScal();
+			const util::color<typename BASE::dst_type> ret = {val, val, val};
+			return ret;
+		}
+	};
+
+public:
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<true, false, SRC, util::color<DST> > *ret = new ValuePtrConverter<true, false, SRC, util::color<DST> >;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
+	}
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+		size_t size = getConvertSize( src, dst );
+		typename ValuePtr<SRC>::const_iterator s = src.castToValuePtr<SRC>().begin();
+		typename ValuePtr<util::color<DST> >::iterator d = dst.castToValuePtr<util::color<DST> >().begin();
+
+		if( checkScale( scaling ) ) {
+			num2color<scaling_op_base<SRC, DST> > op( s );
+			op.setScale( scaling );
+			std::generate_n( d, size, op );
+		} else { // if there is no scaling - we can copy
+			num2color<copy_op_base<SRC, DST> > op( s );
+			std::generate_n( d, size, op );
 		}
 	}
+	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+		return getScalingToColor<SRC, DST>( min, max, scaleopt );
+	}
+
 	virtual ~ValuePtrConverter() {}
 };
 
@@ -248,10 +430,8 @@ template<typename SRC> struct inner_ValuePtrConverter {
 	inner_ValuePtrConverter( std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValuePtrConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
-		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const ValuePtrConverterBase> conv =
-			ValuePtrConverter<is_num::value, is_same::value, SRC, DST>::get();
+			ValuePtrConverter<boost::is_arithmetic<SRC>::value, boost::is_arithmetic<DST>::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( ValuePtr<DST>::staticID, conv ) );
 	}
@@ -267,7 +447,6 @@ struct outer_ValuePtrConverter {
 		);
 	}
 };
-/// @endcond
 
 ValuePtrConverterMap::ValuePtrConverterMap()
 {
@@ -281,6 +460,8 @@ ValuePtrConverterMap::ValuePtrConverterMap()
 }
 
 }
+API_EXCLUDE_END
 }
 }
+/// @endcond
 

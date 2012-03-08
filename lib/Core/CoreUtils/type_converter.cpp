@@ -40,18 +40,9 @@ namespace isis
 {
 namespace util
 {
+API_EXCLUDE_BEGIN
 namespace _internal
 {
-
-// define special string conversions
-template<typename T> std::string toStringConv( const T &src )
-{
-	std::stringstream s;
-	s << std::boolalpha << src; // bool will be converted to true/false
-	return s.str();
-}
-template<> std::string toStringConv<uint8_t>( const uint8_t &src ) {return toStringConv( static_cast<uint16_t>( src ) );}
-template<> std::string toStringConv<int8_t> ( const  int8_t &src ) {return toStringConv( static_cast< int16_t>( src ) );}
 
 //Define generator - this can be global because its using convert internally
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
@@ -109,9 +100,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// Numeric version -- uses boost::numeric_cast
+// some helper
 /////////////////////////////////////////////////////////////////////////////
-struct NumericOverflowHandler { //@todo this is NOT thread-safe
+
+// global numeric overflow handler @todo this is NOT thread-safe
+struct NumericOverflowHandler {
 	static boost::numeric::range_check_result result;
 	void operator() ( boost::numeric::range_check_result r ) { // throw bad_numeric_conversion derived
 		result = r;
@@ -119,6 +112,147 @@ struct NumericOverflowHandler { //@todo this is NOT thread-safe
 };
 boost::numeric::range_check_result NumericOverflowHandler::result = boost::numeric::cInRange;
 
+// basic numeric to numeric conversion (does runding and handles overlow)
+template<typename SRC, typename DST> boost::numeric::range_check_result num2num( const SRC &src, DST &dst )
+{
+	typedef boost::numeric::converter <
+	DST, SRC,
+	   boost::numeric::conversion_traits<DST, SRC>,
+	   NumericOverflowHandler,
+	   boost::numeric::RoundEven<SRC>
+	   > converter;
+	NumericOverflowHandler::result = boost::numeric::cInRange;
+	dst = converter::convert( src );
+	return NumericOverflowHandler::result;
+}
+
+template<typename DST> boost::numeric::range_check_result str2scalar( const std::string &src, DST &dst )
+{
+	try {
+		if( boost::is_arithmetic<DST>::value ) { // if a converter from double is available first map to double and then convert that into DST
+			return num2num<double, DST>( Value<double>( src ), dst );
+		} else { // otherwise try direct mapping (rounding will fail)
+			LOG( Debug, warning ) << "using lexical_cast to convert from string to "
+								  << Value<DST>::staticName() << " no rounding can be done.";
+			dst = boost::lexical_cast<DST>( src );
+		}
+	} catch( const boost::bad_lexical_cast & ) {
+		dst = DST();
+		LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( src ) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST() );
+	}
+
+	return boost::numeric::cInRange;
+}
+//this is trivial
+template<> boost::numeric::range_check_result str2scalar<std::string>( const std::string &src, std::string &dst )
+{
+	dst = src;
+	return boost::numeric::cInRange;
+}
+// needs special handling
+template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptime>( const std::string &src, boost::posix_time::ptime &dst )
+{
+	dst = boost::posix_time::time_from_string( src.c_str() ); //first try "2002-01-20 23:59:59.000"
+
+	if( dst.is_not_a_date_time() ) // try iso formatting
+		dst = boost::posix_time::from_iso_string( src.c_str() );
+
+	LOG_IF( dst.is_not_a_date_time(), Runtime, error ) // if its still broken at least tell the user
+			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
+	return boost::numeric::cInRange;
+}
+// this as well (interpret everything like true/false yes/no y/n)
+template<> boost::numeric::range_check_result str2scalar<bool>( const std::string &src, bool &dst )
+{
+	const std::string srcVal = boost::algorithm::to_lower_copy<std::string>( src );
+
+	if (  srcVal == "true" || srcVal == "y" || srcVal == "yes" ) {
+		dst = true;
+	} else if ( srcVal == "false" || srcVal == "n" || srcVal == "no" ) {
+		dst = false;
+	} else {
+		LOG( Runtime, warning ) << util::MSubject( src ) << " is ambiguous while converting to " << Value<bool>::staticName();
+		return boost::numeric::cPosOverflow;
+	}
+
+	return boost::numeric::cInRange;
+}
+//and this (lexical_cast doesnt work here, because it creates a temporary buffer which will screw our dst)
+template<> boost::numeric::range_check_result str2scalar<Selection>( const std::string &src, Selection &dst )
+{
+	if ( dst.set( src.c_str() ) )
+		return boost::numeric::cInRange;
+	else
+		return boost::numeric::cPosOverflow; //if the string is not "part" of the selection we count this as positive overflow
+}
+
+template<bool IS_NUM> struct Tokenizer { //jump from number to number in the string ignoring anything else
+	static std::list<std::string> run( const std::string &src ) {
+		std::list<std::string> ret;
+		const char *mask = "0123456789-.";
+
+		for( size_t i = src.find_first_of( mask ), end; i < std::string::npos; i = src.find_first_of( mask, end ) ) {
+			end = src.find_first_not_of( mask, i );
+			const std::string numstr = src.substr( i, end - i );
+			ret.push_back( numstr );
+		}
+
+		return ret;
+	}
+};
+template<> struct Tokenizer<false> { // not for numbers / tokenize string at spaces,"," and ";"
+	static std::list<std::string> run( const std::string &src ) {
+		return util::stringToList<std::string>( src, boost::regex( "[\\s,;]+" ) );
+	}
+};
+
+template<typename DST> struct StrTransformer {
+	boost::numeric::range_check_result range_ok;
+	StrTransformer(): range_ok( boost::numeric::cInRange ) {}
+	DST operator()( const std::string &src ) {
+		DST ret;
+		const boost::numeric::range_check_result result = str2scalar( src, ret );
+
+		if( result != boost::numeric::cInRange )
+			range_ok = result; // keep the first error
+
+		return ret;
+	}
+};
+
+// additional base for converters which use another converter
+template<typename SRC, typename DST> struct SubValueConv {
+	boost::shared_ptr<const ValueConverterBase> sub_conv;
+};
+template<typename CLASS, typename SRC, typename DST> static boost::shared_ptr<const ValueConverterBase> getFor()
+{
+	typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
+	typedef boost::is_same<SRC, DST> is_same;
+	boost::shared_ptr<const ValueConverterBase> sub_conv = ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
+
+	if ( sub_conv ) {
+		boost::shared_ptr<CLASS > ret( new CLASS );
+		ret->sub_conv = sub_conv;
+		return ret;
+	} else {
+		return boost::shared_ptr<const ValueConverterBase>();
+	}
+}
+
+// special to string conversions
+template<typename T> std::string toStringConv( const T &src )
+{
+	std::stringstream s;
+	s << std::boolalpha << src; // bool will be converted to true/false
+	return s.str();
+}
+template<> std::string toStringConv<uint8_t>( const uint8_t &src ) {return toStringConv( static_cast<uint16_t>( src ) );}
+template<> std::string toStringConv<int8_t> ( const  int8_t &src ) {return toStringConv( static_cast< int16_t>( src ) );}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Numeric version -- uses num2num
+/////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST> class ValueConverter<true, false, SRC, DST> : public ValueGenerator<SRC, DST>
 {
 	ValueConverter() {
@@ -132,23 +266,13 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		typedef boost::numeric::converter <
-		DST, SRC,
-		   boost::numeric::conversion_traits<DST, SRC>,
-		   NumericOverflowHandler,
-		   boost::numeric::RoundEven<SRC>
-		   > converter;
-		DST &dstVal = dst.castTo<DST>();
-		const SRC &srcVal = src.castTo<SRC>();
-		NumericOverflowHandler::result = boost::numeric::cInRange;
-		dstVal = converter::convert( srcVal );
-		return NumericOverflowHandler::result;
+		return num2num( src.castTo<SRC>(), dst.castTo<DST>() );
 	}
 	virtual ~ValueConverter() {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Conversion for complex numbers
+// Conversion between complex numbers -- uses num2num
 /////////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST> class ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > : public ValueGenerator<std::complex<SRC>, std::complex<DST> >
 {
@@ -161,85 +285,85 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		typedef boost::numeric::converter <
-		std::complex<DST> , std::complex<SRC> ,
-			boost::numeric::conversion_traits<std::complex<DST>, std::complex<SRC> >,
-			NumericOverflowHandler,
-			boost::numeric::RoundEven<std::complex<SRC> >
-			> converter;
-		NumericOverflowHandler::result = boost::numeric::cInRange;
-		const std::complex<SRC> &srcVal = src.castTo<std::complex<SRC> >();
-		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
-
-		dstVal = converter::convert( srcVal );
-		return NumericOverflowHandler::result;
+		return num2num( src.castTo<std::complex<SRC> >(), dst.castTo<std::complex<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Conversion for "normal" to complex numbers -- uses ValueConverter on the real part
+// Conversion between color -- uses num2num
 /////////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class ValueConverter<false, false, SRC, std::complex<DST> > : public ValueGenerator<SRC, std::complex<DST> >
+template<typename SRC, typename DST> class ValueConverter<false, false, color<SRC>, color<DST> > : public ValueGenerator<color<SRC>, color<DST> >
 {
-	boost::shared_ptr<const ValueConverterBase> m_conv;
-	ValueConverter( boost::shared_ptr<const ValueConverterBase> elem_conv ): m_conv( elem_conv ) {
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating color converter from " << Value<color<SRC> >::staticName() << " to " << Value<color<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, color<SRC>, color<DST>  > *ret = new ValueConverter<false, false, color<SRC>, color<DST>  >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		boost::numeric::range_check_result res = boost::numeric::cInRange;
+		const SRC *srcVal = &src.castTo<color<SRC> >().r;
+		DST *dstVal = &dst.castTo<color<DST> >().r;
+
+		for( uint_fast8_t i = 0; i < 3; i++ ) {
+			const boost::numeric::range_check_result result = num2num( srcVal[i], dstVal[i] );
+
+			if( result != boost::numeric::cInRange )res = result;
+		}
+
+		return res;
+	}
+	virtual ~ValueConverter() {}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Conversion for "all" to complex numbers -- uses ValueConverter on the real part
+/////////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValueConverter<false, false, SRC, std::complex<DST> > :
+	public ValueGenerator<SRC, std::complex<DST> >, private SubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
 		LOG( Debug, verbose_info )
 				<< "Creating number-complex converter from "
 				<< Value<SRC>::staticName() << " to " << Value<std::complex<DST> >::staticName();
 	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, SRC, std::complex<DST> >, SRC, DST >();
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
-		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-		typedef boost::is_same<SRC, DST> is_same;
-		boost::shared_ptr<const ValueConverterBase> elem_conv =
-			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
-
-		if ( elem_conv ) { // if there is a conversion from SRC to DST create a conversion SRC => complex<DST> using that
-			ValueConverter<false, false, SRC, std::complex<DST> > *ret = new ValueConverter<false, false, SRC, std::complex<DST> >( elem_conv );
-			return boost::shared_ptr<const ValueConverterBase>( ret );
-		} else {
-			return boost::shared_ptr<const ValueConverterBase>();
-		}
+		return getFor<ValueConverter<false, false, SRC, std::complex<DST> >, SRC, DST >();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
 		Value<DST> real;
-		boost::numeric::range_check_result ret = m_conv->convert( src, real );
+		boost::numeric::range_check_result ret = this->sub_conv->convert( src, real );
 
 		if( ret == boost::numeric::cInRange )
 			dstVal = std::complex<DST>( ( DST )real, DST() );
 
-		return NumericOverflowHandler::result;
+		return ret;
 	}
 	virtual ~ValueConverter() {}
 };
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vector4 version -- uses ValueConverter on every element
+// vector4 to vector4 version -- uses ValueConverter on every element
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector4<DST> >: public ValueGenerator<vector4<SRC>, vector4<DST> >
+template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector4<DST> >:
+	public ValueGenerator<vector4<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
 {
-	boost::shared_ptr<const ValueConverterBase> m_conv;
-	ValueConverter( boost::shared_ptr<const ValueConverterBase> elem_conv ): m_conv( elem_conv ) {
+	ValueConverter( ) {
 		LOG( Debug, verbose_info )
 				<< "Creating vector converter from "
 				<< Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
-		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-		typedef boost::is_same<SRC, DST> is_same;
-		boost::shared_ptr<const ValueConverterBase> elem_conv =
-			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
-
-		if ( elem_conv ) {
-			ValueConverter<false, false, vector4<SRC>, vector4<DST> > *ret = new ValueConverter<false, false, vector4<SRC>, vector4<DST> >( elem_conv );
-			return boost::shared_ptr<const ValueConverterBase>( ret );
-		} else {
-			return boost::shared_ptr<const ValueConverterBase>();
-		}
+		return getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		vector4<DST> &dstVal = dst.castTo<vector4<DST> >();
@@ -248,9 +372,9 @@ public:
 
 		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
 			Value<DST> elem_dst;
-			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( srcVal[i] ), elem_dst );
+			const boost::numeric::range_check_result result = this->sub_conv->convert( Value<SRC>( srcVal[i] ), elem_dst );
 
-			if ( result != boost::numeric::cInRange )
+			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
 				ret = result;
 
 			dstVal[i] = ( DST )elem_dst;
@@ -262,29 +386,20 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// list version -- uses ValueConverter on every element
+// list to list version -- uses ValueConverter on every element
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, std::list<DST> >: public ValueGenerator<std::list<SRC>, std::list<DST> >
+template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, std::list<DST> >:
+	public ValueGenerator<std::list<SRC>, std::list<DST> >, private SubValueConv<SRC, DST >
 {
-	boost::shared_ptr<const ValueConverterBase> m_conv;
-	ValueConverter( boost::shared_ptr<const ValueConverterBase> elem_conv ): m_conv( elem_conv ) {
+	ValueConverter() {
 		LOG( Debug, verbose_info )
 				<< "Creating list converter from "
 				<< Value<std::list<SRC> >::staticName() << " to " << Value<std::list<DST> >::staticName();
 	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, std::list<DST> >, SRC, DST>();
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
-		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-		typedef boost::is_same<SRC, DST> is_same;
-		boost::shared_ptr<const ValueConverterBase> elem_conv =
-			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
-
-		if ( elem_conv ) {
-			ValueConverter<false, false, std::list<SRC>, std::list<DST> > *ret = new ValueConverter<false, false, std::list<SRC>, std::list<DST> >( elem_conv );
-			return boost::shared_ptr<const ValueConverterBase>( ret );
-		} else {
-			return boost::shared_ptr<const ValueConverterBase>();
-		}
+		return getFor<ValueConverter<false, false, std::list<SRC>, std::list<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		std::list<DST> &dstVal = dst.castTo<std::list<DST> >();
@@ -296,9 +411,9 @@ public:
 
 		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
 			Value<DST> elem_dst;
-			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( *i ), elem_dst );
+			const boost::numeric::range_check_result result = this->sub_conv->convert( Value<SRC>( *i ), elem_dst );
 
-			if ( result != boost::numeric::cInRange )
+			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
 				ret = result;
 
 			dstVal.push_back( ( DST )elem_dst );
@@ -310,21 +425,13 @@ public:
 };
 
 
-/////////////////////////////////////////////////////////////////////////////
-// string version -- uses special string converter to convert from/to string
-/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// string to scalar -- uses lexical_cast (and in some cases mumeric conversion) to convert from string
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename DST> class ValueConverter<false, false, std::string, DST> : public ValueGenerator<std::string, DST>
 {
-	boost::shared_ptr<const ValueConverterBase> inner_conv;
 	ValueConverter() {
-		typedef boost::is_arithmetic<DST> is_num;
-
-		if( is_num::value ) // if DST is a number we can go via double to do a proper conversion
-			inner_conv =
-				ValueConverter<is_num::value, boost::is_same<double, DST>::value, double, DST>::get();
-
-		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<DST>::staticName();
+		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -332,45 +439,40 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		const std::string &srcVal = src.castTo<std::string>();
-
+		return str2scalar( src.castTo<std::string>(), dst.castTo<DST>() );
+	}
+	virtual ~ValueConverter() {}
+};
+// cannot use the general str to all because that would be ambiguous with "all to complex"
+template<typename DST> class ValueConverter<false, false, std::string, std::complex<DST> > :
+	public ValueGenerator<std::string, std::complex<DST> >, private SubValueConv<std::complex<double>, std::complex<DST> >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating from-string converter for " << Value<std::complex<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::string, std::complex<DST> >, std::complex<double>, std::complex<DST> >();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, std::string, std::complex<DST> >, std::complex<double>, std::complex<DST> >();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		try {
-			if( inner_conv ) { // if the target is a number first map to double and then convert that into DST
-				return inner_conv->convert( Value<double>( srcVal ), dst );
-			} else { // otherwise try direct mapping (rounding will fail)
-				LOG( Debug, warning ) << "using lexical_cast to convert from string to "
-									  << Value<DST>::staticName() << " no rounding can be done.";
-				DST &dstVal = dst.castTo<DST>();
-				dstVal = boost::lexical_cast<DST>( srcVal );
-			}
+			const util::Value<std::complex<double> > srcDbl( src.castTo<std::string>() ); // make a double from the string
+			return num2num( srcDbl.castTo<std::complex<double> >(), dst.castTo<std::complex<DST> >() );
 		} catch( const boost::bad_lexical_cast & ) {
 			dst.castTo<DST>() = DST();
-			LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( srcVal ) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST() );
+			LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( src ) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST() );
 		}
 
 		return boost::numeric::cInRange;
 	}
 	virtual ~ValueConverter() {}
 };
-template<typename DST> class ValueConverter<false, false, std::string, std::complex<DST> > : public ValueGenerator<std::string, std::complex<DST> >
-{
-	ValueConverter() {
-		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<std::complex<DST> >::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
-		ValueConverter<false, false, std::string, std::complex<DST> > *ret = new ValueConverter<false, false, std::string, std::complex<DST> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
-	}
-	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
-		const std::string &srcVal = src.castTo<std::string>();
-		dstVal = boost::lexical_cast<std::complex<DST> >( srcVal );
-		return boost::numeric::cInRange; //@todo handle bad casts
-	}
-	virtual ~ValueConverter() {}
-};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// all to string -- just use formatted print into a string buffer
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename SRC> class ValueConverter<false, false, SRC, std::string> : public ValueGenerator<SRC, std::string>
 {
 	ValueConverter() {
@@ -390,69 +492,10 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// special version to convert from string to a given selection
-// (lexical_cast doesnt work here, because it creates a temporary buffer)
+// string => list/vector/color version -- uses util::stringToList
 /////////////////////////////////////////////////////////////////////////////
-template<> class ValueConverter<false, false, std::string, Selection> : public ValueGenerator<std::string, Selection>
-{
-	ValueConverter() {
-		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Value<Selection>::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
-		ValueConverter<false, false, std::string, Selection> *ret = new ValueConverter<false, false, std::string, Selection>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
-	}
-	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		Selection &dstVal = dst.castTo<Selection>();
-		const std::string &srcVal = src.castTo<std::string>();
-
-		if ( dstVal.set( srcVal.c_str() ) )
-			return boost::numeric::cInRange;
-		else
-			return boost::numeric::cPosOverflow; //if the string is not "part" of the selection we count this as positive overflow
-	}
-	virtual ~ValueConverter() {}
-};
-
-
-/////////////////////////////////////////////////////////////////////////////
-// string/bool version -- uses decision based on text
-/////////////////////////////////////////////////////////////////////////////
-template<> class ValueConverter<false, false, std::string, bool> : public ValueGenerator<std::string, bool>
-{
-	ValueConverter() {
-		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Value<bool>::staticName();
-	};
-public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
-		ValueConverter<false, false, std::string, bool> *ret = new ValueConverter<false, false, std::string, bool>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
-	}
-	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		bool &dstVal = dst.castTo<bool>();
-		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>( src.castTo<std::string>() );
-
-		if (  srcVal == "true" || srcVal == "y" || srcVal == "yes" ) {
-			dstVal = true;
-		} else if ( srcVal == "false" || srcVal == "n" || srcVal == "no" ) {
-			dstVal = false;
-		} else {
-			LOG( Runtime, warning ) << src.toString( true ) << " is ambiguous while converting to " << Value<bool>::staticName();
-			return boost::numeric::cPosOverflow;
-		}
-
-		return boost::numeric::cInRange;
-	}
-	virtual ~ValueConverter() {}
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// string => list/vector version -- uses util::stringToList
-/////////////////////////////////////////////////////////////////////////////
-template<typename DST> class ValueConverter<false, false, std::string, std::list<DST> >: public ValueGenerator<std::string, std::list<DST> >  //string => list
+template<typename DST> class ValueConverter<false, false, std::string, std::list<DST> >:
+	public ValueGenerator<std::string, std::list<DST> >
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
@@ -464,15 +507,12 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		std::list<DST> &dstVal = dst.castTo<std::list<DST> >();
-		LOG_IF( ! dstVal.empty(), CoreLog, warning )
-				<< "Conversion from " << Value<std::string>::staticName()
-				<< " into non empty list  " << Value<std::list<DST> >::staticName()
-				<< " previous content will be lost";
-		const std::string &srcVal = src.castTo<std::string>();
-		const std::list<DST> buff = util::stringToList<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
-		dstVal.assign( buff.begin(), buff.end() );
-		return boost::numeric::cInRange;  //@todo handle bad casts
+		std::list<DST> &dstList = dst.castTo<std::list<DST> >();
+		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the strin based on the target type
+		dstList.resize( srcList.size() ); // resize target to the ammount of found tokens
+		StrTransformer<DST> transformer; // create a transformer from string to DST
+		std::transform( srcList.begin(), srcList.end(), dstList.begin(), transformer ); // transform the found strings to the destination
+		return transformer.range_ok;
 	}
 	virtual ~ValueConverter() {}
 };
@@ -488,25 +528,37 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		vector4<DST> &dstVal = dst.castTo<vector4<DST> >();
-		const std::string &srcVal = src.castTo<std::string>();
-		const std::list<DST> buff = stringToList<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
-		dstVal.copyFrom( buff.begin(), buff.end() );
-		return boost::numeric::cInRange; //@todo handle bad casts
+		vector4<DST> &dstList = dst.castTo<vector4<DST> >();
+		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+		std::list< std::string >::const_iterator end = srcList.begin();
+		std::advance( end, std::min<size_t>( srcList.size(), 4 ) ); // use a max of 4 tokens
+		StrTransformer<DST> transformer; // create a transformer from string to DST
+		std::transform( srcList.begin(), end, dstList.begin(), transformer ); // transform the found strings to the destination
+		return transformer.range_ok;
 	}
 	virtual ~ValueConverter() {}
 };
 
-
-// @todo we cannot parse this stuff yet
-template<> class ValueConverter<false, false, std::string, color24 >: public ValueGenerator<std::string, color24 >  //string => color
+template<typename T> class ValueConverter<false, false, std::string, color<T> >: public ValueGenerator<std::string, color<T> >  //string => color
 {
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating from-string converter for " << Value<color<T> >::staticName();
+	};
 public:
-	virtual ~ValueConverter() {}
-};
-template<> class ValueConverter<false, false, std::string, color48 >: public ValueGenerator<std::string, color48 >  //string => color
-{
-public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, color<T> > *ret = new ValueConverter<false, false, std::string, color<T> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		color<T> &dstVal = dst.castTo<color<T> >();
+		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<T>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+		std::list< std::string >::const_iterator end = srcList.begin();
+		std::advance( end, std::min<size_t>( srcList.size(), 3 ) ); // use a max of 3 tokens
+		StrTransformer<T> transformer; // create a transformer from string to DST
+		std::transform( srcList.begin(), end, &dstVal.r, transformer ); // transform the found strings to the destination
+		return transformer.range_ok;
+	}
 	virtual ~ValueConverter() {}
 };
 
@@ -539,7 +591,6 @@ struct outer_TypeConverter {
 		);
 	}
 };
-/// @endcond
 
 ValueConverterMap::ValueConverterMap()
 {
@@ -548,5 +599,7 @@ ValueConverterMap::ValueConverterMap()
 }
 
 }
+API_EXCLUDE_END
 }
 }
+/// @endcond

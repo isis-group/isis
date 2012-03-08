@@ -109,7 +109,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 void Application::printHelp( bool withHidden )const
 {
 	std::cerr << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
-	std::cerr << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
+	std::cerr << "Usage: " << this->m_filename << " <options>" << std::endl << "Where <options> includes:" << std::endl;;
 
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
@@ -136,9 +136,9 @@ void Application::printHelp( bool withHidden )const
 	}
 }
 
-boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+boost::shared_ptr< MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
 {
-	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
+	return boost::shared_ptr< MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
 const std::string Application::getCoreVersion( void )
 {

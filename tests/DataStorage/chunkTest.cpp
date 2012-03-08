@@ -185,8 +185,8 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 	std::pair<util::ValueReference, util::ValueReference> minmax = ch.getMinMax();
 
 	data::scaling_pair scale = ch.getScalingTo( data::ValuePtr<uint8_t>::staticID, minmax );
-	const util::_internal::ValueBase &scale_s = *( scale.first );
-	const util::_internal::ValueBase &scale_o = *( scale.second );
+	const util::ValueBase &scale_s = *( scale.first );
+	const util::ValueBase &scale_o = *( scale.second );
 
 	BOOST_CHECK_EQUAL( scale_s.as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale_o.as<double>(), 5 );

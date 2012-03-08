@@ -12,10 +12,10 @@ namespace util
 ///Class to store a rgb tripel of type T.
 template<typename T> struct color {
 	T r, g, b;
-	bool operator==( const color &other )const {
+	template<typename O> bool operator==( const color<O> &other )const {
 		return r == other.r && g == other.g && b == other.b;
 	}
-	bool operator!=( const color &other )const {
+	template<typename O> bool operator!=( const color<O> &other )const {
 		return ! operator==( other );
 	}
 };

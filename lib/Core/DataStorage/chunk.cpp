@@ -22,6 +22,7 @@ namespace isis
 {
 namespace data
 {
+/// @cond _internal
 namespace _internal
 {
 
@@ -37,6 +38,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 ChunkBase::~ChunkBase() { }
 
 }
+/// @endcond _internal
 
 Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ):
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
@@ -47,18 +49,15 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
-	util::vector4<size_t> newSize = getSizeAsVector();
+	return createByID( getTypeID(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+}
 
-	if ( nrOfColumns )newSize[0] = nrOfColumns;
-
-	if ( nrOfRows )newSize[1] = nrOfRows;
-
-	if ( nrOfSlices )newSize[2] = nrOfSlices;
-
-	if ( nrOfTimesteps )newSize[3] = nrOfTimesteps;
-
-	const ValuePtrReference cloned( getValuePtrBase().cloneToNew( newSize.product() ) );
-	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
+Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+{
+	util::vector4<size_t> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+	assert( newSize.product() );
+	const ValuePtrReference created( ValuePtrBase::createByID( ID, newSize.product() ) );
+	return Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
@@ -74,7 +73,7 @@ bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 	return true;
 }
 
-size_t Chunk::bytesPerVoxel()const
+size_t Chunk::getBytesPerVoxel()const
 {
 	return getValuePtrBase().bytesPerElem();
 }
@@ -270,7 +269,7 @@ size_t Chunk::useCount() const
 
 void Chunk::swapAlong( const dimensions dim ) const
 {
-	const size_t elSize = bytesPerVoxel();
+	const size_t elSize = getBytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();
 
 	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );

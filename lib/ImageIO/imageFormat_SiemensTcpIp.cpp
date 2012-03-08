@@ -198,7 +198,7 @@ public:
 					}
 
 					size_t size_to_alloc = iim * width_slice * height_slice;
-					isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID( tID, size_to_alloc );
+					isis::data::ValuePtrReference valPtrBuffer = isis::data::ValuePtrBase::createByID( tID, size_to_alloc );
 
 					for( unsigned int _slice = 0; _slice < iim; _slice++ ) {
 						for( unsigned int _row = 0; _row < height_slice; _row++ ) {

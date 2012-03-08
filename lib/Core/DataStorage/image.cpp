@@ -274,6 +274,42 @@ bool Image::updateOrientationMatrices()
 	return true;
 }
 
+bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
+{
+	//for transforming we have to ensure to have the below properties in our chunks and image
+	std::list<std::string > neededProps;
+	neededProps.push_back ( "indexOrigin" );
+	neededProps.push_back ( "rowVec" );
+	neededProps.push_back ( "columnVec" );
+	neededProps.push_back ( "sliceVec" );
+	neededProps.push_back ( "voxelSize" );
+	//propagate needed properties to chunks
+	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+		BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
+			if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
+				chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
+			}
+		}
+
+		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
+			return false;
+		}
+	}
+	//      establish initial state
+
+	if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+		LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
+		return false;
+	}
+
+	if ( !updateOrientationMatrices() ) {
+		LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
+		return false;
+	}
+
+	deduplicateProperties();
+	return true;
+}
 
 dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 {
@@ -655,15 +691,15 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 	return ret;
 }
 
-size_t Image::getBytesPerVoxel() const
+size_t Image::getMaxBytesPerVoxel() const
 {
-	size_t bytes = chunkPtrAt( 0 )->bytesPerVoxel();
+	size_t bytes = chunkPtrAt( 0 )->getBytesPerVoxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( bytes != ref->bytesPerVoxel(), Debug, warning )
-				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->bytesPerVoxel() << "). Using the biggest.";
+		LOG_IF( bytes != ref->getBytesPerVoxel(), Debug, warning )
+				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->getBytesPerVoxel() << "). Using the biggest.";
 
-		if( bytes < ref->bytesPerVoxel() ) {
-			bytes = ref->bytesPerVoxel();
+		if( bytes < ref->getBytesPerVoxel() ) {
+			bytes = ref->getBytesPerVoxel();
 		}
 	}
 	return bytes;
@@ -691,6 +727,7 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 	return ret;
 }
 
+// @todo this wont work with images of more 2 two different data types
 std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
 	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";

@@ -10,8 +10,6 @@ namespace isis
 {
 namespace data
 {
-namespace _internal
-{
 
 /**
  * Helper to sanitise scaling.
@@ -33,7 +31,7 @@ size_t ValuePtrBase::getLength() const { return m_len;}
 
 ValuePtrBase::~ValuePtrBase() {}
 
-ValuePtrBase::DelProxy::DelProxy( const isis::data::_internal::ValuePtrBase &master ): boost::shared_ptr<const void>( master.getRawAddress() )
+ValuePtrBase::DelProxy::DelProxy( const isis::data::ValuePtrBase &master ): boost::shared_ptr<const void>( master.getRawAddress() )
 {
 	LOG( Debug, verbose_info ) << "Creating DelProxy for " << master.getTypeName() << " at " << this->get();
 }
@@ -48,21 +46,22 @@ void ValuePtrBase::DelProxy::operator()( const void *at )
 }
 
 
-const ValuePtrConverterMap &ValuePtrBase::converters()
+const _internal::ValuePtrConverterMap &ValuePtrBase::converters()
 {
-	return util::Singletons::get<_internal::ValuePtrConverterMap, 0>();
+	static _internal::ValuePtrConverterMap ret; //@todo not using class Singleton because ValuePtrConverterMap is hidden
+	return ret;
 }
 
 const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )const
 {
-	const ValuePtrConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	const _internal::ValuePtrConverterMap::const_iterator f1 = converters().find( getTypeID() );
 	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()];
-	const ValuePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	const _internal::ValuePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
 	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()] << " to " << util::getTypeMap()[ID];
 	return f2->second;
 }
 
-size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const
+size_t ValuePtrBase::compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start ) const
 {
 	assert( start <= end );
 	size_t ret = 0;
@@ -112,7 +111,7 @@ ValuePtrBase::Reference ValuePtrBase::copyByID( unsigned short ID, scaling_pair 
 	}
 }
 
-bool ValuePtrBase::copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pair scaling ) const
+bool ValuePtrBase::copyTo( isis::data::ValuePtrBase &dst, scaling_pair scaling ) const
 {
 	const unsigned short dID = dst.getTypeID();
 	const Converter &conv = getConverterTo( dID );
@@ -129,8 +128,8 @@ bool ValuePtrBase::copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pai
 
 ValuePtrBase::Reference ValuePtrBase::createByID( unsigned short ID, size_t len )
 {
-	const ValuePtrConverterMap::const_iterator f1 = converters().find( ID );
-	ValuePtrConverterMap::mapped_type::const_iterator f2;
+	const _internal::ValuePtrConverterMap::const_iterator f1 = converters().find( ID );
+	_internal::ValuePtrConverterMap::mapped_type::const_iterator f2;
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
 	if( f1 != converters().end() && ( f2 = f1->second.find( ID ) ) != f1->second.end() ) {
@@ -214,6 +213,9 @@ ValuePtrBase::const_value_iterator ValuePtrBase::endGeneric()const
 	return beginGeneric() + m_len;
 }
 
+/// @cond _internal
+namespace _internal
+{
 template<> GenericValueIterator<true>::reference GenericValueIterator<true>::operator*() const
 {
 	assert( getValueFunc );
@@ -239,7 +241,7 @@ WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &
 	setValueFunc( const_cast<uint8_t * const>( p ), *val );
 	return *this;
 }
-
-}
+} // namespace _internal
+/// @endcond _internal
 }
 }

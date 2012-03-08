@@ -8,7 +8,7 @@ isis::qt4::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )
 {}
 
 
-void isis::qt4::QDefaultMessagePrint::commit( const isis::util::_internal::Message &msg )
+void isis::qt4::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 {
 	QMessage qMessage;
 	qMessage.m_file = msg.m_file;

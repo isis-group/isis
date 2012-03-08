@@ -16,10 +16,14 @@ namespace isis
 {
 namespace image_io
 {
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length() > b.length();}
 }
+/// @endcond _internal
+API_EXCLUDE_END
 
 void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {

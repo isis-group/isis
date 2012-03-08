@@ -714,7 +714,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )
 {
-	const size_t bpv = src.getBytesPerVoxel() * 8;
+	const size_t bpv = src.getMaxBytesPerVoxel() * 8;
 	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
 
 	//bitmap is not supportet by spm and fsl
