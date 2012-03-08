@@ -527,6 +527,12 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 	}
 
+	if( head->intent_code  ) {
+		props.setPropertyAs( "nifti/intent_code", head->intent_code ); // use it the usual way
+		LOG(Runtime,warning) << "Ignoring intent_code " << props.propertyValue("nifti/intent_code");
+	}
+
+
 	return parseSliceOrdering( head, props );
 }
 
@@ -624,10 +630,6 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	//get the header - we use it directly from the file
 	_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &mfile[0] );
 	const bool swap_endian = checkSwapEndian( header );
-
-	if( header->intent_code != 0 ) {
-		throwGenericError( std::string( "only intent_code==0 is supportet" ) );
-	}
 
 	if( header->sizeof_hdr < 348 ) {
 		LOG( Runtime, warning ) << "sizeof_hdr of the file (" << header->vox_offset << ") is invalid, assuming 348";
