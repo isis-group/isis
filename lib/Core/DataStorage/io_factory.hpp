@@ -43,12 +43,20 @@ private:
 	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:
 	/**
-	 * Load a data file with given filename and dialect.
-	 * @param path list to store the loaded chunks in
+	 * Load data from a set of files or directories with given paths and dialect.
+	 * @param paths list if files or directories to load
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
+	 * @param dialect dialect of the fileformat to load
+	 * @return list of images created from the loaded data
+	 * @note the images a re created from all loaded files, so loading mutilple files can very well result in only one image
+	 */
+	static std::list<data::Image> load( const util::slist &paths, std::string suffix_override = "", std::string dialect = "" );
+	/**
+	 * Load a data file or directory with given filename and dialect.
 	 * @param path file or directory to load
 	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
 	 * @param dialect dialect of the fileformat to load
-	 * @return list of chunks (part of an image)
+	 * @return list of images created from the loaded data
 	 */
 	static std::list<data::Image> load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 	/**

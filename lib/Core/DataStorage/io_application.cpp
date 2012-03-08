@@ -174,10 +174,9 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	BOOST_FOREACH( util::slist::const_reference ref, input ) {
-		const std::list< Image > tImages = data::IOFactory::load( ref, rf, dl );
-		images.insert( images.end(), tImages.begin(), tImages.end() );
-	}
+	const std::list< Image > tImages = data::IOFactory::load( input, rf, dl );
+
+	images.insert( images.end(), tImages.begin(), tImages.end() );
 
 	if ( images.empty() ) {
 		if ( exitOnError ) {
@@ -242,7 +241,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 		data::IOFactory::setProgressFeedback( feedback );
 
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
-		if ( exitOnError ){
+		if ( exitOnError ) {
 			LOG( Runtime, notice ) << "Failed to write, exiting...";
 			exit( 1 );
 		}

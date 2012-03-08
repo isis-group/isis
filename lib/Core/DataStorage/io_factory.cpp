@@ -335,15 +335,22 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 	return loaded;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
+std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffix_override, std::string dialect )
 {
 	std::list<Chunk> chunks;
-	const boost::filesystem::path p( path );
-	const size_t loaded = load( chunks, path, suffix_override, dialect );
+	size_t loaded = 0;
+	BOOST_FOREACH( const std::string & path, paths ) {
+		loaded += load( chunks, path , suffix_override, dialect );
+	}
 	const std::list<data::Image> images = chunkListToImageList( chunks );
 	LOG( Runtime, info )
-			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
+			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << paths;
 	return images;
+}
+
+std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
+{
+	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
 size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
