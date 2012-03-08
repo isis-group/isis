@@ -4,6 +4,7 @@
 #include "CoreUtils/application.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
+#include <algorithm>
 
 
 struct DiffLog {static const char *name() {return "Diff";}; enum {use = _ENABLE_LOG};};
@@ -27,7 +28,7 @@ boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sour
 	}
 }
 
-boost::filesystem::path getCommonSource( const data::Image img )
+boost::filesystem::path getCommonSource( const data::Image &img )
 {
 	if( img.hasProperty( "source" ) )
 		return img.getPropertyAs<std::string>( "source" );
@@ -43,12 +44,15 @@ boost::filesystem::path getCommonSource( const data::Image img )
 std::string identify( const data::Image &img )
 {
 	return
-		getCommonSource( img ).file_string()
-		+ "[S"
-		+ img.getPropertyAs<std::string>( "sequenceNumber" )
-		+ ( img.hasProperty( "sequenceDescription" ) ? ( "_" +     img.getPropertyAs<std::string>( "sequenceDescription" ) ) : "" )
-		+ ( img.hasProperty( "sequenceStart" )       ? ( " from " + img.getPropertyAs<std::string>( "sequenceStart" ) )      : "" )
-		+ "]";
+		"\"S" + img.getPropertyAs<std::string>( "sequenceNumber" ) + ( img.hasProperty( "sequenceDescription" ) ?
+				( "_" + img.getPropertyAs<std::string>( "sequenceDescription" ) ) :
+				""
+																	 ) + "\""
+		+ " from " + getCommonSource( img ).file_string()
+		+ ( img.hasProperty( "sequenceStart" ) ?
+			( " taken at " + img.getPropertyAs<std::string>( "sequenceStart" ) ) :
+			""
+		  );
 }
 
 std::pair<std::string, int>  parseFilename( std::string name )
@@ -83,27 +87,35 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 	return *at;
 }
 
-bool doFit( const data::Image reference, std::list<data::Image> &org_images, std::list<data::Image> &images, const char *propName )
+size_t doFit( const data::Image reference, std::list<data::Image> &org_images, std::list<data::Image> &images, const char *propName )
 {
+	//first time org is empty - images is full
 	const util::PropertyMap::PropPath propPath( propName );
-	images.remove_if( boost::bind( hasDifferentProp, _1, propPath , reference.propertyValue( propPath ) ) );
-	org_images.remove_if( boost::bind( hasSameProp, _1, propPath, reference.propertyValue( propPath ) ) );
+	util::PropertyValue propval = reference.propertyValue( propPath );
 
-	if( images.size() <= 1 ) {
-		LOG( DiffDebug, info ) << "Found a unique image with the same " << propName << " " << util::MSubject( reference.propertyValue( propPath ) ) << ", returning....";
-		return true;
-	} else
-		return false;
+	//now move all with different prop back into org
+	for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
+		if( hasDifferentProp( *i, propPath, propval ) ) {
+			org_images.push_back( *i );
+			images.erase( i++ );
+		} else
+			i++;
+	}
+
+	LOG( DiffLog, info ) << images.size() << " candidated left, " << org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
+	return images.size();
 }
 
 std::list<data::Image> findFitting( const data::Image reference, std::list<data::Image> &org_images )
 {
-	std::list< data::Image > images = org_images;
-	const char *props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart"};
+	std::list< data::Image > images;
+	images.splice( images.begin(), org_images ); //first move all into images
+
+	const char *props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart", "coilChannelMask"};
 
 	BOOST_FOREACH( const char * prop, props ) {
-		if( doFit( reference, org_images, images, prop ) )
-			return images;
+		if( doFit( reference, org_images, images, prop ) <= 1 ) //now move all with different prop back into org
+			return images; // stop if only one image left
 	}
 	return images;
 }
@@ -237,12 +249,12 @@ int main( int argc, char *argv[] )
 		}
 
 		if( !images1.empty() ) {
-			std::cout << "there are " << images1.size() << " images left uncompared from " << util::MSubject( in1.first ) << std::endl;
+			std::cout << "there are " << images1.size() << " images left uncompared from " << util::MSubject( in1.first ) << "(in1)" << std::endl;
 			ret += images1.size();
 		}
 
 		if( !images2.empty() ) {
-			std::cout << "there are " << images2.size() << " images left uncompared from " << util::MSubject( in2.first ) << std::endl;
+			std::cout << "there are " << images2.size() << " images left uncompared from " << util::MSubject( in2.first ) << "(in2)" << std::endl;
 			ret += images2.size();
 		}
 	} else {
