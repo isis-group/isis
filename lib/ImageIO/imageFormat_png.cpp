@@ -10,9 +10,7 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes /*modes = both */ )const {
-		return std::string( ".png" );
-	}
+	util::istring suffixes( io_modes /*modes = both */ )const {return ".png";}
 	struct Reader {
 		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
 		virtual ~Reader() {}

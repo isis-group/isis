@@ -40,7 +40,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
 
 protected:
-	std::string suffixes( io_modes mode = both )const;
+	util::istring suffixes( io_modes mode = both )const;
 
 	boost::shared_ptr< _internal::VistaHeader> m_vheader;
 

@@ -208,7 +208,7 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 	}
 
 }
-std::string ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return std::string( ".nii" );}
+util::istring ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return ".nii";}
 
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
 {

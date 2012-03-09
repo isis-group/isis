@@ -113,9 +113,7 @@ private:
 	}
 
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".gz" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".gz";}
 public:
 	util::istring dialects( const std::string &filename )const {
 		if( filename.empty() ) {

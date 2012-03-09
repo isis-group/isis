@@ -213,7 +213,7 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, util::istring dialect )
+size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, util::istring suffix_override, util::istring dialect )
 {
 	FileFormatList formatReader;
 	formatReader = getFileFormatList( filename.file_string(), suffix_override, dialect );
@@ -225,7 +225,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 		if( !boost::filesystem::exists( filename ) ) {
 			LOG( Runtime, error ) << util::MSubject( filename.file_string() )
 								  << " does not exist as file, and no suitable plugin was found to generate data from "
-								  << ( suffix_override.empty() ? std::string( "that name" ) : std::string( "the suffix \"" ) + suffix_override + "\"" );
+								  << ( suffix_override.empty() ? util::istring( "that name" ) : util::istring( "the suffix \"" ) + suffix_override + "\"" );
 		} else if( suffix_override.empty() ) {
 			LOG( Runtime, error ) << "No plugin found to read " << filename.file_string() << with_dialect;
 		} else {
@@ -256,7 +256,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 }
 
 
-IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, std::string suffix_override, util::istring dialect )
+IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, util::istring suffix_override, util::istring dialect )
 {
 	std::list<std::string> ext;
 	FileFormatList ret;
@@ -322,7 +322,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 	return ret;
 }
 
-size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override, util::istring dialect )
+size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
 	const boost::filesystem::path p( path );
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
@@ -335,7 +335,7 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 	return loaded;
 }
 
-std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffix_override, util::istring dialect )
+std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect )
 {
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
@@ -348,12 +348,12 @@ std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffi
 	return images;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, util::istring dialect )
+std::list<data::Image> IOFactory::load( const std::string &path, util::istring suffix_override, util::istring dialect )
 {
 	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
-size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, util::istring dialect )
+size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, util::istring suffix_override, util::istring dialect )
 {
 	int loaded = 0;
 
@@ -377,13 +377,13 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 	return loaded;
 }
 
-bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, util::istring dialect )
+bool IOFactory::write( const data::Image &image, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
 	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
 }
 
 
-bool IOFactory::write( std::list< isis::data::Image > images, const std::string &path, std::string suffix_override, util::istring dialect )
+bool IOFactory::write( std::list< isis::data::Image > images, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
 	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 

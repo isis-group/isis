@@ -188,7 +188,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
 
 protected:
-	std::string suffixes( io_modes mode = both )const;
+	util::istring suffixes( io_modes mode = both )const;
 };
 
 

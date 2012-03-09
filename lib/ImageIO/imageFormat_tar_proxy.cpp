@@ -72,11 +72,11 @@ private:
 	}
 
 protected:
-	std::string suffixes( io_modes modes = both )const {
+	util::istring suffixes( io_modes modes = both )const {
 		if( modes == write_only )
-			return std::string();
+			return util::istring();
 		else
-			return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
+			return "tar tar.gz tgz tar.bz2 tbz tar.Z taz";
 	}
 public:
 	util::istring dialects( const std::string &/*filename*/ )const {

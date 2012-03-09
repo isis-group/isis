@@ -29,7 +29,7 @@ class ImageFormat_SiemensTcpIp: public FileFormat
 {
 
 protected:
-	std::string suffixes( isis::image_io::FileFormat::io_modes iomode )const {
+	util::istring suffixes( isis::image_io::FileFormat::io_modes iomode )const {
 		if ( write_only == iomode ) {
 			return std::string();
 		} else {

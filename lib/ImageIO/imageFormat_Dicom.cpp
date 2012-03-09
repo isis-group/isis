@@ -135,12 +135,12 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
-std::string ImageFormat_Dicom::suffixes( io_modes modes )const
+util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 {
 	if( modes == write_only )
-		return std::string();
+		return util::istring();
 	else
-		return std::string( ".ima .dcm" );
+		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
 util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}

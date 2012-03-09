@@ -113,9 +113,7 @@ class ImageFormat_Nifti : public FileFormat
 		}
 	};
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".nii.gz .nii .hdr" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".nii.gz .nii .hdr";}
 public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 

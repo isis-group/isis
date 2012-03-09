@@ -52,7 +52,7 @@ protected:
 		return false;
 	}
 	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes(io_modes modes=both)const = 0;
+	virtual util::istring suffixes(io_modes modes=both)const = 0;
 	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );

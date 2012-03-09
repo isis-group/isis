@@ -60,7 +60,7 @@ class ImageFormat_Dicom: public FileFormat
 	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey, util::PropertyMap::PropPath> dictionary;
 protected:
-	std::string suffixes( io_modes modes = both )const;
+	util::istring suffixes( io_modes modes = both )const;
 	util::PropertyMap::PropPath tag2Name( const DcmTagKey &tag ) const;
 public:
 	ImageFormat_Dicom();

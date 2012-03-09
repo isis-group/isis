@@ -174,7 +174,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	const std::list< Image > tImages = data::IOFactory::load( input, rf, dl.c_str() );
+	const std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str() );
 
 	images.insert( images.end(), tImages.begin(), tImages.end() );
 
@@ -240,7 +240,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 	if( feedback )
 		data::IOFactory::setProgressFeedback( feedback );
 
-	if ( ! IOFactory::write( out_images, output, wf, dl.c_str() ) ) {
+	if ( ! IOFactory::write( out_images, output, wf.c_str(), dl.c_str() ) ) {
 		if ( exitOnError ) {
 			LOG( Runtime, notice ) << "Failed to write, exiting...";
 			exit( 1 );

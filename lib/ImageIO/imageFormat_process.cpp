@@ -17,9 +17,7 @@ class ImageFormat_StdinProxy: public FileFormat
 private:
 
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( "process" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return "process";}
 public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 

@@ -45,7 +45,7 @@ namespace image_io
 class ImageFormat_Vista: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {return std::string( ".v" );}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".v";}
 public:
 	std::string getName()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
