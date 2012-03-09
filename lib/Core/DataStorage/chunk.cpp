@@ -40,11 +40,19 @@ ChunkBase::~ChunkBase() { }
 }
 /// @endcond _internal
 
-Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps):
+Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid ):
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 	ValuePtrReference( src )
 {
 	assert( ( *this )->getLength() == getVolume() );
+
+	if( fakeValid ) {
+		setPropertyAs( "indexOrigin", util::fvector4() );
+		setPropertyAs( "acquisitionNumber", 0 );
+		setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+		setPropertyAs( "columnVec", util::fvector4( 1, 0 ) );
+	}
 }
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
@@ -52,12 +60,12 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 	return createByID( getTypeID(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
 }
 
-Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps)
+Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid )
 {
 	util::vector4<size_t> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
 	assert( newSize.product() );
 	const ValuePtrReference created( ValuePtrBase::createByID( ID, newSize.product() ) );
-	return  Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3]);
+	return  Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3], fakeValid );
 }
 
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
