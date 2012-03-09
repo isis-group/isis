@@ -76,20 +76,20 @@ template<> std::pair<int32_t, int32_t> calcMinMax<int32_t, 1>( const int32_t *da
 
 API_EXCLUDE_BEGIN
 template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
-	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
+	std::pair<T, T> operator()( const ValueArray<T> &/*ref*/ ) const {
 		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
 		return std::pair<T, T>();
 	}
 };
 
-template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
-	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
+template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValueArray)
+	std::pair<T, T> operator()( const ValueArray<T> &ref ) const {
 		return calcMinMax<T, 1>( &ref[0], ref.getLength() );
 	}
 };
 
 template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic min-max for color (get bounding box in color space)
-	std::pair<util::color<T> , util::color<T> > operator()( const ValuePtr<util::color<T> > &ref ) const {
+	std::pair<util::color<T> , util::color<T> > operator()( const ValueArray<util::color<T> > &ref ) const {
 		std::pair<util::color<T> , util::color<T> > ret;
 
 		for( uint_fast8_t i = 0; i < 3; i++ ) {
@@ -102,7 +102,7 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 	}
 };
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
-	std::pair<std::complex<T> , std::complex<T> > operator()( const ValuePtr<std::complex<T> > &ref ) const {
+	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
 		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
 		const std::pair<T, T > real = calcMinMax<T, 2>( &ref[0].real(), ref.getLength() * 2 );
 		const std::pair<T, T > imag = calcMinMax<T, 2>( &ref[0].imag(), ref.getLength() * 2 );
@@ -114,45 +114,45 @@ template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic m
 API_EXCLUDE_END
 
 /**
- * Basic iterator for ValuePtr.
+ * Basic iterator for ValueArray.
  * This is a common iterator following the random access iterator model.
- * It is not part of the reference counting used in ValuePtr. So make sure you keep the ValuePtr you created it from while you use this iterator.
+ * It is not part of the reference counting used in ValueArray. So make sure you keep the ValueArray you created it from while you use this iterator.
  */
-template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag, TYPE>
+template<typename TYPE> class ValueArrayIterator: public std::iterator<std::random_access_iterator_tag, TYPE>
 {
 	TYPE *p;
 	typedef typename std::iterator<std::random_access_iterator_tag, TYPE>::difference_type distance;
-	friend class ValuePtrIterator<const TYPE>;
+	friend class ValueArrayIterator<const TYPE>;
 public:
-	ValuePtrIterator(): p( NULL ) {}
-	ValuePtrIterator( TYPE *_p ): p( _p ) {}
-	ValuePtrIterator( const ValuePtrIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
+	ValueArrayIterator(): p( NULL ) {}
+	ValueArrayIterator( TYPE *_p ): p( _p ) {}
+	ValueArrayIterator( const ValueArrayIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
 
-	ValuePtrIterator<TYPE>& operator++() {++p; return *this;}
-	ValuePtrIterator<TYPE>& operator--() {--p; return *this;}
+	ValueArrayIterator<TYPE>& operator++() {++p; return *this;}
+	ValueArrayIterator<TYPE>& operator--() {--p; return *this;}
 
-	ValuePtrIterator<TYPE>  operator++( int ) {ValuePtrIterator<TYPE> tmp = *this; ++*this; return tmp;}
-	ValuePtrIterator<TYPE>  operator--( int ) {ValuePtrIterator<TYPE> tmp = *this; --*this; return tmp;}
+	ValueArrayIterator<TYPE>  operator++( int ) {ValueArrayIterator<TYPE> tmp = *this; ++*this; return tmp;}
+	ValueArrayIterator<TYPE>  operator--( int ) {ValueArrayIterator<TYPE> tmp = *this; --*this; return tmp;}
 
 	TYPE &operator*() const { return *p; }
 	TYPE *operator->() const { return p; }
 
-	bool operator==( const ValuePtrIterator<TYPE> &cmp )const {return p == cmp.p;}
-	bool operator!=( const ValuePtrIterator<TYPE> &cmp )const {return !( *this == cmp );}
+	bool operator==( const ValueArrayIterator<TYPE> &cmp )const {return p == cmp.p;}
+	bool operator!=( const ValueArrayIterator<TYPE> &cmp )const {return !( *this == cmp );}
 
-	bool operator>( const ValuePtrIterator<TYPE> &cmp )const {return p > cmp.p;}
-	bool operator<( const ValuePtrIterator<TYPE> &cmp )const {return p < cmp.p;}
+	bool operator>( const ValueArrayIterator<TYPE> &cmp )const {return p > cmp.p;}
+	bool operator<( const ValueArrayIterator<TYPE> &cmp )const {return p < cmp.p;}
 
-	bool operator>=( const ValuePtrIterator<TYPE> &cmp )const {return p >= cmp.p;}
-	bool operator<=( const ValuePtrIterator<TYPE> &cmp )const {return p <= cmp.p;}
+	bool operator>=( const ValueArrayIterator<TYPE> &cmp )const {return p >= cmp.p;}
+	bool operator<=( const ValueArrayIterator<TYPE> &cmp )const {return p <= cmp.p;}
 
-	ValuePtrIterator<TYPE> operator+( distance n )const {return ValuePtrIterator<TYPE>( p + n );}
-	ValuePtrIterator<TYPE> operator-( distance n )const {return ValuePtrIterator<TYPE>( p - n );}
+	ValueArrayIterator<TYPE> operator+( distance n )const {return ValueArrayIterator<TYPE>( p + n );}
+	ValueArrayIterator<TYPE> operator-( distance n )const {return ValueArrayIterator<TYPE>( p - n );}
 
-	distance operator-( const ValuePtrIterator<TYPE> &cmp )const {return p - cmp.p;}
+	distance operator-( const ValueArrayIterator<TYPE> &cmp )const {return p - cmp.p;}
 
-	ValuePtrIterator<TYPE> &operator+=( distance n ) {p += n; return *this;}
-	ValuePtrIterator<TYPE> &operator-=( distance n ) {p -= n; return *this;}
+	ValueArrayIterator<TYPE> &operator+=( distance n ) {p += n; return *this;}
+	ValueArrayIterator<TYPE> &operator-=( distance n ) {p -= n; return *this;}
 
 	TYPE &operator[]( distance n )const {return *( p + n );}
 };
@@ -164,10 +164,10 @@ public:
  * The class is designed for arrays, but you can also "point" to an single element
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
- * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
+ * The copy is cheap, thus the copy of a ValueArray will reference the same data.
  * The usual pointer dereferencing interface ("*", "->" and "[]") is supported.
  */
-template<typename TYPE> class ValuePtr: public ValuePtrBase
+template<typename TYPE> class ValueArray: public ValueArrayBase
 {
 	boost::shared_ptr<TYPE> m_val;
 	static const util::ValueReference getValueFrom( const void *p ) {
@@ -177,13 +177,13 @@ template<typename TYPE> class ValuePtr: public ValuePtrBase
 		*reinterpret_cast<TYPE *>( p ) = val.as<TYPE>();
 	}
 protected:
-	ValuePtr() {} // should only be used by child classed who initialize the pointer them self
-	ValuePtrBase *clone() const {
-		return new ValuePtr( *this );
+	ValueArray() {} // should only be used by child classed who initialize the pointer them self
+	ValueArrayBase *clone() const {
+		return new ValueArray( *this );
 	}
 public:
-	typedef _internal::ValuePtrIterator<TYPE> iterator;
-	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
+	typedef _internal::ValueArrayIterator<TYPE> iterator;
+	typedef _internal::ValueArrayIterator<const TYPE> const_iterator;
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 
@@ -192,63 +192,63 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
-			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
 	/**
-	 * Creates a ValuePtr pointing to a newly allocated array of elements of the given type.
+	 * Creates a ValueArray pointing to a newly allocated array of elements of the given type.
 	 * The array is zero-initialized.
 	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
 	 * \param length amount of elements in the new array
 	 */
-	ValuePtr( size_t length ): ValuePtrBase( length ) {
+	ValueArray( size_t length ): ValueArrayBase( length ) {
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
 		LOG_IF( length == 0, Debug, warning )
-				<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() )
+				<< "Creating an empty ValueArray of type " << util::MSubject( staticName() )
 				<< " you should overwrite it with a useful pointer before using it";
 	}
 
 	/**
-	 * Creates ValuePtr from a boost::shared_ptr of the same type.
+	 * Creates ValueArray from a boost::shared_ptr of the same type.
 	 * It will inherit the deleter of the shared_ptr.
 	 * \param ptr the shared_ptr to share the data with
-	 * \param length the length of the used array (ValuePtr does NOT check for length,
+	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValuePtrBase( length ), m_val( ptr ) {}
+	ValueArray( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
 
 	/**
-	 * Creates ValuePtr from a pointer of type TYPE.
+	 * Creates ValueArray from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
 	 * \param ptr the pointer to the used array
-	 * \param length the length of the used array (ValuePtr does NOT check for length,
+	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( TYPE *const ptr, size_t length ): ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValueArray( TYPE *const ptr, size_t length ): ValueArrayBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
-	 * Creates ValuePtr from a pointer of type TYPE.
+	 * Creates ValueArray from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
 	 * (this does not apply, if d does not delete).
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array
-	 * \param length the length of the used array in elements (ValuePtr does NOT check for length),
+	 * \param length the length of the used array in elements (ValueArray does NOT check for length),
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValueArray( TYPE *const ptr, size_t length, D d ): ValueArrayBase( length ), m_val( ptr, d ) {}
 
-	virtual ~ValuePtr() {}
+	virtual ~ValueArray() {}
 
 	boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
 		if( offset ) {
@@ -259,7 +259,7 @@ public:
 			return boost::static_pointer_cast<const void>( m_val );
 	}
 	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
-		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
+		return boost::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
 	}
 	virtual value_iterator beginGeneric() {
 		return value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
@@ -323,7 +323,7 @@ public:
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
-			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValuePtr";
+			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValueArray";
 			return std::pair<util::ValueReference, util::ValueReference>();
 		} else {
 
@@ -350,10 +350,10 @@ public:
 		DelProxy proxy( *this );
 
 		for ( size_t i = 0; i < fullSplices; i++ )
-			ret[i].reset( new ValuePtr( m_val.get() + i * size, size, proxy ) );
+			ret[i].reset( new ValueArray( m_val.get() + i * size, size, proxy ) );
 
 		if ( lastSize )
-			ret.back().reset( new ValuePtr( m_val.get() + fullSplices * size, lastSize, proxy ) );
+			ret.back().reset( new ValueArray( m_val.get() + fullSplices * size, lastSize, proxy ) );
 
 		return ret;
 	}
@@ -366,19 +366,19 @@ public:
 		} else { // get min/max and compute the scaling
 			std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 			assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-			return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
+			return ValueArrayBase::getScalingTo( typeID, minmax, scaleopt );
 		}
 	}
 };
 /// @cond _internal
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
-template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
+template<> scaling_pair ValueArray<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
+template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 /// @endcond
-template<typename T> bool ValuePtrBase::is()const
+template<typename T> bool ValueArrayBase::is()const
 {
 	util::checkType<T>();
-	return getTypeID() == ValuePtr<T>::staticID;
+	return getTypeID() == ValueArray<T>::staticID;
 }
 
 

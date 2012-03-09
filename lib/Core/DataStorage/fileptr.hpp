@@ -32,10 +32,10 @@ namespace data
  *
  * Writing to a FilePtr mapping a file read-only is valid. It will not change the mapped file.
  *
- * This is inherting from ValuePtr. Thus this, and all ValuePtr created from it will be managed.
+ * This is inherting from ValueArray. Thus this, and all ValueArray created from it will be managed.
  * The mapped file will automatically unmapped and closed after all pointers a deleted.
  */
-class FilePtr: public ValuePtr<uint8_t>
+class FilePtr: public ValueArray<uint8_t>
 {
 	struct Closer {
 		FILE_HANDLE file, mmaph;
@@ -44,17 +44,17 @@ class FilePtr: public ValuePtr<uint8_t>
 		bool write;
 		void operator()( void *p );
 	};
-	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t, bool );
+	typedef data::ValueArrayReference( *generator_type )( data::FilePtr &, size_t, size_t, bool );
 	struct GeneratorMap: public std::map<unsigned short, generator_type> {
 		GeneratorMap();
-		template<class T> static data::ValuePtrReference generator( data::FilePtr &mfile, size_t offset, size_t len, bool swap_endianess ) {
+		template<class T> static data::ValueArrayReference generator( data::FilePtr &mfile, size_t offset, size_t len, bool swap_endianess ) {
 			return mfile.at<T>( offset, len, swap_endianess );
 		}
 		struct proc {
 			std::map<unsigned short, generator_type> *m_map;
 			proc( std::map<unsigned short, generator_type> *map ): m_map( map ) {}
 			template<class T> void operator()( const T & ) {
-				m_map->insert( std::make_pair( ValuePtr<T>::staticID, &generator<T> ) );
+				m_map->insert( std::make_pair( ValueArray<T>::staticID, &generator<T> ) );
 			}
 		};
 	};
@@ -83,24 +83,24 @@ public:
 	 * - if write is false and len is greater then the length of the file or the file does not exist
 	 *
 	 * \param filename the file to map into memory
-	 * \param len the requested length of the resulting ValuePtr in bytes (automatically set if 0)
+	 * \param len the requested length of the resulting ValueArray in bytes (automatically set if 0)
 	 * \param write the file be opened for writing (writing to the mapped memory will write to the file, otherwise it will cause a copy-on-write)
 	 */
 	FilePtr( const boost::filesystem::path &filename, size_t len = 0, bool write = false );
 
 	/**
-	 * Get a ValuePtr representing the data in the file.
-	 * The resulting ValuePtr will use a proxy deleter to keep track of the mapped file.
-	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
+	 * Get a ValueArray representing the data in the file.
+	 * The resulting ValueArray will use a proxy deleter to keep track of the mapped file.
+	 * So the file will be unmapped and closed if, and only if all ValueArray created by this function and the FilePtr are closed.
 	 *
-	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
+	 * If the FilePtr was opened writing, writing access to this ValueArray objects will result in writes to the file. Otherwise it will just write into memory.
 	 *
 	 * Note that there is no conversion done, just reinterpretation of the raw data in the file.
 	 * \param offset the position in the file to start from (in bytes)
-	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
+	 * \param len the requested length of the resulting ValueArray in elements (if that will go behind the end of the file, a warning will be issued).
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
-	template<typename T> ValuePtr<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
+	template<typename T> ValueArray<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
 		boost::shared_ptr<T> ptr = boost::static_pointer_cast<T>( getRawAddress( offset ) );
 
 		if( len == 0 ) {
@@ -116,10 +116,10 @@ public:
 				<< "Ignoring requested to swap byte order for writing (the systems byte order is " << BOOST_BYTE_ORDER << " and that will be used)";
 
 		if( writing || !swap_endianess ) { // if not endianess swapping was requested or T is not float (or if we are writing)
-			return data::ValuePtr<T>( ptr, len ); // return a cheap copy
-		} else { // flip bytes into a new ValuePtr
-			LOG( Debug, info ) << "Byte swapping " <<  ValuePtr<T>::staticName() << " for endianess";
-			ValuePtr<T> ret( len );
+			return data::ValueArray<T>( ptr, len ); // return a cheap copy
+		} else { // flip bytes into a new ValueArray
+			LOG( Debug, info ) << "Byte swapping " <<  ValueArray<T>::staticName() << " for endianess";
+			ValueArray<T> ret( len );
 			data::endianSwapArray( ptr.get(), ptr.get() + std::min( len, getLength() / sizeof( T ) ), ret.begin() );
 			return ret;
 		}
@@ -127,11 +127,11 @@ public:
 	}
 
 	/**
-	 * Get a ValuePtrReference to a ValuePtr of the requested type.
-	 * The resulting ValuePtr will use a proxy deleter to keep track of the mapped file.
-	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
+	 * Get a ValueArrayReference to a ValueArray of the requested type.
+	 * The resulting ValueArray will use a proxy deleter to keep track of the mapped file.
+	 * So the file will be unmapped and closed if, and only if all ValueArray created by this function and the FilePtr are closed.
 	 *
-	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file.
+	 * If the FilePtr was opened writing, writing access to this ValueArray objects will result in writes to the file.
 	 * Otherwise it will just write into memory.
 	 *
 	 * If the FilePtr was opened reading and the assumed endianess of the file (see parameter) does not fit the endianess
@@ -139,10 +139,10 @@ public:
 	 *
 	 * \param ID the requested type (note that there is no conversion done, just reinterpretation of the raw data in the file)
 	 * \param offset the position in the file to start from (in bytes)
-	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
+	 * \param len the requested length of the resulting ValueArray in elements (if that will go behind the end of the file, a warning will be issued).
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
-	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0, bool swap_endianess = false );
+	data::ValueArrayReference atByID( unsigned short ID, size_t offset, size_t len = 0, bool swap_endianess = false );
 
 	bool good();
 	void release();

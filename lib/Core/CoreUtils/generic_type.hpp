@@ -28,7 +28,7 @@
 /// @cond _internal
 namespace isis
 {
-namespace data {template<typename TYPE> class ValuePtr;}
+namespace data {template<typename TYPE> class ValueArray;}
 namespace util
 {
 template<typename TYPE> class Value;
@@ -74,7 +74,7 @@ public:
 };
 
 /**
- * Base class to store and handle references to Value and ValuePtr objects.
+ * Base class to store and handle references to Value and ValueArray objects.
  * The values are refernced as smart pointers to their base class.
  * So the references are counted and data are automatically deleted if necessary.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
@@ -83,7 +83,7 @@ public:
  */
 template<typename TYPE_TYPE> class GenericReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
-	template<typename TT> friend class data::ValuePtr; //allow Value and ValuePtr to use the protected contructor below
+	template<typename TT> friend class data::ValueArray; //allow Value and ValueArray to use the protected contructor below
 	template<typename TT> friend class Value;
 protected:
 	//dont use this directly

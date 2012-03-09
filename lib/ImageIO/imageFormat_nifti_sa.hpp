@@ -139,7 +139,7 @@ protected:
 	size_t m_voxelstart, m_bpv;
 	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
-	void applyFlip( data::ValuePtrReference dat, isis::util::vector4< size_t > chunkSize );
+	void applyFlip( data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize );
 public:
 	virtual ~WriteOp() {}
 	nifti_1_header *getHeader();
@@ -166,8 +166,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::map<short, unsigned short> nifti_type2isis_type;
 	std::map<unsigned short, short> isis_type2nifti_type;
 	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
-		LOG( Runtime, info ) << data::ValuePtr<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValuePtr<NEW_T>::staticName();
-		return data::ValuePtr<NEW_T>::staticID;
+		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
+		return data::ValueArray<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
 	static std::list<data::Chunk> parseSliceOrdering( const _internal::nifti_1_header *head, data::Chunk current );
@@ -177,7 +177,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
-	data::ValuePtr<bool> bitRead( isis::data::ValuePtr< uint8_t > src, size_t length );
+	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( _internal::nifti_1_header *header );
 public:
 	ImageFormat_NiftiSa();

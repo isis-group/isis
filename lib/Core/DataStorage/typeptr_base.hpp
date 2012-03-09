@@ -122,17 +122,17 @@ template<> GenericValueIterator<false>::reference GenericValueIterator<false>::o
 } //namespace _internal
 /// @endcond _internal
 
-class ValuePtrBase : public util::_internal::GenericValue
+class ValueArrayBase : public util::_internal::GenericValue
 {
-	friend class util::_internal::GenericReference<ValuePtrBase>;
-	static const _internal::ValuePtrConverterMap &converters();
+	friend class util::_internal::GenericReference<ValueArrayBase>;
+	static const _internal::ValueArrayConverterMap &converters();
 	scaling_pair getScaling( const scaling_pair &scale, unsigned short ID )const;
 protected:
 	size_t m_len;
-	ValuePtrBase( size_t len = 0 );
+	ValueArrayBase( size_t len = 0 );
 
-	/// Create a ValuePtr of the same type pointing at the same address.
-	virtual ValuePtrBase *clone()const = 0;
+	/// Create a ValueArray of the same type pointing at the same address.
+	virtual ValueArrayBase *clone()const = 0;
 
 public:
 	typedef _internal::GenericValueIterator<false> value_iterator;
@@ -148,17 +148,17 @@ public:
 		 * This increments the use_count of the master and thus keeps the
 		 * master from being deleted while parts of it are still in use.
 		 */
-		DelProxy( const ValuePtrBase &master );
+		DelProxy( const ValueArrayBase &master );
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( const void *at );
 	};
 
 	/**
-	 * Get the raw address the ValuePtr points to.
+	 * Get the raw address the ValueArray points to.
 	 * An offset can be added to the result. If it is not zero, the resulting shared_ptr will use DelProxy as deleter.
 	 * Thus, it will increase  the reference count of the original pointer by one and decrease it when the deletion of the offset pointer is triggered.
 	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer
-	 * \returns a shared_ptr with the memory address of the data handled by this ValuePtr.
+	 * \returns a shared_ptr with the memory address of the data handled by this ValueArray.
 	 */
 	virtual boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
 
@@ -170,41 +170,41 @@ public:
 	virtual const_value_iterator beginGeneric()const = 0;
 	const_value_iterator endGeneric()const;
 
-	typedef util::_internal::GenericReference<ValuePtrBase> Reference;
-	typedef _internal::ValuePtrConverterMap::mapped_type::mapped_type Converter;
+	typedef util::_internal::GenericReference<ValueArrayBase> Reference;
+	typedef _internal::ValueArrayConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
 
 	/**
-	* Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Constant version.
+	* Dynamically cast the ValueBase up to its actual ValueArray\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a constant reference of the ValuePtr.
+	* \returns a constant reference of the ValueArray.
 	*/
-	template<typename T> const ValuePtr<T>& castToValuePtr() const {
-		return m_cast_to<ValuePtr<T> >();
+	template<typename T> const ValueArray<T>& castToValueArray() const {
+		return m_cast_to<ValueArray<T> >();
 	}
 
 	/**
-	 * Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Referenced version.
+	 * Dynamically cast the ValueBase up to its actual ValueArray\<T\>. Referenced version.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a reference of the ValuePtr.
+	 * \returns a reference of the ValueArray.
 	 */
-	template<typename T> ValuePtr<T>& castToValuePtr() {
-		return m_cast_to<ValuePtr<T> >();
+	template<typename T> ValueArray<T>& castToValueArray() {
+		return m_cast_to<ValueArray<T> >();
 	}
 
 	/// \returns the length (in elements) of the data pointed to
 	size_t getLength()const;
 
 	/**
-	 * Splice up the ValuePtr into equal sized blocks.
-	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating ValuePtr objects for them.
-	 * This ValuePtr objects use the reference counting of the original ValuePtr via DelProxy, so the original data are only deleted (as a whole)
-	 * when all spliced and all "normal" ValuePtr for this data are deleted.
+	 * Splice up the ValueArray into equal sized blocks.
+	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating ValueArray objects for them.
+	 * This ValueArray objects use the reference counting of the original ValueArray via DelProxy, so the original data are only deleted (as a whole)
+	 * when all spliced and all "normal" ValueArray for this data are deleted.
 	 * \param size the maximum size of the spliced parts of the data (the last part can be smaller)
-	 * \returns a vector of references to ValuePtr's which point to the parts of the spliced data
+	 * \returns a vector of references to ValueArray's which point to the parts of the spliced data
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
@@ -215,22 +215,22 @@ public:
 	/**
 	 * Create new data in memory containg a (converted) copy of this.
 	 * Allocates new memory of the requested type and copies the (converted) content of this into that memory.
-	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
+	 * \param ID the ID of the type the new ValueArray (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
 	Reference copyByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
 
 	/**
-	 * Copies elements from this into another ValuePtr.
+	 * Copies elements from this into another ValueArray.
 	 * This is allways a deep copy, regardless of the types.
 	 * If necessary, a conversion will be done.
 	 * If the this and the target are not of the same length:
 	 * - the shorter length will be used
 	 * - a warning about it will be sent to Debug
-	 * \param dst the ValuePtr-object to copy into
+	 * \param dst the ValueArray-object to copy into
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	bool copyTo( isis::data::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
+	bool copyTo( isis::data::ValueArrayBase &dst, scaling_pair scaling = scaling_pair() )const;
 
 	/**
 	 * Copies elements from this into raw memory.
@@ -243,7 +243,7 @@ public:
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
 	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
-		ValuePtr<T> cont( dst, len, typename ValuePtr<T>::NonDeleter() );
+		ValueArray<T> cont( dst, len, typename ValueArray<T>::NonDeleter() );
 		return copyTo( cont, scaling );
 	}
 
@@ -258,93 +258,93 @@ public:
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
 	template<typename T> bool copyFromMem( const T *const src, size_t len, scaling_pair scaling = scaling_pair() ) {
-		ValuePtr<T> cont( const_cast<T *>( src ), len, typename ValuePtr<T>::NonDeleter() ); //its ok - we're no going to change it
+		ValueArray<T> cont( const_cast<T *>( src ), len, typename ValueArray<T>::NonDeleter() ); //its ok - we're no going to change it
 		return cont.copyTo( *this, scaling );
 	}
 
 	/**
-	 * Create a ValuePtr of given type and length.
+	 * Create a ValueArray of given type and length.
 	 * This allocates memory as needed but does not initialize it.
-	 * \returns a Reference to a ValuePtr pointing to the allocated memory. Or an empty Reference if the creation failed.
+	 * \returns a Reference to a ValueArray pointing to the allocated memory. Or an empty Reference if the creation failed.
 	 */
 	static Reference createByID( unsigned short ID, size_t len );
 
 	/**
-	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
-	 * This will create a new ValuePtr of type T and the length of this.
+	 * Copy this to a new ValueArray\<T\> using newly allocated memory.
+	 * This will create a new ValueArray of type T and the length of this.
 	 * The memory will be allocated and the data of this will be copy-converted to T using min/max as value range.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
-	 * \returns a the newly created ValuePtr
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValueArray will be undefined.
+	 * \returns a the newly created ValueArray
 	 */
-	template<typename T> ValuePtr<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		Reference erg = copyByID( ValuePtr<T>::staticID, scaling );
-		return erg.isEmpty() ? ValuePtr<T>( 0 ) : erg->castToValuePtr<T>();
+	template<typename T> ValueArray<T> copyAs( scaling_pair scaling = scaling_pair() )const {
+		Reference erg = copyByID( ValueArray<T>::staticID, scaling );
+		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 
 	/**
-	 * Get this as a ValuePtr of a specific type.
-	 * This does an automatic conversion into a new ValuePtr if one of following is true:
+	 * Get this as a ValueArray of a specific type.
+	 * This does an automatic conversion into a new ValueArray if one of following is true:
 	 * - the target type is not the current type
 	 * - scaling.first (the scaling factor) is not 1
 	 * - scaling.first (the scaling offset) is not 0
 	 *
 	 * Otherwise a cheap copy is done.
-	 * \param ID the ID of the requeseted type (use ValuePtr::staticID)
+	 * \param ID the ID of the requeseted type (use ValueArray::staticID)
 	 * \param scaling the scaling to be used (determined automatically if not given)
-	 * \returns a reference of eigther a cheap copy or a newly created ValuePtr
+	 * \returns a reference of eigther a cheap copy or a newly created ValueArray
 	 */
-	ValuePtrBase::Reference  convertByID( unsigned short ID, scaling_pair scaling = scaling_pair() );
+	ValueArrayBase::Reference  convertByID( unsigned short ID, scaling_pair scaling = scaling_pair() );
 
 
 	/**
-	 * Get this as a ValuePtr of a specific type.
-	 * This does an automatic conversion into a new ValuePtr if one of following is true:
+	 * Get this as a ValueArray of a specific type.
+	 * This does an automatic conversion into a new ValueArray if one of following is true:
 	 * - the target type is not the current type
 	 * - scaling.first (the scaling factor) is not 1
 	 * - scaling.first (the scaling offset) is not 0
 	 *
 	 * Otherwise a cheap copy is done.
 	 * \param scaling the scaling to be used (determined automatically if not given)
-	 * \returns eigther a cheap copy or a newly created ValuePtr
+	 * \returns eigther a cheap copy or a newly created ValueArray
 	 */
-	template<typename T> ValuePtr<T> as( scaling_pair scaling = scaling_pair() ) {
-		Reference erg = convertByID( ValuePtr<T>::staticID, scaling );
-		return erg.isEmpty() ? ValuePtr<T>( 0 ) : erg->castToValuePtr<T>();
+	template<typename T> ValueArray<T> as( scaling_pair scaling = scaling_pair() ) {
+		Reference erg = convertByID( ValueArray<T>::staticID, scaling );
+		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 
 	/**
-	 * Create a new ValuePtr, of the same type, but differnent size in memory.
+	 * Create a new ValueArray, of the same type, but differnent size in memory.
 	 * (The actual data are _not_ copied)
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
-	ValuePtrBase::Reference cloneToNew( size_t length )const;
+	ValueArrayBase::Reference cloneToNew( size_t length )const;
 
-	/// \returns the byte-size of the type of the data this ValuePtr points to.
+	/// \returns the byte-size of the type of the data this ValueArray points to.
 	virtual size_t bytesPerElem()const = 0;
 
-	virtual ~ValuePtrBase();
+	virtual ~ValueArrayBase();
 
 	/**
-	 * Copy a range of elements to another ValuePtr of the same type.
+	 * Copy a range of elements to another ValueArray of the same type.
 	 * \param start first element in this to be copied
 	 * \param end last element in this to be copied
 	 * \param dst target for the copy
 	 * \param dst_start starting element in dst to be overwritten
 	 */
-	void copyRange( size_t start, size_t end, ValuePtrBase &dst, size_t dst_start )const;
+	void copyRange( size_t start, size_t end, ValueArrayBase &dst, size_t dst_start )const;
 
 	/// \returns the number of references using the same memory as this.
 	size_t useCount()const;
 
 	/**
-	 * Get minimum/maximum of a ValuePtr.
+	 * Get minimum/maximum of a ValueArray.
 	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.
 	 * This actually returns the bounding box of the values in the value space of the type. This means:
 	 * - min/max numbers for numbers from a 1-D value space (aka real numbers)
 	 * - complex(lowest real value,lowest imaginary value) / complex(biggest real value,biggest imaginary value) for complex numbers
 	 * - color(lowest red value,lowest green value, lowest blue value)/color(biggest red value,biggest green value, biggest blue value) for color
 	 * The computed min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
-	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
+	 * The following code checks if the value range of ValueArray-object data1 is a real subset of data2:
 	 * \code
 	 * std::pair<util::ValueReference,util::ValueReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
 	 * if(minmax1.first->gt(minmax2.second) && minmax1.second->lt(minmax2.second)
@@ -355,21 +355,21 @@ public:
 	virtual std::pair<util::ValueReference, util::ValueReference> getMinMax()const = 0;
 
 	/**
-	 * Compare the data of two ValuePtr.
-	 * Counts how many elements in this and the given ValuePtr are different within the given range.
-	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
-	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
+	 * Compare the data of two ValueArray.
+	 * Counts how many elements in this and the given ValueArray are different within the given range.
+	 * If the type of this is not equal to the type of the given ValueArray the whole length is assumed to be different.
+	 * If the given range does not fit into this or the given ValueArray an error is send to the runtime log and the function will probably crash.
 	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
 	 * \param end the first element in this, which should _not_ be compared anymore to the given TyprPtr
-	 * \param dst the given ValuePtr this should be compared to
+	 * \param dst the given ValueArray this should be compared to
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
-	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
+	 * \returns the amount of elements which actually differ in both ValueArray or the whole length of the range when the types are not equal.
 	 */
-	size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const;
+	size_t compare( size_t start, size_t end, const ValueArrayBase &dst, size_t dst_start )const;
 };
 
 
-typedef ValuePtrBase::Reference ValuePtrReference;
+typedef ValueArrayBase::Reference ValueArrayReference;
 
 }
 }

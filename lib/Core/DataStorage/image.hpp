@@ -387,7 +387,7 @@ public:
 	template <typename T> T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
-		ValuePtr<T> &data = chunkAt ( index.first ).asValuePtr<T>();
+		ValueArray<T> &data = chunkAt ( index.first ).asValueArray<T>();
 		return data[index.second];
 	}
 
@@ -405,7 +405,7 @@ public:
 	 */
 	template <typename T> const T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) const {
 		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
-		const ValuePtr<T> &data = chunkPtrAt ( index.first )->getValuePtr<T>();
+		const ValueArray<T> &data = chunkPtrAt ( index.first )->getValueArray<T>();
 		return data[index.second];
 	}
 
@@ -420,7 +420,7 @@ public:
 	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
 	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
 	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
-	 * \returns a number which is equal to the ValuePtr::staticID of the selected type.
+	 * \returns a number which is equal to the ValueArray::staticID of the selected type.
 	 */
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
@@ -481,7 +481,7 @@ public:
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
-		return getChunkAs<TYPE> ( getScalingTo ( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -497,7 +497,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
 		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType ( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType ( ValueArray<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -629,7 +629,7 @@ public:
 	template<typename T> void copyToMem ( T *dst, size_t len,  scaling_pair scaling = scaling_pair() ) const {
 		if ( clean ) {
 			if ( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
-				scaling = getScalingTo ( ValuePtr<T>::staticID );
+				scaling = getScalingTo ( ValueArray<T>::staticID );
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
@@ -637,7 +637,7 @@ public:
 				const size_t cSize = ref->getSizeAsVector().product();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
-					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValueArray<T>::staticName();
 				} else {
 					if ( len < cSize ) {
 						LOG ( Runtime, error ) << "Abborting copy, because there is no space left in the target";
@@ -673,16 +673,16 @@ public:
 	}
 
 	/**
-	 * Copy all voxel data into a new ValuePtr.
-	 * This creates a ValuePtr of the requested type and the same length as the images volume and then copies all voxeldata of the image into that ValuePtr.
+	 * Copy all voxel data into a new ValueArray.
+	 * This creates a ValueArray of the requested type and the same length as the images volume and then copies all voxeldata of the image into that ValueArray.
 	 *
 	 * If neccessary a conversion into T is done using min/max of the image.
-	 * \note This is a deep copy, no data will be shared between the Image and the ValuePtr. It will waste a lot of memory, use it wisely.
-	 * \returns a ValuePtr containing the voxeldata of the Image (but not its Properties)
+	 * \note This is a deep copy, no data will be shared between the Image and the ValueArray. It will waste a lot of memory, use it wisely.
+	 * \returns a ValueArray containing the voxeldata of the Image (but not its Properties)
 	 */
-	template<typename T> ValuePtr<T> copyAsValuePtr() const {
+	template<typename T> ValueArray<T> copyAsValueArray() const {
 		const util::vector4<size_t> size = getSizeAsVector();
-		data::ValuePtr<T> ret ( getVolume() );
+		data::ValueArray<T> ret ( getVolume() );
 		copyToMem<T> ( &ret[0], ret.getVolume() );
 		return ret;
 	}
@@ -738,7 +738,7 @@ public:
 			}
 		};
 		_proxy prx ( op );
-		return convertToType ( data::ValuePtr<TYPE>::staticID ) && foreachChunk ( prx, false );
+		return convertToType ( data::ValueArray<TYPE>::staticID ) && foreachChunk ( prx, false );
 	}
 
 	/// \returns the number of rows of the image
@@ -763,14 +763,14 @@ template<typename T> class TypedImage: public Image
 protected:
 	TypedImage() {} // to be used only by inheriting classes
 public:
-	typedef _internal::ImageIteratorTemplate<data::ValuePtr<T> > iterator;
-	typedef _internal::ImageIteratorTemplate<const data::ValuePtr<T> > const_iterator;
+	typedef _internal::ImageIteratorTemplate<data::ValueArray<T> > iterator;
+	typedef _internal::ImageIteratorTemplate<const data::ValueArray<T> > const_iterator;
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage ( const Image &src ) : Image ( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		convertToType ( ValuePtr<T>::staticID );
+		convertToType ( ValueArray<T>::staticID );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator= ( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -780,7 +780,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator= ( ref );
-		convertToType ( ValuePtr<T>::staticID );
+		convertToType ( ValueArray<T>::staticID );
 		return *this;
 	}
 	void copyToMem ( void *dst ) {
@@ -791,10 +791,10 @@ public:
 	}
 	iterator begin() {
 		if ( checkMakeClean() ) {
-			std::vector<data::ValuePtr<T>*> vec ( lookup.size() );
+			std::vector<data::ValueArray<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->template asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValueArray<T>();
 
 			return iterator ( vec );
 		} else {
@@ -807,10 +807,10 @@ public:
 	};
 	const_iterator begin() const {
 		if ( isClean() ) {
-			std::vector<const data::ValuePtr<T>*> vec ( lookup.size() );
+			std::vector<const data::ValueArray<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->template asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValueArray<T>();
 
 			return const_iterator ( vec );
 		} else {
@@ -855,7 +855,7 @@ public:
 				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo ( ValuePtr<T>::staticID );
+		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID );
 		LOG ( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform ( conv_op );

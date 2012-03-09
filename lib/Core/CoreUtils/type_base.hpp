@@ -62,7 +62,7 @@ API_EXCLUDE_END
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
- * Additionally, there's the ValuePtrBase containing the more complex data handling stuff with abstract values.
+ * Additionally, there's the ValueArrayBase containing the more complex data handling stuff with abstract values.
  * Both are derived from GenericValue containing the description of the actual value type.
  */
 
@@ -73,9 +73,9 @@ class ValueBase : public _internal::GenericValue
 protected:
 	/**
 	* Create a copy of this.
-	* Creates a new Value/ValuePtr an stores a copy of its value there.
+	* Creates a new Value/ValueArray an stores a copy of its value there.
 	* Makes ValueBase-pointers copyable without knowing their type.
-	* \returns a ValueBase-pointer to a newly created Value/ValuePtr.
+	* \returns a ValueBase-pointer to a newly created Value/ValueArray.
 	*/
 	virtual ValueBase *clone()const = 0;
 public:

@@ -59,10 +59,10 @@ public:
 
 /**
  * Main class for four-dimensional random-access data blocks.
- * Like in ValuePtr, the copy of a Chunk will reference the same data. (cheap copy)
+ * Like in ValueArray, the copy of a Chunk will reference the same data. (cheap copy)
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, protected ValuePtrReference
+class Chunk : public _internal::ChunkBase, protected ValueArrayReference
 {
 	friend class Image;
 	friend class std::vector<Chunk>;
@@ -77,17 +77,17 @@ protected:
 	 * \param nrOfTimesteps size in the fourth dimension
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ), ValuePtrReference( ValuePtr<TYPE>( src, getVolume(), d ) ) {}
+		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ), ValueArrayReference( ValueArray<TYPE>( src, getVolume(), d ) ) {}
 
 	Chunk() {}; //do not use this
 public:
 
-	typedef ValuePtrBase::value_iterator iterator;
-	typedef ValuePtrBase::const_value_iterator const_iterator;
+	typedef ValueArrayBase::value_iterator iterator;
+	typedef ValueArrayBase::const_value_iterator const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
 
-	Chunk( const isis::data::ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false );
+	Chunk( const isis::data::ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false );
 
 	/**
 	 * Gets a reference to the element at a given index.
@@ -98,7 +98,7 @@ public:
 		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::vector4<size_t>( idx ) << " is out of range " << getSizeAsString();
-		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
+		ValueArray<TYPE> &ret = asValueArray<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
 
@@ -118,7 +118,7 @@ public:
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
-		const ValuePtr<TYPE> &ret = const_cast<Chunk &>( *this ).asValuePtr<TYPE>();
+		const ValueArray<TYPE> &ret = const_cast<Chunk &>( *this ).asValueArray<TYPE>();
 
 		return ret[getLinearIndex( idx )];
 	}
@@ -136,7 +136,7 @@ public:
 	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::vector4<size_t> offset ) {
 		const util::vector4<size_t> imagesize = getSizeAsVector();
 		util::vector4<size_t> pos;
-		TYPE *vox = &asValuePtr<TYPE>()[0];
+		TYPE *vox = &asValueArray<TYPE>()[0];
 		size_t ret = 0;
 
 		for( pos[timeDim] = 0; pos[timeDim] < imagesize[timeDim]; pos[timeDim]++ )
@@ -164,11 +164,11 @@ public:
 	const_iterator begin()const;
 	const_iterator end()const;
 
-	ValuePtrBase &asValuePtrBase() {return operator*();}
-	const ValuePtrBase &getValuePtrBase()const {return operator*();}
+	ValueArrayBase &asValueArrayBase() {return operator*();}
+	const ValueArrayBase &getValueArrayBase()const {return operator*();}
 
-	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {return asValuePtrBase().castToValuePtr<TYPE>();}
-	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {return getValuePtrBase().castToValuePtr<TYPE>();}
+	template<typename TYPE> ValueArray<TYPE> &asValueArray() {return asValueArrayBase().castToValueArray<TYPE>();}
+	template<typename TYPE> const ValueArray<TYPE> getValueArray()const {return getValueArrayBase().castToValueArray<TYPE>();}
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
@@ -195,7 +195,7 @@ public:
 	 * \return true if copying was (at least partly) successful
 	 */
 	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
-		return getValuePtrBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValuePtrBase
+		return getValueArrayBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValueArrayBase
 	}
 
 	///get the scaling (and offset) which would be used in an conversion to the given type
@@ -205,7 +205,7 @@ public:
 	size_t getBytesPerVoxel()const;
 	std::string getTypeName()const;
 	unsigned short getTypeID()const;
-	template<typename T> bool is()const {return getValuePtrBase().is<T>();}
+	template<typename T> bool is()const {return getValueArrayBase().is<T>();}
 
 	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
 
@@ -282,7 +282,7 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference( ValuePtr<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {}
+		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -295,14 +295,14 @@ public:
 	 * \param nrOfTimesteps size of the resulting image
 	 */
 	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference( ValuePtr<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {
+		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {
 		util::checkType<T>();
-		asValuePtrBase().copyFromMem( org, getVolume() );
+		asValueArrayBase().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -311,20 +311,20 @@ public:
 	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
 	 */
 	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, scaling ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID, scaling ) );
 	}
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
 		LOG_IF( useCount() > 1, Debug, warning )
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
@@ -342,7 +342,7 @@ public:
 	MemChunkNonDel( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
 			( TYPE * )calloc( nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns, sizeof( TYPE ) ),
-			typename ValuePtr<TYPE>::NonDeleter(),
+			typename ValueArray<TYPE>::NonDeleter(),
 			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {}
 	/**
@@ -360,16 +360,16 @@ public:
 	template<typename T> MemChunkNonDel( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
 			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
-			typename ValuePtr<TYPE>::NonDeleter(),
+			typename ValueArray<TYPE>::NonDeleter(),
 			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {
 		util::checkType<T>();
-		asValuePtrBase().copyFromMem( org, getVolume() );
+		asValueArrayBase().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -379,20 +379,20 @@ public:
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
 	MemChunkNonDel( const Chunk &ref, const util::ValueBase &min, const  util::ValueBase &max ): Chunk( ref ) {
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, min, max ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID, min, max ) );
 	}
 	MemChunkNonDel( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
 		LOG_IF( useCount() > 1, Debug, warning )
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
-		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
+		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)

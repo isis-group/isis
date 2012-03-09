@@ -66,7 +66,7 @@ bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 		return true;
 	}
 }
-void WriteOp::applyFlip ( isis::data::ValuePtrReference dat, isis::util::vector4< size_t > chunkSize )
+void WriteOp::applyFlip ( isis::data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize )
 {
 	if( m_doFlip ) {
 		// wrap the copied part back into a Chunk to flip it
@@ -87,8 +87,8 @@ public:
 
 	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
-		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
-		ch.asValuePtrBase().copyTo( *out_data, m_scale );
+		data::ValueArrayReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
+		ch.asValueArrayBase().copyTo( *out_data, m_scale );
 		applyFlip( out_data, ch.getSizeAsVector() );
 		return true;
 	}
@@ -131,13 +131,13 @@ public:
 
 	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
 		data::Chunk ch = src;
-		ch.convertToType( data::ValuePtr<util::color24>::staticID, m_scale );
+		ch.convertToType( data::ValueArray<util::color24>::staticID, m_scale );
 		VoxelCp cp;
 		assert( posInImage[data::timeDim] == 0 );
 
 		for( ; posInImage[data::timeDim] < 3; posInImage[data::timeDim]++ ) { //copy each color/timestep into m_out
 			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
-			data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
+			data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
 			cp.ptr = &out_data[0];
 			cp.mode = posInImage[data::timeDim];
 			ch.foreachVoxel( cp );
@@ -147,7 +147,7 @@ public:
 		return true;
 	}
 
-	short unsigned int getTypeId() {return data::ValuePtr<uint8_t>::staticID;}
+	short unsigned int getTypeId() {return data::ValueArray<uint8_t>::staticID;}
 };
 
 class BitWriteOp: public WriteOp
@@ -156,10 +156,10 @@ public:
 	BitWriteOp( const data::Image &image ): WriteOp( image, 1 ) {}
 
 	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
-		data::ValuePtr<bool> in_data = src.asValuePtrBase().as<bool>();
+		data::ValueArray<bool> in_data = src.asValueArrayBase().as<bool>();
 		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv ;
 
-		data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
+		data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
 		memset( &out_data[0], 0, out_data.getLength() );
 
 		for( size_t i = 0; i < in_data.getLength(); i++ ) {
@@ -174,7 +174,7 @@ public:
 		return true;
 	}
 
-	short unsigned int getTypeId() {return data::ValuePtr<bool>::staticID;}
+	short unsigned int getTypeId() {return data::ValueArray<bool>::staticID;}
 };
 
 
@@ -182,25 +182,25 @@ public:
 
 ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 {
-	nifti_type2isis_type[NIFTI_TYPE_INT8 ] = data::ValuePtr< int8_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_INT16] = data::ValuePtr<int16_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_INT32] = data::ValuePtr<int32_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_INT64] = data::ValuePtr<int64_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_INT8 ] = data::ValueArray< int8_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_INT16] = data::ValueArray<int16_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_INT32] = data::ValueArray<int32_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_INT64] = data::ValueArray<int64_t>::staticID;
 
-	nifti_type2isis_type[NIFTI_TYPE_UINT8 ] = data::ValuePtr< uint8_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_UINT16] = data::ValuePtr<uint16_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_UINT32] = data::ValuePtr<uint32_t>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_UINT64] = data::ValuePtr<uint64_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_UINT8 ] = data::ValueArray< uint8_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_UINT16] = data::ValueArray<uint16_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_UINT32] = data::ValueArray<uint32_t>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_UINT64] = data::ValueArray<uint64_t>::staticID;
 
-	nifti_type2isis_type[NIFTI_TYPE_FLOAT32] = data::ValuePtr<float>::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_FLOAT64] = data::ValuePtr<double>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_FLOAT32] = data::ValueArray<float>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_FLOAT64] = data::ValueArray<double>::staticID;
 
-	nifti_type2isis_type[NIFTI_TYPE_RGB24] = data::ValuePtr<util::color24>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_RGB24] = data::ValueArray<util::color24>::staticID;
 
-	nifti_type2isis_type[NIFTI_TYPE_COMPLEX64] = data::ValuePtr<std::complex<float> >::staticID;
-	nifti_type2isis_type[NIFTI_TYPE_COMPLEX128] = data::ValuePtr<std::complex<double> >::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_COMPLEX64] = data::ValueArray<std::complex<float> >::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_COMPLEX128] = data::ValueArray<std::complex<double> >::staticID;
 
-	nifti_type2isis_type[NIFTI_TYPE_BINARY] = data::ValuePtr<bool>::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_BINARY] = data::ValueArray<bool>::staticID;
 
 	typedef std::map<short, unsigned short>::const_reference ref_type;
 	BOOST_FOREACH( ref_type ref, nifti_type2isis_type ) {
@@ -537,7 +537,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
 
-isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead( data::ValuePtr< uint8_t > src, size_t size )
+isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray< uint8_t > src, size_t size )
 {
 	assert( size );
 
@@ -547,7 +547,7 @@ isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead( data::ValuePtr< uint8
 		throwGenericError( err );
 	}
 
-	isis::data::ValuePtr< bool > ret( size );
+	isis::data::ValueArray< bool > ret( size );
 
 	for( size_t i = 0; i < size; i++ ) {
 		const size_t byte = i / 8;
@@ -654,15 +654,15 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	size.fill( 1 );
 
 	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
-	data::ValuePtrReference data_src;
+	data::ValueArrayReference data_src;
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
 		data_src = bitRead( mfile.at<uint8_t>( header->vox_offset ), size.product() );
 	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = size.product() / 3;
-		data::ValuePtr<util::color24> buff( volume );
-		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset, volume * 3 );
+		data::ValueArray<util::color24> buff( volume );
+		const data::ValueArray<uint8_t> src = mfile.at<uint8_t>( header->vox_offset, volume * 3 );
 		LOG( Runtime, info ) << "Mapping nifti image as FSL RBG set of 3*" << volume << " elements";
 
 		for( size_t v = 0; v < volume; v++ ) {
@@ -676,8 +676,8 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
 		const size_t volume = size.product() / 3;
-		data::ValuePtr<util::fvector4> buff( volume );
-		const data::ValuePtr<float> src = mfile.at<float>( header->vox_offset, size.product(), swap_endian );
+		data::ValueArray<util::fvector4> buff( volume );
+		const data::ValueArray<float> src = mfile.at<float>( header->vox_offset, size.product(), swap_endian );
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v][0] = src[v];
@@ -723,7 +723,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
 
 	//bitmap is not supportet by spm and fsl
-	if( target_id == data::ValuePtr<bool>::staticID ) {
+	if( target_id == data::ValueArray<bool>::staticID ) {
 		if( dialect == "fsl" || dialect == "spm" ) {
 			target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );// fall back to uint8_t and use normal writer for that
 		} else {
@@ -734,19 +734,19 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	// fsl cannot deal with some types
 	if( dialect == "fsl" ) {
 		switch( target_id ) {
-		case data::ValuePtr<uint16_t>::staticID:
+		case data::ValueArray<uint16_t>::staticID:
 			target_id = typeFallBack<uint16_t, int16_t>( "fsl" );
 			break;
-		case data::ValuePtr<uint32_t>::staticID:
+		case data::ValueArray<uint32_t>::staticID:
 			target_id = typeFallBack<uint32_t, int32_t>( "fsl" );
 			break;
-		case data::ValuePtr<util::color24>::staticID:
+		case data::ValueArray<util::color24>::staticID:
 
 			if( src.getRelevantDims() > 3 ) {
 				LOG( Runtime, error ) << "Cannot store color image of size " << src.getSizeAsString() << " using fsl dialect (4th dim is needed for the colors)";
 				throwGenericError( "unsupported datatype" );
 			} else {
-				LOG( Runtime, info ) << data::ValuePtr<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
+				LOG( Runtime, info ) << data::ValueArray<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
 				return std::auto_ptr<_internal::WriteOp>( new _internal::FslRgbWriteOp( src ) );
 			}
 
@@ -783,7 +783,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 		guessSliceOrdering( image, header->slice_code, header->slice_duration );
 
-		if( image.getMajorTypeID() == data::ValuePtr<util::color24>::staticID ) {
+		if( image.getMajorTypeID() == data::ValueArray<util::color24>::staticID ) {
 			header->cal_min = 0;
 			header->cal_max = 255;
 		} else {

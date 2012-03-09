@@ -65,12 +65,12 @@ int ImageFormat_VistaSa::load ( std::list< data::Chunk >& chunks, const std::str
 
 
 	//  data::FilePtr::iterator begin = mfile.begin();
-	//  std::list< data::ValuePtr< uint8_t > > d;
+	//  std::list< data::ValueArray< uint8_t > > d;
 	//  bool r = qi::parse<data::FilePtr::iterator >( begin,mfile.end() , lit("V-data 2") >> *ascii::space
 	//                                                                      >> '{',
 	//                      d );
 	//  std::cout << r << std::endl;
-	//  BOOST_FOREACH( std::list< data::ValuePtr< uint8_t > >::const_reference number, d)
+	//  BOOST_FOREACH( std::list< data::ValueArray< uint8_t > >::const_reference number, d)
 	//  {
 	//      std::cout << number << std::endl;
 	//  }

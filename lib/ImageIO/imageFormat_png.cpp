@@ -109,7 +109,7 @@ public:
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
-		row_pointers[0] = ( png_byte * )buff.getValuePtrBase().getRawAddress().get();
+		row_pointers[0] = ( png_byte * )buff.getValueArrayBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
 			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
@@ -205,19 +205,19 @@ public:
 		png_byte color_type, bit_depth; ;
 
 		switch( isis_data_type ) {
-		case data::ValuePtr< int8_t>::staticID: // if its signed, fall "back" to unsigned
-		case data::ValuePtr<uint8_t>::staticID:
-			tImg.convertToType( data::ValuePtr<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
+		case data::ValueArray< int8_t>::staticID: // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint8_t>::staticID:
+			tImg.convertToType( data::ValueArray<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 8;
-		case data::ValuePtr< int16_t>::staticID: // if its signed, fall "back" to unsigned
-		case data::ValuePtr<uint16_t>::staticID:
-			tImg.convertToType( data::ValuePtr<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
+		case data::ValueArray< int16_t>::staticID: // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint16_t>::staticID:
+			tImg.convertToType( data::ValueArray<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 16;
 			break;
-		case data::ValuePtr<util::color24>::staticID:
-		case data::ValuePtr<util::color48>::staticID:
+		case data::ValueArray<util::color24>::staticID:
+		case data::ValueArray<util::color48>::staticID:
 			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
 			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;

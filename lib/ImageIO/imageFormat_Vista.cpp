@@ -110,41 +110,41 @@ throw( std::runtime_error & )
 		// from the chunk since the chunks can have different types.
 		switch( image.getMajorTypeID() ) {
 			// VBit
-		case data::ValuePtr<bool>::staticID:
+		case data::ValueArray<bool>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 			copyImageToVista<vista_bitmask_type>( image, vimages[0] );
 			break;
 			// VUByte
-		case data::ValuePtr<VUByte>::staticID:
+		case data::ValueArray<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 			copyImageToVista<VUByte>( image, vimages[0] );
 			break;
 			// VSByte
-		case data::ValuePtr<VSByte>::staticID:
+		case data::ValueArray<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
-		case data::ValuePtr<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID:
 			LOG( Runtime, info ) << "Vista does not support " << util::Value<u_int16_t>::staticName() << ". Falling back to " << util::Value<VShort>::staticName();
-		case data::ValuePtr<VShort>::staticID:
+		case data::ValueArray<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
 #if defined(_M_X64) || defined(__amd64__) && not defined (__APPLE__)
 			// VLong
-		case data::ValuePtr<VLong>::staticID:
+		case data::ValueArray<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
 #endif
 			// VFloat
-		case data::ValuePtr<VFloat>::staticID:
+		case data::ValueArray<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 			copyImageToVista<VFloat>( image, vimages[0] );
 			break;
 			// VDouble
-		case data::ValuePtr<VDouble>::staticID:
+		case data::ValueArray<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
 			copyImageToVista<VDouble>( image, vimages[0] );
 			break;
@@ -983,13 +983,13 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 	const util::vector4<size_t> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
-	const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
+	const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 				data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, 0 );
-				ch.getValuePtr<T>().copyToMem( &VPixel( vimage, z, y, x, T ), csize.product() );
+				ch.getValueArray<T>().copyToMem( &VPixel( vimage, z, y, x, T ), csize.product() );
 			}
 		}
 	}

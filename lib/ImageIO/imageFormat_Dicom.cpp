@@ -35,12 +35,12 @@ class DicomChunk : public data::Chunk
 		data::Chunk( dat, del, width, height, 1, 1 ) {
 		LOG( Debug, verbose_info )
 				<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-				<< dat << " (" << data::ValuePtr<TYPE>::staticName() << ")" ;
+				<< dat << " (" << data::ValueArray<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
-		data::ValuePtr<util::color<TYPE> > &dest = ret->asValuePtr<util::color<TYPE> >();
+		data::ValueArray<util::color<TYPE> > &dest = ret->asValueArray<util::color<TYPE> >();
 		const size_t pixels = dest.getLength();
 
 		for ( size_t i = 0; i < pixels; i++ ) {

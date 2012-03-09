@@ -297,7 +297,7 @@ public:
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
 
 		switch ( image.getMajorTypeID() ) {
-		case data::ValuePtr<int8_t>::staticID:
+		case data::ValueArray<int8_t>::staticID:
 
 			if ( dialect == "fsl" || dialect == "spm" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
@@ -309,15 +309,15 @@ public:
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
-		case data::ValuePtr<uint8_t>::staticID:
+		case data::ValueArray<uint8_t>::staticID:
 			ni.datatype = DT_UINT8;
 			copyDataToNifti<uint8_t>( image, ni );
 			break;
-		case data::ValuePtr<int16_t>::staticID:
+		case data::ValueArray<int16_t>::staticID:
 			ni.datatype = DT_INT16;
 			copyDataToNifti<int16_t>( image, ni );
 			break;
-		case data::ValuePtr<uint16_t>::staticID:
+		case data::ValueArray<uint16_t>::staticID:
 
 			if ( dialect == "fsl" || dialect == "spm" ) {
 				//              image.print( std::cout );
@@ -330,11 +330,11 @@ public:
 			}
 
 			break;
-		case data::ValuePtr<int32_t>::staticID:
+		case data::ValueArray<int32_t>::staticID:
 			ni.datatype = DT_INT32;
 			copyDataToNifti<int32_t>( image, ni );
 			break;
-		case data::ValuePtr<uint32_t>::staticID:
+		case data::ValueArray<uint32_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				data::TypedImage<int32_t> fslCopy( image );
@@ -346,11 +346,11 @@ public:
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<uint16_t>( image, ni );
 			break;
-		case data::ValuePtr<float>::staticID:
+		case data::ValueArray<float>::staticID:
 			ni.datatype = DT_FLOAT32;
 			copyDataToNifti<float>( image, ni );
 			break;
-		case data::ValuePtr<double>::staticID:
+		case data::ValueArray<double>::staticID:
 			ni.datatype = DT_FLOAT64;
 			copyDataToNifti<double>( image, ni );
 			break;
@@ -578,7 +578,7 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::vector4<size_t> isize = image.getSizeAsVector();
-		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
+		const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {

@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.isValid() );
 	BOOST_CHECK_EQUAL( img.copyChunksToVector( false ).size(), 4 );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::vector4<size_t>( size ) ) );
-	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
+	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValueArray<int16_t>( NULL, 0 ).getTypeID() );
 }
 
 BOOST_AUTO_TEST_CASE ( type_scale_test )
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	data::scaling_pair scale = img.getScalingTo( data::ValuePtr<uint8_t>::staticID );
+	data::scaling_pair scale = img.getScalingTo( data::ValueArray<uint8_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
 }
@@ -876,7 +876,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const size_t D[] = {0, 0, 0, 0};
 
 	cpSource.copyRange( S1, S2, chSlice, D );
-	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getValuePtr<float>() ).get();
+	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
 	float *pRun = pValues;
 
 	for ( unsigned int iy = 0; iy < nrY; iy++ ) {

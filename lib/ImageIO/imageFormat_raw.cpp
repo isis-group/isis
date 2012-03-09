@@ -55,7 +55,7 @@ public:
 		}
 
 
-		data::ValuePtrReference dataRef = mfile.atByID( type, 0 );
+		data::ValueArrayReference dataRef = mfile.atByID( type, 0 );
 		const size_t elemSize = dataRef->bytesPerElem();
 
 		const size_t ssize = sqrt( fsize / elemSize );
@@ -88,7 +88,7 @@ public:
 				out.exceptions( std::ios::failbit | std::ios::badbit );
 			}
 			bool operator()( data::Chunk &ref, util::vector4<size_t> /*posInImage*/ ) {
-				const boost::shared_ptr<const void> data( ref.getValuePtrBase().getRawAddress() );
+				const boost::shared_ptr<const void> data( ref.getValueArrayBase().getRawAddress() );
 				const size_t data_size = ref.getBytesPerVoxel() * ref.getVolume();
 				out.write( static_cast<const char *>( data.get() ), data_size );
 				return true;

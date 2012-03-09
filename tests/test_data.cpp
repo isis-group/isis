@@ -55,7 +55,7 @@ int main()
 	Value<float> f( 5.4 );
 	int i_ = f;//this wont throw an exception because it only does an implizit conversions from Value<float>=>float and float=>int
 	std::cout << "Value<float>(5.4) is " << f.toString( true ) << " int from that is " << i_ << std::endl;
-	ValuePtr<int> p( ( int * )calloc( 5, sizeof( int ) ), 5, isis::test::SpeakingDeleter( "Rolf" ) );
+	ValueArray<int> p( ( int * )calloc( 5, sizeof( int ) ), 5, isis::test::SpeakingDeleter( "Rolf" ) );
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 	const short x[] = {1, 2, 3, 4};
 	FixedVector<short, 4> v( x );
@@ -64,11 +64,11 @@ int main()
 	{
 		MemChunk<short> a( 1, 1, 1, 10 );
 		list.push_back( a );
-		a.asValuePtr<short>()[5] = 5;
+		a.asValueArray<short>()[5] = 5;
 		std::cout << "a.voxel<short>(0,0,0,5):" << a.voxel<short>( 0, 0, 0, 5 ) << std::endl;
 		a.voxel<short>( 3, 0, 0, 5 ) = 3;//fail (may crash or not)
 	}
 	Chunk cp = *list.begin();
 	std::cout << "cp.voxel(0,0,0,5):" << cp.voxel<short>( 0, 0, 0, 5 ) << std::endl;
-	std::cout << "list.begin()->getValuePtr<short>().toString():" << list.begin()->getValuePtr<short>().toString() << std::endl;
+	std::cout << "list.begin()->getValueArray<short>().toString():" << list.begin()->getValueArray<short>().toString() << std::endl;
 }

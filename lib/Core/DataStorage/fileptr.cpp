@@ -107,7 +107,7 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
 		writing = write;
-		static_cast<ValuePtr<uint8_t>&>( *this ) = ValuePtr<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
+		static_cast<ValueArray<uint8_t>&>( *this ) = ValueArray<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}
 }
@@ -210,7 +210,7 @@ void FilePtr::release()
 	m_good = false;
 }
 
-ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len, bool swap_endianess )
+ValueArrayReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len, bool swap_endianess )
 {
 	LOG_IF( static_cast<boost::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
 			<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";

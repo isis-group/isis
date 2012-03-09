@@ -32,7 +32,7 @@ ValueBase::~ValueBase() {}
 
 const _internal::ValueConverterMap &ValueBase::converters()
 {
-	static _internal::ValueConverterMap ret; //@todo not using class Singleton because ValuePtrConverterMap is hidden
+	static _internal::ValueConverterMap ret; //@todo not using class Singleton because ValueArrayConverterMap is hidden
 	return ret;
 }
 

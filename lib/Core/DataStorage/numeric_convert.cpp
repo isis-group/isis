@@ -38,15 +38,15 @@ namespace _internal
 #define IMPL_CONVERT(SRC,DST,SRC_KEY,DST_KEY)                                               \
 	template<> void numeric_convert_impl<SRC,DST>( const SRC *src, DST *dst, size_t count ){\
 		LOG( Runtime, info )                                                                \
-				<< "using optimized convert " << ValuePtr<SRC>::staticName() << " => "      \
-				<< ValuePtr<DST>::staticName() << " without scaling";                       \
+				<< "using optimized convert " << ValueArray<SRC>::staticName() << " => "      \
+				<< ValueArray<DST>::staticName() << " without scaling";                       \
 		oil_conv_ ## DST_KEY ## _ ## SRC_KEY (dst,sizeof(DST),src,sizeof(SRC),count);       \
 	}
 
 #define IMPL_SCALED_CONVERT(SRC,DST,SRC_KEY,DST_KEY)                                                                       \
 	template<> void numeric_convert_impl<SRC,DST>( const SRC *src, DST *dst, size_t count, double scale, double offset ){  \
 		LOG( Runtime, info )                                                                                               \
-				<< "using optimized scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()\
+				<< "using optimized scaling convert " << ValueArray<SRC>::staticName() << "=>" << ValueArray<DST>::staticName()\
 				<< " with scale/offset " << std::fixed << scale << "/" << offset;                                          \
 		oil_scaleconv_ ## DST_KEY ## _ ## SRC_KEY (dst,src,count,&offset,&scale);                                          \
 	}

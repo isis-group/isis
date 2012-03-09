@@ -37,7 +37,7 @@ template<typename T> T round( double x )
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
-			<< "using generic scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()
+			<< "using generic scaling convert " << ValueArray<SRC>::staticName() << "=>" << ValueArray<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 
 	for ( size_t i = 0; i < count; i++ ) {
@@ -47,7 +47,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
+	LOG( Runtime, info ) << "using generic convert " << ValueArray<SRC>::staticName() << " => " << ValueArray<DST>::staticName() << " without scaling";
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = round<DST>( src[i] );
@@ -60,12 +60,12 @@ template<typename SRC, typename DST> void numeric_convert_impl( const std::compl
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
-	LOG( Runtime, info )    << "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
+	LOG( Runtime, info )    << "using memcpy-copy of " << ValueArray<T>::staticName() << " without scaling";
 	memcpy( dst, src, count * sizeof( T ) );
 }
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
-	LOG( Runtime, info )    << "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+	LOG( Runtime, info )    << "using generic scaling copy of " << ValueArray<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = src[i] * scale + offset;

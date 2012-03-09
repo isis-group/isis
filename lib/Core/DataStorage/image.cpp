@@ -774,7 +774,7 @@ size_t Image::compare( const isis::data::Image &comp ) const
 		LOG( Debug, verbose_info )
 				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
 				<< " and the length is " << c1pair2.second - c1pair1.second;
-		ret += c1.getValuePtrBase().compare( c1pair1.second, c1pair2.second, c2.getValuePtrBase(), c2pair1.second );
+		ret += c1.getValueArrayBase().compare( c1pair1.second, c1pair2.second, c2.getValueArrayBase(), c2pair1.second );
 	}
 
 	return ret;
@@ -830,10 +830,10 @@ Image::orientation Image::getMainOrientation()const
 unsigned short Image::getMajorTypeID() const
 {
 	switch( getChunk( 0 ).getTypeID() ) { // dont do smart typeID detection for types who cant do minmax
-	case data::ValuePtr<util::color24>::staticID:
-	case data::ValuePtr<util::color48>::staticID:
-	case data::ValuePtr<std::complex< float >  >::staticID:
-	case data::ValuePtr<std::complex< double > >::staticID:
+	case data::ValueArray<util::color24>::staticID:
+	case data::ValueArray<util::color48>::staticID:
+	case data::ValueArray<std::complex< float >  >::staticID:
+	case data::ValueArray<std::complex< double > >::staticID:
 		LOG( Debug, info ) << "Using flat typeID for " << getChunk( 0 ).getTypeName() << " because I cannot compute min/max";
 		return getChunk( 0 ).getTypeID();
 		break;
@@ -842,7 +842,7 @@ unsigned short Image::getMajorTypeID() const
 		LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
 		if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
-			return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the ID's ValuePtr
+			return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the ID's ValueArray
 		} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
 			return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 		} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that

@@ -38,28 +38,28 @@ itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkRe
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
-	case data::ValuePtr<int8_t>::staticID:
+	case data::ValueArray<int8_t>::staticID:
 		return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<u_int8_t>::staticID:
+	case data::ValueArray<u_int8_t>::staticID:
 		return this->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<int16_t>::staticID:
+	case data::ValueArray<int16_t>::staticID:
 		return this->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<u_int16_t>::staticID:
+	case data::ValueArray<u_int16_t>::staticID:
 		return this->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<int32_t>::staticID:
+	case data::ValueArray<int32_t>::staticID:
 		return this->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<u_int32_t>::staticID:
+	case data::ValueArray<u_int32_t>::staticID:
 		return this->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<float>::staticID:
+	case data::ValueArray<float>::staticID:
 		return this->internCreateItk<float, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValuePtr<double>::staticID:
+	case data::ValueArray<double>::staticID:
 		return this->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 		break;
 	default:
@@ -72,28 +72,28 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 {
 	if( m_TypeID ) {
 		switch ( m_TypeID ) {
-		case data::ValuePtr<int8_t>::staticID:
+		case data::ValueArray<int8_t>::staticID:
 			return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<u_int8_t>::staticID:
+		case data::ValueArray<u_int8_t>::staticID:
 			return this->internCreateISIS<TImage, u_int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<int16_t>::staticID:
+		case data::ValueArray<int16_t>::staticID:
 			return this->internCreateISIS<TImage, int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID:
 			return this->internCreateISIS<TImage, u_int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<int32_t>::staticID:
+		case data::ValueArray<int32_t>::staticID:
 			return this->internCreateISIS<TImage, int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<u_int32_t>::staticID:
+		case data::ValueArray<u_int32_t>::staticID:
 			return this->internCreateISIS<TImage, u_int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<float>::staticID:
+		case data::ValueArray<float>::staticID:
 			return this->internCreateISIS<TImage, float>( src, behaveAsItkWriter );
 			break;
-		case data::ValuePtr<double>::staticID:
+		case data::ValueArray<double>::staticID:
 			return this->internCreateISIS<TImage, double>( src, behaveAsItkWriter );
 			break;
 		default:
@@ -210,7 +210,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	BOOST_FOREACH(  std::vector<data::Chunk >::reference ref, chList ) {
 		data::Chunk &chRef = ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
-		chRef.getValuePtr<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
+		chRef.getValueArray<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
 		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropertyMapVector.push_back( tmpMap );
 	}
@@ -248,11 +248,11 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
 	data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) );
-	const data::scaling_pair scale = tmpChunk.getScalingTo( data::ValuePtr<ISISRepn>::staticID, data::noscale );
+	const data::scaling_pair scale = tmpChunk.getScalingTo( data::ValueArray<ISISRepn>::staticID, data::noscale );
 	//
 	data::numeric_convert<ITKRepn, ISISRepn>(
-		tmpChunk.asValuePtr<ITKRepn>(),
-		retChunk.asValuePtr<ISISRepn>(),
+		tmpChunk.asValueArray<ITKRepn>(),
+		retChunk.asValueArray<ISISRepn>(),
 		scale.first->as<double>(),
 		scale.second->as<double>() );
 	//dummy join to allow creating this chunk
