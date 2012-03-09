@@ -75,13 +75,13 @@ int ImageFormat_VistaSa::load ( std::list< data::Chunk >& chunks, const std::str
 	//      std::cout << number << std::endl;
 	//  }
 	// //   bool r = qi::parse< data::FilePtr::const_iterator >( mfile.begin(), mfile.end(),  );
-	// //   if(r) std::cout << "§fsjkhfksdh" << std::endl;
+	// //   if(r) std::cout << "ï¿½fsjkhfksdh" << std::endl;
 }
 
 
 
 
-void ImageFormat_VistaSa::write ( const data::Image &image, const std::string &filename, const std::string &dialect ) throw ( std::runtime_error & )
+void ImageFormat_VistaSa::write ( const data::Image &image, const std::string &filename, const util::istring &dialect ) throw ( std::runtime_error & )
 {
 
 }

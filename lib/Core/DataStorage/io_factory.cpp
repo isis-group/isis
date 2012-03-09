@@ -56,11 +56,11 @@ struct pluginDeleter {
 	}
 };
 struct dialect_missing {
-	std::string dialect;
+	util::istring dialect;
 	std::string filename;
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		const std::string dia = ref->dialects( filename );
-		std::list<std::string> splitted = util::stringToList<std::string>( dia, ' ' );
+		const util::istring dia = ref->dialects( filename );
+		std::list<util::istring> splitted = util::stringToList<util::istring>( dia, ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
 		return ret;
@@ -213,13 +213,13 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
+size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, util::istring dialect )
 {
 	FileFormatList formatReader;
 	formatReader = getFileFormatList( filename.file_string(), suffix_override, dialect );
 	const size_t nimgs_old = ret.size();   // save number of chunks
-	const std::string with_dialect = dialect.empty() ?
-									 std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
+	const util::istring with_dialect = dialect.empty() ?
+									   util::istring( "" ) : util::istring( " with dialect \"" ) + dialect + "\"";
 
 	if ( formatReader.empty() ) {
 		if( !boost::filesystem::exists( filename ) ) {
@@ -256,7 +256,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 }
 
 
-IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, std::string suffix_override, std::string dialect )
+IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, std::string suffix_override, util::istring dialect )
 {
 	std::list<std::string> ext;
 	FileFormatList ret;
@@ -322,7 +322,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 	return ret;
 }
 
-size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override, std::string dialect )
+size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override, util::istring dialect )
 {
 	const boost::filesystem::path p( path );
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
@@ -335,7 +335,7 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 	return loaded;
 }
 
-std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffix_override, std::string dialect )
+std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffix_override, util::istring dialect )
 {
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
@@ -348,12 +348,12 @@ std::list< Image > IOFactory::load ( const util::slist &paths, std::string suffi
 	return images;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
+std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, util::istring dialect )
 {
 	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
-size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
+size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, util::istring dialect )
 {
 	int loaded = 0;
 
@@ -377,13 +377,13 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 	return loaded;
 }
 
-bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, std::string dialect )
+bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, util::istring dialect )
 {
 	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
 }
 
 
-bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, std::string dialect )
+bool IOFactory::write( std::list< isis::data::Image > images, const std::string &path, std::string suffix_override, util::istring dialect )
 {
 	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 
@@ -396,18 +396,19 @@ bool IOFactory::write( std::list<data::Image> images, const std::string &path, s
 			LOG( Debug, info )
 					<< "plugin to write to " <<  path << ": " << it->getName()
 					<<  ( dialect.empty() ?
-						  std::string( "" ) :
-						  std::string( " using dialect: " ) + dialect
+						  util::istring( "" ) :
+						  util::istring( " using dialect: " ) + dialect
 						);
 
 			try {
 				it->write( images, path, dialect );
-				LOG( Runtime, info ) << images.size()
-									 << " images written to " << path << " using " <<  it->getName()
-									 <<  ( dialect.empty() ?
-										   std::string( "" ) :
-										   std::string( " and dialect: " ) + dialect
-										 );
+				LOG( Runtime, info )
+						<< images.size()
+						<< " images written to " << path << " using " <<  it->getName()
+						<<  ( dialect.empty() ?
+							  util::istring( "" ) :
+							  util::istring( " and dialect: " ) + dialect
+							);
 				return true;
 			} catch ( std::runtime_error &e ) {
 				LOG( Runtime, warning )

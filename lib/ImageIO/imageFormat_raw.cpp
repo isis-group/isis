@@ -22,7 +22,7 @@ public:
 	std::string getName()const {
 		return "raw data output";
 	}
-	virtual std::string dialects( const std::string & ) const {
+	virtual util::istring dialects( const std::string & ) const {
 		std::string ret;
 		typemap types = util::getTransposedTypeMap( false, true );
 		types.erase( "boolean*" );
@@ -37,7 +37,7 @@ public:
 	}
 
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & ) {
 
 		data::FilePtr mfile( filename );
 
@@ -78,7 +78,7 @@ public:
 		}
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
 		class WriteOp: public data::ChunkOp
 		{
 			std::ofstream out;

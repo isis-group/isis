@@ -79,7 +79,7 @@ protected:
 			return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:
-	std::string dialects( const std::string &/*filename*/ )const {
+	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
 		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
@@ -89,11 +89,11 @@ public:
 		suffixes.sort();
 		suffixes.unique();
 
-		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
+		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
 	}
 	std::string getName()const {return "tar decompression proxy for other formats";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
 		int ret = 0;
 
 		const util::istring suffix = makeBasename( filename ).second.c_str();
@@ -137,7 +137,7 @@ public:
 
 			if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
 
-				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect.c_str() ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
 					LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
@@ -166,7 +166,7 @@ public:
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev = chunks.end();
 					--prev;
-					ret += data::IOFactory::load( chunks, tmpfile.string(), dialect );
+					ret += data::IOFactory::load( chunks, tmpfile.string(), dialect.c_str() );
 
 					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
@@ -182,7 +182,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Writing to tar is not (yet) implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

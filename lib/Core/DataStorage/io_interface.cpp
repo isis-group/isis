@@ -25,7 +25,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END
 
-void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -37,8 +37,8 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 			LOG( Runtime, notice )
 					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
 					<< " using " <<  getName() << ( dialect.empty() ?
-													std::string() :
-													std::string( " and dialect " ) + dialect
+													util::istring() :
+													util::istring( " and dialect " ) + dialect
 												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )

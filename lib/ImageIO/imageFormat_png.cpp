@@ -44,7 +44,7 @@ public:
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
-	std::string dialects( const std::string &/*filename*/ ) const {
+	util::istring dialects( const std::string &/*filename*/ ) const {
 		return "middle";
 	}
 	bool write_png( const std::string &filename, const data::Chunk &buff, int color_type, int bit_depth ) {
@@ -190,12 +190,12 @@ public:
 		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
 		chunks.push_back( read_png( filename ) );
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;

@@ -48,7 +48,7 @@ boost::is_unsigned<VBit>::type,
 
 void
 ImageFormat_Vista::write( const data::Image &image,
-						  const std::string &filename, const std::string &/*dialect*/ )
+						  const std::string &filename, const util::istring &/*dialect*/ )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -209,11 +209,11 @@ throw( std::runtime_error & )
 
 
 int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &filename,
-							 const std::string &dialect ) throw ( std::runtime_error & )
+							 const util::istring &dialect ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
-	std::string myDialect = dialect;
+	util::istring myDialect = dialect;
 
 	if( !( ip = fopen( filename.c_str(), "r" ) ) ) {
 		std::string s;
@@ -238,7 +238,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// enable "info" log level
 	// image_io::enable_log<util::DefaultMsgPrint>( info );
-	if( myDialect == std::string( "onlyfirst" ) ) {
+	if( myDialect == "onlyfirst" ) {
 		nimages = 1;
 	}
 
@@ -342,7 +342,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
 	// along the z-direction -> add all resulting chunks to the chunk list.
-	if( myDialect == std::string( "functional" ) ) {
+	if( myDialect == "functional" ) {
 		char orient[100], voxelstr[100];
 		orient[0] = '\0';
 		voxelstr[0] = '\0';
@@ -634,7 +634,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
 	// first image found will be saved in a float MemChunk and added to the output.
-	else if( myDialect == std::string( "map" ) ) {
+	else if( myDialect == "map" ) {
 		// print a warning message when there are more than one image.
 		if( nimages >= 1 ) {
 			LOG( image_io::Runtime, warning )

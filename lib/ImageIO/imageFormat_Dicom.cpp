@@ -55,7 +55,7 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const util::istring &dialect ) {
 		std::auto_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
@@ -143,7 +143,7 @@ std::string ImageFormat_Dicom::suffixes( io_modes modes )const
 		return std::string( ".ima .dcm" );
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
 
 
 
@@ -471,7 +471,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )throw( std::runtime_error & )
+int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect )throw( std::runtime_error & )
 {
 
 	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
@@ -503,7 +503,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	return 0;
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
