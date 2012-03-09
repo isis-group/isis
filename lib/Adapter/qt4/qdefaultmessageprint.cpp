@@ -31,31 +31,22 @@ void isis::qt4::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 		QMessageBox msgBox;
 		std::string level;
 		switch( msg.m_level ) {
-			case isis::info:
-				level = "Info";
-				msgBox.setIcon(QMessageBox::Information);
-				break;
 			case isis::verbose_info:
-				level = "Verbose info";
-				msgBox.setIcon(QMessageBox::Information);
-				break;
+			case isis::info:
 			case isis::notice:
-				level = "Notice";
 				msgBox.setIcon(QMessageBox::Information);
 				break;
 			case isis::warning:
-				level = "Warning";
 				msgBox.setIcon( QMessageBox::Warning );
 				break;
 			case isis::error:
-				level = "Error";
 				msgBox.setIcon( QMessageBox::Critical );
 				break;
 		}
 		std::stringstream windowTitle;
 		std::stringstream text;
 		windowTitle << qMessage.m_module << " (" << qMessage.time_str << ")";
-		text << level << " in " << qMessage.m_file << ":" << qMessage.m_line;
+		text << util::logLevelName(msg.m_level) << " in " << qMessage.m_file << ":" << qMessage.m_line;
 		msgBox.setWindowTitle( windowTitle.str().c_str() );
 		msgBox.setText( text.str().c_str() );
 		msgBox.setInformativeText( qMessage.message.c_str() );
