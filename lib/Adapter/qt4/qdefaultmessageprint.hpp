@@ -35,9 +35,12 @@ Q_SIGNALS:
 
 public:
 	virtual void commit( const util::Message &msg );
+	void qmessageBelow( LogLevel level );
 	QDefaultMessagePrint( LogLevel level );
 	virtual ~QDefaultMessagePrint();
 	const QMessageList &getMessageList() const;
+private:
+	LogLevel m_QMessageLogLevel;
 
 };
 
