@@ -1,5 +1,6 @@
 #include "qdefaultmessageprint.hpp"
 #include <CoreUtils/singletons.hpp>
+#include <DataStorage/image.hpp>
 #include <QMessageBox>
 
 isis::qt4::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )
@@ -11,7 +12,6 @@ void isis::qt4::QDefaultMessagePrint::qmessageBelow ( isis::LogLevel level )
 {
 	m_QMessageLogLevel = level;
 }
-
 
 void isis::qt4::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 {
