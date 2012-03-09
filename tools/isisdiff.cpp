@@ -10,6 +10,9 @@
 struct DiffLog {static const char *name() {return "Diff";}; enum {use = _ENABLE_LOG};};
 struct DiffDebug {static const char *name() {return "DiffDebug";}; enum {use = _ENABLE_DEBUG};};
 
+static const char *_props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart", "indexOrigin"};
+static const char *_skips[] = {"sequenceDescription=localizer"};
+
 using namespace isis;
 
 boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources )
@@ -27,18 +30,24 @@ boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sour
 		return getCommonSource( sources );
 	}
 }
-
+boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
+{
+	std::list<boost::filesystem::path> sources;
+	BOOST_FOREACH( const data::Image & img, imgs ) {
+		if( img.hasProperty( "source" ) )
+			sources.push_back( img.getPropertyAs<std::string>( "source" ) );
+		else {
+			BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
+				sources.push_back( ref.as<std::string>() );
+			}
+		}
+	}
+	sources.sort();
+	return getCommonSource( sources );
+}
 boost::filesystem::path getCommonSource( const data::Image &img )
 {
-	if( img.hasProperty( "source" ) )
-		return img.getPropertyAs<std::string>( "source" );
-	else {
-		std::list<boost::filesystem::path> sources;
-		BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
-			sources.push_back( ref->as<std::string>() );
-		}
-		return getCommonSource( sources );
-	}
+	return getCommonSource( std::list<data::Image>( 1, img ) );
 }
 
 std::string identify( const data::Image &img )
@@ -71,19 +80,25 @@ std::pair<std::string, int>  parseFilename( std::string name )
 	return ret;
 }
 
-bool hasDifferentProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
-{
-	return !( img.propertyValue( pname ) == pval ); // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
-}
 bool hasSameProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
 {
-	return img.propertyValue( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
+	return ( !img.hasProperty( pname ) && pval.isEmpty() ) || img.propertyValue( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
+}
+bool hasDifferentProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
+{
+	return !hasSameProp( img, pname, pval ); // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
 }
 
 data::Image pickImg( int pos, std::list<data::Image> list )
 {
 	std::list< data::Image >::iterator at = list.begin();
 	std::advance( at, pos );
+
+	if( at == list.end() ) {
+		LOG( DiffLog, error ) << "Sorry, there is no " << pos << "th image" ;
+		throw( std::logic_error( std::string( "no " ) + boost::lexical_cast<std::string>( pos ) + "th image" ) );
+	}
+
 	return *at;
 }
 
@@ -106,15 +121,13 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 	return images.size();
 }
 
-std::list<data::Image> findFitting( const data::Image reference, std::list<data::Image> &org_images )
+std::list<data::Image> findFitting( const data::Image reference, std::list<data::Image> &org_images, const util::slist &props )
 {
 	std::list< data::Image > images;
 	images.splice( images.begin(), org_images ); //first move all into images
 
-	const char *props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart", "coilChannelMask"};
-
-	BOOST_FOREACH( const char * prop, props ) {
-		if( doFit( reference, org_images, images, prop ) <= 1 ) //now move all with different prop back into org
+	BOOST_FOREACH( const std::string & prop, props ) {
+		if( doFit( reference, org_images, images, prop.c_str() ) <= 1 ) //now move all with different prop back into org
 			return images; // stop if only one image left
 	}
 	return images;
@@ -133,22 +146,21 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 
 	if ( ! diff.empty() ) {
 		std::cout
-				<< "Metadata of " << name1 << " and " << name2  << " differ:" << std::endl
+				<< "Metadata of " << std::endl << name1 << " and " << std::endl << name2  << " differ:" << std::endl
 				<< diff << std::endl;
 		ret = true;
 	}
 
 	if ( img1.getSizeAsVector() != img2.getSizeAsVector() ) {
 		std::cout
-				<< "Image sizes of " << name1 << " and " << name2  << " differ:"
+				<< "Image sizes of " << std::endl << name1 << " and " << std::endl << name2 << " differ:"
 				<< img1.getSizeAsString() << "/" << img2.getSizeAsString() << std::endl;
 		ret = true;
 	} else {
 		size_t voxels = img1.compare( img2 );
 
 		if ( voxels != 0 ) {
-			std::cout << voxels * 100 / img1.getVolume() << "% of the voxels in " << name1 << " and "
-					  << name2  << " differ" << std::endl;
+			std::cout << voxels * 100. / img1.getVolume() << "% of the voxels in " << std::endl << name1 << " and " << std::endl << name2 << " differ" << std::endl;
 			ret = true;
 		}
 	}
@@ -171,9 +183,13 @@ int main( int argc, char *argv[] )
 	app.parameters["ignore"].needed() = false;
 	app.parameters["ignore"].setDescription( "List of properties which should be ignored when comparing" );
 
-	app.parameters["skipwith"] = util::slist( 1, "sequenceDescription=localizer" );
+	app.parameters["skipwith"] = util::slist( _skips, _skips + sizeof( _skips ) / sizeof( char * ) );
 	app.parameters["skipwith"].needed() = false;
 	app.parameters["skipwith"].setDescription( "List of property=value sets which should should make the program skip the according image" );
+
+	app.parameters["selectwith"] = util::slist( _props, _props + sizeof( _props ) / sizeof( char * ) );
+	app.parameters["selectwith"].needed() = false;
+	app.parameters["selectwith"].setDescription( "List of properties which should be used to select images for comparison" );
 
 	app.addLogging<DiffLog>( "" );
 	app.addLogging<DiffDebug>( "" );
@@ -185,13 +201,13 @@ int main( int argc, char *argv[] )
 
 	std::pair<std::string, int > in1, in2;
 
-	if( app.parameters["in1"]->as<util::slist>().size() == 1 )
-		in1 = parseFilename( app.parameters["in1"]->as<util::slist>().front() );
+	if( app.parameters["in1"].as<util::slist>().size() == 1 )
+		in1 = parseFilename( app.parameters["in1"].as<util::slist>().front() );
 	else
 		in1.second = -1;
 
-	if( app.parameters["in2"]->as<util::slist>().size() == 1 )
-		in2 = parseFilename( app.parameters["in2"]->as<util::slist>().front() );
+	if( app.parameters["in2"].as<util::slist>().size() == 1 )
+		in2 = parseFilename( app.parameters["in2"].as<util::slist>().front() );
 	else
 		in2.second = -1;
 
@@ -202,7 +218,6 @@ int main( int argc, char *argv[] )
 	boost::shared_ptr<util::ConsoleFeedback> feedback( new util::ConsoleFeedback );
 
 	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
-		LOG( DiffLog, notice ) << "Comparing image " << in1.second << " from " << in1.first << " and Image " << in2.second  << " from " << in2.first;
 		app.parameters["in1"] = util::slist( 1, in1.first );
 		std::list<data::Image> images;
 		data::IOApplication::autoload( app.parameters, images, true, "1", feedback );
@@ -217,6 +232,8 @@ int main( int argc, char *argv[] )
 
 		const data::Image second = pickImg( in2.second, images );
 
+		LOG( DiffLog, info ) << "Comparing single images " << identify( first ) << " and " << identify( second );
+
 		if( diff( first, second, ignore ) )
 			ret = 1;
 
@@ -226,13 +243,18 @@ int main( int argc, char *argv[] )
 		dropWith( app.parameters["skipwith"], images1 );
 		dropWith( app.parameters["skipwith"], images2 );
 
-		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << in1.first << "\" and " << images2.size() << " from \"" << in2.first << "\"";
+		util::slist src1 = app.parameters["in1"], src2 = app.parameters["in2"];
+		boost::filesystem::path sPath1 = ( src1.size() == 1 ) ? src1.front() : getCommonSource( images1 );
+		boost::filesystem::path sPath2 = ( src2.size() == 1 ) ? src2.front() : getCommonSource( images2 );
+
+
+		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << sPath1.file_string() << "\" and " << images2.size() << " from \"" << sPath2.file_string() << "\"";
 
 		for (
 			std::list< data::Image >::iterator first = images1.begin();
 			first != images1.end() && !images1.empty();
 		) {
-			const std::list<data::Image> candidates = findFitting( *first, images2 );
+			const std::list<data::Image> candidates = findFitting( *first, images2, app.parameters["selectwith"] );
 			LOG_IF( candidates.size() > 1 || candidates.empty(), DiffLog, warning )
 					<< "Could not find a unique image fitting " << identify( *first )
 					<< ". " << candidates.size() << " where found";
