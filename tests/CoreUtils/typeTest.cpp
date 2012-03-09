@@ -15,7 +15,7 @@
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
 #include <string>
-#include "CoreUtils/type.hpp"
+#include "CoreUtils/value.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/numeric/conversion/converter.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

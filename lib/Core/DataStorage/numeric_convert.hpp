@@ -6,7 +6,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "common.hpp"
-#include "typeptr.hpp"
+#include "valuearray.hpp"
 
 
 namespace isis

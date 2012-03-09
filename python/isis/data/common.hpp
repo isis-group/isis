@@ -10,7 +10,7 @@
 
 #include "CoreUtils/log.hpp"
 #include "DataStorage/chunk.hpp"
-#include "DataStorage/typeptr.hpp"
+#include "DataStorage/valuearray.hpp"
 #include <boost/python.hpp>
 
 using namespace isis::data;

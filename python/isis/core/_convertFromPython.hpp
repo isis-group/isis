@@ -1,7 +1,7 @@
 #ifndef CONVERTFROMPYTHON_HPP
 #define CONVERTFROMPYTHON_HPP
 
-#include "CoreUtils/type.hpp"
+#include "CoreUtils/value.hpp"
 #include <boost/python.hpp>
 #include "CoreUtils/property.hpp"
 #include <boost/date_time/gregorian/gregorian_io.hpp>

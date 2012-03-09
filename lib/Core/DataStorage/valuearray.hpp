@@ -22,9 +22,9 @@
 
 #include <boost/static_assert.hpp>
 
-#include "typeptr_base.hpp"
-#include "typeptr_converter.hpp"
-#include "../CoreUtils/type.hpp"
+#include "valuearray_base.hpp"
+#include "valuearray_converter.hpp"
+#include "../CoreUtils/value.hpp"
 #include "common.hpp"
 #include <boost/type_traits/remove_const.hpp>
 

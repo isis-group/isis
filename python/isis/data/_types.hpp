@@ -1,7 +1,7 @@
 #ifndef TYPES_DATA_HPP
 #define TYPES_DATA_HPP
 
-#include "DataStorage/typeptr.hpp"
+#include "DataStorage/valuearray.hpp"
 
 namespace isis
 {

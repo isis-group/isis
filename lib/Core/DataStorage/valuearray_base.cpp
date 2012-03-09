@@ -2,8 +2,8 @@
 #define NOMINMAX 1
 #endif
 
-#include "typeptr_base.hpp"
-#include "typeptr_converter.hpp"
+#include "valuearray_base.hpp"
+#include "valuearray_converter.hpp"
 #include "common.hpp"
 
 namespace isis

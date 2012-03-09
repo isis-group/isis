@@ -13,7 +13,7 @@
 #ifndef ISISTYPE_HPP
 #define ISISTYPE_HPP
 
-#include "type_base.hpp"
+#include "value_base.hpp"
 
 #include <string>
 #include <functional>

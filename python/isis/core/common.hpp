@@ -10,7 +10,7 @@
 
 #include "CoreUtils/log.hpp"
 #include "CoreUtils/common.hpp"
-#include "CoreUtils/type.hpp"
+#include "CoreUtils/value.hpp"
 
 namespace isis
 {

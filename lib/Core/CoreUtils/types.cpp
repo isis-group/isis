@@ -16,8 +16,8 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "type.hpp"
-#include "../DataStorage/typeptr.hpp"
+#include "value.hpp"
+#include "../DataStorage/valuearray.hpp"
 #include "types.hpp"
 #include <complex>
 #include <boost/date_time/posix_time/posix_time.hpp>

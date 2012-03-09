@@ -3,7 +3,7 @@
 
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
-#include "../CoreUtils/type.hpp"
+#include "../CoreUtils/value.hpp"
 
 namespace isis
 {

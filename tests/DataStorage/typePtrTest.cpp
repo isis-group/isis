@@ -8,7 +8,7 @@
 #define NOMINMAX 1
 #define BOOST_TEST_MODULE ValueArrayTest
 #include <boost/test/unit_test.hpp>
-#include <DataStorage/typeptr.hpp>
+#include <DataStorage/valuearray.hpp>
 #include <cmath>
 
 

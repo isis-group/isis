@@ -15,7 +15,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <map>
-#include "type.hpp"
+#include "value.hpp"
 #include "log.hpp"
 
 namespace isis

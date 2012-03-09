@@ -21,9 +21,9 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "typeptr_converter.hpp"
+#include "valuearray_converter.hpp"
 
-#include "typeptr_base.hpp"
+#include "valuearray_base.hpp"
 #include "numeric_convert.hpp"
 #include "../CoreUtils/types.hpp"
 #include <boost/mpl/for_each.hpp>

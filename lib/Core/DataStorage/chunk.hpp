@@ -13,7 +13,7 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include "typeptr.hpp"
+#include "valuearray.hpp"
 #include "../CoreUtils/log.hpp"
 #include "../CoreUtils/propmap.hpp"
 #include "common.hpp"

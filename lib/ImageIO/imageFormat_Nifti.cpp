@@ -28,10 +28,10 @@
 
 //LOCAL INCLUDES
 #include <DataStorage/io_interface.h>
-#include <CoreUtils/type.hpp>
+#include <CoreUtils/value.hpp>
 #include <DataStorage/common.hpp>
 #include <CoreUtils/vector.hpp>
-#include <DataStorage/typeptr.hpp>
+#include <DataStorage/valuearray.hpp>
 
 //SYSTEM INCLUDES
 #include <nifti1_io.h>

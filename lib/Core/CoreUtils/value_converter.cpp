@@ -21,9 +21,9 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "type_converter.hpp"
-#include "type_base.hpp"
-#include "type.hpp"
+#include "value_converter.hpp"
+#include "value_base.hpp"
+#include "value.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>

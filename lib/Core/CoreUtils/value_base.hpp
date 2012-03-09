@@ -18,8 +18,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "types.hpp"
-#include "type_converter.hpp"
-#include "generic_type.hpp"
+#include "value_converter.hpp"
+#include "generic_value.hpp"
 #include "common.hpp"
 
 

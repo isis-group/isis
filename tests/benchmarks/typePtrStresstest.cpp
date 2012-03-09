@@ -1,4 +1,4 @@
-#include "DataStorage/typeptr.hpp"
+#include "DataStorage/valuearray.hpp"
 #include <boost/timer.hpp>
 
 using namespace isis;

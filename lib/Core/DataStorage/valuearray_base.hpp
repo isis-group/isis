@@ -19,8 +19,8 @@
 #ifndef TYPEPTRBASE_HPP
 #define TYPEPTRBASE_HPP
 
-#include "../CoreUtils/type_base.hpp"
-#include "typeptr_converter.hpp"
+#include "../CoreUtils/value_base.hpp"
+#include "valuearray_converter.hpp"
 #include "common.hpp"
 #include <boost/mpl/if.hpp>
 #include <boost/utility/enable_if.hpp>
