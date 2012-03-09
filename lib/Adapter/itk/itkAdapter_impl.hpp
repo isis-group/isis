@@ -246,50 +246,31 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 
 	data::Chunk
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) ) ;
-	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-	data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) );
-	const data::scaling_pair scale = tmpChunk.getScalingTo( data::ValuePtr<ISISRepn>::staticID, data::noscale );
-	//
-	data::numeric_convert<ITKRepn, ISISRepn>(
-		tmpChunk.asValuePtr<ITKRepn>(),
-		retChunk.asValuePtr<ISISRepn>(),
-		scale.first->as<double>(),
-		scale.second->as<double>() );
-	//dummy join to allow creating this chunk
-	retChunk.join( m_ImagePropertyMap );
-
-	//since the acquisitionNumber is not stored in the PropertyMap of the image, we have
-	//to create a dummy acquisitionNumber
-	if ( !retChunk.hasProperty( "acquisitionNumber" ) )
-		retChunk.setPropertyAs( "acquisitionNumber", static_cast<u_int32_t>( 1 ) );
-
-	//do not try to grasp that in a sober state!!
-	//workaround to create a TypedImage out of a MemChunk
-	std::list<data::Chunk> tmpChList = std::list<data::Chunk>( 1, retChunk );
-	std::list<data::Image> isisImageList = data::IOFactory::chunkListToImageList( tmpChList );
-	data::TypedImage< TOutputISIS >  retImage ( data::TypedImage<TOutputISIS> ( isisImageList.front() ) );
-	//these are properties eventually manipulated by itk. So we can not take the
+	tmpChunk.convertToType( data::ValuePtr<ISISRepn>::staticID );
+	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
-	retImage.setPropertyAs( "indexOrigin", util::fvector4( static_cast<float>( indexOrigin[0] ),
+	tmpChunk.setPropertyAs( "indexOrigin", util::fvector4( static_cast<float>( indexOrigin[0] ),
 							static_cast<float>( indexOrigin[1] ),
 							static_cast<float>( indexOrigin[2] ),
 							static_cast<float>( indexOrigin[3] ) ) );
-	retImage.setPropertyAs( "rowVec"     , util::fvector4( static_cast<float>( imageDirection[0][0] ),
+	tmpChunk.setPropertyAs( "rowVec"     , util::fvector4( static_cast<float>( imageDirection[0][0] ),
 							static_cast<float>( imageDirection[1][0] ),
 							static_cast<float>( imageDirection[2][0] ),
 							0 ) );
-	retImage.setPropertyAs( "columnVec"  , util::fvector4( ( imageDirection[0][1] ),
+	tmpChunk.setPropertyAs( "columnVec"  , util::fvector4( ( imageDirection[0][1] ),
 							( imageDirection[1][1] ),
 							( imageDirection[2][1] ),
 							0 ) );
-	retImage.setPropertyAs( "sliceVec"   , util::fvector4( static_cast<float>( imageDirection[0][2] ),
+	tmpChunk.setPropertyAs( "sliceVec"   , util::fvector4( static_cast<float>( imageDirection[0][2] ),
 							static_cast<float>( imageDirection[1][2] ),
 							static_cast<float>( imageDirection[2][2] ),
 							0 ) );
-	retImage.setPropertyAs( "voxelSize"  , util::fvector4( static_cast<float>( imageSpacing[0] ),
+	tmpChunk.setPropertyAs( "voxelSize"  , util::fvector4( static_cast<float>( imageSpacing[0] ),
 							static_cast<float>( imageSpacing[1] ),
 							static_cast<float>( imageSpacing[2] ),
 							static_cast<float>( imageSpacing[3] ) ) );
+	tmpChunk.setPropertyAs<u_int32_t>( "acquisitionNumber", 1 );
+	data::TypedImage<ISISRepn> retImage( tmpChunk );
 
 	//this will splice down the image the same way it was handed over to the itkAdapter
 	if ( 0 < m_RelevantDim ) {
