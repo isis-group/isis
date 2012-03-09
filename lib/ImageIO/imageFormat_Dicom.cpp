@@ -328,7 +328,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
-		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() )->castTo<util::fvector4>();
+		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() ).castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
 			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
@@ -414,7 +414,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	util::fvector4 &origin = source.propertyValue( "indexOrigin" ).castTo<util::fvector4>();
 	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setPropertyAs( prefix + "ImageType", iType );
@@ -434,7 +434,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	}
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
-		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
+		acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
 	}
 
 	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
@@ -444,7 +444,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
-		util::fvector4 &ref = dest.propertyValue( "fov" )->castTo<util::fvector4>();
+		util::fvector4 &ref = dest.propertyValue( "fov" ).castTo<util::fvector4>();
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );

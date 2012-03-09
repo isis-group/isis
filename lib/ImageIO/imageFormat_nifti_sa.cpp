@@ -221,8 +221,8 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( order );
 		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( order );
 
-		if( first->gt( *second ) ) { // second slice has a lower number than the first => decrementing
-			if( middle->gt( *second ) ) { // if the middle number is greater than the second its interleaved
+		if( ( *first ).gt( *second ) ) { // second slice has a lower number than the first => decrementing
+			if( ( *middle ).gt( *second ) ) { // if the middle number is greater than the second its interleaved
 				LOG( Runtime, info )
 						<< "The \"middle\" " << order << " (" << middle.toString() << ") is greater than the second (" << second.toString()
 						<< ") assuming decrementing interleaved slice order";
@@ -234,7 +234,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 				slice_code = NIFTI_SLICE_SEQ_DEC;
 			}
 		} else { // assume incrementing
-			if( middle->lt( *second ) ) { // if the middle number is less than the second ist interleaved
+			if( ( *middle ).lt( *second ) ) { // if the middle number is less than the second ist interleaved
 				LOG( Runtime, info )
 						<< "The \"middle\" " << order << " (" << middle.toString() << ") is less than the second (" << second.toString()
 						<< ") assuming incrementing interleaved slice order";
@@ -247,7 +247,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 			}
 		}
 
-		slice_duration = fabs( second->as<float>() - second->as<float>() );
+		slice_duration = fabs( second.as<float>() - second.as<float>() );
 
 		if( slice_code == NIFTI_SLICE_SEQ_INC || slice_code == NIFTI_SLICE_SEQ_DEC ) { // if its interleaved there was another slice between 0 and 1
 			slice_duration /= 2;
@@ -332,7 +332,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 
 			if( head->slice_duration ) {
 				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ ) { // set su-property "acquisitionTime" based of the slice number
-					ch.propertyValueAt( "acquisitionTime",  i ) = ch.propertyValueAt( "acquisitionNumber", i )->as<float>() * head->slice_duration * time_fac;
+					ch.propertyValueAt( "acquisitionTime",  i ) = ch.propertyValueAt( "acquisitionNumber", i ).as<float>() * head->slice_duration * time_fac;
 				}
 			}
 
@@ -476,14 +476,14 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 	props.setPropertyAs<std::string>( "sequenceDescription", head->descrip );
 
 	if( head->sform_code ) { // get srow if sform_code>0
-		props.setPropertyAs( "nifti/sform_code", formCode )->castTo<util::Selection>().set( head->sform_code );
-		props.setPropertyAs( "nifti/srow_x", util::fvector4() )->castTo<util::fvector4>().copyFrom( head->srow_x, head->srow_x + 4 );;
-		props.setPropertyAs( "nifti/srow_y", util::fvector4() )->castTo<util::fvector4>().copyFrom( head->srow_y, head->srow_y + 4 );;
-		props.setPropertyAs( "nifti/srow_z", util::fvector4() )->castTo<util::fvector4>().copyFrom( head->srow_z, head->srow_z + 4 );;
+		props.setPropertyAs( "nifti/sform_code", formCode ).castTo<util::Selection>().set( head->sform_code );
+		props.setPropertyAs( "nifti/srow_x", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_x, head->srow_x + 4 );;
+		props.setPropertyAs( "nifti/srow_y", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_y, head->srow_y + 4 );;
+		props.setPropertyAs( "nifti/srow_z", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_z, head->srow_z + 4 );;
 	}
 
 	if( head->qform_code ) { // get the quaternion if qform_code>0
-		props.setPropertyAs( "nifti/qform_code", formCode )->castTo<util::Selection>().set( head->qform_code );
+		props.setPropertyAs( "nifti/qform_code", formCode ).castTo<util::Selection>().set( head->qform_code );
 		props.setPropertyAs( "nifti/quatern_b", head->quatern_b );
 		props.setPropertyAs( "nifti/quatern_c", head->quatern_c );
 		props.setPropertyAs( "nifti/quatern_d", head->quatern_d );
@@ -510,8 +510,8 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 	}
 
 	// set space unit factors
-	props.propertyValue( "voxelSize" )->castTo<util::fvector4>() *= size_fac;
-	props.propertyValue( "indexOrigin" )->castTo<util::fvector4>() *= size_fac;
+	props.propertyValue( "voxelSize" ).castTo<util::fvector4>() *= size_fac;
+	props.propertyValue( "indexOrigin" ).castTo<util::fvector4>() *= size_fac;
 
 	// Tr
 	if( head->pixdim[dims] != 0 ) // if pixdim is given for the uppermost dim, assume its repetitionTime
@@ -865,7 +865,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 	//get position of image-voxel 0,0,0,0 in isis space
 	const util::fvector4 origin = image2isis.dot( util::fvector4( 0, 0, 0, 1 ) );
-	props.setPropertyAs<util::fvector4>( "indexOrigin", origin )->castTo<util::fvector4>()[data::timeDim] = 0; // timedim is 1 from the matrix calc
+	props.setPropertyAs<util::fvector4>( "indexOrigin", origin ).castTo<util::fvector4>()[data::timeDim] = 0; // timedim is 1 from the matrix calc
 	LOG( Debug, info ) << "Computed indexOrigin=" << props.getPropertyAs<util::fvector4>( "indexOrigin" ) << " from sform";
 
 	//remove offset from image2isis
@@ -880,7 +880,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 		image2isis.dot( util::fvector4( 0, 1, 0 ) ).len(),
 		image2isis.dot( util::fvector4( 0, 0, 1 ) ).len()
 	);
-	props.setPropertyAs<util::fvector4>( "voxelSize", voxelSize )->castTo<util::fvector4>()[data::timeDim] = 0; // timedim is 1 from the matrix calc
+	props.setPropertyAs<util::fvector4>( "voxelSize", voxelSize ).castTo<util::fvector4>()[data::timeDim] = 0; // timedim is 1 from the matrix calc
 	LOG( Debug, info ) << "Computed voxelSize=" << props.getPropertyAs<util::fvector4>( "voxelSize" ) << " from sform";
 
 

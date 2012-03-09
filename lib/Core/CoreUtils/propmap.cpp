@@ -446,7 +446,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 	if( ! found.isEmpty() ) {
 		util::ValueReference &dst = static_cast<util::ValueReference &>( propertyValue( to ) );
 
-		if ( found->getTypeID() == dstID ) {
+		if ( found.getTypeID() == dstID ) {
 			if( from != to ) {
 				dst = found ;
 				ret = true;
@@ -455,7 +455,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			dst = found->copyByID( dstID );
+			dst = ( *found ).copyByID( dstID );
 			ret = !dst.isEmpty();
 		}
 	}

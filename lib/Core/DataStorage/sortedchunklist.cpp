@@ -113,16 +113,16 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" ).castTo<util::fvector4>();
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
-	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
+	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" ).castTo<util::fvector4>();
+	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" ).castTo<util::fvector4>();
 	const util::fvector4 sliceVec = ch.hasProperty( "sliceVec" ) ?
-									ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
+									ch.propertyValue( "sliceVec" ).castTo<util::fvector4>() :
 									util::fvector4(
 										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],

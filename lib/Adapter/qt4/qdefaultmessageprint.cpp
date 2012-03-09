@@ -4,7 +4,7 @@
 
 isis::qt4::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )
 	: MessageHandlerBase( level ),
-	m_QMessageLogLevel( isis::error )
+	  m_QMessageLogLevel( isis::error )
 {}
 
 void isis::qt4::QDefaultMessagePrint::qmessageBelow ( isis::LogLevel level )
@@ -27,26 +27,29 @@ void isis::qt4::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 	qMessage.time_str = msg.strTime();
 	util::Singletons::get<QMessageList, 10>().push_back( qMessage );
 	commitMessage( qMessage );
+
 	if( m_QMessageLogLevel > msg.m_level ) {
 		QMessageBox msgBox;
 		std::string level;
+
 		switch( msg.m_level ) {
-			case isis::verbose_info:
-			case isis::info:
-			case isis::notice:
-				msgBox.setIcon(QMessageBox::Information);
-				break;
-			case isis::warning:
-				msgBox.setIcon( QMessageBox::Warning );
-				break;
-			case isis::error:
-				msgBox.setIcon( QMessageBox::Critical );
-				break;
+		case isis::verbose_info:
+		case isis::info:
+		case isis::notice:
+			msgBox.setIcon( QMessageBox::Information );
+			break;
+		case isis::warning:
+			msgBox.setIcon( QMessageBox::Warning );
+			break;
+		case isis::error:
+			msgBox.setIcon( QMessageBox::Critical );
+			break;
 		}
+
 		std::stringstream windowTitle;
 		std::stringstream text;
 		windowTitle << qMessage.m_module << " (" << qMessage.time_str << ")";
-		text << util::logLevelName(msg.m_level) << " in " << qMessage.m_file << ":" << qMessage.m_line;
+		text << util::logLevelName( msg.m_level ) << " in " << qMessage.m_file << ":" << qMessage.m_line;
 		msgBox.setWindowTitle( windowTitle.str().c_str() );
 		msgBox.setText( text.str().c_str() );
 		msgBox.setInformativeText( qMessage.message.c_str() );

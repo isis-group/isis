@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		BOOST_REQUIRE( data::IOFactory::write( null, niifile.file_string() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
-		null.propertyValue( "voxelSize" )->castTo<util::fvector4>() += null.propertyValue( "voxelGap" )->castTo<util::fvector4>();
+		null.propertyValue( "voxelSize" ).castTo<util::fvector4>() += null.propertyValue( "voxelGap" ).castTo<util::fvector4>();
 		null.remove( "voxelGap" );
 
 		std::list< data::Image > niftilist = data::IOFactory::load( niifile.file_string() );

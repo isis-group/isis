@@ -911,62 +911,62 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// VBit -> VBit (char *)
 			BOOST_STATIC_ASSERT( sizeof( char ) == sizeof( uint8_t ) );
 
-			if( pv->is<uint8_t>() ) {
+			if( pv.is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->castTo<uint8_t>() );
+							 ( VBit )pv.castTo<uint8_t>() );
 				continue;
 			}
 
 			// VUByte -> VUByte (char *)
-			if( pv->is<VUByte>() ) {
+			if( pv.is<VUByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VUByteRepn,
-							 pv->castTo<VUByte>() );
+							 pv.castTo<VUByte>() );
 				continue;
 			}
 
 			// VSByte -> VSByte (char *)
-			if( pv->is<VSByte>() ) {
+			if( pv.is<VSByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VSByteRepn,
-							 pv->castTo<VSByte>() );
+							 pv.castTo<VSByte>() );
 				continue;
 			}
 
 			// VShort -> VShort (char *)
-			if( pv->is<VShort>() ) {
+			if( pv.is<VShort>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VShortRepn,
-							 pv->castTo<VShort>() );
+							 pv.castTo<VShort>() );
 				continue;
 			}
 
 #if defined(_M_X64) || defined(__amd64__) && not defined(__APPLE__)
 
 			// VLong -> VLong (char *)
-			if( pv->is<VLong>() ) {
+			if( pv.is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
-							 pv->castTo<VLong>() );
+							 pv.castTo<VLong>() );
 				continue;
 			}
 
 #endif
 
 			// VFloat -> VFloat (char *)
-			if( pv->is<VFloat>() ) {
+			if( pv.is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
-							 pv->castTo<VFloat>() );
+							 pv.castTo<VFloat>() );
 				continue;
 			}
 
 			// VDouble -> VDouble (char *)
-			if( pv->is<VDouble>() ) {
+			if( pv.is<VDouble>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VDoubleRepn,
-							 pv->castTo<VDouble>() );
+							 pv.castTo<VDouble>() );
 				continue;
 			}
 
 			// VString -> std::string
-			if( pv->is<std::string>() ) {
+			if( pv.is<std::string>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VStringRepn,
-							 pv->castTo<std::string>().c_str() );
+							 pv.castTo<std::string>().c_str() );
 				continue;
 			}
 		}

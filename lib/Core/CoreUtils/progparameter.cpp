@@ -142,7 +142,7 @@ bool ParameterMap::parse( int argc, char **argv )
 			} else if ( !matchingStrings.size() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
 			} else {
-				if( at( matchingStrings.front() )->is<util::slist>() &&
+				if( at( matchingStrings.front() ).is<util::slist>() &&
 					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) )
 				  ) { //dont do tokenizing if the target is an slist (is already done by the shell)
 					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
@@ -152,7 +152,7 @@ bool ParameterMap::parse( int argc, char **argv )
 					LOG( Runtime, error )
 							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
 							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
-							<< " was given, but a " << at( matchingStrings.front() )->getTypeName() << " was expected.";
+							<< " was given, but a " << at( matchingStrings.front() ).getTypeName() << " was expected.";
 					parsed = false;
 				}
 
@@ -184,7 +184,7 @@ ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()con
 {
 	boost::scoped_ptr<ValueBase> dummy;
 
-	if( ( *this )->castTo<bool>() )dummy.reset( new Value<int16_t> );
+	if( ( *this ).castTo<bool>() )dummy.reset( new Value<int16_t> );
 
 	return  dummy;
 }

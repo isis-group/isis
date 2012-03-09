@@ -87,7 +87,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	BOOST_FOREACH( logger_ref ref, logs ) {
 		const std::string dname = std::string( "d" ) + ref.first;
 		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
-		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname]->as<Selection>();
+		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
 		BOOST_FOREACH( setLogFunction setter, ref.second ) {
 			( this->*setter )( level );
 		}
@@ -134,10 +134,10 @@ void Application::printHelp( bool withHidden )const
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second.getTypeName() << ">" << std::endl;
 
-		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->castTo<Selection>();
+		if ( iP->second.is<Selection>() ) {
+			const Selection &ref = iP->second.castTo<Selection>();
 			std::cerr << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 

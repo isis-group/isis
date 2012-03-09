@@ -33,6 +33,9 @@ namespace util
 class PropertyValue: public ValueReference
 {
 	bool m_needed;
+	//prevent usage of ValueReference's dereferencing (the hooks below should be used) (use "*" if you really have to)
+	ValueBase *operator->();
+	const ValueBase *operator->()const;
 public:
 	/**
 	 * Default constructor.
@@ -110,7 +113,7 @@ public:
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Value<T>::staticName() << ", trying to convert.";
-			ValueReference dst = ( *this )->copyByID( Value<T>::staticID );
+			ValueReference dst = ( **this ).copyByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;
@@ -118,11 +121,26 @@ public:
 
 		return false;
 	}
+
+	//Hooks for property reference and below
+	/// @copydoc ValueBase::as
+	template<class T> T as()const {return ( **this ).as<T>();}
+
+	/// @copydoc ValueBase::is
+	template<class T> bool is()const {return ( **this ).is<T>();}
+
+	/// @copydoc ValueBase::getTypeName
+	std::string getTypeName()const {return ( **this ).getTypeName();}
+
+	/// @copydoc ValueBase::getTypeID
+	unsigned short getTypeID()const {return ( **this ).getTypeID();}
+
+	/// @copydoc ValueBase::castTo
+	template<class T> T &castTo()const {return ( **this ).castTo<T>();}
 };
 
 }
 }
-
 #endif
 
 

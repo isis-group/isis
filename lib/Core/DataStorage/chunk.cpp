@@ -40,7 +40,7 @@ ChunkBase::~ChunkBase() { }
 }
 /// @endcond _internal
 
-Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ):
+Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps):
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 	ValuePtrReference( src )
 {
@@ -52,12 +52,12 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 	return createByID( getTypeID(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
 }
 
-Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps)
 {
 	util::vector4<size_t> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
 	assert( newSize.product() );
 	const ValuePtrReference created( ValuePtrBase::createByID( ID, newSize.product() ) );
-	return Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3] );
+	return  Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3]);
 }
 
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
@@ -168,29 +168,29 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	}
 
 	util::fvector4 offset;
-	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
+	const util::fvector4 voxelSize = propertyValue( "voxelSize" ).castTo<util::fvector4>();
 	util::fvector4 voxelGap;
 
 	if( hasProperty( "voxelGap" ) )
-		voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>();
+		voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector4>();
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 	size_t atDim = getRelevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :
-		offset = this->propertyValue( "rowVec" )->castTo<util::fvector4>();
+		offset = this->propertyValue( "rowVec" ).castTo<util::fvector4>();
 		break;
 	case columnDim:
-		offset = this->propertyValue( "columnVec" )->castTo<util::fvector4>();
+		offset = this->propertyValue( "columnVec" ).castTo<util::fvector4>();
 		break;
 	case sliceDim:
 
 		if( this->hasProperty( "sliceVec" ) ) {
-			offset = this->propertyValue( "sliceVec" )->castTo<util::fvector4>();
+			offset = this->propertyValue( "sliceVec" ).castTo<util::fvector4>();
 		} else {
-			const util::fvector4 row = this->propertyValue( "rowVec" )->castTo<util::fvector4>();
-			const util::fvector4 column = this->propertyValue( "columnVec" )->castTo<util::fvector4>();
+			const util::fvector4 row = this->propertyValue( "rowVec" ).castTo<util::fvector4>();
+			const util::fvector4 column = this->propertyValue( "columnVec" ).castTo<util::fvector4>();
 			assert( util::fuzzyEqual<float>( row.sqlen(), 1 ) );
 			assert( util::fuzzyEqual<float>( column.sqlen(), 1 ) );
 			offset[0] = row[1] * column[2] - row[2] * column[1];
@@ -214,14 +214,14 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	it++;// skip the first one
 
 	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them
-		util::fvector4 &orig = it->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+		util::fvector4 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector4>();
 
 		if( orig == ret.front().getPropertyAs<util::fvector4>( "indexOrigin" ) ) { // fix pos if its the same as for the first
 			LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
 			orig = orig + indexOriginOffset * ( float )cnt;
 		}
 
-		uint32_t &acq = it->propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
+		uint32_t &acq = it->propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
 
 		if( acq == ret.front().getPropertyAs<uint32_t>( "acquisitionNumber" ) ) {
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acq << " will be moved by " << acquisitionNumberStride << "*"  << cnt;

@@ -360,8 +360,8 @@ public:
 		if( ret.isEmpty() ) {
 			const bool needed = ret.isNeeded();
 			( ret = val ).needed() = needed;
-		} else if( ret->is<T>() ) {
-			ret->castTo<T>() = val;
+		} else if( ret.is<T>() ) {
+			ret.castTo<T>() = val;
 		} else { // don't overwrite already set properties with a different type
 			LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 		}
@@ -501,7 +501,7 @@ template<typename T> T PropertyMap::getPropertyAs( const PropPath &path ) const
 		const PropertyValue &ref = entry->getLeaf()[0];
 
 		if( !ref.isEmpty() )
-			return ref->as<T>();
+			return ref.as<T>();
 	}
 
 	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << path << " does not exist";

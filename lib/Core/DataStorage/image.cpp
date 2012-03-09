@@ -403,8 +403,8 @@ bool Image::reIndex()
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
-			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Value<util::fvector4>::staticName();
-			util::fvector4 &vec = prop->castTo<util::fvector4>();
+			LOG_IF( !prop.is<util::fvector4>(), Debug, error ) << "Using " << prop.getTypeName() << " as " << util::Value<util::fvector4>::staticName();
+			util::fvector4 &vec = prop.castTo<util::fvector4>();
 
 			if( vec.sqlen() == 0 ) {
 				util::fvector4  v_one;
@@ -420,7 +420,7 @@ bool Image::reIndex()
 		oneCnt++;
 	}
 
-	util::fvector4 &voxeSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
+	util::fvector4 &voxeSize = propertyValue( "voxelSize" ).castTo<util::fvector4>();
 
 	for( int i = 0; i < 4; i++ ) {
 		if( std::isinf( voxeSize[i] ) ) {
@@ -470,7 +470,7 @@ bool Image::reIndex()
 					setPropertyAs( "voxelGap", util::fvector4( 0, 0, inf, 0 ) );
 				}
 
-				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
+				util::fvector4 &voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
 					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
@@ -490,8 +490,8 @@ bool Image::reIndex()
 
 	//if we have row- and column- vector
 	if ( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) ) {
-		util::fvector4 &row = propertyValue( "rowVec" )->castTo<util::fvector4>();
-		util::fvector4 &column = propertyValue( "columnVec" )->castTo<util::fvector4>();
+		util::fvector4 &row = propertyValue( "rowVec" ).castTo<util::fvector4>();
+		util::fvector4 &column = propertyValue( "columnVec" ).castTo<util::fvector4>();
 		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
 											row[1] * column[2] - row[2] * column[1],
@@ -500,7 +500,7 @@ bool Image::reIndex()
 										);
 
 		if ( hasProperty( "sliceVec" ) ) {
-			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
+			util::fvector4 &sliceVec = propertyValue( "sliceVec" ).castTo<util::fvector4>(); //get the slice vector
 			LOG_IF( std::acos( crossVec.dot( sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the row- and column vector " << crossVec;
@@ -516,7 +516,7 @@ bool Image::reIndex()
 	}
 
 	if ( hasProperty( "fov" ) ) {
-		util::fvector4 &propFoV = propertyValue( "fov" )->castTo<util::fvector4>();
+		util::fvector4 &propFoV = propertyValue( "fov" ).castTo<util::fvector4>();
 
 		const util::fvector4 &calcFoV = getFoV();
 

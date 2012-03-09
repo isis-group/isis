@@ -376,9 +376,9 @@ public:
 private:
 
 	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
-		row->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		column->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
-		slice->castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
+		row.castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
+		column.castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+		slice.castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
 	void copyHeaderFromNifti( data::Chunk &retChunk, const nifti_image &ni ) {
@@ -397,7 +397,7 @@ private:
 
 			retChunk.setPropertyAs( "nifti/qform_code", ni.qform_code );
 			retChunk.setPropertyAs( "nifti/sform_code", ni.sform_code );
-			const util::fvector4 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) )->castToType<util::fvector4>();
+			const util::fvector4 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) ).castTo<util::fvector4>();
 
 			if( ni.sform_code ) {
 				geometryFromNifti(

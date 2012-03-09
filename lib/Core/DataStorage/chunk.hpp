@@ -87,7 +87,7 @@ public:
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
 
-	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
+	Chunk( const isis::data::ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1);
 
 	/**
 	 * Gets a reference to the element at a given index.
@@ -177,7 +177,7 @@ public:
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
 
 	/// Creates a new empty Chunk without properties but of specified type and specified size.
-	static Chunk createByID( short unsigned int ID, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
+	static Chunk createByID( short unsigned int ID, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1);
 
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
