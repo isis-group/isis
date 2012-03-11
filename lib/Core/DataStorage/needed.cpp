@@ -11,6 +11,8 @@
  * see PropertyObject::sufficient()
  */
 
+/// @cond _internal
+
 // Stuff needed for every Chunk
 const char *isis::data::_internal::ChunkBase::neededProperties = "\
 	indexOrigin\
@@ -28,3 +30,4 @@ const char *isis::data::Image::neededProperties = "\
 	sliceVec\
 ";
 
+/// @endcond _internal

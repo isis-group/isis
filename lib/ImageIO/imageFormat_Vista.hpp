@@ -45,7 +45,7 @@ namespace image_io
 class ImageFormat_Vista: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {return std::string( ".v" );}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".v";}
 public:
 	std::string getName()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
@@ -65,11 +65,11 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical onlyfirst" );}
+	util::istring dialects( const std::string &/*filename*/ )const {return "functional map anatomical onlyfirst";}
 	int load( std::list<data::Chunk> &chunks, const std::string &filename,
-			  const std::string &dialect ) throw( std::runtime_error & );
+			  const util::istring &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
-				const std::string &dialect ) throw( std::runtime_error & );
+				const util::istring &dialect ) throw( std::runtime_error & );
 
 	/**
 	 * Default constructor. Needed to initialize some private member variables.

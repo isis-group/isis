@@ -16,7 +16,7 @@ void _addParameter( isis::util::Application &base, const std::string &name, boos
 boost::python::api::object _getParameter( const isis::util::Application &base, const std::string &name )
 {
 	return util::Singletons::get<_internal::TypesMap, 10>().at(
-			   base.parameters.at( name.c_str() )->getTypeID() )->convert( *base.parameters.at( name.c_str() ) );
+			   base.parameters.at( name.c_str() ).getTypeID() )->convert( *base.parameters.at( name.c_str() ) );
 }
 
 

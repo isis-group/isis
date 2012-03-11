@@ -186,6 +186,8 @@ template<typename TYPE>
 class Matrix4x4: public FixedMatrix<TYPE, 4, 4>
 {
 public:
+	Matrix4x4() {};
+
 	Matrix4x4( const FixedMatrix<TYPE, 4, 4> &src ): FixedMatrix<TYPE, 4, 4>( src ) {}
 
 	Matrix4x4( const TYPE src[16] ): FixedMatrix<TYPE, 4, 4>( src ) {}

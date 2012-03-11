@@ -24,9 +24,7 @@ namespace isis
 {
 namespace util
 {
-namespace _internal
-{
-const char *logLevelNames( LogLevel level )
+const char *logLevelName( LogLevel level )
 {
 	switch( level ) {
 	case error:
@@ -139,13 +137,11 @@ bool Message::shouldCommit()const
 LogLevel MessageHandlerBase::m_stop_below = error;
 
 
-} //namespace _internal
-
 std::ostream *DefaultMsgPrint::o = &::std::cerr;
-void DefaultMsgPrint::commit( const _internal::Message &mesg )
+void DefaultMsgPrint::commit( const Message &mesg )
 {
 	if( last.empty() || last != mesg.str() ) {
-		*o << mesg.m_module << ":" << _internal::logLevelNames( mesg.m_level );
+		*o << mesg.m_module << ":" << logLevelName( mesg.m_level );
 #ifndef NDEBUG //if with debug-info
 		*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
 #else

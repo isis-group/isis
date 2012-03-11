@@ -16,11 +16,9 @@ class ImageFormat_FListProxy: public FileFormat
 private:
 
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( "flist" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return "flist";}
 public:
-	std::string dialects( const std::string &/*filename*/ )const {
+	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
 		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
@@ -30,39 +28,43 @@ public:
 		suffixes.sort();
 		suffixes.unique();
 
-		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
+		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
 	}
 	std::string getName()const {return "filelist proxy (gets filenames from files or stdin)";}
 
-	size_t doLoad( std::istream &in, std::list<data::Chunk> &chunks, const std::string &dialect ) {
+	size_t doLoad( std::istream &in, std::list<data::Chunk> &chunks, const util::istring &dialect ) {
 		size_t red = 0;
 		const boost::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
+		size_t fcnt = 0;
 
 		while( !in.eof() ) {
 			in >> fnames ;
 			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
 				LOG( Runtime, info ) << "loading " << fname;
 				red += data::IOFactory::load( chunks, fname, "", dialect );
+				fcnt++;
 			}
 		}
+
+		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from the input list";
 
 		return red;
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
 		if( filename.empty() ) {
-			LOG( Runtime, info ) << "Getting filelist from stdin";
+			LOG( Runtime, info ) << "getting filelist from stdin";
 			return doLoad( std::cin, chunks, dialect );
 		} else {
-			LOG( Runtime, info ) << "Getting filelist from " << filename;
+			LOG( Runtime, info ) << "getting filelist from " << filename;
 			std::ifstream in( filename.c_str() );
 			in.exceptions( std::ios::badbit );
 			return doLoad( in, chunks, dialect );
 		}
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

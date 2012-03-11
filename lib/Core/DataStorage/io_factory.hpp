@@ -37,20 +37,28 @@ namespace data
 class IOFactory
 {
 public:
-	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
+	typedef boost::shared_ptr< image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
 	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:
 	/**
-	 * Load a data file with given filename and dialect.
-	 * @param path list to store the loaded chunks in
+	 * Load data from a set of files or directories with given paths and dialect.
+	 * @param paths list if files or directories to load
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
+	 * @param dialect dialect of the fileformat to load
+	 * @return list of images created from the loaded data
+	 * @note the images a re created from all loaded files, so loading mutilple files can very well result in only one image
+	 */
+	static std::list<data::Image> load( const util::slist &paths, util::istring suffix_override = "", util::istring dialect = "" );
+	/**
+	 * Load a data file or directory with given filename and dialect.
 	 * @param path file or directory to load
 	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
 	 * @param dialect dialect of the fileformat to load
-	 * @return list of chunks (part of an image)
+	 * @return list of images created from the loaded data
 	 */
-	static std::list<data::Image> load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static std::list<data::Image> load( const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 	/**
 	 * Load a data file with given filename and dialect into a chunklist.
 	 * @param chunks list to store the loaded chunks in
@@ -59,10 +67,10 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static size_t load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static size_t load( std::list<data::Chunk> &chunks, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 
-	static bool write( const data::Image &image, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
-	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static bool write( const data::Image &image, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
+	static bool write( std::list<data::Image> images, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 
 	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
@@ -75,7 +83,7 @@ public:
 	 * \param suffix_override if given, it will override the suffix of the given file (and thus enforce usage of a format)
 	 * \param dialect if given, the plugins supporting the dialect are preferred
 	 */
-	static FileFormatList getFileFormatList( std::string filename, std::string suffix_override = "", std::string dialect = "" );
+	static FileFormatList getFileFormatList( std::string filename, util::istring suffix_override = "", util::istring dialect = "" );
 	/**
 	 *  Make images out of a (unordered) list of chunks.
 	 *  Uses the chunks in the chunklist to fit them together into images.
@@ -85,8 +93,8 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
 protected:
-	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override = "", std::string dialect = "" );
-	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override = "", std::string dialect = "" );
+	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
+	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, util::istring suffix_override = "", util::istring dialect = "" );
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

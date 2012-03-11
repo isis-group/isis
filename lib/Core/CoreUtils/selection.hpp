@@ -46,8 +46,10 @@ public:
 	 * Default constructor.
 	 * Creates a selection with the given options.
 	 * \param entries comma separated list of the options as a string
+	 * \param init_val the string which should be selected after initialisation (must be one from entries)
+	 * \warning this is really only <b>comma</b> separated, so write "first,second,and,so,on" and not "first, second, and, so, on"
 	 */
-	Selection( const char *entries );
+	Selection( const char *entries, const char *init_val = "" );
 	/**
 	 * Default constructor.
 	 * Creates a selection from a number-option map.

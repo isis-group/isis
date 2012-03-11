@@ -1,7 +1,4 @@
 #include <DataStorage/io_application.hpp>
-#include <DataStorage/io_factory.hpp>
-#include <boost/foreach.hpp>
-
 
 using namespace isis;
 
