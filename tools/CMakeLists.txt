@@ -47,7 +47,7 @@ build_manpage(isisflip "flip MR images along specific dimensions")
 add_executable(isisraw isisraw.cpp)
 target_link_libraries(isisraw isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisraw PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-build_manpage(isisraw "flip MR images along specific dimensions")
+build_manpage(isisraw "read or write raw data files from/to isis images")
 
 # the install targets.
 install(TARGETS
@@ -55,5 +55,6 @@ install(TARGETS
   isisdiff
   isisconv
   isisflip
+  isisraw
   RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 
