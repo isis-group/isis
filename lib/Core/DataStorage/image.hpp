@@ -686,7 +686,14 @@ public:
 		copyToMem<T> ( &ret[0], ret.getVolume() );
 		return ret;
 	}
-
+	/**
+	 * Copy all voxel data of the image into an existing ValueArray using its type.
+	 * If neccessary a conversion into the datatype of the target is done using min/max of the image.
+	 * \param dst ValueArray to copy into
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 */
+	void copyToValueArray ( data::ValueArrayBase &dst,  scaling_pair scaling = scaling_pair() ) const;
+	
 	/**
 	* Get a sorted list of the chunks of the image.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.

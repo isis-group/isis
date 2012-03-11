@@ -593,6 +593,40 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	return getChunkAt( index, copy_metadata );
 }
 
+void Image::copyToValueArray(ValueArrayBase& dst, scaling_pair scaling) const
+{
+	if(getVolume()>dst.getLength()){
+		LOG(Runtime,error) << "Image wont fit into the ValueArray, wont copy..";
+		return;
+	}
+	if ( clean ) {
+		if ( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
+			scaling = getScalingTo ( dst.getTypeID() );
+		}
+
+		std::vector< ValueArrayReference > targets;
+		if(lookup.size()>1){ //if there are more than 1 chunks
+			//splice target to have the same parts as the image
+			targets=dst.splice(lookup.front()->getVolume());
+		} else {
+			//just put that ValueArray into the list
+			targets.push_back(dst);
+		}
+
+		std::vector< ValueArrayReference >::iterator target=targets.begin();
+		BOOST_FOREACH ( const boost::shared_ptr<Chunk> &ref, lookup ) { // copy chunks into the parts
+			if ( !ref->getValueArrayBase().copyTo ( **target, scaling ) ) {
+				LOG ( Runtime, error )
+					<< "Failed to copy raw data of type " << ref->getTypeName() << " from "<< getSizeAsString() << "-image into ValueArray of type "
+					<< dst.getTypeName() << " and length " << dst.getLength();
+			}
+			target++;
+		}
+	} else {
+		LOG ( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
+	}
+}
+
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
 	std::vector<isis::data::Chunk> ret;
