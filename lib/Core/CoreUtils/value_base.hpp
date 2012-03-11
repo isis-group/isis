@@ -82,6 +82,7 @@ public:
 	typedef _internal::GenericReference<ValueBase> Reference;
 	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
+	/// \return true is the stored type is T
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
@@ -108,7 +109,7 @@ public:
 	* Value<std::string> mephisto("666");
 	* Value<int> devil((std::string)devil);
 	* \endcode
-	* \return value of any requested type parsed from toString(false).
+	* \return this value converted to the requested type if conversion was successfull.
 	*/
 	template<class T> T as()const {
 		if( is<T>() )

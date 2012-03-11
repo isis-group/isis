@@ -50,6 +50,11 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		null.propertyValue( "voxelSize" ).castTo<util::fvector4>() += null.propertyValue( "voxelGap" ).castTo<util::fvector4>();
 		null.remove( "voxelGap" );
 
+		// that will be set by the nifti reader
+		const std::pair<util::ValueReference, util::ValueReference> minmax=null.getMinMax();
+		null.setPropertyAs("nifti/cal_min",minmax.first->as<float>());
+		null.setPropertyAs("nifti/cal_max",minmax.second->as<float>());
+		
 		std::list< data::Image > niftilist = data::IOFactory::load( niifile.file_string() );
 		BOOST_REQUIRE( niftilist.size() == 1 );
 		data::Image &nii = niftilist.front();

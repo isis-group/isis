@@ -57,9 +57,9 @@ public:
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
 	 */
 	PropertyValue();
-	/// returns true if PropertyValue is marked as needed, false otherwise
+	/// accessor to mark as (not) needed
 	bool &needed();
-	///\copydoc needed
+	/// returns true if PropertyValue is marked as needed, false otherwise
 	bool isNeeded ()const;
 
 	/**
@@ -122,20 +122,34 @@ public:
 		return false;
 	}
 
-	//Hooks for property reference and below
-	/// @copydoc ValueBase::as
+	/**
+	 * \copybrief ValueBase::as 
+	 * hook for \link ValueBase::as \endlink
+	 */
 	template<class T> T as()const {return ( **this ).as<T>();}
 
-	/// @copydoc ValueBase::is
+	/**
+	 * \copybrief ValueBase::is
+	 * hook for \link ValueBase::is \endlink
+	 */
 	template<class T> bool is()const {return ( **this ).is<T>();}
 
-	/// @copydoc ValueBase::getTypeName
+	/**
+	 * \copybrief ValueBase::getTypeName
+	 * hook for \link ValueBase::getTypeName \endlink
+	 */
 	std::string getTypeName()const {return ( **this ).getTypeName();}
 
-	/// @copydoc ValueBase::getTypeID
+	/**
+	 * \copybrief ValueBase::getTypeID
+	 * hook for \link ValueBase::getTypeID \endlink
+	 */
 	unsigned short getTypeID()const {return ( **this ).getTypeID();}
 
-	/// @copydoc ValueBase::castTo
+	/**
+	 * \copybrief ValueBase::castTo
+	 * hook for \link ValueBase::castTo \endlink
+	 */
 	template<class T> T &castTo()const {return ( **this ).castTo<T>();}
 };
 
