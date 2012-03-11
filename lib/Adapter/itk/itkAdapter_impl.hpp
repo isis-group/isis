@@ -221,6 +221,9 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	rescaler->SetOutputMaximum( minMaxPair.second->as<typename InputImageType::PixelType>() );
 	rescaler->Update();
 	outputImage = rescaler->GetOutput();
+
+    free(targePtr);
+
 	return outputImage;
 }
 
