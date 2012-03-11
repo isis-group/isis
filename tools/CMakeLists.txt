@@ -44,6 +44,11 @@ target_link_libraries(isisflip isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisflip "flip MR images along specific dimensions")
 
+add_executable(isisraw isisraw.cpp)
+target_link_libraries(isisraw isis_core ${ISIS_LIB_DEPENDS})
+set_target_properties(isisraw PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisraw "flip MR images along specific dimensions")
+
 # the install targets.
 install(TARGETS
   isisdump

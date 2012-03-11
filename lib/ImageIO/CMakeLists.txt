@@ -268,15 +268,6 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
-############################################################
-# RAW plugin
-############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
-  add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
-  target_link_libraries(isisImageFormat_raw isis_core ${ISIS_LIB_DEPENDS})
-  set(TARGETS ${TARGETS} isisImageFormat_raw)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
-
 #################################################################################################
 # Siemens TCPIP
 #################################################################################################
