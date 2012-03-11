@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 	util::PropertyValue propZero;
 	//  initializer
 	util::PropertyValue propA = std::string( "Property01" );
-	BOOST_CHECK_EQUAL( propA->toString(), "Property01" );
+	BOOST_CHECK_EQUAL( propA.toString(), "Property01" );
 	//  default: not needed
 	BOOST_CHECK( !propA.needed() );
 	BOOST_CHECK( !propZero.needed() );

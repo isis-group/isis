@@ -42,6 +42,10 @@ public:
 		return autowrite( image );
 	}
 
+	bool _autoload( bool exitOnError ) {
+		return autoload( exitOnError );
+	}
+
 private:
 	PyObject *self;
 

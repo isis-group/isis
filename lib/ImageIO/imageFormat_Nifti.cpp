@@ -28,10 +28,10 @@
 
 //LOCAL INCLUDES
 #include <DataStorage/io_interface.h>
-#include <CoreUtils/type.hpp>
+#include <CoreUtils/value.hpp>
 #include <DataStorage/common.hpp>
 #include <CoreUtils/vector.hpp>
-#include <DataStorage/typeptr.hpp>
+#include <DataStorage/valuearray.hpp>
 
 //SYSTEM INCLUDES
 #include <nifti1_io.h>
@@ -113,16 +113,12 @@ class ImageFormat_Nifti : public FileFormat
 		}
 	};
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".nii.gz .nii .hdr" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".nii.gz .nii .hdr";}
 public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
 
-	std::string dialects( const std::string &/*filename*/ )const {
-		return std::string( "fsl spm" );
-	}
+	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
 
 	std::string getName()const {
 		//TODO: wahrscheinlich sollten die Namen irgendwie so aussehen "mpg.cbs.nii"?
@@ -136,7 +132,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+	int load( std::list<data::Chunk> &retList, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
 		//read the file with the function from nifti1_io.h
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 
@@ -193,7 +189,7 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &imageOrig, const std::string &filename, const std::string &sdialect ) throw( std::runtime_error & ) {
+	void write( const data::Image &imageOrig, const std::string &filename, const util::istring &sdialect ) throw( std::runtime_error & ) {
 		const util::istring dialect( sdialect.begin(), sdialect.end() );
 		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.getMajorTypeName() << " as nifti";
 
@@ -301,7 +297,7 @@ public:
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
 
 		switch ( image.getMajorTypeID() ) {
-		case data::ValuePtr<int8_t>::staticID:
+		case data::ValueArray<int8_t>::staticID:
 
 			if ( dialect == "fsl" || dialect == "spm" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
@@ -313,15 +309,15 @@ public:
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
-		case data::ValuePtr<uint8_t>::staticID:
+		case data::ValueArray<uint8_t>::staticID:
 			ni.datatype = DT_UINT8;
 			copyDataToNifti<uint8_t>( image, ni );
 			break;
-		case data::ValuePtr<int16_t>::staticID:
+		case data::ValueArray<int16_t>::staticID:
 			ni.datatype = DT_INT16;
 			copyDataToNifti<int16_t>( image, ni );
 			break;
-		case data::ValuePtr<uint16_t>::staticID:
+		case data::ValueArray<uint16_t>::staticID:
 
 			if ( dialect == "fsl" || dialect == "spm" ) {
 				//              image.print( std::cout );
@@ -334,11 +330,11 @@ public:
 			}
 
 			break;
-		case data::ValuePtr<int32_t>::staticID:
+		case data::ValueArray<int32_t>::staticID:
 			ni.datatype = DT_INT32;
 			copyDataToNifti<int32_t>( image, ni );
 			break;
-		case data::ValuePtr<uint32_t>::staticID:
+		case data::ValueArray<uint32_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				data::TypedImage<int32_t> fslCopy( image );
@@ -350,11 +346,11 @@ public:
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<uint16_t>( image, ni );
 			break;
-		case data::ValuePtr<float>::staticID:
+		case data::ValueArray<float>::staticID:
 			ni.datatype = DT_FLOAT32;
 			copyDataToNifti<float>( image, ni );
 			break;
-		case data::ValuePtr<double>::staticID:
+		case data::ValueArray<double>::staticID:
 			ni.datatype = DT_FLOAT64;
 			copyDataToNifti<double>( image, ni );
 			break;
@@ -376,9 +372,9 @@ public:
 private:
 
 	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
-		row->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		column->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
-		slice->castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
+		row.castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
+		column.castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+		slice.castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
 	void copyHeaderFromNifti( data::Chunk &retChunk, const nifti_image &ni ) {
@@ -397,7 +393,7 @@ private:
 
 			retChunk.setPropertyAs( "nifti/qform_code", ni.qform_code );
 			retChunk.setPropertyAs( "nifti/sform_code", ni.sform_code );
-			const util::fvector4 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) )->castToType<util::fvector4>();
+			const util::fvector4 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) ).castTo<util::fvector4>();
 
 			if( ni.sform_code ) {
 				geometryFromNifti(
@@ -578,11 +574,11 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
-		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
+		ni.data = malloc( image.getMaxBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
 		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::vector4<size_t> isize = image.getSizeAsVector();
-		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
+		const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
@@ -598,7 +594,7 @@ private:
 		}
 
 		// data dependent information added
-		ni.nbyper = image.getBytesPerVoxel();
+		ni.nbyper = image.getMaxBytesPerVoxel();
 		std::pair<double, double> minmax = image.getMinMaxAs<double>();
 		ni.cal_min = minmax.first;
 		ni.cal_max = minmax.second;
@@ -615,7 +611,7 @@ private:
 	}
 	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {
 		//all the other information for the nifti header
-		BOOST_ASSERT( data::Image::dims == 4 );
+		BOOST_STATIC_ASSERT( data::Image::dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
 

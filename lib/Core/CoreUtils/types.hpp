@@ -77,9 +77,9 @@ template< typename T > struct checkType {
 	);
 };
 
-std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValuePtrs = true );
+std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValueArrays = true );
 
-std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValuePtrs = true );
+std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValueArrays = true );
 }
 }
 

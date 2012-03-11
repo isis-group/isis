@@ -325,7 +325,7 @@ public:
 	 * \returns amount of successfully inserted chunks
 	 */
 	template<typename T> size_t insertChunksFromContainer ( T &chunks ) {
-		BOOST_STATIC_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
+		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type > ) );
 		size_t cnt = 0;
 
 		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
@@ -387,7 +387,7 @@ public:
 	template <typename T> T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
-		ValuePtr<T> &data = chunkAt ( index.first ).asValuePtr<T>();
+		ValueArray<T> &data = chunkAt ( index.first ).asValueArray<T>();
 		return data[index.second];
 	}
 
@@ -405,7 +405,7 @@ public:
 	 */
 	template <typename T> const T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) const {
 		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
-		const ValuePtr<T> &data = chunkPtrAt ( index.first )->getValuePtr<T>();
+		const ValueArray<T> &data = chunkPtrAt ( index.first )->getValueArray<T>();
 		return data[index.second];
 	}
 
@@ -420,7 +420,7 @@ public:
 	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
 	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
 	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
-	 * \returns a number which is equal to the ValuePtr::staticID of the selected type.
+	 * \returns a number which is equal to the ValueArray::staticID of the selected type.
 	 */
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
@@ -481,7 +481,7 @@ public:
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
-		return getChunkAs<TYPE> ( getScalingTo ( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -497,7 +497,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
 		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType ( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType ( ValueArray<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -531,8 +531,19 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::KeyType &key, bool unique = false ) const;
 
-	/// get the voxelsize (in bytes) for the major type in the image
-	size_t getBytesPerVoxel() const;
+	/**
+	 * Get the size (in bytes) for the voxels in the image
+	 * \warning As each Chunk of the image can have a different type (and thus bytesize),
+	 * this does not neccesarly return the correct size for all voxels in the image. It
+	 * will rather return the biggest size.
+	 * \note The easiest (and most expensive) way to make sure you have the same bytesize accross the whole Image, is to run:
+	 * \code
+	 * image.convertToType(image.getMajorTypeID());
+	 * \endcode
+	 * assuming "image" is your image.
+	 * \returns Get the biggest size (in bytes) accross all voxels in the image.
+	 */
+	size_t getMaxBytesPerVoxel() const;
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
@@ -563,7 +574,7 @@ public:
 	 * function only changes the orientation information (rowVec, columnVec, sliceVec, indexOrigin)
 	 * of the image but will not change the image itself.
 	 *
-	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
+	 * \warning If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
@@ -574,41 +585,7 @@ public:
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
-	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		//for transforming we have to ensure to have the below properties in our chunks and image
-		std::list<std::string > neededProps;
-		neededProps.push_back ( "indexOrigin" );
-		neededProps.push_back ( "rowVec" );
-		neededProps.push_back ( "columnVec" );
-		neededProps.push_back ( "sliceVec" );
-		neededProps.push_back ( "voxelSize" );
-		//propagate needed properties to chunks
-		BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
-				if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
-					chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
-				}
-			}
-
-			if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
-				return false;
-			}
-		}
-		//      establish initial state
-
-		if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
-			return false;
-		}
-
-		if ( !updateOrientationMatrices() ) {
-			LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
-			return false;
-		}
-
-		deduplicateProperties();
-		return true;
-	}
+	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false );
 
 	/** Maps the given scanner Axis to the dimension with the minimal angle.
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
@@ -652,7 +629,7 @@ public:
 	template<typename T> void copyToMem ( T *dst, size_t len,  scaling_pair scaling = scaling_pair() ) const {
 		if ( clean ) {
 			if ( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
-				scaling = getScalingTo ( ValuePtr<T>::staticID );
+				scaling = getScalingTo ( ValueArray<T>::staticID );
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
@@ -660,7 +637,7 @@ public:
 				const size_t cSize = ref->getSizeAsVector().product();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
-					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValueArray<T>::staticName();
 				} else {
 					if ( len < cSize ) {
 						LOG ( Runtime, error ) << "Abborting copy, because there is no space left in the target";
@@ -679,22 +656,51 @@ public:
 
 	/**
 	 * Copy all voxel data into a new MemChunk.
-	 * This creates a MemChunk\<T\> of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 * This creates a MemChunk of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 *
 	 * If neccessary a conversion into T is done using min/max of the image.
-	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
+	 *
+	 * Also the properties of the first chunk are \link util::PropertyMap::join join\endlink-ed with those of the image and copied.
+	 * \note This is a deep copy, no data will be shared between the Image and the MemChunk. It will waste a lot of memory, use it wisely.
+	 * \returns a MemChunk containing the voxeldata and the properties of the Image
 	 */
-	template<typename T> MemChunk<T> copyToMemChunk() const {
+	template<typename T> MemChunk<T> copyAsMemChunk() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
 		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
+		static_cast<util::PropertyMap &>( ret ) = static_cast<const util::PropertyMap &>( getChunkAt( 0 ) );
 		return ret;
 	}
 
 	/**
+	 * Copy all voxel data into a new ValueArray.
+	 * This creates a ValueArray of the requested type and the same length as the images volume and then copies all voxeldata of the image into that ValueArray.
+	 *
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \note This is a deep copy, no data will be shared between the Image and the ValueArray. It will waste a lot of memory, use it wisely.
+	 * \returns a ValueArray containing the voxeldata of the Image (but not its Properties)
+	 */
+	template<typename T> ValueArray<T> copyAsValueArray() const {
+		const util::vector4<size_t> size = getSizeAsVector();
+		data::ValueArray<T> ret ( getVolume() );
+		copyToMem<T> ( &ret[0], ret.getVolume() );
+		return ret;
+	}
+	/**
+	 * Copy all voxel data of the image into an existing ValueArray using its type.
+	 * If neccessary a conversion into the datatype of the target is done using min/max of the image.
+	 * \param dst ValueArray to copy into
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 */
+	void copyToValueArray ( data::ValueArrayBase &dst,  scaling_pair scaling = scaling_pair() ) const;
+	
+	/**
 	* Get a sorted list of the chunks of the image.
-	* Note: These chunks are cheap copies, so changing their voxels will change the voxels of the image.
-	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
+	* \note These chunks will be cheap copies, so changing their voxels will change the voxels of the image. But you can for example use \code
+	* std::vector< data::Chunk > cheapchunks=img.copyChunksToVector(); //this is a cheap copy
+	* std::vector< data::MemChunk<float> > memchunks(cheapchunks.begin(),cheapchunks.end()); // this is not not
+	* \endcode to get deep copies.
 	*/
 	std::vector<isis::data::Chunk> copyChunksToVector ( bool copy_metadata = true ) const;
 
@@ -704,7 +710,7 @@ public:
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool convertToType ( unsigned short ID );
+	bool convertToType ( short unsigned int ID, isis::data::autoscaleOption scaleopt = autoscale );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.
@@ -739,7 +745,7 @@ public:
 			}
 		};
 		_proxy prx ( op );
-		return convertToType ( data::ValuePtr<TYPE>::staticID ) && foreachChunk ( prx, false );
+		return convertToType ( data::ValueArray<TYPE>::staticID ) && foreachChunk ( prx, false );
 	}
 
 	/// \returns the number of rows of the image
@@ -764,14 +770,14 @@ template<typename T> class TypedImage: public Image
 protected:
 	TypedImage() {} // to be used only by inheriting classes
 public:
-	typedef _internal::ImageIteratorTemplate<data::ValuePtr<T> > iterator;
-	typedef _internal::ImageIteratorTemplate<const data::ValuePtr<T> > const_iterator;
+	typedef _internal::ImageIteratorTemplate<data::ValueArray<T> > iterator;
+	typedef _internal::ImageIteratorTemplate<const data::ValueArray<T> > const_iterator;
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage ( const Image &src ) : Image ( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		convertToType ( ValuePtr<T>::staticID );
+		convertToType ( ValueArray<T>::staticID );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator= ( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -781,7 +787,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator= ( ref );
-		convertToType ( ValuePtr<T>::staticID );
+		convertToType ( ValueArray<T>::staticID );
 		return *this;
 	}
 	void copyToMem ( void *dst ) {
@@ -792,10 +798,10 @@ public:
 	}
 	iterator begin() {
 		if ( checkMakeClean() ) {
-			std::vector<data::ValuePtr<T>*> vec ( lookup.size() );
+			std::vector<data::ValueArray<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->template asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValueArray<T>();
 
 			return iterator ( vec );
 		} else {
@@ -808,10 +814,10 @@ public:
 	};
 	const_iterator begin() const {
 		if ( isClean() ) {
-			std::vector<const data::ValuePtr<T>*> vec ( lookup.size() );
+			std::vector<const data::ValueArray<T>*> vec ( lookup.size() );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
-				vec[i] = &lookup[i]->template asValuePtr<T>();
+				vec[i] = &lookup[i]->template asValueArray<T>();
 
 			return const_iterator ( vec );
 		} else {
@@ -856,7 +862,7 @@ public:
 				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo ( ValuePtr<T>::staticID );
+		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID );
 		LOG ( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform ( conv_op );

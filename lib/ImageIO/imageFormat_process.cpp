@@ -17,11 +17,9 @@ class ImageFormat_StdinProxy: public FileFormat
 private:
 
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( "process" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return "process";}
 public:
-	std::string dialects( const std::string &/*filename*/ )const {
+	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
 		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
@@ -31,11 +29,11 @@ public:
 		suffixes.sort();
 		suffixes.unique();
 
-		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
+		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
 	}
 	std::string getName()const {return "process proxy (gets filenames from child process given in the filename)";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
 		size_t red = 0;
 		LOG( Runtime, info ) << "Running " << util::MSubject( filename );
 		FILE *in = popen( filename.c_str(), "r" );
@@ -48,13 +46,15 @@ public:
 
 		char got;
 		std::string fname;
+		size_t fcnt = 0;
 
 		while( ( got = fgetc( in ) ) != EOF ) {
 			if( got == '\n' ) {
 				if( !fname.empty() ) {
 					LOG( Runtime, info ) << "Got " << util::MSubject( fname ) << " from " << util::MSubject( filename );
-					red += data::IOFactory::load( chunks, fname, dialect, "" );
+					red += data::IOFactory::load( chunks, fname, dialect.c_str(), "" );
 					fname.clear();
+					fcnt++;
 				}
 			} else {
 				fname += got;
@@ -62,10 +62,11 @@ public:
 		}
 
 		pclose( in );
+		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from " << util::MSubject( filename );
 		return red;
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

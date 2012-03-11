@@ -41,10 +41,8 @@ class ImageFormat_Null: public FileFormat
 		return ret;
 	}
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".null" );
-	}
-	size_t getSize( const std::string &dialect ) {
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".null"; }
+	size_t getSize( const util::istring &dialect ) {
 		size_t size = 10;
 
 		if( !dialect.empty() )
@@ -57,11 +55,11 @@ public:
 	std::string getName()const {
 		return "Null";
 	}
-	std::string dialects( const std::string &/*filename*/ )const {
-		return std::string( "50 500 1000 2000" );
+	util::istring dialects( const std::string &/*filename*/ )const {
+		return "50 500 1000 2000";
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const util::istring &dialect )  throw( std::runtime_error & ) {
 
 		size_t size = getSize( dialect );
 
@@ -95,7 +93,7 @@ public:
 		return timesteps * size;
 	}
 
-	void write( const data::Image &img, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
 		data::Image image = img;
 
 		// set by the core, thus the newChunks cannot have one

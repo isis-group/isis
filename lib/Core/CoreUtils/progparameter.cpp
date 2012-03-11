@@ -42,7 +42,7 @@ bool &ProgParameter::hidden()
 
 bool ProgParameter::parse( const Value<std::string> &props )
 {
-	_internal::ValueBase &me = **this;
+	ValueBase &me = **this;
 	bool ret = false;
 
 	if ( ( ( std::string )props ).empty() ) {
@@ -51,7 +51,7 @@ bool ProgParameter::parse( const Value<std::string> &props )
 			ret = true;
 		}
 	} else {
-		ret = _internal::ValueBase::convert( props, me );
+		ret = ValueBase::convert( props, me );
 	}
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
@@ -62,14 +62,14 @@ bool ProgParameter::parse( const Value<std::string> &props )
 }
 bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
 {
-	_internal::ValueBase &me = **this;
+	ValueBase &me = **this;
 	bool ret = false;
 	const util::slist &theList = props_list.castTo<util::slist>();
 
 	if ( theList.empty() ) {
 		//there is nothing like a bool-list (yet)
 	} else {
-		ret = _internal::ValueBase::convert( props_list, me );
+		ret = ValueBase::convert( props_list, me );
 	}
 
 	LOG_IF( ret, Debug, info )
@@ -122,7 +122,11 @@ bool ParameterMap::parse( int argc, char **argv )
 			std::list<std::string> matchingStrings;
 			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
-					matchingStrings.push_back( parameterRef.first );
+					if( parameterRef.first.length() == pName.length() ) { //if its an exact match
+						matchingStrings = std::list<std::string>( 1, pName ); //use that
+						break;// and stop searching for partial matches
+					} else
+						matchingStrings.push_back( parameterRef.first );
 				}
 			}
 
@@ -138,7 +142,7 @@ bool ParameterMap::parse( int argc, char **argv )
 			} else if ( !matchingStrings.size() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
 			} else {
-				if( at( matchingStrings.front() )->is<util::slist>() &&
+				if( at( matchingStrings.front() ).is<util::slist>() &&
 					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) )
 				  ) { //dont do tokenizing if the target is an slist (is already done by the shell)
 					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
@@ -148,7 +152,7 @@ bool ParameterMap::parse( int argc, char **argv )
 					LOG( Runtime, error )
 							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
 							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
-							<< " was given, but a " << at( matchingStrings.front() )->getTypeName() << " was expected.";
+							<< " was given, but a " << at( matchingStrings.front() ).getTypeName() << " was expected.";
 					parsed = false;
 				}
 
@@ -163,12 +167,24 @@ bool ParameterMap::isComplete()const
 	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
-
-ProgParameter::operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const
+const ProgParameter ParameterMap::operator[] ( const std::string key ) const
 {
-	boost::scoped_ptr<_internal::ValueBase> dummy;
+	std::map<std::string, ProgParameter>::const_iterator at = find( key );
 
-	if( ( *this )->castTo<bool>() )dummy.reset( new Value<int16_t> );
+	if( at != end() )
+		return at->second;
+	else {
+		LOG( Debug, error ) << "The requested parameter " << util::MSubject( key ) << " does not exist";
+		return ProgParameter();
+	}
+}
+ProgParameter &ParameterMap::operator[] ( const std::string key ) {return std::map<std::string, ProgParameter>::operator[]( key );}
+
+ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const
+{
+	boost::scoped_ptr<ValueBase> dummy;
+
+	if( ( *this ).castTo<bool>() )dummy.reset( new Value<int16_t> );
 
 	return  dummy;
 }

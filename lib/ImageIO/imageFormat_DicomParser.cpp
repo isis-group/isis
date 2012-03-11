@@ -407,7 +407,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const util::istring &dialect )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
@@ -417,7 +417,7 @@ void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, cons
 		pos += parseCSAEntry( array + pos, map, dialect );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const std::string &dialect )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const util::istring &dialect )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -533,7 +533,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const std::string &dialect )const
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const util::istring &dialect )const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();

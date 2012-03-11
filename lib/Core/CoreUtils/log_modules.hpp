@@ -1,7 +1,7 @@
 #ifndef LOG_MOUDLES_HPP_INCLUDED
 #define LOG_MOUDLES_HPP_INCLUDED
 
-/// @cond _hidden
+/// @cond _internal
 namespace isis
 {
 struct CoreLog {static const char *name() {return "Core";}; enum {use = _ENABLE_LOG};};

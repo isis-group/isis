@@ -152,9 +152,9 @@ BOOST_AUTO_TEST_CASE( propMap_transform_test )
 	BOOST_CHECK( map.transform<float>( "sub/Test1", "sub/Test1float" ) );
 	BOOST_CHECK( map.transform<int32_t>( "Test1", "Test1int" ) );
 	BOOST_CHECK( map.transform<util::ivector4>( "Test3", "Test3int" ) );
-	BOOST_CHECK( map.propertyValue( "sub/Test1float" )->is<float>() );
-	BOOST_CHECK( map.propertyValue( "Test1int" )->is<int>() );
-	BOOST_CHECK( map.propertyValue( "Test3int" )->is<util::ivector4>() );
+	BOOST_CHECK( map.propertyValue( "sub/Test1float" ).is<float>() );
+	BOOST_CHECK( map.propertyValue( "Test1int" ).is<int>() );
+	BOOST_CHECK( map.propertyValue( "Test3int" ).is<util::ivector4>() );
 	BOOST_CHECK_EQUAL( map.propertyValue( "sub/Test1float" ), ( float )1 );
 	BOOST_CHECK_EQUAL( map.propertyValue( "sub/Test1float" ), ( int32_t )1 ); // this will do an automatic transform back to int for comparison
 	BOOST_CHECK_EQUAL( map.propertyValue( "Test1int" ), ( int32_t )6 );

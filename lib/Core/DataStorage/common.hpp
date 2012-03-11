@@ -16,17 +16,13 @@
 #include "../CoreUtils/log_modules.hpp"
 #include "../CoreUtils/log.hpp"
 #include "../CoreUtils/propmap.hpp"
+#include "../config.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
 namespace isis
 {
-
-/*! \addtogroup data
- *  Additional documentation for group `mygrp'
- *  @{
- */
 
 namespace image_io
 {
@@ -86,6 +82,5 @@ template<typename HANDLE> void enableLog( LogLevel level )
 	ENABLE_LOG( Debug, HANDLE, level );
 }
 }
-/** @} */
 }
 #endif //DATA_COMMON_HPP
