@@ -81,6 +81,10 @@ template<typename HANDLE> void enableLog( LogLevel level )
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
 }
+class Image;
+boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources );
+boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs );
+boost::filesystem::path getCommonSource( const data::Image &img );
 }
 }
 #endif //DATA_COMMON_HPP
