@@ -51,7 +51,7 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 		setPropertyAs( "acquisitionNumber", 0 );
 		setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		setPropertyAs( "columnVec", util::fvector4( 0,1 ) );
+		setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	}
 }
 

@@ -123,7 +123,7 @@ public:
 	}
 
 	/**
-	 * \copybrief ValueBase::as 
+	 * \copybrief ValueBase::as
 	 * hook for \link ValueBase::as \endlink
 	 */
 	template<class T> T as()const {return ( **this ).as<T>();}

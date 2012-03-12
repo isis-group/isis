@@ -529,7 +529,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 	if( head->intent_code  ) {
 		props.setPropertyAs( "nifti/intent_code", head->intent_code ); // use it the usual way
-		LOG(Runtime,warning) << "Ignoring intent_code " << props.propertyValue("nifti/intent_code");
+		LOG( Runtime, warning ) << "Ignoring intent_code " << props.propertyValue( "nifti/intent_code" );
 	}
 
 

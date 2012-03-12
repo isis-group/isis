@@ -222,7 +222,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	rescaler->Update();
 	outputImage = rescaler->GetOutput();
 
-    free(targePtr);
+	free( targePtr );
 
 	return outputImage;
 }
