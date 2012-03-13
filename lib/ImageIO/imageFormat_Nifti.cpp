@@ -368,6 +368,8 @@ public:
 
 		if ( errno )
 			throwSystemError( errno );
+
+        free(ni.data);
 	}
 
 	/****************************************
