@@ -18,23 +18,19 @@
 #include <boost/lexical_cast.hpp>
 
 #include "types.hpp"
-#include "type_converter.hpp"
-#include "generic_type.hpp"
+#include "value_converter.hpp"
+#include "generic_value.hpp"
 #include "common.hpp"
 
 
 namespace isis
 {
-/*! \addtogroup util
-	*  Additional documentation for group `mygrp'
-	*  @{
-	*/
 namespace util
 {
-
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
-/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
@@ -60,30 +56,33 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 		return value; //special version types are same - so just return the value
 	}
 };
+}
 /// @endcond
+API_EXCLUDE_END
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
- * Additionally, there's the ValuePtrBase containing the more complex data handling stuff with abstract values.
+ * Additionally, there's the ValueArrayBase containing the more complex data handling stuff with abstract values.
  * Both are derived from GenericValue containing the description of the actual value type.
  */
 
-class ValueBase : public GenericValue
+class ValueBase : public _internal::GenericValue
 {
-	static const ValueConverterMap &converters();
-	friend class ValueReference<ValueBase>;
+	static const _internal::ValueConverterMap &converters();
+	friend class _internal::GenericReference<ValueBase>;
 protected:
 	/**
 	* Create a copy of this.
-	* Creates a new Value/ValuePtr an stores a copy of its value there.
+	* Creates a new Value/ValueArray an stores a copy of its value there.
 	* Makes ValueBase-pointers copyable without knowing their type.
-	* \returns a ValueBase-pointer to a newly created Value/ValuePtr.
+	* \returns a ValueBase-pointer to a newly created Value/ValueArray.
 	*/
 	virtual ValueBase *clone()const = 0;
 public:
-	typedef ValueReference<ValueBase> Reference;
-	typedef ValueConverterMap::mapped_type::mapped_type Converter;
+	typedef _internal::GenericReference<ValueBase> Reference;
+	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
+	/// \return true is the stored type is T
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
@@ -110,7 +109,7 @@ public:
 	* Value<std::string> mephisto("666");
 	* Value<int> devil((std::string)devil);
 	* \endcode
-	* \return value of any requested type parsed from toString(false).
+	* \return this value converted to the requested type if conversion was successfull.
 	*/
 	template<class T> T as()const {
 		if( is<T>() )
@@ -173,16 +172,14 @@ public:
 
 	virtual ~ValueBase();
 
-	virtual bool gt( const _internal::ValueBase &ref )const = 0;
-	virtual bool lt( const _internal::ValueBase &ref )const = 0;
-	virtual bool eq( const _internal::ValueBase &ref )const = 0;
+	virtual bool gt( const ValueBase &ref )const = 0;
+	virtual bool lt( const ValueBase &ref )const = 0;
+	virtual bool eq( const ValueBase &ref )const = 0;
 };
 
-}
 
-typedef _internal::ValueBase::Reference ValueReference;
+typedef ValueBase::Reference ValueReference;
 
-/// }@
 }
 }
 
@@ -196,7 +193,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::Gene
 }
 /// /// Streaming output for Value referencing classes
 template<typename charT, typename traits, typename TYPE_TYPE> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::ValueReference<TYPE_TYPE> &s )
+operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericReference<TYPE_TYPE> &s )
 {
 	return out << s.toString( true );
 }

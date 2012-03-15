@@ -33,29 +33,44 @@ namespace util
 
 Application::Application( const char name[] ): m_name( name )
 {
-	Selection dbg_levels( "error,warning,notice,info,verbose_info" );
-	dbg_levels.set( "warning" );
-	parameters["dCore"] = dbg_levels;
-	parameters["dCore"].setDescription( "Debugging level for the Core module" );
-	parameters["dCore"].hidden() = true;
-
-	parameters["dData"] = dbg_levels;
-	parameters["dData"].setDescription( "Debugging level for the Data module" );
-	parameters["dData"].hidden() = true;
-
-	parameters["dImageIO"] = dbg_levels;
-	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
-	parameters["dImageIO"].hidden() = true;
+	addLogging<CoreLog>( "Core" );
+	addLogging<CoreDebug>( "Core" );
+	addLogging<DataLog>( "Data" );
+	addLogging<DataDebug>( "Data" );
+	addLogging<ImageIoLog>( "ImageIO" );
+	addLogging<ImageIoDebug>( "ImageIO" );
 
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
-	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
-	ref.second.needed() = false;
+	parameters["help"].needed() = false;
 }
 Application::~Application() {}
 
+void Application::addLoggingParameter( std::string name )
+{
+	static const Selection dbg_levels( "error,warning,notice,info,verbose_info", "notice" );
+
+	if( parameters.find( std::string( "d" ) + name ) == parameters.end() ) { //only add the parameter if it does not exist yet
+		parameters[std::string( "d" )+name] = dbg_levels;
+
+		if( name.empty() )
+			parameters[std::string( "d" )+name].setDescription( "Log level for \"" + m_name + "\" itself" );
+		else
+			parameters[std::string( "d" )+name].setDescription( "Log level for the \"" + name + "\" module(s)" );
+
+		parameters[std::string( "d" )+name].hidden() = true;
+		parameters[std::string( "d" )+name].needed() = false;
+	}
+}
+void Application::removeLogging( std::string name )
+{
+	parameters.erase( name );
+	logs.erase( name );
+}
+
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
+	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
 	bool err = false;
 	m_filename = argv[0];
 
@@ -69,6 +84,15 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
+	BOOST_FOREACH( logger_ref ref, logs ) {
+		const std::string dname = std::string( "d" ) + ref.first;
+		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
+		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
+		BOOST_FOREACH( setLogFunction setter, ref.second ) {
+			( this->*setter )( level );
+		}
+	}
+
 	if ( ! parameters.isComplete() ) {
 		std::cerr << "Missing parameters: ";
 
@@ -78,21 +102,6 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 		std::cerr << std::endl;
 		err = true;
-	}
-
-	if( parameters["dCore"].isSet() ) {
-		setLog<CoreDebug>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() ); //trigger explicit cast from Selection to int and then to LogLevel
-		setLog<CoreLog>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() );
-	}
-
-	if( parameters["dData"].isSet() ) {
-		setLog<DataDebug>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
-		setLog<DataLog>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
-	}
-
-	if( parameters["dImageIO"].isSet() ) {
-		setLog<ImageIoDebug>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
-		setLog<ImageIoLog>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
 	}
 
 	if ( err ) {
@@ -109,7 +118,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 void Application::printHelp( bool withHidden )const
 {
 	std::cerr << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
-	std::cerr << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
+	std::cerr << "Usage: " << this->m_filename << " <options>" << std::endl << "Where <options> includes:" << std::endl;;
 
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
@@ -125,10 +134,10 @@ void Application::printHelp( bool withHidden )const
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second.getTypeName() << ">" << std::endl;
 
-		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->castTo<Selection>();
+		if ( iP->second.is<Selection>() ) {
+			const Selection &ref = iP->second.castTo<Selection>();
 			std::cerr << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 
@@ -136,9 +145,9 @@ void Application::printHelp( bool withHidden )const
 	}
 }
 
-boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+boost::shared_ptr< MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
 {
-	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
+	return boost::shared_ptr< MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
 const std::string Application::getCoreVersion( void )
 {

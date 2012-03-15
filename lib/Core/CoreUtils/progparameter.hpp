@@ -78,7 +78,7 @@ public:
 	}
 
 
-	operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+	operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 
 	/// \returns true, if the parameter was ever successfully parsed
 	bool isSet()const;
@@ -119,6 +119,8 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 	}
 	bool parsed;
 public:
+	const ProgParameter operator[]( const std::string key )const;
+	ProgParameter &operator[]( const std::string key );
 	/*
 	 * Default constructor to create an empty parameter map
 	 */

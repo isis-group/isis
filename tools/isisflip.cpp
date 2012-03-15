@@ -65,5 +65,4 @@ int main( int argc, char **argv )
 	}
 	app.autowrite( finImageList );
 	return 0;
-};
-
+}

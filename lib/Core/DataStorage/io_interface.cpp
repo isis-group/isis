@@ -16,12 +16,16 @@ namespace isis
 {
 namespace image_io
 {
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length() > b.length();}
 }
+/// @endcond _internal
+API_EXCLUDE_END
 
-void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -33,8 +37,8 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 			LOG( Runtime, notice )
 					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
 					<< " using " <<  getName() << ( dialect.empty() ?
-													std::string() :
-													std::string( " and dialect " ) + dialect
+													util::istring() :
+													util::istring( " and dialect " ) + dialect
 												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
@@ -65,7 +69,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const
 {
-	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ).c_str() );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}

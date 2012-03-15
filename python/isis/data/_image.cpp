@@ -99,28 +99,28 @@ size_t _Image::_spliceDownTo ( const isis::data::dimensions dims )
 Image _Image::_deepCopy()
 {
 	switch ( getMajorTypeID() ) {
-	case ValuePtr<int8_t>::staticID:
+	case ValueArray<int8_t>::staticID:
 		return MemImage<int8_t> ( *this );
 		break;
-	case ValuePtr<uint8_t>::staticID:
+	case ValueArray<uint8_t>::staticID:
 		return MemImage<uint8_t> ( *this );
 		break;
-	case ValuePtr<int16_t>::staticID:
+	case ValueArray<int16_t>::staticID:
 		return MemImage<int16_t> ( *this );
 		break;
-	case ValuePtr<uint16_t>::staticID:
+	case ValueArray<uint16_t>::staticID:
 		return MemImage<uint16_t> ( *this );
 		break;
-	case ValuePtr<int32_t>::staticID:
+	case ValueArray<int32_t>::staticID:
 		return MemImage<int32_t> ( *this );
 		break;
-	case ValuePtr<uint32_t>::staticID:
+	case ValueArray<uint32_t>::staticID:
 		return MemImage<uint32_t> ( *this );
 		break;
-	case ValuePtr<float>::staticID:
+	case ValueArray<float>::staticID:
 		return MemImage<float> ( *this );
 		break;
-	case ValuePtr<double>::staticID:
+	case ValueArray<double>::staticID:
 		return MemImage<double> ( *this );
 		break;
 	default:

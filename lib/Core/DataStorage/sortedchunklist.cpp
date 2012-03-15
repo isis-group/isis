@@ -22,6 +22,7 @@
 
 #include "sortedchunklist.hpp"
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -45,8 +46,8 @@ bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const 
 }
 bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::_internal::ValueBase &aScal = *a;
-	const util::_internal::ValueBase &bScal = *b;
+	const util::ValueBase &aScal = *a;
+	const util::ValueBase &bScal = *b;
 
 	if ( aScal.lt( bScal ) ) {
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aScal.toString( false ) << " before " << bScal.toString( false ) << ")";
@@ -112,16 +113,16 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" ).castTo<util::fvector4>();
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
-	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
+	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" ).castTo<util::fvector4>();
+	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" ).castTo<util::fvector4>();
 	const util::fvector4 sliceVec = ch.hasProperty( "sliceVec" ) ?
-									ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
+									ch.propertyValue( "sliceVec" ).castTo<util::fvector4>() :
 									util::fvector4(
 										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
@@ -250,7 +251,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				ret[h + v * horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h + v *horizontal] = iS->second;  // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 
@@ -272,3 +273,4 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 }
 }
 }
+/// @endcond _internal

@@ -28,10 +28,10 @@ public:
 	_IOFactory( PyObject *p ) : self( p ) {}
 	_IOFactory() {}
 
-	static std::list<Image> _load ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+	static std::list<Image> _load ( const std::string &path, const util::istring &suffix_override, const util::istring &dialect ) {
 		return IOFactory::load( path, suffix_override, dialect );
 	}
-	static std::list<Image> _load ( const std::string &path, const std::string &suffix_override ) {
+	static std::list<Image> _load ( const std::string &path, const util::istring &suffix_override ) {
 		return IOFactory::load( path, suffix_override );
 	}
 
@@ -39,21 +39,21 @@ public:
 		return IOFactory::load( path );
 	}
 
-	static bool _write( const isis::data::Image &image, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+	static bool _write( const isis::data::Image &image, const std::string &path, const util::istring &suffix_override, const util::istring &dialect ) {
 		return IOFactory::write( image, path, suffix_override, dialect );
 	}
 
-	static bool _write( const isis::data::Image &image, const std::string &path, const std::string &suffix_override ) {
+	static bool _write( const isis::data::Image &image, const std::string &path, const util::istring &suffix_override ) {
 		return IOFactory::write( image, path, suffix_override, "" );
 	}
 	static bool _write( const isis::data::Image &image, const std::string &path ) {
 		return IOFactory::write( image, path, "", "" );
 	}
-	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const util::istring &suffix_override, const util::istring &dialect ) {
 		return IOFactory::write( images, path, suffix_override, dialect );
 	}
 
-	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const std::string &suffix_override ) {
+	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const util::istring &suffix_override ) {
 		return IOFactory::write( images, path, suffix_override, "" );
 	}
 	static bool _write( std::list<isis::data::Image> &images, const std::string &path ) {

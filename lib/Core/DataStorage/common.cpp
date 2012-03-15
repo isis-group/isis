@@ -11,6 +11,7 @@
 //
 
 #include "common.hpp"
+#include "image.hpp"
 #include <boost/numeric/ublas/io.hpp>
 
 namespace isis
@@ -137,5 +138,41 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 }
 
 }
+
+boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources )
+{
+	sources.erase( std::unique( sources.begin(), sources.end() ), sources.end() );
+
+	if( sources.empty() ) {
+		LOG( Runtime, error ) << "Failed to get common source";
+		return boost::filesystem::path();
+	} else if( sources.size() == 1 )
+		return sources.front();
+	else {
+		BOOST_FOREACH( boost::filesystem::path & ref, sources )
+		ref.remove_filename();
+		return getCommonSource( sources );
+	}
+}
+boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
+{
+	std::list<boost::filesystem::path> sources;
+	BOOST_FOREACH( const data::Image & img, imgs ) {
+		if( img.hasProperty( "source" ) )
+			sources.push_back( img.getPropertyAs<std::string>( "source" ) );
+		else {
+			BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
+				sources.push_back( ref.as<std::string>() );
+			}
+		}
+	}
+	sources.sort();
+	return getCommonSource( sources );
+}
+boost::filesystem::path getCommonSource( const data::Image &img )
+{
+	return getCommonSource( std::list<data::Image>( 1, img ) );
+}
+
 }
 }

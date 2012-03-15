@@ -3,8 +3,8 @@
 
 
 #include "common.hpp"
-#include "CoreUtils/type.hpp"
-#include "DataStorage/typeptr.hpp"
+#include "CoreUtils/value.hpp"
+#include "DataStorage/valuearray.hpp"
 
 namespace isis
 {

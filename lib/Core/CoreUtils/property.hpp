@@ -15,15 +15,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <map>
-#include "type.hpp"
+#include "value.hpp"
 #include "log.hpp"
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
 
@@ -37,6 +33,9 @@ namespace util
 class PropertyValue: public ValueReference
 {
 	bool m_needed;
+	//prevent usage of ValueReference's dereferencing (the hooks below should be used) (use "*" if you really have to)
+	ValueBase *operator->();
+	const ValueBase *operator->()const;
 public:
 	/**
 	 * Default constructor.
@@ -58,9 +57,9 @@ public:
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
 	 */
 	PropertyValue();
-	/// returns true if PropertyValue is marked as needed, false otherwise
+	/// accessor to mark as (not) needed
 	bool &needed();
-	///\copydoc needed
+	/// returns true if PropertyValue is marked as needed, false otherwise
 	bool isNeeded ()const;
 
 	/**
@@ -89,7 +88,7 @@ public:
 	 * - both stored values are equal
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
-	bool operator ==( const _internal::ValueBase &second )const;
+	bool operator ==( const ValueBase &second )const;
 	/**
 	 * Equality to a Value of type T (convenience function).
 	 * Properties are ONLY equal to Values if:
@@ -114,7 +113,7 @@ public:
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Value<T>::staticName() << ", trying to convert.";
-			ValueReference dst = ( *this )->copyByID( Value<T>::staticID );
+			ValueReference dst = ( **this ).copyByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;
@@ -122,12 +121,40 @@ public:
 
 		return false;
 	}
+
+	/**
+	 * \copybrief ValueBase::as
+	 * hook for \link ValueBase::as \endlink
+	 */
+	template<class T> T as()const {return ( **this ).as<T>();}
+
+	/**
+	 * \copybrief ValueBase::is
+	 * hook for \link ValueBase::is \endlink
+	 */
+	template<class T> bool is()const {return ( **this ).is<T>();}
+
+	/**
+	 * \copybrief ValueBase::getTypeName
+	 * hook for \link ValueBase::getTypeName \endlink
+	 */
+	std::string getTypeName()const {return ( **this ).getTypeName();}
+
+	/**
+	 * \copybrief ValueBase::getTypeID
+	 * hook for \link ValueBase::getTypeID \endlink
+	 */
+	unsigned short getTypeID()const {return ( **this ).getTypeID();}
+
+	/**
+	 * \copybrief ValueBase::castTo
+	 * hook for \link ValueBase::castTo \endlink
+	 */
+	template<class T> T &castTo()const {return ( **this ).castTo<T>();}
 };
 
 }
-/** @} */
 }
-
 #endif
 
 
