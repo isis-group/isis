@@ -21,6 +21,7 @@ public:
 
 	bool isValid() const { return valid; }
 	virtual std::string getFilterName() const = 0;
+	virtual ~FilterBase(){}
 protected:
 	virtual bool process() = 0;
 	bool valid;
@@ -133,7 +134,5 @@ class ImageFilter : public _internal::Filter<data::Image, data::Image, NInput, N
 
 }
 }
-
-
 
 #endif

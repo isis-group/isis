@@ -155,7 +155,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 
 	LOG_IF( s.isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 	assert( !s.isEmpty() );
-	out << "default=\"" << s.toString( false ) << "\", type=" << s->getTypeName();
+	out << "default=\"" << s.toString( false ) << "\", type=" << s.getTypeName();
 
 	if ( s.isNeeded() )out << " (needed)";
 
