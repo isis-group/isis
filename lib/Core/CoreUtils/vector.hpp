@@ -54,6 +54,7 @@ public:
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE, SIZE, CONTAINER> this_class;
 	typedef CONTAINER container_type;
+	typedef TYPE value_type;
 protected:
 	/// Generic operations
 	template<typename OP> this_class binaryOp ( const this_class &src )const {
