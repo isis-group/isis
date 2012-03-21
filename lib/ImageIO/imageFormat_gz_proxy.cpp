@@ -74,7 +74,7 @@ private:
 		) {
 			if ( len < 0 ) {
 				int err;
-				gzerror( out, &err );
+				gzerror( in, &err );
 
 				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
 				if ( err == Z_ERRNO ) {
@@ -113,21 +113,19 @@ private:
 	}
 
 protected:
-	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".gz" );
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const {return ".gz";}
 public:
-	std::string dialects( const std::string &filename )const {
+	util::istring dialects( const std::string &filename )const {
 		if( filename.empty() ) {
-			return std::string();
+			return util::istring();
 		} else {
 			std::set<std::string> ret;
 			data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( FileFormat::makeBasename( filename ).first );
 			BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-				const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
+				const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ).c_str() );
 				ret.insert( dias.begin(), dias.end() );
 			}
-			return util::listToString( ret.begin(), ret.end(), " ", "", "" );
+			return util::listToString( ret.begin(), ret.end(), " ", "", "" ).c_str();
 		}
 	}
 	std::string getName()const {return "compression proxy for other formats";}
@@ -147,7 +145,7 @@ public:
 		return std::make_pair( realBase.first, realBase.second + proxyBase.second );
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
 		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first );
@@ -180,7 +178,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Compressed write is not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

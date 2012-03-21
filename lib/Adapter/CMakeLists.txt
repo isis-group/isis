@@ -40,7 +40,17 @@ if(ISIS_QT4)
 
   qt4_wrap_cpp(qdefaultmessageprint_moc qt4/qdefaultmessageprint.hpp)
   # configure target
-  add_library(isisAdapter_qt4 SHARED qt4/qtapplication.cpp ${qdefaultmessageprint_moc} qt4/qdefaultmessageprint.cpp )
+
+  set(ISIS_QT4_LIBRARY_FILES ${qdefaultmessageprint_moc}
+					qt4/qdefaultmessageprint.cpp
+					qt4/qtapplication.cpp
+					qt4/qmatrixconversion.cpp )
+
+  set(ISIS_QT4_HEADER_FILES qt4/qtapplication.hpp
+							qt4/qdefaultmessageprint.hpp
+							qt4/qmatrixconversion.hpp )
+
+  add_library(isisAdapter_qt4 SHARED  ${ISIS_QT4_LIBRARY_FILES} )
   set_target_properties(isisAdapter_qt4  PROPERTIES
 	      ${ISIS_BUILD_PROPERTIES}
 	      SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
@@ -58,7 +68,7 @@ if(ISIS_QT4)
   )
 
   # export header files
-  set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} qt4/qtapplication.hpp qt4/qdefaultmessageprint.hpp )  
+  set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} ${ISIS_QT4_HEADER_FILES} )
 endif(ISIS_QT4)
 
 ############################################################

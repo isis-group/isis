@@ -35,12 +35,12 @@ class DicomChunk : public data::Chunk
 		data::Chunk( dat, del, width, height, 1, 1 ) {
 		LOG( Debug, verbose_info )
 				<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-				<< dat << " (" << data::ValuePtr<TYPE>::staticName() << ")" ;
+				<< dat << " (" << data::ValueArray<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
-		data::ValuePtr<util::color<TYPE> > &dest = ret->asValuePtr<util::color<TYPE> >();
+		data::ValueArray<util::color<TYPE> > &dest = ret->asValueArray<util::color<TYPE> >();
 		const size_t pixels = dest.getLength();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
@@ -55,7 +55,7 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const util::istring &dialect ) {
 		std::auto_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
@@ -135,15 +135,15 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
-std::string ImageFormat_Dicom::suffixes( io_modes modes )const
+util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 {
 	if( modes == write_only )
-		return std::string();
+		return util::istring();
 	else
-		return std::string( ".ima .dcm" );
+		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
 
 
 
@@ -328,7 +328,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
-		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() )->castTo<util::fvector4>();
+		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() ).castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
 			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
@@ -414,7 +414,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	util::fvector4 &origin = source.propertyValue( "indexOrigin" ).castTo<util::fvector4>();
 	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setPropertyAs( prefix + "ImageType", iType );
@@ -434,7 +434,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	}
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
-		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
+		acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
 	}
 
 	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
@@ -444,7 +444,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
-		util::fvector4 &ref = dest.propertyValue( "fov" )->castTo<util::fvector4>();
+		util::fvector4 &ref = dest.propertyValue( "fov" ).castTo<util::fvector4>();
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
@@ -471,7 +471,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )throw( std::runtime_error & )
+int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect )throw( std::runtime_error & )
 {
 
 	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
@@ -503,7 +503,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	return 0;
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }

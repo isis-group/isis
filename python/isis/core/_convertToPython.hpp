@@ -28,7 +28,7 @@ namespace _internal
 
 
 struct PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) = 0;
+	virtual api::object convert( util::ValueBase &value ) = 0;
 };
 
 template<bool ISNUM, typename T>
@@ -38,14 +38,14 @@ struct PyObjectGenerator : PyObjectGeneratorBase {};
 //conversion for all numeric values
 template<typename T>
 struct PyObjectGenerator<true, T> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		return  api::object( value.as<T>() );
 	}
 };
 
 template<typename T>
 struct PyObjectGenerator<false, T> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		return api::object( value.as<T>() );
 	}
 };
@@ -53,7 +53,7 @@ struct PyObjectGenerator<false, T> : PyObjectGeneratorBase {
 //dates
 template<>
 struct PyObjectGenerator<false, boost::gregorian::date> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		PyDateTime_IMPORT;
 		boost::gregorian::date date = value.as<boost::gregorian::date>();
 		std::cout << static_cast<int>( date.year() ) << std::endl;
@@ -68,7 +68,7 @@ struct PyObjectGenerator<false, boost::gregorian::date> : PyObjectGeneratorBase 
 //ptime
 template<>
 struct  PyObjectGenerator<false, boost::posix_time::ptime> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		PyDateTime_IMPORT;
 		boost::posix_time::ptime time = value.as<boost::posix_time::ptime>();
 		return api::object(
@@ -88,28 +88,28 @@ struct  PyObjectGenerator<false, boost::posix_time::ptime> : PyObjectGeneratorBa
 //vectors
 template<>
 struct PyObjectGenerator<false, util::ivector4> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		return api::object( value.as<util::ivector4>() );
 	}
 };
 
 template<>
 struct PyObjectGenerator<false, util::dvector4> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		return api::object( value.as<util::dvector4>() );
 	}
 };
 
 template<>
 struct PyObjectGenerator<false, util::fvector4> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		return api::object( value.as<util::fvector4>() );
 	}
 };
 
 template<>
 struct PyObjectGenerator<false, util::ilist> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		list retList;
 		BOOST_FOREACH( util::ilist::const_reference ref, value.as<util::ilist>() ) {
 			retList.append<int32_t>( ref );
@@ -120,7 +120,7 @@ struct PyObjectGenerator<false, util::ilist> : PyObjectGeneratorBase {
 
 template<>
 struct PyObjectGenerator<false, util::dlist> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		list retList;
 		BOOST_FOREACH( util::dlist::const_reference ref, value.as<util::dlist>() ) {
 			retList.append<double>( ref );
@@ -131,7 +131,7 @@ struct PyObjectGenerator<false, util::dlist> : PyObjectGeneratorBase {
 
 template<>
 struct PyObjectGenerator<false, util::slist> : PyObjectGeneratorBase {
-	virtual api::object convert( util::_internal::ValueBase &value ) {
+	virtual api::object convert( util::ValueBase &value ) {
 		list retList;
 		BOOST_FOREACH( util::slist::const_reference ref, value.as<util::slist>() ) {
 			retList.append<std::string>( ref );

@@ -48,7 +48,7 @@ boost::is_unsigned<VBit>::type,
 
 void
 ImageFormat_Vista::write( const data::Image &image,
-						  const std::string &filename, const std::string &/*dialect*/ )
+						  const std::string &filename, const util::istring &/*dialect*/ )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -110,41 +110,41 @@ throw( std::runtime_error & )
 		// from the chunk since the chunks can have different types.
 		switch( image.getMajorTypeID() ) {
 			// VBit
-		case data::ValuePtr<bool>::staticID:
+		case data::ValueArray<bool>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 			copyImageToVista<vista_bitmask_type>( image, vimages[0] );
 			break;
 			// VUByte
-		case data::ValuePtr<VUByte>::staticID:
+		case data::ValueArray<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 			copyImageToVista<VUByte>( image, vimages[0] );
 			break;
 			// VSByte
-		case data::ValuePtr<VSByte>::staticID:
+		case data::ValueArray<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
-		case data::ValuePtr<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID:
 			LOG( Runtime, info ) << "Vista does not support " << util::Value<u_int16_t>::staticName() << ". Falling back to " << util::Value<VShort>::staticName();
-		case data::ValuePtr<VShort>::staticID:
+		case data::ValueArray<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
 #if defined(_M_X64) || defined(__amd64__) && not defined (__APPLE__)
 			// VLong
-		case data::ValuePtr<VLong>::staticID:
+		case data::ValueArray<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
 #endif
 			// VFloat
-		case data::ValuePtr<VFloat>::staticID:
+		case data::ValueArray<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 			copyImageToVista<VFloat>( image, vimages[0] );
 			break;
 			// VDouble
-		case data::ValuePtr<VDouble>::staticID:
+		case data::ValueArray<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
 			copyImageToVista<VDouble>( image, vimages[0] );
 			break;
@@ -209,11 +209,11 @@ throw( std::runtime_error & )
 
 
 int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &filename,
-							 const std::string &dialect ) throw ( std::runtime_error & )
+							 const util::istring &dialect ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
-	std::string myDialect = dialect;
+	util::istring myDialect = dialect;
 
 	if( !( ip = fopen( filename.c_str(), "r" ) ) ) {
 		std::string s;
@@ -238,7 +238,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// enable "info" log level
 	// image_io::enable_log<util::DefaultMsgPrint>( info );
-	if( myDialect == std::string( "onlyfirst" ) ) {
+	if( myDialect == "onlyfirst" ) {
 		nimages = 1;
 	}
 
@@ -342,7 +342,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
 	// along the z-direction -> add all resulting chunks to the chunk list.
-	if( myDialect == std::string( "functional" ) ) {
+	if( myDialect == "functional" ) {
 		char orient[100], voxelstr[100];
 		orient[0] = '\0';
 		voxelstr[0] = '\0';
@@ -634,7 +634,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
 	// first image found will be saved in a float MemChunk and added to the output.
-	else if( myDialect == std::string( "map" ) ) {
+	else if( myDialect == "map" ) {
 		// print a warning message when there are more than one image.
 		if( nimages >= 1 ) {
 			LOG( image_io::Runtime, warning )
@@ -909,64 +909,64 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// get property value
 			util::PropertyValue pv = vista_branch.propertyValue( *kiter );
 			// VBit -> VBit (char *)
-			BOOST_MPL_ASSERT_RELATION( sizeof( char ), == , sizeof( uint8_t ) );
+			BOOST_STATIC_ASSERT( sizeof( char ) == sizeof( uint8_t ) );
 
-			if( pv->is<uint8_t>() ) {
+			if( pv.is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->castTo<uint8_t>() );
+							 ( VBit )pv.castTo<uint8_t>() );
 				continue;
 			}
 
 			// VUByte -> VUByte (char *)
-			if( pv->is<VUByte>() ) {
+			if( pv.is<VUByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VUByteRepn,
-							 pv->castTo<VUByte>() );
+							 pv.castTo<VUByte>() );
 				continue;
 			}
 
 			// VSByte -> VSByte (char *)
-			if( pv->is<VSByte>() ) {
+			if( pv.is<VSByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VSByteRepn,
-							 pv->castTo<VSByte>() );
+							 pv.castTo<VSByte>() );
 				continue;
 			}
 
 			// VShort -> VShort (char *)
-			if( pv->is<VShort>() ) {
+			if( pv.is<VShort>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VShortRepn,
-							 pv->castTo<VShort>() );
+							 pv.castTo<VShort>() );
 				continue;
 			}
 
 #if defined(_M_X64) || defined(__amd64__) && not defined(__APPLE__)
 
 			// VLong -> VLong (char *)
-			if( pv->is<VLong>() ) {
+			if( pv.is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
-							 pv->castTo<VLong>() );
+							 pv.castTo<VLong>() );
 				continue;
 			}
 
 #endif
 
 			// VFloat -> VFloat (char *)
-			if( pv->is<VFloat>() ) {
+			if( pv.is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
-							 pv->castTo<VFloat>() );
+							 pv.castTo<VFloat>() );
 				continue;
 			}
 
 			// VDouble -> VDouble (char *)
-			if( pv->is<VDouble>() ) {
+			if( pv.is<VDouble>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VDoubleRepn,
-							 pv->castTo<VDouble>() );
+							 pv.castTo<VDouble>() );
 				continue;
 			}
 
 			// VString -> std::string
-			if( pv->is<std::string>() ) {
+			if( pv.is<std::string>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VStringRepn,
-							 pv->castTo<std::string>().c_str() );
+							 pv.castTo<std::string>().c_str() );
 				continue;
 			}
 		}
@@ -983,13 +983,13 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 	const util::vector4<size_t> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
-	const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
+	const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 				data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, 0 );
-				ch.getValuePtr<T>().copyToMem( &VPixel( vimage, z, y, x, T ), csize.product() );
+				ch.getValueArray<T>().copyToMem( &VPixel( vimage, z, y, x, T ), csize.product() );
 			}
 		}
 	}

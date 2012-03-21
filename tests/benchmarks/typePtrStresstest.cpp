@@ -1,4 +1,4 @@
-#include "DataStorage/typeptr.hpp"
+#include "DataStorage/valuearray.hpp"
 #include <boost/timer.hpp>
 
 using namespace isis;
@@ -6,12 +6,12 @@ using namespace isis;
 template<typename T> void testMinMax( size_t size )
 {
 	boost::timer timer;
-	data::ValuePtr<T> array( ( T * )malloc( size ), size / sizeof( T ) );
+	data::ValueArray<T> array( ( T * )malloc( size ), size / sizeof( T ) );
 
 	timer.restart();
 	array.getMinMax();
 	std::cout
-			<< "found min/max of " << size / 1024 / 1024 << "MB of " << data::ValuePtr<T>::staticName()
+			<< "found min/max of " << size / 1024 / 1024 << "MB of " << data::ValueArray<T>::staticName()
 			<< " in " << timer.elapsed() << " seconds " << std::endl;
 
 }

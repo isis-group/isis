@@ -1,7 +1,7 @@
 #ifndef CONVERTFROMPYTHON_HPP
 #define CONVERTFROMPYTHON_HPP
 
-#include "CoreUtils/type.hpp"
+#include "CoreUtils/value.hpp"
 #include <boost/python.hpp>
 #include "CoreUtils/property.hpp"
 #include <boost/date_time/gregorian/gregorian_io.hpp>
@@ -50,7 +50,7 @@ private:
 		std::list<TYPE> retList;
 
 		for( Py_ssize_t i = 0; i < PyList_Size( value.ptr() ); i++ ) {
-			retList.push_back( convert( api::object( handle<>( borrowed( PyList_GetItem( value.ptr(), i )  ) ) ) )->as<TYPE>() );
+			retList.push_back( convert( api::object( handle<>( borrowed( PyList_GetItem( value.ptr(), i )  ) ) ) ).as<TYPE>() );
 		}
 
 		return retList;

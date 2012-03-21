@@ -27,7 +27,7 @@
 
 namespace isis
 {
-namespace data {template<typename TYPE> class ValuePtr;}
+namespace data {template<typename TYPE> class ValueArray;}
 namespace util
 {
 template<typename TYPE> class Value;
@@ -73,35 +73,35 @@ public:
 };
 
 /**
- * Base class to store and handle references to Value and ValuePtr objects.
+ * Base class to store and handle references to Value and ValueArray objects.
  * The values are refernced as smart pointers to their base class.
  * So the references are counted and data are automatically deleted if necessary.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
  * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
-template<typename TYPE_TYPE> class ValueReference: protected boost::scoped_ptr<TYPE_TYPE>
+template<typename TYPE_TYPE> class GenericReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
-	template<typename TT> friend class data::ValuePtr; //allow Value and ValuePtr to use the protected contructor below
+	template<typename TT> friend class data::ValueArray; //allow Value and ValueArray to use the protected contructor below
 	template<typename TT> friend class Value;
 protected:
 	//dont use this directly
-	ValueReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
+	GenericReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
 public:
 	///reexport parts of scoped_ptr's interface
 	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
 	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
-	ValueReference() {}
+	GenericReference() {}
 	/**
 	 * Copy constructor
 	 * This operator creates a copy of the referenced Value-Object.
 	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
 	 */
-	ValueReference( const ValueReference &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
+	GenericReference( const GenericReference &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
 		operator=( src );
 	}
-	ValueReference( const TYPE_TYPE &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
+	GenericReference( const TYPE_TYPE &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
 		operator=( src );
 	}
 	/**
@@ -111,7 +111,7 @@ public:
 	 * If the source is empty the target will drop its content. Thus it will become empty as well.
 	 * \returns reference to the (just changed) target
 	 */
-	ValueReference<TYPE_TYPE>& operator=( const ValueReference<TYPE_TYPE> &src ) {
+	GenericReference<TYPE_TYPE>& operator=( const GenericReference<TYPE_TYPE> &src ) {
 		boost::scoped_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
 		return *this;
 	}
@@ -120,7 +120,7 @@ public:
 	 * This operator replaces the current content by a copy of src.
 	 * \returns reference to the (just changed) target
 	 */
-	ValueReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
+	GenericReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
 		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
 		return *this;
 	}

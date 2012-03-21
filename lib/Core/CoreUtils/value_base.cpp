@@ -10,34 +10,37 @@
 //
 //
 
-#include "type_base.hpp"
+#include "value_base.hpp"
 #include "singletons.hpp"
 
 namespace isis
 {
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
-
 bool GenericValue::isSameType ( const GenericValue &second ) const
 {
 	return getTypeID() == second.getTypeID();
 }
+}
+/// @endcond _internal
 
 ValueBase::~ValueBase() {}
 
 
-const ValueConverterMap &ValueBase::converters()
+const _internal::ValueConverterMap &ValueBase::converters()
 {
-	return Singletons::get<_internal::ValueConverterMap, 0>();
+	static _internal::ValueConverterMap ret; //@todo not using class Singleton because ValueArrayConverterMap is hidden
+	return ret;
 }
 
 const ValueBase::Converter &ValueBase::getConverterTo( unsigned short ID )const
 {
-	const ValueConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	const _internal::ValueConverterMap::const_iterator f1 = converters().find( getTypeID() );
 	assert( f1 != converters().end() );
-	const ValueConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	const _internal::ValueConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
 	assert( f2 != f1->second.end() );
 	return f2->second;
 }
@@ -107,6 +110,5 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 	}
 }
 
-}
 }
 }

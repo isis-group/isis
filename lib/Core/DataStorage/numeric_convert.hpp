@@ -6,7 +6,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "common.hpp"
-#include "typeptr.hpp"
+#include "valuearray.hpp"
 
 
 namespace isis
@@ -14,6 +14,8 @@ namespace isis
 namespace data
 {
 enum autoscaleOption;
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 
@@ -32,12 +34,10 @@ template<typename T> T round( double x )
 	return round_impl<T>( x, boost::mpl::bool_<std::numeric_limits<T>::is_integer>() ); //we do use overloading intead of (forbidden) partial specialization
 }
 
-size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst );
-
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
-			<< "using generic scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()
+			<< "using generic scaling convert " << ValueArray<SRC>::staticName() << "=>" << ValueArray<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 
 	for ( size_t i = 0; i < count; i++ ) {
@@ -47,7 +47,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
+	LOG( Runtime, info ) << "using generic convert " << ValueArray<SRC>::staticName() << " => " << ValueArray<DST>::staticName() << " without scaling";
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = round<DST>( src[i] );
@@ -60,12 +60,12 @@ template<typename SRC, typename DST> void numeric_convert_impl( const std::compl
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
-	LOG( Runtime, info )    << "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
+	LOG( Runtime, info )    << "using memcpy-copy of " << ValueArray<T>::staticName() << " without scaling";
 	memcpy( dst, src, count * sizeof( T ) );
 }
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
-	LOG( Runtime, info )    << "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+	LOG( Runtime, info )    << "using generic scaling copy of " << ValueArray<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = src[i] * scale + offset;
@@ -193,7 +193,8 @@ DECL_SCALED_CONVERT( uint8_t, double );
 #endif //ISIS_USE_LIBOIL
 
 }
-
+/// @endcond _internal
+API_EXCLUDE_END
 /**
  * Computes scaling and offset between two scalar value domains.
  * The rules are:
@@ -212,7 +213,7 @@ DECL_SCALED_CONVERT( uint8_t, double );
  * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> std::pair<double, double>
-getNumericScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )
+getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )
 {
 	double scale = 1.0;
 	double offset = 0.0;
@@ -259,13 +260,9 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 			std::numeric_limits<double>::max();
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
-		if ( scale < 1 ) {
-			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
-		} else if ( scaleopt == noupscale ) {
-			if ( scale > 1 ) {
-				LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
-				scale = 1;
-			}
+		if ( scaleopt == noupscale && scale > 1 ) {
+			LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
+			scale = 1;
 		}
 
 		if( scale == 1 ) {
@@ -290,26 +287,20 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
  * The conversion itself is equivalent to dst[i] = round( src[i] * scale + offset )
  * \param src data to be converted
  * \param dst target where to convert src to
+ * \param size the amount of elements to be converted
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
+template<typename SRC, typename DST> void numeric_convert( const SRC *src, DST *dst, size_t size, const double scale, const double offset )
 {
-	const size_t size = _internal::getConvertSize( src, dst );
-
 	if ( ( scale != 1. || offset ) )
-		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
+		_internal::numeric_convert_impl( src, dst, size, scale, offset );
 	else
-		_internal::numeric_convert_impl( &src[0], &dst[0], size );
+		_internal::numeric_convert_impl( src, dst, size );
 }
-template<typename T> void numeric_copy( const ValuePtr<T> &src, ValuePtr<T> &dst, const double scale, const double offset )
+template<typename T> void numeric_copy( const T *src, T *dst, size_t size )
 {
-	const size_t size = _internal::getConvertSize( src, dst );
-
-	if ( ( scale != 1. || offset ) )
-		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size, scale, offset );
-	else
-		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size );
+	_internal::numeric_copy_impl<T>( src, dst, size );
 }
 
 }
