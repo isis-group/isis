@@ -16,7 +16,7 @@ add_executable( chunkTest chunkTest.cpp )
 add_executable( sortedchunklistTest sortedchunklistTest.cpp)
 add_executable( imageTest imageTest.cpp )
 add_executable( imageListTest imageListTest.cpp )
-add_executable( typePtrTest typePtrTest.cpp )
+add_executable( typePtrTest valueArrayTest.cpp )
 add_executable( filePtrTest filePtrTest.cpp )
 add_executable( filterTest filterTest.cpp )
 

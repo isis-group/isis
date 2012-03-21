@@ -45,7 +45,6 @@ public:
 	 * Thus parameters created using this must be set to any type/value before parse() is called.
 	 */
 	ProgParameter();
-	ProgParameter( const ProgParameter &ref );
 	/**
 	 * Create a programm parameter using an initial value/type.
 	 * \param ref the intial value/type the programm parameter should get
@@ -155,7 +154,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 
 	LOG_IF( s.isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 	assert( !s.isEmpty() );
-	out << "default=\"" << s.toString( false ) << "\", type=" << s->getTypeName();
+	out << "default=\"" << s.toString( false ) << "\", type=" << s.getTypeName();
 
 	if ( s.isNeeded() )out << " (needed)";
 

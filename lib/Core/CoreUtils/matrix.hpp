@@ -39,6 +39,8 @@ public:
 	static const size_t rows = ROWS;
 	static const size_t columns = COLS;
 
+	typedef TYPE value_type;
+
 	template<typename TYPE2, typename CONTAINER2>
 	void copyFrom( const FixedVector<TYPE2, COLS, CONTAINER2> src[ROWS] ) {
 		for( size_t r = 0; r < ROWS; r++ ) {
