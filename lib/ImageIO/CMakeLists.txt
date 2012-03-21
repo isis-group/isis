@@ -22,12 +22,10 @@ option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 
 ############################################################
@@ -57,20 +55,6 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
   target_link_libraries(isisImageFormat_Nifti_sa isis_core  ${ISIS_LIB_DEPENDS})
   set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
-
-############################################################
-# vista_sa
-############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
-
-	set(VISTA_SRC_FILES Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/VistaSaParser.cpp )
-	include_directories(${Boost_INCLUDE_DIR})
-	add_library(isisImageFormat_Vista_sa SHARED ${VISTA_SRC_FILES})
-	add_definitions(-DPHOENIX_LIMIT=10)
-	target_link_libraries(isisImageFormat_Vista_sa isis_core  ${ISIS_LIB_DEPENDS} ${Boost_LIBRARIES})
-	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
-
 
 ############################################################
 # vista
