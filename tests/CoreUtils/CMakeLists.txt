@@ -13,7 +13,7 @@
 ############################################################
 
 add_executable( propertyTest propertyTest.cpp )
-add_executable( typeTest typeTest.cpp )
+add_executable( valueTest valueTest.cpp )
 add_executable( vectorTest vectorTest.cpp )
 add_executable( propMapTest propMapTest.cpp )
 add_executable( singletonTest singletonTest.cpp )
@@ -23,7 +23,7 @@ add_executable( istringTest istringTest.cpp )
 
 target_link_libraries( commonTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
 target_link_libraries( propertyTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( typeTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
+target_link_libraries( valueTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
 target_link_libraries( vectorTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
 target_link_libraries( propMapTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
 target_link_libraries( singletonTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
@@ -36,7 +36,7 @@ target_link_libraries( istringTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPEN
 
 add_test(NAME propertyTest COMMAND propertyTest)
 add_test(NAME commonTest COMMAND commonTest)
-add_test(NAME typeTest COMMAND typeTest)
+add_test(NAME valueTest COMMAND valueTest)
 add_test(NAME vectorTest COMMAND vectorTest)
 add_test(NAME propMapTest COMMAND propMapTest)
 add_test(NAME singletonTest COMMAND singletonTest)

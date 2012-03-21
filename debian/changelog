@@ -1,3 +1,42 @@
+isis (0.5.0-1) UNRELEASED; urgency=low
+
+  * minor performance improvements and cleanup
+  * prevent big parts of the conversion system from being exported -
+    reduces core library size by 10%
+  * make the png-plugin to accept signed 8/16 bit images for writing (just
+    write them as unsgined 8/16 bit)
+  * revised isisdiff to better read/diff datasets with multiple images
+  * in ParameterMap::parse stop searching for abbreviations if there is a
+    full match with a parameter (stops conflics with parameters which are
+    substrings of other parameters)
+  * enable getMinMax for color and complex numbers
+  * enable conversion of color and complex data (also from numeric types)
+  * add function Chunk::createByID
+  * put the IO functionality of IOApplication into static functions, so others
+    can use it as well
+  * add Application::addLogging to dynamically add logging modules and their
+    related program parameters
+  * add Image::copyAsValuePtr
+  * in IOApplication add program parameter to control scaling, when converting
+    for writing files
+  * add capability to show QMEssageBox in QDefaultMessagePrint module
+  * add an overloaded IOFactory::load to load from a list of sources
+  * disable confusing PropertyValue::operator-> inherited from ValueReference
+    and add some hooks to access some common functions from Value
+  * add optional parameter for Chunk creation to fake the properties needed for
+    a valid Chunk
+  * add Image::copyToValueArray
+  * replace imageFormat_raw by a special tool for reading/writing raw data
+  * move ValuePtrBase into namespace data (from data::_internal)
+  * rename Chunk::bytesPerVoxel to Chunk::getBytesPerVoxel
+  * rename Image::getBytesPerVoxel to Image::getMaxBytesPerVoxel (and improve
+    the doc)
+  * rename Image::copyToMemChunk to Image::copyAsMemChunk (and improve the doc)
+  * rename ValuePtr to ValueArray
+  * rename type.{ch}pp files to value.{ch}pp
+
+ -- Enrico Reimer <reimer@island.cbs.mpg.de>  Thu, 15 Mar 2012 11:39:54 +0100
+
 isis (0.4.7-1) UNRELEASED; urgency=low
 
   * Initial Debian packaging (Closes: #633677).

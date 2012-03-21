@@ -537,7 +537,11 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	dictionary[DcmTag( 0x0019, 0x100c )] = "SiemensDiffusionBValue";
 	dictionary[DcmTag( 0x0019, 0x100e )] = "SiemensDiffusionGradientOrientation";
 
-	dictionary[DcmTag( 0x0029, 0x0010 )] = "PrivateCreator";
+	for( unsigned short i = 0x0010; i <= 0x00FF; i++ ) {
+		dictionary[DcmTag( 0x0029, i )] = ( std::string( "Private Code for " ) + DcmTag( 0x0029, i << 8 ).toString().c_str() + "-" + DcmTag( 0x0029, ( i << 8 ) + 0xFF ).toString().c_str() ).c_str();
+	}
+
+
 }
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const
 {

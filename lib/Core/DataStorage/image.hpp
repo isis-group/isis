@@ -683,7 +683,7 @@ public:
 	template<typename T> ValueArray<T> copyAsValueArray() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::ValueArray<T> ret ( getVolume() );
-		copyToMem<T> ( &ret[0], ret.getVolume() );
+		copyToMem<T> ( ret.begin().operator->(), ret.getLength() );
 		return ret;
 	}
 	/**
@@ -693,7 +693,7 @@ public:
 	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
 	void copyToValueArray ( data::ValueArrayBase &dst,  scaling_pair scaling = scaling_pair() ) const;
-	
+
 	/**
 	* Get a sorted list of the chunks of the image.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
@@ -759,6 +759,17 @@ public:
 
 	util::fvector4 getFoV() const;
 	bool updateOrientationMatrices();
+
+	/**
+	 * Generate a string identifying the image
+	 * The identifier is made of
+	 * - sequenceNumber
+	 * - sequenceDescription if available
+	 * - the common path of all chunk-sources (or the source file, if there is only one) if withpath is true
+	 * - sequenceStart if available
+	 * \param withpath add the common path of all sources to the identifying string
+	 */
+	std::string identify( bool withpath = true )const;
 };
 
 /**

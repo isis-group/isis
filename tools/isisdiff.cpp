@@ -15,55 +15,6 @@ static const char *_skips[] = {"sequenceDescription=localizer"};
 
 using namespace isis;
 
-boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources )
-{
-	sources.erase( std::unique( sources.begin(), sources.end() ), sources.end() );
-
-	if( sources.empty() ) {
-		LOG( DiffLog, error ) << "Failed to get common source";
-		return boost::filesystem::path();
-	} else if( sources.size() == 1 )
-		return sources.front();
-	else {
-		BOOST_FOREACH( boost::filesystem::path & ref, sources )
-		ref.remove_filename();
-		return getCommonSource( sources );
-	}
-}
-boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
-{
-	std::list<boost::filesystem::path> sources;
-	BOOST_FOREACH( const data::Image & img, imgs ) {
-		if( img.hasProperty( "source" ) )
-			sources.push_back( img.getPropertyAs<std::string>( "source" ) );
-		else {
-			BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
-				sources.push_back( ref.as<std::string>() );
-			}
-		}
-	}
-	sources.sort();
-	return getCommonSource( sources );
-}
-boost::filesystem::path getCommonSource( const data::Image &img )
-{
-	return getCommonSource( std::list<data::Image>( 1, img ) );
-}
-
-std::string identify( const data::Image &img )
-{
-	return
-		"\"S" + img.getPropertyAs<std::string>( "sequenceNumber" ) + ( img.hasProperty( "sequenceDescription" ) ?
-				( "_" + img.getPropertyAs<std::string>( "sequenceDescription" ) ) :
-				""
-																	 ) + "\""
-		+ " from " + getCommonSource( img ).file_string()
-		+ ( img.hasProperty( "sequenceStart" ) ?
-			( " taken at " + img.getPropertyAs<std::string>( "sequenceStart" ) ) :
-			""
-		  );
-}
-
 std::pair<std::string, int>  parseFilename( std::string name )
 {
 	const boost::regex reg( "^([^:]*):([[:digit:]]+)$" );
@@ -95,7 +46,7 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 	std::advance( at, pos );
 
 	if( at == list.end() ) {
-		LOG( DiffLog, error ) << "Sorry, there is no " << pos << "th image" ;
+		LOG( DiffLog, error ) << "Sorry, there is no image " << pos;
 		throw( std::logic_error( std::string( "no " ) + boost::lexical_cast<std::string>( pos ) + "th image" ) );
 	}
 
@@ -140,8 +91,8 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
 	}
-	const std::string name1 = identify( img1 );
-	const std::string name2 = identify( img2 );
+	const std::string name1 = img1.identify();
+	const std::string name2 = img2.identify();
 	LOG( DiffLog, info ) << "Comparing " << name1 << " and " << name2;
 
 	if ( ! diff.empty() ) {
@@ -232,7 +183,7 @@ int main( int argc, char *argv[] )
 
 		const data::Image second = pickImg( in2.second, images );
 
-		LOG( DiffLog, info ) << "Comparing single images " << identify( first ) << " and " << identify( second );
+		LOG( DiffLog, info ) << "Comparing single images " << first.identify() << " and " << second.identify();
 
 		if( diff( first, second, ignore ) )
 			ret = 1;
@@ -256,7 +207,7 @@ int main( int argc, char *argv[] )
 		) {
 			const std::list<data::Image> candidates = findFitting( *first, images2, app.parameters["selectwith"] );
 			LOG_IF( candidates.size() > 1 || candidates.empty(), DiffLog, warning )
-					<< "Could not find a unique image fitting " << identify( *first )
+					<< "Could not find a unique image fitting " << first->identify()
 					<< ". " << candidates.size() << " where found";
 
 			BOOST_FOREACH( const data::Image & second, candidates ) {

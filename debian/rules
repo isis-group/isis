@@ -20,6 +20,7 @@ gitver = $(shell [ -x /usr/bin/git ] && git describe --tags --match '*\.*\.*' $$
 # currently tests only get built but do not run as the test suite assumes
 # an already installed package -- upstream is working on a fix
 CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
+            -DCMAKE_BUILD_TYPE=Release \
             -DPYTHON_VERSIONS:LIST="$$(pyversions -s | sed -e 's/ /;/g')" \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
@@ -34,7 +35,6 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_IOPLUGIN_NIFTI_SA:BOOL=ON \
             -DISIS_IOPLUGIN_NULL:BOOL=ON \
             -DISIS_IOPLUGIN_PNG:BOOL=ON \
-            -DISIS_IOPLUGIN_RAW:BOOL=ON \
             -DISIS_IOPLUGIN_TAR:BOOL=ON \
             -DISIS_IOPLUGIN_VISTA:BOOL=ON \
             -DISIS_IOPLUGIN_FLIST:BOOL=ON \
