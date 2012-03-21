@@ -21,7 +21,7 @@ public:
 
 	bool isValid() const { return valid; }
 	virtual std::string getFilterName() const = 0;
-	virtual ~FilterBase(){}
+	virtual ~FilterBase() {}
 protected:
 	virtual bool process() = 0;
 	bool valid;

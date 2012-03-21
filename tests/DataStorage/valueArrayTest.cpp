@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE( ValueArray_conversion_test )
 
 BOOST_AUTO_TEST_CASE( ValueArray_complex_minmax_test )
 {
-	const std::complex<float> init[] = { std::complex<float>(-2, 1), -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, std::complex<float>(0.2, -5)};
+	const std::complex<float> init[] = { std::complex<float>( -2, 1 ), -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, std::complex<float>( 0.2, -5 )};
 	data::ValueArray<std::complex<float> > cfArray( 12 );
 	cfArray.copyFromMem( init, 12 );
 	std::pair< util::ValueReference, util::ValueReference > minmax = cfArray.getMinMax();
@@ -353,7 +353,7 @@ BOOST_AUTO_TEST_CASE( ValueArray_boolean_conversion_test )
 
 BOOST_AUTO_TEST_CASE( ValueArray_minmax_test )
 {
-	const float init[] = { -1. / 0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, static_cast<float>(sqrt( -1 )), 1. / 0, 0.6, 0.2};
+	const float init[] = { -1. / 0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, static_cast<float>( sqrt( -1 ) ), 1. / 0, 0.6, 0.2};
 	data::ValueArray<float> floatArray( sizeof( init ) / sizeof( float ) );
 	//without scaling
 	floatArray.copyFromMem( init, sizeof( init ) / sizeof( float ) );

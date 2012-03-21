@@ -683,7 +683,7 @@ public:
 	template<typename T> ValueArray<T> copyAsValueArray() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::ValueArray<T> ret ( getVolume() );
-		copyToMem<T> ( &ret[0], ret.getVolume() );
+		copyToMem<T> ( ret.begin().operator->(), ret.getLength() );
 		return ret;
 	}
 	/**

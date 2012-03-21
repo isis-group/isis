@@ -45,7 +45,6 @@ public:
 	 * Thus parameters created using this must be set to any type/value before parse() is called.
 	 */
 	ProgParameter();
-	ProgParameter( const ProgParameter &ref );
 	/**
 	 * Create a programm parameter using an initial value/type.
 	 * \param ref the intial value/type the programm parameter should get

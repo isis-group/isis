@@ -46,7 +46,7 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 	std::advance( at, pos );
 
 	if( at == list.end() ) {
-		LOG( DiffLog, error ) << "Sorry, there is no " << pos << "th image" ;
+		LOG( DiffLog, error ) << "Sorry, there is no image " << pos;
 		throw( std::logic_error( std::string( "no " ) + boost::lexical_cast<std::string>( pos ) + "th image" ) );
 	}
 
