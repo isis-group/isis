@@ -48,6 +48,7 @@ class Application
 {
 	const std::string m_name;
 	std::string m_filename;
+	std::list<std::pair<std::string, std::string> > m_examples;
 	void addLoggingParameter( std::string name );
 
 protected:
@@ -73,7 +74,7 @@ public:
 	/**
 	 * Add a logging module.
 	 * This enables a logging module MODULE and adds related program parameters to control its logging level.
-	 * This logging level then applies LOG-commands using that specific module.
+	 * This logging level then applies to LOG-commands using that specific module.
 	 *
 	 * The MODULE must be a struct like
 	 * \code struct MyLogModule {static const char *name() {return "MyModuleLog";}; enum {use = _ENABLE_LOG};}; \endcode
@@ -104,6 +105,13 @@ public:
 	 * \note the logging module cannot be removed at runtime - its usage is controled by the _ENABLE_LOG / _ENABLE_DEBUG defines at compile time.
 	 */
 	void removeLogging( std::string name );
+
+	/**
+	 * Add an example for the programs usage.
+	 * \param parameters the parameter string for the example call
+	 * \param desc the description of the example
+	 */
+	void addExample( std::string parameters, std::string desc );
 
 	/**
 	 * Initializes the programm parameter map using argc/argv.

@@ -68,11 +68,16 @@ void Application::removeLogging( std::string name )
 	logs.erase( name );
 }
 
+void Application::addExample ( std::string parameters, std::string desc )
+{
+	m_examples.push_back( std::make_pair( parameters, desc ) );
+}
+
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
 	bool err = false;
-	m_filename = argv[0];
+	m_filename = boost::filesystem::path( argv[0] ).filename();
 
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
@@ -117,6 +122,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::printHelp( bool withHidden )const
 {
+	typedef std::list<std::pair<std::string, std::string> >::const_reference example_type;
 	std::cerr << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
 	std::cerr << "Usage: " << this->m_filename << " <options>" << std::endl << "Where <options> includes:" << std::endl;;
 
@@ -131,17 +137,34 @@ void Application::printHelp( bool withHidden )const
 		}
 
 		if ( ! iP->second.isNeeded() ) {
-			pref = ". Default: \"" + iP->second.toString() + "\"";
+			pref = ". Default: \"" + iP->second.toString() + "\".";
 		}
 
-		std::cerr << "\t-" << iP->first << " <" << iP->second.getTypeName() << ">" << std::endl;
+		std::cerr
+				<< "\t-" << iP->first << " <" << iP->second.getTypeName() << ">" << std::endl
+				<< "\t\t" << iP->second.description() << pref << std::endl;
 
 		if ( iP->second.is<Selection>() ) {
 			const Selection &ref = iP->second.castTo<Selection>();
-			std::cerr << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
-		}
+			const std::list< istring > entries = ref.getEntries();
+			std::list< istring >::const_iterator i = entries.begin();
+			std::cerr << "\t\tOptions are: \"" << *i << "\"";
 
-		std::cerr << "\t\t" << iP->second.description() << pref << std::endl;
+			for( i++ ; i != entries.end(); i++ ) {
+				std::list< istring >::const_iterator dummy = i;
+				std::cout << ( ( ++dummy ) != entries.end() ? ", " : " or " ) << "\"" << *i << "\"";
+			}
+
+			std::cerr << "." << std::endl;
+		}
+	}
+
+	if( !m_examples.empty() ) {
+		std::cout << "Examples:" << std::endl;
+
+		BOOST_FOREACH( example_type ex, m_examples ) {
+			std::cout << '\t' << m_filename + " " + ex.first << '\t' << ex.second << std::endl;
+		}
 	}
 }
 
