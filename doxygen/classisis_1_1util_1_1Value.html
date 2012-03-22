@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -54,39 +53,39 @@
 <h1>isis::util::Value&lt; TYPE &gt; Class Template Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::util::Value" --><!-- doxytag: inherits="isis::util::_internal::ValueBase" -->
+<!-- doxytag: class="isis::util::Value" --><!-- doxytag: inherits="isis::util::ValueBase" -->
 <p>Generic class for type aware variables.  
 <a href="#_details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="type_8hpp_source.html">type.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="value_8hpp_source.html">value.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for isis::util::Value&lt; TYPE &gt;:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classisis_1_1util_1_1Value.png" usemap="#isis::util::Value&lt; TYPE &gt;_map" alt=""/>
   <map id="isis::util::Value&lt; TYPE &gt;_map" name="isis::util::Value&lt; TYPE &gt;_map">
-<area href="classisis_1_1util_1_1__internal_1_1ValueBase.html" alt="isis::util::_internal::ValueBase" shape="rect" coords="0,56,191,80"/>
+<area href="classisis_1_1util_1_1ValueBase.html" alt="isis::util::ValueBase" shape="rect" coords="0,56,191,80"/>
 <area href="classisis_1_1util_1_1__internal_1_1GenericValue.html" alt="isis::util::_internal::GenericValue" shape="rect" coords="0,0,191,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a2b6b09afffe04315cc3da9aac49f9bd3">eq</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;ref) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is equal to ref converted to TYPE.  <a href="#a2b6b09afffe04315cc3da9aac49f9bd3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#adf47edea4678aad02ba8f37e4859bcaa">eq</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;ref) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is equal to ref converted to TYPE.  <a href="#adf47edea4678aad02ba8f37e4859bcaa"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#ac12b24afa087bd70d540272dbc82ec0f">getTypeID</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#aa4d3342990d3ce450eef158de394f7d8">getTypeName</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a761f267def26578609f4c10c6d700906">gt</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;ref) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is greater than ref converted to TYPE.  <a href="#a761f267def26578609f4c10c6d700906"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#ac703fb321d63abcafc6e3f8998412af6">gt</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;ref) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is greater than ref converted to TYPE.  <a href="#ac703fb321d63abcafc6e3f8998412af6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#aa4b91afe454895a3b00374fa78c6c3f7">isFloat</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#aad9f9c104dcef103a4f362bf08e28ebd">isInteger</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a26273aa30652e1b521adf9c2a708c92f">lt</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;ref) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is less than ref converted to TYPE.  <a href="#a26273aa30652e1b521adf9c2a708c92f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#abb746f3d90bc5ef21669877f80d2f121">lt</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;ref) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the value of this is less than ref converted to TYPE.  <a href="#abb746f3d90bc5ef21669877f80d2f121"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a9728beb201f57a6f706c5fa9770b5ba6">operator const TYPE &amp;</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit conversion of <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> to its value type.  <a href="#a9728beb201f57a6f706c5fa9770b5ba6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a6e10653c8b52e4848bedeed7629b0d3d">operator TYPE &amp;</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit conversion of <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> to its value type.  <a href="#a6e10653c8b52e4848bedeed7629b0d3d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a9990a77d28a69b98dbf74ad4038bfc0d">operator==</a> (const ValueBase &amp;second) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a9990a77d28a69b98dbf74ad4038bfc0d">operator==</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;second) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a0794ebacbce8236ecef00e9785f6a27a">toString</a> (bool labeled=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the string representation of the <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a>.  <a href="#a0794ebacbce8236ecef00e9785f6a27a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a2a5b02dc47c9cc066b21674440ecfe19">Value</a> ()</td></tr>
@@ -102,7 +101,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static const unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a8eb493234308a7a3231b8e15ba120139">staticID</a> = _internal::TypeID&lt;TYPE&gt;::value</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">ValueBase *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a8807f2fd4ae3a7d204a41509fb97b51d">clone</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Value.html#a8807f2fd4ae3a7d204a41509fb97b51d">clone</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a copy of this.  <a href="#a8807f2fd4ae3a7d204a41509fb97b51d"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
@@ -112,9 +111,9 @@ Protected Member Functions</h2></td></tr>
 <p>Generic class for type aware variables. </p>
 <p>Only this generic approach for types makes it possible to handle all the types of Properties for the different data these library can handle. On the other side it's more complex to read and write with these kind of types. Please don't bother about and look carefully at further comments on functionality and examples in use, e.g. with <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a>.<br/>
  For supported types see <a class="el" href="types_8hpp.html">types.hpp</a> <br/>
- Another advantage is the available type conversion, for further information how to do this and limitations see <a class="el" href="type__converter_8hpp.html">type_converter.hpp</a> </p>
+ Another advantage is the available type conversion, for further information how to do this and limitations see type_converter.hpp </p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00161">161</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00159">159</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2a5b02dc47c9cc066b21674440ecfe19"></a><!-- doxytag: member="isis::util::Value::Value" ref="a2a5b02dc47c9cc066b21674440ecfe19" args="()" -->
 <div class="memitem">
@@ -132,7 +131,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00171">171</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00169">169</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -163,7 +162,7 @@ template&lt;typename T &gt; </div>
 <li>If the lexical cast fails, boost::bad_lexical_cast is thrown. </li>
 </ul>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00182">182</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00180">180</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -183,7 +182,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00294">294</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00292">292</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -195,7 +194,7 @@ template&lt;typename TYPE&gt; </div>
 template&lt;typename TYPE&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">ValueBase* <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::clone </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a>* <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline, protected, virtual]</code></td>
@@ -205,16 +204,16 @@ template&lt;typename TYPE&gt; </div>
 <div class="memdoc">
 
 <p>Create a copy of this. </p>
-<p>Creates a new Value/ValuePtr an stores a copy of its value there. Makes ValueBase-pointers copyable without knowing their type. </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a ValueBase-pointer to a newly created Value/ValuePtr. </dd></dl>
+<p>Creates a new Value/ValueArray an stores a copy of its value there. Makes ValueBase-pointers copyable without knowing their type. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a ValueBase-pointer to a newly created Value/ValueArray. </dd></dl>
 
-<p>Implements <a class="el" href="group__util.html#gae850fafba582c0a7cf7441b4cb9c6fd9">isis::util::_internal::ValueBase</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1ValueBase.html#acab624b1f1980291ec1e339de1efe578">isis::util::ValueBase</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00166">166</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00164">164</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2b6b09afffe04315cc3da9aac49f9bd3"></a><!-- doxytag: member="isis::util::Value::eq" ref="a2b6b09afffe04315cc3da9aac49f9bd3" args="(const _internal::ValueBase &amp;ref) const " -->
+<a class="anchor" id="adf47edea4678aad02ba8f37e4859bcaa"></a><!-- doxytag: member="isis::util::Value::eq" ref="adf47edea4678aad02ba8f37e4859bcaa" args="(const ValueBase &amp;ref) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -223,7 +222,7 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="memname">bool <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::eq </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>ref</em></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -243,9 +242,9 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="group__util.html#ga6ae3d43f176268f9d74f3c3b8b53fd0f">isis::util::_internal::ValueBase</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1ValueBase.html#a8ff53cb0629b9bfaf4c9fe3549b765a3">isis::util::ValueBase</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00289">289</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00287">287</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -268,7 +267,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00211">211</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00209">209</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,11 +290,11 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00210">210</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00208">208</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a761f267def26578609f4c10c6d700906"></a><!-- doxytag: member="isis::util::Value::gt" ref="a761f267def26578609f4c10c6d700906" args="(const _internal::ValueBase &amp;ref) const " -->
+<a class="anchor" id="ac703fb321d63abcafc6e3f8998412af6"></a><!-- doxytag: member="isis::util::Value::gt" ref="ac703fb321d63abcafc6e3f8998412af6" args="(const ValueBase &amp;ref) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -304,7 +303,7 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="memname">bool <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::gt </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>ref</em></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -324,9 +323,9 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="group__util.html#gab3c32082e7430b1136d0cc58e6f9f8cb">isis::util::_internal::ValueBase</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1ValueBase.html#af371a3d41da0b7658fbf1196588e8c2a">isis::util::ValueBase</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00261">261</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00259">259</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,7 +348,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#aa929b28db7f737a5329d023b1857afec">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00212">212</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00210">210</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,11 +371,11 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ae9a0682484b9213f564a3cb117f94dfc">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00213">213</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00211">211</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a26273aa30652e1b521adf9c2a708c92f"></a><!-- doxytag: member="isis::util::Value::lt" ref="a26273aa30652e1b521adf9c2a708c92f" args="(const _internal::ValueBase &amp;ref) const " -->
+<a class="anchor" id="abb746f3d90bc5ef21669877f80d2f121"></a><!-- doxytag: member="isis::util::Value::lt" ref="abb746f3d90bc5ef21669877f80d2f121" args="(const ValueBase &amp;ref) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -385,7 +384,7 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="memname">bool <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::lt </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>ref</em></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -405,9 +404,9 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="group__util.html#ga22e05eca804180d2d79959bb70cac634">isis::util::_internal::ValueBase</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1ValueBase.html#a28df9a707f76bfc12b68b3ec32185f4f">isis::util::ValueBase</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00275">275</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00273">273</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +433,7 @@ template&lt;typename TYPE&gt; </div>
 </pre></div><p> In this case the function returns int which is then also implicitely converted to float. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a const reference to the stored value </dd></dl>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00237">237</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00235">235</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +460,7 @@ template&lt;typename TYPE&gt; </div>
 </pre></div><p> In this case the function returns int which is then also implicitely converted to float. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the stored value </dd></dl>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00250">250</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00248">248</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +473,7 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="memname">virtual bool <a class="el" href="classisis_1_1util_1_1Value.html">isis::util::Value</a>&lt; TYPE &gt;::operator== </td>
           <td>(</td>
-          <td class="paramtype">const ValueBase &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>second</em></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -483,7 +482,9 @@ template&lt;typename TYPE&gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if and only if this and second do contain the same value of the same type </dd></dl>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00216">216</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1ValueBase.html#acf18b4b2d5efa02be181b3f6a75964d1">isis::util::ValueBase</a>.</p>
+
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00214">214</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +505,7 @@ template&lt;typename TYPE&gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the name of the type </dd></dl>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00224">224</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00222">222</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +537,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Implements <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#a54e2a61ebef7a0b7c07cd6e579c5f64a">isis::util::_internal::GenericValue</a>.</p>
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00194">194</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00192">192</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
@@ -554,15 +555,15 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="type_8hpp_source.html#l00170">170</a> of file <a class="el" href="type_8hpp_source.html">type.hpp</a>.</p>
+<p>Definition at line <a class="el" href="value_8hpp_source.html#l00168">168</a> of file <a class="el" href="value_8hpp_source.html">value.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="type_8hpp_source.html">type.hpp</a></li>
+<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="value_8hpp_source.html">value.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

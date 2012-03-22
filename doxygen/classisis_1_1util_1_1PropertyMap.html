@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -74,13 +73,9 @@ Inheritance diagram for isis::util::PropertyMap:</div>
  <div class="center">
   <img src="classisis_1_1util_1_1PropertyMap.png" usemap="#isis::util::PropertyMap_map" alt=""/>
   <map id="isis::util::PropertyMap_map" name="isis::util::PropertyMap_map">
-<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="118,56,345,80"/>
-<area href="classisis_1_1data_1_1Image.html" alt="isis::data::Image" shape="rect" coords="474,56,701,80"/>
-<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="118,112,345,136"/>
-<area href="classisis_1_1data_1_1TypedImage.html" alt="isis::data::TypedImage&lt; T &gt;" shape="rect" coords="474,112,701,136"/>
-<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,168,227,192"/>
-<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="237,168,464,192"/>
-<area href="classisis_1_1data_1_1MemImage.html" alt="isis::data::MemImage&lt; T &gt;" shape="rect" coords="474,168,701,192"/>
+<area href="classisis_1_1data_1_1Image.html" alt="isis::data::Image" shape="rect" coords="0,56,165,80"/>
+<area href="classisis_1_1data_1_1TypedImage.html" alt="isis::data::TypedImage&lt; T &gt;" shape="rect" coords="0,112,165,136"/>
+<area href="classisis_1_1data_1_1MemImage.html" alt="isis::data::MemImage&lt; T &gt;" shape="rect" coords="0,168,165,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -144,7 +139,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a9485ad2dbf2e7f5f8ec393c41d9ebd73">print</a> (std::ostream &amp;out, bool label=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">"Print" the property tree.  <a href="#a9485ad2dbf2e7f5f8ec393c41d9ebd73"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#afcc2f4657fbd500284e60e0ef442bbe6">PropertyMap</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#aa9c3813f90144fbea1a8012bee99cc54">PropertyMap</a> (const Container &amp;src)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a40d78a893f4ee919c2591153a68ea0b8">PropertyMap</a> (const Container &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df">propertyValue</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the property referenced by the path.  <a href="#a4c656dc09e8b6b41f96dd9e396ac20df"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#aeabcb29b04b303b2264501b4b05bfcac">propertyValue</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path)</td></tr>
@@ -197,10 +192,10 @@ Protected Member Functions</h2></td></tr>
 <li>path is one or more case insensitive key names separated by "/" to locate both, branches or properties, in the tree. </li>
 </ul>
 <p>Nevertheless there are separate access functions for branches and properties. Trying to access a branch as a property value,or to access a property value as a branch will cause error messages and give empty results.</p>
-<p>Paths can be created from other paths and from strings (c-strings and <a class="el" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a>, but not std::string). So both can be used for functions which expect paths, but the usage of c-strings is slower.</p>
+<p>Paths can be created from other paths and from strings (c-strings and <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>, but not std::string). So both can be used for functions which expect paths, but the usage of c-strings is slower.</p>
 <p>To describe the minimum of needed metadata needed by specific data structures / subclasses properties can be marked as "needed" and there are functions to verify that they are not empty. </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00054">54</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00052">52</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 </div><hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="a0bfc17a3afe4a2a010e75c80f8883102"></a><!-- doxytag: member="isis::util::PropertyMap::DiffMap" ref="a0bfc17a3afe4a2a010e75c80f8883102" args="" -->
 <div class="memitem">
@@ -215,7 +210,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>a flat map matching keys to pairs of values </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00062">62</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00060">60</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +227,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>a flat map, matching complete paths as keys to the corresponding values </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00064">64</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00062">62</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +244,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>a list to store keys only (without the corresponding values) </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00060">60</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00058">58</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -266,17 +261,17 @@ Protected Member Functions</h2></td></tr>
 
 <p>type of the keys forming a path </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00058">58</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00056">56</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa9c3813f90144fbea1a8012bee99cc54"></a><!-- doxytag: member="isis::util::PropertyMap::PropertyMap" ref="aa9c3813f90144fbea1a8012bee99cc54" args="(const Container &amp;src)" -->
+<a class="anchor" id="a40d78a893f4ee919c2591153a68ea0b8"></a><!-- doxytag: member="isis::util::PropertyMap::PropertyMap" ref="a40d78a893f4ee919c2591153a68ea0b8" args="(const Container &amp;src)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">isis::util::PropertyMap::PropertyMap </td>
+          <td class="memname">API_EXCLUDE_BEGIN _internal API_EXCLUDE_END isis::util::PropertyMap::PropertyMap </td>
           <td>(</td>
           <td class="paramtype">const Container &amp;&#160;</td>
           <td class="paramname"><em>src</em></td><td>)</td>
@@ -286,7 +281,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00055">55</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00058">58</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +299,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00063">63</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00066">66</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +327,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00490">490</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00493">493</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +354,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00496">496</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00499">499</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -387,7 +382,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the branching <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00207">207</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00210">210</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +411,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the branching <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00194">194</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00197">197</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -462,7 +457,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>full path to the property (including the properties name) if it is found, empty string elsewhise </dd></dl>
 
-<p>Definition at line <a class="el" href="istring_8cpp_source.html#l00056">56</a> of file <a class="el" href="istring_8cpp_source.html">istring.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00515">515</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -482,7 +477,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>find all non scalar entries </p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00474">474</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00477">477</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +499,7 @@ template&lt;class Predicate &gt; </div>
 
 <p>create a list of keys for every entry for which the given scalar predicate is true. </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00119">119</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00117">117</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +546,7 @@ template&lt;class Predicate &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00278">278</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00281">281</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -570,7 +565,7 @@ template&lt;class Predicate &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>a flat representation of the whole property tree </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00431">431</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00434">434</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +586,7 @@ template&lt;class Predicate &gt; </div>
 <p>Get a list of the paths of all properties. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a flat list of the paths to all properties in the <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00467">467</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00470">470</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -612,7 +607,7 @@ template&lt;class Predicate &gt; </div>
 <p>Get a list of missing properties. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of the paths for all properties which are marked as needed and but are empty. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00482">482</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00485">485</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -644,7 +639,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the property with given type, if not set yet T() is returned. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00497">497</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00496">496</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +667,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the given branch does exist and is not empty, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00546">546</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00549">549</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -700,7 +695,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the given property does exist and is not empty, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00506">506</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00509">509</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -721,7 +716,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1Image.html#a9fb0c9f8351fddc6a2fea609d487aa2b">isis::data::Image</a>.</p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00273">273</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00276">276</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -742,7 +737,7 @@ template&lt;typename T &gt; </div>
 <p>Check if every property marked as needed is set. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if ALL needed properties are NOT empty, false otherwhise. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00266">266</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00269">269</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -781,7 +776,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of the rejected properties that couldn't be inserted, for success this should be empty </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00381">381</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00384">384</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -812,7 +807,7 @@ template&lt;typename T &gt; </div>
 
 <p>copy the tree into a flat key/property-map </p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00418">418</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00421">421</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -831,7 +826,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00057">57</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00060">60</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -870,7 +865,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00585">585</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00588">588</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -899,7 +894,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00182">182</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00185">185</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -927,7 +922,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00187">187</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00190">190</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -955,7 +950,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00174">174</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00177">177</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -984,7 +979,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00161">161</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00164">164</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1023,7 +1018,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if all properties removed succesfully, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00218">218</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00221">221</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1062,7 +1057,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if all properties removed succesfully, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00232">232</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00235">235</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1091,7 +1086,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if successful, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00213">213</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00216">216</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1129,7 +1124,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00342">342</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00345">345</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1173,7 +1168,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00552">552</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00555">555</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1216,7 +1211,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> (this can be used later, e.g. if a vector is filled step by step the reference can be used to not ask for the Property each time) </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00359">359</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00357">357</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -1270,7 +1265,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00569">569</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00572">572</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1324,7 +1319,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the transformation was done, false it failed </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00439">439</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00442">442</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1373,17 +1368,16 @@ template&lt;typename DST &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the transformation was done, false it failed </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00337">337</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00335">335</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8hpp_source.html">propmap.hpp</a></li>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="istring_8cpp_source.html">istring.cpp</a></li>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8cpp_source.html">propmap.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

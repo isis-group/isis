@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -54,16 +53,25 @@
 <h1>isis::util::DefaultMsgPrint Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::util::DefaultMsgPrint" -->
+<!-- doxytag: class="isis::util::DefaultMsgPrint" --><!-- doxytag: inherits="isis::util::MessageHandlerBase" -->
 <p>Default message output class.  
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="message_8hpp_source.html">message.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for isis::util::DefaultMsgPrint:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classisis_1_1util_1_1DefaultMsgPrint.png" usemap="#isis::util::DefaultMsgPrint_map" alt=""/>
+  <map id="isis::util::DefaultMsgPrint_map" name="isis::util::DefaultMsgPrint_map">
+<area href="classisis_1_1util_1_1MessageHandlerBase.html" alt="isis::util::MessageHandlerBase" shape="rect" coords="0,0,182,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3dce3496a9115f7cc1860259836b9aad">commit</a> (const _internal::Message &amp;mesg)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">DefaultMsgPrint</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a5b9e0688e0869171cf742287552780c7">commit</a> (const <a class="el" href="classisis_1_1util_1_1Message.html">Message</a> &amp;mesg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">DefaultMsgPrint</a> (<a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a22290bfe93e6484bc499859f760543e8">~DefaultMsgPrint</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -79,7 +87,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="textblock"><p>Default message output class. </p>
 <p>Will print any issued message to the given output stream in the format: "LOG_MODULE_NAME:LOG_LEVEL_NAME[LOCATION] MESSAGE" The default output stream is std::cout. But can be set using setStream. Location is the calling Object/Method if compiled without debug infos (NDEBUG is set) or FILENAME:LINE_NUMER if compiled with debug infos. </p>
 
-<p>Definition at line <a class="el" href="message_8hpp_source.html#l00103">103</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8hpp_source.html#l00093">93</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a4f20fa6e51b795a8748ccbbb66cf9436"></a><!-- doxytag: member="isis::util::DefaultMsgPrint::DefaultMsgPrint" ref="a4f20fa6e51b795a8748ccbbb66cf9436" args="(LogLevel level)" -->
 <div class="memitem">
@@ -88,7 +96,7 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">isis::util::DefaultMsgPrint::DefaultMsgPrint </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a>&#160;</td>
           <td class="paramname"><em>level</em></td><td>)</td>
           <td><code> [inline]</code></td>
         </tr>
@@ -96,7 +104,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8hpp_source.html#l00109">109</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8hpp_source.html#l00099">99</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
 
 </div>
 </div>
@@ -114,27 +122,29 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8hpp_source.html#l00110">110</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8hpp_source.html#l00100">100</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a3dce3496a9115f7cc1860259836b9aad"></a><!-- doxytag: member="isis::util::DefaultMsgPrint::commit" ref="a3dce3496a9115f7cc1860259836b9aad" args="(const _internal::Message &amp;mesg)" -->
+<a class="anchor" id="a5b9e0688e0869171cf742287552780c7"></a><!-- doxytag: member="isis::util::DefaultMsgPrint::commit" ref="a5b9e0688e0869171cf742287552780c7" args="(const Message &amp;mesg)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void isis::util::DefaultMsgPrint::commit </td>
           <td>(</td>
-          <td class="paramtype">const _internal::Message &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1Message.html">Message</a> &amp;&#160;</td>
           <td class="paramname"><em>mesg</em></td><td>)</td>
-          <td></td>
+          <td><code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8cpp_source.html#l00145">145</a> of file <a class="el" href="message_8cpp_source.html">message.cpp</a>.</p>
+<p>Implements <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a519378d5ea8c4eb517f174a32e1151e9">isis::util::MessageHandlerBase</a>.</p>
+
+<p>Definition at line <a class="el" href="message_8cpp_source.html#l00141">141</a> of file <a class="el" href="message_8cpp_source.html">message.cpp</a>.</p>
 
 </div>
 </div>
@@ -153,7 +163,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8cpp_source.html#l00160">160</a> of file <a class="el" href="message_8cpp_source.html">message.cpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8cpp_source.html#l00156">156</a> of file <a class="el" href="message_8cpp_source.html">message.cpp</a>.</p>
 
 </div>
 </div>
@@ -169,7 +179,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8hpp_source.html#l00107">107</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8hpp_source.html#l00097">97</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
 
 </div>
 </div>
@@ -184,7 +194,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="message_8hpp_source.html#l00106">106</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
+<p>Definition at line <a class="el" href="message_8hpp_source.html#l00096">96</a> of file <a class="el" href="message_8hpp_source.html">message.hpp</a>.</p>
 
 </div>
 </div>
@@ -193,7 +203,7 @@ Static Protected Attributes</h2></td></tr>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="message_8cpp_source.html">message.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -45,19 +44,18 @@
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
 <a name="l00004"></a>00004 <span class="preprocessor">#include &lt;boost/type_traits/is_arithmetic.hpp&gt;</span>
 <a name="l00005"></a>00005 <span class="preprocessor">#include &quot;<a class="code" href="types_8hpp.html">../CoreUtils/types.hpp</a>&quot;</span>
-<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;<a class="code" href="type_8hpp.html">../CoreUtils/type.hpp</a>&quot;</span>
+<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;<a class="code" href="value_8hpp.html">../CoreUtils/value.hpp</a>&quot;</span>
 <a name="l00007"></a>00007 
 <a name="l00008"></a>00008 <span class="keyword">namespace </span>isis
 <a name="l00009"></a>00009 {
 <a name="l00010"></a>00010 <span class="keyword">namespace </span>data
 <a name="l00011"></a>00011 {
-<a name="l00012"></a>00012 <span class="preprocessor">#pragma GCC visibility push(hidden)</span>
-<a name="l00013"></a>00013 <span class="preprocessor"></span><span class="keyword">namespace </span>_internal
+<a name="l00013"></a>00013 <span class="keyword">namespace </span>_internal
 <a name="l00014"></a>00014 {
 <a name="l00015"></a>00015 
 <a name="l00016"></a>00016 <span class="comment">// actual implementation of the scalar-byte-swap (generic version)</span>
-<a name="l00017"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html">00017</a> <span class="keyword">template</span>&lt;u<span class="keywordtype">int</span>_fast8_t SIZE&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html">SwapImpl</a> {
-<a name="l00018"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html#a6d88c94f6771329c72a3c1faef2c0090">00018</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> TYPE <a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html#a6d88c94f6771329c72a3c1faef2c0090">doSwap</a>( <span class="keyword">const</span> TYPE &amp;src ) {
+<a name="l00017"></a>00017 <span class="keyword">template</span>&lt;u<span class="keywordtype">int</span>_fast8_t SIZE&gt; <span class="keyword">struct </span>SwapImpl {
+<a name="l00018"></a>00018     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> TYPE doSwap( <span class="keyword">const</span> TYPE &amp;src ) {
 <a name="l00019"></a>00019         TYPE ret = 0;
 <a name="l00020"></a>00020         uint8_t *retPtr = <span class="keyword">reinterpret_cast&lt;</span>uint8_t *<span class="keyword">&gt;</span>( &amp;ret );
 <a name="l00021"></a>00021         <span class="keyword">const</span> uint8_t *srcPtr = <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>uint8_t *<span class="keyword">&gt;</span>( &amp;src );
@@ -69,64 +67,63 @@
 <a name="l00027"></a>00027     }
 <a name="l00028"></a>00028 };
 <a name="l00029"></a>00029 <span class="comment">// specialisation (swapping 1 byte might be a bit useless)</span>
-<a name="l00030"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl_3_011_01_4.html">00030</a> <span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html">SwapImpl</a>&lt;1&gt; {
-<a name="l00031"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl_3_011_01_4.html#aacbd6b85d1dfe0dc1e1d322d369e84b8">00031</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> TYPE <a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl_3_011_01_4.html#aacbd6b85d1dfe0dc1e1d322d369e84b8">doSwap</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> src;}
+<a name="l00030"></a>00030 <span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span>SwapImpl&lt;1&gt; {
+<a name="l00031"></a>00031     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">static</span> TYPE doSwap( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> src;}
 <a name="l00032"></a>00032 };
 <a name="l00033"></a>00033 
 <a name="l00034"></a>00034 
 <a name="l00035"></a>00035 <span class="comment">// gatekeeper for SwapImpl (do not allow swapping of types we do not know about)</span>
-<a name="l00036"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">00036</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">bool</span> IS_NUM&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper</a> {
-<a name="l00037"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">00037</a>     <span class="keyword">static</span> TYPE <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">swap</a>( <span class="keyword">const</span> TYPE &amp;src ) {
-<a name="l00038"></a>00038         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry, endianess swap for &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;TYPE&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; is not supportet&quot;</span>;
+<a name="l00036"></a>00036 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">bool</span> IS_NUM&gt; <span class="keyword">struct </span>EndianSwapper {
+<a name="l00037"></a>00037     <span class="keyword">static</span> TYPE swap( <span class="keyword">const</span> TYPE &amp;src ) {
+<a name="l00038"></a>00038         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry, endianess swap for &quot;</span> &lt;&lt; util::Value&lt;TYPE&gt;::staticName() &lt;&lt; <span class="stringliteral">&quot; is not supportet&quot;</span>;
 <a name="l00039"></a>00039         <span class="keywordflow">return</span> src;
 <a name="l00040"></a>00040     }
 <a name="l00041"></a>00041 };
 <a name="l00042"></a>00042 
 <a name="l00043"></a>00043 <span class="comment">// plain numeric scalar - directly use doSwap</span>
-<a name="l00044"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01TYPE_00_01true_01_4.html">00044</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper</a>&lt;TYPE, true&gt; {
-<a name="l00045"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01TYPE_00_01true_01_4.html#a7a585e726b8ff268c2d979a274374768">00045</a>     <span class="keyword">static</span> TYPE <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01TYPE_00_01true_01_4.html#a7a585e726b8ff268c2d979a274374768">swap</a>( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html">SwapImpl&lt;sizeof( TYPE )&gt;::doSwap</a>( src );}
+<a name="l00044"></a>00044 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span>EndianSwapper&lt;TYPE, true&gt; {
+<a name="l00045"></a>00045     <span class="keyword">static</span> TYPE swap( <span class="keyword">const</span> TYPE &amp;src ) {<span class="keywordflow">return</span> SwapImpl&lt;sizeof( TYPE )&gt;::doSwap( src );}
 <a name="l00046"></a>00046 };
 <a name="l00047"></a>00047 
 <a name="l00048"></a>00048 <span class="comment">//color-struct - do swap for each color</span>
-<a name="l00049"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1color_3_01TYPE_01_4_00_01false_01_4.html">00049</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper</a>&lt;util::color&lt;TYPE&gt;, false&gt; {
-<a name="l00050"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1color_3_01TYPE_01_4_00_01false_01_4.html#ae5ef9597e56a978534f53dae82cd6178">00050</a>     <span class="keyword">static</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">util::color&lt;TYPE&gt;</a> <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1color_3_01TYPE_01_4_00_01false_01_4.html#ae5ef9597e56a978534f53dae82cd6178">swap</a>( <span class="keyword">const</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">util::color&lt;TYPE&gt;</a> &amp;src ) {
-<a name="l00051"></a>00051         <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">util::color&lt;TYPE&gt;</a> ret;
-<a name="l00052"></a>00052         ret.<a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">r</a> = <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value</a>&gt;<a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">::swap</a>( src.<a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">r</a> );
-<a name="l00053"></a>00053         ret.<a class="code" href="structisis_1_1util_1_1color.html#aa6b5d1b2de5b75624c543ac5f2a8c74d">g</a> = <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value</a>&gt;<a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">::swap</a>( src.<a class="code" href="structisis_1_1util_1_1color.html#aa6b5d1b2de5b75624c543ac5f2a8c74d">g</a> );
-<a name="l00054"></a>00054         ret.<a class="code" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a> = <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value</a>&gt;<a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">::swap</a>( src.<a class="code" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a> );
+<a name="l00049"></a>00049 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span>EndianSwapper&lt;util::color&lt;TYPE&gt;, false&gt; {
+<a name="l00050"></a>00050     <span class="keyword">static</span> util::color&lt;TYPE&gt; swap( <span class="keyword">const</span> util::color&lt;TYPE&gt; &amp;src ) {
+<a name="l00051"></a>00051         util::color&lt;TYPE&gt; ret;
+<a name="l00052"></a>00052         ret.r = EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value&gt;::swap( src.r );
+<a name="l00053"></a>00053         ret.g = EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value&gt;::swap( src.g );
+<a name="l00054"></a>00054         ret.b = EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value&gt;::swap( src.b );
 <a name="l00055"></a>00055         <span class="keywordflow">return</span> ret;
 <a name="l00056"></a>00056     }
 <a name="l00057"></a>00057 };
 <a name="l00058"></a>00058 
 <a name="l00059"></a>00059 <span class="comment">// lists - do swap for each entry</span>
-<a name="l00060"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01std_1_1list_3_01TYPE_01_4_00_01false_01_4.html">00060</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper</a>&lt;std::list&lt;TYPE&gt;, false&gt; {
-<a name="l00061"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01std_1_1list_3_01TYPE_01_4_00_01false_01_4.html#a83544b3a2280fa4d76a99a02616e5337">00061</a>     <span class="keyword">static</span> std::list&lt;TYPE&gt; <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01std_1_1list_3_01TYPE_01_4_00_01false_01_4.html#a83544b3a2280fa4d76a99a02616e5337">swap</a>( <span class="keyword">const</span> std::list&lt;TYPE&gt; &amp;src ) {
+<a name="l00060"></a>00060 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt; <span class="keyword">struct </span>EndianSwapper&lt;std::list&lt;TYPE&gt;, false&gt; {
+<a name="l00061"></a>00061     <span class="keyword">static</span> std::list&lt;TYPE&gt; swap( <span class="keyword">const</span> std::list&lt;TYPE&gt; &amp;src ) {
 <a name="l00062"></a>00062         std::list&lt;TYPE&gt; ret;
-<a name="l00063"></a>00063         std::transform( src.begin(), src.end(), ret.begin(), <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value</a>&gt;<a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">::swap</a> );
+<a name="l00063"></a>00063         std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value&gt;::swap );
 <a name="l00064"></a>00064         <span class="keywordflow">return</span> ret;
 <a name="l00065"></a>00065     }
 <a name="l00066"></a>00066 };
 <a name="l00067"></a>00067 
 <a name="l00068"></a>00068 <span class="comment">// FixedVector - do swap for each entry</span>
-<a name="l00069"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1FixedVector_3_01TYPE_00_01SIZE_01_4_00_01false_01_4.html">00069</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper</a>&lt;util::FixedVector&lt;TYPE, SIZE&gt;, false&gt; {
-<a name="l00070"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1FixedVector_3_01TYPE_00_01SIZE_01_4_00_01false_01_4.html#acb769b02e6d98e984c463f4281a9000e">00070</a>     <span class="keyword">static</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1FixedVector_3_01TYPE_00_01SIZE_01_4_00_01false_01_4.html#acb769b02e6d98e984c463f4281a9000e">swap</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;TYPE, SIZE&gt;</a> &amp;src ) {
-<a name="l00071"></a>00071         <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;TYPE, SIZE&gt;</a> ret;
-<a name="l00072"></a>00072         std::transform( src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), src.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a>(), ret.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a>(), <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value</a>&gt;<a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html#a758eebb708ff519545e83a3f0b25b155">::swap</a> );
+<a name="l00069"></a>00069 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE&gt; <span class="keyword">struct </span>EndianSwapper&lt;util::FixedVector&lt;TYPE, SIZE&gt;, false&gt; {
+<a name="l00070"></a>00070     <span class="keyword">static</span> util::FixedVector&lt;TYPE, SIZE&gt; swap( <span class="keyword">const</span> util::FixedVector&lt;TYPE, SIZE&gt; &amp;src ) {
+<a name="l00071"></a>00071         util::FixedVector&lt;TYPE, SIZE&gt; ret;
+<a name="l00072"></a>00072         std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper&lt;TYPE, boost::is_arithmetic&lt;TYPE&gt;::value&gt;::swap );
 <a name="l00073"></a>00073         <span class="keywordflow">return</span> ret;
 <a name="l00074"></a>00074     }
 <a name="l00075"></a>00075 };
 <a name="l00076"></a>00076 } <span class="comment">//_internal</span>
-<a name="l00077"></a>00077 <span class="preprocessor">#pragma GCC visibility pop</span>
-<a name="l00078"></a>00078 <span class="preprocessor"></span>
+<a name="l00078"></a>00078 <span class="comment"></span>
 <a name="l00079"></a>00079 <span class="comment">// public interface</span>
-<a name="l00080"></a><a class="code" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">00080</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">static</span>  T <a class="code" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">endianSwap</a>( <span class="keyword">const</span> T &amp;var )
+<a name="l00080"></a><a class="code" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">00080</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">static</span>  T <a class="code" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">endianSwap</a>( <span class="keyword">const</span> T &amp;var )
 <a name="l00081"></a>00081 {
-<a name="l00082"></a>00082     <span class="keywordflow">return</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">_internal::EndianSwapper&lt;T, boost::is_arithmetic&lt; T &gt;::value</a> &gt;::swap( var );
+<a name="l00082"></a>00082     <span class="keywordflow">return</span> _internal::EndianSwapper&lt;T, boost::is_arithmetic&lt; T &gt;::value &gt;::swap( var );
 <a name="l00083"></a>00083 }
 <a name="l00084"></a><a class="code" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">00084</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ITER, <span class="keyword">typename</span> TITER&gt; <span class="keyword">static</span>  <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">endianSwapArray</a>( <span class="keyword">const</span> ITER begin, <span class="keyword">const</span> ITER end, TITER target )
 <a name="l00085"></a>00085 {
 <a name="l00086"></a>00086     <span class="keywordflow">for</span>( ITER i = begin; i != end; i++, target++ ) {
-<a name="l00087"></a>00087         *target = <a class="code" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">endianSwap</a>( *i );
+<a name="l00087"></a>00087         *target = <a class="code" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">endianSwap</a>( *i );
 <a name="l00088"></a>00088     }
 <a name="l00089"></a>00089 }
 <a name="l00090"></a>00090 
@@ -135,7 +132,7 @@
 <a name="l00093"></a>00093 <span class="preprocessor">#endif //ENDIANESS_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

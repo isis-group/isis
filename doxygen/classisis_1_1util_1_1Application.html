@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -49,7 +48,9 @@
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Data Fields</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a>  </div>
+<a href="#pro-types">Protected Types</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <h1>isis::util::Application Class Reference</h1>  </div>
 </div>
@@ -71,15 +72,22 @@ Inheritance diagram for isis::util::Application:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1">addExample</a> (std::string <a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, std::string desc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an example for the programs usage.  <a href="#afe8d3e4dd336f11d95f749c9df6e27b1"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename MODULE &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#ab2c1e683fa3bc774d54f5c2d10e4d3cb">addLogging</a> (std::string name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a logging module.  <a href="#ab2c1e683fa3bc774d54f5c2d10e4d3cb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373">Application</a> (const char name[])</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default Constructor.  <a href="#aab8be4d850600d999f871bcd310ca373"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">init</a> (int argc, char **argv, bool exitOnError=true)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the programm parameter map using argc/argv.  <a href="#a84cfa64fefcb8221c06892794bc4cec8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7">printHelp</a> (bool withHidden=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual function to display a short help text.  <a href="#a9bba50d56e8df6a18deee81e273bf1c7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a0613887cbb4f61ff6108bed6b5626497">removeLogging</a> (std::string name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a logging parameter from the application.  <a href="#a0613887cbb4f61ff6108bed6b5626497"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename MODULE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204">setLog</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the logging level for the specified module.  <a href="#a1e1ba30e10d3790edc6a590011551204"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a67c41351afed0f7b85a84c985efa6ab1">setLog</a> (<a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the logging level for the specified module.  <a href="#a67c41351afed0f7b85a84c985efa6ab1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">~Application</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -87,20 +95,43 @@ Static Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1ParameterMap.html">ParameterMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a></td></tr>
+<tr><td colspan="2"><h2><a name="pro-types"></a>
+Protected Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef void(Application::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">setLogFunction</a> )(<a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level) const </td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual boost::shared_ptr<br class="typebreak"/>
-&lt; _internal::MessageHandlerBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a> (std::string module, <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
+&lt; <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html">MessageHandlerBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">getLogHandler</a> (std::string module, <a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
+<tr><td colspan="2"><h2><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <br class="typebreak"/>
+std::list&lt; <a class="el" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">setLogFunction</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The ISIS base application class. </p>
 <p>To speed up the creation of new command line tools, the ISIS core library contains a number of helper classes based on <a class="el" href="classisis_1_1util_1_1Application.html" title="The ISIS base application class.">Application</a>. An ISIS application class provides a parameter parser that tokenizes the program argument list according to given parameter names and types and saves the results in an internal parameter map.</p>
 <p>An application needs to be initialized explicitly with a call to <a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init()</a>.</p>
 <p>Usage instructions and a short paramter list can be shown with the method <a class="el" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp()</a>.</p>
-<p>See also: <a class="el" href="classisis_1_1data_1_1IOApplication.html">isis::data::IOApplication</a>, <a class="el" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">isis::util::ParameterMap</a> and <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel </a> </p>
+<p>See also: <a class="el" href="classisis_1_1data_1_1IOApplication.html">isis::data::IOApplication</a>, <a class="el" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">isis::util::ParameterMap</a> and <a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel </a> </p>
 
 <p>Definition at line <a class="el" href="application_8hpp_source.html#l00047">47</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+</div><hr/><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="a6eb6bfd9323cca764fa4e4e8cc02c872"></a><!-- doxytag: member="isis::util::Application::setLogFunction" ref="a6eb6bfd9323cca764fa4e4e8cc02c872" args=")(LogLevel level) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void( Application::* <a class="el" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">isis::util::Application::setLogFunction</a>)(<a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level) const <code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00055">55</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aab8be4d850600d999f871bcd310ca373"></a><!-- doxytag: member="isis::util::Application::Application" ref="aab8be4d850600d999f871bcd310ca373" args="(const char name[])" -->
 <div class="memitem">
 <div class="memproto">
@@ -143,11 +174,100 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00055">55</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00047">47</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="afe8d3e4dd336f11d95f749c9df6e27b1"></a><!-- doxytag: member="isis::util::Application::addExample" ref="afe8d3e4dd336f11d95f749c9df6e27b1" args="(std::string parameters, std::string desc)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::util::Application::addExample </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>desc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Add an example for the programs usage. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the parameter string for the example call </td></tr>
+    <tr><td class="paramname">desc</td><td>the description of the example </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00071">71</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab2c1e683fa3bc774d54f5c2d10e4d3cb"></a><!-- doxytag: member="isis::util::Application::addLogging" ref="ab2c1e683fa3bc774d54f5c2d10e4d3cb" args="(std::string name)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MODULE &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::util::Application::addLogging </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Add a logging module. </p>
+<p>This enables a logging module MODULE and adds related program parameters to control its logging level. This logging level then applies to LOG-commands using that specific module.</p>
+<p>The MODULE must be a struct like </p>
+<div class="fragment"><pre class="fragment"> <span class="keyword">struct </span>MyLogModule {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;MyModuleLog&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_LOG};}; 
+</pre></div><p> than </p>
+<div class="fragment"><pre class="fragment"> addLogging&lt;MyLogModule&gt;(<span class="stringliteral">&quot;MyLog&quot;</span>); 
+</pre></div><p> will install a parameter "-dMyLog" which will control all calls to </p>
+<div class="fragment"><pre class="fragment"> <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>(MyLogModule,...) &lt;&lt; ... 
+</pre></div><p> if _ENABLE_LOG was set for the compilation. Otherwise this commands will not have an effect.</p>
+<p>Multiple MODLUES can have the same parameter name, so </p>
+<div class="fragment"><pre class="fragment"> <span class="keyword">struct </span>MyLogModule {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;MyModuleLog&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_LOG};};
+ <span class="keyword">struct </span>MyDebugModule {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;MyModuleDbg&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_DEBUG};};
+
+ addLogging&lt;MyLogModule&gt;(<span class="stringliteral">&quot;MyLog&quot;</span>);
+ addLogging&lt;MyDebugModule&gt;(<span class="stringliteral">&quot;MyLog&quot;</span>);
+</pre></div><p> will control </p>
+<div class="fragment"><pre class="fragment"> <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>(MyLogModule,...) &lt;&lt; ... 
+</pre></div><p> and </p>
+<div class="fragment"><pre class="fragment"> <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>(MyDebugModule,...) &lt;&lt; ... 
+</pre></div><p> through the parameter "-dMyLog".</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>the name used for the program parameters and their description</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This does not set the logging handler. That is done by reimplementing <a class="el" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">getLogHandler( std::string module, isis::LogLevel level )const</a>. </dd>
+<dd>
+If name is an empty string (""), its assumed as the logging for the application. </dd></dl>
+
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00098">98</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a50f504bbb15d5a73a622d431219a13d3"></a><!-- doxytag: member="isis::util::Application::getCoreVersion" ref="a50f504bbb15d5a73a622d431219a13d3" args="(void)" -->
 <div class="memitem">
 <div class="memproto">
@@ -163,16 +283,16 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00143">143</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00175">175</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afa298abfc2b0a30cce0b4972636c6378"></a><!-- doxytag: member="isis::util::Application::getLogHandler" ref="afa298abfc2b0a30cce0b4972636c6378" args="(std::string module, isis::LogLevel level) const " -->
+<a class="anchor" id="a83b8d584d1face33a9c11d29940233c4"></a><!-- doxytag: member="isis::util::Application::getLogHandler" ref="a83b8d584d1face33a9c11d29940233c4" args="(std::string module, isis::LogLevel level) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::shared_ptr&lt; _internal::MessageHandlerBase &gt; isis::util::Application::getLogHandler </td>
+          <td class="memname">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html">MessageHandlerBase</a> &gt; isis::util::Application::getLogHandler </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>module</em>, </td>
@@ -180,7 +300,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
           <td class="paramname"><em>level</em>&#160;</td>
         </tr>
         <tr>
@@ -192,9 +312,9 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">isis::data::IOApplication</a>.</p>
+<p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#a15e619df12e2d5e0f35b2a92436e8703">isis::data::IOApplication</a>.</p>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00139">139</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00171">171</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +362,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">isis::data::IOApplication</a>.</p>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00057">57</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00076">76</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
@@ -266,11 +386,39 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4">isis::data::IOApplication</a>.</p>
 
-<p>Definition at line <a class="el" href="application_8cpp_source.html#l00109">109</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00123">123</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1e1ba30e10d3790edc6a590011551204"></a><!-- doxytag: member="isis::util::Application::setLog" ref="a1e1ba30e10d3790edc6a590011551204" args="(LogLevel level)" -->
+<a class="anchor" id="a0613887cbb4f61ff6108bed6b5626497"></a><!-- doxytag: member="isis::util::Application::removeLogging" ref="a0613887cbb4f61ff6108bed6b5626497" args="(std::string name)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::util::Application::removeLogging </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes a logging parameter from the application. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>the parameter name without "-d" </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>the logging module cannot be removed at runtime - its usage is controled by the _ENABLE_LOG / _ENABLE_DEBUG defines at compile time. </dd></dl>
+
+<p>Definition at line <a class="el" href="application_8cpp_source.html#l00065">65</a> of file <a class="el" href="application_8cpp_source.html">application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a67c41351afed0f7b85a84c985efa6ab1"></a><!-- doxytag: member="isis::util::Application::setLog" ref="a67c41351afed0f7b85a84c985efa6ab1" args="(LogLevel level) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -279,9 +427,9 @@ template&lt;typename MODULE &gt; </div>
         <tr>
           <td class="memname">void isis::util::Application::setLog </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a>&#160;</td>
           <td class="paramname"><em>level</em></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
@@ -289,11 +437,26 @@ template&lt;typename MODULE &gt; </div>
 
 <p>Set the logging level for the specified module. </p>
 
-<p>Definition at line <a class="el" href="application_8hpp_source.html#l00086">86</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00132">132</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Field Documentation</h2>
+<a class="anchor" id="ad766cb48d4ac2c2e4c5eba68963b5465"></a><!-- doxytag: member="isis::util::Application::logs" ref="ad766cb48d4ac2c2e4c5eba68963b5465" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;std::string, std::list&lt;<a class="el" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">setLogFunction</a>&gt; &gt; <a class="el" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">isis::util::Application::logs</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00056">56</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aa6e216ac203dc3c981ed73f794145d1b"></a><!-- doxytag: member="isis::util::Application::parameters" ref="aa6e216ac203dc3c981ed73f794145d1b" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -305,7 +468,7 @@ template&lt;typename MODULE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="application_8hpp_source.html#l00057">57</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="application_8hpp_source.html#l00061">61</a> of file <a class="el" href="application_8hpp_source.html">application.hpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +477,7 @@ template&lt;typename MODULE &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="application_8cpp_source.html">application.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

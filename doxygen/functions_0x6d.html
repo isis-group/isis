@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -49,7 +48,8 @@
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
-      <li><a href="functions.html#index_a"><span>a</span></a></li>
+      <li><a href="functions.html#index__"><span>_</span></a></li>
+      <li><a href="functions_0x61.html#index_a"><span>a</span></a></li>
       <li><a href="functions_0x62.html#index_b"><span>b</span></a></li>
       <li><a href="functions_0x63.html#index_c"><span>c</span></a></li>
       <li><a href="functions_0x64.html#index_d"><span>d</span></a></li>
@@ -88,15 +88,31 @@
 <li>m_ColumnVecInv
 : <a class="el" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">isis::data::Image</a>
 </li>
+<li>m_file
+: <a class="el" href="classisis_1_1util_1_1Message.html#afba7899ea1dbe788226ecc561e778ad7">isis::util::Message</a>
+</li>
 <li>m_input
 : <a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">isis::filter::_internal::HasNInput&lt; TYPE, NInput &gt;</a>
 , <a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">isis::filter::_internal::Filter&lt; InType, OutType,-1, NOutput &gt;</a>
 </li>
 <li>m_len
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#abee69127367d7a8cef739fe35d125147">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a5e3043cf337256d969b8aeb61b0569a8">isis::data::ValueArrayBase</a>
+</li>
+<li>m_level
+: <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a95d1320bfe7f2febf64b0ec796857d09">isis::util::MessageHandlerBase</a>
+, <a class="el" href="classisis_1_1util_1_1Message.html#a7bdd453f7a04cda8e57b48487faa688e">isis::util::Message</a>
+</li>
+<li>m_line
+: <a class="el" href="classisis_1_1util_1_1Message.html#aafc4cd2aba969f221d014b8c8dc35c14">isis::util::Message</a>
 </li>
 <li>m_map
 : <a class="el" href="structisis_1_1data_1_1FilePtr_1_1GeneratorMap_1_1proc.html#ae30f3f537b5f7f802e8586c78c05daa7">isis::data::FilePtr::GeneratorMap::proc</a>
+</li>
+<li>m_module
+: <a class="el" href="classisis_1_1util_1_1Message.html#a58e126c164af2f9f4c22cfda92c5105b">isis::util::Message</a>
+</li>
+<li>m_object
+: <a class="el" href="classisis_1_1util_1_1Message.html#a704ce99528bb113851b4442e4c7fbe14">isis::util::Message</a>
 </li>
 <li>m_Offset
 : <a class="el" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">isis::data::Image</a>
@@ -123,6 +139,12 @@
 <li>m_SliceVecInv
 : <a class="el" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">isis::data::Image</a>
 </li>
+<li>m_subjects
+: <a class="el" href="classisis_1_1util_1_1Message.html#accd957df71a2300bb0dba389445f33f0">isis::util::Message</a>
+</li>
+<li>m_timeStamp
+: <a class="el" href="classisis_1_1util_1_1Message.html#ab7b2db74c0518ae25d3e3c9ca3e7f42b">isis::util::Message</a>
+</li>
 <li>makeBasename()
 : <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a9055b81aa6f91a4853991b01e6905f84">isis::image_io::FileFormat</a>
 </li>
@@ -142,20 +164,29 @@
 : <a class="el" href="classisis_1_1util_1_1Matrix4x4.html#a58a4d5109d91b4d5abf6957b3d75642a">isis::util::Matrix4x4&lt; TYPE &gt;</a>
 </li>
 <li>MemChunk()
-: <a class="el" href="classisis_1_1data_1_1MemChunk.html#a091650e852746a55b14add69b4721f43">isis::data::MemChunk&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1MemChunk.html#a8a14b33730742ac1f7dbf5c3798204da">isis::data::MemChunk&lt; TYPE &gt;</a>
 </li>
 <li>MemChunkNonDel()
-: <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#ad92b17ba107262816653cdcbe7f2c311">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#adf659ede265fa97b7f817da74bff19a7">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>
 </li>
 <li>MemImage()
 : <a class="el" href="classisis_1_1data_1_1MemImage.html#a7bcae94f698adcb22d4ec30b8075d40b">isis::data::MemImage&lt; T &gt;</a>
+</li>
+<li>merge()
+: <a class="el" href="classisis_1_1util_1_1Message.html#aad70bfbbb716bd1b0e4e8af9dda416ab">isis::util::Message</a>
+</li>
+<li>Message()
+: <a class="el" href="classisis_1_1util_1_1Message.html#a6d360ba6c9249187af3eb61807597a59">isis::util::Message</a>
+</li>
+<li>MessageHandlerBase()
+: <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a02bd865542fb107175b80127bdc6b931">isis::util::MessageHandlerBase</a>
 </li>
 <li>MSubject()
 : <a class="el" href="classisis_1_1util_1_1MSubject.html#acfd2aba2bd2343f6884f37d4c6f2f5be">isis::util::MSubject</a>
 </li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

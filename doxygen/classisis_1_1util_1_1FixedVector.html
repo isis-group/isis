@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -72,6 +71,7 @@ Public Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef CONTAINER::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, <br class="typebreak"/>
 SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a9aba478fa4be4f8188cdaed0fa0d9e8d">this_class</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef TYPE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#af353ca4a24e418aa96a36aa50dd7eda0">value_type</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">begin</a> ()</td></tr>
@@ -84,19 +84,21 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">copy the elements to somthing designed after the output iterator model  <a href="#a55f7f4c81ad3c791ca14299e24715dd6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TYPE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ab9fb48f1043227af14e78eb9a6622192">dot</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;vect) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the inner product.  <a href="#ab9fb48f1043227af14e78eb9a6622192"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a6d62e671ecb1e277dbdac40ddb722b27">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a88f4582528957e28f23ae49dd3101aa4">end</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a32866d69e1d987d69ca0fe659f55e87b">end</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6">fill</a> (const TYPE &amp;val)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all elements to a value.  <a href="#af94746a0cc9eb0e48a2a71da0e3a56c6"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">FixedVector</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, SIZE, CONTAINER2 &gt; &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ab9238459ce4a0f313fdc5e02ef696445">FixedVector</a> (const TYPE src[SIZE])</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a> out of an array of same type and length.  <a href="#ab9238459ce4a0f313fdc5e02ef696445"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a3975a370960fc207b60debcbfb2364a9">FixedVector</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, SIZE, CONTAINER2 &gt; &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ad187ce0824853ba3ca448ce2d6c50467">FixedVector</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <a href="#ad187ce0824853ba3ca448ce2d6c50467"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a9f9a36e15da09c5c3ee4e3f6ea529f79">fuzzyEqual</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;other, unsigned short scale=10) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Fuzzy comparison for vectors.  <a href="#a9f9a36e15da09c5c3ee4e3f6ea529f79"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ad8c0b98399fe51378bbc5f1867193127">getBiggestVecElemAbs</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::numeric::ublas::vector<br class="typebreak"/>
+&lt; TYPE &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ac1d822842d2c1eb97ce04ba3a1988f3e">getBoostVector</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TYPE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d">len</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the the length of the vector.  <a href="#a754ee91bca9023770d77488b3f291c8d"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a1db243bdd575e925e2ef7ceb3135e87f">lexical_less</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src) const </td></tr>
@@ -117,8 +119,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">operator-</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">operator-=</a> (const TYPE &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">operator-=</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">operator/</a> (const TYPE &amp;src) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">operator/</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a37ead0c779ad0fd44f148442741d6e4f">operator/</a> (const TYPE &amp;src) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">operator/=</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">operator/=</a> (const TYPE &amp;src)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">operator==</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src) const </td></tr>
@@ -218,6 +220,25 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 
 </div>
 </div>
+<a class="anchor" id="af353ca4a24e418aa96a36aa50dd7eda0"></a><!-- doxytag: member="isis::util::FixedVector::value_type" ref="af353ca4a24e418aa96a36aa50dd7eda0" args="" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef TYPE <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedVector.html#af353ca4a24e418aa96a36aa50dd7eda0">value_type</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</a>, <a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">isis::util::FixedMatrix&lt; TYPE, ELEMS, ELEMS &gt;</a>, and <a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">isis::util::FixedMatrix&lt; TYPE, 4, 4 &gt;</a>.</p>
+
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00057">57</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad187ce0824853ba3ca448ce2d6c50467"></a><!-- doxytag: member="isis::util::FixedVector::FixedVector" ref="ad187ce0824853ba3ca448ce2d6c50467" args="()" -->
 <div class="memitem">
@@ -238,7 +259,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <p>Default constructor. </p>
 <p>Initializes all elements with default value of TYPE. </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00087">87</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00088">88</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -261,7 +282,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 
 <p>Create a <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a> out of an array of same type and length. </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00092">92</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00093">93</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -284,7 +305,7 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00290">290</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00301">301</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +326,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00299">299</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00310">310</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -325,30 +346,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00301">301</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0c2ed6386943b4ee835c93264c5f614b"></a><!-- doxytag: member="isis::util::FixedVector::binaryOp" ref="a0c2ed6386943b4ee835c93264c5f614b" args="(const TYPE &amp;src) const " -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
-<div class="memtemplate">
-template&lt;typename OP &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::binaryOp </td>
-          <td>(</td>
-          <td class="paramtype">const TYPE &amp;&#160;</td>
-          <td class="paramname"><em>src</em></td><td>)</td>
-          <td> const<code> [inline, protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00064">64</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00312">312</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +371,30 @@ template&lt;typename OP &gt; </div>
 
 <p>Generic operations. </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00059">59</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00060">60</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0c2ed6386943b4ee835c93264c5f614b"></a><!-- doxytag: member="isis::util::FixedVector::binaryOp" ref="a0c2ed6386943b4ee835c93264c5f614b" args="(const TYPE &amp;src) const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename OP &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::binaryOp </td>
+          <td>(</td>
+          <td class="paramtype">const TYPE &amp;&#160;</td>
+          <td class="paramname"><em>src</em></td><td>)</td>
+          <td> const<code> [inline, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00065">65</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,7 +429,7 @@ template&lt;class InputIterator &gt; </div>
 
 <p>copy the elements to somthing designed after the output iterator model </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00285">285</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00296">296</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -433,7 +454,7 @@ template&lt;class OutputIterator &gt; </div>
 
 <p>copy the elements to somthing designed after the output iterator model </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00280">280</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00291">291</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -457,27 +478,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <p>Get the inner product. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><img class="formulaInl" alt="$ \overrightarrow{this} \cdot \overrightarrow{src} = \sum_{i=0}^{SIZE-1} {this_i * src_i} $" src="form_1.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00219">219</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a32866d69e1d987d69ca0fe659f55e87b"></a><!-- doxytag: member="isis::util::FixedVector::end" ref="a32866d69e1d987d69ca0fe659f55e87b" args="()" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a> <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::end </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00300">300</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00220">220</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -497,7 +498,27 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00302">302</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00313">313</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a32866d69e1d987d69ca0fe659f55e87b"></a><!-- doxytag: member="isis::util::FixedVector::end" ref="a32866d69e1d987d69ca0fe659f55e87b" args="()" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a> <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00311">311</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -520,7 +541,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 
 <p>Set all elements to a value. </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00097">97</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00098">98</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -562,7 +583,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if <a class="el" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651" title="Fuzzy comparison between floating point values.">util::fuzzyEqual</a> for all elements </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00171">171</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00172">172</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -582,7 +603,27 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00100">100</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00101">101</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac1d822842d2c1eb97ce04ba3a1988f3e"></a><!-- doxytag: member="isis::util::FixedVector::getBoostVector" ref="ac1d822842d2c1eb97ce04ba3a1988f3e" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt;TYPE, SIZE&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::numeric::ublas::vector&lt;TYPE&gt; <a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector</a>&lt; TYPE, SIZE, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::getBoostVector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00277">277</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +646,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <p>Get the the length of the vector. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><img class="formulaInl" alt="$ \sqrt{\sum_{i=0}^{SIZE-1} this_i^2} $" src="form_3.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00229">229</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00230">230</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -627,7 +668,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if this is lexically less than the given vector (first entry has highest rank) </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00129">129</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00130">130</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -649,7 +690,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if this is lexically less than the given vector (first entry has lowest rank) </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00144">144</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00145">145</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -670,7 +711,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>a negated copy </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00211">211</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00212">212</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -699,7 +740,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <p>If <a class="el" href="classisis_1_1util_1_1FixedVector.html#a754ee91bca9023770d77488b3f291c8d" title="Get the the length of the vector.">len()</a> is equal to zero std::invalid_argument will be thrown, and this wont be changed. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the changed *this </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00241">241</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00242">242</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -721,7 +762,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>false if this is equal to src </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00161">161</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00162">162</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -742,7 +783,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00194">194</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00195">195</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -763,7 +804,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00189">189</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00190">190</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -784,7 +825,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00202">202</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00203">203</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -805,7 +846,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00207">207</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00208">208</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -826,7 +867,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00193">193</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00194">194</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -847,7 +888,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00188">188</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00189">189</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -868,7 +909,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00201">201</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00202">202</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -889,7 +930,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00206">206</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00207">207</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -910,7 +951,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00192">192</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00193">193</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -931,7 +972,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00187">187</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00188">188</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -952,7 +993,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00200">200</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00201">201</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -973,7 +1014,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00205">205</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00206">206</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -994,7 +1035,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00190">190</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00191">191</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1015,7 +1056,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00195">195</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00196">196</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1077,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00208">208</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00209">209</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1057,7 +1098,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00203">203</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00204">204</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1079,7 +1120,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if this is equal to src </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00159">159</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00160">160</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1100,7 +1141,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00116">116</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00117">117</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1121,7 +1162,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00120">120</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00121">121</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1147,7 +1188,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </p>
  </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00254">254</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00255">255</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1170,7 +1211,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 <p>Get the inner product with itself (aka squared length). </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><img class="formulaInl" alt="$ \overrightarrow{this} \cdot \overrightarrow{this} = \sum_{i=0}^{SIZE-1} this_i^2 $" src="form_2.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00224">224</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00225">225</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1196,7 +1237,7 @@ template&lt;typename TYPE, size_t SIZE, typename CONTAINER = _internal::array&lt
 </p>
  </dd></dl>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00267">267</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00268">268</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1218,7 +1259,7 @@ template&lt;typename OP &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00074">74</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00075">75</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1243,7 +1284,7 @@ template&lt;typename charT , typename traits &gt; </div>
 
 <p>write the elements formated to basic_ostream </p>
 
-<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00295">295</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vector_8hpp_source.html#l00306">306</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1292,7 @@ template&lt;typename charT , typename traits &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="vector_8hpp_source.html">vector.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

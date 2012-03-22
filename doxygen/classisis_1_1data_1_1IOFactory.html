@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -60,31 +59,33 @@
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr<br class="typebreak"/>
-&lt; ::<a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a></td></tr>
+&lt; <a class="el" href="classisis_1_1image__io_1_1FileFormat.html">image_io::FileFormat</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce">chunkListToImageList</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &amp;chunks)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make images out of a (unordered) list of chunks.  <a href="#aeb4016ec8b46a0ca884336b4da991cce"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5">getFileFormatList</a> (std::string filename, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all formats which should be able to read/write the given file.  <a href="#a08d036ba67174cfabc170c433b69f1e5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f">getFileFormatList</a> (std::string filename, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all formats which should be able to read/write the given file.  <a href="#a07b407c3480f15d69175ce9a83c30f1f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2">getFormats</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a list of all known file-formats (aka. io-plugins loaded)  <a href="#a52611ba56dfb78eb53125fcacad7f6d2"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734">load</a> (const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a data file with given filename and dialect.  <a href="#a000cf7092de70db16134db5d486f6734"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#ac9bbcf2b4c24ea02139af17b9cb1859a">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a data file with given filename and dialect into a chunklist.  <a href="#ac9bbcf2b4c24ea02139af17b9cb1859a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a96d9dd7beaed58d4f3fd94dfd9de5f7f">load</a> (const std::string &amp;path, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a data file or directory with given filename and dialect.  <a href="#a96d9dd7beaed58d4f3fd94dfd9de5f7f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a9303be1d3dac8782e7ae4415c1ece452">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;path, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a data file with given filename and dialect into a chunklist.  <a href="#a9303be1d3dac8782e7ae4415c1ece452"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62">load</a> (const <a class="el" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;paths, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from a set of files or directories with given paths and dialect.  <a href="#ad3be6d7e942ad0b83a0d982a13360b62"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">setProgressFeedback</a> (boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt; feedback)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aa3ab9130c2f787bbde8d7da56f37a9b6">write</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; images, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aff740043a9bf867991ce39ed12ee8c4f">write</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; images, const std::string &amp;path, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;path, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a> (const std::string &amp;path)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">IOFactory</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">loadFile</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &amp;ret, const boost::filesystem::path &amp;filename, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#ab3176d2de75afc665712eb9fd3cde9df">loadPath</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &amp;ret, const boost::filesystem::path &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a> (const <a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> plugin)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#adcdad6a4d9c693887b0d7c2abf7f2ecb">IOFactory</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">loadFile</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &amp;ret, const boost::filesystem::path &amp;filename, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">loadPath</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &amp;ret, const boost::filesystem::path &amp;path, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override=&quot;&quot;, <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect=&quot;&quot;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a> (const <a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> plugin)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOFactory.html#a0497caa2dc6d4d8ae58b513c2a07e062">get</a> ()</td></tr>
@@ -101,7 +102,7 @@ Protected Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::list&lt;<a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a>&gt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">isis::data::IOFactory::FileFormatList</a></td>
+          <td class="memname">typedef std::list&lt;<a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a>&gt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">isis::data::IOFactory::FileFormatList</a></td>
         </tr>
       </table>
 </div>
@@ -111,12 +112,12 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9a757e6a835f38e1b43a4c92ddd25dfc"></a><!-- doxytag: member="isis::data::IOFactory::FileFormatPtr" ref="a9a757e6a835f38e1b43a4c92ddd25dfc" args="" -->
+<a class="anchor" id="a0aa039248796b66aafe118ee31072590"></a><!-- doxytag: member="isis::data::IOFactory::FileFormatPtr" ref="a0aa039248796b66aafe118ee31072590" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef boost::shared_ptr&lt; ::<a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a>&gt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">isis::data::IOFactory::FileFormatPtr</a></td>
+          <td class="memname">typedef boost::shared_ptr&lt; <a class="el" href="classisis_1_1image__io_1_1FileFormat.html">image_io::FileFormat</a>&gt; <a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">isis::data::IOFactory::FileFormatPtr</a></td>
         </tr>
       </table>
 </div>
@@ -127,12 +128,12 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="adab7c3ade45c59ac221accb9daafef1f"></a><!-- doxytag: member="isis::data::IOFactory::IOFactory" ref="adab7c3ade45c59ac221accb9daafef1f" args="()" -->
+<a class="anchor" id="adcdad6a4d9c693887b0d7c2abf7f2ecb"></a><!-- doxytag: member="isis::data::IOFactory::IOFactory" ref="adcdad6a4d9c693887b0d7c2abf7f2ecb" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">isis::data::IOFactory::IOFactory </td>
+          <td class="memname">API_EXCLUDE_BEGIN _internal API_EXCLUDE_BEGIN isis::data::IOFactory::IOFactory </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [protected]</code></td>
@@ -141,7 +142,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00077">77</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00080">80</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -171,7 +172,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of newly created images consisting off chunks out of the given chunk list. </dd></dl>
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00293">293</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00296">296</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -190,7 +191,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00137">137</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00140">140</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,11 +209,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00208">208</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00211">211</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a08d036ba67174cfabc170c433b69f1e5"></a><!-- doxytag: member="isis::data::IOFactory::getFileFormatList" ref="a08d036ba67174cfabc170c433b69f1e5" args="(std::string filename, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="a07b407c3480f15d69175ce9a83c30f1f"></a><!-- doxytag: member="isis::data::IOFactory::getFileFormatList" ref="a07b407c3480f15d69175ce9a83c30f1f" args="(std::string filename, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -225,13 +226,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -253,7 +254,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00256">256</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00259">259</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -273,11 +274,11 @@ Protected Attributes</h2></td></tr>
 
 <p>Get a list of all known file-formats (aka. io-plugins loaded) </p>
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00423">423</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00434">434</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a000cf7092de70db16134db5d486f6734"></a><!-- doxytag: member="isis::data::IOFactory::load" ref="a000cf7092de70db16134db5d486f6734" args="(const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="a96d9dd7beaed58d4f3fd94dfd9de5f7f"></a><!-- doxytag: member="isis::data::IOFactory::load" ref="a96d9dd7beaed58d4f3fd94dfd9de5f7f" args="(const std::string &amp;path, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -290,13 +291,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -308,23 +309,69 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Load a data file with given filename and dialect. </p>
+<p>Load a data file or directory with given filename and dialect. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">path</td><td>list to store the loaded chunks in </td></tr>
     <tr><td class="paramname">path</td><td>file or directory to load </td></tr>
     <tr><td class="paramname">suffix_override</td><td>override the given suffix with this one (especially if there's no suffix) </td></tr>
     <tr><td class="paramname">dialect</td><td>dialect of the fileformat to load </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>list of chunks (part of an image) </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>list of images created from the loaded data </dd></dl>
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00335">335</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00351">351</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac9bbcf2b4c24ea02139af17b9cb1859a"></a><!-- doxytag: member="isis::data::IOFactory::load" ref="ac9bbcf2b4c24ea02139af17b9cb1859a" args="(std::list&lt; data::Chunk &gt; &amp;chunks, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="ad3be6d7e942ad0b83a0d982a13360b62"></a><!-- doxytag: member="isis::data::IOFactory::load" ref="ad3be6d7e942ad0b83a0d982a13360b62" args="(const util::slist &amp;paths, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> &gt; isis::data::IOFactory::load </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;&#160;</td>
+          <td class="paramname"><em>paths</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
+          <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
+          <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Load data from a set of files or directories with given paths and dialect. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">paths</td><td>list if files or directories to load </td></tr>
+    <tr><td class="paramname">suffix_override</td><td>override the given suffix with this one (especially if there's no suffix) </td></tr>
+    <tr><td class="paramname">dialect</td><td>dialect of the fileformat to load </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>list of images created from the loaded data </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>the images a re created from all loaded files, so loading mutilple files can very well result in only one image </dd></dl>
+
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00338">338</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9303be1d3dac8782e7ae4415c1ece452"></a><!-- doxytag: member="isis::data::IOFactory::load" ref="a9303be1d3dac8782e7ae4415c1ece452" args="(std::list&lt; data::Chunk &gt; &amp;chunks, const std::string &amp;path, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -343,13 +390,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -373,11 +420,11 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>list of chunks (part of an image) </dd></dl>
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00322">322</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00325">325</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac0c799f2a0a6cb31ac78664f3e2710f9"></a><!-- doxytag: member="isis::data::IOFactory::loadFile" ref="ac0c799f2a0a6cb31ac78664f3e2710f9" args="(std::list&lt; Chunk &gt; &amp;ret, const boost::filesystem::path &amp;filename, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="aba182fce9e23d7de63926cf2f3b3bcd9"></a><!-- doxytag: member="isis::data::IOFactory::loadFile" ref="aba182fce9e23d7de63926cf2f3b3bcd9" args="(std::list&lt; Chunk &gt; &amp;ret, const boost::filesystem::path &amp;filename, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -396,13 +443,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -414,11 +461,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00213">213</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00216">216</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab3176d2de75afc665712eb9fd3cde9df"></a><!-- doxytag: member="isis::data::IOFactory::loadPath" ref="ab3176d2de75afc665712eb9fd3cde9df" args="(std::list&lt; Chunk &gt; &amp;ret, const boost::filesystem::path &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="a1c58a724e6088d19d96566c52fed8266"></a><!-- doxytag: member="isis::data::IOFactory::loadPath" ref="a1c58a724e6088d19d96566c52fed8266" args="(std::list&lt; Chunk &gt; &amp;ret, const boost::filesystem::path &amp;path, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -437,13 +484,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -455,7 +502,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00346">346</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00356">356</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -466,7 +513,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool isis::data::IOFactory::registerFileFormat </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a>&#160;</td>
           <td class="paramname"><em>plugin</em></td><td>)</td>
           <td><code> [protected]</code></td>
         </tr>
@@ -474,7 +521,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00121">121</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00124">124</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -493,52 +540,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00414">414</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00425">425</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9272ba797bf39993c3136b16b6dafb5f"></a><!-- doxytag: member="isis::data::IOFactory::write" ref="a9272ba797bf39993c3136b16b6dafb5f" args="(const data::Image &amp;image, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::data::IOFactory::write </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;&#160;</td>
-          <td class="paramname"><em>image</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [static]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00370">370</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa3ab9130c2f787bbde8d7da56f37a9b6"></a><!-- doxytag: member="isis::data::IOFactory::write" ref="aa3ab9130c2f787bbde8d7da56f37a9b6" args="(std::list&lt; data::Image &gt; images, const std::string &amp;path, std::string suffix_override=&quot;&quot;, std::string dialect=&quot;&quot;)" -->
+<a class="anchor" id="aff740043a9bf867991ce39ed12ee8c4f"></a><!-- doxytag: member="isis::data::IOFactory::write" ref="aff740043a9bf867991ce39ed12ee8c4f" args="(std::list&lt; data::Image &gt; images, const std::string &amp;path, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -557,13 +563,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
           <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -575,7 +581,48 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00376">376</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00386">386</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aafdb009cac00eece03fec50de2c9757b"></a><!-- doxytag: member="isis::data::IOFactory::write" ref="aafdb009cac00eece03fec50de2c9757b" args="(const data::Image &amp;image, const std::string &amp;path, util::istring suffix_override=&quot;&quot;, util::istring dialect=&quot;&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOFactory::write </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;&#160;</td>
+          <td class="paramname"><em>image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
+          <td class="paramname"><em>suffix_override</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>&#160;</td>
+          <td class="paramname"><em>dialect</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="io__factory_8cpp_source.html#l00380">380</a> of file <a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +638,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__factory_8hpp_source.html#l00093">93</a> of file <a class="el" href="io__factory_8hpp_source.html">io_factory.hpp</a>.</p>
+<p>Definition at line <a class="el" href="io__factory_8hpp_source.html#l00101">101</a> of file <a class="el" href="io__factory_8hpp_source.html">io_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -600,7 +647,7 @@ Protected Attributes</h2></td></tr>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="io__factory_8cpp_source.html">io_factory.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

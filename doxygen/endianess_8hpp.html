@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -38,7 +37,6 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -47,33 +45,23 @@
 <div class="contents">
 <div class="textblock"><code>#include &lt;boost/type_traits/is_arithmetic.hpp&gt;</code><br/>
 <code>#include &quot;<a class="el" href="types_8hpp_source.html">../CoreUtils/types.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="type_8hpp_source.html">../CoreUtils/type.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="value_8hpp_source.html">../CoreUtils/value.hpp</a>&quot;</code><br/>
 </div>
 <p><a href="endianess_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="nested-classes"></a>
-Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1EndianSwapper.html">isis::data::_internal::EndianSwapper&lt; TYPE, IS_NUM &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01std_1_1list_3_01TYPE_01_4_00_01false_01_4.html">isis::data::_internal::EndianSwapper&lt; std::list&lt; TYPE &gt;, false &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01TYPE_00_01true_01_4.html">isis::data::_internal::EndianSwapper&lt; TYPE, true &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1color_3_01TYPE_01_4_00_01false_01_4.html">isis::data::_internal::EndianSwapper&lt; util::color&lt; TYPE &gt;, false &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1EndianSwapper_3_01util_1_1FixedVector_3_01TYPE_00_01SIZE_01_4_00_01false_01_4.html">isis::data::_internal::EndianSwapper&lt; util::FixedVector&lt; TYPE, SIZE &gt;, false &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1SwapImpl.html">isis::data::_internal::SwapImpl&lt; SIZE &gt;</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1data_1_1__internal_1_1SwapImpl_3_011_01_4.html">isis::data::_internal::SwapImpl&lt; 1 &gt;</a></td></tr>
 <tr><td colspan="2"><h2><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis.html">isis</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html">isis::data</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html">isis::data::_internal</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">isis::data::endianSwap</a> (const T &amp;var)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static _internal T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">isis::data::endianSwap</a> (const T &amp;var)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename ITER , typename TITER &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">isis::data::endianSwapArray</a> (const ITER begin, const ITER end, TITER target)</td></tr>
 </table>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -50,7 +49,7 @@
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<h1>isis::data Namespace Reference<div class="ingroups"><a class="el" href="group__data.html">Data</a></div></h1>  </div>
+<h1>isis::data Namespace Reference</h1>  </div>
 </div>
 <div class="contents">
 <table class="memberdecls">
@@ -76,26 +75,17 @@ Data Structures</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">An <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> which always uses its own memory and a specific type.  <a href="classisis_1_1data_1_1MemImage.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1TypedImage.html">TypedImage</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">An <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> where all chunks are guaranteed to have a specific type.  <a href="classisis_1_1data_1_1TypedImage.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic class for type (and length) - aware pointers.  <a href="classisis_1_1data_1_1ValuePtr.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic class for type (and length) - aware pointers.  <a href="classisis_1_1data_1_1ValueArray.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1ValueArrayBase.html">ValueArrayBase</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for operators used for foreachVoxel.  <a href="classisis_1_1data_1_1VoxelOp.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef DataDebug&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef DataLog&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef std::pair<br class="typebreak"/>
-&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <br class="typebreak"/>
-<a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
-<a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">_internal::ValuePtrBase::Reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a034202f5fd7fbf274481b9c93c59d6ef">ValuePtrReference</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">ValueArrayBase::Reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ae4b511577f1c1ca4e7634252fa486953">ValueArrayReference</a></td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> { <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c">noscale</a>, 
-<a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a>, 
-<a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49ae0f4f5a8a42628127f1b79310c4fd70e">noupscale</a>, 
-<a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a6364d1287e45a24c9c38d5005fb32bd2">upscale</a>
- }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> { <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> =  0, 
 <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4d76e19bcda99794dc317e4dfacb2f3c">columnDim</a>, 
 <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a5ac8c76240726965f794dcedcb675d8e">sliceDim</a>, 
@@ -109,20 +99,25 @@ Enumerations</h2></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename HANDLE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">enableLog</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">enableLog</a> (<a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set logging level for the namespace data.  <a href="#a465a70c53d5fc5a7be8916b70c37df18"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">endianSwap</a> (const T &amp;var)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static _internal T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">endianSwap</a> (const T &amp;var)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename ITER , typename TITER &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">endianSwapArray</a> (const ITER begin, const ITER end, TITER target)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a980af7c2d8ec452f14b3277cd731977f">getCommonSource</a> (const std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; &amp;imgs)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a50a7d38f7a9273fde2fb4861ad3394d7">getCommonSource</a> (std::list&lt; boost::filesystem::path &gt; sources)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a34019fd5d92a7009010034f639182a73">getCommonSource</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;img)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename SRC , typename DST &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; double, double &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84">getNumericScaling</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes scaling and offset between two scalar value domains.  <a href="#a0d2323b3e931946a3fd24d1198ecbd84"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">API_EXCLUDE_BEGIN _internal <br class="typebreak"/>
+API_EXCLUDE_END std::pair<br class="typebreak"/>
+&lt; double, double &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#ae58ab8da6a7852154d52cb8d41ded907">getNumericScaling</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;min, const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;max, autoscaleOption scaleopt=autoscale)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes scaling and offset between two scalar value domains.  <a href="#ae58ab8da6a7852154d52cb8d41ded907"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename SRC , typename DST &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646">numeric_convert</a> (const <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; SRC &gt; &amp;src, <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; DST &gt; &amp;dst, const double scale, const double offset)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts data from 'src' to the type of 'dst' and stores them there.  <a href="#a96dabec5c1bb02cf1f5b8548854e6646"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a0d0adfe5290da024da43cdb9ea8d462d">numeric_convert</a> (const SRC *src, DST *dst, size_t size, const double scale, const double offset)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts data from 'src' to the type of 'dst' and stores them there.  <a href="#a0d0adfe5290da024da43cdb9ea8d462d"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">numeric_copy</a> (const <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt; &amp;src, <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; T &gt; &amp;dst, const double scale, const double offset)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a25ad819c547c2fc39b3a14efb64a99b8">numeric_copy</a> (const T *src, T *dst, size_t size)</td></tr>
 </table>
 <hr/><h2>Typedef Documentation</h2>
 <a class="anchor" id="a1fa5e73edba41053e31839cba7134dbd"></a><!-- doxytag: member="isis::data::Debug" ref="a1fa5e73edba41053e31839cba7134dbd" args="" -->
@@ -136,7 +131,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00071">71</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00067">67</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -151,68 +146,26 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00070">70</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00066">66</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac2873e5e7a9637d4ac68253dcf140ff4"></a><!-- doxytag: member="isis::data::scaling_pair" ref="ac2873e5e7a9637d4ac68253dcf140ff4" args="" -->
+<a class="anchor" id="ae4b511577f1c1ca4e7634252fa486953"></a><!-- doxytag: member="isis::data::ValueArrayReference" ref="ae4b511577f1c1ca4e7634252fa486953" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::pair&lt;<a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>&gt; <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">isis::data::scaling_pair</a></td>
+          <td class="memname">typedef <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">ValueArrayBase::Reference</a> <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">isis::data::ValueArrayReference</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="typeptr__converter_8hpp_source.html#l00033">33</a> of file <a class="el" href="typeptr__converter_8hpp_source.html">typeptr_converter.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a034202f5fd7fbf274481b9c93c59d6ef"></a><!-- doxytag: member="isis::data::ValuePtrReference" ref="a034202f5fd7fbf274481b9c93c59d6ef" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">_internal::ValuePtrBase::Reference</a> <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">isis::data::ValuePtrReference</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="typeptr__base_8hpp_source.html#l00364">364</a> of file <a class="el" href="typeptr__base_8hpp_source.html">typeptr_base.hpp</a>.</p>
+<p>Definition at line <a class="el" href="valuearray__base_8hpp_source.html#l00372">372</a> of file <a class="el" href="valuearray__base_8hpp_source.html">valuearray_base.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Enumeration Type Documentation</h2>
-<a class="anchor" id="a69354ef53dcb79cbe577ae5fe8764e49"></a><!-- doxytag: member="isis::data::autoscaleOption" ref="a69354ef53dcb79cbe577ae5fe8764e49" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">isis::data::autoscaleOption</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c"></a><!-- doxytag: member="noscale" ref="a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c" args="" -->noscale</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f"></a><!-- doxytag: member="autoscale" ref="a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f" args="" -->autoscale</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a69354ef53dcb79cbe577ae5fe8764e49ae0f4f5a8a42628127f1b79310c4fd70e"></a><!-- doxytag: member="noupscale" ref="a69354ef53dcb79cbe577ae5fe8764e49ae0f4f5a8a42628127f1b79310c4fd70e" args="" -->noupscale</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a69354ef53dcb79cbe577ae5fe8764e49a6364d1287e45a24c9c38d5005fb32bd2"></a><!-- doxytag: member="upscale" ref="a69354ef53dcb79cbe577ae5fe8764e49a6364d1287e45a24c9c38d5005fb32bd2" args="" -->upscale</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dd>
-</dl>
-
-<p>Definition at line <a class="el" href="typeptr__converter_8hpp_source.html#l00032">32</a> of file <a class="el" href="typeptr__converter_8hpp_source.html">typeptr_converter.hpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a157a8a81ce7fb08f84af9c27b7d251a3"></a><!-- doxytag: member="isis::data::dimensions" ref="a157a8a81ce7fb08f84af9c27b7d251a3" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -236,7 +189,7 @@ Functions</h2></td></tr>
 </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00072">72</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00068">68</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +216,7 @@ Functions</h2></td></tr>
 </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00073">73</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00069">69</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,18 +241,18 @@ template&lt;typename HANDLE &gt; </div>
 <p>Set logging level for the namespace data. </p>
 <p>This logging level will be used for every LOG(Debug,...) and LOG(Runtime,...) within the data namespace. This is affected by by the _ENABLE_LOG and _ENABLE_DEBUG settings of the current compile and won't have an effect on the Debug or Runtime logging if the corresponding define is set to "0". So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1", you won't be able to change the logging level of the debug messages of these library. </p>
 
-<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00083">83</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
+<p>Definition at line <a class="el" href="DataStorage_2common_8hpp_source.html#l00079">79</a> of file <a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a649709edd7e060b1335e840f5a1ba639"></a><!-- doxytag: member="isis::data::endianSwap" ref="a649709edd7e060b1335e840f5a1ba639" args="(const T &amp;var)" -->
+<a class="anchor" id="a07f5fa3b0e0209640522db3443abf496"></a><!-- doxytag: member="isis::data::endianSwap" ref="a07f5fa3b0e0209640522db3443abf496" args="(const T &amp;var)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">static T isis::data::endianSwap </td>
+          <td class="memname">static _internal T isis::data::endianSwap </td>
           <td>(</td>
           <td class="paramtype">const T &amp;&#160;</td>
           <td class="paramname"><em>var</em></td><td>)</td>
@@ -350,22 +303,79 @@ template&lt;typename ITER , typename TITER &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0d2323b3e931946a3fd24d1198ecbd84"></a><!-- doxytag: member="isis::data::getNumericScaling" ref="a0d2323b3e931946a3fd24d1198ecbd84" args="(const util::_internal::ValueBase &amp;min, const util::_internal::ValueBase &amp;max, autoscaleOption scaleopt=autoscale)" -->
+<a class="anchor" id="a980af7c2d8ec452f14b3277cd731977f"></a><!-- doxytag: member="isis::data::getCommonSource" ref="a980af7c2d8ec452f14b3277cd731977f" args="(const std::list&lt; data::Image &gt; &amp;imgs)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path isis::data::getCommonSource </td>
+          <td>(</td>
+          <td class="paramtype">const std::list&lt; data::Image &gt; &amp;&#160;</td>
+          <td class="paramname"><em>imgs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="DataStorage_2common_8cpp_source.html#l00158">158</a> of file <a class="el" href="DataStorage_2common_8cpp_source.html">common.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a50a7d38f7a9273fde2fb4861ad3394d7"></a><!-- doxytag: member="isis::data::getCommonSource" ref="a50a7d38f7a9273fde2fb4861ad3394d7" args="(std::list&lt; boost::filesystem::path &gt; sources)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path isis::data::getCommonSource </td>
+          <td>(</td>
+          <td class="paramtype">std::list&lt; boost::filesystem::path &gt;&#160;</td>
+          <td class="paramname"><em>sources</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="DataStorage_2common_8cpp_source.html#l00143">143</a> of file <a class="el" href="DataStorage_2common_8cpp_source.html">common.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a34019fd5d92a7009010034f639182a73"></a><!-- doxytag: member="isis::data::getCommonSource" ref="a34019fd5d92a7009010034f639182a73" args="(const data::Image &amp;img)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path isis::data::getCommonSource </td>
+          <td>(</td>
+          <td class="paramtype">const data::Image &amp;&#160;</td>
+          <td class="paramname"><em>img</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="DataStorage_2common_8cpp_source.html#l00173">173</a> of file <a class="el" href="DataStorage_2common_8cpp_source.html">common.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae58ab8da6a7852154d52cb8d41ded907"></a><!-- doxytag: member="isis::data::getNumericScaling" ref="ae58ab8da6a7852154d52cb8d41ded907" args="(const util::ValueBase &amp;min, const util::ValueBase &amp;max, autoscaleOption scaleopt=autoscale)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename SRC , typename DST &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;double, double&gt; isis::data::getNumericScaling </td>
+          <td class="memname">API_EXCLUDE_BEGIN _internal API_EXCLUDE_END std::pair&lt;double, double&gt; isis::data::getNumericScaling </td>
           <td>(</td>
-          <td class="paramtype">const util::_internal::ValueBase &amp;&#160;</td>
+          <td class="paramtype">const util::ValueBase &amp;&#160;</td>
           <td class="paramname"><em>min</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const util::_internal::ValueBase &amp;&#160;</td>
+          <td class="paramtype">const util::ValueBase &amp;&#160;</td>
           <td class="paramname"><em>max</em>, </td>
         </tr>
         <tr>
@@ -405,11 +415,11 @@ template&lt;typename SRC , typename DST &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00215">215</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00216">216</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a96dabec5c1bb02cf1f5b8548854e6646"></a><!-- doxytag: member="isis::data::numeric_convert" ref="a96dabec5c1bb02cf1f5b8548854e6646" args="(const ValuePtr&lt; SRC &gt; &amp;src, ValuePtr&lt; DST &gt; &amp;dst, const double scale, const double offset)" -->
+<a class="anchor" id="a0d0adfe5290da024da43cdb9ea8d462d"></a><!-- doxytag: member="isis::data::numeric_convert" ref="a0d0adfe5290da024da43cdb9ea8d462d" args="(const SRC *src, DST *dst, size_t size, const double scale, const double offset)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -418,14 +428,20 @@ template&lt;typename SRC , typename DST &gt; </div>
         <tr>
           <td class="memname">void isis::data::numeric_convert </td>
           <td>(</td>
-          <td class="paramtype">const ValuePtr&lt; SRC &gt; &amp;&#160;</td>
+          <td class="paramtype">const SRC *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ValuePtr&lt; DST &gt; &amp;&#160;</td>
+          <td class="paramtype">DST *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -458,6 +474,7 @@ template&lt;typename SRC , typename DST &gt; </div>
   <table class="params">
     <tr><td class="paramname">src</td><td>data to be converted </td></tr>
     <tr><td class="paramname">dst</td><td>target where to convert src to </td></tr>
+    <tr><td class="paramname">size</td><td>the amount of elements to be converted </td></tr>
     <tr><td class="paramname">scale</td><td>the scaling factor </td></tr>
     <tr><td class="paramname">offset</td><td>the offset </td></tr>
   </table>
@@ -466,11 +483,11 @@ template&lt;typename SRC , typename DST &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00296">296</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00294">294</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a79e9fc5312bde6344ddd372ced767385"></a><!-- doxytag: member="isis::data::numeric_copy" ref="a79e9fc5312bde6344ddd372ced767385" args="(const ValuePtr&lt; T &gt; &amp;src, ValuePtr&lt; T &gt; &amp;dst, const double scale, const double offset)" -->
+<a class="anchor" id="a25ad819c547c2fc39b3a14efb64a99b8"></a><!-- doxytag: member="isis::data::numeric_copy" ref="a25ad819c547c2fc39b3a14efb64a99b8" args="(const T *src, T *dst, size_t size)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -479,26 +496,20 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname">void isis::data::numeric_copy </td>
           <td>(</td>
-          <td class="paramtype">const ValuePtr&lt; T &gt; &amp;&#160;</td>
+          <td class="paramtype">const T *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ValuePtr&lt; T &gt; &amp;&#160;</td>
+          <td class="paramtype">T *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>scale</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>offset</em>&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -509,12 +520,12 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00305">305</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="numeric__convert_8hpp_source.html#l00301">301</a> of file <a class="el" href="numeric__convert_8hpp_source.html">numeric_convert.hpp</a>.</p>
 
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

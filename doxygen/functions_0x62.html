@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -49,7 +48,8 @@
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
-      <li><a href="functions.html#index_a"><span>a</span></a></li>
+      <li><a href="functions.html#index__"><span>_</span></a></li>
+      <li><a href="functions_0x61.html#index_a"><span>a</span></a></li>
       <li class="current"><a href="functions_0x62.html#index_b"><span>b</span></a></li>
       <li><a href="functions_0x63.html#index_c"><span>c</span></a></li>
       <li><a href="functions_0x64.html#index_d"><span>d</span></a></li>
@@ -83,19 +83,19 @@
 : <a class="el" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">isis::util::color&lt; T &gt;</a>
 </li>
 <li>begin()
-: <a class="el" href="classisis_1_1util_1_1__internal_1_1array.html#a25faf6a5300972b62308f120d614ff98">isis::util::_internal::array&lt; TYPE, SIZE &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1Image.html#abf0729737cf6906a0aa6c1e830c0d728">isis::data::Image</a>
-, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a45544ddaa43859139b25f28f107aa521">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">isis::data::TypedImage&lt; T &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1__internal_1_1array.html#a5cae8a6b0fe05c69cb21ff4833251b34">isis::util::_internal::array&lt; TYPE, SIZE &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1FixedVector.html#a95d5626919b24bc60fe25917179af216">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">isis::data::Chunk</a>
-, <a class="el" href="classisis_1_1data_1_1ValuePtr.html#ac7878f9b214a6f7c2efe35c6469d1ca9">isis::data::ValuePtr&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">isis::data::TypedImage&lt; T &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1Chunk.html#a07d458a2703945cbe76fe4bded7fd333">isis::data::Chunk</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArray.html#acf527fc5f2e1678f0c336889eccc5911">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a45544ddaa43859139b25f28f107aa521">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1Image.html#abf0729737cf6906a0aa6c1e830c0d728">isis::data::Image</a>
 </li>
 <li>beginGeneric()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a7e9ec0485153f4def57a6ea9791e0126">isis::data::_internal::ValuePtrBase</a>
-, <a class="el" href="classisis_1_1data_1_1ValuePtr.html#aab609293f04f7e642cdcb1fdee7f7341">isis::data::ValuePtr&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArray.html#af8f6aeaa9635257edb5d064c2a599bce">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#add26158225fd5d5b6b1ba1482327b866">isis::data::ValueArrayBase</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArray.html#a018e092d2a797b2411d8dd54cab3a3cc">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#af4f4dc8d05c774eed5f0f7f0b69c04d3">isis::data::ValueArrayBase</a>
 </li>
 <li>binaryOp()
 : <a class="el" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
@@ -110,15 +110,12 @@
 : <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a7d0ac1e2070a996c40b57db1ab2dc93e">isis::util::PropertyMap</a>
 </li>
 <li>bytesPerElem()
-: <a class="el" href="classisis_1_1data_1_1ValuePtr.html#ab8384c8cbb5f61685beb00d5f68ff7a3">isis::data::ValuePtr&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#af2699cc78c91ebc74e724dfeaff6407b">isis::data::_internal::ValuePtrBase</a>
-</li>
-<li>bytesPerVoxel()
-: <a class="el" href="classisis_1_1data_1_1Chunk.html#ab29816f5d460bf0b903e3e3bb2e79066">isis::data::Chunk</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a69ce77d19d3bf3e25c6e38e656c4ad21">isis::data::ValueArrayBase</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArray.html#a479663bad612777af5d1411b40b67470">isis::data::ValueArray&lt; TYPE &gt;</a>
 </li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -53,26 +52,27 @@
 <a name="l00011"></a>00011 <span class="comment"> * see PropertyObject::sufficient()</span>
 <a name="l00012"></a>00012 <span class="comment"> */</span>
 <a name="l00013"></a>00013 
-<a name="l00014"></a>00014 <span class="comment">// Stuff needed for every Chunk</span>
-<a name="l00015"></a>00015 <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#af74b3cb30cbca0f4e19bb246415520ce">isis::data::_internal::ChunkBase::neededProperties</a> = <span class="stringliteral">&quot;\</span>
-<a name="l00016"></a>00016 <span class="stringliteral">    indexOrigin\</span>
-<a name="l00017"></a>00017 <span class="stringliteral">    acquisitionNumber\</span>
-<a name="l00018"></a>00018 <span class="stringliteral">    voxelSize\</span>
-<a name="l00019"></a>00019 <span class="stringliteral">    rowVec\</span>
-<a name="l00020"></a>00020 <span class="stringliteral">    columnVec\</span>
-<a name="l00021"></a>00021 <span class="stringliteral">&quot;</span>;
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="comment">// Stuff needed for any Image</span>
-<a name="l00024"></a>00024 <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1Image.html#a8f9c4e537ac029bc07d10ded62d0be32">isis::data::Image::neededProperties</a> = <span class="stringliteral">&quot;\</span>
-<a name="l00025"></a>00025 <span class="stringliteral">    voxelSize\</span>
-<a name="l00026"></a>00026 <span class="stringliteral">    rowVec\</span>
-<a name="l00027"></a>00027 <span class="stringliteral">    columnVec\</span>
-<a name="l00028"></a>00028 <span class="stringliteral">    sliceVec\</span>
-<a name="l00029"></a>00029 <span class="stringliteral">&quot;</span>;
-<a name="l00030"></a>00030 
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016 <span class="comment">// Stuff needed for every Chunk</span>
+<a name="l00017"></a>00017 <span class="keyword">const</span> <span class="keywordtype">char</span> *isis::data::_internal::ChunkBase::neededProperties = <span class="stringliteral">&quot;\</span>
+<a name="l00018"></a>00018 <span class="stringliteral">    indexOrigin\</span>
+<a name="l00019"></a>00019 <span class="stringliteral">    acquisitionNumber\</span>
+<a name="l00020"></a>00020 <span class="stringliteral">    voxelSize\</span>
+<a name="l00021"></a>00021 <span class="stringliteral">    rowVec\</span>
+<a name="l00022"></a>00022 <span class="stringliteral">    columnVec\</span>
+<a name="l00023"></a>00023 <span class="stringliteral">&quot;</span>;
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025 <span class="comment">// Stuff needed for any Image</span>
+<a name="l00026"></a>00026 <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">isis::data::Image::neededProperties</a> = <span class="stringliteral">&quot;\</span>
+<a name="l00027"></a>00027 <span class="stringliteral">    voxelSize\</span>
+<a name="l00028"></a>00028 <span class="stringliteral">    rowVec\</span>
+<a name="l00029"></a>00029 <span class="stringliteral">    columnVec\</span>
+<a name="l00030"></a>00030 <span class="stringliteral">    sliceVec\</span>
+<a name="l00031"></a>00031 <span class="stringliteral">&quot;</span>;
+<a name="l00032"></a>00032 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

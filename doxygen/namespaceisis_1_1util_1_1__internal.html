@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -45,8 +44,7 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#nested-classes">Data Structures</a>  </div>
   <div class="headertitle">
 <h1>isis::util::_internal Namespace Reference</h1>  </div>
 </div>
@@ -54,99 +52,12 @@
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1array.html">array</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">GenericReference</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class to store and handle references to <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> and ValueArray objects.  <a href="classisis_1_1util_1_1__internal_1_1GenericReference.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html">GenericValue</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1__internal_1_1ichar__traits.html">ichar_traits</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">ValueBase</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueConverterBase.html">ValueConverterBase</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueConverterMap.html">ValueConverterMap</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">ValueReference</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class to store and handle references to <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> and ValuePtr objects.  <a href="classisis_1_1util_1_1__internal_1_1ValueReference.html#_details">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename ForwardIterator , typename T , typename CMP &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util_1_1__internal.html#a5c859e6a9ce845922f481cc5da3b3e40">continousFind</a> (ForwardIterator &amp;current, const ForwardIterator end, const T &amp;compare, CMP compOp)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Continously searches in a sorted list using the given less-than comparison.  <a href="#a5c859e6a9ce845922f481cc5da3b3e40"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1util_1_1__internal.html#a0c30f550c7105a9b870db3692bce1b19">logLevelNames</a> (<a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 </table>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="a5c859e6a9ce845922f481cc5da3b3e40"></a><!-- doxytag: member="isis::util::_internal::continousFind" ref="a5c859e6a9ce845922f481cc5da3b3e40" args="(ForwardIterator &amp;current, const ForwardIterator end, const T &amp;compare, CMP compOp)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename ForwardIterator , typename T , typename CMP &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::util::_internal::continousFind </td>
-          <td>(</td>
-          <td class="paramtype">ForwardIterator &amp;&#160;</td>
-          <td class="paramname"><em>current</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const ForwardIterator&#160;</td>
-          <td class="paramname"><em>end</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>compare</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">CMP&#160;</td>
-          <td class="paramname"><em>compOp</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>Continously searches in a sorted list using the given less-than comparison. </p>
-<p>It starts at current and increments it until the referenced value is not less than the compare-value anymore. Than it returns. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">current</td><td>the current-position-iterator for the sorted list. This value is changed directly, so after the function returns is references the first entry of the list which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end. </td></tr>
-    <tr><td class="paramname">end</td><td>the end of the list </td></tr>
-    <tr><td class="paramname">compare</td><td>the compare-value </td></tr>
-    <tr><td class="paramname">compOp</td><td>the comparison functor. It must provide "bool operator()(T,T)". </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true if the value current currently refers to is equal to compare </dd></dl>
-
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00036">36</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0c30f550c7105a9b870db3692bce1b19"></a><!-- doxytag: member="isis::util::_internal::logLevelNames" ref="a0c30f550c7105a9b870db3692bce1b19" args="(LogLevel level)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* isis::util::_internal::logLevelNames </td>
-          <td>(</td>
-          <td class="paramtype">LogLevel&#160;</td>
-          <td class="paramname"><em>level</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="message_8cpp_source.html#l00029">29</a> of file <a class="el" href="message_8cpp_source.html">message.cpp</a>.</p>
-
-</div>
-</div>
-</div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

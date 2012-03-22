@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -64,253 +63,253 @@
 <a name="l00022"></a>00022 <span class="preprocessor"></span>
 <a name="l00023"></a>00023 <span class="preprocessor">#include &quot;<a class="code" href="sortedchunklist_8hpp.html">sortedchunklist.hpp</a>&quot;</span>
 <a name="l00024"></a>00024 
-<a name="l00025"></a>00025 <span class="keyword">namespace </span>isis
-<a name="l00026"></a>00026 {
-<a name="l00027"></a>00027 <span class="keyword">namespace </span>data
-<a name="l00028"></a>00028 {
-<a name="l00029"></a>00029 <span class="keyword">namespace </span>_internal
-<a name="l00030"></a>00030 {
-<a name="l00031"></a>00031 
-<a name="l00033"></a>00033 <span class="comment">// sorting algorithm implementation</span>
-<a name="l00035"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">00035</a> <span class="comment"></span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">SortedChunkList::scalarPropCompare::scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name ): propertyName( prop_name ) {}
-<a name="l00036"></a>00036 
-<a name="l00037"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">00037</a> <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">SortedChunkList::posCompare::operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;posA, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;posB )<span class="keyword"> const</span>
-<a name="l00038"></a>00038 <span class="keyword"></span>{
-<a name="l00039"></a>00039     <span class="keywordflow">if</span> ( posA.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a450ce5ffbd45c0782c750a9d0a55925f">lexical_less_reverse</a>( posB ) ) { <span class="comment">//if chunk is &quot;under&quot; the other - put it there</span>
-<a name="l00040"></a>00040         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Successfully sorted chunks by in-image position (&quot;</span> &lt;&lt; posA &lt;&lt; <span class="stringliteral">&quot; below &quot;</span> &lt;&lt; posB &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00041"></a>00041         <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00042"></a>00042     }
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00045"></a>00045 }
-<a name="l00046"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a26ffc959c82f67ee9c4a33e988fcf645">00046</a> <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a26ffc959c82f67ee9c4a33e988fcf645">SortedChunkList::scalarPropCompare::operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">isis::util::PropertyValue</a> &amp;a, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">isis::util::PropertyValue</a> &amp;b )<span class="keyword"> const</span>
-<a name="l00047"></a>00047 <span class="keyword"></span>{
-<a name="l00048"></a>00048     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;aScal = *a;
-<a name="l00049"></a>00049     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;bScal = *b;
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051     <span class="keywordflow">if</span> ( aScal.<a class="code" href="group__util.html#ga22e05eca804180d2d79959bb70cac634">lt</a>( bScal ) ) {
-<a name="l00052"></a>00052         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Successfully sorted chunks by &quot;</span> &lt;&lt; propertyName &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; aScal.<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#a54e2a61ebef7a0b7c07cd6e579c5f64a">toString</a>( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; before &quot;</span> &lt;&lt; bScal.<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#a54e2a61ebef7a0b7c07cd6e579c5f64a">toString</a>( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00053"></a>00053         <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00054"></a>00054     } <span class="keywordflow">else</span>
-<a name="l00055"></a>00055         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00056"></a>00056 }
-<a name="l00057"></a>00057 
-<a name="l00059"></a>00059 <span class="comment">// Chunk operators</span>
-<a name="l00061"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html#a0b36f828fbf3b2384c3a297b0f83fde5">00061</a> <span class="comment"></span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html#a0b36f828fbf3b2384c3a297b0f83fde5">SortedChunkList::chunkPtrOperator::~chunkPtrOperator</a>() {}
-<a name="l00062"></a>00062 
+<a name="l00026"></a>00026 <span class="keyword">namespace </span>isis
+<a name="l00027"></a>00027 {
+<a name="l00028"></a>00028 <span class="keyword">namespace </span>data
+<a name="l00029"></a>00029 {
+<a name="l00030"></a>00030 <span class="keyword">namespace </span>_internal
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032 
+<a name="l00034"></a>00034 <span class="comment">// sorting algorithm implementation</span>
+<a name="l00036"></a>00036 <span class="comment"></span>SortedChunkList::scalarPropCompare::scalarPropCompare( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name ): propertyName( prop_name ) {}
+<a name="l00037"></a>00037 
+<a name="l00038"></a>00038 <span class="keywordtype">bool</span> SortedChunkList::posCompare::operator()( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;posA, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;posB )<span class="keyword"> const</span>
+<a name="l00039"></a>00039 <span class="keyword"></span>{
+<a name="l00040"></a>00040     <span class="keywordflow">if</span> ( posA.lexical_less_reverse( posB ) ) { <span class="comment">//if chunk is &quot;under&quot; the other - put it there</span>
+<a name="l00041"></a>00041         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Successfully sorted chunks by in-image position (&quot;</span> &lt;&lt; posA &lt;&lt; <span class="stringliteral">&quot; below &quot;</span> &lt;&lt; posB &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00042"></a>00042         <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00043"></a>00043     }
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 <span class="keywordtype">bool</span> SortedChunkList::scalarPropCompare::operator()( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">isis::util::PropertyValue</a> &amp;a, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">isis::util::PropertyValue</a> &amp;b )<span class="keyword"> const</span>
+<a name="l00048"></a>00048 <span class="keyword"></span>{
+<a name="l00049"></a>00049     <span class="keyword">const</span> util::ValueBase &amp;aScal = *a;
+<a name="l00050"></a>00050     <span class="keyword">const</span> util::ValueBase &amp;bScal = *b;
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052     <span class="keywordflow">if</span> ( aScal.lt( bScal ) ) {
+<a name="l00053"></a>00053         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Successfully sorted chunks by &quot;</span> &lt;&lt; propertyName &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; aScal.toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; before &quot;</span> &lt;&lt; bScal.toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00054"></a>00054         <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00055"></a>00055     } <span class="keywordflow">else</span>
+<a name="l00056"></a>00056         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 
+<a name="l00060"></a>00060 <span class="comment">// Chunk operators</span>
+<a name="l00062"></a>00062 <span class="comment"></span>SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 <a name="l00063"></a>00063 
-<a name="l00065"></a>00065 <span class="comment">// SortedChunkList implementation</span>
-<a name="l00067"></a>00067 <span class="comment"></span>
-<a name="l00068"></a>00068 <span class="comment">// constructor</span>
-<a name="l00069"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a">00069</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList::SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props ):
-<a name="l00070"></a>00070     equalProps( util::<a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>&lt;util::PropertyMap::KeyType&gt;( comma_separated_equal_props, <span class="stringliteral">&#39;,&#39;</span> ) )
-<a name="l00071"></a>00071 {}
-<a name="l00072"></a>00072 
+<a name="l00064"></a>00064 
+<a name="l00066"></a>00066 <span class="comment">// SortedChunkList implementation</span>
+<a name="l00068"></a>00068 <span class="comment"></span>
+<a name="l00069"></a>00069 <span class="comment">// constructor</span>
+<a name="l00070"></a>00070 SortedChunkList::SortedChunkList( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props ):
+<a name="l00071"></a>00071     equalProps( util::<a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>&lt;util::PropertyMap::KeyType&gt;( comma_separated_equal_props, <span class="stringliteral">&#39;,&#39;</span> ) )
+<a name="l00072"></a>00072 {}
 <a name="l00073"></a>00073 
-<a name="l00074"></a>00074 <span class="comment">// low level finding</span>
-<a name="l00075"></a>00075 boost::shared_ptr&lt;Chunk&gt; SortedChunkList::secondaryFind( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;key, SortedChunkList::SecondaryMap &amp;map )
-<a name="l00076"></a>00076 {
-<a name="l00077"></a>00077     <span class="keyword">const</span> SecondaryMap::iterator found = map.find( key );
-<a name="l00078"></a>00078     <span class="keywordflow">return</span> found != map.end() ? found-&gt;second : boost::shared_ptr&lt;Chunk&gt;();
-<a name="l00079"></a>00079 }
-<a name="l00080"></a>00080 SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;key )
-<a name="l00081"></a>00081 {
-<a name="l00082"></a>00082     <span class="keyword">const</span> PrimaryMap::iterator found = chunks.find( key );
-<a name="l00083"></a>00083     <span class="keywordflow">return</span> found != chunks.end() ? &amp;found-&gt;second : NULL;
-<a name="l00084"></a>00084 }
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 <span class="comment">// low level insert</span>
-<a name="l00087"></a>00087 std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; SortedChunkList::secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> Chunk &amp;ch )
-<a name="l00088"></a>00088 {
-<a name="l00089"></a>00089     <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> propName = map.key_comp().propertyName;
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091     <span class="keywordflow">if</span>( ch.hasProperty( propName ) ) {
-<a name="l00092"></a>00092         <span class="comment">//check, if there is already a chunk</span>
-<a name="l00093"></a>00093         boost::shared_ptr&lt;Chunk&gt; &amp;pos = map[ch.propertyValue( propName )];
-<a name="l00094"></a>00094         <span class="keywordtype">bool</span> inserted = <span class="keyword">false</span>;
-<a name="l00095"></a>00095 
-<a name="l00096"></a>00096         <span class="comment">//if not. put oures there</span>
-<a name="l00097"></a>00097         <span class="keywordflow">if</span>( !pos ) {
-<a name="l00098"></a>00098             pos.reset( <span class="keyword">new</span> Chunk( ch ) );
-<a name="l00099"></a>00099             inserted = <span class="keyword">true</span>;
-<a name="l00100"></a>00100         }
-<a name="l00101"></a>00101 
-<a name="l00102"></a>00102         assert( pos ); <span class="comment">// here it must have some content</span>
-<a name="l00103"></a>00103         <span class="keywordflow">return</span> std::make_pair( pos, inserted );
-<a name="l00104"></a>00104     } <span class="keywordflow">else</span> {
-<a name="l00105"></a>00105         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot insert chunk. It&#39;s lacking the property &quot;</span> &lt;&lt; util::MSubject( propName ) &lt;&lt; <span class="stringliteral">&quot; which is needed for primary sorting&quot;</span>;
-<a name="l00106"></a>00106         <span class="keywordflow">return</span> std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt;( boost::shared_ptr&lt;Chunk&gt;(), <span class="keyword">false</span> );
-<a name="l00107"></a>00107     }
-<a name="l00108"></a>00108 }
-<a name="l00109"></a>00109 std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; SortedChunkList::primaryInsert( <span class="keyword">const</span> Chunk &amp;ch )
-<a name="l00110"></a>00110 {
-<a name="l00111"></a>00111     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( secondarySort.empty(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;There is no known secondary sorting left. Chunksort will fail.&quot;</span>;
-<a name="l00112"></a>00112     assert( ch.isValid() );
-<a name="l00113"></a>00113     <span class="comment">// compute the position of the chunk in the image space</span>
-<a name="l00114"></a>00114     <span class="comment">// we dont have this position, but we have the position in scanner-space (indexOrigin)</span>
-<a name="l00115"></a>00115     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;origin = ch.propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> )-&gt;castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
-<a name="l00116"></a>00116     <span class="comment">// and we have the transformation matrix</span>
-<a name="l00117"></a>00117     <span class="comment">// [ rowVec ]</span>
-<a name="l00118"></a>00118     <span class="comment">// [ columnVec]</span>
-<a name="l00119"></a>00119     <span class="comment">// [ sliceVec]</span>
-<a name="l00120"></a>00120     <span class="comment">// [ 0 0 0 1 ]</span>
-<a name="l00121"></a>00121     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;rowVec = ch.propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> )-&gt;castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
-<a name="l00122"></a>00122     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;columnVec = ch.propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> )-&gt;castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
-<a name="l00123"></a>00123     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> sliceVec = ch.hasProperty( <span class="stringliteral">&quot;sliceVec&quot;</span> ) ?
-<a name="l00124"></a>00124                                     ch.propertyValue( <span class="stringliteral">&quot;sliceVec&quot;</span> )-&gt;castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;() :
-<a name="l00125"></a>00125                                     <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>(
-<a name="l00126"></a>00126                                         rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
-<a name="l00127"></a>00127                                         rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
-<a name="l00128"></a>00128                                         rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-<a name="l00129"></a>00129                                     );
-<a name="l00130"></a>00130 
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 <span class="comment">// low level finding</span>
+<a name="l00076"></a>00076 boost::shared_ptr&lt;Chunk&gt; SortedChunkList::secondaryFind( <span class="keyword">const</span> util::PropertyValue &amp;key, SortedChunkList::SecondaryMap &amp;map )
+<a name="l00077"></a>00077 {
+<a name="l00078"></a>00078     <span class="keyword">const</span> SecondaryMap::iterator found = map.find( key );
+<a name="l00079"></a>00079     <span class="keywordflow">return</span> found != map.end() ? found-&gt;second : boost::shared_ptr&lt;Chunk&gt;();
+<a name="l00080"></a>00080 }
+<a name="l00081"></a>00081 SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;key )
+<a name="l00082"></a>00082 {
+<a name="l00083"></a>00083     <span class="keyword">const</span> PrimaryMap::iterator found = chunks.find( key );
+<a name="l00084"></a>00084     <span class="keywordflow">return</span> found != chunks.end() ? &amp;found-&gt;second : NULL;
+<a name="l00085"></a>00085 }
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087 <span class="comment">// low level insert</span>
+<a name="l00088"></a>00088 std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; SortedChunkList::secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> Chunk &amp;ch )
+<a name="l00089"></a>00089 {
+<a name="l00090"></a>00090     <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> propName = map.key_comp().propertyName;
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092     <span class="keywordflow">if</span>( ch.hasProperty( propName ) ) {
+<a name="l00093"></a>00093         <span class="comment">//check, if there is already a chunk</span>
+<a name="l00094"></a>00094         boost::shared_ptr&lt;Chunk&gt; &amp;pos = map[ch.propertyValue( propName )];
+<a name="l00095"></a>00095         <span class="keywordtype">bool</span> inserted = <span class="keyword">false</span>;
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097         <span class="comment">//if not. put oures there</span>
+<a name="l00098"></a>00098         <span class="keywordflow">if</span>( !pos ) {
+<a name="l00099"></a>00099             pos.reset( <span class="keyword">new</span> Chunk( ch ) );
+<a name="l00100"></a>00100             inserted = <span class="keyword">true</span>;
+<a name="l00101"></a>00101         }
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103         assert( pos ); <span class="comment">// here it must have some content</span>
+<a name="l00104"></a>00104         <span class="keywordflow">return</span> std::make_pair( pos, inserted );
+<a name="l00105"></a>00105     } <span class="keywordflow">else</span> {
+<a name="l00106"></a>00106         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot insert chunk. It&#39;s lacking the property &quot;</span> &lt;&lt; util::MSubject( propName ) &lt;&lt; <span class="stringliteral">&quot; which is needed for primary sorting&quot;</span>;
+<a name="l00107"></a>00107         <span class="keywordflow">return</span> std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt;( boost::shared_ptr&lt;Chunk&gt;(), <span class="keyword">false</span> );
+<a name="l00108"></a>00108     }
+<a name="l00109"></a>00109 }
+<a name="l00110"></a>00110 std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; SortedChunkList::primaryInsert( <span class="keyword">const</span> Chunk &amp;ch )
+<a name="l00111"></a>00111 {
+<a name="l00112"></a>00112     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( secondarySort.empty(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;There is no known secondary sorting left. Chunksort will fail.&quot;</span>;
+<a name="l00113"></a>00113     assert( ch.isValid() );
+<a name="l00114"></a>00114     <span class="comment">// compute the position of the chunk in the image space</span>
+<a name="l00115"></a>00115     <span class="comment">// we dont have this position, but we have the position in scanner-space (indexOrigin)</span>
+<a name="l00116"></a>00116     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;origin = ch.propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> ).castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
+<a name="l00117"></a>00117     <span class="comment">// and we have the transformation matrix</span>
+<a name="l00118"></a>00118     <span class="comment">// [ rowVec ]</span>
+<a name="l00119"></a>00119     <span class="comment">// [ columnVec]</span>
+<a name="l00120"></a>00120     <span class="comment">// [ sliceVec]</span>
+<a name="l00121"></a>00121     <span class="comment">// [ 0 0 0 1 ]</span>
+<a name="l00122"></a>00122     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;rowVec = ch.propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> ).castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
+<a name="l00123"></a>00123     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;columnVec = ch.propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> ).castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
+<a name="l00124"></a>00124     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> sliceVec = ch.hasProperty( <span class="stringliteral">&quot;sliceVec&quot;</span> ) ?
+<a name="l00125"></a>00125                                     ch.propertyValue( <span class="stringliteral">&quot;sliceVec&quot;</span> ).castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;() :
+<a name="l00126"></a>00126                                     <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>(
+<a name="l00127"></a>00127                                         rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+<a name="l00128"></a>00128                                         rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+<a name="l00129"></a>00129                                         rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
+<a name="l00130"></a>00130                                     );
 <a name="l00131"></a>00131 
-<a name="l00132"></a>00132     <span class="comment">// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough</span>
-<a name="l00133"></a>00133     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
-<a name="l00134"></a>00134     <span class="keyword">const</span> scalarPropCompare &amp;secondaryComp = secondarySort.top();
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136     <span class="comment">// get the reference of the secondary map for &quot;key&quot; (create and insert a new if neccessary)</span>
-<a name="l00137"></a>00137     SecondaryMap &amp;subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first-&gt;second;
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139     <span class="comment">// run insert on that</span>
-<a name="l00140"></a>00140     <span class="keywordflow">return</span> secondaryInsert( subMap, ch ); <span class="comment">// insert ch into the right secondary map</span>
-<a name="l00141"></a>00141 }
-<a name="l00142"></a>00142 
-<a name="l00143"></a>00143 <span class="comment">// high level insert</span>
-<a name="l00144"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a1a1cb0783be4cb78d82c798b12507088">00144</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a1a1cb0783be4cb78d82c798b12507088" title="Tries to insert a chunk (a cheap copy of the chunk is done when inserted)">SortedChunkList::insert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch )
-<a name="l00145"></a>00145 {
-<a name="l00146"></a>00146     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( secondarySort.empty(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.&quot;</span>;
-<a name="l00147"></a>00147     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You&#39;re trying insert an invalid chunk. The missing properties are &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
-<a name="l00148"></a>00148     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..&quot;</span>;
-<a name="l00149"></a>00149     assert( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>() );
-<a name="l00150"></a>00150 
-<a name="l00151"></a>00151     <span class="keywordflow">if</span>( !<a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>() ) {
-<a name="l00152"></a>00152         <span class="comment">// compare some attributes of the first chunk and the one which shall be inserted</span>
-<a name="l00153"></a>00153         <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;first = *( chunks.begin()-&gt;second.begin()-&gt;second );
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155         <span class="keywordflow">if</span> ( first.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>() != ch.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>() ) { <span class="comment">// if they have different size - do not insert</span>
-<a name="l00156"></a>00156             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00157"></a>00157                     &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different size. (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot;!=&quot;</span> &lt;&lt; first.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00158"></a>00158             <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00159"></a>00159         }
-<a name="l00160"></a>00160 
-<a name="l00161"></a>00161         BOOST_FOREACH( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp; ref, equalProps ) { <span class="comment">// check all properties which where given to the constructor of the list</span>
-<a name="l00162"></a>00162             <span class="comment">// if at least one of them has the property and they are not equal - do not insert</span>
-<a name="l00163"></a>00163             <span class="keywordflow">if</span> ( ( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( ref ) || ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( ref ) ) &amp;&amp; first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) != ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) ) {
-<a name="l00164"></a>00164                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00165"></a>00165                         &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different &quot;</span> &lt;&lt; ref &lt;&lt; <span class="stringliteral">&quot;. Is &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) )
-<a name="l00166"></a>00166                         &lt;&lt; <span class="stringliteral">&quot; but chunks already in the list have &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( first.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( ref ) );
-<a name="l00167"></a>00167                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00168"></a>00168             }
-<a name="l00169"></a>00169         }
-<a name="l00170"></a>00170     } <span class="keywordflow">else</span> {
-<a name="l00171"></a>00171         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting 1st chunk&quot;</span>;
-<a name="l00172"></a>00172         std::stack&lt;scalarPropCompare&gt; backup = secondarySort;
-<a name="l00173"></a>00173 
-<a name="l00174"></a>00174         <span class="keywordflow">while</span>( !ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( secondarySort.top().propertyName ) ) {
-<a name="l00175"></a>00175             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> temp = secondarySort.top().propertyName;
-<a name="l00176"></a>00176 
-<a name="l00177"></a>00177             <span class="keywordflow">if</span> ( secondarySort.size() &gt; 1 ) {
-<a name="l00178"></a>00178                 secondarySort.pop();
-<a name="l00179"></a>00179             } <span class="keywordflow">else</span> {
-<a name="l00180"></a>00180                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00181"></a>00181                         &lt;&lt; <span class="stringliteral">&quot;First chunk is missing the last secondary sort-property fallback (&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( temp ) &lt;&lt; <span class="stringliteral">&quot;), won&#39;t insert.&quot;</span>;
-<a name="l00182"></a>00182                 secondarySort = backup;
-<a name="l00183"></a>00183                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00184"></a>00184             }
-<a name="l00185"></a>00185         }
-<a name="l00186"></a>00186 
-<a name="l00187"></a>00187         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )  &lt;&lt; <span class="stringliteral">&quot;Using &quot;</span> &lt;&lt; secondarySort.top().propertyName &lt;&lt; <span class="stringliteral">&quot; for secondary sorting, determined by the first chunk&quot;</span>;
-<a name="l00188"></a>00188     }
-<a name="l00189"></a>00189 
-<a name="l00190"></a>00190     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop2 = secondarySort.top().propertyName;
-<a name="l00191"></a>00191 
-<a name="l00192"></a>00192     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; inserted = primaryInsert( ch );
-<a name="l00193"></a>00193 
-<a name="l00194"></a>00194     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( inserted.first &amp;&amp; !inserted.second, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00195"></a>00195             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is already a Chunk at the same position (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
-<a name="l00196"></a>00196             &lt;&lt; std::make_pair( prop2, ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( prop2 ) );
-<a name="l00197"></a>00197 
-<a name="l00198"></a>00198     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(
-<a name="l00199"></a>00199         inserted.first &amp;&amp; !inserted.second &amp;&amp;
-<a name="l00200"></a>00200         ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp; inserted.first-&gt;hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp;
-<a name="l00201"></a>00201         !( ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ) == inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ) ),
-<a name="l00202"></a>00202         <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00203"></a>00203             &lt;&lt; <span class="stringliteral">&quot;The conflicting chunks where &quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> );
-<a name="l00204"></a>00204 
-<a name="l00205"></a>00205     <span class="keywordflow">return</span> inserted.second;
-<a name="l00206"></a>00206 }
-<a name="l00207"></a>00207 
-<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb">00208</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">SortedChunkList::addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp )
-<a name="l00209"></a>00209 {
-<a name="l00210"></a>00210     secondarySort.push( <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">scalarPropCompare</a>( cmp ) );
-<a name="l00211"></a>00211 }
-<a name="l00212"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">00212</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">SortedChunkList::isEmpty</a>()<span class="keyword">const</span>
-<a name="l00213"></a>00213 <span class="keyword"></span>{
-<a name="l00214"></a>00214     <span class="keywordflow">return</span> chunks.empty() || chunks.begin()-&gt;second.empty(); <span class="comment">// if there is no subMap or nothing in the first subMap ... its empty</span>
-<a name="l00215"></a>00215 }
-<a name="l00216"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#af769bcdd67e0f6d39ffc56958cabca3a">00216</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#af769bcdd67e0f6d39ffc56958cabca3a" title="Empties the list.">SortedChunkList::clear</a>()
-<a name="l00217"></a>00217 {
-<a name="l00218"></a>00218     chunks.clear();
-<a name="l00219"></a>00219 }
-<a name="l00220"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a06e7c1c512255d9a1df79171a6316a74">00220</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a06e7c1c512255d9a1df79171a6316a74">SortedChunkList::isRectangular</a>()
-<a name="l00221"></a>00221 {
-<a name="l00222"></a>00222     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>() )<span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00223"></a>00223 
-<a name="l00224"></a>00224     <span class="keywordtype">size_t</span> images = <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ad91ab01c0e43c5dfad198221ecabbf4e">getHorizontalSize</a>();
-<a name="l00225"></a>00225     BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
-<a name="l00226"></a>00226         <span class="keywordflow">if</span>( outer.second.size() != images )
-<a name="l00227"></a>00227             <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00228"></a>00228     }
-<a name="l00229"></a>00229     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00230"></a>00230 }
-<a name="l00231"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ad91ab01c0e43c5dfad198221ecabbf4e">00231</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ad91ab01c0e43c5dfad198221ecabbf4e">SortedChunkList::getHorizontalSize</a>()
-<a name="l00232"></a>00232 {
-<a name="l00233"></a>00233     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>() )<span class="keywordflow">return</span> 0;
-<a name="l00234"></a>00234     <span class="keywordflow">else</span> <span class="keywordflow">return</span> chunks.begin()-&gt;second.size();
-<a name="l00235"></a>00235 }
-<a name="l00236"></a>00236 
-<a name="l00237"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a713a12ecad6e864a2741846e9219d0b1">00237</a> std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt; <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a713a12ecad6e864a2741846e9219d0b1">SortedChunkList::getLookup</a>()
-<a name="l00238"></a>00238 {
-<a name="l00239"></a>00239     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !<a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a06e7c1c512255d9a1df79171a6316a74">isRectangular</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Running getLookup on an non rectangular chunk-list is not defined&quot;</span>;
-<a name="l00240"></a>00240 
-<a name="l00241"></a>00241     <span class="keywordflow">if</span>( !<a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>() ) {
-<a name="l00242"></a>00242         PrimaryMap::iterator iP = chunks.begin();
-<a name="l00243"></a>00243         <span class="keyword">const</span> <span class="keywordtype">size_t</span> horizontal = chunks.size();
-<a name="l00244"></a>00244         <span class="keyword">const</span> <span class="keywordtype">size_t</span> vertical = iP-&gt;second.size();
-<a name="l00245"></a>00245         std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt; ret( horizontal * vertical );
-<a name="l00246"></a>00246 
-<a name="l00247"></a>00247         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> h = 0; h &lt; horizontal; h++, iP++ ) { <span class="comment">// outer loop iterates horizontaly (through the primary sorting)</span>
-<a name="l00248"></a>00248             assert( iP != chunks.end() );
-<a name="l00249"></a>00249             SecondaryMap::iterator iS = iP-&gt;second.begin();
-<a name="l00250"></a>00250 
-<a name="l00251"></a>00251             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> v = 0; v &lt; vertical; v++, iS++ ) { <span class="comment">// inner loop iterates verticaly (through the secondary sorting)</span>
-<a name="l00252"></a>00252                 assert( iS != iP-&gt;second.end() );
-<a name="l00253"></a>00253                 ret[h + v * horizontal] = iS-&gt;second; <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
-<a name="l00254"></a>00254             }
-<a name="l00255"></a>00255         }
-<a name="l00256"></a>00256 
-<a name="l00257"></a>00257         <span class="keywordflow">return</span> ret;
-<a name="l00258"></a>00258     } <span class="keywordflow">else</span>
-<a name="l00259"></a>00259         <span class="keywordflow">return</span> std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt;();
-<a name="l00260"></a>00260 }
-<a name="l00261"></a>00261 
-<a name="l00262"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a2ea78156b40133138eeecd7dc9092274">00262</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a2ea78156b40133138eeecd7dc9092274" title="runs op on all entries of the list (the order is not defined) and replaces the entries by the return ...">SortedChunkList::transform</a>( <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html">chunkPtrOperator</a> &amp;op )
-<a name="l00263"></a>00263 {
-<a name="l00264"></a>00264     BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
-<a name="l00265"></a>00265         BOOST_FOREACH( SecondaryMap::reference inner, outer.second ) {
-<a name="l00266"></a>00266             inner.second = op( inner.second );
-<a name="l00267"></a>00267         }
-<a name="l00268"></a>00268     }
-<a name="l00269"></a>00269 }
-<a name="l00270"></a>00270 
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133     <span class="comment">// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough</span>
+<a name="l00134"></a>00134     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
+<a name="l00135"></a>00135     <span class="keyword">const</span> scalarPropCompare &amp;secondaryComp = secondarySort.top();
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137     <span class="comment">// get the reference of the secondary map for &quot;key&quot; (create and insert a new if neccessary)</span>
+<a name="l00138"></a>00138     SecondaryMap &amp;subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first-&gt;second;
+<a name="l00139"></a>00139 
+<a name="l00140"></a>00140     <span class="comment">// run insert on that</span>
+<a name="l00141"></a>00141     <span class="keywordflow">return</span> secondaryInsert( subMap, ch ); <span class="comment">// insert ch into the right secondary map</span>
+<a name="l00142"></a>00142 }
+<a name="l00143"></a>00143 
+<a name="l00144"></a>00144 <span class="comment">// high level insert</span>
+<a name="l00145"></a>00145 <span class="keywordtype">bool</span> SortedChunkList::insert( <span class="keyword">const</span> Chunk &amp;ch )
+<a name="l00146"></a>00146 {
+<a name="l00147"></a>00147     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( secondarySort.empty(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.&quot;</span>;
+<a name="l00148"></a>00148     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.isValid(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You&#39;re trying insert an invalid chunk. The missing properties are &quot;</span> &lt;&lt; ch.getMissing();
+<a name="l00149"></a>00149     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ch.isValid(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..&quot;</span>;
+<a name="l00150"></a>00150     assert( ch.isValid() );
+<a name="l00151"></a>00151 
+<a name="l00152"></a>00152     <span class="keywordflow">if</span>( !isEmpty() ) {
+<a name="l00153"></a>00153         <span class="comment">// compare some attributes of the first chunk and the one which shall be inserted</span>
+<a name="l00154"></a>00154         Chunk &amp;first = *( chunks.begin()-&gt;second.begin()-&gt;second );
+<a name="l00155"></a>00155 
+<a name="l00156"></a>00156         <span class="keywordflow">if</span> ( first.getSizeAsVector() != ch.getSizeAsVector() ) { <span class="comment">// if they have different size - do not insert</span>
+<a name="l00157"></a>00157             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
+<a name="l00158"></a>00158                     &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different size. (&quot;</span> &lt;&lt; ch.getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;!=&quot;</span> &lt;&lt; first.getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00159"></a>00159             <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00160"></a>00160         }
+<a name="l00161"></a>00161 
+<a name="l00162"></a>00162         BOOST_FOREACH( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp; ref, equalProps ) { <span class="comment">// check all properties which where given to the constructor of the list</span>
+<a name="l00163"></a>00163             <span class="comment">// if at least one of them has the property and they are not equal - do not insert</span>
+<a name="l00164"></a>00164             <span class="keywordflow">if</span> ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) &amp;&amp; first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
+<a name="l00165"></a>00165                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
+<a name="l00166"></a>00166                         &lt;&lt; <span class="stringliteral">&quot;Ignoring chunk with different &quot;</span> &lt;&lt; ref &lt;&lt; <span class="stringliteral">&quot;. Is &quot;</span> &lt;&lt; util::MSubject( ch.propertyValue( ref ) )
+<a name="l00167"></a>00167                         &lt;&lt; <span class="stringliteral">&quot; but chunks already in the list have &quot;</span> &lt;&lt; util::MSubject( first.propertyValue( ref ) );
+<a name="l00168"></a>00168                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00169"></a>00169             }
+<a name="l00170"></a>00170         }
+<a name="l00171"></a>00171     } <span class="keywordflow">else</span> {
+<a name="l00172"></a>00172         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Inserting 1st chunk&quot;</span>;
+<a name="l00173"></a>00173         std::stack&lt;scalarPropCompare&gt; backup = secondarySort;
+<a name="l00174"></a>00174 
+<a name="l00175"></a>00175         <span class="keywordflow">while</span>( !ch.hasProperty( secondarySort.top().propertyName ) ) {
+<a name="l00176"></a>00176             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> temp = secondarySort.top().propertyName;
+<a name="l00177"></a>00177 
+<a name="l00178"></a>00178             <span class="keywordflow">if</span> ( secondarySort.size() &gt; 1 ) {
+<a name="l00179"></a>00179                 secondarySort.pop();
+<a name="l00180"></a>00180             } <span class="keywordflow">else</span> {
+<a name="l00181"></a>00181                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00182"></a>00182                         &lt;&lt; <span class="stringliteral">&quot;First chunk is missing the last secondary sort-property fallback (&quot;</span> &lt;&lt; util::MSubject( temp ) &lt;&lt; <span class="stringliteral">&quot;), won&#39;t insert.&quot;</span>;
+<a name="l00183"></a>00183                 secondarySort = backup;
+<a name="l00184"></a>00184                 <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00185"></a>00185             }
+<a name="l00186"></a>00186         }
+<a name="l00187"></a>00187 
+<a name="l00188"></a>00188         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )  &lt;&lt; <span class="stringliteral">&quot;Using &quot;</span> &lt;&lt; secondarySort.top().propertyName &lt;&lt; <span class="stringliteral">&quot; for secondary sorting, determined by the first chunk&quot;</span>;
+<a name="l00189"></a>00189     }
+<a name="l00190"></a>00190 
+<a name="l00191"></a>00191     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop2 = secondarySort.top().propertyName;
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; inserted = primaryInsert( ch );
+<a name="l00194"></a>00194 
+<a name="l00195"></a>00195     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( inserted.first &amp;&amp; !inserted.second, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
+<a name="l00196"></a>00196             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is already a Chunk at the same position (&quot;</span> &lt;&lt; ch.propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
+<a name="l00197"></a>00197             &lt;&lt; std::make_pair( prop2, ch.propertyValue( prop2 ) );
+<a name="l00198"></a>00198 
+<a name="l00199"></a>00199     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(
+<a name="l00200"></a>00200         inserted.first &amp;&amp; !inserted.second &amp;&amp;
+<a name="l00201"></a>00201         ch.hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp; inserted.first-&gt;hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) &amp;&amp;
+<a name="l00202"></a>00202         !( ch.propertyValue( <span class="stringliteral">&quot;source&quot;</span> ) == inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ) ),
+<a name="l00203"></a>00203         <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
+<a name="l00204"></a>00204             &lt;&lt; <span class="stringliteral">&quot;The conflicting chunks where &quot;</span> &lt;&lt; ch.propertyValue( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; inserted.first-&gt;propertyValue( <span class="stringliteral">&quot;source&quot;</span> ).toString( <span class="keyword">false</span> );
+<a name="l00205"></a>00205 
+<a name="l00206"></a>00206     <span class="keywordflow">return</span> inserted.second;
+<a name="l00207"></a>00207 }
+<a name="l00208"></a>00208 
+<a name="l00209"></a>00209 <span class="keywordtype">void</span> SortedChunkList::addSecondarySort( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp )
+<a name="l00210"></a>00210 {
+<a name="l00211"></a>00211     secondarySort.push( scalarPropCompare( cmp ) );
+<a name="l00212"></a>00212 }
+<a name="l00213"></a>00213 <span class="keywordtype">bool</span> SortedChunkList::isEmpty()<span class="keyword">const</span>
+<a name="l00214"></a>00214 <span class="keyword"></span>{
+<a name="l00215"></a>00215     <span class="keywordflow">return</span> chunks.empty() || chunks.begin()-&gt;second.empty(); <span class="comment">// if there is no subMap or nothing in the first subMap ... its empty</span>
+<a name="l00216"></a>00216 }
+<a name="l00217"></a>00217 <span class="keywordtype">void</span> SortedChunkList::clear()
+<a name="l00218"></a>00218 {
+<a name="l00219"></a>00219     chunks.clear();
+<a name="l00220"></a>00220 }
+<a name="l00221"></a>00221 <span class="keywordtype">bool</span> SortedChunkList::isRectangular()
+<a name="l00222"></a>00222 {
+<a name="l00223"></a>00223     <span class="keywordflow">if</span>( isEmpty() )<span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225     <span class="keywordtype">size_t</span> images = getHorizontalSize();
+<a name="l00226"></a>00226     BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
+<a name="l00227"></a>00227         <span class="keywordflow">if</span>( outer.second.size() != images )
+<a name="l00228"></a>00228             <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00229"></a>00229     }
+<a name="l00230"></a>00230     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00231"></a>00231 }
+<a name="l00232"></a>00232 <span class="keywordtype">size_t</span> SortedChunkList::getHorizontalSize()
+<a name="l00233"></a>00233 {
+<a name="l00234"></a>00234     <span class="keywordflow">if</span>( isEmpty() )<span class="keywordflow">return</span> 0;
+<a name="l00235"></a>00235     <span class="keywordflow">else</span> <span class="keywordflow">return</span> chunks.begin()-&gt;second.size();
+<a name="l00236"></a>00236 }
+<a name="l00237"></a>00237 
+<a name="l00238"></a>00238 std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt; SortedChunkList::getLookup()
+<a name="l00239"></a>00239 {
+<a name="l00240"></a>00240     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !isRectangular(), <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Running getLookup on an non rectangular chunk-list is not defined&quot;</span>;
+<a name="l00241"></a>00241 
+<a name="l00242"></a>00242     <span class="keywordflow">if</span>( !isEmpty() ) {
+<a name="l00243"></a>00243         PrimaryMap::iterator iP = chunks.begin();
+<a name="l00244"></a>00244         <span class="keyword">const</span> <span class="keywordtype">size_t</span> horizontal = chunks.size();
+<a name="l00245"></a>00245         <span class="keyword">const</span> <span class="keywordtype">size_t</span> vertical = iP-&gt;second.size();
+<a name="l00246"></a>00246         std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt; ret( horizontal * vertical );
+<a name="l00247"></a>00247 
+<a name="l00248"></a>00248         <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> h = 0; h &lt; horizontal; h++, iP++ ) { <span class="comment">// outer loop iterates horizontaly (through the primary sorting)</span>
+<a name="l00249"></a>00249             assert( iP != chunks.end() );
+<a name="l00250"></a>00250             SecondaryMap::iterator iS = iP-&gt;second.begin();
+<a name="l00251"></a>00251 
+<a name="l00252"></a>00252             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> v = 0; v &lt; vertical; v++, iS++ ) { <span class="comment">// inner loop iterates verticaly (through the secondary sorting)</span>
+<a name="l00253"></a>00253                 assert( iS != iP-&gt;second.end() );
+<a name="l00254"></a>00254                 ret[h + v *horizontal] = iS-&gt;second;  <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
+<a name="l00255"></a>00255             }
+<a name="l00256"></a>00256         }
+<a name="l00257"></a>00257 
+<a name="l00258"></a>00258         <span class="keywordflow">return</span> ret;
+<a name="l00259"></a>00259     } <span class="keywordflow">else</span>
+<a name="l00260"></a>00260         <span class="keywordflow">return</span> std::vector&lt; boost::shared_ptr&lt; Chunk &gt; &gt;();
+<a name="l00261"></a>00261 }
+<a name="l00262"></a>00262 
+<a name="l00263"></a>00263 <span class="keywordtype">void</span> SortedChunkList::transform( chunkPtrOperator &amp;op )
+<a name="l00264"></a>00264 {
+<a name="l00265"></a>00265     BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
+<a name="l00266"></a>00266         BOOST_FOREACH( SecondaryMap::reference inner, outer.second ) {
+<a name="l00267"></a>00267             inner.second = op( inner.second );
+<a name="l00268"></a>00268         }
+<a name="l00269"></a>00269     }
+<a name="l00270"></a>00270 }
 <a name="l00271"></a>00271 
-<a name="l00272"></a>00272 }
+<a name="l00272"></a>00272 
 <a name="l00273"></a>00273 }
 <a name="l00274"></a>00274 }
+<a name="l00275"></a>00275 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

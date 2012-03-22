@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -39,6 +38,7 @@
     <ul class="tablist">
       <li><a href="namespacemembers.html"><span>All</span></a></li>
       <li class="current"><a href="namespacemembers_func.html"><span>Functions</span></a></li>
+      <li><a href="namespacemembers_vars.html"><span>Variables</span></a></li>
       <li><a href="namespacemembers_type.html"><span>Typedefs</span></a></li>
       <li><a href="namespacemembers_enum.html"><span>Enumerations</span></a></li>
       <li><a href="namespacemembers_eval.html"><span>Enumerator</span></a></li>
@@ -46,7 +46,6 @@
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
-      <li><a href="#index_c"><span>c</span></a></li>
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_f"><span>f</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
@@ -55,7 +54,6 @@
       <li><a href="#index_m"><span>m</span></a></li>
       <li><a href="#index_n"><span>n</span></a></li>
       <li><a href="#index_o"><span>o</span></a></li>
-      <li><a href="#index_r"><span>r</span></a></li>
       <li><a href="#index_s"><span>s</span></a></li>
       <li><a href="#index_t"><span>t</span></a></li>
     </ul>
@@ -63,13 +61,6 @@
 </div>
 <div class="contents">
 &#160;
-
-<h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
-<li>continousFind()
-: <a class="el" href="namespaceisis_1_1util_1_1__internal.html#a5c859e6a9ce845922f481cc5da3b3e40">isis::util::_internal</a>
-</li>
-</ul>
-
 
 <h3><a class="anchor" id="index_e"></a>- e -</h3><ul>
 <li>enableLog()
@@ -81,7 +72,7 @@
 : <a class="el" href="namespaceisis.html#ac8d06135addd3cbab5df9465a2633975">isis</a>
 </li>
 <li>endianSwap()
-: <a class="el" href="namespaceisis_1_1data.html#a649709edd7e060b1335e840f5a1ba639">isis::data</a>
+: <a class="el" href="namespaceisis_1_1data.html#a07f5fa3b0e0209640522db3443abf496">isis::data</a>
 </li>
 <li>endianSwapArray()
 : <a class="el" href="namespaceisis_1_1data.html#ab0a1078db56fe21f750d1b2b58a6aa4b">isis::data</a>
@@ -97,28 +88,25 @@
 
 
 <h3><a class="anchor" id="index_g"></a>- g -</h3><ul>
-<li>getConvertSize()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a645ee7399f56ed23de7f63b40fe2744f">isis::data::_internal</a>
+<li>getCommonSource()
+: <a class="el" href="namespaceisis_1_1data.html#a50a7d38f7a9273fde2fb4861ad3394d7">isis::data</a>
 </li>
 <li>getLastSystemError()
 : <a class="el" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">isis::util</a>
 </li>
 <li>getNumericScaling()
-: <a class="el" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84">isis::data</a>
+: <a class="el" href="namespaceisis_1_1data.html#ae58ab8da6a7852154d52cb8d41ded907">isis::data</a>
 </li>
 <li>getTransposedTypeMap()
-: <a class="el" href="namespaceisis_1_1util.html#a5a52ca08d3380ec9ccba8cb17d9e5b7f">isis::util</a>
+: <a class="el" href="namespaceisis_1_1util.html#a88c57837190db30ff1d066c7bd0ac15d">isis::util</a>
 </li>
 <li>getTypeMap()
-: <a class="el" href="namespaceisis_1_1util.html#a0a3769148564862e35ff59c6f0505988">isis::util</a>
+: <a class="el" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">isis::util</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
-<li>invalid_and_tell()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a086e0a1930218b9799ed11f8dc0b611f">isis::data::_internal</a>
-</li>
 <li>inverseMatrix()
 : <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a35d55c3b417bd1a0153c928b42fe09aa">isis::data::_internal</a>
 </li>
@@ -141,8 +129,8 @@
 <li>listToString()
 : <a class="el" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648">isis::util</a>
 </li>
-<li>logLevelNames()
-: <a class="el" href="namespaceisis_1_1util_1_1__internal.html#a0c30f550c7105a9b870db3692bce1b19">isis::util::_internal</a>
+<li>logLevelName()
+: <a class="el" href="namespaceisis_1_1util.html#a0be95778f8ee30216b88547e46f02cd3">isis::util</a>
 </li>
 </ul>
 
@@ -154,24 +142,15 @@
 <li>minVector()
 : <a class="el" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">isis::util</a>
 </li>
-<li>moreCmp()
-: <a class="el" href="namespaceisis_1_1image__io_1_1__internal.html#a83d3ecb2865aa4bc1af8c3ad7e7e904e">isis::image_io::_internal</a>
-</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_n"></a>- n -</h3><ul>
 <li>numeric_convert()
-: <a class="el" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646">isis::data</a>
-</li>
-<li>numeric_convert_impl()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">isis::data::_internal</a>
+: <a class="el" href="namespaceisis_1_1data.html#a0d0adfe5290da024da43cdb9ea8d462d">isis::data</a>
 </li>
 <li>numeric_copy()
-: <a class="el" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">isis::data</a>
-</li>
-<li>numeric_copy_impl()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">isis::data::_internal</a>
+: <a class="el" href="namespaceisis_1_1data.html#a25ad819c547c2fc39b3a14efb64a99b8">isis::data</a>
 </li>
 </ul>
 
@@ -179,16 +158,6 @@
 <h3><a class="anchor" id="index_o"></a>- o -</h3><ul>
 <li>operator&lt;&lt;()
 : <a class="el" href="namespacestd.html#aad0fbf35da088a95292c2f56e81ae646">std</a>
-</li>
-</ul>
-
-
-<h3><a class="anchor" id="index_r"></a>- r -</h3><ul>
-<li>round()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#a3502ce271464b9958f330371d41c0872">isis::data::_internal</a>
-</li>
-<li>round_impl()
-: <a class="el" href="namespaceisis_1_1data_1_1__internal.html#ae739276776001aa07831929f3279d592">isis::data::_internal</a>
 </li>
 </ul>
 
@@ -206,7 +175,7 @@
 </li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

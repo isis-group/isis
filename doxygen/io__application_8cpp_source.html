@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -63,208 +62,262 @@
 <a name="l00021"></a>00021 <span class="preprocessor"></span><span class="preprocessor">#pragma warning(disable:4996)</span>
 <a name="l00022"></a>00022 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
 <a name="l00023"></a>00023 <span class="preprocessor"></span>
-<a name="l00024"></a><a class="code" href="io__application_8cpp.html#a7b03a7555e481d771c4ca8c611e331b0">00024</a> <span class="preprocessor">#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost &lt; 1.44</span>
-<a name="l00025"></a>00025 <span class="preprocessor"></span>
-<a name="l00026"></a>00026 <span class="preprocessor">#include &quot;<a class="code" href="io__application_8hpp.html">io_application.hpp</a>&quot;</span>
-<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;<a class="code" href="io__factory_8hpp.html">io_factory.hpp</a>&quot;</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;boost/mpl/for_each.hpp&gt;</span>
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>isis
+<a name="l00024"></a>00024 <span class="preprocessor">#include &quot;<a class="code" href="io__application_8hpp.html">io_application.hpp</a>&quot;</span>
+<a name="l00025"></a>00025 <span class="preprocessor">#include &quot;<a class="code" href="io__factory_8hpp.html">io_factory.hpp</a>&quot;</span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;boost/mpl/for_each.hpp&gt;</span>
+<a name="l00027"></a>00027 
+<a name="l00028"></a>00028 
+<a name="l00029"></a>00029 <span class="keyword">namespace </span>isis
+<a name="l00030"></a>00030 {
+<a name="l00031"></a>00031 <span class="keyword">namespace </span>data
 <a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 <span class="keyword">namespace </span>data
-<a name="l00034"></a>00034 {
-<a name="l00035"></a>00035 <a class="code" href="classisis_1_1data_1_1IOApplication.html#af10b58f3c9d4fdaee9d888c28afbfb33">IOApplication::IOApplication</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[], <span class="keywordtype">bool</span> have_input, <span class="keywordtype">bool</span> have_output ):
-<a name="l00036"></a>00036     Application( name ),
-<a name="l00037"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af10b58f3c9d4fdaee9d888c28afbfb33">00037</a>     m_input( have_input ), m_output( have_output ), feedback( <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> )
-<a name="l00038"></a>00038 {
-<a name="l00039"></a>00039     <span class="keywordflow">if</span> ( have_input ) {
-<a name="l00040"></a>00040         parameters[<span class="stringliteral">&quot;in&quot;</span>] = <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a>();
-<a name="l00041"></a>00041         parameters[<span class="stringliteral">&quot;in&quot;</span>].setDescription( <span class="stringliteral">&quot;input file(s) or directory(s)&quot;</span> );
-<a name="l00042"></a>00042         parameters[<span class="stringliteral">&quot;rf&quot;</span>] = std::string();
-<a name="l00043"></a>00043         parameters[<span class="stringliteral">&quot;rf&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00044"></a>00044         parameters[<span class="stringliteral">&quot;rf&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046         parameters[<span class="stringliteral">&quot;rf&quot;</span>].setDescription( <span class="stringliteral">&quot;Override automatic detection of file suffix for reading with given value&quot;</span> );
-<a name="l00047"></a>00047         parameters[<span class="stringliteral">&quot;rdialect&quot;</span>] = std::string();
-<a name="l00048"></a>00048         parameters[<span class="stringliteral">&quot;rdialect&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00049"></a>00049         parameters[<span class="stringliteral">&quot;rdialect&quot;</span>].setDescription(
-<a name="l00050"></a>00050             <span class="stringliteral">&quot;choose dialect for reading. The available dialects depend on the capabilities of IO plugins&quot;</span> );
-<a name="l00051"></a>00051     }
+<a name="l00033"></a>00033 <a class="code" href="classisis_1_1data_1_1IOApplication.html#af10b58f3c9d4fdaee9d888c28afbfb33">IOApplication::IOApplication</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[], <span class="keywordtype">bool</span> have_input, <span class="keywordtype">bool</span> have_output ):
+<a name="l00034"></a>00034     Application( name ),
+<a name="l00035"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af10b58f3c9d4fdaee9d888c28afbfb33">00035</a>     m_input( have_input ), m_output( have_output ), feedback( new util::ConsoleFeedback )
+<a name="l00036"></a>00036 {
+<a name="l00037"></a>00037     <span class="keywordflow">if</span> ( have_input )
+<a name="l00038"></a>00038         addInput( parameters );
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040     <span class="keywordflow">if</span> ( have_output )
+<a name="l00041"></a>00041         addOutput( parameters );
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043     parameters[<span class="stringliteral">&quot;help-io&quot;</span>] = <span class="keyword">false</span>;
+<a name="l00044"></a>00044     parameters[<span class="stringliteral">&quot;help-io&quot;</span>].needed() = <span class="keyword">false</span>;
+<a name="l00045"></a>00045     parameters[<span class="stringliteral">&quot;help-io&quot;</span>].setDescription( <span class="stringliteral">&quot;List all loaded IO plugins and their supported formats, exit after that&quot;</span> );
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 <a class="code" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">IOApplication::~IOApplication</a>()
+<a name="l00049"></a>00049 {
+<a name="l00050"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">00050</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt;() );
+<a name="l00051"></a>00051 }
 <a name="l00052"></a>00052 
-<a name="l00053"></a>00053     <span class="keywordflow">if</span> ( have_output ) {
-<a name="l00054"></a>00054         parameters[<span class="stringliteral">&quot;out&quot;</span>] = std::string();
-<a name="l00055"></a>00055         parameters[<span class="stringliteral">&quot;out&quot;</span>].setDescription( <span class="stringliteral">&quot;output file&quot;</span> );
-<a name="l00056"></a>00056         parameters[<span class="stringliteral">&quot;wf&quot;</span>] = std::string();
-<a name="l00057"></a>00057         parameters[<span class="stringliteral">&quot;wf&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00058"></a>00058         parameters[<span class="stringliteral">&quot;wf&quot;</span>].setDescription( <span class="stringliteral">&quot;Override automatic detection of file suffix for writing with given value&quot;</span> );
-<a name="l00059"></a>00059         parameters[<span class="stringliteral">&quot;wf&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061         parameters[<span class="stringliteral">&quot;wdialect&quot;</span>] = std::string();
-<a name="l00062"></a>00062         parameters[<span class="stringliteral">&quot;wdialect&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00063"></a>00063         parameters[<span class="stringliteral">&quot;wdialect&quot;</span>].setDescription( <span class="stringliteral">&quot;choose dialect for writing. Use \&quot;--help\&quot; for a list of the plugins and their supported dialects&quot;</span> );
-<a name="l00064"></a>00064         std::map&lt;unsigned short, std::string&gt; types = <a class="code" href="namespaceisis_1_1util.html#a0a3769148564862e35ff59c6f0505988">util::getTypeMap</a>( <span class="keyword">false</span>, <span class="keyword">true</span> );
-<a name="l00065"></a>00065         <span class="comment">// remove some types which are useless as representation</span>
-<a name="l00066"></a>00066         <span class="comment">// &quot;(unsigned short)&quot; is needed because otherwise erase would take the reference of a static constant which is only there during compile time</span>
-<a name="l00067"></a>00067         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;util::Selection&gt;::staticID</a> );
-<a name="l00068"></a>00068         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;std::string&gt;::staticID</a> );
-<a name="l00069"></a>00069         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;boost::posix_time::ptime&gt;::staticID</a> );
-<a name="l00070"></a>00070         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;boost::gregorian::date&gt;::staticID</a> );
-<a name="l00071"></a>00071         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;util::ilist&gt;::staticID</a> );
-<a name="l00072"></a>00072         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;util::dlist&gt;::staticID</a> );
-<a name="l00073"></a>00073         types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">data::ValuePtr&lt;util::slist&gt;::staticID</a> );
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075         <span class="keywordflow">for</span>( std::map&lt;unsigned short, std::string&gt;::iterator i = types.begin(); i != types.end(); i++ ) {
-<a name="l00076"></a>00076             i-&gt;second.resize( i-&gt;second.find_last_not_of( <span class="charliteral">&#39;*&#39;</span> ) + 1 );
-<a name="l00077"></a>00077         }
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079         parameters[<span class="stringliteral">&quot;repn&quot;</span>] = <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a>( types );
-<a name="l00080"></a>00080         parameters[<span class="stringliteral">&quot;repn&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00081"></a>00081         parameters[<span class="stringliteral">&quot;repn&quot;</span>].setDescription(
-<a name="l00082"></a>00082             <span class="stringliteral">&quot;Representation in which the data shall be written.&quot;</span> );
-<a name="l00083"></a>00083     }
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085     <span class="keywordflow">if</span>( have_input || have_output ) {
-<a name="l00086"></a>00086         parameters[<span class="stringliteral">&quot;np&quot;</span>] = <span class="keyword">false</span>;
-<a name="l00087"></a>00087         parameters[<span class="stringliteral">&quot;np&quot;</span>].needed() = <span class="keyword">false</span>;
-<a name="l00088"></a>00088         parameters[<span class="stringliteral">&quot;np&quot;</span>].setDescription( <span class="stringliteral">&quot;suppress progress bar&quot;</span> );
-<a name="l00089"></a>00089         parameters[<span class="stringliteral">&quot;np&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00090"></a>00090     }
-<a name="l00091"></a>00091 }
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093 <a class="code" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">IOApplication::~IOApplication</a>()
-<a name="l00094"></a>00094 {
-<a name="l00095"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">00095</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt;() );
-<a name="l00096"></a>00096 }
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">IOApplication::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
-<a name="l00099"></a>00099 {
-<a name="l00100"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">00100</a>     <span class="keywordflow">if</span> ( ! <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">util::Application::init</a>( argc, argv, exitOnError ) )
-<a name="l00101"></a>00101         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103     <span class="keywordflow">if</span> ( m_input ) {
-<a name="l00104"></a>00104         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">autoload</a>( exitOnError );
-<a name="l00105"></a>00105     }
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00108"></a>00108 }
-<a name="l00109"></a>00109 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4" title="Virtual function to display a short help text.">IOApplication::printHelp</a>( <span class="keywordtype">bool</span> withHidden )<span class="keyword"> const</span>
-<a name="l00110"></a>00110 <span class="keyword"></span>{
-<a name="l00111"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4">00111</a>     <a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4" title="Virtual function to display a short help text.">util::Application::printHelp</a>( withHidden );
-<a name="l00112"></a>00112 
-<a name="l00113"></a>00113     <span class="keywordflow">if</span>( withHidden ) {
-<a name="l00114"></a>00114         std::cerr &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Available IO Plugins:&quot;</span> &lt;&lt; std::endl;
-<a name="l00115"></a>00115         <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">data::IOFactory::FileFormatList</a> plugins = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">data::IOFactory::getFormats</a>();
-<a name="l00116"></a>00116         BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-<a name="l00117"></a>00117             std::cerr &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; pi-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; pi-&gt;plugin_file.file_string() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;
-<a name="l00118"></a>00118             std::cerr &lt;&lt; <span class="stringliteral">&quot;\t=======================================&quot;</span> &lt;&lt; std::endl;
-<a name="l00119"></a>00119             <span class="keyword">const</span> std::list&lt;util::istring&gt; suff = pi-&gt;getSuffixes();
-<a name="l00120"></a>00120             <span class="keyword">const</span> std::list&lt;std::string&gt; dialects = util::stringToList&lt;std::string&gt;( pi-&gt;dialects( <span class="stringliteral">&quot;&quot;</span> ) );
-<a name="l00121"></a>00121             std::cerr &lt;&lt; <span class="stringliteral">&quot;\tsupported suffixes: &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( suff.begin(), suff.end(), <span class="stringliteral">&quot;\&quot;, \&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span> )  &lt;&lt; std::endl;
-<a name="l00122"></a>00122 
-<a name="l00123"></a>00123             <span class="keywordflow">if</span>( !dialects.empty() )
-<a name="l00124"></a>00124                 std::cerr &lt;&lt; <span class="stringliteral">&quot;\tsupported dialects: &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( dialects.begin(), dialects.end(), <span class="stringliteral">&quot;\&quot;, \&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span> )  &lt;&lt; std::endl;
-<a name="l00125"></a>00125         }
-<a name="l00126"></a>00126     }
-<a name="l00127"></a>00127 }
+<a name="l00053"></a>00053 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">IOApplication::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
+<a name="l00054"></a>00054 {
+<a name="l00055"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138">00055</a>     <span class="keyword">const</span> <span class="keywordtype">bool</span> ok = <a class="code" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">util::Application::init</a>( argc, argv, exitOnError );
+<a name="l00056"></a>00056 
+<a name="l00057"></a>00057     <span class="keywordflow">if</span> ( !ok  )
+<a name="l00058"></a>00058         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060     <span class="keywordflow">if</span> ( m_input ) {
+<a name="l00061"></a>00061         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca" title="Load data into the input list of the Application using the internal ParameterMap.">autoload</a>( exitOnError );
+<a name="l00062"></a>00062     }
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#abfb57801256b7b68def36b169fc94612" title="Add input parameters to the given ParameterMap.">IOApplication::addInput</a> ( <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">util::ParameterMap</a> &amp;parameters, <span class="keywordtype">bool</span> needed, <span class="keyword">const</span> std::string &amp;suffix, <span class="keyword">const</span> std::string &amp;desc )
+<a name="l00068"></a>00068 {
+<a name="l00069"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#abfb57801256b7b68def36b169fc94612">00069</a>     parameters[std::string( <span class="stringliteral">&quot;in&quot;</span> )+suffix] = <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a>();
+<a name="l00070"></a>00070     parameters[std::string( <span class="stringliteral">&quot;in&quot;</span> )+suffix].setDescription( std::string( <span class="stringliteral">&quot;input file(s) or directory(s)&quot;</span> ) + desc );
+<a name="l00071"></a>00071     parameters[std::string( <span class="stringliteral">&quot;in&quot;</span> )+suffix].needed() = needed;
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073     parameters[std::string( <span class="stringliteral">&quot;rf&quot;</span> )+suffix] = std::string();
+<a name="l00074"></a>00074     parameters[std::string( <span class="stringliteral">&quot;rf&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00075"></a>00075     parameters[std::string( <span class="stringliteral">&quot;rf&quot;</span> )+suffix].hidden() = <span class="keyword">true</span>;
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077     parameters[std::string( <span class="stringliteral">&quot;rf&quot;</span> )+suffix].setDescription( std::string( <span class="stringliteral">&quot;Override automatic detection of file suffix for reading&quot;</span> + desc + <span class="stringliteral">&quot; with given value&quot;</span> ) );
+<a name="l00078"></a>00078     parameters[std::string( <span class="stringliteral">&quot;rdialect&quot;</span> )+suffix] = std::string();
+<a name="l00079"></a>00079     parameters[std::string( <span class="stringliteral">&quot;rdialect&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00080"></a>00080     parameters[std::string( <span class="stringliteral">&quot;rdialect&quot;</span> )+suffix].setDescription(
+<a name="l00081"></a>00081         std::string( <span class="stringliteral">&quot;choose dialect for reading&quot;</span> ) + desc + <span class="stringliteral">&quot;. The available dialects depend on the capabilities of the used IO plugin&quot;</span> );
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083     <span class="keywordflow">if</span>( parameters.find( <span class="stringliteral">&quot;np&quot;</span> ) == parameters.end() ) {
+<a name="l00084"></a>00084         parameters[<span class="stringliteral">&quot;np&quot;</span>] = <span class="keyword">false</span>;
+<a name="l00085"></a>00085         parameters[<span class="stringliteral">&quot;np&quot;</span>].needed() = <span class="keyword">false</span>;
+<a name="l00086"></a>00086         parameters[<span class="stringliteral">&quot;np&quot;</span>].setDescription( <span class="stringliteral">&quot;suppress progress bar&quot;</span> );
+<a name="l00087"></a>00087         parameters[<span class="stringliteral">&quot;np&quot;</span>].hidden() = <span class="keyword">true</span>;
+<a name="l00088"></a>00088     }
+<a name="l00089"></a>00089 }
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#aa8816fb8e14a8904c01957a939be1b6b" title="Add output parameters to the given ParameterMap.">IOApplication::addOutput</a> ( <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">util::ParameterMap</a> &amp;parameters, <span class="keywordtype">bool</span> needed, <span class="keyword">const</span> std::string &amp;suffix, <span class="keyword">const</span> std::string &amp;desc )
+<a name="l00092"></a>00092 {
+<a name="l00093"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#aa8816fb8e14a8904c01957a939be1b6b">00093</a>     parameters[std::string( <span class="stringliteral">&quot;out&quot;</span> )+suffix] = std::string();
+<a name="l00094"></a>00094     parameters[std::string( <span class="stringliteral">&quot;out&quot;</span> )+suffix].setDescription( <span class="stringliteral">&quot;output filename&quot;</span> + desc );
+<a name="l00095"></a>00095     parameters[std::string( <span class="stringliteral">&quot;out&quot;</span> )+suffix].needed() = needed;
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097     parameters[std::string( <span class="stringliteral">&quot;wf&quot;</span> )+suffix] = std::string();
+<a name="l00098"></a>00098     parameters[std::string( <span class="stringliteral">&quot;wf&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00099"></a>00099     parameters[std::string( <span class="stringliteral">&quot;wf&quot;</span> )+suffix].setDescription( <span class="stringliteral">&quot;Override automatic detection of file suffix for writing&quot;</span> + desc + <span class="stringliteral">&quot; with given value&quot;</span> );
+<a name="l00100"></a>00100     parameters[std::string( <span class="stringliteral">&quot;wf&quot;</span> )+suffix].hidden() = <span class="keyword">true</span>;
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102     parameters[std::string( <span class="stringliteral">&quot;wdialect&quot;</span> )+suffix] = std::string();
+<a name="l00103"></a>00103     parameters[std::string( <span class="stringliteral">&quot;wdialect&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00104"></a>00104     parameters[std::string( <span class="stringliteral">&quot;wdialect&quot;</span> )+suffix].setDescription( <span class="stringliteral">&quot;Choose dialect for writing&quot;</span> + desc + <span class="stringliteral">&quot;. Use \&quot;--help\&quot; for a list of the plugins and their supported dialects&quot;</span> );
+<a name="l00105"></a>00105     std::map&lt;unsigned short, std::string&gt; types = <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">util::getTypeMap</a>( <span class="keyword">false</span>, <span class="keyword">true</span> );
+<a name="l00106"></a>00106     <span class="comment">// remove some types which are useless as representation</span>
+<a name="l00107"></a>00107     <span class="comment">// &quot;(unsigned short)&quot; is needed because otherwise erase would take the reference of a static constant which is only there during compile time</span>
+<a name="l00108"></a>00108     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;util::Selection&gt;::staticID</a> );
+<a name="l00109"></a>00109     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;std::string&gt;::staticID</a> );
+<a name="l00110"></a>00110     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;boost::posix_time::ptime&gt;::staticID</a> );
+<a name="l00111"></a>00111     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;boost::gregorian::date&gt;::staticID</a> );
+<a name="l00112"></a>00112     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;util::ilist&gt;::staticID</a> );
+<a name="l00113"></a>00113     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;util::dlist&gt;::staticID</a> );
+<a name="l00114"></a>00114     types.erase( ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )<a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;util::slist&gt;::staticID</a> );
+<a name="l00115"></a>00115 
+<a name="l00116"></a>00116     <span class="keywordflow">for</span>( std::map&lt;unsigned short, std::string&gt;::iterator i = types.begin(); i != types.end(); i++ ) {
+<a name="l00117"></a>00117         i-&gt;second.resize( i-&gt;second.find_last_not_of( <span class="charliteral">&#39;*&#39;</span> ) + 1 );
+<a name="l00118"></a>00118     }
+<a name="l00119"></a>00119 
+<a name="l00120"></a>00120     parameters[std::string( <span class="stringliteral">&quot;repn&quot;</span> )+suffix] = <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a>( types );
+<a name="l00121"></a>00121     parameters[std::string( <span class="stringliteral">&quot;repn&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00122"></a>00122     parameters[std::string( <span class="stringliteral">&quot;repn&quot;</span> )+suffix].setDescription(
+<a name="l00123"></a>00123         <span class="stringliteral">&quot;Representation in which the data&quot;</span> + desc + <span class="stringliteral">&quot; shall be written&quot;</span> );
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125     parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix] = <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a>( <span class="stringliteral">&quot;noscale,autoscale,noupscale,upscale&quot;</span>, <span class="stringliteral">&quot;autoscale&quot;</span> );
+<a name="l00126"></a>00126     parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix].needed() = <span class="keyword">false</span>;
+<a name="l00127"></a>00127     parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix].hidden() = <span class="keyword">true</span>;
 <a name="l00128"></a>00128 
-<a name="l00129"></a>00129 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">IOApplication::autoload</a>( <span class="keywordtype">bool</span> exitOnError )
-<a name="l00130"></a>00130 {
-<a name="l00131"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">00131</a>     <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> input = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;in&quot;</span>];
-<a name="l00132"></a>00132     std::string rf = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;rf&quot;</span>];
-<a name="l00133"></a>00133     std::string dl = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;rdialect&quot;</span>];
-<a name="l00134"></a>00134     <span class="keywordtype">bool</span> no_progress = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;np&quot;</span>];
-<a name="l00135"></a>00135     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00136"></a>00136             &lt;&lt; <span class="stringliteral">&quot;loading &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( input )
-<a name="l00137"></a>00137             &lt;&lt; ( rf.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the format: &quot;</span> ) + rf )
-<a name="l00138"></a>00138             &lt;&lt; ( ( !rf.empty() &amp;&amp; !dl.empty() ) ? <span class="stringliteral">&quot; and&quot;</span> : <span class="stringliteral">&quot;&quot;</span> )
-<a name="l00139"></a>00139             &lt;&lt; ( dl.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the dialect: &quot;</span> ) + dl );
+<a name="l00129"></a>00129     parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix].setDescription(
+<a name="l00130"></a>00130         <span class="stringliteral">&quot;Scaling strategy to be used when converting into the datatype given in with -repn&quot;</span> + suffix );
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132     <span class="keywordflow">if</span>( parameters.find( <span class="stringliteral">&quot;np&quot;</span> ) == parameters.end() ) {
+<a name="l00133"></a>00133         parameters[<span class="stringliteral">&quot;np&quot;</span>] = <span class="keyword">false</span>;
+<a name="l00134"></a>00134         parameters[<span class="stringliteral">&quot;np&quot;</span>].needed() = <span class="keyword">false</span>;
+<a name="l00135"></a>00135         parameters[<span class="stringliteral">&quot;np&quot;</span>].setDescription( <span class="stringliteral">&quot;suppress progress bar&quot;</span> );
+<a name="l00136"></a>00136         parameters[<span class="stringliteral">&quot;np&quot;</span>].hidden() = <span class="keyword">true</span>;
+<a name="l00137"></a>00137     }
+<a name="l00138"></a>00138 }
+<a name="l00139"></a>00139 
 <a name="l00140"></a>00140 
-<a name="l00141"></a>00141     <span class="keywordflow">if</span>( !no_progress ) {
-<a name="l00142"></a>00142         <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( feedback );
-<a name="l00143"></a>00143     }
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145     BOOST_FOREACH( util::slist::const_reference ref, input ) {
-<a name="l00146"></a>00146         <span class="keyword">const</span> std::list&lt; Image &gt; tImages = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">data::IOFactory::load</a>( ref, rf, dl );
-<a name="l00147"></a>00147         <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.insert( <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.end(), tImages.begin(), tImages.end() );
-<a name="l00148"></a>00148     }
-<a name="l00149"></a>00149 
-<a name="l00150"></a>00150     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.empty() ) {
-<a name="l00151"></a>00151         <span class="keywordflow">if</span> ( exitOnError )
-<a name="l00152"></a>00152             exit( 1 );
-<a name="l00153"></a>00153         <span class="keywordflow">else</span>
-<a name="l00154"></a>00154             <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00155"></a>00155     } <span class="keywordflow">else</span> {
-<a name="l00156"></a>00156         <span class="keywordflow">for</span>( std::list&lt;data::Image&gt;::const_iterator a = <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.begin(); a != <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.end(); a++ ) {
-<a name="l00157"></a>00157             <span class="keywordflow">for</span>( std::list&lt;data::Image&gt;::const_iterator b = a; ( ++b ) != <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.end(); ) {
-<a name="l00158"></a>00158                 <span class="keyword">const</span> util::PropertyMap &amp;aref = *a, bref = *b;
-<a name="l00159"></a>00159                 <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( aref.getDifference( bref ).empty(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The metadata of the images from &quot;</span>
-<a name="l00160"></a>00160                         &lt;&lt; aref.getPropertyAs&lt;std::string&gt;( <span class="stringliteral">&quot;source&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::distance&lt;std::list&lt;Image&gt; ::const_iterator&gt;( <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.begin(), a )
-<a name="l00161"></a>00161                         &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; bref.getPropertyAs&lt;std::string&gt;( <span class="stringliteral">&quot;source&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::distance&lt;std::list&lt;Image&gt; ::const_iterator&gt;( <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.begin(), b )
-<a name="l00162"></a>00162                         &lt;&lt; <span class="stringliteral">&quot; are equal. Maybe they are duplicates.&quot;</span>;
-<a name="l00163"></a>00163             }
-<a name="l00164"></a>00164         }
-<a name="l00165"></a>00165     }
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00168"></a>00168 }
-<a name="l00169"></a>00169 
-<a name="l00170"></a>00170 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">IOApplication::autowrite</a>( Image out_image, <span class="keywordtype">bool</span> exitOnError )
-<a name="l00171"></a>00171 {
-<a name="l00172"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7">00172</a>     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">autowrite</a>( std::list&lt;Image&gt;( 1, out_image ), exitOnError );
-<a name="l00173"></a>00173 }
-<a name="l00174"></a>00174 
-<a name="l00175"></a>00175 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">IOApplication::autowrite</a>( std::list&lt;Image&gt; out_images, <span class="keywordtype">bool</span> exitOnError )
-<a name="l00176"></a>00176 {
-<a name="l00177"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">00177</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a> repn = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;repn&quot;</span>];
-<a name="l00178"></a>00178     <span class="keyword">const</span> std::string output = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;out&quot;</span>];
-<a name="l00179"></a>00179     <span class="keyword">const</span> std::string wf = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;wf&quot;</span>];
-<a name="l00180"></a>00180     <span class="keyword">const</span> std::string dl = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;wdialect&quot;</span>];
-<a name="l00181"></a>00181     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00182"></a>00182             &lt;&lt; <span class="stringliteral">&quot;Writing &quot;</span> &lt;&lt; out_images.size() &lt;&lt; <span class="stringliteral">&quot; images&quot;</span>
-<a name="l00183"></a>00183             &lt;&lt; ( repn ? std::string( <span class="stringliteral">&quot; as &quot;</span> ) + ( std::string )repn : <span class="stringliteral">&quot;&quot;</span> )
-<a name="l00184"></a>00184             &lt;&lt; <span class="stringliteral">&quot; to &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( output )
-<a name="l00185"></a>00185             &lt;&lt; ( wf.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the format: &quot;</span> ) + wf )
-<a name="l00186"></a>00186             &lt;&lt; ( ( !wf.empty() &amp;&amp; !dl.empty() ) ? <span class="stringliteral">&quot; and&quot;</span> : <span class="stringliteral">&quot;&quot;</span> )
-<a name="l00187"></a>00187             &lt;&lt; ( dl.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the dialect: &quot;</span> ) + dl );
-<a name="l00188"></a>00188 
-<a name="l00189"></a>00189     <span class="keywordflow">if</span>( repn != 0 ) {
-<a name="l00190"></a>00190         BOOST_FOREACH( std::list&lt;Image&gt;::reference ref, out_images ) {
-<a name="l00191"></a>00191             ref.convertToType( repn );
-<a name="l00192"></a>00192         }
-<a name="l00193"></a>00193     }
-<a name="l00194"></a>00194 
-<a name="l00195"></a>00195     <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( feedback );
-<a name="l00196"></a>00196 
-<a name="l00197"></a>00197     <span class="keywordflow">if</span> ( ! <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">IOFactory::write</a>( out_images, output, wf, dl ) ) {
-<a name="l00198"></a>00198         <span class="keywordflow">if</span> ( exitOnError )
-<a name="l00199"></a>00199             exit( 1 );
-<a name="l00200"></a>00200 
-<a name="l00201"></a>00201         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00202"></a>00202     } <span class="keywordflow">else</span>
-<a name="l00203"></a>00203         <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00204"></a>00204 }
-<a name="l00205"></a>00205 
-<a name="l00206"></a>00206 Image <a class="code" href="classisis_1_1data_1_1IOApplication.html#afaaa5d45e0acc646b3e071631956298d" title="Get the next image from the input.">IOApplication::fetchImage</a>()
-<a name="l00207"></a>00207 {
-<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#afaaa5d45e0acc646b3e071631956298d">00208</a>     assert( !<a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.empty() );
-<a name="l00209"></a>00209     <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> ret = <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.front();
-<a name="l00210"></a>00210     <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>.pop_front();
-<a name="l00211"></a>00211     <span class="keywordflow">return</span> ret;
-<a name="l00212"></a>00212 }
-<a name="l00213"></a>00213 
-<a name="l00214"></a>00214 boost::shared_ptr&lt; util::_internal::MessageHandlerBase &gt; <a class="code" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">IOApplication::getLogHandler</a>( std::string module, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )<span class="keyword"> const</span>
-<a name="l00215"></a>00215 <span class="keyword"></span>{
-<a name="l00216"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">00216</a>     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">isis::util::Application::getLogHandler</a>( module, level );
-<a name="l00217"></a>00217 }
-<a name="l00218"></a>00218 
-<a name="l00219"></a>00219 
-<a name="l00220"></a>00220 }
-<a name="l00221"></a>00221 }
-<a name="l00222"></a>00222 
+<a name="l00141"></a>00141 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4" title="Virtual function to display a short help text.">IOApplication::printHelp</a>( <span class="keywordtype">bool</span> withHidden )<span class="keyword"> const</span>
+<a name="l00142"></a>00142 <span class="keyword"></span>{
+<a name="l00143"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4">00143</a>     <span class="keywordflow">if</span>( !parameters[<span class="stringliteral">&quot;help-io&quot;</span>].isSet() ) { <span class="comment">// if help-io was not set - print normal help</span>
+<a name="l00144"></a>00144         <a class="code" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4" title="Virtual function to display a short help text.">Application::printHelp</a>( withHidden );
+<a name="l00145"></a>00145     } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( parameters[<span class="stringliteral">&quot;help-io&quot;</span>].as&lt;bool&gt;() ) { <span class="comment">// if help-io was set to true</span>
+<a name="l00146"></a>00146         std::cerr &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Available IO Plugins:&quot;</span> &lt;&lt; std::endl;
+<a name="l00147"></a>00147         <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">data::IOFactory::FileFormatList</a> plugins = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">data::IOFactory::getFormats</a>();
+<a name="l00148"></a>00148         BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
+<a name="l00149"></a>00149             std::cerr &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; pi-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; pi-&gt;plugin_file.file_string() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;
+<a name="l00150"></a>00150             std::cerr &lt;&lt; <span class="stringliteral">&quot;\t=======================================&quot;</span> &lt;&lt; std::endl;
+<a name="l00151"></a>00151             <span class="keyword">const</span> std::list&lt;util::istring&gt; suff = pi-&gt;getSuffixes();
+<a name="l00152"></a>00152             <span class="keyword">const</span> std::list&lt;util::istring&gt; dialects = util::stringToList&lt;util::istring&gt;( pi-&gt;dialects( <span class="stringliteral">&quot;&quot;</span> ).c_str() );
+<a name="l00153"></a>00153             std::cerr &lt;&lt; <span class="stringliteral">&quot;\tsupported suffixes: &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( suff.begin(), suff.end(), <span class="stringliteral">&quot;\&quot;, \&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span> )  &lt;&lt; std::endl;
+<a name="l00154"></a>00154 
+<a name="l00155"></a>00155             <span class="keywordflow">if</span>( !dialects.empty() )
+<a name="l00156"></a>00156                 std::cerr &lt;&lt; <span class="stringliteral">&quot;\tsupported dialects: &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( dialects.begin(), dialects.end(), <span class="stringliteral">&quot;\&quot;, \&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span>, <span class="stringliteral">&quot;\&quot;&quot;</span> )  &lt;&lt; std::endl;
+<a name="l00157"></a>00157         }
+<a name="l00158"></a>00158     }
+<a name="l00159"></a>00159 }
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca" title="Load data into the input list of the Application using the internal ParameterMap.">IOApplication::autoload</a>( <span class="keywordtype">bool</span> exitOnError )
+<a name="l00162"></a>00162 {
+<a name="l00163"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">00163</a>     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca" title="Load data into the input list of the Application using the internal ParameterMap.">autoload</a>( parameters, <a class="code" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>, exitOnError, <span class="stringliteral">&quot;&quot;</span>, feedback );
+<a name="l00164"></a>00164 
+<a name="l00165"></a>00165 }
+<a name="l00166"></a>00166 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca" title="Load data into the input list of the Application using the internal ParameterMap.">IOApplication::autoload</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">util::ParameterMap</a> &amp;parameters, std::list&lt;Image&gt; &amp;images, <span class="keywordtype">bool</span> exitOnError, <span class="keyword">const</span> std::string &amp;suffix,  boost::shared_ptr&lt;util::ConsoleFeedback&gt; feedback )
+<a name="l00167"></a>00167 {
+<a name="l00168"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#ae69219b4375826a741177c45374f0229">00168</a>     <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> input = parameters[std::string( <span class="stringliteral">&quot;in&quot;</span> )+suffix];
+<a name="l00169"></a>00169     std::string rf = parameters[std::string( <span class="stringliteral">&quot;rf&quot;</span> )+suffix];
+<a name="l00170"></a>00170     std::string dl = parameters[std::string( <span class="stringliteral">&quot;rdialect&quot;</span> )+suffix];
+<a name="l00171"></a>00171     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00172"></a>00172             &lt;&lt; <span class="stringliteral">&quot;loading &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( input )
+<a name="l00173"></a>00173             &lt;&lt; ( rf.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the format: &quot;</span> ) + rf )
+<a name="l00174"></a>00174             &lt;&lt; ( ( !rf.empty() &amp;&amp; !dl.empty() ) ? <span class="stringliteral">&quot; and&quot;</span> : <span class="stringliteral">&quot;&quot;</span> )
+<a name="l00175"></a>00175             &lt;&lt; ( dl.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the dialect: &quot;</span> ) + dl );
+<a name="l00176"></a>00176 
+<a name="l00177"></a>00177     <span class="keywordtype">bool</span> no_progress = parameters[<span class="stringliteral">&quot;np&quot;</span>];
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179     <span class="keywordflow">if</span>( !no_progress &amp;&amp; feedback ) {
+<a name="l00180"></a>00180         <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( feedback );
+<a name="l00181"></a>00181     }
+<a name="l00182"></a>00182 
+<a name="l00183"></a>00183     <span class="keyword">const</span> std::list&lt; Image &gt; tImages = <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">data::IOFactory::load</a>( input, rf.c_str(), dl.c_str() );
+<a name="l00184"></a>00184 
+<a name="l00185"></a>00185     images.insert( images.end(), tImages.begin(), tImages.end() );
+<a name="l00186"></a>00186 
+<a name="l00187"></a>00187     <span class="keywordflow">if</span> ( images.empty() ) {
+<a name="l00188"></a>00188         <span class="keywordflow">if</span> ( exitOnError ) {
+<a name="l00189"></a>00189             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad35fd8a1a402fc01ce52911ebd7a51e4">notice</a> ) &lt;&lt; <span class="stringliteral">&quot;No data acquired, exiting...&quot;</span>;
+<a name="l00190"></a>00190             exit( 1 );
+<a name="l00191"></a>00191         } <span class="keywordflow">else</span>
+<a name="l00192"></a>00192             <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00193"></a>00193     } <span class="keywordflow">else</span> {
+<a name="l00194"></a>00194         <span class="keywordflow">for</span>( std::list&lt;data::Image&gt;::const_iterator a = images.begin(); a != images.end(); a++ ) {
+<a name="l00195"></a>00195             <span class="keywordflow">for</span>( std::list&lt;data::Image&gt;::const_iterator b = a; ( ++b ) != images.end(); ) {
+<a name="l00196"></a>00196                 <span class="keyword">const</span> util::PropertyMap &amp;aref = *a, bref = *b;
+<a name="l00197"></a>00197                 <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( aref.getDifference( bref ).empty(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The metadata of the images from &quot;</span>
+<a name="l00198"></a>00198                         &lt;&lt; aref.getPropertyAs&lt;std::string&gt;( <span class="stringliteral">&quot;source&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::distance&lt;std::list&lt;Image&gt; ::const_iterator&gt;( images.begin(), a )
+<a name="l00199"></a>00199                         &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; bref.getPropertyAs&lt;std::string&gt;( <span class="stringliteral">&quot;source&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; std::distance&lt;std::list&lt;Image&gt; ::const_iterator&gt;( images.begin(), b )
+<a name="l00200"></a>00200                         &lt;&lt; <span class="stringliteral">&quot; are equal. Maybe they are duplicates.&quot;</span>;
+<a name="l00201"></a>00201             }
+<a name="l00202"></a>00202         }
+<a name="l00203"></a>00203     }
+<a name="l00204"></a>00204 
+<a name="l00205"></a>00205     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00206"></a>00206 }
+<a name="l00207"></a>00207 
+<a name="l00208"></a>00208 
+<a name="l00209"></a>00209 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">IOApplication::autowrite</a>( Image out_image, <span class="keywordtype">bool</span> exitOnError ) {<span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">autowrite</a>( std::list&lt;Image&gt;( 1, out_image ), exitOnError );}
+<a name="l00210"></a>00210 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">IOApplication::autowrite</a>( std::list&lt;Image&gt; out_images, <span class="keywordtype">bool</span> exitOnError )
+<a name="l00211"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7">00211</a> {
+<a name="l00212"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">00212</a>     <span class="keyword">const</span> <span class="keywordtype">bool</span> no_progress = parameters[<span class="stringliteral">&quot;np&quot;</span>];
+<a name="l00213"></a>00213     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">autowrite</a>( parameters, out_images, exitOnError, <span class="stringliteral">&quot;&quot;</span>, no_progress ? boost::shared_ptr&lt;util::ConsoleFeedback&gt;() : feedback );
+<a name="l00214"></a>00214 }
+<a name="l00215"></a>00215 
+<a name="l00216"></a>00216 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">IOApplication::autowrite</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">util::ParameterMap</a> &amp;parameters, <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> out_image, <span class="keywordtype">bool</span> exitOnError, <span class="keyword">const</span> std::string &amp;suffix, boost::shared_ptr&lt;util::ConsoleFeedback&gt; feedback )
+<a name="l00217"></a>00217 {
+<a name="l00218"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a2cd0010709ccf97705f2b2a9e0a0303e">00218</a>     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">autowrite</a>( parameters, std::list&lt;Image&gt;( 1, out_image ), exitOnError, suffix, feedback );
+<a name="l00219"></a>00219 }
+<a name="l00220"></a>00220 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7" title="Write data using the internal ParameterMap.">IOApplication::autowrite</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">util::ParameterMap</a> &amp;parameters, std::list&lt; Image &gt; out_images, <span class="keywordtype">bool</span> exitOnError, <span class="keyword">const</span> std::string &amp;suffix, boost::shared_ptr&lt;util::ConsoleFeedback&gt; feedback )
+<a name="l00221"></a>00221 {
+<a name="l00222"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a5d7653bba820d3261b1f56acee4b7823">00222</a>     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a> repn = parameters[std::string( <span class="stringliteral">&quot;repn&quot;</span> )+suffix];
+<a name="l00223"></a>00223     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">util::Selection</a> scale_mode = parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix];
+<a name="l00224"></a>00224     <span class="keyword">const</span> std::string output = parameters[std::string( <span class="stringliteral">&quot;out&quot;</span> )+suffix];
+<a name="l00225"></a>00225     <span class="keyword">const</span> std::string wf = parameters[std::string( <span class="stringliteral">&quot;wf&quot;</span> )+suffix];
+<a name="l00226"></a>00226     <span class="keyword">const</span> std::string dl = parameters[std::string( <span class="stringliteral">&quot;wdialect&quot;</span> )+suffix];
+<a name="l00227"></a>00227     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00228"></a>00228             &lt;&lt; <span class="stringliteral">&quot;Writing &quot;</span> &lt;&lt; out_images.size() &lt;&lt; <span class="stringliteral">&quot; images&quot;</span>
+<a name="l00229"></a>00229             &lt;&lt; ( repn ? std::string( <span class="stringliteral">&quot; as &quot;</span> ) + ( std::string )repn : <span class="stringliteral">&quot;&quot;</span> )
+<a name="l00230"></a>00230             &lt;&lt; <span class="stringliteral">&quot; to &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( output )
+<a name="l00231"></a>00231             &lt;&lt; ( wf.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the format: &quot;</span> ) + wf )
+<a name="l00232"></a>00232             &lt;&lt; ( ( !wf.empty() &amp;&amp; !dl.empty() ) ? <span class="stringliteral">&quot; and&quot;</span> : <span class="stringliteral">&quot;&quot;</span> )
+<a name="l00233"></a>00233             &lt;&lt; ( dl.empty() ? <span class="stringliteral">&quot;&quot;</span> : std::string( <span class="stringliteral">&quot; using the dialect: &quot;</span> ) + dl );
+<a name="l00234"></a>00234 
+<a name="l00235"></a>00235 
+<a name="l00236"></a>00236     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( parameters[std::string( <span class="stringliteral">&quot;scale_mode&quot;</span> )+suffix].isSet() &amp;&amp; repn == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00237"></a>00237             &lt;&lt; <span class="stringliteral">&quot;Ignoring -scale_mode&quot;</span> &lt;&lt; suffix &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( scale_mode )
+<a name="l00238"></a>00238             &lt;&lt;  <span class="stringliteral">&quot;, because -repn&quot;</span> &lt;&lt; suffix &lt;&lt; <span class="stringliteral">&quot; was not given&quot;</span>;
+<a name="l00239"></a>00239 
+<a name="l00240"></a>00240     <span class="keywordflow">if</span>( repn != 0 ) {
+<a name="l00241"></a>00241         BOOST_FOREACH( std::list&lt;Image&gt;::reference ref, out_images ) {
+<a name="l00242"></a>00242             ref.convertToType( repn, static_cast&lt;autoscaleOption&gt;( scale_mode - 1 ) ); <span class="comment">//noscale is 0 but 1 in the selection</span>
+<a name="l00243"></a>00243         }
+<a name="l00244"></a>00244     }
+<a name="l00245"></a>00245 
+<a name="l00246"></a>00246     <span class="keywordflow">if</span>( feedback )
+<a name="l00247"></a>00247         <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">data::IOFactory::setProgressFeedback</a>( feedback );
+<a name="l00248"></a>00248 
+<a name="l00249"></a>00249     <span class="keywordflow">if</span> ( ! <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">IOFactory::write</a>( out_images, output, wf.c_str(), dl.c_str() ) ) {
+<a name="l00250"></a>00250         <span class="keywordflow">if</span> ( exitOnError ) {
+<a name="l00251"></a>00251             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad35fd8a1a402fc01ce52911ebd7a51e4">notice</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to write, exiting...&quot;</span>;
+<a name="l00252"></a>00252             exit( 1 );
+<a name="l00253"></a>00253         }
+<a name="l00254"></a>00254 
+<a name="l00255"></a>00255         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00256"></a>00256     } <span class="keywordflow">else</span>
+<a name="l00257"></a>00257         <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00258"></a>00258 }
+<a name="l00259"></a>00259 
+<a name="l00260"></a>00260 Image <a class="code" href="classisis_1_1data_1_1IOApplication.html#afaaa5d45e0acc646b3e071631956298d" title="Get the next image from the input.">IOApplication::fetchImage</a>()
+<a name="l00261"></a>00261 {
+<a name="l00262"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#afaaa5d45e0acc646b3e071631956298d">00262</a>     assert( !images.empty() );
+<a name="l00263"></a>00263     <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> ret = images.front();
+<a name="l00264"></a>00264     images.pop_front();
+<a name="l00265"></a>00265     <span class="keywordflow">return</span> ret;
+<a name="l00266"></a>00266 }
+<a name="l00267"></a>00267 
+<a name="l00268"></a>00268 boost::shared_ptr&lt; util::MessageHandlerBase &gt; <a class="code" href="classisis_1_1data_1_1IOApplication.html#a15e619df12e2d5e0f35b2a92436e8703">IOApplication::getLogHandler</a>( std::string module, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level )<span class="keyword"> const</span>
+<a name="l00269"></a>00269 <span class="keyword"></span>{
+<a name="l00270"></a><a class="code" href="classisis_1_1data_1_1IOApplication.html#a15e619df12e2d5e0f35b2a92436e8703">00270</a>     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOApplication.html#a15e619df12e2d5e0f35b2a92436e8703">isis::util::Application::getLogHandler</a>( module, level );
+<a name="l00271"></a>00271 }
+<a name="l00272"></a>00272 
+<a name="l00273"></a>00273 
+<a name="l00274"></a>00274 }
+<a name="l00275"></a>00275 }
+<a name="l00276"></a>00276 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -60,8 +59,10 @@
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1color.html#adea878e6091a84633758be422c3440a1">operator!=</a> (const <a class="el" href="structisis_1_1util_1_1color.html">color</a> &amp;other) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1color.html#ac2f706fff448e69ecd4a20d00b612101">operator==</a> (const <a class="el" href="structisis_1_1util_1_1color.html">color</a> &amp;other) const </td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename O &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1color.html#a518a86c3e2ef826a2d55693667519d9d">operator!=</a> (const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; O &gt; &amp;other) const </td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename O &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1color.html#a4267f671cebcee2e6d55e58bcdcf7bee">operator==</a> (const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; O &gt; &amp;other) const </td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a></td></tr>
@@ -76,16 +77,18 @@ Data Fields</h2></td></tr>
 
 <p>Definition at line <a class="el" href="color_8hpp_source.html#l00013">13</a> of file <a class="el" href="color_8hpp_source.html">color.hpp</a>.</p>
 </div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="adea878e6091a84633758be422c3440a1"></a><!-- doxytag: member="isis::util::color::operator!=" ref="adea878e6091a84633758be422c3440a1" args="(const color &amp;other) const " -->
+<a class="anchor" id="a518a86c3e2ef826a2d55693667519d9d"></a><!-- doxytag: member="isis::util::color::operator!=" ref="a518a86c3e2ef826a2d55693667519d9d" args="(const color&lt; O &gt; &amp;other) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T&gt; </div>
+<div class="memtemplate">
+template&lt;typename O &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="structisis_1_1util_1_1color.html">isis::util::color</a>&lt; T &gt;::operator!= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; O &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td> const<code> [inline]</code></td>
         </tr>
@@ -97,16 +100,18 @@ template&lt;typename T&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ac2f706fff448e69ecd4a20d00b612101"></a><!-- doxytag: member="isis::util::color::operator==" ref="ac2f706fff448e69ecd4a20d00b612101" args="(const color &amp;other) const " -->
+<a class="anchor" id="a4267f671cebcee2e6d55e58bcdcf7bee"></a><!-- doxytag: member="isis::util::color::operator==" ref="a4267f671cebcee2e6d55e58bcdcf7bee" args="(const color&lt; O &gt; &amp;other) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T&gt; </div>
+<div class="memtemplate">
+template&lt;typename O &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="structisis_1_1util_1_1color.html">isis::util::color</a>&lt; T &gt;::operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1color.html">color</a>&lt; O &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td> const<code> [inline]</code></td>
         </tr>
@@ -174,7 +179,7 @@ template&lt;typename T&gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="color_8hpp_source.html">color.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

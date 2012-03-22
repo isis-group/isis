@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -63,50 +62,50 @@
 <a name="l00021"></a>00021 
 <a name="l00023"></a>00023 <span class="keyword">namespace </span>isis
 <a name="l00024"></a>00024 {
-<a name="l00029"></a>00029 <span class="keyword">namespace </span>util
-<a name="l00030"></a>00030 {
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>_internal
-<a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="keyword">template</span>&lt;<span class="keyword">class</span> MODULE&gt; <span class="keyword">class </span>Log
-<a name="l00035"></a>00035 {
-<a name="l00036"></a>00036     <span class="keyword">friend</span> <span class="keyword">class </span>util::Singletons;
-<a name="l00037"></a>00037     boost::shared_ptr&lt;MessageHandlerBase&gt; m_handle;
-<a name="l00038"></a>00038     <span class="keyword">static</span> boost::shared_ptr&lt;MessageHandlerBase&gt; &amp;getHandle() {
-<a name="l00039"></a>00039         boost::shared_ptr&lt;util::_internal::MessageHandlerBase&gt; &amp;handle = Singletons::get &lt; Log&lt;MODULE&gt;, INT_MAX - 1 &gt; ().m_handle;
-<a name="l00040"></a>00040         <span class="keywordflow">return</span> handle;
-<a name="l00041"></a>00041     }
-<a name="l00042"></a>00042     Log(): m_handle( new DefaultMsgPrint( <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad35fd8a1a402fc01ce52911ebd7a51e4">notice</a> ) ) {}
-<a name="l00043"></a>00043 <span class="keyword">public</span>:
-<a name="l00044"></a>00044     <span class="keyword">template</span>&lt;<span class="keyword">class</span> HANDLE_CLASS&gt; <span class="keyword">static</span> <span class="keywordtype">void</span> enable( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> enable ) {
-<a name="l00045"></a>00045         setHandler( boost::shared_ptr&lt;MessageHandlerBase&gt;( enable ? <span class="keyword">new</span> HANDLE_CLASS( enable ) : 0 ) );
-<a name="l00046"></a>00046     }
-<a name="l00047"></a>00047     <span class="keyword">static</span> <span class="keywordtype">void</span> setHandler( boost::shared_ptr&lt;MessageHandlerBase&gt; handler ) {
-<a name="l00048"></a>00048         getHandle() = handler;
+<a name="l00025"></a>00025 <span class="keyword">namespace </span>util
+<a name="l00026"></a>00026 {
+<a name="l00027"></a>00027 <span class="keyword">namespace </span>_internal
+<a name="l00028"></a>00028 {
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="keyword">template</span>&lt;<span class="keyword">class</span> MODULE&gt; <span class="keyword">class </span>Log
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032     <span class="keyword">friend</span> <span class="keyword">class </span>util::Singletons;
+<a name="l00033"></a>00033     boost::shared_ptr&lt;MessageHandlerBase&gt; m_handle;
+<a name="l00034"></a>00034     <span class="keyword">static</span> boost::shared_ptr&lt;MessageHandlerBase&gt; &amp;getHandle() {
+<a name="l00035"></a>00035         boost::shared_ptr&lt;util::MessageHandlerBase&gt; &amp;handle = Singletons::get &lt; Log&lt;MODULE&gt;, INT_MAX - 1 &gt; ().m_handle;
+<a name="l00036"></a>00036         <span class="keywordflow">return</span> handle;
+<a name="l00037"></a>00037     }
+<a name="l00038"></a>00038     Log(): m_handle( new DefaultMsgPrint( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad35fd8a1a402fc01ce52911ebd7a51e4">notice</a> ) ) {}
+<a name="l00039"></a>00039 <span class="keyword">public</span>:
+<a name="l00040"></a>00040     <span class="keyword">template</span>&lt;<span class="keyword">class</span> HANDLE_CLASS&gt; <span class="keyword">static</span> <span class="keywordtype">void</span> enable( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> enable ) {
+<a name="l00041"></a>00041         setHandler( boost::shared_ptr&lt;MessageHandlerBase&gt;( enable ? <span class="keyword">new</span> HANDLE_CLASS( enable ) : 0 ) );
+<a name="l00042"></a>00042     }
+<a name="l00043"></a>00043     <span class="keyword">static</span> <span class="keywordtype">void</span> setHandler( boost::shared_ptr&lt;MessageHandlerBase&gt; handler ) {
+<a name="l00044"></a>00044         getHandle() = handler;
+<a name="l00045"></a>00045     }
+<a name="l00046"></a>00046     <span class="keyword">static</span> Message send( <span class="keyword">const</span> <span class="keywordtype">char</span> file[], <span class="keyword">const</span> <span class="keywordtype">char</span> <span class="keywordtype">object</span>[], <span class="keywordtype">int</span> line, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
+<a name="l00047"></a>00047         boost::shared_ptr&lt;util::MessageHandlerBase&gt; &amp;handle = getHandle();
+<a name="l00048"></a>00048         <span class="keywordflow">return</span> Message( <span class="keywordtype">object</span>, MODULE::name(), file, line, level, handle );
 <a name="l00049"></a>00049     }
-<a name="l00050"></a>00050     <span class="keyword">static</span> Message send( <span class="keyword">const</span> <span class="keywordtype">char</span> file[], <span class="keyword">const</span> <span class="keywordtype">char</span> <span class="keywordtype">object</span>[], <span class="keywordtype">int</span> line, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
-<a name="l00051"></a>00051         boost::shared_ptr&lt;util::_internal::MessageHandlerBase&gt; &amp;handle = getHandle();
-<a name="l00052"></a>00052         <span class="keywordflow">return</span> Message( <span class="keywordtype">object</span>, MODULE::name(), file, line, level, handle );
-<a name="l00053"></a>00053     }
-<a name="l00054"></a>00054 };
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056 }
-<a name="l00057"></a>00057 }
-<a name="l00059"></a>00059 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a><a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">00062</a> <span class="preprocessor">#define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\</span>
-<a name="l00063"></a>00063 <span class="preprocessor">    if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::enable&lt;HANDLE_CLASS&gt;(set)</span>
-<a name="l00064"></a>00064 <span class="preprocessor"></span>
-<a name="l00065"></a><a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">00065</a> <span class="preprocessor">#define LOG(MODULE,LEVEL)\</span>
-<a name="l00066"></a>00066 <span class="preprocessor">    if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</span>
-<a name="l00067"></a>00067 <span class="preprocessor"></span>
-<a name="l00068"></a><a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">00068</a> <span class="preprocessor">#define LOG_IF(PRED,MODULE,LEVEL)\</span>
-<a name="l00069"></a>00069 <span class="preprocessor">    if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</span>
-<a name="l00070"></a>00070 <span class="preprocessor"></span>
-<a name="l00071"></a>00071 <span class="preprocessor">#endif</span>
+<a name="l00050"></a>00050 };
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 }
+<a name="l00053"></a>00053 }
+<a name="l00054"></a>00054 }
+<a name="l00056"></a>00056 
+<a name="l00057"></a><a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">00057</a> <span class="preprocessor">#define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\</span>
+<a name="l00058"></a>00058 <span class="preprocessor">    if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::enable&lt;HANDLE_CLASS&gt;(set)</span>
+<a name="l00059"></a>00059 <span class="preprocessor"></span>
+<a name="l00060"></a><a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">00060</a> <span class="preprocessor">#define LOG(MODULE,LEVEL)\</span>
+<a name="l00061"></a>00061 <span class="preprocessor">    if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</span>
+<a name="l00062"></a>00062 <span class="preprocessor"></span>
+<a name="l00063"></a><a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">00063</a> <span class="preprocessor">#define LOG_IF(PRED,MODULE,LEVEL)\</span>
+<a name="l00064"></a>00064 <span class="preprocessor">    if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</span>
+<a name="l00065"></a>00065 <span class="preprocessor"></span>
+<a name="l00066"></a>00066 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

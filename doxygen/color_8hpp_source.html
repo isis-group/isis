@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -53,11 +52,11 @@
 <a name="l00011"></a>00011 
 <a name="l00013"></a><a class="code" href="structisis_1_1util_1_1color.html">00013</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span><a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">color</a> {
 <a name="l00014"></a><a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">00014</a>     T <a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">r</a>, <a class="code" href="structisis_1_1util_1_1color.html#aa6b5d1b2de5b75624c543ac5f2a8c74d">g</a>, <a class="code" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a>;
-<a name="l00015"></a><a class="code" href="structisis_1_1util_1_1color.html#ac2f706fff448e69ecd4a20d00b612101">00015</a>     <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1util_1_1color.html#ac2f706fff448e69ecd4a20d00b612101">operator==</a>( <span class="keyword">const</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">color</a> &amp;other )<span class="keyword">const </span>{
+<a name="l00015"></a><a class="code" href="structisis_1_1util_1_1color.html#a4267f671cebcee2e6d55e58bcdcf7bee">00015</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> O&gt; <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1util_1_1color.html#a4267f671cebcee2e6d55e58bcdcf7bee">operator==</a>( <span class="keyword">const</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">color&lt;O&gt;</a> &amp;other )<span class="keyword">const </span>{
 <a name="l00016"></a>00016         <span class="keywordflow">return</span> <a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">r</a> == other.<a class="code" href="structisis_1_1util_1_1color.html#a2796b6dbf4be2eb625ae570d5f1a407a">r</a> &amp;&amp; <a class="code" href="structisis_1_1util_1_1color.html#aa6b5d1b2de5b75624c543ac5f2a8c74d">g</a> == other.<a class="code" href="structisis_1_1util_1_1color.html#aa6b5d1b2de5b75624c543ac5f2a8c74d">g</a> &amp;&amp; <a class="code" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a> == other.<a class="code" href="structisis_1_1util_1_1color.html#a3251b559ca69ad0760b102dca8c38a52">b</a>;
 <a name="l00017"></a>00017     }
-<a name="l00018"></a><a class="code" href="structisis_1_1util_1_1color.html#adea878e6091a84633758be422c3440a1">00018</a>     <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1util_1_1color.html#adea878e6091a84633758be422c3440a1">operator!=</a>( <span class="keyword">const</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">color</a> &amp;other )<span class="keyword">const </span>{
-<a name="l00019"></a>00019         <span class="keywordflow">return</span> ! <a class="code" href="structisis_1_1util_1_1color.html#ac2f706fff448e69ecd4a20d00b612101">operator==</a>( other );
+<a name="l00018"></a><a class="code" href="structisis_1_1util_1_1color.html#a518a86c3e2ef826a2d55693667519d9d">00018</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> O&gt; <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1util_1_1color.html#a518a86c3e2ef826a2d55693667519d9d">operator!=</a>( <span class="keyword">const</span> <a class="code" href="structisis_1_1util_1_1color.html" title="Class to store a rgb tripel of type T.">color&lt;O&gt;</a> &amp;other )<span class="keyword">const </span>{
+<a name="l00019"></a>00019         <span class="keywordflow">return</span> ! <a class="code" href="structisis_1_1util_1_1color.html#a4267f671cebcee2e6d55e58bcdcf7bee">operator==</a>( other );
 <a name="l00020"></a>00020     }
 <a name="l00021"></a>00021 };
 <a name="l00022"></a>00022 
@@ -79,7 +78,7 @@
 <a name="l00039"></a>00039 <span class="preprocessor">#endif //COLOR_HPP_INCLUDED</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

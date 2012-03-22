@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@
 <a name="l00031"></a>00031 
 <a name="l00032"></a>00032 <span class="keywordtype">void</span> FilePtr::Closer::operator()( <span class="keywordtype">void</span> *p )
 <a name="l00033"></a>00033 {
-<a name="l00034"></a>00034     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Unmapping and closing &quot;</span> &lt;&lt; util::MSubject( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot; it was mapped at &quot;</span> &lt;&lt; p;
+<a name="l00034"></a>00034     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Unmapping and closing &quot;</span> &lt;&lt; util::MSubject( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot; it was mapped at &quot;</span> &lt;&lt; p;
 <a name="l00035"></a>00035 
 <a name="l00036"></a>00036     <span class="keywordtype">bool</span> unmapped = <span class="keyword">false</span>;
 <a name="l00037"></a>00037 <span class="preprocessor">#ifdef WIN32</span>
@@ -81,14 +80,14 @@
 <a name="l00039"></a>00039 <span class="preprocessor">#else</span>
 <a name="l00040"></a>00040 <span class="preprocessor"></span>    unmapped = !munmap( p, len );
 <a name="l00041"></a>00041 <span class="preprocessor">#endif</span>
-<a name="l00042"></a>00042 <span class="preprocessor"></span>    <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !unmapped, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00042"></a>00042 <span class="preprocessor"></span>    <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !unmapped, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
 <a name="l00043"></a>00043             &lt;&lt; <span class="stringliteral">&quot;Unmapping of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00044"></a>00044             &lt;&lt; <span class="stringliteral">&quot; failed, the error was: &quot;</span> &lt;&lt; util::MSubject( <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>() );
 <a name="l00045"></a>00045 
 <a name="l00046"></a>00046 <span class="preprocessor">#ifdef __APPLE__</span>
 <a name="l00047"></a>00047 <span class="preprocessor"></span>
 <a name="l00048"></a>00048     <span class="keywordflow">if</span>( write &amp;&amp; futimes( file, NULL ) != 0 ) {
-<a name="l00049"></a>00049         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00049"></a>00049         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
 <a name="l00050"></a>00050                 &lt;&lt; <span class="stringliteral">&quot;Setting access time of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00051"></a>00051                 &lt;&lt; <span class="stringliteral">&quot; failed, the error was: &quot;</span> &lt;&lt; util::MSubject( strerror( errno ) );
 <a name="l00052"></a>00052     }
@@ -101,7 +100,7 @@
 <a name="l00059"></a>00059 
 <a name="l00060"></a>00060         GetSystemTime( &amp;st );
 <a name="l00061"></a>00061         <span class="keywordtype">bool</span> ok = SystemTimeToFileTime( &amp;st, &amp;ft ) &amp;&amp; SetFileTime( file, NULL, ( LPFILETIME ) NULL, &amp;ft );
-<a name="l00062"></a>00062         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ok, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00062"></a>00062         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !ok, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
 <a name="l00063"></a>00063                 &lt;&lt; <span class="stringliteral">&quot;Setting access time of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00064"></a>00064                 &lt;&lt; <span class="stringliteral">&quot; failed, the error was: &quot;</span> &lt;&lt; util::MSubject( <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>() );
 <a name="l00065"></a>00065     }
@@ -115,7 +114,7 @@
 <a name="l00073"></a>00073 <span class="preprocessor"></span>
 <a name="l00074"></a>00074     <span class="keywordflow">if</span>( ::close( file ) != 0 ) {
 <a name="l00075"></a>00075 <span class="preprocessor">#endif</span>
-<a name="l00076"></a>00076 <span class="preprocessor"></span>        <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00076"></a>00076 <span class="preprocessor"></span>        <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
 <a name="l00077"></a>00077                 &lt;&lt; <span class="stringliteral">&quot;Closing of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00078"></a>00078                 &lt;&lt; <span class="stringliteral">&quot; failed, the error was: &quot;</span> &lt;&lt; util::MSubject( strerror( errno ) );
 <a name="l00079"></a>00079     }
@@ -144,12 +143,12 @@
 <a name="l00102"></a>00102 <span class="preprocessor">#endif</span>
 <a name="l00103"></a>00103 <span class="preprocessor"></span>
 <a name="l00104"></a>00104     <span class="keywordflow">if</span>( ptr == NULL ) {
-<a name="l00105"></a>00105         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to map &quot;</span> &lt;&lt; util::MSubject( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot;, error was &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>();
+<a name="l00105"></a>00105         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to map &quot;</span> &lt;&lt; util::MSubject( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot;, error was &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>();
 <a name="l00106"></a>00106         <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00107"></a>00107     } <span class="keywordflow">else</span> {
 <a name="l00108"></a>00108         <span class="keyword">const</span> Closer cl = {file, mmaph, len, filename, write};
 <a name="l00109"></a>00109         writing = write;
-<a name="l00110"></a>00110         <span class="keyword">static_cast&lt;</span>ValuePtr&lt;uint8_t&gt;&amp;<span class="keyword">&gt;</span>( *this ) = ValuePtr&lt;uint8_t&gt;( <span class="keyword">static_cast&lt;</span>uint8_t * const<span class="keyword">&gt;</span>( ptr ), len, cl );
+<a name="l00110"></a>00110         <span class="keyword">static_cast&lt;</span>ValueArray&lt;uint8_t&gt;&amp;<span class="keyword">&gt;</span>( *this ) = ValueArray&lt;uint8_t&gt;( <span class="keyword">static_cast&lt;</span>uint8_t * const<span class="keyword">&gt;</span>( ptr ), len, cl );
 <a name="l00111"></a>00111         <span class="keywordflow">return</span> <span class="keyword">true</span>;
 <a name="l00112"></a>00112     }
 <a name="l00113"></a>00113 }
@@ -171,7 +170,7 @@
 <a name="l00129"></a>00129                 }
 <a name="l00130"></a>00130             }
 <a name="l00131"></a>00131 
-<a name="l00132"></a>00132             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00132"></a>00132             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
 <a name="l00133"></a>00133                     &lt;&lt; <span class="stringliteral">&quot;Failed to resize &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00134"></a>00134                     &lt;&lt; <span class="stringliteral">&quot; to the requested size &quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;, the error was: &quot;</span> &lt;&lt; util::MSubject( <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>() );
 <a name="l00135"></a>00135             <span class="keywordflow">return</span> 0; <span class="comment">// fail</span>
@@ -179,7 +178,7 @@
 <a name="l00137"></a>00137 <span class="preprocessor"></span>            <span class="keyword">const</span> <span class="keywordtype">int</span> err = ftruncate( file, size ) ? errno : 0;
 <a name="l00138"></a>00138 
 <a name="l00139"></a>00139             <span class="keywordflow">if</span>( err ) { <span class="comment">// could not resize the file =&gt; fail</span>
-<a name="l00140"></a>00140                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00140"></a>00140                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
 <a name="l00141"></a>00141                         &lt;&lt; <span class="stringliteral">&quot;Failed to resize &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00142"></a>00142                         &lt;&lt; <span class="stringliteral">&quot; to the requested size &quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;, the error was: &quot;</span> &lt;&lt; util::MSubject( strerror( err ) );
 <a name="l00143"></a>00143                 <span class="keywordflow">return</span> 0; <span class="comment">// fail</span>
@@ -192,7 +191,7 @@
 <a name="l00150"></a>00150     } <span class="keywordflow">else</span> { <span class="comment">// if we&#39;re reading</span>
 <a name="l00151"></a>00151         <span class="keywordflow">if</span>( size == 0 ) {
 <a name="l00152"></a>00152             <span class="keywordflow">if</span> ( std::numeric_limits&lt;size_t&gt;::max() &lt; currSize ) {
-<a name="l00153"></a>00153                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry cannot map files larger than &quot;</span> &lt;&lt; std::numeric_limits&lt;size_t&gt;::max()
+<a name="l00153"></a>00153                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry cannot map files larger than &quot;</span> &lt;&lt; std::numeric_limits&lt;size_t&gt;::max()
 <a name="l00154"></a>00154                                       &lt;&lt; <span class="stringliteral">&quot; bytes on this platform&quot;</span>;
 <a name="l00155"></a>00155                 <span class="keywordflow">return</span> 0;
 <a name="l00156"></a>00156             } <span class="keywordflow">else</span>
@@ -200,7 +199,7 @@
 <a name="l00158"></a>00158         } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( size &lt;= currSize )
 <a name="l00159"></a>00159             <span class="keywordflow">return</span> size; <span class="comment">// keep the requested size (will fit into the file)</span>
 <a name="l00160"></a>00160         <span class="keywordflow">else</span> { <span class="comment">// size will not fit into the file (and we cannot resize) =&gt; fail</span>
-<a name="l00161"></a>00161             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The requested size for readonly mapping of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
+<a name="l00161"></a>00161             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The requested size for readonly mapping of &quot;</span> &lt;&lt; util::MSubject( filename.file_string() )
 <a name="l00162"></a>00162                                   &lt;&lt; <span class="stringliteral">&quot; is greater than the filesize (&quot;</span> &lt;&lt; currSize &lt;&lt; <span class="stringliteral">&quot;).&quot;</span>;
 <a name="l00163"></a>00163             <span class="keywordflow">return</span> 0; <span class="comment">// fail</span>
 <a name="l00164"></a>00164         }
@@ -229,7 +228,7 @@
 <a name="l00187"></a>00187 <span class="preprocessor">#endif</span>
 <a name="l00188"></a>00188 <span class="preprocessor"></span>
 <a name="l00189"></a>00189     <span class="keywordflow">if</span>( file == invalid ) {
-<a name="l00190"></a>00190         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to open &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() )
+<a name="l00190"></a>00190         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to open &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() )
 <a name="l00191"></a>00191                               &lt;&lt; <span class="stringliteral">&quot;, the error was: &quot;</span> &lt;&lt; <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>();
 <a name="l00192"></a>00192         <span class="keywordflow">return</span>;
 <a name="l00193"></a>00193     }
@@ -238,7 +237,7 @@
 <a name="l00196"></a>00196 
 <a name="l00197"></a>00197     <span class="keywordflow">if</span>( map_size ) {
 <a name="l00198"></a>00198         m_good = map( file, map_size, write, filename ); <span class="comment">//and do the mapping</span>
-<a name="l00199"></a>00199         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Mapped &quot;</span> &lt;&lt; map_size &lt;&lt; <span class="stringliteral">&quot; bytes of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot; at &quot;</span> &lt;&lt; getRawAddress().get();
+<a name="l00199"></a>00199         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Mapped &quot;</span> &lt;&lt; map_size &lt;&lt; <span class="stringliteral">&quot; bytes of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot; at &quot;</span> &lt;&lt; getRawAddress().get();
 <a name="l00200"></a>00200     }
 <a name="l00201"></a>00201 
 <a name="l00202"></a>00202     <span class="comment">// from here on the pointer will be set if mapping succeded</span>
@@ -252,9 +251,9 @@
 <a name="l00210"></a>00210     m_good = <span class="keyword">false</span>;
 <a name="l00211"></a>00211 }
 <a name="l00212"></a>00212 
-<a name="l00213"></a>00213 <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueReference.html" title="Base class to store and handle references to Value and ValuePtr objects.">ValuePtrReference</a> FilePtr::atByID( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, <span class="keywordtype">size_t</span> offset, <span class="keywordtype">size_t</span> len, <span class="keywordtype">bool</span> swap_endianess )
-<a name="l00214"></a><a class="code" href="classisis_1_1data_1_1FilePtr.html#a7301c37340f98591f769c26b796d81f1">00214</a> {
-<a name="l00215"></a>00215     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <span class="keyword">static_cast&lt;</span>boost::shared_ptr&lt;uint8_t&gt;&amp;<span class="keyword">&gt;</span>( *this ).get() == 0, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00213"></a>00213 <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> FilePtr::atByID( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, <span class="keywordtype">size_t</span> offset, <span class="keywordtype">size_t</span> len, <span class="keywordtype">bool</span> swap_endianess )
+<a name="l00214"></a><a class="code" href="classisis_1_1data_1_1FilePtr.html#ac82536590cef02b97a90e0a4828f1415">00214</a> {
+<a name="l00215"></a>00215     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <span class="keyword">static_cast&lt;</span>boost::shared_ptr&lt;uint8_t&gt;&amp;<span class="keyword">&gt;</span>( *this ).get() == 0, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
 <a name="l00216"></a>00216             &lt;&lt; <span class="stringliteral">&quot;There is no mapped data for this FilePtr - I&#39;m very likely gonna crash soon ..&quot;</span>;
 <a name="l00217"></a>00217     GeneratorMap &amp;map = util::Singletons::get&lt;GeneratorMap, 0&gt;();
 <a name="l00218"></a>00218     assert( !map.empty() );
@@ -268,7 +267,7 @@
 <a name="l00226"></a>00226 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

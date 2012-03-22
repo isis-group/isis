@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -57,8 +56,8 @@
 <a name="l00016"></a>00016 <span class="preprocessor"></span><span class="preprocessor">#pragma warning(disable:4800 4996)</span>
 <a name="l00017"></a>00017 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
 <a name="l00018"></a>00018 <span class="preprocessor"></span>
-<a name="l00019"></a>00019 <span class="preprocessor">#include &quot;<a class="code" href="type_8hpp.html">type.hpp</a>&quot;</span>
-<a name="l00020"></a>00020 <span class="preprocessor">#include &quot;<a class="code" href="typeptr_8hpp.html">../DataStorage/typeptr.hpp</a>&quot;</span>
+<a name="l00019"></a>00019 <span class="preprocessor">#include &quot;<a class="code" href="value_8hpp.html">value.hpp</a>&quot;</span>
+<a name="l00020"></a>00020 <span class="preprocessor">#include &quot;<a class="code" href="valuearray_8hpp.html">../DataStorage/valuearray.hpp</a>&quot;</span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &quot;<a class="code" href="types_8hpp.html">types.hpp</a>&quot;</span>
 <a name="l00022"></a>00022 <span class="preprocessor">#include &lt;complex&gt;</span>
 <a name="l00023"></a>00023 <span class="preprocessor">#include &lt;boost/date_time/posix_time/posix_time.hpp&gt;</span>
@@ -116,45 +115,47 @@
 <a name="l00075"></a>00075 DEF_TYPE( boost::posix_time::ptime, timestamp );
 <a name="l00076"></a>00076 DEF_TYPE( boost::gregorian::date, date );
 <a name="l00077"></a>00077 
-<a name="l00078"></a>00078 <span class="keyword">namespace </span>_internal
-<a name="l00079"></a>00079 {
-<a name="l00080"></a>00080 <span class="keyword">struct </span>type_lister {
-<a name="l00081"></a>00081     std::map&lt; unsigned short, std::string &gt; &amp;m_map;
-<a name="l00082"></a>00082     <span class="keywordtype">bool</span> m_withValues, m_withValuePtrs;
-<a name="l00083"></a>00083     type_lister( std::map&lt; unsigned short, std::string &gt; &amp;map, <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValuePtrs ): m_map( map ), m_withValues( withValues ), m_withValuePtrs( withValuePtrs ) {}
-<a name="l00084"></a>00084     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC&gt; <span class="keywordtype">void</span> operator()( SRC ) {<span class="comment">//will be called by the mpl::for_each</span>
-<a name="l00085"></a>00085         <span class="keywordflow">if</span>( m_withValues )m_map.insert( std::make_pair( util::Value&lt;SRC&gt;::staticID, util::Value&lt;SRC&gt;::staticName() ) );
-<a name="l00086"></a>00086 
-<a name="l00087"></a>00087         <span class="keywordflow">if</span>( m_withValuePtrs )m_map.insert( std::make_pair( data::ValuePtr&lt;SRC&gt;::staticID, data::ValuePtr&lt;SRC&gt;::staticName() ) );
-<a name="l00088"></a>00088     }
-<a name="l00089"></a>00089 };
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091 }
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093 std::map&lt; unsigned short, std::string &gt; <a class="code" href="namespaceisis_1_1util.html#a0a3769148564862e35ff59c6f0505988">getTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValuePtrs )
-<a name="l00094"></a>00094 {
-<a name="l00095"></a>00095     std::map&lt; unsigned short, std::string &gt; ret;
-<a name="l00096"></a>00096     boost::mpl::for_each&lt;_internal::types&gt;( _internal::type_lister( ret, withValues, withValuePtrs ) );
-<a name="l00097"></a>00097     <span class="keywordflow">return</span> ret;
-<a name="l00098"></a>00098 }
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100 std::map&lt; std::string, unsigned short &gt; <a class="code" href="namespaceisis_1_1util.html#a5a52ca08d3380ec9ccba8cb17d9e5b7f">getTransposedTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValuePtrs )
-<a name="l00101"></a>00101 {
-<a name="l00102"></a>00102     <span class="keyword">typedef</span> std::map&lt; std::string, unsigned short&gt; transposedMapType;
-<a name="l00103"></a>00103     <span class="keyword">typedef</span> std::map&lt; unsigned short, std::string &gt; mapType;
-<a name="l00104"></a>00104     transposedMapType ret;
-<a name="l00105"></a>00105     BOOST_FOREACH( mapType::const_reference ref, <a class="code" href="namespaceisis_1_1util.html#a0a3769148564862e35ff59c6f0505988">util::getTypeMap</a>( withValues, withValuePtrs ) ) {
-<a name="l00106"></a>00106         ret[ref.second] = ref.first;
-<a name="l00107"></a>00107     }
-<a name="l00108"></a>00108     <span class="keywordflow">return</span> ret;
-<a name="l00109"></a>00109 }
-<a name="l00110"></a>00110 
+<a name="l00078"></a>00078 <a class="code" href="config_8hpp.html#a4121f00721360474a8bd91b291159f18">API_EXCLUDE_BEGIN</a>
+<a name="l00079"></a>00079 <span class="keyword">namespace </span>_internal
+<a name="l00080"></a>00080 {
+<a name="l00081"></a>00081 <span class="keyword">struct </span>type_lister {
+<a name="l00082"></a>00082     std::map&lt; unsigned short, std::string &gt; &amp;m_map;
+<a name="l00083"></a>00083     <span class="keywordtype">bool</span> m_withValues, m_withValueArrays;
+<a name="l00084"></a>00084     type_lister( std::map&lt; unsigned short, std::string &gt; &amp;map, <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays ): m_map( map ), m_withValues( withValues ), m_withValueArrays( withValueArrays ) {}
+<a name="l00085"></a>00085     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC&gt; <span class="keywordtype">void</span> operator()( SRC ) {<span class="comment">//will be called by the mpl::for_each</span>
+<a name="l00086"></a>00086         <span class="keywordflow">if</span>( m_withValues )m_map.insert( std::make_pair( util::Value&lt;SRC&gt;::staticID, util::Value&lt;SRC&gt;::staticName() ) );
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088         <span class="keywordflow">if</span>( m_withValueArrays )m_map.insert( std::make_pair( data::ValueArray&lt;SRC&gt;::staticID, data::ValueArray&lt;SRC&gt;::staticName() ) );
+<a name="l00089"></a>00089     }
+<a name="l00090"></a>00090 };
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 }
+<a name="l00093"></a>00093 <a class="code" href="config_8hpp.html#a63e8f68230fde1f0a06d07a8642701fe">API_EXCLUDE_END</a>
+<a name="l00094"></a>00094 
+<a name="l00095"></a>00095 std::map&lt; unsigned short, std::string &gt; <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">getTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
+<a name="l00096"></a>00096 {
+<a name="l00097"></a>00097     std::map&lt; unsigned short, std::string &gt; ret;
+<a name="l00098"></a>00098     boost::mpl::for_each&lt;_internal::types&gt;( _internal::type_lister( ret, withValues, withValueArrays ) );
+<a name="l00099"></a>00099     <span class="keywordflow">return</span> ret;
+<a name="l00100"></a>00100 }
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102 std::map&lt; std::string, unsigned short &gt; <a class="code" href="namespaceisis_1_1util.html#a88c57837190db30ff1d066c7bd0ac15d">getTransposedTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
+<a name="l00103"></a>00103 {
+<a name="l00104"></a>00104     <span class="keyword">typedef</span> std::map&lt; std::string, unsigned short&gt; transposedMapType;
+<a name="l00105"></a>00105     <span class="keyword">typedef</span> std::map&lt; unsigned short, std::string &gt; mapType;
+<a name="l00106"></a>00106     transposedMapType ret;
+<a name="l00107"></a>00107     BOOST_FOREACH( mapType::const_reference ref, <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">util::getTypeMap</a>( withValues, withValueArrays ) ) {
+<a name="l00108"></a>00108         ret[ref.second] = ref.first;
+<a name="l00109"></a>00109     }
+<a name="l00110"></a>00110     <span class="keywordflow">return</span> ret;
 <a name="l00111"></a>00111 }
-<a name="l00112"></a>00112 }
-<a name="l00113"></a>00113 
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113 }
+<a name="l00114"></a>00114 }
+<a name="l00115"></a>00115 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

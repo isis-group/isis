@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -49,7 +48,8 @@
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
-      <li><a href="functions.html#index_a"><span>a</span></a></li>
+      <li><a href="functions.html#index__"><span>_</span></a></li>
+      <li><a href="functions_0x61.html#index_a"><span>a</span></a></li>
       <li><a href="functions_0x62.html#index_b"><span>b</span></a></li>
       <li><a href="functions_0x63.html#index_c"><span>c</span></a></li>
       <li><a href="functions_0x64.html#index_d"><span>d</span></a></li>
@@ -82,14 +82,14 @@
 <li>o
 : <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a0cc0a4025e9c3a9127631cc5d26ee950">isis::util::DefaultMsgPrint</a>
 </li>
-<li>operator boost::scoped_ptr&lt; _internal::ValueBase &gt;::unspecified_bool_type()
-: <a class="el" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">isis::util::ProgParameter</a>
+<li>operator boost::scoped_ptr&lt; ValueBase &gt;::unspecified_bool_type()
+: <a class="el" href="classisis_1_1util_1_1ProgParameter.html#a240cff721f257aa32b94f12c0ded6850">isis::util::ProgParameter</a>
 </li>
 <li>operator boost::shared_ptr&lt; TYPE &gt; &amp;()
-: <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a8a307eca934ade3dfccbc7e41fb01208">isis::data::ValuePtr&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArray.html#a407cba5e4725d4fca01bbbbcb062f39d">isis::data::ValueArray&lt; TYPE &gt;</a>
 </li>
 <li>operator const boost::shared_ptr&lt; TYPE &gt; &amp;()
-: <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a869d6aa942d986d201d6d4255401845b">isis::data::ValuePtr&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArray.html#ac947bfca23784c339d4d2086f86e007a">isis::data::ValueArray&lt; TYPE &gt;</a>
 </li>
 <li>operator const T()
 : <a class="el" href="classisis_1_1util_1_1ProgParameter.html#a539a4f231f449cac2534537f96b1d9e6">isis::util::ProgParameter</a>
@@ -110,148 +110,131 @@
 : <a class="el" href="classisis_1_1util_1_1Selection.html#ac3b9120e948bd68e6152e1ca9fa637a8">isis::util::Selection</a>
 </li>
 <li>operator!=()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html#afd786143354b930da915ede62e1fa10e">isis::data::_internal::ConstValueAdapter</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a0d8f3516fc95cd135c499945475e1ca6">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="structisis_1_1util_1_1color.html#adea878e6091a84633758be422c3440a1">isis::util::color&lt; T &gt;</a>
+: <a class="el" href="structisis_1_1util_1_1color.html#a518a86c3e2ef826a2d55693667519d9d">isis::util::color&lt; T &gt;</a>
 , <a class="el" href="classisis_1_1util_1_1PropertyValue.html#a719edc22b62f7dd573d342b232849f79">isis::util::PropertyValue</a>
 , <a class="el" href="classisis_1_1util_1_1FixedVector.html#a71134e94627ac868b3d602e574d1bc0e">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ade54ec06c8e6cef9dbb0b0937d4ca120">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a9f4d55aaee4b2eb72bdd74c06aea545d">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa23e33dee051cea2e36e6f4b3b358678">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator()()
 : <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html#a62845f3b9a67624f00f79497a864ab38">isis::util::PropertyMap::walkTree&lt; Predicate &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1VoxelOp.html#a551683f4b80786ba708a3d4f78b3cf36">isis::data::VoxelOp&lt; TYPE &gt;</a>
 , <a class="el" href="structisis_1_1data_1_1FilePtr_1_1GeneratorMap_1_1proc.html#a455216f3bc78d84d36b3dbabdbf30dcb">isis::data::FilePtr::GeneratorMap::proc</a>
 , <a class="el" href="classisis_1_1data_1_1ChunkOp.html#ab1fae7b38670d42cd15b7e0355725aea">isis::data::ChunkOp</a>
-, <a class="el" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a26ffc959c82f67ee9c4a33e988fcf645">isis::data::_internal::SortedChunkList::scalarPropCompare</a>
-, <a class="el" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">isis::data::_internal::SortedChunkList::posCompare</a>
-, <a class="el" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html#ad19eaedb1482e0bcceaf3fc66fc50f29">isis::data::_internal::SortedChunkList::chunkPtrOperator</a>
-, <a class="el" href="structisis_1_1data_1_1ValuePtr_1_1NonDeleter.html#a5645463c9224820f4a0e41aa2d6416f3">isis::data::ValuePtr&lt; TYPE &gt;::NonDeleter</a>
-, <a class="el" href="structisis_1_1data_1_1ValuePtr_1_1BasicDeleter.html#a7640d152cfaf9f2720b1b6d87a0f7bb0">isis::data::ValuePtr&lt; TYPE &gt;::BasicDeleter</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase_1_1DelProxy.html#a5d1b83dda84ca49104ee042a10793435">isis::data::_internal::ValuePtrBase::DelProxy</a>
+, <a class="el" href="structisis_1_1data_1_1ValueArray_1_1NonDeleter.html#aa151009c66c14d57c195ba38fce731ac">isis::data::ValueArray&lt; TYPE &gt;::NonDeleter</a>
+, <a class="el" href="structisis_1_1data_1_1ValueArray_1_1BasicDeleter.html#a6edfdd7aeb73825ddb927d933a88003b">isis::data::ValueArray&lt; TYPE &gt;::BasicDeleter</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase_1_1DelProxy.html#ad4895743e6d4415f50479ca642b758f3">isis::data::ValueArrayBase::DelProxy</a>
 </li>
 <li>operator*()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a9f651b6ba8af0a777fbeb65d9cee1eb7">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a0860b9a2f389be9dc47e726a53e4c16a">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html#a122782f1017724fcc72e304641921e82">isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#a32394daa901097ead25b7b2059add8de">isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;</a>
 , <a class="el" href="classisis_1_1util_1_1FixedVector.html#aa7c2ae057917a602f53e37a5c62a41ab">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a5834592f5c356c2bde0d14dd751d4bb4">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#a5cdacb2c107776effbceac692e0588b9">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator*=()
 : <a class="el" href="classisis_1_1util_1_1FixedVector.html#af1acc437254956e373d8efe714f5880e">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>operator+()
-: <a class="el" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a6a9b1561934832b81591ae5846791d10">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#ac8f143a40ead1423340fd31b3631d257">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a8ee28e82f0d4750bb8f88453868dd3f0">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a6a9b1561934832b81591ae5846791d10">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa99d4328b168299149fd2734947c78e1">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1FixedVector.html#aee83d07b852e4263fe4815a8d01c3d70">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>operator++()
 : <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#ae8ebb9c7558e5fe080c5cbb7ffcb2e47">isis::util::ProgressFeedback</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#aaaa87cd110f236f75bace97c04a60e20">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#ae28513715415a6f67f6f4fc4dd811835">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#ab2626c87eda65a249c517d805dfc1134">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#afb023c73c4426c3375f6fc5ca104d78a">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator+=()
 : <a class="el" href="classisis_1_1util_1_1FixedVector.html#a63a5b37304fa35e164f293212b2d0c4b">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#abac0c06882a51cc277837486cb7e0397">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a8b29d8b2409c4f88e628343158238864">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a901d9d521c897e6e57a9b8a29bff60c4">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#ac896a786022046af9e2da127338ffea0">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator-()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a6049b78086785ec43a6cf5ae6f322093">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1FixedVector.html#ac3b7495884c222fc8e88cf369946fc48">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a7d7a22f35596bf943f56761391312dd3">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a7b920d25ada076f3a010faa18b26f30d">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a21aefd512b97df2f49be1552825cf3ed">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#addddb4e7e45eda1de71403beb28799b2">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator--()
 : <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a3b9e20b45b6641ce106fd725f6e2251f">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#adf36ceb4e59e2dbaf277ac1f250fb7ef">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a3e6699c6bc783029190db234b3a70064">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#a99d7943cc770fa4c552abbeaa5caf5d2">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator-=()
-: <a class="el" href="classisis_1_1util_1_1FixedVector.html#a7d4f8d5d1c2893454edf3a719be19d04">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ace836ca3b19ecdf83d1c3af6d44e6303">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#ab7d6593cef54c21d2296b850bd0fad6e">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1FixedVector.html#adb7fee05eb9a533fb48f8a9cc3930ab1">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a0f8a97b7dcf54fe70857f5e86ca3f202">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#adcb53d67aa2fc9484ed01c60867ef9c9">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator-&gt;()
-: <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html#a2c971d7ff48959feed4b210963cb59fb">isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa0ec4a5b2d4ad20e8378d48a60abf8df">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#a221ab7a4929bd40962ac062833e374a1">isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a757b430421ae4119597e94a3b695bb6e">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a989d51c9876470d391e4923566ef0628">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#aaed5da48cb3d606bc32c9627cafb62f2">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
 </li>
 <li>operator/()
 : <a class="el" href="classisis_1_1util_1_1FixedVector.html#ad0776d5c9a2e1a1b8632b55a50b0e4d7">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>operator/=()
-: <a class="el" href="classisis_1_1util_1_1FixedVector.html#ae03a7264beb87f7f19efb23f2703a5a2">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1FixedVector.html#a6dfa5ad945798fdcbf557591d2f9ce49">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>operator&lt;()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#ae852ec119596e4d7e9d3905ba983b785">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a692c47625e313d983f82de737df40aa5">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a4ad55fafbef06bb0cc85f1d12997cbe6">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html#a59f144f2bbed7b471bb97c1ec849a3cf">isis::data::_internal::ConstValueAdapter</a>
+: <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a692c47625e313d983f82de737df40aa5">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#a453e954915e6bd1018f5d2419db05595">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
+</li>
+<li>operator&lt;&lt;()
+: <a class="el" href="classisis_1_1util_1_1Message.html#a657eebd4d872d639e8a49daa856f41d4">isis::util::Message</a>
 </li>
 <li>operator&lt;=()
 : <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a4538618a31d59422821b4b42845e0820">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#af1f9c80b0cd7bcf4530f2461a57963a6">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a739d6076529f1c5d809fcb0f357a19b3">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa9c530926ec273b59824c2c50535d536">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator=()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1WritingValueAdapter.html#aaa760cc97bd416410d66b74469e5aaf6">isis::data::_internal::WritingValueAdapter</a>
-, <a class="el" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f">isis::data::MemImage&lt; T &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">isis::data::Chunk</a>
-, <a class="el" href="classisis_1_1data_1_1TypedImage.html#a16654e67097e9e70a1bcc16b84bdd640">isis::data::TypedImage&lt; T &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html#ae7178dcfb6abaf7986a7472c079b7125">isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1MemChunk.html#af9f6ea2b3fafbeb2f268abd3b8c3a1a7">isis::data::MemChunk&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a3c13bcfbb74e214c66207a712829a865">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1Image.html#aae95616fad335432d8ce3b5e5daf004a">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#aae95616fad335432d8ce3b5e5daf004a">isis::data::Image</a>
 , <a class="el" href="classisis_1_1data_1_1MemChunk.html#a94aec23312fc84454dcde422985446af">isis::data::MemChunk&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#a4f8d1c2bd131b0ce34f97c2c9dfe548d">isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">isis::data::Chunk</a>
+, <a class="el" href="classisis_1_1data_1_1MemChunk.html#af9f6ea2b3fafbeb2f268abd3b8c3a1a7">isis::data::MemChunk&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a12903d6b1577134bd670ca24afadb0c9">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1TypedImage.html#a16654e67097e9e70a1bcc16b84bdd640">isis::data::TypedImage&lt; T &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f">isis::data::MemImage&lt; T &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b">isis::data::TypedImage&lt; T &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a3c13bcfbb74e214c66207a712829a865">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>
 </li>
 <li>operator==()
-: <a class="el" href="classisis_1_1util_1_1Selection.html#a0b7f7921c73c4aa866304cdfeedff1d0">isis::util::Selection</a>
-, <a class="el" href="classisis_1_1util_1_1Value.html#a9990a77d28a69b98dbf74ad4038bfc0d">isis::util::Value&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html#adb3fa30ae1a1884b835c88f7c97e7c76">isis::data::_internal::ConstValueAdapter</a>
-, <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a1e93ada16242a03c04b787bc6ae6f413">isis::util::PropertyMap</a>
-, <a class="el" href="classisis_1_1util_1_1PropertyValue.html#aa17872fd557f8eef929ab2211bafd832">isis::util::PropertyValue</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ac5955bec92bce2d749af5672e2830a6e">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1Selection.html#ac3812d67829f8388e678932218d99701">isis::util::Selection</a>
+: <a class="el" href="structisis_1_1util_1_1color.html#a4267f671cebcee2e6d55e58bcdcf7bee">isis::util::color&lt; T &gt;</a>
 , <a class="el" href="classisis_1_1util_1_1FixedVector.html#a077180aecf9fb55b67b29e1d558a3f0c">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1PropertyValue.html#aecd2651717669398590174ce1b444aac">isis::util::PropertyValue</a>
+, <a class="el" href="classisis_1_1util_1_1Value.html#a9990a77d28a69b98dbf74ad4038bfc0d">isis::util::Value&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1Selection.html#a0b7f7921c73c4aa866304cdfeedff1d0">isis::util::Selection</a>
+, <a class="el" href="classisis_1_1util_1_1ValueBase.html#acf18b4b2d5efa02be181b3f6a75964d1">isis::util::ValueBase</a>
 , <a class="el" href="classisis_1_1util_1_1Selection.html#af9e1d385b3806d374617ea3d143a7fdd">isis::util::Selection</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#adfecf4f6afec70888b85f5c8286fab77">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#ab2b25ee84489a428d17a825a7c51f013">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="group__util.html#ga799136167f36a51b0413c179d47ac290">isis::util::_internal::ValueBase</a>
-, <a class="el" href="structisis_1_1util_1_1color.html#ac2f706fff448e69ecd4a20d00b612101">isis::util::color&lt; T &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1PropertyValue.html#a3d4d3b0958cf9857967bb766c1b177fd">isis::util::PropertyValue</a>
+, <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a1e93ada16242a03c04b787bc6ae6f413">isis::util::PropertyMap</a>
+, <a class="el" href="classisis_1_1util_1_1Selection.html#ac3812d67829f8388e678932218d99701">isis::util::Selection</a>
+, <a class="el" href="classisis_1_1util_1_1PropertyValue.html#aecd2651717669398590174ce1b444aac">isis::util::PropertyValue</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#afb14f2a649c02ab019ff21b2e1bf6450">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1PropertyValue.html#a65f66b77ecf04a0a9c3e70794f77caf0">isis::util::PropertyValue</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ac5955bec92bce2d749af5672e2830a6e">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
 </li>
 <li>operator&gt;()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html#a292feef45e15fb0ab922bbae8d548b46">isis::data::_internal::ConstValueAdapter</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ad3df6438690f668b1f58436d31c40862">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#abc2391e7952b761b5c6f31106a1c920e">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#ae327f7392a751c6d45083175c1a94432">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ad3df6438690f668b1f58436d31c40862">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa281b1750226164eaab471e872eb8533">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator&gt;=()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a079bc40b28ff8176e184fbf14b9eeaa9">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#aa95c881aed39f804185fdaaf302be7f1">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a608e0d6ad0a24818fb677b8548339e1b">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a79656d2948b25d540b27f785d2f06973">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
 </li>
 <li>operator[]()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html#a81652fc24e4b0b7e31fa9d07b33cfe07">isis::data::_internal::GenericValueIterator&lt; IS_CONST &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrIterator.html#a3546b9d221971654c33ff22df6919767">isis::data::_internal::ValuePtrIterator&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a8e4c8ddd427bb142ef5d88e636f7932e">isis::data::ValuePtr&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a7e3d1b4dadcd711da69d632660bbf324">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArray.html#a73342337f4ae57613ec4a939235c5b30">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html#a54d76a802b043793c274f75c7876dbad">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 , <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#ab67fb2e8c137a3f421ba6f0391da9798">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArray.html#a82612e65bd944963c65d268a8acebba8">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a7e3d1b4dadcd711da69d632660bbf324">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1ParameterMap.html#a667be1614157dd4fb2610c1c89b7b479">isis::util::ParameterMap</a>
 </li>
 <li>orientation
 : <a class="el" href="classisis_1_1data_1_1Image.html#ac83f7eecffd172b0c0759cb5ee7dd633">isis::data::Image</a>
 </li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

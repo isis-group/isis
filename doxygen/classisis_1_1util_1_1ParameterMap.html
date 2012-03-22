@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -68,6 +67,8 @@ Data Structures</h2></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">isComplete</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1ProgParameter.html">ProgParameter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html#ab470f69f7ccfbcb4f1cb36cb060944dd">operator[]</a> (const std::string key)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1ProgParameter.html">ProgParameter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html#a667be1614157dd4fb2610c1c89b7b479">operator[]</a> (const std::string key) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">ParameterMap</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b">parse</a> (int argc, char **argv)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and tokenizes argv, detecs the parameter names (names are preceded by a "-") and sends the values (everything between one parameter name and the other) to the corresponding ProgParameter-objects to be parsed.  <a href="#aa7687a42f9087453f7c05f5bb041e11b"></a><br/></td></tr>
@@ -76,7 +77,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>A Map of all current Program Parameters when reading from the commandline. </p>
 <p>Handles instances of <a class="el" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">ProgParameter</a> for every expected programm parameter and sets them by reading an argc/argv pair. </p>
 
-<p>Definition at line <a class="el" href="progparameter_8hpp_source.html#l00097">97</a> of file <a class="el" href="progparameter_8hpp_source.html">progparameter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8hpp_source.html#l00096">96</a> of file <a class="el" href="progparameter_8hpp_source.html">progparameter.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aae364565646f3e332b1116306885e961"></a><!-- doxytag: member="isis::util::ParameterMap::ParameterMap" ref="aae364565646f3e332b1116306885e961" args="()" -->
 <div class="memitem">
@@ -92,7 +93,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00098">98</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00096">96</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -112,7 +113,45 @@ Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>true, if ALL needed parameter were correctly parsed, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00161">161</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00163">163</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab470f69f7ccfbcb4f1cb36cb060944dd"></a><!-- doxytag: member="isis::util::ParameterMap::operator[]" ref="ab470f69f7ccfbcb4f1cb36cb060944dd" args="(const std::string key)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1ProgParameter.html">ProgParameter</a> &amp; isis::util::ParameterMap::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00179">179</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a667be1614157dd4fb2610c1c89b7b479"></a><!-- doxytag: member="isis::util::ParameterMap::operator[]" ref="a667be1614157dd4fb2610c1c89b7b479" args="(const std::string key) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classisis_1_1util_1_1ProgParameter.html">ProgParameter</a> isis::util::ParameterMap::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00168">168</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -151,7 +190,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if succesfully converted all parameters to correct internal types, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00100">100</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
+<p>Definition at line <a class="el" href="progparameter_8cpp_source.html#l00098">98</a> of file <a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a>.</p>
 
 </div>
 </div>
@@ -160,7 +199,7 @@ Public Member Functions</h2></td></tr>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="progparameter_8cpp_source.html">progparameter.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

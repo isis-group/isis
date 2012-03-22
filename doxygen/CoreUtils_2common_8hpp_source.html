@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -71,251 +70,235 @@
 <a name="l00029"></a>00029 <span class="preprocessor">#include &lt;cmath&gt;</span>
 <a name="l00030"></a>00030 <span class="preprocessor">#include &quot;<a class="code" href="log_8hpp.html">log.hpp</a>&quot;</span>
 <a name="l00031"></a>00031 <span class="preprocessor">#include &quot;<a class="code" href="log__modules_8hpp.html">log_modules.hpp</a>&quot;</span>
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00034"></a>00034 <span class="preprocessor"></span><span class="preprocessor">#include &lt;Windows.h&gt;</span>
-<a name="l00035"></a>00035 <span class="preprocessor">#endif</span>
-<a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 <span class="preprocessor">#ifdef _MSC_VER</span>
-<a name="l00038"></a>00038 <span class="preprocessor"></span><span class="keyword">typedef</span> boost::int8_t   int8_t;
-<a name="l00039"></a>00039 <span class="keyword">typedef</span> boost::int16_t  int16_t;
-<a name="l00040"></a>00040 <span class="keyword">typedef</span> boost::int32_t  int32_t;
-<a name="l00041"></a>00041 <span class="keyword">typedef</span> boost::uint8_t  uint8_t;
-<a name="l00042"></a>00042 <span class="keyword">typedef</span> boost::uint16_t uint16_t;
-<a name="l00043"></a>00043 <span class="keyword">typedef</span> boost::uint32_t uint32_t;
-<a name="l00044"></a>00044 <span class="keyword">typedef</span> boost::int64_t  int64_t;
-<a name="l00045"></a>00045 <span class="keyword">typedef</span> boost::uint64_t uint64_t;
-<a name="l00046"></a>00046 <span class="preprocessor">#else</span>
-<a name="l00047"></a>00047 <span class="preprocessor"></span><span class="preprocessor">#include &lt;stdint.h&gt;</span>
-<a name="l00048"></a>00048 <span class="preprocessor">#endif</span>
-<a name="l00049"></a>00049 <span class="preprocessor"></span>
-<a name="l00050"></a>00050 <span class="keyword">namespace </span>isis
-<a name="l00051"></a>00051 {
-<a name="l00052"></a>00052 <span class="preprocessor">#ifdef _MSC_VER</span>
-<a name="l00053"></a>00053 <span class="preprocessor"></span><span class="comment">// dear microsoft, if I &#39;ld mean &quot;boost::mpl::size_t&quot;, I &#39;ld write &quot;boost::mpl::size_t&quot; *argl*</span>
-<a name="l00054"></a>00054 typedef ::size_t size_t;
-<a name="l00055"></a>00055 <span class="preprocessor">#endif</span>
-<a name="l00056"></a>00056 <span class="preprocessor"></span><span class="keyword">namespace </span>util
-<a name="l00057"></a>00057 {
-<a name="l00058"></a>00058 
-<a name="l00059"></a>00059 std::string <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">getLastSystemError</a>();
-<a name="l00060"></a>00060 
-<a name="l00070"></a>00070 <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator, <span class="keyword">typename</span> _CharT, <span class="keyword">typename</span> _Traits&gt; std::basic_ostream&lt;_CharT, _Traits&gt; &amp;
-<a name="l00071"></a><a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c">00071</a> <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( InputIterator start, InputIterator end,
-<a name="l00072"></a>00072                std::basic_ostream&lt;_CharT, _Traits&gt; &amp;o,
-<a name="l00073"></a>00073                <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
-<a name="l00074"></a>00074                <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
-<a name="l00075"></a>00075 {
-<a name="l00076"></a>00076     o &lt;&lt; prefix;
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078     <span class="keywordflow">if</span> ( start != end ) {
-<a name="l00079"></a>00079         o &lt;&lt; *start;
-<a name="l00080"></a>00080         start++;
-<a name="l00081"></a>00081     }
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083     <span class="keywordflow">for</span> ( InputIterator i = start; i != end; i++ )
-<a name="l00084"></a>00084         o &lt;&lt; delim &lt;&lt; *i;
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086     o &lt;&lt; suffix;
-<a name="l00087"></a>00087     <span class="keywordflow">return</span> o;
-<a name="l00088"></a>00088 }
-<a name="l00089"></a>00089 
-<a name="l00090"></a>00090 <span class="comment">// specialization to print char-list as number lists, not strings</span>
-<a name="l00091"></a>00091 <span class="comment">//@todo check if this works for VC</span>
-<a name="l00092"></a>00092 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _CharT, <span class="keyword">typename</span> _Traits&gt; std::basic_ostream&lt;_CharT, _Traits&gt; &amp;
-<a name="l00093"></a><a class="code" href="namespaceisis_1_1util.html#a0dcfcb5d19fbf9b102f441a5fdd657a1">00093</a> <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *start, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *end,
-<a name="l00094"></a>00094                std::basic_ostream&lt;_CharT, _Traits&gt; &amp;o,
-<a name="l00095"></a>00095                <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
-<a name="l00096"></a>00096                <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
-<a name="l00097"></a>00097 {
-<a name="l00098"></a>00098     o &lt;&lt; prefix;
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100     <span class="keywordflow">if</span> ( start != end ) {
-<a name="l00101"></a>00101         o &lt;&lt; ( <span class="keywordtype">unsigned</span> short )*start;
-<a name="l00102"></a>00102         start++;
-<a name="l00103"></a>00103     }
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105     <span class="keywordflow">for</span> ( <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *i = start; i != end; i++ )
-<a name="l00106"></a>00106         o &lt;&lt; delim &lt;&lt; ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )*i;
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108     o &lt;&lt; suffix;
-<a name="l00109"></a>00109     <span class="keywordflow">return</span> o;
-<a name="l00110"></a>00110 }
-<a name="l00111"></a>00111 
-<a name="l00113"></a><a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648">00113</a> <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt; std::string <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>(
-<a name="l00114"></a>00114     InputIterator start, InputIterator end,
-<a name="l00115"></a>00115     <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
-<a name="l00116"></a>00116     <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
-<a name="l00117"></a>00117 {
-<a name="l00118"></a>00118     std::ostringstream ret;
-<a name="l00119"></a>00119     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( start, end, ret, delim, prefix, suffix );
-<a name="l00120"></a>00120     <span class="keywordflow">return</span> ret.str();
-<a name="l00121"></a>00121 }
-<a name="l00123"></a><a class="code" href="namespaceisis_1_1util.html#aaabe116f9a5b282137e0b558f624493c">00123</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> InputIterator&gt; std::list&lt;T&gt; <a class="code" href="namespaceisis_1_1util.html#aaabe116f9a5b282137e0b558f624493c" title="do lexical_cast&amp;lt;T&amp;gt; on the elements of a list and return them">listToList</a>( InputIterator start, InputIterator end )
-<a name="l00124"></a>00124 {
-<a name="l00125"></a>00125     std::list&lt;T&gt; ret;
-<a name="l00126"></a>00126 
-<a name="l00127"></a>00127     <span class="keywordflow">for</span> ( ; start != end; start++ )
-<a name="l00128"></a>00128         ret.push_back( boost::lexical_cast&lt;T&gt;( *start ) );
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130     <span class="keywordflow">return</span> ret;
-<a name="l00131"></a>00131 }
-<a name="l00132"></a>00132 
-<a name="l00145"></a><a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263">00145</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET&gt; std::list&lt;TARGET&gt; <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>(
-<a name="l00146"></a>00146     std::string source, <span class="keyword">const</span> boost::regex &amp;separator,
-<a name="l00147"></a>00147     boost::regex prefix, boost::regex postfix )
-<a name="l00148"></a>00148 {
-<a name="l00149"></a>00149     std::list&lt;TARGET&gt; ret;
-<a name="l00150"></a>00150     assert( ! separator.empty() );
-<a name="l00151"></a>00151 
-<a name="l00152"></a>00152     <span class="keywordflow">if</span> ( ! prefix.empty() ) {
-<a name="l00153"></a>00153         <span class="keywordflow">if</span> ( prefix.str()[0] != <span class="charliteral">&#39;^&#39;</span> )
-<a name="l00154"></a>00154             prefix = boost::regex( std::string( <span class="stringliteral">&quot;^&quot;</span> ) + prefix.str(), prefix.flags() );
-<a name="l00155"></a>00155 
-<a name="l00156"></a>00156         source = boost::regex_replace( source, prefix, <span class="stringliteral">&quot;&quot;</span>, boost::format_first_only | boost::match_default );
-<a name="l00157"></a>00157     }
-<a name="l00158"></a>00158 
-<a name="l00159"></a>00159     <span class="keywordflow">if</span> ( ! postfix.empty() ) {
-<a name="l00160"></a>00160         <span class="keywordflow">if</span> ( postfix.str()[postfix.size() - 1] != <span class="charliteral">&#39;$&#39;</span> )
-<a name="l00161"></a>00161             postfix = boost::regex( postfix.str() + <span class="stringliteral">&quot;$&quot;</span>, postfix.flags() );
-<a name="l00162"></a>00162 
-<a name="l00163"></a>00163         source = boost::regex_replace( source, postfix, <span class="stringliteral">&quot;&quot;</span>, boost::format_first_only | boost::match_default );
-<a name="l00164"></a>00164     }
-<a name="l00165"></a>00165 
-<a name="l00166"></a>00166     boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
-<a name="l00167"></a>00167     <span class="keyword">const</span> boost::sregex_token_iterator token_end;
-<a name="l00168"></a>00168 
-<a name="l00169"></a>00169     <span class="keywordflow">while</span> ( i != token_end ) {
-<a name="l00170"></a>00170         ret.push_back( boost::lexical_cast&lt;TARGET&gt;( ( i++ )-&gt;str() ) );
-<a name="l00171"></a>00171     }
-<a name="l00172"></a>00172 
-<a name="l00173"></a>00173     <span class="keywordflow">return</span> ret;
-<a name="l00174"></a>00174 }
-<a name="l00184"></a><a class="code" href="namespaceisis_1_1util.html#af3100265b61a66f41d810a948529a72b">00184</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET&gt; std::list&lt;TARGET&gt; <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>(
-<a name="l00185"></a>00185     std::string source,
-<a name="l00186"></a>00186     <span class="keyword">const</span> boost::regex separator = boost::regex( <span class="stringliteral">&quot;[[:space:]]&quot;</span> ) )
-<a name="l00187"></a>00187 {
-<a name="l00188"></a>00188     <span class="keywordflow">return</span> stringToList&lt;TARGET&gt;( source, separator, separator, separator );
-<a name="l00189"></a>00189 }
-<a name="l00190"></a>00190 
-<a name="l00203"></a>00203 <span class="comment">//@todo test</span>
-<a name="l00204"></a>00204 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET, <span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; std::list&lt;TARGET&gt;
-<a name="l00205"></a><a class="code" href="namespaceisis_1_1util.html#a5c7207cad38ddcfdf28b4b16a8908b9a">00205</a> <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>( <span class="keyword">const</span> std::basic_string&lt;charT, traits&gt; &amp;source,  charT separator )
-<a name="l00206"></a>00206 {
-<a name="l00207"></a>00207     std::list&lt;TARGET&gt; ret;
-<a name="l00208"></a>00208 
-<a name="l00209"></a>00209     <span class="keywordflow">for</span> (
-<a name="l00210"></a>00210         <span class="keywordtype">size_t</span> next = source.find_first_not_of( separator );
-<a name="l00211"></a>00211         next != std::string::npos;
-<a name="l00212"></a>00212         next = source.find_first_not_of( separator, next )
-<a name="l00213"></a>00213     ) {
-<a name="l00214"></a>00214         <span class="keyword">const</span> <span class="keywordtype">size_t</span> start = next;
-<a name="l00215"></a>00215         next = source.find( separator, start );
-<a name="l00216"></a>00216         ret.push_back( boost::lexical_cast&lt;TARGET&gt;( source.substr( start, next - start ) ) );
-<a name="l00217"></a>00217     }
-<a name="l00218"></a>00218 
-<a name="l00219"></a>00219     <span class="keywordflow">return</span> ret;
-<a name="l00220"></a>00220 }
-<a name="l00221"></a>00221 
-<a name="l00233"></a><a class="code" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651">00233</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651" title="Fuzzy comparison between floating point values.">fuzzyEqual</a>( T a, T b, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> scale = 10 )
-<a name="l00234"></a>00234 {
-<a name="l00235"></a>00235     BOOST_MPL_ASSERT( ( boost::is_float&lt;T&gt; ) );
-<a name="l00236"></a>00236 
-<a name="l00237"></a>00237     <span class="keyword">const</span> T epsilon = std::numeric_limits&lt;T&gt;::epsilon(); <span class="comment">// get the distange between 1 and the next representable value</span>
-<a name="l00238"></a>00238     T bigger, smaller;
-<a name="l00239"></a>00239 
-<a name="l00240"></a>00240     a = std::abs( a );
-<a name="l00241"></a>00241     b = std::abs( b );
-<a name="l00242"></a>00242 
-<a name="l00243"></a>00243     <span class="keywordflow">if</span>( a &lt; b ) {
-<a name="l00244"></a>00244         bigger = b;
-<a name="l00245"></a>00245         smaller = a;
-<a name="l00246"></a>00246     } <span class="keywordflow">else</span> {
-<a name="l00247"></a>00247         smaller = b;
-<a name="l00248"></a>00248         bigger = a;
-<a name="l00249"></a>00249     }
-<a name="l00250"></a>00250 
-<a name="l00251"></a>00251     <span class="keywordflow">if</span>( smaller == 0 )
-<a name="l00252"></a>00252         <span class="keywordflow">return</span> bigger &lt; std::numeric_limits&lt;T&gt;::min() * scale;
-<a name="l00253"></a>00253 
-<a name="l00254"></a>00254     <span class="keyword">const</span> T factor = 1 / smaller; <span class="comment">// scale smaller to that value</span>
-<a name="l00255"></a>00255     <span class="keywordflow">return</span> ( bigger * factor ) &lt;= ( 1 + epsilon * scale ); <span class="comment">//scaled bigger should be between 1 and the next representable value</span>
-<a name="l00256"></a>00256 }
-<a name="l00257"></a>00257 
-<a name="l00258"></a><a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">00258</a> <span class="keyword">typedef</span> CoreDebug <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>;
-<a name="l00259"></a><a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">00259</a> <span class="keyword">typedef</span> CoreLog <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>;
-<a name="l00260"></a>00260 
-<a name="l00269"></a><a class="code" href="namespaceisis_1_1util.html#ae28b2248d6b0eceaf7387b53cc78da30">00269</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1util.html#ae28b2248d6b0eceaf7387b53cc78da30" title="Set logging level for the namespace util.">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
-<a name="l00270"></a>00270 {
-<a name="l00271"></a>00271     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreLog, HANDLE, level );
-<a name="l00272"></a>00272     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreDebug, HANDLE, level );
-<a name="l00273"></a>00273 }
-<a name="l00274"></a>00274 }<span class="comment">//util</span>
-<a name="l00275"></a>00275 
-<a name="l00284"></a><a class="code" href="namespaceisis.html#ac8d06135addd3cbab5df9465a2633975">00284</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis.html#ac8d06135addd3cbab5df9465a2633975" title="Set logging level for the namespaces util,data and image_io.">enableLogGlobal</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
-<a name="l00285"></a>00285 {
-<a name="l00286"></a>00286     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreLog, HANDLE, level );
-<a name="l00287"></a>00287     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreDebug, HANDLE, level );
-<a name="l00288"></a>00288     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( ImageIoLog, HANDLE, level );
-<a name="l00289"></a>00289     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( ImageIoDebug, HANDLE, level );
-<a name="l00290"></a>00290     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( DataLog, HANDLE, level );
-<a name="l00291"></a>00291     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( DataDebug, HANDLE, level );
-<a name="l00292"></a>00292 }
-<a name="l00293"></a>00293 }<span class="comment">//isis</span>
-<a name="l00294"></a>00294 
-<a name="l00295"></a>00295 <span class="keyword">namespace </span>std
-<a name="l00296"></a>00296 {
-<a name="l00298"></a>00298 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _FIRST, <span class="keyword">typename</span> _SECOND &gt; basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp;
-<a name="l00299"></a><a class="code" href="namespacestd.html#a3b30c7c3a38acc9acac5bad9afed9084">00299</a> operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> pair&lt;_FIRST, _SECOND&gt; &amp;s )
-<a name="l00300"></a>00300 {
-<a name="l00301"></a>00301     <span class="keywordflow">return</span> out &lt;&lt; s.first &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; s.second;
-<a name="l00302"></a>00302 }
-<a name="l00303"></a>00303 
-<a name="l00305"></a>00305 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Key, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Compare, <span class="keyword">typename</span> _Alloc &gt;
-<a name="l00306"></a><a class="code" href="namespacestd.html#aba82eac91e872dbb9fde1a0dff9384fa">00306</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> map&lt;_Key, _Tp, _Compare, _Alloc&gt;&amp; s )
-<a name="l00307"></a>00307 {
-<a name="l00308"></a>00308     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out, <span class="stringliteral">&quot;\n&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00309"></a>00309     <span class="keywordflow">return</span> out;
-<a name="l00310"></a>00310 }
-<a name="l00311"></a>00311 
-<a name="l00313"></a>00313 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Compare, <span class="keyword">typename</span> _Alloc &gt;
-<a name="l00314"></a><a class="code" href="namespacestd.html#ab1272fc537afbd867444811526804eb6">00314</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> map&lt;std::string, _Tp, _Compare, _Alloc&gt;&amp; s )
-<a name="l00315"></a>00315 {
-<a name="l00316"></a>00316     <span class="keywordtype">size_t</span> key_len = 0;
-<a name="l00317"></a>00317     <span class="keyword">typedef</span> <span class="keyword">typename</span> map&lt;std::string, _Tp, _Compare, _Alloc&gt;::const_iterator m_iterator;
-<a name="l00318"></a>00318 
-<a name="l00319"></a>00319     <span class="keywordflow">for</span> ( m_iterator i = s.begin(); i != s.end(); i++ )
-<a name="l00320"></a>00320         <span class="keywordflow">if</span> ( key_len &lt; i-&gt;first.length() )
-<a name="l00321"></a>00321             key_len = i-&gt;first.length();
-<a name="l00322"></a>00322 
-<a name="l00323"></a>00323     <span class="keywordflow">for</span> ( m_iterator i = s.begin(); i != s.end(); ) {
-<a name="l00324"></a>00324         out &lt;&lt; make_pair( i-&gt;first + std::string( key_len - i-&gt;first.length(), <span class="charliteral">&#39; &#39;</span> ), i-&gt;second );
-<a name="l00325"></a>00325 
-<a name="l00326"></a>00326         <span class="keywordflow">if</span> ( ++i != s.end() )
-<a name="l00327"></a>00327             out &lt;&lt; std::endl;
-<a name="l00328"></a>00328     }
-<a name="l00329"></a>00329 
-<a name="l00330"></a>00330     <span class="keywordflow">return</span> out;
-<a name="l00331"></a>00331 }
-<a name="l00332"></a>00332 
-<a name="l00334"></a>00334 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc &gt;
-<a name="l00335"></a><a class="code" href="namespacestd.html#adaff12a24946fca9c08e1168d2a55937">00335</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> list&lt;_Tp, _Alloc&gt;&amp; s )
-<a name="l00336"></a>00336 {
-<a name="l00337"></a>00337     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out );
-<a name="l00338"></a>00338     <span class="keywordflow">return</span> out;
-<a name="l00339"></a>00339 }
-<a name="l00341"></a>00341 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc &gt;
-<a name="l00342"></a><a class="code" href="namespacestd.html#a6c81f3717930754543c520d4f7b4b32b">00342</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> set&lt;_Tp, _Alloc&gt;&amp; s )
-<a name="l00343"></a>00343 {
-<a name="l00344"></a>00344     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out );
-<a name="l00345"></a>00345     <span class="keywordflow">return</span> out;
-<a name="l00346"></a>00346 }
-<a name="l00347"></a>00347 
-<a name="l00348"></a>00348 }
-<a name="l00349"></a>00349 <span class="preprocessor">#endif //CORE_COMMON_HPP</span>
+<a name="l00032"></a>00032 <span class="preprocessor">#include &quot;<a class="code" href="config_8hpp.html">../config.hpp</a>&quot;</span>
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor">#include &lt;Windows.h&gt;</span>
+<a name="l00036"></a>00036 <span class="preprocessor">#endif</span>
+<a name="l00037"></a>00037 <span class="preprocessor"></span>
+<a name="l00038"></a>00038 <span class="keyword">namespace </span>isis
+<a name="l00039"></a>00039 {
+<a name="l00040"></a>00040 <span class="keyword">namespace </span>util
+<a name="l00041"></a>00041 {
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 std::string <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">getLastSystemError</a>();
+<a name="l00044"></a>00044 
+<a name="l00054"></a>00054 <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator, <span class="keyword">typename</span> _CharT, <span class="keyword">typename</span> _Traits&gt; std::basic_ostream&lt;_CharT, _Traits&gt; &amp;
+<a name="l00055"></a><a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c">00055</a> <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( InputIterator start, InputIterator end,
+<a name="l00056"></a>00056                std::basic_ostream&lt;_CharT, _Traits&gt; &amp;o,
+<a name="l00057"></a>00057                <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
+<a name="l00058"></a>00058                <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
+<a name="l00059"></a>00059 {
+<a name="l00060"></a>00060     o &lt;&lt; prefix;
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062     <span class="keywordflow">if</span> ( start != end ) {
+<a name="l00063"></a>00063         o &lt;&lt; *start;
+<a name="l00064"></a>00064         start++;
+<a name="l00065"></a>00065     }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067     <span class="keywordflow">for</span> ( InputIterator i = start; i != end; i++ )
+<a name="l00068"></a>00068         o &lt;&lt; delim &lt;&lt; *i;
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070     o &lt;&lt; suffix;
+<a name="l00071"></a>00071     <span class="keywordflow">return</span> o;
+<a name="l00072"></a>00072 }
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 <span class="comment">// specialization to print char-list as number lists, not strings</span>
+<a name="l00075"></a>00075 <span class="comment">//@todo check if this works for VC</span>
+<a name="l00076"></a>00076 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _CharT, <span class="keyword">typename</span> _Traits&gt; std::basic_ostream&lt;_CharT, _Traits&gt; &amp;
+<a name="l00077"></a><a class="code" href="namespaceisis_1_1util.html#a0dcfcb5d19fbf9b102f441a5fdd657a1">00077</a> <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *start, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *end,
+<a name="l00078"></a>00078                std::basic_ostream&lt;_CharT, _Traits&gt; &amp;o,
+<a name="l00079"></a>00079                <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
+<a name="l00080"></a>00080                <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
+<a name="l00081"></a>00081 {
+<a name="l00082"></a>00082     o &lt;&lt; prefix;
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084     <span class="keywordflow">if</span> ( start != end ) {
+<a name="l00085"></a>00085         o &lt;&lt; ( <span class="keywordtype">unsigned</span> short )*start;
+<a name="l00086"></a>00086         start++;
+<a name="l00087"></a>00087     }
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089     <span class="keywordflow">for</span> ( <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *i = start; i != end; i++ )
+<a name="l00090"></a>00090         o &lt;&lt; delim &lt;&lt; ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> )*i;
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092     o &lt;&lt; suffix;
+<a name="l00093"></a>00093     <span class="keywordflow">return</span> o;
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095 
+<a name="l00097"></a><a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648">00097</a> <span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt; std::string <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>(
+<a name="l00098"></a>00098     InputIterator start, InputIterator end,
+<a name="l00099"></a>00099     <span class="keyword">const</span> std::string delim = <span class="stringliteral">&quot;,&quot;</span>,
+<a name="l00100"></a>00100     <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;{&quot;</span>, <span class="keyword">const</span> std::string suffix = <span class="stringliteral">&quot;}&quot;</span> )
+<a name="l00101"></a>00101 {
+<a name="l00102"></a>00102     std::ostringstream ret;
+<a name="l00103"></a>00103     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">listToOStream</a>( start, end, ret, delim, prefix, suffix );
+<a name="l00104"></a>00104     <span class="keywordflow">return</span> ret.str();
+<a name="l00105"></a>00105 }
+<a name="l00107"></a><a class="code" href="namespaceisis_1_1util.html#aaabe116f9a5b282137e0b558f624493c">00107</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> InputIterator&gt; std::list&lt;T&gt; <a class="code" href="namespaceisis_1_1util.html#aaabe116f9a5b282137e0b558f624493c" title="do lexical_cast&amp;lt;T&amp;gt; on the elements of a list and return them">listToList</a>( InputIterator start, InputIterator end )
+<a name="l00108"></a>00108 {
+<a name="l00109"></a>00109     std::list&lt;T&gt; ret;
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111     <span class="keywordflow">for</span> ( ; start != end; start++ )
+<a name="l00112"></a>00112         ret.push_back( boost::lexical_cast&lt;T&gt;( *start ) );
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114     <span class="keywordflow">return</span> ret;
+<a name="l00115"></a>00115 }
+<a name="l00116"></a>00116 
+<a name="l00129"></a><a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263">00129</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET&gt; std::list&lt;TARGET&gt; <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>(
+<a name="l00130"></a>00130     std::string source, <span class="keyword">const</span> boost::regex &amp;separator,
+<a name="l00131"></a>00131     boost::regex prefix, boost::regex postfix )
+<a name="l00132"></a>00132 {
+<a name="l00133"></a>00133     std::list&lt;TARGET&gt; ret;
+<a name="l00134"></a>00134     assert( ! separator.empty() );
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136     <span class="keywordflow">if</span> ( ! prefix.empty() ) {
+<a name="l00137"></a>00137         <span class="keywordflow">if</span> ( prefix.str()[0] != <span class="charliteral">&#39;^&#39;</span> )
+<a name="l00138"></a>00138             prefix = boost::regex( std::string( <span class="stringliteral">&quot;^&quot;</span> ) + prefix.str(), prefix.flags() );
+<a name="l00139"></a>00139 
+<a name="l00140"></a>00140         source = boost::regex_replace( source, prefix, <span class="stringliteral">&quot;&quot;</span>, boost::format_first_only | boost::match_default );
+<a name="l00141"></a>00141     }
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143     <span class="keywordflow">if</span> ( ! postfix.empty() ) {
+<a name="l00144"></a>00144         <span class="keywordflow">if</span> ( postfix.str()[postfix.size() - 1] != <span class="charliteral">&#39;$&#39;</span> )
+<a name="l00145"></a>00145             postfix = boost::regex( postfix.str() + <span class="stringliteral">&quot;$&quot;</span>, postfix.flags() );
+<a name="l00146"></a>00146 
+<a name="l00147"></a>00147         source = boost::regex_replace( source, postfix, <span class="stringliteral">&quot;&quot;</span>, boost::format_first_only | boost::match_default );
+<a name="l00148"></a>00148     }
+<a name="l00149"></a>00149 
+<a name="l00150"></a>00150     boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
+<a name="l00151"></a>00151     <span class="keyword">const</span> boost::sregex_token_iterator token_end;
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153     <span class="keywordflow">while</span> ( i != token_end ) {
+<a name="l00154"></a>00154         ret.push_back( boost::lexical_cast&lt;TARGET&gt;( ( i++ )-&gt;str() ) );
+<a name="l00155"></a>00155     }
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157     <span class="keywordflow">return</span> ret;
+<a name="l00158"></a>00158 }
+<a name="l00168"></a><a class="code" href="namespaceisis_1_1util.html#af3100265b61a66f41d810a948529a72b">00168</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET&gt; std::list&lt;TARGET&gt; <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>(
+<a name="l00169"></a>00169     std::string source,
+<a name="l00170"></a>00170     <span class="keyword">const</span> boost::regex separator = boost::regex( <span class="stringliteral">&quot;[[:space:]]&quot;</span> ) )
+<a name="l00171"></a>00171 {
+<a name="l00172"></a>00172     <span class="keywordflow">return</span> stringToList&lt;TARGET&gt;( source, separator, separator, separator );
+<a name="l00173"></a>00173 }
+<a name="l00174"></a>00174 
+<a name="l00187"></a>00187 <span class="comment">//@todo test</span>
+<a name="l00188"></a>00188 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TARGET, <span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; std::list&lt;TARGET&gt;
+<a name="l00189"></a><a class="code" href="namespaceisis_1_1util.html#a5c7207cad38ddcfdf28b4b16a8908b9a">00189</a> <a class="code" href="namespaceisis_1_1util.html#a9245736ae5d5dc1b001f2f3021b61263" title="Generic tokenizer.">stringToList</a>( <span class="keyword">const</span> std::basic_string&lt;charT, traits&gt; &amp;source,  charT separator )
+<a name="l00190"></a>00190 {
+<a name="l00191"></a>00191     std::list&lt;TARGET&gt; ret;
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193     <span class="keywordflow">for</span> (
+<a name="l00194"></a>00194         <span class="keywordtype">size_t</span> next = source.find_first_not_of( separator );
+<a name="l00195"></a>00195         next != std::string::npos;
+<a name="l00196"></a>00196         next = source.find_first_not_of( separator, next )
+<a name="l00197"></a>00197     ) {
+<a name="l00198"></a>00198         <span class="keyword">const</span> <span class="keywordtype">size_t</span> start = next;
+<a name="l00199"></a>00199         next = source.find( separator, start );
+<a name="l00200"></a>00200         ret.push_back( boost::lexical_cast&lt;TARGET&gt;( source.substr( start, next - start ) ) );
+<a name="l00201"></a>00201     }
+<a name="l00202"></a>00202 
+<a name="l00203"></a>00203     <span class="keywordflow">return</span> ret;
+<a name="l00204"></a>00204 }
+<a name="l00205"></a>00205 
+<a name="l00217"></a><a class="code" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651">00217</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1util.html#aaecd6bf63106060c5021502e97956651" title="Fuzzy comparison between floating point values.">fuzzyEqual</a>( T a, T b, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> scale = 10 )
+<a name="l00218"></a>00218 {
+<a name="l00219"></a>00219     BOOST_MPL_ASSERT( ( boost::is_float&lt;T&gt; ) );
+<a name="l00220"></a>00220 
+<a name="l00221"></a>00221     <span class="keyword">const</span> T epsilon = std::numeric_limits&lt;T&gt;::epsilon(); <span class="comment">// get the distange between 1 and the next representable value</span>
+<a name="l00222"></a>00222     T bigger, smaller;
+<a name="l00223"></a>00223 
+<a name="l00224"></a>00224     a = std::abs( a );
+<a name="l00225"></a>00225     b = std::abs( b );
+<a name="l00226"></a>00226 
+<a name="l00227"></a>00227     <span class="keywordflow">if</span>( a &lt; b ) {
+<a name="l00228"></a>00228         bigger = b;
+<a name="l00229"></a>00229         smaller = a;
+<a name="l00230"></a>00230     } <span class="keywordflow">else</span> {
+<a name="l00231"></a>00231         smaller = b;
+<a name="l00232"></a>00232         bigger = a;
+<a name="l00233"></a>00233     }
+<a name="l00234"></a>00234 
+<a name="l00235"></a>00235     <span class="keywordflow">if</span>( smaller == 0 )
+<a name="l00236"></a>00236         <span class="keywordflow">return</span> bigger &lt; std::numeric_limits&lt;T&gt;::min() * scale;
+<a name="l00237"></a>00237 
+<a name="l00238"></a>00238     <span class="keyword">const</span> T factor = 1 / smaller; <span class="comment">// scale smaller to that value</span>
+<a name="l00239"></a>00239     <span class="keywordflow">return</span> ( bigger * factor ) &lt;= ( 1 + epsilon * scale ); <span class="comment">//scaled bigger should be between 1 and the next representable value</span>
+<a name="l00240"></a>00240 }
+<a name="l00241"></a>00241 
+<a name="l00242"></a><a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">00242</a> <span class="keyword">typedef</span> CoreDebug <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>;
+<a name="l00243"></a><a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">00243</a> <span class="keyword">typedef</span> CoreLog <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>;
+<a name="l00244"></a>00244 
+<a name="l00253"></a><a class="code" href="namespaceisis_1_1util.html#ae28b2248d6b0eceaf7387b53cc78da30">00253</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1util.html#ae28b2248d6b0eceaf7387b53cc78da30" title="Set logging level for the namespace util.">enableLog</a>( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
+<a name="l00254"></a>00254 {
+<a name="l00255"></a>00255     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreLog, HANDLE, level );
+<a name="l00256"></a>00256     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreDebug, HANDLE, level );
+<a name="l00257"></a>00257 }
+<a name="l00258"></a>00258 }<span class="comment">//util</span>
+<a name="l00259"></a>00259 
+<a name="l00268"></a><a class="code" href="namespaceisis.html#ac8d06135addd3cbab5df9465a2633975">00268</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis.html#ac8d06135addd3cbab5df9465a2633975" title="Set logging level for the namespaces util,data and image_io.">enableLogGlobal</a>( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
+<a name="l00269"></a>00269 {
+<a name="l00270"></a>00270     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreLog, HANDLE, level );
+<a name="l00271"></a>00271     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( CoreDebug, HANDLE, level );
+<a name="l00272"></a>00272     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( ImageIoLog, HANDLE, level );
+<a name="l00273"></a>00273     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( ImageIoDebug, HANDLE, level );
+<a name="l00274"></a>00274     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( DataLog, HANDLE, level );
+<a name="l00275"></a>00275     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( DataDebug, HANDLE, level );
+<a name="l00276"></a>00276 }
+<a name="l00277"></a>00277 }<span class="comment">//isis</span>
+<a name="l00278"></a>00278 
+<a name="l00279"></a>00279 <span class="keyword">namespace </span>std
+<a name="l00280"></a>00280 {
+<a name="l00282"></a>00282 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _FIRST, <span class="keyword">typename</span> _SECOND &gt; basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp;
+<a name="l00283"></a><a class="code" href="namespacestd.html#a3b30c7c3a38acc9acac5bad9afed9084">00283</a> operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> pair&lt;_FIRST, _SECOND&gt; &amp;s )
+<a name="l00284"></a>00284 {
+<a name="l00285"></a>00285     <span class="keywordflow">return</span> out &lt;&lt; s.first &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; s.second;
+<a name="l00286"></a>00286 }
+<a name="l00287"></a>00287 
+<a name="l00289"></a>00289 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Key, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Compare, <span class="keyword">typename</span> _Alloc &gt;
+<a name="l00290"></a><a class="code" href="namespacestd.html#aba82eac91e872dbb9fde1a0dff9384fa">00290</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> map&lt;_Key, _Tp, _Compare, _Alloc&gt;&amp; s )
+<a name="l00291"></a>00291 {
+<a name="l00292"></a>00292     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out, <span class="stringliteral">&quot;\n&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00293"></a>00293     <span class="keywordflow">return</span> out;
+<a name="l00294"></a>00294 }
+<a name="l00295"></a>00295 
+<a name="l00297"></a>00297 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Compare, <span class="keyword">typename</span> _Alloc &gt;
+<a name="l00298"></a><a class="code" href="namespacestd.html#ab1272fc537afbd867444811526804eb6">00298</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> map&lt;std::string, _Tp, _Compare, _Alloc&gt;&amp; s )
+<a name="l00299"></a>00299 {
+<a name="l00300"></a>00300     <span class="keywordtype">size_t</span> key_len = 0;
+<a name="l00301"></a>00301     <span class="keyword">typedef</span> <span class="keyword">typename</span> map&lt;std::string, _Tp, _Compare, _Alloc&gt;::const_iterator m_iterator;
+<a name="l00302"></a>00302 
+<a name="l00303"></a>00303     <span class="keywordflow">for</span> ( m_iterator i = s.begin(); i != s.end(); i++ )
+<a name="l00304"></a>00304         <span class="keywordflow">if</span> ( key_len &lt; i-&gt;first.length() )
+<a name="l00305"></a>00305             key_len = i-&gt;first.length();
+<a name="l00306"></a>00306 
+<a name="l00307"></a>00307     <span class="keywordflow">for</span> ( m_iterator i = s.begin(); i != s.end(); ) {
+<a name="l00308"></a>00308         out &lt;&lt; make_pair( i-&gt;first + std::string( key_len - i-&gt;first.length(), <span class="charliteral">&#39; &#39;</span> ), i-&gt;second );
+<a name="l00309"></a>00309 
+<a name="l00310"></a>00310         <span class="keywordflow">if</span> ( ++i != s.end() )
+<a name="l00311"></a>00311             out &lt;&lt; std::endl;
+<a name="l00312"></a>00312     }
+<a name="l00313"></a>00313 
+<a name="l00314"></a>00314     <span class="keywordflow">return</span> out;
+<a name="l00315"></a>00315 }
+<a name="l00316"></a>00316 
+<a name="l00318"></a>00318 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc &gt;
+<a name="l00319"></a><a class="code" href="namespacestd.html#adaff12a24946fca9c08e1168d2a55937">00319</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> list&lt;_Tp, _Alloc&gt;&amp; s )
+<a name="l00320"></a>00320 {
+<a name="l00321"></a>00321     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out );
+<a name="l00322"></a>00322     <span class="keywordflow">return</span> out;
+<a name="l00323"></a>00323 }
+<a name="l00325"></a>00325 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc &gt;
+<a name="l00326"></a><a class="code" href="namespacestd.html#a6c81f3717930754543c520d4f7b4b32b">00326</a> basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt;&amp; operator&lt;&lt;( basic_ostream&lt;charT, std::char_traits&lt;charT&gt; &gt; &amp;out, <span class="keyword">const</span> set&lt;_Tp, _Alloc&gt;&amp; s )
+<a name="l00327"></a>00327 {
+<a name="l00328"></a>00328     <a class="code" href="namespaceisis_1_1util.html#a29c9506962af37e8c3cabc8843d2b69c" title="Write a list of elements to a std::basic_ostream.">isis::util::listToOStream</a>( s.begin(), s.end(), out );
+<a name="l00329"></a>00329     <span class="keywordflow">return</span> out;
+<a name="l00330"></a>00330 }
+<a name="l00331"></a>00331 
+<a name="l00332"></a>00332 }
+<a name="l00333"></a>00333 <span class="preprocessor">#endif //CORE_COMMON_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

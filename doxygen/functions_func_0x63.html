@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -79,13 +78,14 @@
 
 <h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
 <li>castTo()
-: <a class="el" href="group__util.html#gae3a0bd53d46c15c537e85b934080d0ff">isis::util::_internal::ValueBase</a>
+: <a class="el" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684">isis::util::PropertyValue</a>
+, <a class="el" href="classisis_1_1util_1_1ValueBase.html#acdd97084343fb3d0c1f0eb52d045c464">isis::util::ValueBase</a>
 </li>
 <li>castToType()
-: <a class="el" href="group__util.html#gabf5dd2f68e199c1cd80e5e41cbd915f5">isis::util::_internal::ValueBase</a>
+: <a class="el" href="classisis_1_1util_1_1ValueBase.html#a7895cdf1f63b83566b1663285ccf2dd9">isis::util::ValueBase</a>
 </li>
-<li>castToValuePtr()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a7a2198cd211bc56c8c3477c781b17bef">isis::data::_internal::ValuePtrBase</a>
+<li>castToValueArray()
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a57dae00d2ea1114771cfb01af16d6cc3">isis::data::ValueArrayBase</a>
 </li>
 <li>checkMakeClean()
 : <a class="el" href="classisis_1_1data_1_1Image.html#acd213fa6d0856d45e6413801f9bdec66">isis::data::Image</a>
@@ -96,107 +96,99 @@
 <li>chunkAt()
 : <a class="el" href="classisis_1_1data_1_1Image.html#a087ed8c4884cea467e47c386c65d5be2">isis::data::Image</a>
 </li>
-<li>ChunkBase()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a197c223e4a5a1f2e0aa1aa7d7aa31539">isis::data::_internal::ChunkBase</a>
-</li>
 <li>chunkListToImageList()
 : <a class="el" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce">isis::data::IOFactory</a>
 </li>
-<li>clear()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#af769bcdd67e0f6d39ffc56958cabca3a">isis::data::_internal::SortedChunkList</a>
-</li>
 <li>clone()
-: <a class="el" href="classisis_1_1util_1_1Value.html#a8807f2fd4ae3a7d204a41509fb97b51d">isis::util::Value&lt; TYPE &gt;</a>
-, <a class="el" href="group__util.html#gae850fafba582c0a7cf7441b4cb9c6fd9">isis::util::_internal::ValueBase</a>
-, <a class="el" href="classisis_1_1data_1_1ValuePtr.html#a2d302e9026427e86c3128184f5ce3a0e">isis::data::ValuePtr&lt; TYPE &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a67a01586958fb8c49d361ba7bbf546b8">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArray.html#af4d10111dc253c85d2f79822ade969a2">isis::data::ValueArray&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a37d6d3fb6891d1c9db23ff412a603c82">isis::data::ValueArrayBase</a>
+, <a class="el" href="classisis_1_1util_1_1Value.html#a8807f2fd4ae3a7d204a41509fb97b51d">isis::util::Value&lt; TYPE &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1ValueBase.html#acab624b1f1980291ec1e339de1efe578">isis::util::ValueBase</a>
 </li>
 <li>cloneToNew()
 : <a class="el" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">isis::data::Chunk</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ad03e77a6d9227da4204d747fa2e1e234">isis::data::_internal::ValuePtrBase</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a43592eda5bca6e1e408131ec63a738e6">isis::data::ValueArrayBase</a>
 </li>
 <li>close()
 : <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#a4df847f33b92b3f03ae3ffd4e2e28382">isis::util::ProgressFeedback</a>
 , <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf">isis::util::ConsoleFeedback</a>
 </li>
 <li>commit()
-: <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3dce3496a9115f7cc1860259836b9aad">isis::util::DefaultMsgPrint</a>
+: <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a519378d5ea8c4eb517f174a32e1151e9">isis::util::MessageHandlerBase</a>
+, <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a5b9e0688e0869171cf742287552780c7">isis::util::DefaultMsgPrint</a>
 </li>
 <li>compare()
-: <a class="el" href="structisis_1_1util_1_1__internal_1_1ichar__traits.html#a2d71a0b9d4d51ee4e4e9eca315d03038">isis::util::_internal::ichar_traits</a>
-, <a class="el" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">isis::data::Chunk</a>
+: <a class="el" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">isis::data::Chunk</a>
 , <a class="el" href="classisis_1_1data_1_1Image.html#a0750957ebf3422a0fbb3d029cc9b292a">isis::data::Image</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a5f987f2312b6e8f50b672d6eb3bf5d7b">isis::data::_internal::ValuePtrBase</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#ad0d6e7f7e573aca3bd15a76860eda88b">isis::data::ValueArrayBase</a>
 </li>
 <li>compareRange()
 : <a class="el" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">isis::data::Chunk</a>
 </li>
-<li>ConstValueAdapter()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ConstValueAdapter.html#abf2da50fb308051c95423c27e11791a3">isis::data::_internal::ConstValueAdapter</a>
-</li>
 <li>convert()
-: <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueConverterBase.html#aee34b4abb4b22c98a445292be88ef330">isis::util::_internal::ValueConverterBase</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ae96a776c044c51be41fe1d43862a1706">isis::data::_internal::ValuePtrConverterBase</a>
-, <a class="el" href="group__util.html#gade70635b58d5b7940fbd8cd3b92ae1c2">isis::util::_internal::ValueBase</a>
+: <a class="el" href="classisis_1_1util_1_1ValueBase.html#a75fe925e8b95eb64fde444220bf72d6a">isis::util::ValueBase</a>
 </li>
 <li>convertByID()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a3070743b9918aba9cd6270c6938d034d">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a74ac6260e52e6f84f039d8e8d4bb0b6d">isis::data::ValueArrayBase</a>
 </li>
 <li>convertToType()
-: <a class="el" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">isis::data::Chunk</a>
-, <a class="el" href="classisis_1_1data_1_1Image.html#a582f927569aba48d8626c9a7d941ded1">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b">isis::data::Image</a>
+, <a class="el" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">isis::data::Chunk</a>
 </li>
 <li>copyAs()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ada3fafae7863b379260347f66477289f">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#ac9e0074bc38c0d6d22301f45ff646779">isis::data::ValueArrayBase</a>
+</li>
+<li>copyAsMemChunk()
+: <a class="el" href="classisis_1_1data_1_1Image.html#a5ef4434d95f796e456991e941c2e6751">isis::data::Image</a>
+</li>
+<li>copyAsValueArray()
+: <a class="el" href="classisis_1_1data_1_1Image.html#ab94b524daf0b9172d90704c447f16e03">isis::data::Image</a>
 </li>
 <li>copyByID()
-: <a class="el" href="group__util.html#ga5df438ca2ef0b2ae816e30c945132085">isis::util::_internal::ValueBase</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#ab1336fff3e8085e211fec8837b5314d4">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#acb89aa9af0991985e70373b5ad95ff1a">isis::data::ValueArrayBase</a>
+, <a class="el" href="classisis_1_1util_1_1ValueBase.html#a523733d7ac4e130efd97fa3ad336f206">isis::util::ValueBase</a>
 </li>
 <li>copyChunksToVector()
 : <a class="el" href="classisis_1_1data_1_1Image.html#a2fd76bb61355c14ef7035e740b462a5e">isis::data::Image</a>
 </li>
 <li>copyFrom()
-: <a class="el" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
-, <a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</a>
+: <a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</a>
+, <a class="el" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>copyFromMem()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a81878b6d897e8bcfc290d98cb1bb4958">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a5f8cc90b965557c8b187dd1a01838fc0">isis::data::ValueArrayBase</a>
 </li>
 <li>copyRange()
 : <a class="el" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">isis::data::Chunk</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aa8bf2bc7b77c6dc578f2f6e26e6df339">isis::data::_internal::ValuePtrBase</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#abfeb0f7ccc3abfa12c4ecd3448068cc3">isis::data::ValueArrayBase</a>
 </li>
 <li>copySlice()
 : <a class="el" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">isis::data::Chunk</a>
 </li>
 <li>copyTo()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a17d127194ab5474e26f04cd9fce856d3">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#af71bef17ea013607db2aa14cfa96a15a">isis::data::ValueArrayBase</a>
 , <a class="el" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a>
 </li>
 <li>copyToMem()
-: <a class="el" href="classisis_1_1data_1_1Image.html#a1849844422ad86be44556bbab0d55088">isis::data::Image</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#aa7a5baa0e458f2d91e2473d722e6046e">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#ad99a24d29466a74f4f3859dee99788ef">isis::data::ValueArrayBase</a>
 , <a class="el" href="classisis_1_1data_1_1TypedImage.html#a32b8263ed887ddf4ad21fdb35796aacd">isis::data::TypedImage&lt; T &gt;</a>
-, <a class="el" href="classisis_1_1data_1_1Chunk.html#a0481aaeeddf752979f665207f44fd57b">isis::data::Chunk</a>
+, <a class="el" href="classisis_1_1data_1_1Image.html#a1849844422ad86be44556bbab0d55088">isis::data::Image</a>
 , <a class="el" href="classisis_1_1data_1_1TypedImage.html#aa76b45b6e85fa810e63b472bde5f25f8">isis::data::TypedImage&lt; T &gt;</a>
+, <a class="el" href="classisis_1_1data_1_1Chunk.html#a0481aaeeddf752979f665207f44fd57b">isis::data::Chunk</a>
 </li>
-<li>copyToMemChunk()
-: <a class="el" href="classisis_1_1data_1_1Image.html#ad4c4bf9e84ee707c221cb5140cfb8f3f">isis::data::Image</a>
-</li>
-<li>create()
-: <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueConverterBase.html#ae20febd737ead22dbc8f2ef7f15e14c8">isis::util::_internal::ValueConverterBase</a>
-, <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a9494b8868d9f41b2e0497f35095b6f54">isis::data::_internal::ValuePtrConverterBase</a>
+<li>copyToValueArray()
+: <a class="el" href="classisis_1_1data_1_1Image.html#ada16d33e2a19b88df23c393845ebd9a3">isis::data::Image</a>
 </li>
 <li>createByID()
-: <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a79b3de50d9cf180a6286fb2b9b7ab7fe">isis::data::_internal::ValuePtrBase</a>
+: <a class="el" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e">isis::data::Chunk</a>
+, <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#af4bbd40448c21a15c1a18c704ebfd510">isis::data::ValueArrayBase</a>
 </li>
 <li>currentDist()
 : <a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html#a6ff7945957322e9016dc8ebc53df1b4b">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a>
 </li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

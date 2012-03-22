@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -45,6 +44,7 @@
 </div>
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="DataStorage_2common_8hpp_source.html">common.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="image_8hpp_source.html">image.hpp</a>&quot;</code><br/>
 <code>#include &lt;boost/numeric/ublas/io.hpp&gt;</code><br/>
 </div>
 <p><a href="DataStorage_2common_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -56,10 +56,13 @@ Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html">isis::data::_internal</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a50a7d38f7a9273fde2fb4861ad3394d7">isis::data::getCommonSource</a> (std::list&lt; boost::filesystem::path &gt; sources)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a34019fd5d92a7009010034f639182a73">isis::data::getCommonSource</a> (const data::Image &amp;img)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data.html#a980af7c2d8ec452f14b3277cd731977f">isis::data::getCommonSource</a> (const std::list&lt; data::Image &gt; &amp;imgs)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceisis_1_1data_1_1__internal.html#a5e0873965e56d7bad760f2e34b9a1f57">isis::data::_internal::transformCoords</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;properties, util::vector4&lt; size_t &gt; size, boost::numeric::ublas::matrix&lt; float &gt; transform, bool transformCenterIsImageCenter)</td></tr>
 </table>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

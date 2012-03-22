@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -47,6 +46,7 @@
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Data Fields</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
@@ -68,8 +68,10 @@ Inheritance diagram for isis::data::IOApplication:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a04aa66742d86f0adea8153c51ca938ca">autoload</a> (bool exitOnError=false)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">autowrite</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; out_images, bool exitOnError=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the input list of the Application using the internal ParameterMap.  <a href="#a04aa66742d86f0adea8153c51ca938ca"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#af072cbccdec4174e85c1b585f744d3a7">autowrite</a> (<a class="el" href="classisis_1_1data_1_1Image.html">Image</a> out_image, bool exitOnError=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data using the internal ParameterMap.  <a href="#af072cbccdec4174e85c1b585f744d3a7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a968bb7b48ae28d516b6327acb096aeab">autowrite</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; out_images, bool exitOnError=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#afaaa5d45e0acc646b3e071631956298d">fetchImage</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next image from the input.  <a href="#afaaa5d45e0acc646b3e071631956298d"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
@@ -81,13 +83,24 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#af8b156d0d3852a92a7b3f82b94ebffe4">printHelp</a> (bool withHidden=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual function to display a short help text.  <a href="#af8b156d0d3852a92a7b3f82b94ebffe4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a064353eac800d01c66c6517f5052b664">~IOApplication</a> ()</td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#abfb57801256b7b68def36b169fc94612">addInput</a> (<a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;<a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, bool needed=true, const std::string &amp;suffix=&quot;&quot;, const std::string &amp;desc=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add input parameters to the given ParameterMap.  <a href="#abfb57801256b7b68def36b169fc94612"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#aa8816fb8e14a8904c01957a939be1b6b">addOutput</a> (<a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;<a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, bool needed=true, const std::string &amp;suffix=&quot;&quot;, const std::string &amp;desc=&quot;&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add output parameters to the given ParameterMap.  <a href="#aa8816fb8e14a8904c01957a939be1b6b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#ae69219b4375826a741177c45374f0229">autoload</a> (const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;<a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> &gt; &amp;<a class="el" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a>, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt; feedback=boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;())</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load images using parameters from the given ParameterMap.  <a href="#ae69219b4375826a741177c45374f0229"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a2cd0010709ccf97705f2b2a9e0a0303e">autowrite</a> (const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;<a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> out_image, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt; feedback=boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;())</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write images using parameters from the given ParameterMap.  <a href="#a2cd0010709ccf97705f2b2a9e0a0303e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a5d7653bba820d3261b1f56acee4b7823">autowrite</a> (const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;<a class="el" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> &gt; out_images, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt; feedback=boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;())</td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a295873952f1587e88009428c859b1da0">images</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual boost::shared_ptr<br class="typebreak"/>
-&lt; util::_internal::MessageHandlerBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a3f672c3df1ee97cfdfa754875d3b28fd">getLogHandler</a> (std::string module, <a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
+&lt; <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html">util::MessageHandlerBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1IOApplication.html#a15e619df12e2d5e0f35b2a92436e8703">getLogHandler</a> (std::string module, <a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level) const </td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
@@ -124,7 +137,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00037">37</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00035">35</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -142,11 +155,189 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00095">95</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00050">50</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="abfb57801256b7b68def36b169fc94612"></a><!-- doxytag: member="isis::data::IOApplication::addInput" ref="abfb57801256b7b68def36b169fc94612" args="(util::ParameterMap &amp;parameters, bool needed=true, const std::string &amp;suffix=&quot;&quot;, const std::string &amp;desc=&quot;&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::data::IOApplication::addInput </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>needed</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>desc</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Add input parameters to the given ParameterMap. </p>
+<p>This adds the usual parameter for image input (used by <a class="el" href="classisis_1_1data_1_1IOApplication.html#ae69219b4375826a741177c45374f0229" title="Load images using parameters from the given ParameterMap.">autoload( const util::ParameterMap &amp;, std::list&lt; Image &gt;&amp;, bool, const std::string &amp;, boost::shared_ptr&lt; util::ConsoleFeedback &gt; )</a> ) to the given ParameterMap. The parameters are:</p>
+<ul>
+<li><code>-in</code> the filename or path to load from</li>
+<li><code>-rf</code> to override the file suffix used to select the plugin used for reading</li>
+<li><code>-rdialect</code> selects a special dialect used for reading <dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the ParameterMap the parameters should be added to </td></tr>
+    <tr><td class="paramname">needed</td><td>if true, the -in parameter is marked as needed (init will fail, if this is not set) </td></tr>
+    <tr><td class="paramname">suffix</td><td>text to be appended to the parameters above (eg. "1" here results in "-in1" etc.) to distinguish multiple inputs </td></tr>
+    <tr><td class="paramname">desc</td><td>a specific description of this particular input parameters (will be used in the help-output) </td></tr>
+  </table>
+  </dd>
+</dl>
+</li>
+</ul>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00069">69</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa8816fb8e14a8904c01957a939be1b6b"></a><!-- doxytag: member="isis::data::IOApplication::addOutput" ref="aa8816fb8e14a8904c01957a939be1b6b" args="(util::ParameterMap &amp;parameters, bool needed=true, const std::string &amp;suffix=&quot;&quot;, const std::string &amp;desc=&quot;&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void isis::data::IOApplication::addOutput </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>needed</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>desc</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Add output parameters to the given ParameterMap. </p>
+<p>This adds the usual parameters for image output to the given ParameterMap. The parameters are:</p>
+<ul>
+<li><code>-out</code> the filename to write to</li>
+<li><code>-wf</code> to override the file suffix used to select the plugin used for writing</li>
+<li><code>-wdialect</code> selects a special dialect used for writing</li>
+<li><code>-repn</code> selects a data type used for writing</li>
+<li><code>-scale_mode</code> selects the scaling strategy when converting data type for writing <dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the ParameterMap the parameters should be added to </td></tr>
+    <tr><td class="paramname">needed</td><td>if true, the -out parameter is marked as needed (init will fail, if this is not set) </td></tr>
+    <tr><td class="paramname">suffix</td><td>text to be appended to the parameters above (eg. "1" here results in "-out1" etc.) to distinguish multiple outputs </td></tr>
+    <tr><td class="paramname">desc</td><td>a specific description of this particular output parameters (will be used in the help-output) </td></tr>
+  </table>
+  </dd>
+</dl>
+</li>
+</ul>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00093">93</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae69219b4375826a741177c45374f0229"></a><!-- doxytag: member="isis::data::IOApplication::autoload" ref="ae69219b4375826a741177c45374f0229" args="(const util::ParameterMap &amp;parameters, std::list&lt; Image &gt; &amp;images, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; util::ConsoleFeedback &gt; feedback=boost::shared_ptr&lt; util::ConsoleFeedback &gt;())" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOApplication::autoload </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>images</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exitOnError</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em> = <code>boost::shared_ptr&lt;&#160;<a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a>&#160;&gt;()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Load images using parameters from the given ParameterMap. </p>
+<p>These program parameters should be the same as set by <a class="el" href="classisis_1_1data_1_1IOApplication.html#abfb57801256b7b68def36b169fc94612" title="Add input parameters to the given ParameterMap.">addInput()</a>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the ParameterMap the parameters should be taken from </td></tr>
+    <tr><td class="paramname">images</td><td>an image list to store the red images </td></tr>
+    <tr><td class="paramname">exitOnError</td><td>terminate the application if there was an error reading the data </td></tr>
+    <tr><td class="paramname">suffix</td><td>the same suffix used for <a class="el" href="classisis_1_1data_1_1IOApplication.html#abfb57801256b7b68def36b169fc94612" title="Add input parameters to the given ParameterMap.">addInput()</a> </td></tr>
+    <tr><td class="paramname">feedback</td><td>if given, the <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> object will be used to display reading progress if possible </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00168">168</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a04aa66742d86f0adea8153c51ca938ca"></a><!-- doxytag: member="isis::data::IOApplication::autoload" ref="a04aa66742d86f0adea8153c51ca938ca" args="(bool exitOnError=false)" -->
 <div class="memitem">
 <div class="memproto">
@@ -162,36 +353,11 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00131">131</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Load data into the input list of the Application using the internal ParameterMap. </p>
+<p>This is the default loading function, it is calling <a class="el" href="classisis_1_1data_1_1IOApplication.html#ae69219b4375826a741177c45374f0229" title="Load images using parameters from the given ParameterMap.">autoload( const util::ParameterMap &amp;, std::list&lt; Image &gt;&amp;, bool, const std::string &amp;, boost::shared_ptr&lt; util::ConsoleFeedback &gt; )</a> with the ParameterMap of the application and stores the loaded image in its input list (see fetchImage and fetchImageAs). </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>usually there is no nedd to explicitely call that function. It is called automatically by <a class="el" href="classisis_1_1data_1_1IOApplication.html#ac68163171beb321b8a6f5c1fc34c4138" title="Initializes the programm parameter map using argc/argv.">init()</a> if the Application is set up for input (see <a class="el" href="classisis_1_1data_1_1IOApplication.html#af10b58f3c9d4fdaee9d888c28afbfb33">IOApplication()</a>). </dd></dl>
 
-</div>
-</div>
-<a class="anchor" id="a968bb7b48ae28d516b6327acb096aeab"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="a968bb7b48ae28d516b6327acb096aeab" args="(std::list&lt; data::Image &gt; out_images, bool exitOnError=false)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::data::IOApplication::autowrite </td>
-          <td>(</td>
-          <td class="paramtype">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td>
-          <td class="paramname"><em>out_images</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>exitOnError</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00177">177</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00163">163</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +386,155 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00172">172</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Write data using the internal ParameterMap. </p>
+<p>Uses <a class="el" href="classisis_1_1data_1_1IOApplication.html#a2cd0010709ccf97705f2b2a9e0a0303e" title="Write images using parameters from the given ParameterMap.">autowrite(const util::ParameterMap &amp;, Image, bool, const std::string &amp;, boost::shared_ptr&lt; util::ConsoleFeedback &gt;)</a> with the ParameterMap of the application to write the given image. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out_image</td><td>the image to be written </td></tr>
+    <tr><td class="paramname">exitOnError</td><td>terminate the application if there was an error writing the data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00211">211</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a968bb7b48ae28d516b6327acb096aeab"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="a968bb7b48ae28d516b6327acb096aeab" args="(std::list&lt; data::Image &gt; out_images, bool exitOnError=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOApplication::autowrite </td>
+          <td>(</td>
+          <td class="paramtype">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt;&#160;</td>
+          <td class="paramname"><em>out_images</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exitOnError</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00212">212</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2cd0010709ccf97705f2b2a9e0a0303e"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="a2cd0010709ccf97705f2b2a9e0a0303e" args="(const util::ParameterMap &amp;parameters, Image out_image, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; util::ConsoleFeedback &gt; feedback=boost::shared_ptr&lt; util::ConsoleFeedback &gt;())" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOApplication::autowrite </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a>&#160;</td>
+          <td class="paramname"><em>out_image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exitOnError</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em> = <code>boost::shared_ptr&lt;&#160;<a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a>&#160;&gt;()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Write images using parameters from the given ParameterMap. </p>
+<p>These program parameters should be the same as set by <a class="el" href="classisis_1_1data_1_1IOApplication.html#aa8816fb8e14a8904c01957a939be1b6b" title="Add output parameters to the given ParameterMap.">addOutput()</a>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the ParameterMap the parameters should be taken from </td></tr>
+    <tr><td class="paramname">out_image</td><td>the image to be written </td></tr>
+    <tr><td class="paramname">exitOnError</td><td>terminate the application if there was an error writing the data </td></tr>
+    <tr><td class="paramname">suffix</td><td>the same suffix used for <a class="el" href="classisis_1_1data_1_1IOApplication.html#aa8816fb8e14a8904c01957a939be1b6b" title="Add output parameters to the given ParameterMap.">addOutput()</a> </td></tr>
+    <tr><td class="paramname">feedback</td><td>if given, the <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> object will be used to display reading progress if possible </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00218">218</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5d7653bba820d3261b1f56acee4b7823"></a><!-- doxytag: member="isis::data::IOApplication::autowrite" ref="a5d7653bba820d3261b1f56acee4b7823" args="(const util::ParameterMap &amp;parameters, std::list&lt; Image &gt; out_images, bool exitOnError=false, const std::string &amp;suffix=&quot;&quot;, boost::shared_ptr&lt; util::ConsoleFeedback &gt; feedback=boost::shared_ptr&lt; util::ConsoleFeedback &gt;())" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::IOApplication::autowrite </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ParameterMap.html">util::ParameterMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">Image</a> &gt;&#160;</td>
+          <td class="paramname"><em>out_images</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exitOnError</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>suffix</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em> = <code>boost::shared_ptr&lt;&#160;<a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html">util::ConsoleFeedback</a>&#160;&gt;()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00222">222</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +556,7 @@ Protected Member Functions</h2></td></tr>
 <p>This removes the currently first image in the input list, and returns a cheap copy of this image. If the input image list is empty, an exception is thrown. You might want to check the amount of available images via images.size(). </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the currently first image in the input chain </dd></dl>
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00208">208</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00262">262</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -273,16 +587,16 @@ template&lt;typename TYPE &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the currently first image in the input chain represented in the given type </dd></dl>
 
-<p>Definition at line <a class="el" href="io__application_8hpp_source.html#l00064">64</a> of file <a class="el" href="io__application_8hpp_source.html">io_application.hpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8hpp_source.html#l00092">92</a> of file <a class="el" href="io__application_8hpp_source.html">io_application.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3f672c3df1ee97cfdfa754875d3b28fd"></a><!-- doxytag: member="isis::data::IOApplication::getLogHandler" ref="a3f672c3df1ee97cfdfa754875d3b28fd" args="(std::string module, isis::LogLevel level) const " -->
+<a class="anchor" id="a15e619df12e2d5e0f35b2a92436e8703"></a><!-- doxytag: member="isis::data::IOApplication::getLogHandler" ref="a15e619df12e2d5e0f35b2a92436e8703" args="(std::string module, isis::LogLevel level) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::shared_ptr&lt; util::_internal::MessageHandlerBase &gt; isis::data::IOApplication::getLogHandler </td>
+          <td class="memname">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html">util::MessageHandlerBase</a> &gt; isis::data::IOApplication::getLogHandler </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>module</em>, </td>
@@ -290,7 +604,7 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
           <td class="paramname"><em>level</em>&#160;</td>
         </tr>
         <tr>
@@ -302,9 +616,9 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">isis::util::Application</a>.</p>
+<p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">isis::util::Application</a>.</p>
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00216">216</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00270">270</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -352,7 +666,7 @@ template&lt;typename TYPE &gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">isis::util::Application</a>.</p>
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00100">100</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00055">55</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +690,7 @@ template&lt;typename TYPE &gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7">isis::util::Application</a>.</p>
 
-<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00111">111</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__application_8cpp_source.html#l00143">143</a> of file <a class="el" href="io__application_8cpp_source.html">io_application.cpp</a>.</p>
 
 </div>
 </div>
@@ -401,7 +715,7 @@ template&lt;typename TYPE &gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="io__application_8cpp_source.html">io_application.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

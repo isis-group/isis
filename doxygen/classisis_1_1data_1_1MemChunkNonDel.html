@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -59,11 +58,8 @@ Inheritance diagram for isis::data::MemChunkNonDel&lt; TYPE &gt;:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1MemChunkNonDel.png" usemap="#isis::data::MemChunkNonDel&lt; TYPE &gt;_map" alt=""/>
   <map id="isis::data::MemChunkNonDel&lt; TYPE &gt;_map" name="isis::data::MemChunkNonDel&lt; TYPE &gt;_map">
-<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="316,112,622,136"/>
-<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="158,56,464,80"/>
-<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="474,56,780,80"/>
-<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="0,0,306,24"/>
-<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="316,0,622,24"/>
+<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="0,56,335,80"/>
+<area href="classisis_1_1util_1_1__internal_1_1GenericReference.html" alt="isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;" shape="rect" coords="0,0,335,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -74,8 +70,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#ad92b17ba107262816653cdcbe7f2c311">MemChunkNonDel</a> (const T *const org, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a MemChunkNoDel as copy of a given raw memory block This chunk won't be deleted automatically - HAVE TO BE DELETED MANUALLY This will create a MemChunkNoDel of the given size and fill it with the data at the given address.  <a href="#ad92b17ba107262816653cdcbe7f2c311"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a030675de4aafd5977131b12110ad8dee">MemChunkNonDel</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref, const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a>.  <a href="#a030675de4aafd5977131b12110ad8dee"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#ab5221fe8719a261cc0d3a3087816b0e0">MemChunkNonDel</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref, const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;min, const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;max)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a>.  <a href="#ab5221fe8719a261cc0d3a3087816b0e0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#adf659ede265fa97b7f817da74bff19a7">MemChunkNonDel</a> (const <a class="el" href="classisis_1_1data_1_1MemChunk.html">MemChunk</a>&lt; TYPE &gt; &amp;ref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a4625a4b33cc1cc70d9fd3d0902d47473">MemChunkNonDel</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> (automatic conversion will be used if datatype does not fit)  <a href="#a4625a4b33cc1cc70d9fd3d0902d47473"></a><br/></td></tr>
@@ -89,7 +85,7 @@ Public Member Functions</h2></td></tr>
  class isis::data::MemChunkNonDel&lt; TYPE &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00331">331</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00337">337</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aff62488296739875941a7f32bf055339"></a><!-- doxytag: member="isis::data::MemChunkNonDel::MemChunkNonDel" ref="aff62488296739875941a7f32bf055339" args="(size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)" -->
 <div class="memitem">
@@ -132,7 +128,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create an empty MemChunkNoDel with the given size. </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00336">336</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00342">342</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -196,7 +192,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00354">354</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00360">360</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,11 +215,11 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> (automatic conversion will be used if datatype does not fit) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00364">364</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00370">370</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a030675de4aafd5977131b12110ad8dee"></a><!-- doxytag: member="isis::data::MemChunkNonDel::MemChunkNonDel" ref="a030675de4aafd5977131b12110ad8dee" args="(const Chunk &amp;ref, const util::_internal::ValueBase &amp;min, const util::_internal::ValueBase &amp;max)" -->
+<a class="anchor" id="ab5221fe8719a261cc0d3a3087816b0e0"></a><!-- doxytag: member="isis::data::MemChunkNonDel::MemChunkNonDel" ref="ab5221fe8719a261cc0d3a3087816b0e0" args="(const Chunk &amp;ref, const util::ValueBase &amp;min, const util::ValueBase &amp;max)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -238,13 +234,13 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>min</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">util::ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>max</em>&#160;</td>
         </tr>
         <tr>
@@ -267,7 +263,7 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00375">375</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00381">381</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +284,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00379">379</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00385">385</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +310,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">isis::data::Chunk</a>.</p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00384">384</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00390">390</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -337,7 +333,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> (automatic conversion will be used if datatype does not fit) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00393">393</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00399">399</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +341,7 @@ template&lt;typename TYPE&gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="chunk_8hpp_source.html">chunk.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

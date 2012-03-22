@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -77,32 +76,46 @@
 <a name="l00048"></a>00048 {
 <a name="l00049"></a>00049     <span class="keyword">const</span> std::string m_name;
 <a name="l00050"></a>00050     std::string m_filename;
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052 <span class="keyword">protected</span>:
-<a name="l00053"></a>00053     <span class="keyword">virtual</span> boost::shared_ptr&lt;_internal::MessageHandlerBase&gt; <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( std::string module, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>;
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 <span class="keyword">public</span>:
-<a name="l00056"></a>00056 
-<a name="l00057"></a><a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">00057</a>     <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a> <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>;
+<a name="l00051"></a>00051     std::list&lt;std::pair&lt;std::string, std::string&gt; &gt; m_examples;
+<a name="l00052"></a>00052     <span class="keywordtype">void</span> addLoggingParameter( std::string name );
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 <span class="keyword">protected</span>:
+<a name="l00055"></a><a class="code" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">00055</a>     <span class="keyword">typedef</span> void ( <a class="code" href="classisis_1_1util_1_1Application.html" title="The ISIS base application class.">Application</a>::*<a class="code" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">setLogFunction</a> )( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level )<span class="keyword">const</span>;
+<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">00056</a>     std::map&lt;std::string, std::list&lt;setLogFunction&gt; &gt; <a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a>;
+<a name="l00057"></a>00057     <span class="keyword">virtual</span> boost::shared_ptr&lt;MessageHandlerBase&gt; <a class="code" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">getLogHandler</a>( std::string module, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>;
 <a name="l00058"></a>00058 
-<a name="l00067"></a>00067     <a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373" title="Default Constructor.">Application</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[] );
-<a name="l00068"></a>00068     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">~Application</a>();
-<a name="l00069"></a>00069 
-<a name="l00079"></a>00079     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">true</span> );
-<a name="l00084"></a>00084     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keywordtype">bool</span> withHidden = <span class="keyword">false</span> )<span class="keyword">const</span>;
-<a name="l00086"></a><a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204">00086</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MODULE&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a1e1ba30e10d3790edc6a590011551204" title="Set the logging level for the specified module.">setLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ) {
-<a name="l00087"></a>00087         <span class="keywordflow">if</span> ( !MODULE::use );
-<a name="l00088"></a>00088         <span class="keywordflow">else</span> _internal::Log&lt;MODULE&gt;::setHandler( <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">getLogHandler</a>( MODULE::name(), level ) );
-<a name="l00089"></a>00089     }
-<a name="l00090"></a>00090     <span class="comment">//get the version of the coreutils</span>
-<a name="l00091"></a>00091     <span class="keyword">static</span> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>( <span class="keywordtype">void</span> );
-<a name="l00092"></a>00092 };
-<a name="l00093"></a>00093 }
-<a name="l00094"></a>00094 }
-<a name="l00095"></a>00095 <span class="preprocessor">#endif // APPLICATION_HPP</span>
+<a name="l00059"></a>00059 <span class="keyword">public</span>:
+<a name="l00060"></a>00060 
+<a name="l00061"></a><a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">00061</a>     <a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a> <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>;
+<a name="l00062"></a>00062 
+<a name="l00071"></a>00071     <a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373" title="Default Constructor.">Application</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[] );
+<a name="l00072"></a>00072     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">~Application</a>();
+<a name="l00073"></a>00073 
+<a name="l00098"></a><a class="code" href="classisis_1_1util_1_1Application.html#ab2c1e683fa3bc774d54f5c2d10e4d3cb">00098</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MODULE&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#ab2c1e683fa3bc774d54f5c2d10e4d3cb" title="Add a logging module.">addLogging</a>( std::string name ) {
+<a name="l00099"></a>00099         addLoggingParameter( name );
+<a name="l00100"></a>00100         <a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a>[name].push_back( &amp;Application::setLog&lt;MODULE&gt; );
+<a name="l00101"></a>00101     }
+<a name="l00107"></a>00107     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a0613887cbb4f61ff6108bed6b5626497" title="Removes a logging parameter from the application.">removeLogging</a>( std::string name );
+<a name="l00108"></a>00108 
+<a name="l00114"></a>00114     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1" title="Add an example for the programs usage.">addExample</a>( std::string <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>, std::string desc );
+<a name="l00115"></a>00115 
+<a name="l00125"></a>00125     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError = <span class="keyword">true</span> );
+<a name="l00130"></a>00130     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keywordtype">bool</span> withHidden = <span class="keyword">false</span> )<span class="keyword">const</span>;
+<a name="l00132"></a><a class="code" href="classisis_1_1util_1_1Application.html#a67c41351afed0f7b85a84c985efa6ab1">00132</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MODULE&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a67c41351afed0f7b85a84c985efa6ab1" title="Set the logging level for the specified module.">setLog</a>( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level )<span class="keyword"> const </span>{
+<a name="l00133"></a>00133         <span class="keywordflow">if</span> ( !MODULE::use );
+<a name="l00134"></a>00134         <span class="keywordflow">else</span> _internal::Log&lt;MODULE&gt;::setHandler( <a class="code" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">getLogHandler</a>( MODULE::name(), level ) );
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Setting logging for module &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( MODULE::name() ) &lt;&lt; <span class="stringliteral">&quot; to level &quot;</span> &lt;&lt; level;
+<a name="l00137"></a>00137     }
+<a name="l00138"></a>00138     <span class="comment">//get the version of the coreutils</span>
+<a name="l00139"></a>00139     <span class="keyword">static</span> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>( <span class="keywordtype">void</span> );
+<a name="l00140"></a>00140 };
+<a name="l00141"></a>00141 }
+<a name="l00142"></a>00142 }
+<a name="l00143"></a>00143 <span class="preprocessor">#endif // APPLICATION_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

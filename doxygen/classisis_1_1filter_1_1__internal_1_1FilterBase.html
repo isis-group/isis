@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -81,6 +80,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a> () const =0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a8c8fb2b413bbb7e675072514816b2821">isValid</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ad56cb15812cb83b245400259cf5a376b">run</a> (boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt;=boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt;())</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0699b918905f1a88e9e1df03c4b78eec">~FilterBase</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ad38e796b3e0aa389174df04c9fbddabf">process</a> ()=0</td></tr>
@@ -93,7 +93,26 @@ Protected Attributes</h2></td></tr>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock">
 <p>Definition at line <a class="el" href="filter_8hpp_source.html#l00017">17</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
-</div><hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a0699b918905f1a88e9e1df03c4b78eec"></a><!-- doxytag: member="isis::filter::_internal::FilterBase::~FilterBase" ref="a0699b918905f1a88e9e1df03c4b78eec" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual isis::filter::_internal::FilterBase::~FilterBase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="filter_8hpp_source.html#l00024">24</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="ae98fc91b039925e00bf68b5cd43960c0"></a><!-- doxytag: member="isis::filter::_internal::FilterBase::getFilterName" ref="ae98fc91b039925e00bf68b5cd43960c0" args="() const =0" -->
 <div class="memitem">
 <div class="memproto">
@@ -175,7 +194,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="filter_8hpp_source.html#l00027">27</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="filter_8hpp_source.html#l00028">28</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -190,7 +209,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="filter_8hpp_source.html#l00026">26</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="filter_8hpp_source.html#l00027">27</a> of file <a class="el" href="filter_8hpp_source.html">filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -199,7 +218,7 @@ Protected Attributes</h2></td></tr>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="filter_8cpp_source.html">filter.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

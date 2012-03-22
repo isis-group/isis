@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -75,130 +74,162 @@
 <a name="l00033"></a>00033 
 <a name="l00034"></a><a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373">00034</a> <a class="code" href="classisis_1_1util_1_1Application.html#aab8be4d850600d999f871bcd310ca373" title="Default Constructor.">Application::Application</a>( <span class="keyword">const</span> <span class="keywordtype">char</span> name[] ): m_name( name )
 <a name="l00035"></a>00035 {
-<a name="l00036"></a>00036     <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a> dbg_levels( <span class="stringliteral">&quot;error,warning,notice,info,verbose_info&quot;</span> );
-<a name="l00037"></a>00037     dbg_levels.<a class="code" href="classisis_1_1util_1_1Selection.html#ad8ef91f793e07c3ed886869eb0829c94" title="Set the selection to the given type.">set</a>( <span class="stringliteral">&quot;warning&quot;</span> );
-<a name="l00038"></a>00038     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>] = dbg_levels;
-<a name="l00039"></a>00039     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>].setDescription( <span class="stringliteral">&quot;Debugging level for the Core module&quot;</span> );
-<a name="l00040"></a>00040     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>] = dbg_levels;
-<a name="l00043"></a>00043     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>].setDescription( <span class="stringliteral">&quot;Debugging level for the Data module&quot;</span> );
-<a name="l00044"></a>00044     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>] = dbg_levels;
-<a name="l00047"></a>00047     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>].setDescription( <span class="stringliteral">&quot;Debugging level for the ImageIO module&quot;</span> );
-<a name="l00048"></a>00048     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>].hidden() = <span class="keyword">true</span>;
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>] = <span class="keyword">false</span>;
-<a name="l00051"></a>00051     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>].setDescription( <span class="stringliteral">&quot;Print help&quot;</span> );
-<a name="l00052"></a>00052     BOOST_FOREACH( ParameterMap::reference ref, <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a> ) <span class="comment">//none of these is needed</span>
-<a name="l00053"></a>00053     ref.second.needed() = <span class="keyword">false</span>;
-<a name="l00054"></a>00054 }
-<a name="l00055"></a><a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">00055</a> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">Application::~Application</a>() {}
-<a name="l00056"></a>00056 
-<a name="l00057"></a><a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">00057</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">Application::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
-<a name="l00058"></a>00058 {
-<a name="l00059"></a>00059     <span class="keywordtype">bool</span> err = <span class="keyword">false</span>;
-<a name="l00060"></a>00060     m_filename = argv[0];
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( argc, argv ) ) {
-<a name="l00063"></a>00063         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>] ) {
-<a name="l00064"></a>00064             <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keyword">true</span> );
-<a name="l00065"></a>00065             exit( 0 );
-<a name="l00066"></a>00066         }
-<a name="l00067"></a>00067     } <span class="keywordflow">else</span> {
-<a name="l00068"></a>00068         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to parse the command line&quot;</span>;
-<a name="l00069"></a>00069         err = <span class="keyword">true</span>;
-<a name="l00070"></a>00070     }
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072     <span class="keywordflow">if</span> ( ! <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.<a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">isComplete</a>() ) {
-<a name="l00073"></a>00073         std::cerr &lt;&lt; <span class="stringliteral">&quot;Missing parameters: &quot;</span>;
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075         <span class="keywordflow">for</span> ( ParameterMap::iterator iP = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.begin(); iP != <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.end(); iP++ ) {
-<a name="l00076"></a>00076             <span class="keywordflow">if</span> ( iP-&gt;second.isNeeded() ) {std::cerr &lt;&lt; <span class="stringliteral">&quot;-&quot;</span> &lt;&lt; iP-&gt;first &lt;&lt; <span class="stringliteral">&quot;  &quot;</span>;}
-<a name="l00077"></a>00077         }
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079         std::cerr &lt;&lt; std::endl;
-<a name="l00080"></a>00080         err = <span class="keyword">true</span>;
-<a name="l00081"></a>00081     }
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>].isSet() ) {
-<a name="l00084"></a>00084         setLog&lt;CoreDebug&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() ); <span class="comment">//trigger explicit cast from Selection to int and then to LogLevel</span>
-<a name="l00085"></a>00085         setLog&lt;CoreLog&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dCore&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() );
-<a name="l00086"></a>00086     }
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>].isSet() ) {
-<a name="l00089"></a>00089         setLog&lt;DataDebug&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() );
-<a name="l00090"></a>00090         setLog&lt;DataLog&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dData&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() );
-<a name="l00091"></a>00091     }
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>].isSet() ) {
-<a name="l00094"></a>00094         setLog&lt;ImageIoDebug&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() );
-<a name="l00095"></a>00095         setLog&lt;ImageIoLog&gt;( ( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;dImageIO&quot;</span>]-&gt;as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() );
-<a name="l00096"></a>00096     }
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098     <span class="keywordflow">if</span> ( err ) {
-<a name="l00099"></a>00099         <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>();
+<a name="l00036"></a>00036     addLogging&lt;CoreLog&gt;( <span class="stringliteral">&quot;Core&quot;</span> );
+<a name="l00037"></a>00037     addLogging&lt;CoreDebug&gt;( <span class="stringliteral">&quot;Core&quot;</span> );
+<a name="l00038"></a>00038     addLogging&lt;DataLog&gt;( <span class="stringliteral">&quot;Data&quot;</span> );
+<a name="l00039"></a>00039     addLogging&lt;DataDebug&gt;( <span class="stringliteral">&quot;Data&quot;</span> );
+<a name="l00040"></a>00040     addLogging&lt;ImageIoLog&gt;( <span class="stringliteral">&quot;ImageIO&quot;</span> );
+<a name="l00041"></a>00041     addLogging&lt;ImageIoDebug&gt;( <span class="stringliteral">&quot;ImageIO&quot;</span> );
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>] = <span class="keyword">false</span>;
+<a name="l00044"></a>00044     parameters[<span class="stringliteral">&quot;help&quot;</span>].setDescription( <span class="stringliteral">&quot;Print help&quot;</span> );
+<a name="l00045"></a>00045     parameters[<span class="stringliteral">&quot;help&quot;</span>].needed() = <span class="keyword">false</span>;
+<a name="l00046"></a>00046 }
+<a name="l00047"></a><a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">00047</a> <a class="code" href="classisis_1_1util_1_1Application.html#a84f0df33eba7a01b5c279d13f28337e0">Application::~Application</a>() {}
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049 <span class="keywordtype">void</span> Application::addLoggingParameter( std::string name )
+<a name="l00050"></a>00050 {
+<a name="l00051"></a>00051     <span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a> dbg_levels( <span class="stringliteral">&quot;error,warning,notice,info,verbose_info&quot;</span>, <span class="stringliteral">&quot;notice&quot;</span> );
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053     <span class="keywordflow">if</span>( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.find( std::string( <span class="stringliteral">&quot;d&quot;</span> ) + name ) == <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.end() ) { <span class="comment">//only add the parameter if it does not exist yet</span>
+<a name="l00054"></a>00054         <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[std::string( <span class="stringliteral">&quot;d&quot;</span> )+name] = dbg_levels;
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056         <span class="keywordflow">if</span>( name.empty() )
+<a name="l00057"></a>00057             <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[std::string( <span class="stringliteral">&quot;d&quot;</span> )+name].setDescription( <span class="stringliteral">&quot;Log level for \&quot;&quot;</span> + m_name + <span class="stringliteral">&quot;\&quot; itself&quot;</span> );
+<a name="l00058"></a>00058         <span class="keywordflow">else</span>
+<a name="l00059"></a>00059             <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[std::string( <span class="stringliteral">&quot;d&quot;</span> )+name].setDescription( <span class="stringliteral">&quot;Log level for the \&quot;&quot;</span> + name + <span class="stringliteral">&quot;\&quot; module(s)&quot;</span> );
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061         <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[std::string( <span class="stringliteral">&quot;d&quot;</span> )+name].hidden() = <span class="keyword">true</span>;
+<a name="l00062"></a>00062         <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[std::string( <span class="stringliteral">&quot;d&quot;</span> )+name].needed() = <span class="keyword">false</span>;
+<a name="l00063"></a>00063     }
+<a name="l00064"></a>00064 }
+<a name="l00065"></a><a class="code" href="classisis_1_1util_1_1Application.html#a0613887cbb4f61ff6108bed6b5626497">00065</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a0613887cbb4f61ff6108bed6b5626497" title="Removes a logging parameter from the application.">Application::removeLogging</a>( std::string name )
+<a name="l00066"></a>00066 {
+<a name="l00067"></a>00067     <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.erase( name );
+<a name="l00068"></a>00068     <a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a>.erase( name );
+<a name="l00069"></a>00069 }
+<a name="l00070"></a>00070 
+<a name="l00071"></a><a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1">00071</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1" title="Add an example for the programs usage.">Application::addExample</a> ( std::string parameters, std::string desc )
+<a name="l00072"></a>00072 {
+<a name="l00073"></a>00073     m_examples.push_back( std::make_pair( parameters, desc ) );
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a><a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">00076</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">Application::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
+<a name="l00077"></a>00077 {
+<a name="l00078"></a>00078     <span class="keyword">typedef</span> <span class="keyword">const</span> std::pair&lt; const std::string, std::list&lt; setLogFunction &gt; &gt; &amp; logger_ref;
+<a name="l00079"></a>00079     <span class="keywordtype">bool</span> err = <span class="keyword">false</span>;
+<a name="l00080"></a>00080     m_filename = boost::filesystem::path( argv[0] ).filename();
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( argc, argv ) ) {
+<a name="l00083"></a>00083         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>] ) {
+<a name="l00084"></a>00084             <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>( <span class="keyword">true</span> );
+<a name="l00085"></a>00085             exit( 0 );
+<a name="l00086"></a>00086         }
+<a name="l00087"></a>00087     } <span class="keywordflow">else</span> {
+<a name="l00088"></a>00088         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to parse the command line&quot;</span>;
+<a name="l00089"></a>00089         err = <span class="keyword">true</span>;
+<a name="l00090"></a>00090     }
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092     BOOST_FOREACH( logger_ref ref, <a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a> ) {
+<a name="l00093"></a>00093         <span class="keyword">const</span> std::string dname = std::string( <span class="stringliteral">&quot;d&quot;</span> ) + ref.first;
+<a name="l00094"></a>00094         assert( !<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[dname].isEmpty() ); <span class="comment">// this must have been set by addLoggingParameter (called via addLogging)</span>
+<a name="l00095"></a>00095         <span class="keyword">const</span> <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level = ( <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> )( uint16_t )<a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[dname].as&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;();
+<a name="l00096"></a>00096         BOOST_FOREACH( <a class="code" href="classisis_1_1util_1_1Application.html#a6eb6bfd9323cca764fa4e4e8cc02c872">setLogFunction</a> setter, ref.second ) {
+<a name="l00097"></a>00097             ( this-&gt;*setter )( level );
+<a name="l00098"></a>00098         }
+<a name="l00099"></a>00099     }
 <a name="l00100"></a>00100 
-<a name="l00101"></a>00101         <span class="keywordflow">if</span>( exitOnError ) {
-<a name="l00102"></a>00102             std::cerr &lt;&lt; <span class="stringliteral">&quot;Exiting...&quot;</span> &lt;&lt; std::endl;
-<a name="l00103"></a>00103             exit( 1 );
-<a name="l00104"></a>00104         }
-<a name="l00105"></a>00105     }
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107     <span class="keywordflow">return</span> ! err;
-<a name="l00108"></a>00108 }
-<a name="l00109"></a><a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7">00109</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">Application::printHelp</a>( <span class="keywordtype">bool</span> withHidden )<span class="keyword">const</span>
-<a name="l00110"></a>00110 <span class="keyword"></span>{
-<a name="l00111"></a>00111     std::cerr &lt;&lt; this-&gt;m_name &lt;&lt; <span class="stringliteral">&quot; (using isis &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;
-<a name="l00112"></a>00112     std::cerr &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; this-&gt;m_filename &lt;&lt; <span class="stringliteral">&quot; &lt;options&gt;, where &lt;options&gt; includes:&quot;</span> &lt;&lt; std::endl;
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114     <span class="keywordflow">for</span> ( ParameterMap::const_iterator iP = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.begin(); iP != <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.end(); iP++ ) {
-<a name="l00115"></a>00115         std::string pref;
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117         <span class="keywordflow">if</span> ( iP-&gt;second.isNeeded() ) {
-<a name="l00118"></a>00118             pref = <span class="stringliteral">&quot;. Required.&quot;</span>;
-<a name="l00119"></a>00119         } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( iP-&gt;second.isHidden() ) {
-<a name="l00120"></a>00120             <span class="keywordflow">if</span>( !withHidden )
-<a name="l00121"></a>00121                 <span class="keywordflow">continue</span>; <span class="comment">// if its hidden, not needed, and wie want the short version skip this parameter</span>
-<a name="l00122"></a>00122         }
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124         <span class="keywordflow">if</span> ( ! iP-&gt;second.isNeeded() ) {
-<a name="l00125"></a>00125             pref = <span class="stringliteral">&quot;. Default: \&quot;&quot;</span> + iP-&gt;second.toString() + <span class="stringliteral">&quot;\&quot;&quot;</span>;
-<a name="l00126"></a>00126         }
-<a name="l00127"></a>00127 
-<a name="l00128"></a>00128         std::cerr &lt;&lt; <span class="stringliteral">&quot;\t-&quot;</span> &lt;&lt; iP-&gt;first &lt;&lt; <span class="stringliteral">&quot; &lt;&quot;</span> &lt;&lt; iP-&gt;second-&gt;getTypeName() &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span> &lt;&lt; std::endl;
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130         <span class="keywordflow">if</span> ( iP-&gt;second-&gt;is&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() ) {
-<a name="l00131"></a>00131             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a> &amp;ref = iP-&gt;second-&gt;castTo&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;();
-<a name="l00132"></a>00132             std::cerr &lt;&lt; <span class="stringliteral">&quot;\t\tOptions are: &quot;</span> &lt;&lt;  ref.<a class="code" href="classisis_1_1util_1_1Selection.html#aa785573ad3feea331d30e2b0ece21a02">getEntries</a>() &lt;&lt; std::endl;
-<a name="l00133"></a>00133         }
-<a name="l00134"></a>00134 
-<a name="l00135"></a>00135         std::cerr &lt;&lt; <span class="stringliteral">&quot;\t\t&quot;</span> &lt;&lt; iP-&gt;second.description() &lt;&lt; pref &lt;&lt; std::endl;
-<a name="l00136"></a>00136     }
-<a name="l00137"></a>00137 }
+<a name="l00101"></a>00101     <span class="keywordflow">if</span> ( ! <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.<a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">isComplete</a>() ) {
+<a name="l00102"></a>00102         std::cerr &lt;&lt; <span class="stringliteral">&quot;Missing parameters: &quot;</span>;
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104         <span class="keywordflow">for</span> ( ParameterMap::iterator iP = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.begin(); iP != <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.end(); iP++ ) {
+<a name="l00105"></a>00105             <span class="keywordflow">if</span> ( iP-&gt;second.isNeeded() ) {std::cerr &lt;&lt; <span class="stringliteral">&quot;-&quot;</span> &lt;&lt; iP-&gt;first &lt;&lt; <span class="stringliteral">&quot;  &quot;</span>;}
+<a name="l00106"></a>00106         }
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108         std::cerr &lt;&lt; std::endl;
+<a name="l00109"></a>00109         err = <span class="keyword">true</span>;
+<a name="l00110"></a>00110     }
+<a name="l00111"></a>00111 
+<a name="l00112"></a>00112     <span class="keywordflow">if</span> ( err ) {
+<a name="l00113"></a>00113         <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">printHelp</a>();
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115         <span class="keywordflow">if</span>( exitOnError ) {
+<a name="l00116"></a>00116             std::cerr &lt;&lt; <span class="stringliteral">&quot;Exiting...&quot;</span> &lt;&lt; std::endl;
+<a name="l00117"></a>00117             exit( 1 );
+<a name="l00118"></a>00118         }
+<a name="l00119"></a>00119     }
+<a name="l00120"></a>00120 
+<a name="l00121"></a>00121     <span class="keywordflow">return</span> ! err;
+<a name="l00122"></a>00122 }
+<a name="l00123"></a><a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7">00123</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#a9bba50d56e8df6a18deee81e273bf1c7" title="Virtual function to display a short help text.">Application::printHelp</a>( <span class="keywordtype">bool</span> withHidden )<span class="keyword">const</span>
+<a name="l00124"></a>00124 <span class="keyword"></span>{
+<a name="l00125"></a>00125     <span class="keyword">typedef</span> std::list&lt;std::pair&lt;std::string, std::string&gt; &gt;::const_reference example_type;
+<a name="l00126"></a>00126     std::cerr &lt;&lt; this-&gt;m_name &lt;&lt; <span class="stringliteral">&quot; (using isis &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">getCoreVersion</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;
+<a name="l00127"></a>00127     std::cerr &lt;&lt; <span class="stringliteral">&quot;Usage: &quot;</span> &lt;&lt; this-&gt;m_filename &lt;&lt; <span class="stringliteral">&quot; &lt;options&gt;&quot;</span> &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;Where &lt;options&gt; includes:&quot;</span> &lt;&lt; std::endl;;
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129     <span class="keywordflow">for</span> ( ParameterMap::const_iterator iP = <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.begin(); iP != <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.end(); iP++ ) {
+<a name="l00130"></a>00130         std::string pref;
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132         <span class="keywordflow">if</span> ( iP-&gt;second.isNeeded() ) {
+<a name="l00133"></a>00133             pref = <span class="stringliteral">&quot;. Required.&quot;</span>;
+<a name="l00134"></a>00134         } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( iP-&gt;second.isHidden() ) {
+<a name="l00135"></a>00135             <span class="keywordflow">if</span>( !withHidden )
+<a name="l00136"></a>00136                 <span class="keywordflow">continue</span>; <span class="comment">// if its hidden, not needed, and wie want the short version skip this parameter</span>
+<a name="l00137"></a>00137         }
 <a name="l00138"></a>00138 
-<a name="l00139"></a><a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">00139</a> boost::shared_ptr&lt; _internal::MessageHandlerBase &gt; <a class="code" href="classisis_1_1util_1_1Application.html#afa298abfc2b0a30cce0b4972636c6378">Application::getLogHandler</a>( std::string <span class="comment">/*module*/</span>, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>
-<a name="l00140"></a>00140 <span class="keyword"></span>{
-<a name="l00141"></a>00141     <span class="keywordflow">return</span> boost::shared_ptr&lt; _internal::MessageHandlerBase &gt;( level ? <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html" title="Default message output class.">util::DefaultMsgPrint</a>( level ) : 0 );
-<a name="l00142"></a>00142 }
-<a name="l00143"></a><a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">00143</a> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">Application::getCoreVersion</a>( <span class="keywordtype">void</span> )
-<a name="l00144"></a>00144 {
-<a name="l00145"></a>00145 <span class="preprocessor">#ifdef ISIS_RCS_REVISION</span>
-<a name="l00146"></a>00146 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MAJOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MINOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_PATCH ) + <span class="stringliteral">&quot; [&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( ISIS_RCS_REVISION ) + <span class="stringliteral">&quot;]&quot;</span>;
-<a name="l00147"></a>00147 <span class="preprocessor">#else</span>
-<a name="l00148"></a>00148 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MAJOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MINOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_PATCH );
-<a name="l00149"></a>00149 <span class="preprocessor">#endif</span>
-<a name="l00150"></a>00150 <span class="preprocessor"></span>}
-<a name="l00151"></a>00151 
-<a name="l00152"></a>00152 }
-<a name="l00153"></a>00153 }
-<a name="l00154"></a>00154 <span class="preprocessor">#undef STR</span>
-<a name="l00155"></a>00155 <span class="preprocessor"></span><span class="preprocessor">#undef _xstr_</span>
-<a name="l00156"></a>00156 <span class="preprocessor"></span>
+<a name="l00139"></a>00139         <span class="keywordflow">if</span> ( ! iP-&gt;second.isNeeded() ) {
+<a name="l00140"></a>00140             pref = <span class="stringliteral">&quot;. Default: \&quot;&quot;</span> + iP-&gt;second.toString() + <span class="stringliteral">&quot;\&quot;.&quot;</span>;
+<a name="l00141"></a>00141         }
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143         std::cerr
+<a name="l00144"></a>00144                 &lt;&lt; <span class="stringliteral">&quot;\t-&quot;</span> &lt;&lt; iP-&gt;first &lt;&lt; <span class="stringliteral">&quot; &lt;&quot;</span> &lt;&lt; iP-&gt;second.getTypeName() &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span> &lt;&lt; std::endl
+<a name="l00145"></a>00145                 &lt;&lt; <span class="stringliteral">&quot;\t\t&quot;</span> &lt;&lt; iP-&gt;second.description() &lt;&lt; pref &lt;&lt; std::endl;
+<a name="l00146"></a>00146 
+<a name="l00147"></a>00147         <span class="keywordflow">if</span> ( iP-&gt;second.is&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;() ) {
+<a name="l00148"></a>00148             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a> &amp;ref = iP-&gt;second.castTo&lt;<a class="code" href="classisis_1_1util_1_1Selection.html" title="Here, a Selection is one of our types (see types.hpp) and meant as an enumeration of &amp;quot;things&amp;quo...">Selection</a>&gt;();
+<a name="l00149"></a>00149             <span class="keyword">const</span> std::list&lt; istring &gt; entries = ref.<a class="code" href="classisis_1_1util_1_1Selection.html#aa785573ad3feea331d30e2b0ece21a02">getEntries</a>();
+<a name="l00150"></a>00150             std::list&lt; istring &gt;::const_iterator i = entries.begin();
+<a name="l00151"></a>00151             std::cerr &lt;&lt; <span class="stringliteral">&quot;\t\tOptions are: \&quot;&quot;</span> &lt;&lt; *i &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span>;
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153             <span class="keywordflow">for</span>( i++ ; i != entries.end(); i++ ) {
+<a name="l00154"></a>00154                 std::list&lt; istring &gt;::const_iterator dummy = i;
+<a name="l00155"></a>00155                 std::cout &lt;&lt; ( ( ++dummy ) != entries.end() ? <span class="stringliteral">&quot;, &quot;</span> : <span class="stringliteral">&quot; or &quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span> &lt;&lt; *i &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span>;
+<a name="l00156"></a>00156             }
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158             std::cerr &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; std::endl;
+<a name="l00159"></a>00159         }
+<a name="l00160"></a>00160     }
+<a name="l00161"></a>00161 
+<a name="l00162"></a>00162     <span class="keywordflow">if</span>( !m_examples.empty() ) {
+<a name="l00163"></a>00163         std::cout &lt;&lt; <span class="stringliteral">&quot;Examples:&quot;</span> &lt;&lt; std::endl;
+<a name="l00164"></a>00164 
+<a name="l00165"></a>00165         BOOST_FOREACH( example_type ex, m_examples ) {
+<a name="l00166"></a>00166             std::cout &lt;&lt; <span class="charliteral">&#39;\t&#39;</span> &lt;&lt; m_filename + <span class="stringliteral">&quot; &quot;</span> + ex.first &lt;&lt; <span class="charliteral">&#39;\t&#39;</span> &lt;&lt; ex.second &lt;&lt; std::endl;
+<a name="l00167"></a>00167         }
+<a name="l00168"></a>00168     }
+<a name="l00169"></a>00169 }
+<a name="l00170"></a>00170 
+<a name="l00171"></a><a class="code" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">00171</a> boost::shared_ptr&lt; MessageHandlerBase &gt; <a class="code" href="classisis_1_1util_1_1Application.html#a83b8d584d1face33a9c11d29940233c4">Application::getLogHandler</a>( std::string <span class="comment">/*module*/</span>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a> level )<span class="keyword">const</span>
+<a name="l00172"></a>00172 <span class="keyword"></span>{
+<a name="l00173"></a>00173     <span class="keywordflow">return</span> boost::shared_ptr&lt; MessageHandlerBase &gt;( level ? <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html" title="Default message output class.">util::DefaultMsgPrint</a>( level ) : 0 );
+<a name="l00174"></a>00174 }
+<a name="l00175"></a><a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">00175</a> <span class="keyword">const</span> std::string <a class="code" href="classisis_1_1util_1_1Application.html#a50f504bbb15d5a73a622d431219a13d3">Application::getCoreVersion</a>( <span class="keywordtype">void</span> )
+<a name="l00176"></a>00176 {
+<a name="l00177"></a>00177 <span class="preprocessor">#ifdef ISIS_RCS_REVISION</span>
+<a name="l00178"></a>00178 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MAJOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MINOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_PATCH ) + <span class="stringliteral">&quot; [&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( ISIS_RCS_REVISION ) + <span class="stringliteral">&quot;]&quot;</span>;
+<a name="l00179"></a>00179 <span class="preprocessor">#else</span>
+<a name="l00180"></a>00180 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MAJOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_MINOR ) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code" href="application_8cpp.html#a6388870e639eee9c0a69446876f1f8cc">STR</a>( _ISIS_VERSION_PATCH );
+<a name="l00181"></a>00181 <span class="preprocessor">#endif</span>
+<a name="l00182"></a>00182 <span class="preprocessor"></span>}
+<a name="l00183"></a>00183 
+<a name="l00184"></a>00184 }
+<a name="l00185"></a>00185 }
+<a name="l00186"></a>00186 <span class="preprocessor">#undef STR</span>
+<a name="l00187"></a>00187 <span class="preprocessor"></span><span class="preprocessor">#undef _xstr_</span>
+<a name="l00188"></a>00188 <span class="preprocessor"></span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

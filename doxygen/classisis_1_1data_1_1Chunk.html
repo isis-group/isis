@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -48,13 +47,14 @@
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <h1>isis::data::Chunk Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::data::Chunk" --><!-- doxytag: inherits="isis::data::_internal::ChunkBase,isis::util::_internal::ValueReference" -->
+<!-- doxytag: class="isis::data::Chunk" --><!-- doxytag: inherits="isis::util::_internal::GenericReference" -->
 <p>Main class for four-dimensional random-access data blocks.  
 <a href="#_details">More...</a></p>
 
@@ -65,72 +65,69 @@ Inheritance diagram for isis::data::Chunk:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1Chunk.png" usemap="#isis::data::Chunk_map" alt=""/>
   <map id="isis::data::Chunk_map" name="isis::data::Chunk_map">
-<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="158,56,464,80"/>
-<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="474,56,780,80"/>
-<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="0,0,306,24"/>
-<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="316,0,622,24"/>
-<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="158,168,464,192"/>
-<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="474,168,780,192"/>
+<area href="classisis_1_1util_1_1__internal_1_1GenericReference.html" alt="isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;" shape="rect" coords="172,0,507,24"/>
+<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,112,335,136"/>
+<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="345,112,680,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
-<a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">_internal::ValuePtrBase::const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a21bd5dab60b3b478a7d964b8ba69a0be">const_iterator</a></td></tr>
+<a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a03f8f8c9859fbc87d0d6f116bd6b46de">ValueArrayBase::const_value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">const_iterator</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef const_iterator::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a2f770a2dca2819b9efe8b48fb43ca2e5">const_reference</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
-<a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">_internal::ValuePtrBase::value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a6de6b57114699275fadc9f92d90e5ab4">iterator</a></td></tr>
+<a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a42275e4f83dd7f48620276e4f43c0809">ValueArrayBase::value_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">iterator</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef iterator::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d4f5ebc003affeac2332830f04d6c25">reference</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; TYPE &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a606c40ac8393596b16dcd2a07ec6f8f2">asValuePtr</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">_internal::ValuePtrBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a944f364baa18675dbd1c8f4c6b3f8d73">asValuePtrBase</a> ()</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a>&lt; TYPE &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a210dafafa0c52951d6b15568d797447b">asValueArray</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValueArrayBase.html">ValueArrayBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245">autoSplice</a> (uint32_t acquisitionNumberStride=0) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.  <a href="#ab51fafa7cb8cbbfb4718c64628a3c245"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a21bd5dab60b3b478a7d964b8ba69a0be">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a07d458a2703945cbe76fe4bded7fd333">begin</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a6de6b57114699275fadc9f92d90e5ab4">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab29816f5d460bf0b903e3e3bb2e79066">bytesPerVoxel</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a0b5d8ab1b3d61a47d1e7354301b03434">Chunk</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">ValuePtrReference</a> &amp;src, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a07d458a2703945cbe76fe4bded7fd333">begin</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a32ce9096b68e49f20323ece25bab6ea9">Chunk</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">isis::data::ValueArrayReference</a> &amp;src, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1, bool fakeValid=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">cloneToNew</a> (size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new empty <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> of different size and without properties, but of the same datatype as this.  <a href="#aae5a9140e2d25148d176e3caf4891cdb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">compare</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;dst) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">compareRange</a> (const size_t source_start[], const size_t source_end[], const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;dst, const size_t destination[]) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">convertToType</a> (short unsigned int ID, <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>())</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">convertToType</a> (short unsigned int ID, scaling_pair scaling=scaling_pair())</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Ensure, the chunk has the type with the requested ID.  <a href="#ae8607eff4f684c7934c9f4188a05e24c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">copyRange</a> (const size_t source_start[], const size_t source_end[], <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;dst, const size_t destination[]) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">copySlice</a> (size_t thirdDimS, size_t fourthDimS, <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;dst, size_t thirdDimD, size_t fourthDimD) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a0481aaeeddf752979f665207f44fd57b">copyToMem</a> (T *dst, size_t len, <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> scaling=<a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()) const </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a0481aaeeddf752979f665207f44fd57b">copyToMem</a> (T *dst, size_t len, scaling_pair scaling=scaling_pair()) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy all voxel data of the chunk into memory.  <a href="#a0481aaeeddf752979f665207f44fd57b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a6de6b57114699275fadc9f92d90e5ab4">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">end</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a21bd5dab60b3b478a7d964b8ba69a0be">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a9ac29d0750a5be71ce47414473e5cdbb">end</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">end</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a9ac29d0750a5be71ce47414473e5cdbb">end</a> () const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af7d1aea5c86c996274f4700efd20776e">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run a functor on every Voxel in the chunk.  <a href="#af7d1aea5c86c996274f4700efd20776e"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a99e5865871bcb988bcfd60ce81dcbb2c">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op, <a class="el" href="classisis_1_1util_1_1vector4.html">util::vector4</a>&lt; size_t &gt; offset)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run a functor on every Voxel in the chunk.  <a href="#a99e5865871bcb988bcfd60ce81dcbb2c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">getBytesPerVoxel</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::pair<br class="typebreak"/>
-&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <br class="typebreak"/>
-<a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">getMinMax</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f">getScalingTo</a> (unsigned short typeID, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale) const </td></tr>
+&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>, <br class="typebreak"/>
+<a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">getMinMax</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">scaling_pair&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f">getScalingTo</a> (unsigned short typeID, autoscaleOption scaleopt=autoscale) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get the scaling (and offset) which would be used in an conversion to the given type  <a href="#ae700378263b34d8a0872f9d994a4d05f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab6b7b514d89f624ad435483efae15530">getScalingTo</a> (unsigned short typeID, const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt; &amp;minmax, <a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt=autoscale) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">scaling_pair&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab6b7b514d89f624ad435483efae15530">getScalingTo</a> (unsigned short typeID, const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &gt; &amp;minmax, autoscaleOption scaleopt=autoscale) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">getTypeID</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad186ef78e6e27101e5a2e898fa0c23a2">getTypeName</a> () const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt; TYPE &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab539260c3bcddfccc012527d88b6c06e">getValuePtr</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">_internal::ValuePtrBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a73ab9d7ca753a2e6c061f86b76408541">getValuePtrBase</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">getVoxelValue</a> (size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0) const </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a>&lt; TYPE &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#adee0e57224cef419fcefdd9354410734">getValueArray</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html">ValueArrayBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">getVoxelValue</a> (size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#aee7041a81d699144ccc33a32818e5893">is</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">operator=</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyValue.html">util::PropertyValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8">propertyValueAt</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;key, size_t at)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access properties of the next lower dimension (e.g.  <a href="#af41cf6c4b3148ece948d762f99ffb4f8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">util::PropertyValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#acffaf734f63657782130cbf3c89b53f4">propertyValueAt</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;key, size_t at) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">setVoxelValue</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &amp;val, size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">setVoxelValue</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &amp;val, size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b">splice</a> (<a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> atDim) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Splices the chunk at the given dimension and all dimensions above.  <a href="#a6225923327f21aeb5979d59ea756b26b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1">swapAlong</a> (const <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim) const </td></tr>
@@ -144,6 +141,10 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">TYPE &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42">voxel</a> (size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the element at a given index.  <a href="#acf9c5e0311d80bed02a16362e2e0fc42"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e">createByID</a> (short unsigned int ID, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1, bool fakeValid=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new empty <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> without properties but of specified type and specified size.  <a href="#a2a88b67e68dd908f82dcd1fdb2b39d3e"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE , typename D &gt; </td></tr>
@@ -157,22 +158,22 @@ Friends</h2></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Main class for four-dimensional random-access data blocks. </p>
-<p>Like in <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>, the copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> will reference the same data. (cheap copy) (If you want to make a memory based deep copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> create a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> from it) </p>
+<p>Like in <a class="el" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray</a>, the copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> will reference the same data. (cheap copy) (If you want to make a memory based deep copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> create a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> from it) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00063">63</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00065">65</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 </div><hr/><h2>Member Typedef Documentation</h2>
-<a class="anchor" id="a21bd5dab60b3b478a7d964b8ba69a0be"></a><!-- doxytag: member="isis::data::Chunk::const_iterator" ref="a21bd5dab60b3b478a7d964b8ba69a0be" args="" -->
+<a class="anchor" id="a4d6cdfd2f68ef6abf05bbf1e65e106f3"></a><!-- doxytag: member="isis::data::Chunk::const_iterator" ref="a4d6cdfd2f68ef6abf05bbf1e65e106f3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">_internal::ValuePtrBase::const_value_iterator</a> <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::Chunk::const_iterator</a></td>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a03f8f8c9859fbc87d0d6f116bd6b46de">ValueArrayBase::const_value_iterator</a> <a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">isis::data::Chunk::const_iterator</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00084">84</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00086">86</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -187,22 +188,22 @@ Friends</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00086">86</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00088">88</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6de6b57114699275fadc9f92d90e5ab4"></a><!-- doxytag: member="isis::data::Chunk::iterator" ref="a6de6b57114699275fadc9f92d90e5ab4" args="" -->
+<a class="anchor" id="ad18285aad71195f299ee841a00a28131"></a><!-- doxytag: member="isis::data::Chunk::iterator" ref="ad18285aad71195f299ee841a00a28131" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">_internal::ValuePtrBase::value_iterator</a> <a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">isis::data::Chunk::iterator</a></td>
+          <td class="memname">typedef <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a42275e4f83dd7f48620276e4f43c0809">ValueArrayBase::value_iterator</a> <a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">isis::data::Chunk::iterator</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00080">80</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00082">82</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +218,7 @@ Friends</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00085">85</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00087">87</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -286,7 +287,7 @@ template&lt;typename TYPE , typename D &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00077">77</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00079">79</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -304,18 +305,18 @@ template&lt;typename TYPE , typename D &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00080">80</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00082">82</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0b5d8ab1b3d61a47d1e7354301b03434"></a><!-- doxytag: member="isis::data::Chunk::Chunk" ref="a0b5d8ab1b3d61a47d1e7354301b03434" args="(const ValuePtrReference &amp;src, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)" -->
+<a class="anchor" id="a32ce9096b68e49f20323ece25bab6ea9"></a><!-- doxytag: member="isis::data::Chunk::Chunk" ref="a32ce9096b68e49f20323ece25bab6ea9" args="(const isis::data::ValueArrayReference &amp;src, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1, bool fakeValid=false)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">isis::data::Chunk::Chunk </td>
+          <td class="memname">_internal isis::data::Chunk::Chunk </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">ValuePtrReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">isis::data::ValueArrayReference</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -340,7 +341,13 @@ template&lt;typename TYPE , typename D &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>nrOfTimesteps</em> = <code>1</code>&#160;</td>
+          <td class="paramname"><em>nrOfTimesteps</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>fakeValid</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -351,19 +358,19 @@ template&lt;typename TYPE , typename D &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00042">42</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00044">44</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a606c40ac8393596b16dcd2a07ec6f8f2"></a><!-- doxytag: member="isis::data::Chunk::asValuePtr" ref="a606c40ac8393596b16dcd2a07ec6f8f2" args="()" -->
+<a class="anchor" id="a210dafafa0c52951d6b15568d797447b"></a><!-- doxytag: member="isis::data::Chunk::asValueArray" ref="a210dafafa0c52951d6b15568d797447b" args="()" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename TYPE &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt;TYPE&gt;&amp; isis::data::Chunk::asValuePtr </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a>&lt;TYPE&gt;&amp; isis::data::Chunk::asValueArray </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [inline]</code></td>
@@ -372,16 +379,16 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00168">168</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00170">170</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a944f364baa18675dbd1c8f4c6b3f8d73"></a><!-- doxytag: member="isis::data::Chunk::asValuePtrBase" ref="a944f364baa18675dbd1c8f4c6b3f8d73" args="()" -->
+<a class="anchor" id="a458e4b0fdd8c77a766e12b31de04e000"></a><!-- doxytag: member="isis::data::Chunk::asValueArrayBase" ref="a458e4b0fdd8c77a766e12b31de04e000" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">_internal::ValuePtrBase</a>&amp; isis::data::Chunk::asValuePtrBase </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1ValueArrayBase.html">ValueArrayBase</a>&amp; isis::data::Chunk::asValueArrayBase </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [inline]</code></td>
@@ -390,7 +397,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00165">165</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00167">167</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -410,9 +417,10 @@ template&lt;typename TYPE &gt; </div>
 <div class="memdoc">
 
 <p>Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately. </p>
-<p>This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices. E.g. splice\(1\) on a chunk of the size 512x512x128, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0 will result in 128 chunks of the size 512x512x1, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128. (If voxelSize is 1,1,1 and voxelGap is 0,0,0) (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset) </p>
+<p>This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices.</p>
+<p>E.g. <a class="el" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245" title="Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber...">autoSplice()</a> on a chunk of the size 512x512x128, with rowVec 1,0,0, columnVec 0,1,0 and indexOrigin 0,0,0 will result in 128 chunks of the size 512x512x1, with constant rowVec's 1,0,0, and columnVec's 0,1,0 while the indexOrigin will be going from 0,0,0 to 0,0,128 (If voxelSize is 1,1,1 and voxelGap is 0,0,0). The acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset. </p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00165">165</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00172">172</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +429,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">Chunk::const_iterator</a> isis::data::Chunk::begin </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> isis::data::Chunk::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -430,7 +438,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00337">337</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00344">344</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +447,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">Chunk::iterator</a> isis::data::Chunk::begin </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> isis::data::Chunk::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -448,25 +456,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00328">328</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ab29816f5d460bf0b903e3e3bb2e79066"></a><!-- doxytag: member="isis::data::Chunk::bytesPerVoxel" ref="ab29816f5d460bf0b903e3e3bb2e79066" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t isis::data::Chunk::bytesPerVoxel </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00078">78</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00335">335</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +499,7 @@ template&lt;typename TYPE &gt; </div>
 
 <p>Creates a new empty <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> of different size and without properties, but of the same datatype as this. </p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00049">49</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00059">59</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -528,7 +518,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00135">135</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00142">142</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +559,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00116">116</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00123">123</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -586,8 +576,8 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td>
-          <td class="paramname"><em>scaling</em> = <code><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()</code>&#160;</td>
+          <td class="paramtype">scaling_pair&#160;</td>
+          <td class="paramname"><em>scaling</em> = <code>scaling_pair()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -602,7 +592,7 @@ template&lt;typename TYPE &gt; </div>
 <p>If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>false if there was an error </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00065">65</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00072">72</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +633,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00099">99</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00106">106</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -690,7 +680,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00091">91</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00098">98</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -715,8 +705,8 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>&#160;</td>
-          <td class="paramname"><em>scaling</em> = <code><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a>()</code>&#160;</td>
+          <td class="paramtype">scaling_pair&#160;</td>
+          <td class="paramname"><em>scaling</em> = <code>scaling_pair()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -739,7 +729,60 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if copying was (at least partly) successful </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00191">191</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00197">197</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2a88b67e68dd908f82dcd1fdb2b39d3e"></a><!-- doxytag: member="isis::data::Chunk::createByID" ref="a2a88b67e68dd908f82dcd1fdb2b39d3e" args="(short unsigned int ID, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1, bool fakeValid=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> isis::data::Chunk::createByID </td>
+          <td>(</td>
+          <td class="paramtype">short unsigned int&#160;</td>
+          <td class="paramname"><em>ID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nrOfColumns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nrOfRows</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nrOfSlices</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nrOfTimesteps</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>fakeValid</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Creates a new empty <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> without properties but of specified type and specified size. </p>
 
 </div>
 </div>
@@ -748,7 +791,7 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">Chunk::iterator</a> isis::data::Chunk::end </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> isis::data::Chunk::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -757,7 +800,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00333">333</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00340">340</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -766,7 +809,7 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1__internal_1_1GenericValueIterator.html">Chunk::const_iterator</a> isis::data::Chunk::end </td>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> isis::data::Chunk::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -775,7 +818,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00342">342</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00349">349</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -810,14 +853,14 @@ template&lt;typename TYPE &gt; </div>
 <p>If the data of the chunk are not of type TYPE, behaviour is undefined. (If _DEBUG_LOG is enabled you will get an error message before the progrmm will crash). </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">op</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html" title="Base class for operators used for foreachVoxel.">VoxelOp</a> </td></tr>
+    <tr><td class="paramname">op</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a> </td></tr>
     <tr><td class="paramname">offset</td><td>offset to be added to the voxel position before op is called </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>amount of operations which returned false - so 0 is good! </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00134">134</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00136">136</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -841,22 +884,22 @@ template&lt;typename TYPE &gt; </div>
 <p>Run a functor on every Voxel in the chunk. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">op</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html" title="Base class for operators used for foreachVoxel.">VoxelOp</a> </td></tr>
+    <tr><td class="paramname">op</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a> </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>amount of operations which returned false - so 0 is good! </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00156">156</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00158">158</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7f7307124d91d09ce99661b136d49bc2"></a><!-- doxytag: member="isis::data::Chunk::getMinMax" ref="a7f7307124d91d09ce99661b136d49bc2" args="() const " -->
+<a class="anchor" id="abb184f06b6654e79f0e44e5ac1f05414"></a><!-- doxytag: member="isis::data::Chunk::getBytesPerVoxel" ref="abb184f06b6654e79f0e44e5ac1f05414" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt; isis::data::Chunk::getMinMax </td>
+          <td class="memname">size_t isis::data::Chunk::getBytesPerVoxel </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -865,7 +908,25 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00144">144</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00085">85</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7f7307124d91d09ce99661b136d49bc2"></a><!-- doxytag: member="isis::data::Chunk::getMinMax" ref="a7f7307124d91d09ce99661b136d49bc2" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &gt; isis::data::Chunk::getMinMax </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00151">151</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -874,7 +935,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> isis::data::Chunk::getScalingTo </td>
+          <td class="memname">scaling_pair isis::data::Chunk::getScalingTo </td>
           <td>(</td>
           <td class="paramtype">unsigned short&#160;</td>
           <td class="paramname"><em>typeID</em>, </td>
@@ -882,7 +943,7 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a>&#160;</td>
+          <td class="paramtype">autoscaleOption&#160;</td>
           <td class="paramname"><em>scaleopt</em> = <code>autoscale</code>&#160;</td>
         </tr>
         <tr>
@@ -896,7 +957,7 @@ template&lt;typename TYPE &gt; </div>
 
 <p>get the scaling (and offset) which would be used in an conversion to the given type </p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00149">149</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00156">156</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -905,7 +966,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> isis::data::Chunk::getScalingTo </td>
+          <td class="memname">scaling_pair isis::data::Chunk::getScalingTo </td>
           <td>(</td>
           <td class="paramtype">unsigned short&#160;</td>
           <td class="paramname"><em>typeID</em>, </td>
@@ -913,13 +974,13 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::pair&lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>, <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>minmax</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a>&#160;</td>
+          <td class="paramtype">autoscaleOption&#160;</td>
           <td class="paramname"><em>scaleopt</em> = <code>autoscale</code>&#160;</td>
         </tr>
         <tr>
@@ -931,7 +992,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00153">153</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00160">160</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -949,7 +1010,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00086">86</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00093">93</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -967,18 +1028,18 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00082">82</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00089">89</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab539260c3bcddfccc012527d88b6c06e"></a><!-- doxytag: member="isis::data::Chunk::getValuePtr" ref="ab539260c3bcddfccc012527d88b6c06e" args="() const " -->
+<a class="anchor" id="adee0e57224cef419fcefdd9354410734"></a><!-- doxytag: member="isis::data::Chunk::getValueArray" ref="adee0e57224cef419fcefdd9354410734" args="() const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename TYPE &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classisis_1_1data_1_1ValuePtr.html">ValuePtr</a>&lt;TYPE&gt; isis::data::Chunk::getValuePtr </td>
+          <td class="memname">const <a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a>&lt;TYPE&gt; isis::data::Chunk::getValueArray </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -987,16 +1048,16 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00169">169</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00171">171</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a73ab9d7ca753a2e6c061f86b76408541"></a><!-- doxytag: member="isis::data::Chunk::getValuePtrBase" ref="a73ab9d7ca753a2e6c061f86b76408541" args="() const " -->
+<a class="anchor" id="aac4953ecdcef21aa1beac57a0abe87fc"></a><!-- doxytag: member="isis::data::Chunk::getValueArrayBase" ref="aac4953ecdcef21aa1beac57a0abe87fc" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">_internal::ValuePtrBase</a>&amp; isis::data::Chunk::getValuePtrBase </td>
+          <td class="memname">const <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html">ValueArrayBase</a>&amp; isis::data::Chunk::getValueArrayBase </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -1005,7 +1066,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00166">166</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00168">168</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1014,7 +1075,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> isis::data::Chunk::getVoxelValue </td>
+          <td class="memname">const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> isis::data::Chunk::getVoxelValue </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>nrOfColumns</em>, </td>
@@ -1046,7 +1107,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00347">347</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00354">354</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1066,7 +1127,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00202">202</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00208">208</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1087,38 +1148,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1MemChunk.html#af9f6ea2b3fafbeb2f268abd3b8c3a1a7">isis::data::MemChunk&lt; TYPE &gt;</a>, and <a class="el" href="classisis_1_1data_1_1MemChunkNonDel.html#a3c13bcfbb74e214c66207a712829a865">isis::data::MemChunkNonDel&lt; TYPE &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00158">158</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acffaf734f63657782130cbf3c89b53f4"></a><!-- doxytag: member="isis::data::Chunk::propertyValueAt" ref="acffaf734f63657782130cbf3c89b53f4" args="(const util::PropertyMap::KeyType &amp;key, size_t at) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">util::PropertyValue</a> &amp; isis::data::Chunk::propertyValueAt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>at</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Access properties of the next lower dimension (e.g. </p>
-<p>slice-timings in volumes) This is there for effiency on IO only (you don't have to split up chunks just to store some properties). It will be resolved by reindexing anyway. So, in an clean <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> Chunks will never have such sub-properties. </p>
- 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00320">320</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00165">165</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1150,7 +1180,38 @@ template&lt;typename T &gt; </div>
 <p>Access properties of the next lower dimension (e.g. </p>
 <p>slice-timings in volumes) This is there for effiency on IO only (you don't have to split up chunks just to store some properties). It will be resolved by reindexing anyway. So, in an clean <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> Chunks will never have such sub-properties. </p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00308">308</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00315">315</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acffaf734f63657782130cbf3c89b53f4"></a><!-- doxytag: member="isis::data::Chunk::propertyValueAt" ref="acffaf734f63657782130cbf3c89b53f4" args="(const util::PropertyMap::KeyType &amp;key, size_t at) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">util::PropertyValue</a> &amp; isis::data::Chunk::propertyValueAt </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>at</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Access properties of the next lower dimension (e.g. </p>
+<p>slice-timings in volumes) This is there for effiency on IO only (you don't have to split up chunks just to store some properties). It will be resolved by reindexing anyway. So, in an clean <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> Chunks will never have such sub-properties. </p>
+ 
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00327">327</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1161,7 +1222,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname">void isis::data::Chunk::setVoxelValue </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a> &amp;&#160;</td>
           <td class="paramname"><em>val</em>, </td>
         </tr>
         <tr>
@@ -1197,7 +1258,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00359">359</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00366">366</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1223,7 +1284,7 @@ template&lt;typename T &gt; </div>
 <li>this can be done on chunks without any property (aka invalid Chunks) E.g. splice\(columnDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00237">237</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00244">244</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1244,7 +1305,7 @@ template&lt;typename T &gt; </div>
 
 <p>Swaps the image along a dimension dim in image space. </p>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00272">272</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00279">279</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1277,7 +1338,7 @@ template&lt;typename T &gt; </div>
 <p>Additionally, the index origin will be transformed into the new coordinate system. This function only changes the</p>
 <p><b>IMPORTANT!</b>: If you call this function with a matrix other than the identidy matrix, it's not guaranteed that the image is still in ISIS space according to the DICOM conventions. Maybe some ISIS algorithms that depend on correct image orientations won't work as expected. Use this method with caution! </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00245">245</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00251">251</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1296,7 +1357,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of cheap-copy-chunks using the same memory as this </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00267">267</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00274">274</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
 
 </div>
 </div>
@@ -1342,7 +1403,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Gets a reference to the element at a given index. </p>
 <p>If index is invalid, behaviour is undefined. Most probably it will crash. If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop). </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00095">95</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00097">97</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1388,7 +1449,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Gets a const reference of the element at a given index. </p>
 <p>If index is invalid, behaviour is undefined. Most probably it will crash. If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop). </p>
  
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00110">110</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00112">112</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1404,7 +1465,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00065">65</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00067">67</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1419,7 +1480,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00066">66</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00068">68</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1428,7 +1489,7 @@ template&lt;typename TYPE &gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="chunk_8cpp_source.html">chunk.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

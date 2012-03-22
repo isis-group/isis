@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -66,83 +65,83 @@
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;stack&gt;</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span>
 <a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="keyword">namespace </span>isis
-<a name="l00028"></a>00028 {
-<a name="l00029"></a>00029 <span class="keyword">namespace </span>data
-<a name="l00030"></a>00030 {
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>_internal
-<a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="comment">/*</span>
-<a name="l00035"></a>00035 <span class="comment"> * This class sorts the inserted chunks by the given properties while construction.</span>
-<a name="l00036"></a>00036 <span class="comment"> * The rules of the sorting depends on the upper level using these chunkLists later on.</span>
-<a name="l00037"></a>00037 <span class="comment"> * See the special classes, e.g. MRImage to find details about sorting criterias.</span>
-<a name="l00038"></a>00038 <span class="comment"> */</span>
-<a name="l00039"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html">00039</a> <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html">SortedChunkList</a>
-<a name="l00040"></a>00040 {
-<a name="l00041"></a>00041 <span class="keyword">public</span>:
-<a name="l00042"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">00042</a>     <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">scalarPropCompare</a> {
-<a name="l00043"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">00043</a>         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#afcd7550d685cb0c5b744a8a03b6728bb">propertyName</a>;
-<a name="l00044"></a>00044         <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a43ac7203dccbde489c8daefaf0e74b81">scalarPropCompare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name );
-<a name="l00045"></a>00045         <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html#a26ffc959c82f67ee9c4a33e988fcf645">operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;a, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;b ) <span class="keyword">const</span>;
-<a name="l00046"></a>00046     };
-<a name="l00047"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html">00047</a>     <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html">posCompare</a> {
-<a name="l00048"></a>00048         <span class="keywordtype">bool</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html#a2d709abdba98f1bf46f8d29596ea7c6f">operator()</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;a, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;b ) <span class="keyword">const</span>;
-<a name="l00049"></a>00049     };
-<a name="l00050"></a><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html">00050</a>     <span class="keyword">struct </span><a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html">chunkPtrOperator</a> {
-<a name="l00051"></a>00051         <span class="keyword">virtual</span> boost::shared_ptr&lt;Chunk&gt; <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html#ad19eaedb1482e0bcceaf3fc66fc50f29">operator()</a>( <span class="keyword">const</span> boost::shared_ptr&lt;Chunk&gt; &amp;ptr ) = 0;
-<a name="l00052"></a>00052         <span class="keyword">virtual</span> <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html#a0b36f828fbf3b2384c3a297b0f83fde5">~chunkPtrOperator</a>();
-<a name="l00053"></a>00053     };
-<a name="l00054"></a>00054 <span class="keyword">private</span>:
-<a name="l00055"></a>00055     <span class="keyword">typedef</span> std::map&lt;util::PropertyValue, boost::shared_ptr&lt;Chunk&gt;, <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1scalarPropCompare.html">scalarPropCompare</a>&gt; SecondaryMap;
-<a name="l00056"></a>00056     <span class="keyword">typedef</span> std::map&lt;util::fvector4, SecondaryMap, posCompare&gt; PrimaryMap;
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058     std::stack&lt;scalarPropCompare&gt; secondarySort;
-<a name="l00059"></a>00059     <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1posCompare.html">posCompare</a> primarySort;
-<a name="l00060"></a>00060     PrimaryMap chunks;
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062     <span class="comment">// low level finding</span>
-<a name="l00063"></a>00063     boost::shared_ptr&lt;Chunk&gt; secondaryFind( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;key, SecondaryMap &amp;map );
-<a name="l00064"></a>00064     SecondaryMap *primaryFind( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;key );
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066     <span class="comment">// low level inserting</span>
-<a name="l00067"></a>00067     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch );
-<a name="l00068"></a>00068     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; primaryInsert( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch );
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070     std::list&lt;util::PropertyMap::KeyType&gt; equalProps;
-<a name="l00071"></a>00071 <span class="keyword">public</span>:
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073     <span class="comment">//initialisation</span>
-<a name="l00077"></a>00077 <span class="comment"></span>    <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ac3ff52353238fd809aa11f89a7ec7f0a" title="Creates a sorted list and sets primary sorting as well as properties which should be equal across all...">SortedChunkList</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props );
-<a name="l00078"></a>00078 
-<a name="l00083"></a>00083     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a5dae2491e7ff03e1f2d636e90fe662eb" title="Adds a property for secondary sorting.">addSecondarySort</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp );
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085     <span class="comment">// utils</span>
-<a name="l00086"></a>00086 
-<a name="l00088"></a>00088     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a2ea78156b40133138eeecd7dc9092274" title="runs op on all entries of the list (the order is not defined) and replaces the entries by the return ...">transform</a>( <a class="code" href="structisis_1_1data_1_1__internal_1_1SortedChunkList_1_1chunkPtrOperator.html">chunkPtrOperator</a> &amp;op );
-<a name="l00089"></a>00089 
-<a name="l00091"></a>00091     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a1a1cb0783be4cb78d82c798b12507088" title="Tries to insert a chunk (a cheap copy of the chunk is done when inserted)">insert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch );
-<a name="l00092"></a>00092 
-<a name="l00094"></a>00094     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a8d24186ced99b91c40ce150a9c7385ef">isEmpty</a>()<span class="keyword">const</span>;
-<a name="l00095"></a>00095 
-<a name="l00097"></a>00097     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#af769bcdd67e0f6d39ffc56958cabca3a" title="Empties the list.">clear</a>();
-<a name="l00098"></a>00098 
-<a name="l00100"></a>00100     std::vector&lt;boost::shared_ptr&lt;Chunk&gt; &gt; <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a713a12ecad6e864a2741846e9219d0b1">getLookup</a>();
-<a name="l00101"></a>00101 
-<a name="l00103"></a>00103     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#a06e7c1c512255d9a1df79171a6316a74">isRectangular</a>();
-<a name="l00104"></a>00104 
-<a name="l00106"></a>00106     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1SortedChunkList.html#ad91ab01c0e43c5dfad198221ecabbf4e">getHorizontalSize</a>();
-<a name="l00107"></a>00107 };
-<a name="l00108"></a>00108 
+<a name="l00028"></a>00028 <span class="keyword">namespace </span>isis
+<a name="l00029"></a>00029 {
+<a name="l00030"></a>00030 <span class="keyword">namespace </span>data
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032 <span class="keyword">namespace </span>_internal
+<a name="l00033"></a>00033 {
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035 <span class="comment">/*</span>
+<a name="l00036"></a>00036 <span class="comment"> * This class sorts the inserted chunks by the given properties while construction.</span>
+<a name="l00037"></a>00037 <span class="comment"> * The rules of the sorting depends on the upper level using these chunkLists later on.</span>
+<a name="l00038"></a>00038 <span class="comment"> * See the special classes, e.g. MRImage to find details about sorting criterias.</span>
+<a name="l00039"></a>00039 <span class="comment"> */</span>
+<a name="l00040"></a>00040 <span class="keyword">class </span>SortedChunkList
+<a name="l00041"></a>00041 {
+<a name="l00042"></a>00042 <span class="keyword">public</span>:
+<a name="l00043"></a>00043     <span class="keyword">struct </span>scalarPropCompare {
+<a name="l00044"></a>00044         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> propertyName;
+<a name="l00045"></a>00045         scalarPropCompare( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;prop_name );
+<a name="l00046"></a>00046         <span class="keywordtype">bool</span> operator()( <span class="keyword">const</span> util::PropertyValue &amp;a, <span class="keyword">const</span> util::PropertyValue &amp;b ) <span class="keyword">const</span>;
+<a name="l00047"></a>00047     };
+<a name="l00048"></a>00048     <span class="keyword">struct </span>posCompare {
+<a name="l00049"></a>00049         <span class="keywordtype">bool</span> operator()( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;a, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;b ) <span class="keyword">const</span>;
+<a name="l00050"></a>00050     };
+<a name="l00051"></a>00051     <span class="keyword">struct </span>chunkPtrOperator {
+<a name="l00052"></a>00052         <span class="keyword">virtual</span> boost::shared_ptr&lt;Chunk&gt; operator()( <span class="keyword">const</span> boost::shared_ptr&lt;Chunk&gt; &amp;ptr ) = 0;
+<a name="l00053"></a>00053         <span class="keyword">virtual</span> ~chunkPtrOperator();
+<a name="l00054"></a>00054     };
+<a name="l00055"></a>00055 <span class="keyword">private</span>:
+<a name="l00056"></a>00056     <span class="keyword">typedef</span> std::map&lt;util::PropertyValue, boost::shared_ptr&lt;Chunk&gt;, scalarPropCompare&gt; SecondaryMap;
+<a name="l00057"></a>00057     <span class="keyword">typedef</span> std::map&lt;util::fvector4, SecondaryMap, posCompare&gt; PrimaryMap;
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059     std::stack&lt;scalarPropCompare&gt; secondarySort;
+<a name="l00060"></a>00060     posCompare primarySort;
+<a name="l00061"></a>00061     PrimaryMap chunks;
+<a name="l00062"></a>00062 
+<a name="l00063"></a>00063     <span class="comment">// low level finding</span>
+<a name="l00064"></a>00064     boost::shared_ptr&lt;Chunk&gt; secondaryFind( <span class="keyword">const</span> util::PropertyValue &amp;key, SecondaryMap &amp;map );
+<a name="l00065"></a>00065     SecondaryMap *primaryFind( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;key );
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067     <span class="comment">// low level inserting</span>
+<a name="l00068"></a>00068     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> Chunk &amp;ch );
+<a name="l00069"></a>00069     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; primaryInsert( <span class="keyword">const</span> Chunk &amp;ch );
+<a name="l00070"></a>00070 
+<a name="l00071"></a>00071     std::list&lt;util::PropertyMap::KeyType&gt; equalProps;
+<a name="l00072"></a>00072 <span class="keyword">public</span>:
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074     <span class="comment">//initialisation</span>
+<a name="l00078"></a>00078 <span class="comment"></span>    SortedChunkList( <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> comma_separated_equal_props );
+<a name="l00079"></a>00079 
+<a name="l00084"></a>00084     <span class="keywordtype">void</span> addSecondarySort( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;cmp );
+<a name="l00085"></a>00085 
+<a name="l00086"></a>00086     <span class="comment">// utils</span>
+<a name="l00087"></a>00087 
+<a name="l00089"></a>00089     <span class="keywordtype">void</span> transform( chunkPtrOperator &amp;op );
+<a name="l00090"></a>00090 
+<a name="l00092"></a>00092     <span class="keywordtype">bool</span> insert( <span class="keyword">const</span> Chunk &amp;ch );
+<a name="l00093"></a>00093 
+<a name="l00095"></a>00095     <span class="keywordtype">bool</span> isEmpty()<span class="keyword">const</span>;
+<a name="l00096"></a>00096 
+<a name="l00098"></a>00098     <span class="keywordtype">void</span> clear();
+<a name="l00099"></a>00099 
+<a name="l00101"></a>00101     std::vector&lt;boost::shared_ptr&lt;Chunk&gt; &gt; getLookup();
+<a name="l00102"></a>00102 
+<a name="l00104"></a>00104     <span class="keywordtype">bool</span> isRectangular();
+<a name="l00105"></a>00105 
+<a name="l00107"></a>00107     <span class="keywordtype">size_t</span> getHorizontalSize();
+<a name="l00108"></a>00108 };
 <a name="l00109"></a>00109 
-<a name="l00110"></a>00110 }
+<a name="l00110"></a>00110 
 <a name="l00111"></a>00111 }
 <a name="l00112"></a>00112 }
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114 <span class="preprocessor">#endif // SORTEDCHUNKLIST_HPP</span>
+<a name="l00113"></a>00113 }
+<a name="l00115"></a>00115 
+<a name="l00116"></a>00116 <span class="preprocessor">#endif // SORTEDCHUNKLIST_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -63,125 +62,124 @@
 <a name="l00021"></a>00021 
 <a name="l00022"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a8c8fb2b413bbb7e675072514816b2821">00022</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a8c8fb2b413bbb7e675072514816b2821">isValid</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a>; }
 <a name="l00023"></a>00023     <span class="keyword">virtual</span> std::string <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a>() <span class="keyword">const</span> = 0;
-<a name="l00024"></a>00024 <span class="keyword">protected</span>:
-<a name="l00025"></a>00025     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ad38e796b3e0aa389174df04c9fbddabf">process</a>() = 0;
-<a name="l00026"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">00026</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a>;
-<a name="l00027"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#af9b1906e22615a2d77335456bba0acc7">00027</a>     boost::shared_ptr&lt; util::ProgressFeedback &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#af9b1906e22615a2d77335456bba0acc7">progressfeedback</a>;
-<a name="l00028"></a>00028 };
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">int</span> NInput&gt;
-<a name="l00031"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">00031</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html">FilterBase</a>
-<a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 <span class="keyword">public</span>:
-<a name="l00034"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">00034</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">setInput</a>( std::list&lt;TYPE&gt; inputList ) {
-<a name="l00035"></a>00035         <span class="keywordflow">if</span>( inputList.size() != NInput ) {
-<a name="l00036"></a>00036             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">data::Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The size of the input list (&quot;</span> &lt;&lt; inputList.size()
-<a name="l00037"></a>00037                                           &lt;&lt; <span class="stringliteral">&quot;) passed to the filter \&quot;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a>()
-<a name="l00038"></a>00038                                           &lt;&lt; <span class="stringliteral">&quot;\&quot; does not coincide with the expected size (&quot;</span>
-<a name="l00039"></a>00039                                           &lt;&lt; NInput &lt;&lt; <span class="stringliteral">&quot;). Filter object is not valid !&quot;</span>;
-<a name="l00040"></a>00040             <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">false</span>;
-<a name="l00041"></a>00041             <span class="keywordflow">return</span>;
-<a name="l00042"></a>00042         }
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044         <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> index = 0;
-<a name="l00045"></a>00045         BOOST_FOREACH( <span class="keyword">typename</span> std::list&lt;TYPE&gt;::const_reference elem, inputList ) {
-<a name="l00046"></a>00046             <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>[index++] = boost::shared_ptr&lt;TYPE&gt; ( <span class="keyword">new</span> TYPE( elem ) );
-<a name="l00047"></a>00047         }
-<a name="l00048"></a>00048         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">true</span>;
-<a name="l00049"></a>00049     }
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="keyword">protected</span>:
-<a name="l00052"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a0d86bfbb9b7ff6be74e438c2f4caf7af">00052</a>     <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a0d86bfbb9b7ff6be74e438c2f4caf7af">HasNInput</a>() {
-<a name="l00053"></a>00053         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = !NInput;
-<a name="l00054"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">00054</a>     };
-<a name="l00055"></a>00055     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;boost::shared_ptr&lt;TYPE&gt;</a>, NInput&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>;
-<a name="l00056"></a>00056 };
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">int</span> NOutput&gt;
-<a name="l00059"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">00059</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>
-<a name="l00060"></a>00060 {
-<a name="l00061"></a>00061 <span class="keyword">public</span>:
-<a name="l00062"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#ad8d7e6b63931eb32b70d06161fd97713">00062</a>     std::list&lt;TYPE&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#ad8d7e6b63931eb32b70d06161fd97713">getOutput</a>()<span class="keyword"> const </span>{
-<a name="l00063"></a>00063         std::list&lt;TYPE&gt; retList;
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065         <span class="keywordflow">for</span>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = 0; i &lt; NOutput; i++ ) {
-<a name="l00066"></a>00066             retList.push_back( *( <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a>[i] ) );
-<a name="l00067"></a>00067         }
-<a name="l00068"></a>00068 
-<a name="l00069"></a>00069         <span class="keywordflow">return</span> retList;
-<a name="l00070"></a>00070     }
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072 <span class="keyword">protected</span>:
-<a name="l00073"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">00073</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;boost::shared_ptr&lt;TYPE&gt;</a>, NOutput&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a>;
-<a name="l00074"></a>00074 };
-<a name="l00075"></a>00075 
+<a name="l00024"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0699b918905f1a88e9e1df03c4b78eec">00024</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0699b918905f1a88e9e1df03c4b78eec">~FilterBase</a>() {}
+<a name="l00025"></a>00025 <span class="keyword">protected</span>:
+<a name="l00026"></a>00026     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ad38e796b3e0aa389174df04c9fbddabf">process</a>() = 0;
+<a name="l00027"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">00027</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a>;
+<a name="l00028"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#af9b1906e22615a2d77335456bba0acc7">00028</a>     boost::shared_ptr&lt; util::ProgressFeedback &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#af9b1906e22615a2d77335456bba0acc7">progressfeedback</a>;
+<a name="l00029"></a>00029 };
+<a name="l00030"></a>00030 
+<a name="l00031"></a>00031 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">int</span> NInput&gt;
+<a name="l00032"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">00032</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html">FilterBase</a>
+<a name="l00033"></a>00033 {
+<a name="l00034"></a>00034 <span class="keyword">public</span>:
+<a name="l00035"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">00035</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">setInput</a>( std::list&lt;TYPE&gt; inputList ) {
+<a name="l00036"></a>00036         <span class="keywordflow">if</span>( inputList.size() != NInput ) {
+<a name="l00037"></a>00037             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">data::Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The size of the input list (&quot;</span> &lt;&lt; inputList.size()
+<a name="l00038"></a>00038                                           &lt;&lt; <span class="stringliteral">&quot;) passed to the filter \&quot;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a>()
+<a name="l00039"></a>00039                                           &lt;&lt; <span class="stringliteral">&quot;\&quot; does not coincide with the expected size (&quot;</span>
+<a name="l00040"></a>00040                                           &lt;&lt; NInput &lt;&lt; <span class="stringliteral">&quot;). Filter object is not valid !&quot;</span>;
+<a name="l00041"></a>00041             <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">false</span>;
+<a name="l00042"></a>00042             <span class="keywordflow">return</span>;
+<a name="l00043"></a>00043         }
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045         <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> index = 0;
+<a name="l00046"></a>00046         BOOST_FOREACH( <span class="keyword">typename</span> std::list&lt;TYPE&gt;::const_reference elem, inputList ) {
+<a name="l00047"></a>00047             <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>[index++] = boost::shared_ptr&lt;TYPE&gt; ( <span class="keyword">new</span> TYPE( elem ) );
+<a name="l00048"></a>00048         }
+<a name="l00049"></a>00049         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">true</span>;
+<a name="l00050"></a>00050     }
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="keyword">protected</span>:
+<a name="l00053"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a0d86bfbb9b7ff6be74e438c2f4caf7af">00053</a>     <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a0d86bfbb9b7ff6be74e438c2f4caf7af">HasNInput</a>() {
+<a name="l00054"></a>00054         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = !NInput;
+<a name="l00055"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">00055</a>     };
+<a name="l00056"></a>00056     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;boost::shared_ptr&lt;TYPE&gt;</a>, NInput&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>;
+<a name="l00057"></a>00057 };
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">int</span> NOutput&gt;
+<a name="l00060"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">00060</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>
+<a name="l00061"></a>00061 {
+<a name="l00062"></a>00062 <span class="keyword">public</span>:
+<a name="l00063"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#ad8d7e6b63931eb32b70d06161fd97713">00063</a>     std::list&lt;TYPE&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#ad8d7e6b63931eb32b70d06161fd97713">getOutput</a>()<span class="keyword"> const </span>{
+<a name="l00064"></a>00064         std::list&lt;TYPE&gt; retList;
+<a name="l00065"></a>00065 
+<a name="l00066"></a>00066         <span class="keywordflow">for</span>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = 0; i &lt; NOutput; i++ ) {
+<a name="l00067"></a>00067             retList.push_back( *( <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a>[i] ) );
+<a name="l00068"></a>00068         }
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070         <span class="keywordflow">return</span> retList;
+<a name="l00071"></a>00071     }
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073 <span class="keyword">protected</span>:
+<a name="l00074"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">00074</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;boost::shared_ptr&lt;TYPE&gt;</a>, NOutput&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a>;
+<a name="l00075"></a>00075 };
 <a name="l00076"></a>00076 
-<a name="l00077"></a>00077 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NInput, <span class="keywordtype">int</span> NOutput &gt;
-<a name="l00078"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">00078</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a>&lt;InType, NInput&gt;, <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>&lt;OutType, NOutput&gt;
-<a name="l00079"></a>00079 {};
-<a name="l00080"></a>00080 
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NInput, <span class="keywordtype">int</span> NOutput &gt;
+<a name="l00079"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">00079</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a>&lt;InType, NInput&gt;, <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>&lt;OutType, NOutput&gt;
+<a name="l00080"></a>00080 {};
 <a name="l00081"></a>00081 
-<a name="l00082"></a>00082 <span class="comment">//specialization for having fixed input size but variable outputsize</span>
-<a name="l00083"></a>00083 <span class="keyword">template</span>&lt; <span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NInput&gt;
-<a name="l00084"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html">00084</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> &lt; InType, OutType, NInput, -1 &gt; : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a>&lt;InType, NInput&gt;
-<a name="l00085"></a>00085 {
-<a name="l00086"></a>00086 <span class="keyword">public</span>:
-<a name="l00087"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#ad73e17a5460a706eac555402a69a54a8">00087</a>     std::list&lt;OutType&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#ad73e17a5460a706eac555402a69a54a8">getOutput</a>()<span class="keyword"> const </span>{
-<a name="l00088"></a>00088         std::list&lt;OutType&gt; retList;
-<a name="l00089"></a>00089         BOOST_FOREACH( <span class="keyword">typename</span> std::vector&lt;boost::shared_ptr&lt;OutType&gt; &gt;::const_reference elem, <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a> ) {
-<a name="l00090"></a>00090             retList.push_back( *elem );
-<a name="l00091"></a>00091         }
-<a name="l00092"></a>00092         <span class="keywordflow">return</span> retList;
-<a name="l00093"></a>00093     }
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095 <span class="keyword">protected</span>:
-<a name="l00096"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#a7824126771b411aa0422b3beb95ce690">00096</a>     std::vector&lt;boost::shared_ptr&lt;OutType&gt; &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#a7824126771b411aa0422b3beb95ce690">m_output</a>;
-<a name="l00097"></a>00097 };
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099 <span class="comment">//specialization for having variable input size but fixed outputsize</span>
-<a name="l00100"></a>00100 <span class="keyword">template</span>&lt; <span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NOutput&gt;
-<a name="l00101"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html">00101</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> &lt; InType, OutType, -1, NOutput &gt; : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html">FilterBase</a>, <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>&lt;OutType, NOutput&gt;
-<a name="l00102"></a>00102 {
-<a name="l00103"></a>00103     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">setInput</a>( std::list&lt;InType&gt; inputList ) {
-<a name="l00104"></a>00104         <span class="keywordflow">if</span>( inputList.size() == 0 ) {
-<a name="l00105"></a>00105             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">data::Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The list passed to the filter \&quot;&quot;</span>
-<a name="l00106"></a>00106                                           &lt;&lt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a>() &lt;&lt; <span class="stringliteral">&quot;\&quot; is empty. Filter object is not valid!&quot;</span>;
-<a name="l00107"></a>00107         }
-<a name="l00108"></a>00108 
-<a name="l00109"></a>00109         BOOST_FOREACH( <span class="keyword">typename</span> std::list&lt;InType&gt;::const_reference elem, inputList ) {
-<a name="l00110"></a>00110             <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>.push_back( boost::shared_ptr&lt;InType&gt; ( <span class="keyword">new</span> InType( elem ) ) );
-<a name="l00111"></a>00111         }
-<a name="l00112"></a>00112         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">true</span>;
-<a name="l00113"></a>00113     }
-<a name="l00114"></a>00114 <span class="keyword">protected</span>:
-<a name="l00115"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">00115</a>     std::vector&lt;boost::shared_ptr&lt;InType&gt; &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">m_input</a>;
-<a name="l00116"></a>00116 };
-<a name="l00117"></a>00117 
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083 <span class="comment">//specialization for having fixed input size but variable outputsize</span>
+<a name="l00084"></a>00084 <span class="keyword">template</span>&lt; <span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NInput&gt;
+<a name="l00085"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html">00085</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> &lt; InType, OutType, NInput, -1 &gt; : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">HasNInput</a>&lt;InType, NInput&gt;
+<a name="l00086"></a>00086 {
+<a name="l00087"></a>00087 <span class="keyword">public</span>:
+<a name="l00088"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#ad73e17a5460a706eac555402a69a54a8">00088</a>     std::list&lt;OutType&gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#ad73e17a5460a706eac555402a69a54a8">getOutput</a>()<span class="keyword"> const </span>{
+<a name="l00089"></a>00089         std::list&lt;OutType&gt; retList;
+<a name="l00090"></a>00090         BOOST_FOREACH( <span class="keyword">typename</span> std::vector&lt;boost::shared_ptr&lt;OutType&gt; &gt;::const_reference elem, <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">m_output</a> ) {
+<a name="l00091"></a>00091             retList.push_back( *elem );
+<a name="l00092"></a>00092         }
+<a name="l00093"></a>00093         <span class="keywordflow">return</span> retList;
+<a name="l00094"></a>00094     }
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096 <span class="keyword">protected</span>:
+<a name="l00097"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#a7824126771b411aa0422b3beb95ce690">00097</a>     std::vector&lt;boost::shared_ptr&lt;OutType&gt; &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#a7824126771b411aa0422b3beb95ce690">m_output</a>;
+<a name="l00098"></a>00098 };
+<a name="l00099"></a>00099 
+<a name="l00100"></a>00100 <span class="comment">//specialization for having variable input size but fixed outputsize</span>
+<a name="l00101"></a>00101 <span class="keyword">template</span>&lt; <span class="keyword">typename</span> InType, <span class="keyword">typename</span> OutType, <span class="keywordtype">int</span> NOutput&gt;
+<a name="l00102"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html">00102</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter.html">Filter</a> &lt; InType, OutType, -1, NOutput &gt; : <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html">FilterBase</a>, <span class="keyword">public</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">HasNOutput</a>&lt;OutType, NOutput&gt;
+<a name="l00103"></a>00103 {
+<a name="l00104"></a>00104     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a1e31e9beecbf1c8a890f07f1e67f2414">setInput</a>( std::list&lt;InType&gt; inputList ) {
+<a name="l00105"></a>00105         <span class="keywordflow">if</span>( inputList.size() == 0 ) {
+<a name="l00106"></a>00106             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">data::Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;The list passed to the filter \&quot;&quot;</span>
+<a name="l00107"></a>00107                                           &lt;&lt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#ae98fc91b039925e00bf68b5cd43960c0">getFilterName</a>() &lt;&lt; <span class="stringliteral">&quot;\&quot; is empty. Filter object is not valid!&quot;</span>;
+<a name="l00108"></a>00108         }
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110         BOOST_FOREACH( <span class="keyword">typename</span> std::list&lt;InType&gt;::const_reference elem, inputList ) {
+<a name="l00111"></a>00111             <a class="code" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">m_input</a>.push_back( boost::shared_ptr&lt;InType&gt; ( <span class="keyword">new</span> InType( elem ) ) );
+<a name="l00112"></a>00112         }
+<a name="l00113"></a>00113         <a class="code" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">valid</a> = <span class="keyword">true</span>;
+<a name="l00114"></a>00114     }
+<a name="l00115"></a>00115 <span class="keyword">protected</span>:
+<a name="l00116"></a><a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">00116</a>     std::vector&lt;boost::shared_ptr&lt;InType&gt; &gt; <a class="code" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">m_input</a>;
+<a name="l00117"></a>00117 };
 <a name="l00118"></a>00118 
-<a name="l00119"></a>00119 <span class="comment">//specialization for having 0 inputs and fixed outputsize</span>
-<a name="l00120"></a>00120 
+<a name="l00119"></a>00119 
+<a name="l00120"></a>00120 <span class="comment">//specialization for having 0 inputs and fixed outputsize</span>
 <a name="l00121"></a>00121 
-<a name="l00122"></a>00122 }
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NInput, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NOutput&gt;
-<a name="l00125"></a><a class="code" href="classisis_1_1filter_1_1ChunkFilter.html">00125</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1ChunkFilter.html">ChunkFilter</a> : <span class="keyword">public</span> _internal::Filter&lt;data::Chunk, data::Chunk, NInput, NOutput&gt;
-<a name="l00126"></a>00126 {};
-<a name="l00127"></a>00127 
-<a name="l00128"></a>00128 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NInput, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NOutput&gt;
-<a name="l00129"></a><a class="code" href="classisis_1_1filter_1_1ImageFilter.html">00129</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1ImageFilter.html">ImageFilter</a> : <span class="keyword">public</span> _internal::Filter&lt;data::Image, data::Image, NInput, NOutput&gt;
-<a name="l00130"></a>00130 {};
-<a name="l00131"></a>00131 
+<a name="l00122"></a>00122 
+<a name="l00123"></a>00123 }
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NInput, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NOutput&gt;
+<a name="l00126"></a><a class="code" href="classisis_1_1filter_1_1ChunkFilter.html">00126</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1ChunkFilter.html">ChunkFilter</a> : <span class="keyword">public</span> _internal::Filter&lt;data::Chunk, data::Chunk, NInput, NOutput&gt;
+<a name="l00127"></a>00127 {};
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NInput, <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> NOutput&gt;
+<a name="l00130"></a><a class="code" href="classisis_1_1filter_1_1ImageFilter.html">00130</a> <span class="keyword">class </span><a class="code" href="classisis_1_1filter_1_1ImageFilter.html">ImageFilter</a> : <span class="keyword">public</span> _internal::Filter&lt;data::Image, data::Image, NInput, NOutput&gt;
+<a name="l00131"></a>00131 {};
 <a name="l00132"></a>00132 
 <a name="l00133"></a>00133 
-<a name="l00134"></a>00134 }
+<a name="l00134"></a>00134 
 <a name="l00135"></a>00135 }
-<a name="l00136"></a>00136 
+<a name="l00136"></a>00136 }
 <a name="l00137"></a>00137 
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139 <span class="preprocessor">#endif</span>
+<a name="l00138"></a>00138 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -75,90 +74,91 @@
 <a name="l00039"></a>00039     <span class="keywordtype">bool</span> m_hidden, m_set;
 <a name="l00040"></a>00040 <span class="keyword">public</span>:
 <a name="l00047"></a>00047     <a class="code" href="classisis_1_1util_1_1ProgParameter.html#af34312120d8e68c8e1dbbc1ac54d027a" title="Default constructor.">ProgParameter</a>();
-<a name="l00048"></a>00048     <a class="code" href="classisis_1_1util_1_1ProgParameter.html#af34312120d8e68c8e1dbbc1ac54d027a" title="Default constructor.">ProgParameter</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">ProgParameter</a> &amp;ref );
-<a name="l00055"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a189412a3cdcb5d99a2ed86861ec7a9d2">00055</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a189412a3cdcb5d99a2ed86861ec7a9d2" title="Create a programm parameter using an initial value/type.">ProgParameter</a>( <span class="keyword">const</span> T &amp;ref, <span class="keywordtype">bool</span> is_needed = <span class="keyword">true</span> ): <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a>( ref, is_needed ), m_hidden( false ), m_set( false ) {}
-<a name="l00064"></a>00064     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a30cfb474b5266b6bb3c1779bd381a482" title="Put the given value into this parameter.">parse</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">isis::util::Value&lt; std::string &gt;</a>&amp; props );
-<a name="l00065"></a>00065     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#afdb9a8c2c3637f150e33d67e044bda73">parse_list</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">isis::util::Value&lt; util::slist &gt;</a>&amp; props_list );
-<a name="l00067"></a>00067     <span class="keyword">const</span> std::string &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">description</a>()<span class="keyword">const</span>;
-<a name="l00068"></a>00068     <span class="comment">/* set the description string</span>
-<a name="l00069"></a>00069 <span class="comment">    *  \param desc description to be set */</span>
-<a name="l00070"></a>00070     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">setDescription</a>( <span class="keyword">const</span> std::string &amp;desc );
-<a name="l00075"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a539a4f231f449cac2534537f96b1d9e6">00075</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a539a4f231f449cac2534537f96b1d9e6" title="Implicit cast to Value T.">operator const T</a>()<span class="keyword">const </span>{
-<a name="l00076"></a>00076         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueReference.html#ad9afafd9010d7718be6eacb73773fc48">isEmpty</a>(), isis::CoreDebug, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> ) &lt;&lt; <span class="stringliteral">&quot;Program parameters must not be empty. Please set it to any value.&quot;</span>;
-<a name="l00077"></a>00077         <span class="keywordflow">return</span> <span class="keyword">get</span>()-&gt;castTo&lt;T&gt;();
-<a name="l00078"></a>00078     }
+<a name="l00054"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a189412a3cdcb5d99a2ed86861ec7a9d2">00054</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a189412a3cdcb5d99a2ed86861ec7a9d2" title="Create a programm parameter using an initial value/type.">ProgParameter</a>( <span class="keyword">const</span> T &amp;ref, <span class="keywordtype">bool</span> is_needed = <span class="keyword">true</span> ): <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a>( ref, is_needed ), m_hidden( false ), m_set( false ) {}
+<a name="l00063"></a>00063     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a30cfb474b5266b6bb3c1779bd381a482" title="Put the given value into this parameter.">parse</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">isis::util::Value&lt; std::string &gt;</a>&amp; props );
+<a name="l00064"></a>00064     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#afdb9a8c2c3637f150e33d67e044bda73">parse_list</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">isis::util::Value&lt; util::slist &gt;</a>&amp; props_list );
+<a name="l00066"></a>00066     <span class="keyword">const</span> std::string &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">description</a>()<span class="keyword">const</span>;
+<a name="l00067"></a>00067     <span class="comment">/* set the description string</span>
+<a name="l00068"></a>00068 <span class="comment">    *  \param desc description to be set */</span>
+<a name="l00069"></a>00069     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a2f742aacfbcdf9c695033d5e9e4f1feb">setDescription</a>( <span class="keyword">const</span> std::string &amp;desc );
+<a name="l00074"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a539a4f231f449cac2534537f96b1d9e6">00074</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a539a4f231f449cac2534537f96b1d9e6" title="Implicit cast to Value T.">operator const T</a>()<span class="keyword">const </span>{
+<a name="l00075"></a>00075         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#ae45ed36ae932ab6d221535458cb70e98">isEmpty</a>(), isis::CoreDebug, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> ) &lt;&lt; <span class="stringliteral">&quot;Program parameters must not be empty. Please set it to any value.&quot;</span>;
+<a name="l00076"></a>00076         <span class="keywordflow">return</span> <span class="keyword">get</span>()-&gt;castTo&lt;T&gt;();
+<a name="l00077"></a>00077     }
+<a name="l00078"></a>00078 
 <a name="l00079"></a>00079 
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081     <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">operator boost::scoped_ptr&lt;_internal::ValueBase&gt;::unspecified_bool_type</a>()<span class="keyword">const</span>;<span class="comment">// implicit conversion to &quot;bool&quot; stolen from boost</span>
-<a name="l00082"></a>00082 
-<a name="l00084"></a>00084     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">isSet</a>()<span class="keyword">const</span>;
-<a name="l00085"></a>00085 
-<a name="l00087"></a>00087     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a20377b354b39150e0492be15b31a9aa9" title="returns true for hidden parameters, false otherwise">isHidden</a>()<span class="keyword">const</span>;
-<a name="l00088"></a>00088 
-<a name="l00090"></a>00090     <span class="keywordtype">bool</span> &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#aa2864bd76aefc9a40aebdd41d354bbeb">hidden</a>();
-<a name="l00091"></a>00091 };
-<a name="l00092"></a>00092 
-<a name="l00097"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html">00097</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a>: <span class="keyword">public</span> std::map&lt;std::string, ProgParameter&gt;
-<a name="l00098"></a>00098 {
-<a name="l00099"></a>00099     <span class="keyword">struct </span>neededP {
-<a name="l00100"></a>00100         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> ref.second.isNeeded();}
-<a name="l00101"></a>00101     };
-<a name="l00102"></a>00102     <span class="keyword">struct </span>notneededP {
-<a name="l00103"></a>00103         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> !ref.second.isNeeded();}
-<a name="l00104"></a>00104     };
-<a name="l00105"></a>00105     <span class="keyword">struct </span>hiddenP {
-<a name="l00106"></a>00106         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> ref.second.isHidden();}
-<a name="l00107"></a>00107     };
-<a name="l00108"></a>00108     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> printWithout() {
-<a name="l00109"></a>00109         std::map&lt;key_type, mapped_type, key_compare&gt; result( *<span class="keyword">this</span> );
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111         <span class="keywordflow">for</span> (
-<a name="l00112"></a>00112             iterator found = std::find_if( result.begin(), result.end(), T() );
-<a name="l00113"></a>00113             found != result.end();
-<a name="l00114"></a>00114             found = std::find_if( found, result.end(), hiddenP() )
-<a name="l00115"></a>00115         )
-<a name="l00116"></a>00116             result.erase( found++ );
-<a name="l00117"></a>00117 
-<a name="l00118"></a>00118         std::cout &lt;&lt; result &lt;&lt; std::endl;
-<a name="l00119"></a>00119     }
-<a name="l00120"></a>00120     <span class="keywordtype">bool</span> parsed;
-<a name="l00121"></a>00121 <span class="keyword">public</span>:
-<a name="l00122"></a>00122     <span class="comment">/*</span>
-<a name="l00123"></a>00123 <span class="comment">     * Default constructor to create an empty parameter map</span>
-<a name="l00124"></a>00124 <span class="comment">     */</span>
-<a name="l00125"></a>00125     <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">ParameterMap</a>();
-<a name="l00133"></a>00133     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv );
-<a name="l00134"></a>00134 
-<a name="l00136"></a>00136     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">isComplete</a>()<span class="keyword">const</span>;
-<a name="l00137"></a>00137 };
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139 }
+<a name="l00080"></a>00080     <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a240cff721f257aa32b94f12c0ded6850">operator boost::scoped_ptr&lt;ValueBase&gt;::unspecified_bool_type</a>()<span class="keyword">const</span>;<span class="comment">// implicit conversion to &quot;bool&quot; stolen from boost</span>
+<a name="l00081"></a>00081 
+<a name="l00083"></a>00083     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a49826def1d2c6f6ca012758741cd6d28">isSet</a>()<span class="keyword">const</span>;
+<a name="l00084"></a>00084 
+<a name="l00086"></a>00086     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html#a20377b354b39150e0492be15b31a9aa9" title="returns true for hidden parameters, false otherwise">isHidden</a>()<span class="keyword">const</span>;
+<a name="l00087"></a>00087 
+<a name="l00089"></a>00089     <span class="keywordtype">bool</span> &amp;<a class="code" href="classisis_1_1util_1_1ProgParameter.html#aa2864bd76aefc9a40aebdd41d354bbeb">hidden</a>();
+<a name="l00090"></a>00090 };
+<a name="l00091"></a>00091 
+<a name="l00096"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html">00096</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1ParameterMap.html" title="A Map of all current Program Parameters when reading from the commandline.">ParameterMap</a>: <span class="keyword">public</span> std::map&lt;std::string, ProgParameter&gt;
+<a name="l00097"></a>00097 {
+<a name="l00098"></a>00098     <span class="keyword">struct </span>neededP {
+<a name="l00099"></a>00099         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> ref.second.isNeeded();}
+<a name="l00100"></a>00100     };
+<a name="l00101"></a>00101     <span class="keyword">struct </span>notneededP {
+<a name="l00102"></a>00102         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> !ref.second.isNeeded();}
+<a name="l00103"></a>00103     };
+<a name="l00104"></a>00104     <span class="keyword">struct </span>hiddenP {
+<a name="l00105"></a>00105         <span class="keywordtype">bool</span> operator()( const_reference ref )<span class="keyword">const </span>{<span class="keywordflow">return</span> ref.second.isHidden();}
+<a name="l00106"></a>00106     };
+<a name="l00107"></a>00107     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> printWithout() {
+<a name="l00108"></a>00108         std::map&lt;key_type, mapped_type, key_compare&gt; result( *<span class="keyword">this</span> );
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110         <span class="keywordflow">for</span> (
+<a name="l00111"></a>00111             iterator found = std::find_if( result.begin(), result.end(), T() );
+<a name="l00112"></a>00112             found != result.end();
+<a name="l00113"></a>00113             found = std::find_if( found, result.end(), hiddenP() )
+<a name="l00114"></a>00114         )
+<a name="l00115"></a>00115             result.erase( found++ );
+<a name="l00116"></a>00116 
+<a name="l00117"></a>00117         std::cout &lt;&lt; result &lt;&lt; std::endl;
+<a name="l00118"></a>00118     }
+<a name="l00119"></a>00119     <span class="keywordtype">bool</span> parsed;
+<a name="l00120"></a>00120 <span class="keyword">public</span>:
+<a name="l00121"></a>00121     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">ProgParameter</a> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a667be1614157dd4fb2610c1c89b7b479">operator[]</a>( <span class="keyword">const</span> std::string key )<span class="keyword">const</span>;
+<a name="l00122"></a>00122     <a class="code" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">ProgParameter</a> &amp;<a class="code" href="classisis_1_1util_1_1ParameterMap.html#a667be1614157dd4fb2610c1c89b7b479">operator[]</a>( <span class="keyword">const</span> std::string key );
+<a name="l00123"></a>00123     <span class="comment">/*</span>
+<a name="l00124"></a>00124 <span class="comment">     * Default constructor to create an empty parameter map</span>
+<a name="l00125"></a>00125 <span class="comment">     */</span>
+<a name="l00126"></a>00126     <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aae364565646f3e332b1116306885e961">ParameterMap</a>();
+<a name="l00134"></a>00134     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv );
+<a name="l00135"></a>00135 
+<a name="l00137"></a>00137     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">isComplete</a>()<span class="keyword">const</span>;
+<a name="l00138"></a>00138 };
+<a name="l00139"></a>00139 
 <a name="l00140"></a>00140 }
-<a name="l00141"></a>00141 
-<a name="l00142"></a>00142 <span class="keyword">namespace </span>std
-<a name="l00143"></a>00143 {
-<a name="l00145"></a>00145 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; basic_ostream&lt;charT, traits&gt;&amp;
-<a name="l00146"></a><a class="code" href="namespacestd.html#a645d33e9f147a3b78300de627b3c2e4a">00146</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">isis::util::ProgParameter</a> &amp;s )
-<a name="l00147"></a>00147 {
-<a name="l00148"></a>00148     <span class="keyword">const</span> std::string &amp;desc = s.<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">description</a>();
-<a name="l00149"></a>00149 
-<a name="l00150"></a>00150     <span class="keywordflow">if</span> ( ! desc.empty() ) {
-<a name="l00151"></a>00151         out &lt;&lt; desc &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;
-<a name="l00152"></a>00152     }
-<a name="l00153"></a>00153 
-<a name="l00154"></a>00154     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( s.isEmpty(), isis::CoreDebug, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> ) &lt;&lt; <span class="stringliteral">&quot;Program parameters must not be empty. Please set it to any value.&quot;</span>;
-<a name="l00155"></a>00155     assert( !s.isEmpty() );
-<a name="l00156"></a>00156     out &lt;&lt; <span class="stringliteral">&quot;default=\&quot;&quot;</span> &lt;&lt; s.toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot;\&quot;, type=&quot;</span> &lt;&lt; s-&gt;getTypeName();
-<a name="l00157"></a>00157 
-<a name="l00158"></a>00158     <span class="keywordflow">if</span> ( s.isNeeded() )out &lt;&lt; <span class="stringliteral">&quot; (needed)&quot;</span>;
-<a name="l00159"></a>00159 
-<a name="l00160"></a>00160     <span class="keywordflow">return</span> out;
-<a name="l00161"></a>00161 }
+<a name="l00141"></a>00141 }
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143 <span class="keyword">namespace </span>std
+<a name="l00144"></a>00144 {
+<a name="l00146"></a>00146 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits&gt; basic_ostream&lt;charT, traits&gt;&amp;
+<a name="l00147"></a><a class="code" href="namespacestd.html#a645d33e9f147a3b78300de627b3c2e4a">00147</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1ProgParameter.html" title="Container class for programm parameters (commandline parameters) given to applications derived from i...">isis::util::ProgParameter</a> &amp;s )
+<a name="l00148"></a>00148 {
+<a name="l00149"></a>00149     <span class="keyword">const</span> std::string &amp;desc = s.<a class="code" href="classisis_1_1util_1_1ProgParameter.html#af2b87b988b4679fc3f2c7a1180cff55e">description</a>();
+<a name="l00150"></a>00150 
+<a name="l00151"></a>00151     <span class="keywordflow">if</span> ( ! desc.empty() ) {
+<a name="l00152"></a>00152         out &lt;&lt; desc &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;
+<a name="l00153"></a>00153     }
+<a name="l00154"></a>00154 
+<a name="l00155"></a>00155     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( s.isEmpty(), isis::CoreDebug, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> ) &lt;&lt; <span class="stringliteral">&quot;Program parameters must not be empty. Please set it to any value.&quot;</span>;
+<a name="l00156"></a>00156     assert( !s.isEmpty() );
+<a name="l00157"></a>00157     out &lt;&lt; <span class="stringliteral">&quot;default=\&quot;&quot;</span> &lt;&lt; s.toString( <span class="keyword">false</span> ) &lt;&lt; <span class="stringliteral">&quot;\&quot;, type=&quot;</span> &lt;&lt; s.getTypeName();
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159     <span class="keywordflow">if</span> ( s.isNeeded() )out &lt;&lt; <span class="stringliteral">&quot; (needed)&quot;</span>;
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161     <span class="keywordflow">return</span> out;
 <a name="l00162"></a>00162 }
-<a name="l00163"></a>00163 <span class="preprocessor">#endif // PROGPARAMETER_HPP</span>
+<a name="l00163"></a>00163 }
+<a name="l00164"></a>00164 <span class="preprocessor">#endif // PROGPARAMETER_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:47 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -106,11 +105,11 @@
 <a name="l00067"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">00067</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">dims</a> = DIMS;
 <a name="l00073"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f">00073</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] ) {
 <a name="l00074"></a>00074         std::copy( d, d + DIMS, m_dim );
-<a name="l00075"></a>00075         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
+<a name="l00075"></a>00075         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
 <a name="l00076"></a>00076     }
 <a name="l00077"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">00077</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">init</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a>&amp; d ) {
 <a name="l00078"></a>00078         d.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( m_dim );
-<a name="l00079"></a>00079         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
+<a name="l00079"></a>00079         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
 <a name="l00080"></a>00080     }
 <a name="l00081"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">00081</a>     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">NDimensional</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">NDimensional</a> &amp;src ) {<span class="comment">//@todo default copier should do the job</span>
 <a name="l00082"></a>00082         <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( src.m_dim );
@@ -155,7 +154,7 @@
 <a name="l00147"></a>00147         <span class="keywordflow">return</span> ret;
 <a name="l00148"></a>00148     }
 <a name="l00149"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">00149</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">getFoV</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelSize, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelGap )<span class="keyword">const </span>{
-<a name="l00150"></a>00150         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, DataLog, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Calculating FoV of empty data&quot;</span>;
+<a name="l00150"></a>00150         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, DataLog, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Calculating FoV of empty data&quot;</span>;
 <a name="l00151"></a>00151         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a> voxels = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
 <a name="l00152"></a>00152         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> gapSize = voxelGap * ( voxels - 1 );
 <a name="l00153"></a>00153         <span class="keywordflow">return</span> voxelSize * voxels + gapSize;
@@ -169,7 +168,7 @@
 <a name="l00161"></a>00161 <span class="preprocessor">#endif // NDIMENSIONAL_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

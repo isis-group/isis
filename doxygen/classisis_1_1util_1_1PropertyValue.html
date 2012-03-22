@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -51,7 +50,7 @@
 <h1>isis::util::PropertyValue Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="isis::util::PropertyValue" --><!-- doxytag: inherits="isis::util::_internal::ValueReference" -->
+<!-- doxytag: class="isis::util::PropertyValue" --><!-- doxytag: inherits="isis::util::_internal::GenericReference" -->
 <p>A very generic class to store values of properties.  
 <a href="#_details">More...</a></p>
 
@@ -62,23 +61,39 @@ Inheritance diagram for isis::util::PropertyValue:</div>
  <div class="center">
   <img src="classisis_1_1util_1_1PropertyValue.png" usemap="#isis::util::PropertyValue_map" alt=""/>
   <map id="isis::util::PropertyValue_map" name="isis::util::PropertyValue_map">
-<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="0,0,290,24"/>
-<area href="classisis_1_1util_1_1ProgParameter.html" alt="isis::util::ProgParameter" shape="rect" coords="0,112,290,136"/>
+<area href="classisis_1_1util_1_1__internal_1_1GenericReference.html" alt="isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;" shape="rect" coords="0,0,302,24"/>
+<area href="classisis_1_1util_1_1ProgParameter.html" alt="isis::util::ProgParameter" shape="rect" coords="0,112,302,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#af7db404b5497a9dfbbc254044e6d7ca3">as</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Interpret the value as value of any (other) type. </p>
+ hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#a0beecb81c7b41156f230bee6cabd8343">ValueBase::as</a>  <a href="#af7db404b5497a9dfbbc254044e6d7ca3"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684">castTo</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Dynamically cast the <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> up to its actual value of type T. </p>
+ hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#acdd97084343fb3d0c1f0eb52d045c464">ValueBase::castTo</a>  <a href="#a2e9a477de0bb46993538887db4807684"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a9dbabdacfa18efbf4e3d127ef614b8bc">getTypeID</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">ValueBase::getTypeID</a>  <a href="#a9dbabdacfa18efbf4e3d127ef614b8bc"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39">getTypeName</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">ValueBase::getTypeName</a>  <a href="#aaad3a390099113139ddece01167b6b39"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a88eb102c6a4b1eb475777306e835682d">is</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#a1eb3ec95ef9955dc6cafa2abcde1fed5">ValueBase::is</a>  <a href="#a88eb102c6a4b1eb475777306e835682d"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a588beb7134d93b4938f78cbb7429f66e">isNeeded</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> is marked as needed, false otherwise  <a href="#a588beb7134d93b4938f78cbb7429f66e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a620a0a472c2c7e2a911ae05f84c52ef4">needed</a> ()</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> is marked as needed, false otherwise  <a href="#a620a0a472c2c7e2a911ae05f84c52ef4"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">accessor to mark as (not) needed  <a href="#a620a0a472c2c7e2a911ae05f84c52ef4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a719edc22b62f7dd573d342b232849f79">operator!=</a> (const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &amp;second) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unequality to another <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a>.  <a href="#a719edc22b62f7dd573d342b232849f79"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a3d4d3b0958cf9857967bb766c1b177fd">operator==</a> (const T &amp;second) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality to a <a class="el" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value</a> of type T (convenience function).  <a href="#a3d4d3b0958cf9857967bb766c1b177fd"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#aa17872fd557f8eef929ab2211bafd832">operator==</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;second) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality to another Value-Object (this cannot be empty but <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> can).  <a href="#aa17872fd557f8eef929ab2211bafd832"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a65f66b77ecf04a0a9c3e70794f77caf0">operator==</a> (const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;second) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality to another Value-Object (this cannot be empty but <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> can).  <a href="#a65f66b77ecf04a0a9c3e70794f77caf0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#aecd2651717669398590174ce1b444aac">operator==</a> (const <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &amp;second) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality to another <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a>.  <a href="#aecd2651717669398590174ce1b444aac"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
@@ -94,7 +109,7 @@ Public Member Functions</h2></td></tr>
 <p><a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> may store a value of any type (defined in <a class="el" href="types_8cpp.html">types.cpp</a>) otherwise it's empty. Non-empty ValueValues are equal-compareable. But empty PropertyValues are neigther equal nor unequal to anything (not even to empty ValueValues). </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Enrico Reimer </dd></dl>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00037">37</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00033">33</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a8f6e729c2f0df88ab049fb4eb6634a0a"></a><!-- doxytag: member="isis::util::PropertyValue::PropertyValue" ref="a8f6e729c2f0df88ab049fb4eb6634a0a" args="(const T &amp;ref, bool _needed=false)" -->
 <div class="memitem">
@@ -133,7 +148,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00048">48</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00047">47</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 
 </div>
 </div>
@@ -164,7 +179,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00052">52</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00051">51</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 
 </div>
 </div>
@@ -183,13 +198,121 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 
 <p>Empty constructor. </p>
-<p>Creates an empty property value. So <a class="el" href="classisis_1_1util_1_1PropertyValue.html#ad5df4011f83d0292eb91cb68ce10d723" title="Empty constructor.">PropertyValue()</a>.<a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html#ad9afafd9010d7718be6eacb73773fc48">isEmpty()</a> will allways be true. </p>
+<p>Creates an empty property value. So <a class="el" href="classisis_1_1util_1_1PropertyValue.html#ad5df4011f83d0292eb91cb68ce10d723" title="Empty constructor.">PropertyValue()</a>.<a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#ae45ed36ae932ab6d221535458cb70e98">isEmpty()</a> will allways be true. </p>
 
 <p>Definition at line <a class="el" href="property_8cpp_source.html#l00040">40</a> of file <a class="el" href="property_8cpp_source.html">property.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="af7db404b5497a9dfbbc254044e6d7ca3"></a><!-- doxytag: member="isis::util::PropertyValue::as" ref="af7db404b5497a9dfbbc254044e6d7ca3" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">T isis::util::PropertyValue::as </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p><p>Interpret the value as value of any (other) type. </p>
+ hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#a0beecb81c7b41156f230bee6cabd8343">ValueBase::as</a> </p>
+
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00129">129</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2e9a477de0bb46993538887db4807684"></a><!-- doxytag: member="isis::util::PropertyValue::castTo" ref="a2e9a477de0bb46993538887db4807684" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; isis::util::PropertyValue::castTo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p><p>Dynamically cast the <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> up to its actual value of type T. </p>
+ hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#acdd97084343fb3d0c1f0eb52d045c464">ValueBase::castTo</a> </p>
+
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00153">153</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9dbabdacfa18efbf4e3d127ef614b8bc"></a><!-- doxytag: member="isis::util::PropertyValue::getTypeID" ref="a9dbabdacfa18efbf4e3d127ef614b8bc" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned short isis::util::PropertyValue::getTypeID </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">ValueBase::getTypeID</a> </p>
+
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00147">147</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaad3a390099113139ddece01167b6b39"></a><!-- doxytag: member="isis::util::PropertyValue::getTypeName" ref="aaad3a390099113139ddece01167b6b39" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string isis::util::PropertyValue::getTypeName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">ValueBase::getTypeName</a> </p>
+
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00141">141</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a88eb102c6a4b1eb475777306e835682d"></a><!-- doxytag: member="isis::util::PropertyValue::is" ref="a88eb102c6a4b1eb475777306e835682d" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::util::PropertyValue::is </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p> hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#a1eb3ec95ef9955dc6cafa2abcde1fed5">ValueBase::is</a> </p>
+
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00135">135</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a588beb7134d93b4938f78cbb7429f66e"></a><!-- doxytag: member="isis::util::PropertyValue::isNeeded" ref="a588beb7134d93b4938f78cbb7429f66e" args="() const " -->
 <div class="memitem">
 <div class="memproto">
@@ -203,8 +326,9 @@ template&lt;typename T &gt; </div>
       </table>
 </div>
 <div class="memdoc">
+
 <p>returns true if <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> is marked as needed, false otherwise </p>
- 
+
 <p>Definition at line <a class="el" href="property_8cpp_source.html#l00021">21</a> of file <a class="el" href="property_8cpp_source.html">property.cpp</a>.</p>
 
 </div>
@@ -223,7 +347,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>returns true if <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> is marked as needed, false otherwise </p>
+<p>accessor to mark as (not) needed </p>
 
 <p>Definition at line <a class="el" href="property_8cpp_source.html#l00020">20</a> of file <a class="el" href="property_8cpp_source.html">property.cpp</a>.</p>
 
@@ -285,7 +409,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00104">104</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00103">103</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 
 </div>
 </div>
@@ -317,14 +441,14 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="aa17872fd557f8eef929ab2211bafd832"></a><!-- doxytag: member="isis::util::PropertyValue::operator==" ref="aa17872fd557f8eef929ab2211bafd832" args="(const _internal::ValueBase &amp;second) const " -->
+<a class="anchor" id="a65f66b77ecf04a0a9c3e70794f77caf0"></a><!-- doxytag: member="isis::util::PropertyValue::operator==" ref="a65f66b77ecf04a0a9c3e70794f77caf0" args="(const ValueBase &amp;second) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool isis::util::PropertyValue::operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">_internal::ValueBase</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> &amp;&#160;</td>
           <td class="paramname"><em>second</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -349,7 +473,7 @@ template&lt;typename T &gt; </div>
 <li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="property_8cpp_source.html">property.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:49 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

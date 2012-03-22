@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -76,403 +75,412 @@
 <a name="l00034"></a>00034 {
 <a name="l00035"></a>00035 <span class="keyword">namespace </span>data
 <a name="l00036"></a>00036 {
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 <span class="keyword">namespace </span>_internal
-<a name="l00039"></a>00039 {
-<a name="l00040"></a>00040 <span class="keyword">struct </span>pluginDeleter {
-<a name="l00041"></a>00041     <span class="keywordtype">void</span> *m_dlHandle;
-<a name="l00042"></a>00042     std::string m_pluginName;
-<a name="l00043"></a>00043     pluginDeleter( <span class="keywordtype">void</span> *dlHandle, std::string pluginName ): m_dlHandle( dlHandle ), m_pluginName( pluginName ) {}
-<a name="l00044"></a>00044     <span class="keywordtype">void</span> operator()( image_io::FileFormat *format ) {
-<a name="l00045"></a>00045         <span class="keyword">delete</span> format;
-<a name="l00046"></a>00046 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00047"></a>00047 <span class="preprocessor"></span>
-<a name="l00048"></a>00048         <span class="keywordflow">if</span>( !FreeLibrary( ( HINSTANCE )m_dlHandle ) )
-<a name="l00049"></a>00049 <span class="preprocessor">#else</span>
-<a name="l00050"></a>00050 <span class="preprocessor"></span>        <span class="keywordflow">if</span> ( dlclose( m_dlHandle ) != 0 )
-<a name="l00051"></a>00051 <span class="preprocessor">#endif</span>
-<a name="l00052"></a>00052 <span class="preprocessor"></span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to release plugin &quot;</span> &lt;&lt; m_pluginName &lt;&lt; <span class="stringliteral">&quot; (was loaded at &quot;</span> &lt;&lt; m_dlHandle &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054         <span class="comment">//we cannot use LOG here, because the loggers are gone allready</span>
-<a name="l00055"></a>00055     }
-<a name="l00056"></a>00056 };
-<a name="l00057"></a>00057 <span class="keyword">struct </span>dialect_missing {
-<a name="l00058"></a>00058     std::string dialect;
-<a name="l00059"></a>00059     std::string filename;
-<a name="l00060"></a>00060     <span class="keywordtype">bool</span> operator()( IOFactory::FileFormatList::reference ref )<span class="keyword">const </span>{
-<a name="l00061"></a>00061         <span class="keyword">const</span> std::string dia = ref-&gt;dialects( filename );
-<a name="l00062"></a>00062         std::list&lt;std::string&gt; splitted = util::stringToList&lt;std::string&gt;( dia, <span class="charliteral">&#39; &#39;</span> );
-<a name="l00063"></a>00063         <span class="keyword">const</span> <span class="keywordtype">bool</span> ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
-<a name="l00064"></a>00064         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ret, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; ref-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; does not support the requested dialect &quot;</span> &lt;&lt; util::MSubject( dialect );
-<a name="l00065"></a>00065         <span class="keywordflow">return</span> ret;
-<a name="l00066"></a>00066     }
-<a name="l00067"></a>00067 };
-<a name="l00068"></a>00068 
-<a name="l00069"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a086e0a1930218b9799ed11f8dc0b611f">00069</a> <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a086e0a1930218b9799ed11f8dc0b611f">invalid_and_tell</a>( <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;candidate )
-<a name="l00070"></a>00070 {
-<a name="l00071"></a>00071     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !candidate.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring invalid chunk. Missing properties: &quot;</span> &lt;&lt; candidate.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
-<a name="l00072"></a>00072     <span class="keywordflow">return</span> !candidate.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>();
-<a name="l00073"></a>00073 }
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075 }
-<a name="l00076"></a>00076 
-<a name="l00077"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">00077</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">IOFactory::IOFactory</a>()
-<a name="l00078"></a>00078 {
-<a name="l00079"></a>00079     <span class="keyword">const</span> <span class="keywordtype">char</span> *env_path = getenv( <span class="stringliteral">&quot;ISIS_PLUGIN_PATH&quot;</span> );
-<a name="l00080"></a>00080     <span class="keyword">const</span> <span class="keywordtype">char</span> *env_home = getenv( <span class="stringliteral">&quot;HOME&quot;</span> );
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     <span class="keywordflow">if</span>( env_path ) {
-<a name="l00083"></a>00083         <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( boost::filesystem::path( env_path ).directory_string() );
-<a name="l00084"></a>00084     }
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086     <span class="keywordflow">if</span>( env_home ) {
-<a name="l00087"></a>00087         <span class="keyword">const</span> boost::filesystem::path home = boost::filesystem::path( env_home ) / <span class="stringliteral">&quot;isis&quot;</span> / <span class="stringliteral">&quot;plugins&quot;</span>;
+<a name="l00037"></a>00037 <a class="code" href="config_8hpp.html#a4121f00721360474a8bd91b291159f18">API_EXCLUDE_BEGIN</a>
+<a name="l00039"></a>00039 <span class="keyword">namespace </span>_internal
+<a name="l00040"></a>00040 {
+<a name="l00041"></a>00041 <span class="keyword">struct </span>pluginDeleter {
+<a name="l00042"></a>00042     <span class="keywordtype">void</span> *m_dlHandle;
+<a name="l00043"></a>00043     std::string m_pluginName;
+<a name="l00044"></a>00044     pluginDeleter( <span class="keywordtype">void</span> *dlHandle, std::string pluginName ): m_dlHandle( dlHandle ), m_pluginName( pluginName ) {}
+<a name="l00045"></a>00045     <span class="keywordtype">void</span> operator()( image_io::FileFormat *format ) {
+<a name="l00046"></a>00046         <span class="keyword">delete</span> format;
+<a name="l00047"></a>00047 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00048"></a>00048 <span class="preprocessor"></span>
+<a name="l00049"></a>00049         <span class="keywordflow">if</span>( !FreeLibrary( ( HINSTANCE )m_dlHandle ) )
+<a name="l00050"></a>00050 <span class="preprocessor">#else</span>
+<a name="l00051"></a>00051 <span class="preprocessor"></span>        <span class="keywordflow">if</span> ( dlclose( m_dlHandle ) != 0 )
+<a name="l00052"></a>00052 <span class="preprocessor">#endif</span>
+<a name="l00053"></a>00053 <span class="preprocessor"></span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to release plugin &quot;</span> &lt;&lt; m_pluginName &lt;&lt; <span class="stringliteral">&quot; (was loaded at &quot;</span> &lt;&lt; m_dlHandle &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055         <span class="comment">//we cannot use LOG here, because the loggers are gone allready</span>
+<a name="l00056"></a>00056     }
+<a name="l00057"></a>00057 };
+<a name="l00058"></a>00058 <span class="keyword">struct </span>dialect_missing {
+<a name="l00059"></a>00059     <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect;
+<a name="l00060"></a>00060     std::string filename;
+<a name="l00061"></a>00061     <span class="keywordtype">bool</span> operator()( IOFactory::FileFormatList::reference ref )<span class="keyword">const </span>{
+<a name="l00062"></a>00062         <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dia = ref-&gt;dialects( filename );
+<a name="l00063"></a>00063         std::list&lt;util::istring&gt; splitted = util::stringToList&lt;util::istring&gt;( dia, <span class="charliteral">&#39; &#39;</span> );
+<a name="l00064"></a>00064         <span class="keyword">const</span> <span class="keywordtype">bool</span> ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
+<a name="l00065"></a>00065         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ret, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; ref-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; does not support the requested dialect &quot;</span> &lt;&lt; util::MSubject( dialect );
+<a name="l00066"></a>00066         <span class="keywordflow">return</span> ret;
+<a name="l00067"></a>00067     }
+<a name="l00068"></a>00068 };
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="keywordtype">bool</span> invalid_and_tell( Chunk &amp;candidate )
+<a name="l00071"></a>00071 {
+<a name="l00072"></a>00072     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !candidate.isValid(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring invalid chunk. Missing properties: &quot;</span> &lt;&lt; candidate.getMissing();
+<a name="l00073"></a>00073     <span class="keywordflow">return</span> !candidate.isValid();
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076 }
+<a name="l00078"></a>00078 <a class="code" href="config_8hpp.html#a4121f00721360474a8bd91b291159f18">API_EXCLUDE_BEGIN</a>
+<a name="l00079"></a>00079 
+<a name="l00080"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#adcdad6a4d9c693887b0d7c2abf7f2ecb">00080</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#adcdad6a4d9c693887b0d7c2abf7f2ecb">IOFactory::IOFactory</a>()
+<a name="l00081"></a>00081 {
+<a name="l00082"></a>00082     <span class="keyword">const</span> <span class="keywordtype">char</span> *env_path = getenv( <span class="stringliteral">&quot;ISIS_PLUGIN_PATH&quot;</span> );
+<a name="l00083"></a>00083     <span class="keyword">const</span> <span class="keywordtype">char</span> *env_home = getenv( <span class="stringliteral">&quot;HOME&quot;</span> );
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085     <span class="keywordflow">if</span>( env_path ) {
+<a name="l00086"></a>00086         <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( boost::filesystem::path( env_path ).directory_string() );
+<a name="l00087"></a>00087     }
 <a name="l00088"></a>00088 
-<a name="l00089"></a>00089         <span class="keywordflow">if</span>( boost::filesystem::exists( home ) ) {
-<a name="l00090"></a>00090             <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( home.directory_string() );
-<a name="l00091"></a>00091         } <span class="keywordflow">else</span> {
-<a name="l00092"></a>00092             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; home.directory_string() &lt;&lt; <span class="stringliteral">&quot; does not exist. Won&#39;t check for plugins there&quot;</span>;
-<a name="l00093"></a>00093         }
-<a name="l00094"></a>00094     }
-<a name="l00095"></a>00095 
-<a name="l00096"></a>00096 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00097"></a>00097 <span class="preprocessor"></span>    TCHAR lpExeName[2048];
-<a name="l00098"></a>00098     DWORD lExeName = GetModuleFileName( NULL, lpExeName, 2048 );
-<a name="l00099"></a>00099     <span class="keywordtype">bool</span> w32_path_ok = <span class="keyword">false</span>;
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101     <span class="keywordflow">if</span>( lExeName == 0 ) {
-<a name="l00102"></a>00102         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to get the process name &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>() );
-<a name="l00103"></a>00103     } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( lExeName &lt; 2048 ) {
-<a name="l00104"></a>00104         lpExeName[lExeName] = <span class="charliteral">&#39;\0&#39;</span>;
-<a name="l00105"></a>00105         boost::filesystem::path prog_name( lpExeName );
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107         <span class="keywordflow">if</span>( boost::filesystem::exists( prog_name ) ) {
-<a name="l00108"></a>00108             w32_path_ok = <span class="keyword">true</span>;
-<a name="l00109"></a>00109             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Determined the path of the executable as &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( prog_name.file_string() ) &lt;&lt; <span class="stringliteral">&quot; will search for plugins there..&quot;</span>;
-<a name="l00110"></a>00110             <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( prog_name.remove_filename().directory_string() );
-<a name="l00111"></a>00111         }
-<a name="l00112"></a>00112     } <span class="keywordflow">else</span>
-<a name="l00113"></a>00113         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry, the path of the process is to long (must be less than 2048 characters) &quot;</span>;
-<a name="l00114"></a>00114 
-<a name="l00115"></a>00115     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !w32_path_ok, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not determine the path of the executable, won&#39;t search for plugins there..&quot;</span>;
-<a name="l00116"></a>00116 <span class="preprocessor">#else</span>
-<a name="l00117"></a>00117 <span class="preprocessor"></span>    <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( std::string( PLUGIN_PATH ) );
-<a name="l00118"></a>00118 <span class="preprocessor">#endif</span>
-<a name="l00119"></a>00119 <span class="preprocessor"></span>}
-<a name="l00120"></a>00120 
-<a name="l00121"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">00121</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">IOFactory::registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> plugin )
-<a name="l00122"></a>00122 {
-<a name="l00123"></a>00123     <span class="keywordflow">if</span> ( !plugin )<span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00124"></a>00124 
-<a name="l00125"></a>00125     <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>.push_back( plugin );
-<a name="l00126"></a>00126     std::list&lt;util::istring&gt; suffixes = plugin-&gt;getSuffixes(  );
-<a name="l00127"></a>00127     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00128"></a>00128             &lt;&lt; <span class="stringliteral">&quot;Registering &quot;</span> &lt;&lt; ( plugin-&gt;tainted() ? <span class="stringliteral">&quot;tainted &quot;</span> : <span class="stringliteral">&quot;&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;io-plugin &quot;</span>
-<a name="l00129"></a>00129             &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( plugin-&gt;getName() )
-<a name="l00130"></a>00130             &lt;&lt; <span class="stringliteral">&quot; with supported suffixes &quot;</span> &lt;&lt; suffixes;
-<a name="l00131"></a>00131     BOOST_FOREACH( <a class="code" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp; it, suffixes ) {
-<a name="l00132"></a>00132         io_suffix[it].push_back( plugin );
-<a name="l00133"></a>00133     }
-<a name="l00134"></a>00134     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00135"></a>00135 }
-<a name="l00136"></a>00136 
-<a name="l00137"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">00137</a> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">IOFactory::findPlugins</a>( <span class="keyword">const</span> std::string &amp;path )
-<a name="l00138"></a>00138 {
-<a name="l00139"></a>00139     boost::filesystem::path p( path );
-<a name="l00140"></a>00140 
-<a name="l00141"></a>00141     <span class="keywordflow">if</span> ( !exists( p ) ) {
-<a name="l00142"></a>00142         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p.file_string() ) &lt;&lt; <span class="stringliteral">&quot; not found&quot;</span>;
-<a name="l00143"></a>00143         <span class="keywordflow">return</span> 0;
-<a name="l00144"></a>00144     }
-<a name="l00145"></a>00145 
-<a name="l00146"></a>00146     <span class="keywordflow">if</span> ( !boost::filesystem::is_directory( p ) ) {
-<a name="l00147"></a>00147         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p.file_string() ) &lt;&lt; <span class="stringliteral">&quot; is no directory&quot;</span>;
-<a name="l00148"></a>00148         <span class="keywordflow">return</span> 0;
-<a name="l00149"></a>00149     }
-<a name="l00150"></a>00150 
-<a name="l00151"></a>00151     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )   &lt;&lt; <span class="stringliteral">&quot;Scanning &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p ) &lt;&lt; <span class="stringliteral">&quot; for plugins&quot;</span>;
-<a name="l00152"></a>00152     boost::regex pluginFilter( std::string( <span class="stringliteral">&quot;^&quot;</span> ) + DL_PREFIX + <span class="stringliteral">&quot;isisImageFormat_&quot;</span> + <span class="stringliteral">&quot;[[:word:]]+&quot;</span> + DL_SUFFIX + <span class="stringliteral">&quot;$&quot;</span> );
-<a name="l00153"></a>00153     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ret = 0;
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155     <span class="keywordflow">for</span> ( boost::filesystem::directory_iterator itr( p ); itr != boost::filesystem::directory_iterator(); ++itr ) {
-<a name="l00156"></a>00156         <span class="keywordflow">if</span> ( boost::filesystem::is_directory( *itr ) )<span class="keywordflow">continue</span>;
+<a name="l00089"></a>00089     <span class="keywordflow">if</span>( env_home ) {
+<a name="l00090"></a>00090         <span class="keyword">const</span> boost::filesystem::path home = boost::filesystem::path( env_home ) / <span class="stringliteral">&quot;isis&quot;</span> / <span class="stringliteral">&quot;plugins&quot;</span>;
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092         <span class="keywordflow">if</span>( boost::filesystem::exists( home ) ) {
+<a name="l00093"></a>00093             <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( home.directory_string() );
+<a name="l00094"></a>00094         } <span class="keywordflow">else</span> {
+<a name="l00095"></a>00095             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; home.directory_string() &lt;&lt; <span class="stringliteral">&quot; does not exist. Won&#39;t check for plugins there&quot;</span>;
+<a name="l00096"></a>00096         }
+<a name="l00097"></a>00097     }
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00100"></a>00100 <span class="preprocessor"></span>    TCHAR lpExeName[2048];
+<a name="l00101"></a>00101     DWORD lExeName = GetModuleFileName( NULL, lpExeName, 2048 );
+<a name="l00102"></a>00102     <span class="keywordtype">bool</span> w32_path_ok = <span class="keyword">false</span>;
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104     <span class="keywordflow">if</span>( lExeName == 0 ) {
+<a name="l00105"></a>00105         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Failed to get the process name &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#ac1e695999a4166e9f8a4ff5835aef5aa">util::getLastSystemError</a>() );
+<a name="l00106"></a>00106     } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( lExeName &lt; 2048 ) {
+<a name="l00107"></a>00107         lpExeName[lExeName] = <span class="charliteral">&#39;\0&#39;</span>;
+<a name="l00108"></a>00108         boost::filesystem::path prog_name( lpExeName );
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110         <span class="keywordflow">if</span>( boost::filesystem::exists( prog_name ) ) {
+<a name="l00111"></a>00111             w32_path_ok = <span class="keyword">true</span>;
+<a name="l00112"></a>00112             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Determined the path of the executable as &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( prog_name.file_string() ) &lt;&lt; <span class="stringliteral">&quot; will search for plugins there..&quot;</span>;
+<a name="l00113"></a>00113             <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( prog_name.remove_filename().directory_string() );
+<a name="l00114"></a>00114         }
+<a name="l00115"></a>00115     } <span class="keywordflow">else</span>
+<a name="l00116"></a>00116         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Sorry, the path of the process is to long (must be less than 2048 characters) &quot;</span>;
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !w32_path_ok, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not determine the path of the executable, won&#39;t search for plugins there..&quot;</span>;
+<a name="l00119"></a>00119 <span class="preprocessor">#else</span>
+<a name="l00120"></a>00120 <span class="preprocessor"></span>    <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( std::string( PLUGIN_PATH ) );
+<a name="l00121"></a>00121 <span class="preprocessor">#endif</span>
+<a name="l00122"></a>00122 <span class="preprocessor"></span>}
+<a name="l00123"></a>00123 
+<a name="l00124"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">00124</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">IOFactory::registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> plugin )
+<a name="l00125"></a>00125 {
+<a name="l00126"></a>00126     <span class="keywordflow">if</span> ( !plugin )<span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128     <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>.push_back( plugin );
+<a name="l00129"></a>00129     std::list&lt;util::istring&gt; suffixes = plugin-&gt;getSuffixes(  );
+<a name="l00130"></a>00130     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00131"></a>00131             &lt;&lt; <span class="stringliteral">&quot;Registering &quot;</span> &lt;&lt; ( plugin-&gt;tainted() ? <span class="stringliteral">&quot;tainted &quot;</span> : <span class="stringliteral">&quot;&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;io-plugin &quot;</span>
+<a name="l00132"></a>00132             &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( plugin-&gt;getName() )
+<a name="l00133"></a>00133             &lt;&lt; <span class="stringliteral">&quot; with supported suffixes &quot;</span> &lt;&lt; suffixes;
+<a name="l00134"></a>00134     BOOST_FOREACH( <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp; it, suffixes ) {
+<a name="l00135"></a>00135         io_suffix[it].push_back( plugin );
+<a name="l00136"></a>00136     }
+<a name="l00137"></a>00137     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00138"></a>00138 }
+<a name="l00139"></a>00139 
+<a name="l00140"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">00140</a> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">IOFactory::findPlugins</a>( <span class="keyword">const</span> std::string &amp;path )
+<a name="l00141"></a>00141 {
+<a name="l00142"></a>00142     boost::filesystem::path p( path );
+<a name="l00143"></a>00143 
+<a name="l00144"></a>00144     <span class="keywordflow">if</span> ( !exists( p ) ) {
+<a name="l00145"></a>00145         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p.file_string() ) &lt;&lt; <span class="stringliteral">&quot; not found&quot;</span>;
+<a name="l00146"></a>00146         <span class="keywordflow">return</span> 0;
+<a name="l00147"></a>00147     }
+<a name="l00148"></a>00148 
+<a name="l00149"></a>00149     <span class="keywordflow">if</span> ( !boost::filesystem::is_directory( p ) ) {
+<a name="l00150"></a>00150         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p.file_string() ) &lt;&lt; <span class="stringliteral">&quot; is no directory&quot;</span>;
+<a name="l00151"></a>00151         <span class="keywordflow">return</span> 0;
+<a name="l00152"></a>00152     }
+<a name="l00153"></a>00153 
+<a name="l00154"></a>00154     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )   &lt;&lt; <span class="stringliteral">&quot;Scanning &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( p ) &lt;&lt; <span class="stringliteral">&quot; for plugins&quot;</span>;
+<a name="l00155"></a>00155     boost::regex pluginFilter( std::string( <span class="stringliteral">&quot;^&quot;</span> ) + DL_PREFIX + <span class="stringliteral">&quot;isisImageFormat_&quot;</span> + <span class="stringliteral">&quot;[[:word:]]+&quot;</span> + DL_SUFFIX + <span class="stringliteral">&quot;$&quot;</span> );
+<a name="l00156"></a>00156     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ret = 0;
 <a name="l00157"></a>00157 
-<a name="l00158"></a>00158         <span class="keywordflow">if</span> ( boost::regex_match( itr-&gt;path().leaf(), pluginFilter ) ) {
-<a name="l00159"></a>00159             <span class="keyword">const</span> std::string pluginName = itr-&gt;path().file_string();
-<a name="l00160"></a>00160 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00161"></a>00161 <span class="preprocessor"></span>            HINSTANCE handle = LoadLibrary( pluginName.c_str() );
-<a name="l00162"></a>00162 <span class="preprocessor">#else</span>
-<a name="l00163"></a>00163 <span class="preprocessor"></span>            <span class="keywordtype">void</span> *handle = dlopen( pluginName.c_str(), RTLD_NOW );
-<a name="l00164"></a>00164 <span class="preprocessor">#endif</span>
-<a name="l00165"></a>00165 <span class="preprocessor"></span>
-<a name="l00166"></a>00166             <span class="keywordflow">if</span> ( handle ) {
-<a name="l00167"></a>00167 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00168"></a>00168 <span class="preprocessor"></span>                <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a>* ( *factory_func )() = ( <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a> * ( * )() )GetProcAddress( handle, <span class="stringliteral">&quot;factory&quot;</span> );
-<a name="l00169"></a>00169 <span class="preprocessor">#else</span>
-<a name="l00170"></a>00170 <span class="preprocessor"></span>                <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a>* ( *factory_func )() = ( <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a> * ( * )() )dlsym( handle, <span class="stringliteral">&quot;factory&quot;</span> );
-<a name="l00171"></a>00171 <span class="preprocessor">#endif</span>
-<a name="l00172"></a>00172 <span class="preprocessor"></span>
-<a name="l00173"></a>00173                 <span class="keywordflow">if</span> ( factory_func ) {
-<a name="l00174"></a>00174                     <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
-<a name="l00175"></a>00175 
-<a name="l00176"></a>00176                     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( io_class ) ) {
-<a name="l00177"></a>00177                         io_class-&gt;plugin_file = pluginName;
-<a name="l00178"></a>00178                         ret++;
-<a name="l00179"></a>00179                     } <span class="keywordflow">else</span> {
-<a name="l00180"></a>00180                         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;failed to register plugin &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
-<a name="l00181"></a>00181                     }
-<a name="l00182"></a>00182                 } <span class="keywordflow">else</span> {
-<a name="l00183"></a>00183 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00184"></a>00184 <span class="preprocessor"></span>                    <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00185"></a>00185                             &lt;&lt; <span class="stringliteral">&quot;could not get format factory function from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
-<a name="l00186"></a>00186                     FreeLibrary( handle );
-<a name="l00187"></a>00187 <span class="preprocessor">#else</span>
-<a name="l00188"></a>00188 <span class="preprocessor"></span>                    <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00189"></a>00189                             &lt;&lt; <span class="stringliteral">&quot;could not get format factory function from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dlerror() );
-<a name="l00190"></a>00190                     dlclose( handle );
-<a name="l00191"></a>00191 <span class="preprocessor">#endif</span>
-<a name="l00192"></a>00192 <span class="preprocessor"></span>                }
-<a name="l00193"></a>00193             } <span class="keywordflow">else</span>
-<a name="l00194"></a>00194 <span class="preprocessor">#ifdef WIN32</span>
-<a name="l00195"></a>00195 <span class="preprocessor"></span>                <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not load library &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
-<a name="l00196"></a>00196 
-<a name="l00197"></a>00197 <span class="preprocessor">#else</span>
-<a name="l00198"></a>00198 <span class="preprocessor"></span>                <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not load library &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt;  <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dlerror() );
-<a name="l00199"></a>00199 <span class="preprocessor">#endif</span>
-<a name="l00200"></a>00200 <span class="preprocessor"></span>        } <span class="keywordflow">else</span> {
-<a name="l00201"></a>00201             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring &quot;</span> &lt;&lt; *itr &lt;&lt; <span class="stringliteral">&quot; because it doesn&#39;t match &quot;</span> &lt;&lt; pluginFilter.str();
-<a name="l00202"></a>00202         }
-<a name="l00203"></a>00203     }
-<a name="l00204"></a>00204 
-<a name="l00205"></a>00205     <span class="keywordflow">return</span> ret;
-<a name="l00206"></a>00206 }
+<a name="l00158"></a>00158     <span class="keywordflow">for</span> ( boost::filesystem::directory_iterator itr( p ); itr != boost::filesystem::directory_iterator(); ++itr ) {
+<a name="l00159"></a>00159         <span class="keywordflow">if</span> ( boost::filesystem::is_directory( *itr ) )<span class="keywordflow">continue</span>;
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161         <span class="keywordflow">if</span> ( boost::regex_match( itr-&gt;path().leaf(), pluginFilter ) ) {
+<a name="l00162"></a>00162             <span class="keyword">const</span> std::string pluginName = itr-&gt;path().file_string();
+<a name="l00163"></a>00163 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00164"></a>00164 <span class="preprocessor"></span>            HINSTANCE handle = LoadLibrary( pluginName.c_str() );
+<a name="l00165"></a>00165 <span class="preprocessor">#else</span>
+<a name="l00166"></a>00166 <span class="preprocessor"></span>            <span class="keywordtype">void</span> *handle = dlopen( pluginName.c_str(), RTLD_NOW );
+<a name="l00167"></a>00167 <span class="preprocessor">#endif</span>
+<a name="l00168"></a>00168 <span class="preprocessor"></span>
+<a name="l00169"></a>00169             <span class="keywordflow">if</span> ( handle ) {
+<a name="l00170"></a>00170 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00171"></a>00171 <span class="preprocessor"></span>                <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a>* ( *factory_func )() = ( <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a> * ( * )() )GetProcAddress( handle, <span class="stringliteral">&quot;factory&quot;</span> );
+<a name="l00172"></a>00172 <span class="preprocessor">#else</span>
+<a name="l00173"></a>00173 <span class="preprocessor"></span>                <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a>* ( *factory_func )() = ( <a class="code" href="classisis_1_1image__io_1_1FileFormat.html" title="Base class for image-io-plugins.">image_io::FileFormat</a> * ( * )() )dlsym( handle, <span class="stringliteral">&quot;factory&quot;</span> );
+<a name="l00174"></a>00174 <span class="preprocessor">#endif</span>
+<a name="l00175"></a>00175 <span class="preprocessor"></span>
+<a name="l00176"></a>00176                 <span class="keywordflow">if</span> ( factory_func ) {
+<a name="l00177"></a>00177                     <a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179                     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( io_class ) ) {
+<a name="l00180"></a>00180                         io_class-&gt;plugin_file = pluginName;
+<a name="l00181"></a>00181                         ret++;
+<a name="l00182"></a>00182                     } <span class="keywordflow">else</span> {
+<a name="l00183"></a>00183                         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;failed to register plugin &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
+<a name="l00184"></a>00184                     }
+<a name="l00185"></a>00185                 } <span class="keywordflow">else</span> {
+<a name="l00186"></a>00186 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00187"></a>00187 <span class="preprocessor"></span>                    <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00188"></a>00188                             &lt;&lt; <span class="stringliteral">&quot;could not get format factory function from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
+<a name="l00189"></a>00189                     FreeLibrary( handle );
+<a name="l00190"></a>00190 <span class="preprocessor">#else</span>
+<a name="l00191"></a>00191 <span class="preprocessor"></span>                    <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00192"></a>00192                             &lt;&lt; <span class="stringliteral">&quot;could not get format factory function from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dlerror() );
+<a name="l00193"></a>00193                     dlclose( handle );
+<a name="l00194"></a>00194 <span class="preprocessor">#endif</span>
+<a name="l00195"></a>00195 <span class="preprocessor"></span>                }
+<a name="l00196"></a>00196             } <span class="keywordflow">else</span>
+<a name="l00197"></a>00197 <span class="preprocessor">#ifdef WIN32</span>
+<a name="l00198"></a>00198 <span class="preprocessor"></span>                <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not load library &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName );
+<a name="l00199"></a>00199 
+<a name="l00200"></a>00200 <span class="preprocessor">#else</span>
+<a name="l00201"></a>00201 <span class="preprocessor"></span>                <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Could not load library &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( pluginName ) &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt;  <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dlerror() );
+<a name="l00202"></a>00202 <span class="preprocessor">#endif</span>
+<a name="l00203"></a>00203 <span class="preprocessor"></span>        } <span class="keywordflow">else</span> {
+<a name="l00204"></a>00204             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring &quot;</span> &lt;&lt; *itr &lt;&lt; <span class="stringliteral">&quot; because it doesn&#39;t match &quot;</span> &lt;&lt; pluginFilter.str();
+<a name="l00205"></a>00205         }
+<a name="l00206"></a>00206     }
 <a name="l00207"></a>00207 
-<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a0497caa2dc6d4d8ae58b513c2a07e062">00208</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<a class="code" href="classisis_1_1data_1_1IOFactory.html#a0497caa2dc6d4d8ae58b513c2a07e062">IOFactory::get</a>()
-<a name="l00209"></a>00209 {
-<a name="l00210"></a>00210     <span class="keywordflow">return</span> util::Singletons::get&lt;IOFactory, INT_MAX&gt;();
-<a name="l00211"></a>00211 }
-<a name="l00212"></a>00212 
-<a name="l00213"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">00213</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">IOFactory::loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, std::string suffix_override, std::string dialect )
-<a name="l00214"></a>00214 {
-<a name="l00215"></a>00215     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> formatReader;
-<a name="l00216"></a>00216     formatReader = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( filename.file_string(), suffix_override, dialect );
-<a name="l00217"></a>00217     <span class="keyword">const</span> <span class="keywordtype">size_t</span> nimgs_old = ret.size();   <span class="comment">// save number of chunks</span>
-<a name="l00218"></a>00218     <span class="keyword">const</span> std::string with_dialect = dialect.empty() ?
-<a name="l00219"></a>00219                                      std::string( <span class="stringliteral">&quot;&quot;</span> ) : std::string( <span class="stringliteral">&quot; with dialect \&quot;&quot;</span> ) + dialect + <span class="stringliteral">&quot;\&quot;&quot;</span>;
-<a name="l00220"></a>00220 
-<a name="l00221"></a>00221     <span class="keywordflow">if</span> ( formatReader.empty() ) {
-<a name="l00222"></a>00222         <span class="keywordflow">if</span>( !boost::filesystem::exists( filename ) ) {
-<a name="l00223"></a>00223             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() )
-<a name="l00224"></a>00224                                   &lt;&lt; <span class="stringliteral">&quot; does not exist as file, and no suitable plugin was found to generate data from &quot;</span>
-<a name="l00225"></a>00225                                   &lt;&lt; ( suffix_override.empty() ? std::string( <span class="stringliteral">&quot;that name&quot;</span> ) : std::string( <span class="stringliteral">&quot;the suffix \&quot;&quot;</span> ) + suffix_override + <span class="stringliteral">&quot;\&quot;&quot;</span> );
-<a name="l00226"></a>00226         } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( suffix_override.empty() ) {
-<a name="l00227"></a>00227             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin found to read &quot;</span> &lt;&lt; filename.file_string() &lt;&lt; with_dialect;
-<a name="l00228"></a>00228         } <span class="keywordflow">else</span> {
-<a name="l00229"></a>00229             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin supporting the requested suffix &quot;</span> &lt;&lt; suffix_override &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; was found&quot;</span>;
-<a name="l00230"></a>00230         }
-<a name="l00231"></a>00231     } <span class="keywordflow">else</span> {
-<a name="l00232"></a>00232         BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
-<a name="l00233"></a>00233             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( ImageIoDebug, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00234"></a>00234                     &lt;&lt; <span class="stringliteral">&quot;plugin to load file&quot;</span> &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; it-&gt;getName();
-<a name="l00235"></a>00235 
-<a name="l00236"></a>00236             <span class="keywordflow">try</span> {
-<a name="l00237"></a>00237                 <span class="keywordflow">return</span> it-&gt;load( ret, filename.file_string(), dialect );
-<a name="l00238"></a>00238             } <span class="keywordflow">catch</span> ( std::runtime_error &amp;e ) {
-<a name="l00239"></a>00239                 <span class="keywordflow">if</span>( suffix_override.empty() ) {
-<a name="l00240"></a>00240                     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, formatReader.size() &gt; 1 ? <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> : <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00241"></a>00241                             &lt;&lt; <span class="stringliteral">&quot;Failed to load &quot;</span> &lt;&lt;  filename.file_string() &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName() &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; ( &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot; )&quot;</span>;
-<a name="l00242"></a>00242                 } <span class="keywordflow">else</span> {
-<a name="l00243"></a>00243                     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00244"></a>00244                             &lt;&lt; <span class="stringliteral">&quot;The enforced format &quot;</span> &lt;&lt; it-&gt;getName()  &lt;&lt; <span class="stringliteral">&quot; failed to read &quot;</span> &lt;&lt; filename.file_string() &lt;&lt; with_dialect
-<a name="l00245"></a>00245                             &lt;&lt; <span class="stringliteral">&quot; ( &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot; ), maybe it just wasn&#39;t the right format&quot;</span>;
-<a name="l00246"></a>00246                 }
-<a name="l00247"></a>00247             }
-<a name="l00248"></a>00248         }
-<a name="l00249"></a>00249         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( boost::filesystem::exists( filename ) &amp;&amp; formatReader.size() &gt; 1, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin was able to load: &quot;</span>   &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; with_dialect;
-<a name="l00250"></a>00250     }
-<a name="l00251"></a>00251 
-<a name="l00252"></a>00252     <span class="keywordflow">return</span> ret.size() - nimgs_old;<span class="comment">//no plugin of proposed list could load file</span>
-<a name="l00253"></a>00253 }
+<a name="l00208"></a>00208     <span class="keywordflow">return</span> ret;
+<a name="l00209"></a>00209 }
+<a name="l00210"></a>00210 
+<a name="l00211"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a0497caa2dc6d4d8ae58b513c2a07e062">00211</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<a class="code" href="classisis_1_1data_1_1IOFactory.html#a0497caa2dc6d4d8ae58b513c2a07e062">IOFactory::get</a>()
+<a name="l00212"></a>00212 {
+<a name="l00213"></a>00213     <span class="keywordflow">return</span> util::Singletons::get&lt;IOFactory, INT_MAX&gt;();
+<a name="l00214"></a>00214 }
+<a name="l00215"></a>00215 
+<a name="l00216"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">00216</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">IOFactory::loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00217"></a>00217 {
+<a name="l00218"></a>00218     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> formatReader;
+<a name="l00219"></a>00219     formatReader = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( filename.file_string(), suffix_override, dialect );
+<a name="l00220"></a>00220     <span class="keyword">const</span> <span class="keywordtype">size_t</span> nimgs_old = ret.size();   <span class="comment">// save number of chunks</span>
+<a name="l00221"></a>00221     <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> with_dialect = dialect.empty() ?
+<a name="l00222"></a>00222                                        <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot;&quot;</span> ) : <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot; with dialect \&quot;&quot;</span> ) + dialect + <span class="stringliteral">&quot;\&quot;&quot;</span>;
+<a name="l00223"></a>00223 
+<a name="l00224"></a>00224     <span class="keywordflow">if</span> ( formatReader.empty() ) {
+<a name="l00225"></a>00225         <span class="keywordflow">if</span>( !boost::filesystem::exists( filename ) ) {
+<a name="l00226"></a>00226             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() )
+<a name="l00227"></a>00227                                   &lt;&lt; <span class="stringliteral">&quot; does not exist as file, and no suitable plugin was found to generate data from &quot;</span>
+<a name="l00228"></a>00228                                   &lt;&lt; ( suffix_override.empty() ? <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot;that name&quot;</span> ) : <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot;the suffix \&quot;&quot;</span> ) + suffix_override + <span class="stringliteral">&quot;\&quot;&quot;</span> );
+<a name="l00229"></a>00229         } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( suffix_override.empty() ) {
+<a name="l00230"></a>00230             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin found to read &quot;</span> &lt;&lt; filename.file_string() &lt;&lt; with_dialect;
+<a name="l00231"></a>00231         } <span class="keywordflow">else</span> {
+<a name="l00232"></a>00232             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin supporting the requested suffix &quot;</span> &lt;&lt; suffix_override &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; was found&quot;</span>;
+<a name="l00233"></a>00233         }
+<a name="l00234"></a>00234     } <span class="keywordflow">else</span> {
+<a name="l00235"></a>00235         BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
+<a name="l00236"></a>00236             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( ImageIoDebug, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00237"></a>00237                     &lt;&lt; <span class="stringliteral">&quot;plugin to load file&quot;</span> &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; it-&gt;getName();
+<a name="l00238"></a>00238 
+<a name="l00239"></a>00239             <span class="keywordflow">try</span> {
+<a name="l00240"></a>00240                 <span class="keywordflow">return</span> it-&gt;load( ret, filename.file_string(), dialect );
+<a name="l00241"></a>00241             } <span class="keywordflow">catch</span> ( std::runtime_error &amp;e ) {
+<a name="l00242"></a>00242                 <span class="keywordflow">if</span>( suffix_override.empty() ) {
+<a name="l00243"></a>00243                     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, formatReader.size() &gt; 1 ? <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> : <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00244"></a>00244                             &lt;&lt; <span class="stringliteral">&quot;Failed to load &quot;</span> &lt;&lt;  filename.file_string() &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName() &lt;&lt; with_dialect &lt;&lt; <span class="stringliteral">&quot; ( &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot; )&quot;</span>;
+<a name="l00245"></a>00245                 } <span class="keywordflow">else</span> {
+<a name="l00246"></a>00246                     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00247"></a>00247                             &lt;&lt; <span class="stringliteral">&quot;The enforced format &quot;</span> &lt;&lt; it-&gt;getName()  &lt;&lt; <span class="stringliteral">&quot; failed to read &quot;</span> &lt;&lt; filename.file_string() &lt;&lt; with_dialect
+<a name="l00248"></a>00248                             &lt;&lt; <span class="stringliteral">&quot; ( &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot; ), maybe it just wasn&#39;t the right format&quot;</span>;
+<a name="l00249"></a>00249                 }
+<a name="l00250"></a>00250             }
+<a name="l00251"></a>00251         }
+<a name="l00252"></a>00252         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( boost::filesystem::exists( filename ) &amp;&amp; formatReader.size() &gt; 1, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin was able to load: &quot;</span>   &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( filename.file_string() ) &lt;&lt; with_dialect;
+<a name="l00253"></a>00253     }
 <a name="l00254"></a>00254 
-<a name="l00255"></a>00255 
-<a name="l00256"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5">00256</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">IOFactory::FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5" title="Get all formats which should be able to read/write the given file.">IOFactory::getFileFormatList</a>( std::string filename, std::string suffix_override, std::string dialect )
-<a name="l00257"></a>00257 {
-<a name="l00258"></a>00258     std::list&lt;std::string&gt; ext;
-<a name="l00259"></a>00259     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> ret;
-<a name="l00260"></a>00260     _internal::dialect_missing remove_op;
-<a name="l00261"></a>00261 
-<a name="l00262"></a>00262     <span class="keywordflow">if</span>( suffix_override.empty() ) { <span class="comment">// detect suffixes from the filename</span>
-<a name="l00263"></a>00263         <span class="keyword">const</span> boost::filesystem::path fname( filename );
-<a name="l00264"></a>00264         ext = util::stringToList&lt;std::string&gt;( fname.leaf(), <span class="charliteral">&#39;.&#39;</span> ); <span class="comment">// get all suffixes</span>
-<a name="l00265"></a>00265 
-<a name="l00266"></a>00266         <span class="keywordflow">if</span>( !ext.empty() )ext.pop_front(); <span class="comment">// remove the first &quot;suffix&quot; - actually the basename</span>
-<a name="l00267"></a>00267     } <span class="keywordflow">else</span> ext = util::stringToList&lt;std::string&gt;( suffix_override, <span class="charliteral">&#39;.&#39;</span> );
+<a name="l00255"></a>00255     <span class="keywordflow">return</span> ret.size() - nimgs_old;<span class="comment">//no plugin of proposed list could load file</span>
+<a name="l00256"></a>00256 }
+<a name="l00257"></a>00257 
+<a name="l00258"></a>00258 
+<a name="l00259"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f">00259</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">IOFactory::FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f" title="Get all formats which should be able to read/write the given file.">IOFactory::getFileFormatList</a>( std::string filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00260"></a>00260 {
+<a name="l00261"></a>00261     std::list&lt;std::string&gt; ext;
+<a name="l00262"></a>00262     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> ret;
+<a name="l00263"></a>00263     _internal::dialect_missing remove_op;
+<a name="l00264"></a>00264 
+<a name="l00265"></a>00265     <span class="keywordflow">if</span>( suffix_override.empty() ) { <span class="comment">// detect suffixes from the filename</span>
+<a name="l00266"></a>00266         <span class="keyword">const</span> boost::filesystem::path fname( filename );
+<a name="l00267"></a>00267         ext = util::stringToList&lt;std::string&gt;( fname.leaf(), <span class="charliteral">&#39;.&#39;</span> ); <span class="comment">// get all suffixes</span>
 <a name="l00268"></a>00268 
-<a name="l00269"></a>00269     <span class="keywordflow">while</span>( !ext.empty() ) {
-<a name="l00270"></a>00270         <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> wholeName( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( ext.begin(), ext.end(), <span class="stringliteral">&quot;.&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ).c_str() ); <span class="comment">// (re)construct the rest of the suffix</span>
-<a name="l00271"></a>00271         <span class="keyword">const</span> std::map&lt;util::istring, FileFormatList&gt;::iterator found = <span class="keyword">get</span>().io_suffix.find( wholeName );
-<a name="l00272"></a>00272 
-<a name="l00273"></a>00273         <span class="keywordflow">if</span>( found != <span class="keyword">get</span>().io_suffix.end() ) {
-<a name="l00274"></a>00274             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; found-&gt;second.size() &lt;&lt; <span class="stringliteral">&quot; plugins support suffix &quot;</span> &lt;&lt; wholeName;
-<a name="l00275"></a>00275             ret.insert( ret.end(), found-&gt;second.begin(), found-&gt;second.end() );
-<a name="l00276"></a>00276         }
-<a name="l00277"></a>00277 
-<a name="l00278"></a>00278         ext.pop_front();
-<a name="l00279"></a>00279     }
+<a name="l00269"></a>00269         <span class="keywordflow">if</span>( !ext.empty() )ext.pop_front(); <span class="comment">// remove the first &quot;suffix&quot; - actually the basename</span>
+<a name="l00270"></a>00270     } <span class="keywordflow">else</span> ext = util::stringToList&lt;std::string&gt;( suffix_override, <span class="charliteral">&#39;.&#39;</span> );
+<a name="l00271"></a>00271 
+<a name="l00272"></a>00272     <span class="keywordflow">while</span>( !ext.empty() ) {
+<a name="l00273"></a>00273         <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> wholeName( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( ext.begin(), ext.end(), <span class="stringliteral">&quot;.&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ).c_str() ); <span class="comment">// (re)construct the rest of the suffix</span>
+<a name="l00274"></a>00274         <span class="keyword">const</span> std::map&lt;util::istring, FileFormatList&gt;::iterator found = <span class="keyword">get</span>().io_suffix.find( wholeName );
+<a name="l00275"></a>00275 
+<a name="l00276"></a>00276         <span class="keywordflow">if</span>( found != <span class="keyword">get</span>().io_suffix.end() ) {
+<a name="l00277"></a>00277             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; found-&gt;second.size() &lt;&lt; <span class="stringliteral">&quot; plugins support suffix &quot;</span> &lt;&lt; wholeName;
+<a name="l00278"></a>00278             ret.insert( ret.end(), found-&gt;second.begin(), found-&gt;second.end() );
+<a name="l00279"></a>00279         }
 <a name="l00280"></a>00280 
-<a name="l00281"></a>00281     <span class="keywordflow">if</span>( dialect.empty() ) {
-<a name="l00282"></a>00282         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;No dialect given. Will use all &quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; plugins&quot;</span>;
-<a name="l00283"></a>00283     } <span class="keywordflow">else</span> {<span class="comment">//remove everything which lacks the dialect if there was some given</span>
-<a name="l00284"></a>00284         remove_op.dialect = dialect;
-<a name="l00285"></a>00285         remove_op.filename = filename;
-<a name="l00286"></a>00286         ret.remove_if( remove_op );
-<a name="l00287"></a>00287         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Removed everything which does not support the dialect &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dialect ) &lt;&lt; <span class="stringliteral">&quot; on &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; plugins left)&quot;</span>;
-<a name="l00288"></a>00288     }
-<a name="l00289"></a>00289 
-<a name="l00290"></a>00290     <span class="keywordflow">return</span> ret;
-<a name="l00291"></a>00291 }
+<a name="l00281"></a>00281         ext.pop_front();
+<a name="l00282"></a>00282     }
+<a name="l00283"></a>00283 
+<a name="l00284"></a>00284     <span class="keywordflow">if</span>( dialect.empty() ) {
+<a name="l00285"></a>00285         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;No dialect given. Will use all &quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; plugins&quot;</span>;
+<a name="l00286"></a>00286     } <span class="keywordflow">else</span> {<span class="comment">//remove everything which lacks the dialect if there was some given</span>
+<a name="l00287"></a>00287         remove_op.dialect = dialect;
+<a name="l00288"></a>00288         remove_op.filename = filename;
+<a name="l00289"></a>00289         ret.remove_if( remove_op );
+<a name="l00290"></a>00290         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Removed everything which does not support the dialect &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( dialect ) &lt;&lt; <span class="stringliteral">&quot; on &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; plugins left)&quot;</span>;
+<a name="l00291"></a>00291     }
 <a name="l00292"></a>00292 
-<a name="l00293"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce">00293</a> std::list&lt; Image &gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">IOFactory::chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;src )
-<a name="l00294"></a>00294 {
-<a name="l00295"></a>00295     <span class="comment">// throw away invalid chunks</span>
-<a name="l00296"></a>00296     <span class="keywordtype">size_t</span> errcnt = src.size();
-<a name="l00297"></a>00297     src.remove_if( <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a086e0a1930218b9799ed11f8dc0b611f">_internal::invalid_and_tell</a> );
-<a name="l00298"></a>00298     errcnt -= src.size();
-<a name="l00299"></a>00299 
-<a name="l00300"></a>00300     std::list&lt; Image &gt; ret;
-<a name="l00301"></a>00301 
-<a name="l00302"></a>00302     <span class="keywordflow">while</span> ( !src.empty() ) {
-<a name="l00303"></a>00303         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; src.size() &lt;&lt; <span class="stringliteral">&quot; Chunks left to be distributed.&quot;</span>;
-<a name="l00304"></a>00304         <span class="keywordtype">size_t</span> before = src.size();
-<a name="l00305"></a>00305 
-<a name="l00306"></a>00306         <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> buff( src );
-<a name="l00307"></a>00307 
-<a name="l00308"></a>00308         <span class="keywordflow">if</span> ( buff.<a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() &amp;&amp; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>() ) { <span class="comment">//if the image was successfully indexed and is valid, keep it</span>
-<a name="l00309"></a>00309             ret.push_back( buff );
-<a name="l00310"></a>00310             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Image &quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; with size &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot; done.&quot;</span>;
-<a name="l00311"></a>00311         } <span class="keywordflow">else</span> {
-<a name="l00312"></a>00312             <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>().empty(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00313"></a>00313                     &lt;&lt; <span class="stringliteral">&quot;Cannot insert image. Missing properties: &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
-<a name="l00314"></a>00314             errcnt += before - src.size();
-<a name="l00315"></a>00315         }
-<a name="l00316"></a>00316     }
-<a name="l00317"></a>00317 
-<a name="l00318"></a>00318     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( errcnt, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Dropped &quot;</span> &lt;&lt; errcnt &lt;&lt; <span class="stringliteral">&quot; chunks because they didn&#39;t form valid images&quot;</span>;
-<a name="l00319"></a>00319     <span class="keywordflow">return</span> ret;
-<a name="l00320"></a>00320 }
-<a name="l00321"></a>00321 
-<a name="l00322"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ac9bbcf2b4c24ea02139af17b9cb1859a">00322</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">IOFactory::load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, std::string dialect )
-<a name="l00323"></a>00323 {
-<a name="l00324"></a>00324     <span class="keyword">const</span> boost::filesystem::path p( path );
-<a name="l00325"></a>00325     <span class="keyword">const</span> <span class="keywordtype">size_t</span> loaded = boost::filesystem::is_directory( p ) ?
-<a name="l00326"></a>00326                           <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#ab3176d2de75afc665712eb9fd3cde9df">loadPath</a>( chunks, p, suffix_override, dialect ) :
-<a name="l00327"></a>00327                           <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">loadFile</a>( chunks, p, suffix_override, dialect );
-<a name="l00328"></a>00328     BOOST_FOREACH( <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp; ref, chunks ) {
-<a name="l00329"></a>00329         <span class="keywordflow">if</span> ( ! ref.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ace197e0a37714072c4b8a9c9096018a1" title="check if a property is available">hasProperty</a>( <span class="stringliteral">&quot;source&quot;</span> ) )
-<a name="l00330"></a>00330             ref.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#adee60064ebd5e24f31c31dcf8750eb29" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;source&quot;</span>, p.file_string() );
-<a name="l00331"></a>00331     }
-<a name="l00332"></a>00332     <span class="keywordflow">return</span> loaded;
-<a name="l00333"></a>00333 }
-<a name="l00334"></a>00334 
-<a name="l00335"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734">00335</a> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">IOFactory::load</a>( <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, std::string dialect )
-<a name="l00336"></a>00336 {
-<a name="l00337"></a>00337     std::list&lt;Chunk&gt; chunks;
-<a name="l00338"></a>00338     <span class="keyword">const</span> boost::filesystem::path p( path );
-<a name="l00339"></a>00339     <span class="keyword">const</span> <span class="keywordtype">size_t</span> loaded = <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( chunks, path, suffix_override, dialect );
-<a name="l00340"></a>00340     <span class="keyword">const</span> std::list&lt;data::Image&gt; images = <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( chunks );
-<a name="l00341"></a>00341     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00342"></a>00342             &lt;&lt; <span class="stringliteral">&quot;Generated &quot;</span> &lt;&lt; images.size() &lt;&lt; <span class="stringliteral">&quot; images out of &quot;</span> &lt;&lt; loaded &lt;&lt; <span class="stringliteral">&quot; chunks loaded from &quot;</span> &lt;&lt; ( boost::filesystem::is_directory( p ) ? <span class="stringliteral">&quot;directory &quot;</span> : <span class="stringliteral">&quot;&quot;</span> ) &lt;&lt; p;
-<a name="l00343"></a>00343     <span class="keywordflow">return</span> images;
-<a name="l00344"></a>00344 }
-<a name="l00345"></a>00345 
-<a name="l00346"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ab3176d2de75afc665712eb9fd3cde9df">00346</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ab3176d2de75afc665712eb9fd3cde9df">IOFactory::loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, std::string suffix_override, std::string dialect )
-<a name="l00347"></a>00347 {
-<a name="l00348"></a>00348     <span class="keywordtype">int</span> loaded = 0;
-<a name="l00349"></a>00349 
-<a name="l00350"></a>00350     <span class="keywordflow">if</span>( m_feedback ) {
-<a name="l00351"></a>00351         <span class="keyword">const</span> <span class="keywordtype">size_t</span> length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); <span class="comment">//@todo this will also count directories</span>
-<a name="l00352"></a>00352         m_feedback-&gt;show( length, std::string( <span class="stringliteral">&quot;Reading &quot;</span> ) + <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;std::string&gt;</a>( length ).toString( <span class="keyword">false</span> ) + <span class="stringliteral">&quot; files from &quot;</span> + path.file_string() );
-<a name="l00353"></a>00353     }
-<a name="l00354"></a>00354 
-<a name="l00355"></a>00355     <span class="keywordflow">for</span> ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
-<a name="l00356"></a>00356         <span class="keywordflow">if</span> ( boost::filesystem::is_directory( *i ) )<span class="keywordflow">continue</span>;
-<a name="l00357"></a>00357 
-<a name="l00358"></a>00358         loaded += <a class="code" href="classisis_1_1data_1_1IOFactory.html#ac0c799f2a0a6cb31ac78664f3e2710f9">loadFile</a>( ret, *i, suffix_override, dialect );
+<a name="l00293"></a>00293     <span class="keywordflow">return</span> ret;
+<a name="l00294"></a>00294 }
+<a name="l00295"></a>00295 
+<a name="l00296"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce">00296</a> std::list&lt; Image &gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">IOFactory::chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;src )
+<a name="l00297"></a>00297 {
+<a name="l00298"></a>00298     <span class="comment">// throw away invalid chunks</span>
+<a name="l00299"></a>00299     <span class="keywordtype">size_t</span> errcnt = src.size();
+<a name="l00300"></a>00300     src.remove_if( _internal::invalid_and_tell );
+<a name="l00301"></a>00301     errcnt -= src.size();
+<a name="l00302"></a>00302 
+<a name="l00303"></a>00303     std::list&lt; Image &gt; ret;
+<a name="l00304"></a>00304 
+<a name="l00305"></a>00305     <span class="keywordflow">while</span> ( !src.empty() ) {
+<a name="l00306"></a>00306         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; src.size() &lt;&lt; <span class="stringliteral">&quot; Chunks left to be distributed.&quot;</span>;
+<a name="l00307"></a>00307         <span class="keywordtype">size_t</span> before = src.size();
+<a name="l00308"></a>00308 
+<a name="l00309"></a>00309         <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> buff( src );
+<a name="l00310"></a>00310 
+<a name="l00311"></a>00311         <span class="keywordflow">if</span> ( buff.<a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() &amp;&amp; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every property marked as needed is set.">isValid</a>() ) { <span class="comment">//if the image was successfully indexed and is valid, keep it</span>
+<a name="l00312"></a>00312             ret.push_back( buff );
+<a name="l00313"></a>00313             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Image &quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; with size &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot; done.&quot;</span>;
+<a name="l00314"></a>00314         } <span class="keywordflow">else</span> {
+<a name="l00315"></a>00315             <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>().empty(), <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00316"></a>00316                     &lt;&lt; <span class="stringliteral">&quot;Cannot insert image. Missing properties: &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#ad84de96685231d402bf9e8741a72db91" title="Get a list of missing properties.">getMissing</a>();
+<a name="l00317"></a>00317             errcnt += before - src.size();
+<a name="l00318"></a>00318         }
+<a name="l00319"></a>00319     }
+<a name="l00320"></a>00320 
+<a name="l00321"></a>00321     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( errcnt, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Dropped &quot;</span> &lt;&lt; errcnt &lt;&lt; <span class="stringliteral">&quot; chunks because they didn&#39;t form valid images&quot;</span>;
+<a name="l00322"></a>00322     <span class="keywordflow">return</span> ret;
+<a name="l00323"></a>00323 }
+<a name="l00324"></a>00324 
+<a name="l00325"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a9303be1d3dac8782e7ae4415c1ece452">00325</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">IOFactory::load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00326"></a>00326 {
+<a name="l00327"></a>00327     <span class="keyword">const</span> boost::filesystem::path p( path );
+<a name="l00328"></a>00328     <span class="keyword">const</span> <span class="keywordtype">size_t</span> loaded = boost::filesystem::is_directory( p ) ?
+<a name="l00329"></a>00329                           <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">loadPath</a>( chunks, p, suffix_override, dialect ) :
+<a name="l00330"></a>00330                           <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">loadFile</a>( chunks, p, suffix_override, dialect );
+<a name="l00331"></a>00331     BOOST_FOREACH( <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp; ref, chunks ) {
+<a name="l00332"></a>00332         <span class="keywordflow">if</span> ( ! ref.hasProperty( <span class="stringliteral">&quot;source&quot;</span> ) )
+<a name="l00333"></a>00333             ref.setPropertyAs( <span class="stringliteral">&quot;source&quot;</span>, p.file_string() );
+<a name="l00334"></a>00334     }
+<a name="l00335"></a>00335     <span class="keywordflow">return</span> loaded;
+<a name="l00336"></a>00336 }
+<a name="l00337"></a>00337 
+<a name="l00338"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62">00338</a> std::list&lt; Image &gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">IOFactory::load</a> ( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;paths, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00339"></a>00339 {
+<a name="l00340"></a>00340     std::list&lt;Chunk&gt; chunks;
+<a name="l00341"></a>00341     <span class="keywordtype">size_t</span> loaded = 0;
+<a name="l00342"></a>00342     BOOST_FOREACH( <span class="keyword">const</span> std::string &amp; path, paths ) {
+<a name="l00343"></a>00343         loaded += <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( chunks, path , suffix_override, dialect );
+<a name="l00344"></a>00344     }
+<a name="l00345"></a>00345     <span class="keyword">const</span> std::list&lt;data::Image&gt; images = <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( chunks );
+<a name="l00346"></a>00346     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00347"></a>00347             &lt;&lt; <span class="stringliteral">&quot;Generated &quot;</span> &lt;&lt; images.size() &lt;&lt; <span class="stringliteral">&quot; images out of &quot;</span> &lt;&lt; loaded &lt;&lt; <span class="stringliteral">&quot; chunks loaded from &quot;</span> &lt;&lt; paths;
+<a name="l00348"></a>00348     <span class="keywordflow">return</span> images;
+<a name="l00349"></a>00349 }
+<a name="l00350"></a>00350 
+<a name="l00351"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a96d9dd7beaed58d4f3fd94dfd9de5f7f">00351</a> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">IOFactory::load</a>( <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00352"></a>00352 {
+<a name="l00353"></a>00353     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a>( 1, path ), suffix_override, dialect );
+<a name="l00354"></a>00354 }
+<a name="l00355"></a>00355 
+<a name="l00356"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">00356</a> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">IOFactory::loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00357"></a>00357 {
+<a name="l00358"></a>00358     <span class="keywordtype">int</span> loaded = 0;
 <a name="l00359"></a>00359 
-<a name="l00360"></a>00360         <span class="keywordflow">if</span>( m_feedback )
-<a name="l00361"></a>00361             m_feedback-&gt;progress();
-<a name="l00362"></a>00362     }
-<a name="l00363"></a>00363 
-<a name="l00364"></a>00364     <span class="keywordflow">if</span>( m_feedback )
-<a name="l00365"></a>00365         m_feedback-&gt;close();
-<a name="l00366"></a>00366 
-<a name="l00367"></a>00367     <span class="keywordflow">return</span> loaded;
-<a name="l00368"></a>00368 }
+<a name="l00360"></a>00360     <span class="keywordflow">if</span>( m_feedback ) {
+<a name="l00361"></a>00361         <span class="keyword">const</span> <span class="keywordtype">size_t</span> length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); <span class="comment">//@todo this will also count directories</span>
+<a name="l00362"></a>00362         m_feedback-&gt;show( length, std::string( <span class="stringliteral">&quot;Reading &quot;</span> ) + <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;std::string&gt;</a>( length ).toString( <span class="keyword">false</span> ) + <span class="stringliteral">&quot; files from &quot;</span> + path.file_string() );
+<a name="l00363"></a>00363     }
+<a name="l00364"></a>00364 
+<a name="l00365"></a>00365     <span class="keywordflow">for</span> ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
+<a name="l00366"></a>00366         <span class="keywordflow">if</span> ( boost::filesystem::is_directory( *i ) )<span class="keywordflow">continue</span>;
+<a name="l00367"></a>00367 
+<a name="l00368"></a>00368         loaded += <a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">loadFile</a>( ret, *i, suffix_override, dialect );
 <a name="l00369"></a>00369 
-<a name="l00370"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">00370</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">IOFactory::write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, std::string dialect )
-<a name="l00371"></a>00371 {
-<a name="l00372"></a>00372     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">write</a>( std::list&lt;data::Image&gt;( 1, image ), path, suffix_override, dialect );
-<a name="l00373"></a>00373 }
-<a name="l00374"></a>00374 
-<a name="l00375"></a>00375 
-<a name="l00376"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aa3ab9130c2f787bbde8d7da56f37a9b6">00376</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9272ba797bf39993c3136b16b6dafb5f">IOFactory::write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, std::string dialect )
-<a name="l00377"></a>00377 {
-<a name="l00378"></a>00378     <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> formatWriter = <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( path, suffix_override, dialect );
+<a name="l00370"></a>00370         <span class="keywordflow">if</span>( m_feedback )
+<a name="l00371"></a>00371             m_feedback-&gt;progress();
+<a name="l00372"></a>00372     }
+<a name="l00373"></a>00373 
+<a name="l00374"></a>00374     <span class="keywordflow">if</span>( m_feedback )
+<a name="l00375"></a>00375         m_feedback-&gt;close();
+<a name="l00376"></a>00376 
+<a name="l00377"></a>00377     <span class="keywordflow">return</span> loaded;
+<a name="l00378"></a>00378 }
 <a name="l00379"></a>00379 
-<a name="l00380"></a>00380     BOOST_FOREACH( std::list&lt;data::Image&gt;::reference ref, images ) {
-<a name="l00381"></a>00381         ref.checkMakeClean();
-<a name="l00382"></a>00382     }
-<a name="l00383"></a>00383 
-<a name="l00384"></a>00384     <span class="keywordflow">if</span>( formatWriter.size() ) {
-<a name="l00385"></a>00385         BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
-<a name="l00386"></a>00386             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00387"></a>00387                     &lt;&lt; <span class="stringliteral">&quot;plugin to write to &quot;</span> &lt;&lt;  path &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; it-&gt;getName()
-<a name="l00388"></a>00388                     &lt;&lt;  ( dialect.empty() ?
-<a name="l00389"></a>00389                           std::string( <span class="stringliteral">&quot;&quot;</span> ) :
-<a name="l00390"></a>00390                           std::string( <span class="stringliteral">&quot; using dialect: &quot;</span> ) + dialect
-<a name="l00391"></a>00391                         );
-<a name="l00392"></a>00392 
-<a name="l00393"></a>00393             <span class="keywordflow">try</span> {
-<a name="l00394"></a>00394                 it-&gt;write( images, path, dialect );
-<a name="l00395"></a>00395                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; images.size()
-<a name="l00396"></a>00396                                      &lt;&lt; <span class="stringliteral">&quot; images written to &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName()
-<a name="l00397"></a>00397                                      &lt;&lt;  ( dialect.empty() ?
-<a name="l00398"></a>00398                                            std::string( <span class="stringliteral">&quot;&quot;</span> ) :
-<a name="l00399"></a>00399                                            std::string( <span class="stringliteral">&quot; and dialect: &quot;</span> ) + dialect
-<a name="l00400"></a>00400                                          );
-<a name="l00401"></a>00401                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00402"></a>00402             } <span class="keywordflow">catch</span> ( std::runtime_error &amp;e ) {
-<a name="l00403"></a>00403                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
-<a name="l00404"></a>00404                         &lt;&lt; <span class="stringliteral">&quot;Failed to write &quot;</span> &lt;&lt;  images.size()
-<a name="l00405"></a>00405                         &lt;&lt; <span class="stringliteral">&quot; images to &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00406"></a>00406             }
-<a name="l00407"></a>00407         }
-<a name="l00408"></a>00408     } <span class="keywordflow">else</span> {
-<a name="l00409"></a>00409         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin found to write to: &quot;</span> &lt;&lt; path; <span class="comment">//@todo error message missing</span>
-<a name="l00410"></a>00410     }
-<a name="l00411"></a>00411 
-<a name="l00412"></a>00412     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00413"></a>00413 }
-<a name="l00414"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">00414</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">IOFactory::setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt; feedback )
-<a name="l00415"></a>00415 {
-<a name="l00416"></a>00416     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;This = <span class="keyword">get</span>();
-<a name="l00417"></a>00417 
-<a name="l00418"></a>00418     <span class="keywordflow">if</span>( This.m_feedback )This.m_feedback-&gt;close();
-<a name="l00419"></a>00419 
-<a name="l00420"></a>00420     This.m_feedback = feedback;
-<a name="l00421"></a>00421 }
+<a name="l00380"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">00380</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">IOFactory::write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00381"></a>00381 {
+<a name="l00382"></a>00382     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a>( std::list&lt;data::Image&gt;( 1, image ), path, suffix_override, dialect );
+<a name="l00383"></a>00383 }
+<a name="l00384"></a>00384 
+<a name="l00385"></a>00385 
+<a name="l00386"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aff740043a9bf867991ce39ed12ee8c4f">00386</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">IOFactory::write</a>( std::list&lt; isis::data::Image &gt; images, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect )
+<a name="l00387"></a>00387 {
+<a name="l00388"></a>00388     <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> formatWriter = <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( path, suffix_override, dialect );
+<a name="l00389"></a>00389 
+<a name="l00390"></a>00390     BOOST_FOREACH( std::list&lt;data::Image&gt;::reference ref, images ) {
+<a name="l00391"></a>00391         ref.checkMakeClean();
+<a name="l00392"></a>00392     }
+<a name="l00393"></a>00393 
+<a name="l00394"></a>00394     <span class="keywordflow">if</span>( formatWriter.size() ) {
+<a name="l00395"></a>00395         BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
+<a name="l00396"></a>00396             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00397"></a>00397                     &lt;&lt; <span class="stringliteral">&quot;plugin to write to &quot;</span> &lt;&lt;  path &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; it-&gt;getName()
+<a name="l00398"></a>00398                     &lt;&lt;  ( dialect.empty() ?
+<a name="l00399"></a>00399                           <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot;&quot;</span> ) :
+<a name="l00400"></a>00400                           <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot; using dialect: &quot;</span> ) + dialect
+<a name="l00401"></a>00401                         );
+<a name="l00402"></a>00402 
+<a name="l00403"></a>00403             <span class="keywordflow">try</span> {
+<a name="l00404"></a>00404                 it-&gt;write( images, path, dialect );
+<a name="l00405"></a>00405                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00406"></a>00406                         &lt;&lt; images.size()
+<a name="l00407"></a>00407                         &lt;&lt; <span class="stringliteral">&quot; images written to &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName()
+<a name="l00408"></a>00408                         &lt;&lt;  ( dialect.empty() ?
+<a name="l00409"></a>00409                               <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot;&quot;</span> ) :
+<a name="l00410"></a>00410                               <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a>( <span class="stringliteral">&quot; and dialect: &quot;</span> ) + dialect
+<a name="l00411"></a>00411                             );
+<a name="l00412"></a>00412                 <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00413"></a>00413             } <span class="keywordflow">catch</span> ( std::runtime_error &amp;e ) {
+<a name="l00414"></a>00414                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00415"></a>00415                         &lt;&lt; <span class="stringliteral">&quot;Failed to write &quot;</span> &lt;&lt;  images.size()
+<a name="l00416"></a>00416                         &lt;&lt; <span class="stringliteral">&quot; images to &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot; using &quot;</span> &lt;&lt;  it-&gt;getName() &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00417"></a>00417             }
+<a name="l00418"></a>00418         }
+<a name="l00419"></a>00419     } <span class="keywordflow">else</span> {
+<a name="l00420"></a>00420         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;No plugin found to write to: &quot;</span> &lt;&lt; path; <span class="comment">//@todo error message missing</span>
+<a name="l00421"></a>00421     }
 <a name="l00422"></a>00422 
-<a name="l00423"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2">00423</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">IOFactory::FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">IOFactory::getFormats</a>()
-<a name="l00424"></a>00424 {
-<a name="l00425"></a>00425     <span class="keywordflow">return</span> <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
-<a name="l00426"></a>00426 }
-<a name="l00427"></a>00427 
+<a name="l00423"></a>00423     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00424"></a>00424 }
+<a name="l00425"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">00425</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">IOFactory::setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt; feedback )
+<a name="l00426"></a>00426 {
+<a name="l00427"></a>00427     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;This = <span class="keyword">get</span>();
 <a name="l00428"></a>00428 
-<a name="l00429"></a>00429 }
-<a name="l00430"></a>00430 } <span class="comment">// namespaces data isis</span>
+<a name="l00429"></a>00429     <span class="keywordflow">if</span>( This.m_feedback )This.m_feedback-&gt;close();
+<a name="l00430"></a>00430 
+<a name="l00431"></a>00431     This.m_feedback = feedback;
+<a name="l00432"></a>00432 }
+<a name="l00433"></a>00433 
+<a name="l00434"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2">00434</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">IOFactory::FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">IOFactory::getFormats</a>()
+<a name="l00435"></a>00435 {
+<a name="l00436"></a>00436     <span class="keywordflow">return</span> <span class="keyword">get</span>().<a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
+<a name="l00437"></a>00437 }
+<a name="l00438"></a>00438 
+<a name="l00439"></a>00439 
+<a name="l00440"></a>00440 }
+<a name="l00441"></a>00441 } <span class="comment">// namespaces data isis</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

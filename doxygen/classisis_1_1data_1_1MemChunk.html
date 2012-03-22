@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.4.7 (api 0.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -23,7 +23,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -62,11 +61,8 @@ Inheritance diagram for isis::data::MemChunk&lt; TYPE &gt;:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1MemChunk.png" usemap="#isis::data::MemChunk&lt; TYPE &gt;_map" alt=""/>
   <map id="isis::data::MemChunk&lt; TYPE &gt;_map" name="isis::data::MemChunk&lt; TYPE &gt;_map">
-<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="316,112,622,136"/>
-<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="158,56,464,80"/>
-<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="474,56,780,80"/>
-<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="0,0,306,24"/>
-<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="316,0,622,24"/>
+<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="0,56,335,80"/>
+<area href="classisis_1_1util_1_1__internal_1_1GenericReference.html" alt="isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;" shape="rect" coords="0,0,335,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -77,7 +73,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunk.html#a8a14b33730742ac1f7dbf5c3798204da">MemChunk</a> (const T *const org, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> as copy of a given raw memory block This will create a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> of the given size and fill it with the data at the given address.  <a href="#a8a14b33730742ac1f7dbf5c3798204da"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunk.html#a091650e852746a55b14add69b4721f43">MemChunk</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref, const <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> &amp;scaling)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunk.html#a091650e852746a55b14add69b4721f43">MemChunk</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref, const scaling_pair &amp;scaling)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a>.  <a href="#a091650e852746a55b14add69b4721f43"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunk.html#acf3a698e1062c7b897f2d1cfb8a4626c">MemChunk</a> (const <a class="el" href="classisis_1_1data_1_1MemChunk.html">MemChunk</a>&lt; TYPE &gt; &amp;ref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1MemChunk.html#a19ce57cbc76c505bdb119695dd5a3d7b">MemChunk</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref)</td></tr>
@@ -93,7 +89,7 @@ Public Member Functions</h2></td></tr>
 
 <p><a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> class for memory-based buffers. </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00274">274</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00280">280</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a7ffd83e8f9b1898af1337c4ffc3cc8b0"></a><!-- doxytag: member="isis::data::MemChunk::MemChunk" ref="a7ffd83e8f9b1898af1337c4ffc3cc8b0" args="(size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)" -->
 <div class="memitem">
@@ -136,7 +132,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create an empty <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> with the given size. </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00278">278</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00284">284</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -200,7 +196,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00291">291</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00297">297</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -223,7 +219,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> (automatic conversion will be used if datatype does not fit) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00297">297</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00303">303</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +238,7 @@ template&lt;typename TYPE&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> &amp;&#160;</td>
+          <td class="paramtype">const scaling_pair &amp;&#160;</td>
           <td class="paramname"><em>scaling</em>&#160;</td>
         </tr>
         <tr>
@@ -264,7 +260,7 @@ template&lt;typename TYPE&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00307">307</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00313">313</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -285,7 +281,7 @@ template&lt;typename TYPE&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00311">311</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00317">317</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +307,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">isis::data::Chunk</a>.</p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00316">316</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00322">322</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +330,7 @@ template&lt;typename TYPE&gt; </div>
 
 <p>Create a deep copy of a given <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> (automatic conversion will be used if datatype does not fit) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00325">325</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00331">331</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -342,7 +338,7 @@ template&lt;typename TYPE&gt; </div>
 <li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="chunk_8hpp_source.html">chunk.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Feb 21 2012 18:41:48 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>
