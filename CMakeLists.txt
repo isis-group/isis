@@ -21,11 +21,6 @@ set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "5")
 set(ISIS_VERSION_PATCH "0")
 
-set(ISIS_VERSION_API "1.0.0")
-
-STRING( REGEX MATCH "^[0-9]+" ISIS_VERSION_SO ${ISIS_VERSION_API})
-
-
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
 add_definitions(-D_ISIS_VERSION_PATCH=${ISIS_VERSION_PATCH})
@@ -33,6 +28,15 @@ add_definitions(-D_ISIS_VERSION_PATCH=${ISIS_VERSION_PATCH})
 set(ISIS_VERSION
   ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
   CACHE INTERNAL "The current Version of the ISIS project")
+
+set(ISIS_CORE_VERSION_API "1.0.0")
+set(ISIS_QT_VERSION_API "0.0.0")
+STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
+STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
+
+
+
+
 
 if(NOT WIN32)
 ############################################################
@@ -156,11 +160,6 @@ option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" O
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
 option(ISIS_BUILD_PYTHON_EXT "Build the ISIS python extension. It provides access to the ISIS core image functions from python" OFF)
 
-############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)
-
 ###########################################################
 # CPack config
 ###########################################################
@@ -220,3 +219,9 @@ endif(ISIS_BUILD_PYTHON_EXT)
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
+
