@@ -53,8 +53,8 @@ if(ISIS_QT4)
   add_library(isisAdapter_qt4 SHARED  ${ISIS_QT4_LIBRARY_FILES} )
   set_target_properties(isisAdapter_qt4  PROPERTIES
 	      ${ISIS_BUILD_PROPERTIES}
-	      SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
-	      VERSION ${${CMAKE_PROJECT_NAME}_VERSION_API}
+	      SOVERSION ${ISIS_QT_VERSION_SO}
+	      VERSION ${ISIS_QT_VERSION_API}
 	      INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 	      OUTPUT_NAME "isisAdapter_qt4")
 
