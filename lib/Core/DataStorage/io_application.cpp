@@ -39,6 +39,10 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 	if ( have_output )
 		addOutput( parameters );
+
+	parameters["help-io"] = false;
+	parameters["help-io"].needed() = false;
+	parameters["help-io"].setDescription( "List all loaded IO plugins and their supported formats, exit after that" );
 }
 
 IOApplication::~IOApplication()
@@ -48,7 +52,9 @@ IOApplication::~IOApplication()
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
 {
-	if ( ! util::Application::init( argc, argv, exitOnError ) )
+	const bool ok = util::Application::init( argc, argv, exitOnError );
+
+	if ( !ok  )
 		return false;
 
 	if ( m_input ) {
@@ -134,9 +140,9 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 
 void IOApplication::printHelp( bool withHidden ) const
 {
-	util::Application::printHelp( withHidden );
-
-	if( withHidden ) {
+	if( !parameters["help-io"].isSet() ) { // if help-io was not set - print normal help
+		Application::printHelp( withHidden );
+	} else if( parameters["help-io"].as<bool>() ) { // if help-io was set to true
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
