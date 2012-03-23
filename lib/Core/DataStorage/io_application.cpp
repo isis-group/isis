@@ -72,7 +72,7 @@ void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, cons
 	parameters[std::string( "rdialect" )+suffix] = std::string();
 	parameters[std::string( "rdialect" )+suffix].needed() = false;
 	parameters[std::string( "rdialect" )+suffix].setDescription(
-		std::string( "choose dialect for reading" ) + desc + " . The available dialects depend on the capabilities of IO plugins" );
+		std::string( "choose dialect for reading" ) + desc + ". The available dialects depend on the capabilities of the used IO plugin" );
 
 	if( parameters.find( "np" ) == parameters.end() ) {
 		parameters["np"] = false;

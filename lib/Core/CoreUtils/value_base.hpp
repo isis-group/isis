@@ -107,7 +107,7 @@ public:
 	* If you know the type of source and destination at compile time you should use Value\<DEST_TYPE\>((SOURCE_TYPE)src).
 	* \code
 	* Value<std::string> mephisto("666");
-	* Value<int> devil((std::string)devil);
+	* Value<int> devil((std::string)mephisto);
 	* \endcode
 	* \return this value converted to the requested type if conversion was successfull.
 	*/

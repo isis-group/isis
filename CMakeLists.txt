@@ -18,8 +18,8 @@ project(ISIS)
 # set isis version number
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
-set(ISIS_VERSION_MINOR "4")
-set(ISIS_VERSION_PATCH "7")
+set(ISIS_VERSION_MINOR "5")
+set(ISIS_VERSION_PATCH "0")
 
 set(ISIS_VERSION_API "1.0.0")
 

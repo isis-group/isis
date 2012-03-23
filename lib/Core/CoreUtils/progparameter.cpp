@@ -24,12 +24,10 @@ namespace isis
 namespace util
 {
 
-ProgParameter::ProgParameter()
+ProgParameter::ProgParameter(): m_hidden( false ), m_set( false )
 {
 	needed() = true;
-	hidden() = false;
 }
-ProgParameter::ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ), m_hidden( false ) {}
 
 bool ProgParameter::isHidden() const
 {
