@@ -249,7 +249,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 
 	data::Chunk
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) ) ;
-	tmpChunk.convertToType( data::ValuePtr<ISISRepn>::staticID );
+	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	tmpChunk.setPropertyAs( "indexOrigin", util::fvector4( static_cast<float>( indexOrigin[0] ),
