@@ -148,6 +148,12 @@ int main( int argc, char *argv[] )
 	data::IOApplication::addInput( app.parameters, true, "1", " of the first image" );
 	data::IOApplication::addInput( app.parameters, true, "2", " of the second image" );
 
+	app.addExample( "-in1 orphaned_data/ -in2 /archive/archived.dataset/ -ignore DICOM/PatientID",
+					"Check if (and where) a \"found\" dataset differs from one in your archive ignoring different \"DICOM/PatientID\"s (in case you anonymize your archive)." );
+
+	app.addExample( "-in1 dicom_dataset:3 -in2 :4",
+					"Check for differences between the third and the fourth image found in a directory of DICOM files." );
+
 	if ( ! app.init( argc, argv ) ) return 1;
 
 	std::pair<std::string, int > in1, in2;

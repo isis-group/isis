@@ -40,9 +40,12 @@ int main( int argc, char *argv[] )
 	app.parameters["read_repn"].needed() = false;
 	app.parameters["read_repn"].setDescription( "data type of the raw file (if given, mode for reading raw is assumed)" );
 
-	app.parameters["rawdims"] = util::ivector4();
+	app.parameters["rawdims"] = util::ivector4( 0, 1, 1, 1 );
 	app.parameters["rawdims"].needed() = false;
-	app.parameters["rawdims"].setDescription( "the dimensions of the raw image (ignored when read_repn is not given)" );
+	app.parameters["rawdims"].setDescription( "the dimensions of the raw image, at least number of columns must be given (ignored when read_repn is not given)" );
+
+	app.addExample( "-in my_file.nii -out /tmp/raw.file -repn u8bit", "Write the image data of a nifti file in a u8bit raw file" );
+	app.addExample( "-in raw.file -read_repn s16bit -out new_image.nii -rawdims 384 384 12 -offset 500", "Read 384*384*12 s16bit blocks from a raw file skipping 500 bytes and store them as a nifti image." );
 
 	app.init( argc, argv, true ); // if there is a problem, we just get no images and exit cleanly
 
@@ -53,11 +56,12 @@ int main( int argc, char *argv[] )
 		LOG_IF( infiles.size() > 1, RawLog, warning ) << "Cannot read multiple raw files at once, will only read " << infiles.front();
 		data::FilePtr src( infiles.front() );
 		const unsigned short rrepn = app.parameters["read_repn"].as<util::Selection>();
-		LOG( RawLog, notice ) << "Reading " << ( src.getLength() - app.parameters["offset"].as<uint64_t>() ) / ( 1024.*1024. ) << " MBytes from " << infiles.front();
-		data::ValueArrayReference dat = src.atByID( rrepn, offset, 0, app.parameters["byteswap"] );
 		util::ivector4 dims = app.parameters["rawdims"];
+		data::ValueArrayReference dat;
 
 		if( dims.product() == 0 ) {
+			data::ValueArrayReference dat = src.atByID( rrepn, offset, 0, app.parameters["byteswap"] );
+
 			const size_t sidelength = sqrt( dat->getLength() );
 
 			if( sidelength *sidelength == dat->getLength() ) {
@@ -66,9 +70,13 @@ int main( int argc, char *argv[] )
 				dims[data::rowDim] = dims[data::columnDim] = sidelength;
 			} else {
 				LOG( RawLog, error ) << "No or invalid dimensions given in rawdims and datasize does not fit a squared 2D image, aborting...";
-				throw( std::logic_error( "Invalid dimensions" ) );
+				exit( -1 );
 			}
+		} else {
+			dat = src.atByID( rrepn, offset, dims.product(), app.parameters["byteswap"] );
 		}
+
+		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
 		data::Image out( data::Chunk( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true ) );
 		app.autowrite( out, true );

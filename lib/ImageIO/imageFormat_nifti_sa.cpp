@@ -913,6 +913,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
+	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform.html for qfac
 	util::dvector4 quaternion(
 		0,//a
 		props.getPropertyAs<double>( "nifti/quatern_b" ),
@@ -937,7 +938,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	const util::Matrix4x4<double> M(
 		util::fvector4( a * a + b * b - c * c - d * d, 2 * b * c - 2 * a * d, 2 * b * d + 2 * a * c ),
 		util::fvector4( 2 * b * c + 2 * a * d, a * a + c * c - b * b - d * d, 2 * c * d - 2 * a * b ),
-		util::fvector4( 2 * b * d - 2 * a * c, 2 * c * d + 2 * a * b, a * a + d * d - c * c - b * b )
+		util::fvector4( 2 * b * d - 2 * a * c, 2 * c * d + 2 * a * b, a * a + d * d - c * c - b * b )*props.getPropertyAs<float>( "nifti/qfac" )
 	);
 	const util::Matrix4x4<double> image2isis = nifti2isis.dot( M );
 

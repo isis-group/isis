@@ -31,8 +31,7 @@ set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
 # Build config
 ############################################################
 set(ISIS_BUILD_PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set(ISIS_BUILD_STATIC OFF CACHE BOOL "enable build of the static library. If OFF a dynamic library will be build and
-linked." )
+set(ISIS_BUILD_STATIC OFF CACHE BOOL "enable build of the static library. If OFF a dynamic library will be build and linked." )
 
 ############################################################
 # build core
@@ -51,8 +50,8 @@ macro( build_core name type)
 	target_link_libraries( ${name} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
     set_target_properties( ${name} PROPERTIES
 		${ISIS_BUILD_PROPERTIES}
-		SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
-		VERSION ${${CMAKE_PROJECT_NAME}_VERSION_API}
+		SOVERSION ${ISIS_CORE_VERSION_SO}
+		VERSION ${ISIS_CORE_VERSION_API}
 		INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 		OUTPUT_NAME "isis_core")
     set(target_list ${target_list} ${name})
