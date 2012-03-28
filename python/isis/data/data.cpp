@@ -159,14 +159,14 @@ BOOST_PYTHON_MODULE ( _data )
 	//#######################################################################################
 	//  IOFactory
 	//#######################################################################################
-	bool ( *_writeImage1 ) ( const isis::data::Image &, const std::string &, const isis::util::istring &, const isis::util::istring & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImage2 ) ( const isis::data::Image &, const std::string &, const isis::util::istring & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage1 ) ( const isis::data::Image &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage2 ) ( const isis::data::Image &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
 	bool ( *_writeImage3 ) ( const isis::data::Image &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages1 ) ( std::list<isis::data::Image> &, const std::string &, const isis::util::istring &, const isis::util::istring & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages2 ) ( std::list<isis::data::Image> &, const std::string &, const isis::util::istring & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages1 ) ( std::list<isis::data::Image> &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages2 ) ( std::list<isis::data::Image> &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
 	bool ( *_writeImages3 ) ( std::list<isis::data::Image> &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	std::list<isis::data::Image> ( *_loadImages1 ) ( const std::string &, const isis::util::istring &, const isis::util::istring & ) = isis::python::data::_IOFactory::_load;
-	std::list<isis::data::Image> ( *_loadImages2 ) ( const std::string &, const isis::util::istring & ) = isis::python::data::_IOFactory::_load;
+	std::list<isis::data::Image> ( *_loadImages1 ) ( const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
+	std::list<isis::data::Image> ( *_loadImages2 ) ( const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
 	std::list<isis::data::Image> ( *_loadImages3 ) ( const std::string & ) = isis::python::data::_IOFactory::_load;
 
 	class_< _IOFactory> ( "IOFactory", no_init )
