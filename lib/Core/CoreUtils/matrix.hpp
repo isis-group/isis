@@ -24,6 +24,7 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
+#include <boost/typeof/typeof.hpp>
 #include <iomanip>
 
 
@@ -36,6 +37,9 @@ template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typenam
 class FixedMatrix : public FixedVector<TYPE, ROWS *COLS, CONTAINER>
 {
 public:
+	template<typename A,typename B> struct result_of_mult{
+		typedef BOOST_TYPEOF_TPL(A() * B()) type;
+	};
 	static const size_t rows = ROWS;
 	static const size_t columns = COLS;
 
@@ -122,19 +126,20 @@ public:
 		}
 	}
 
-	template<typename TYPE2, size_t COLS2, typename CONTAINER2> FixedMatrix<TYPE2, COLS2, ROWS, CONTAINER2>
+	template<typename TYPE2, size_t COLS2, typename CONTAINER2> FixedMatrix<typename result_of_mult<TYPE,TYPE2>::type, COLS2, ROWS>
 	dot( const FixedMatrix<TYPE2, COLS2, COLS, CONTAINER2> &right )const {
 		// transpose the right, so we can use columns as rows
+		typedef typename result_of_mult<TYPE,TYPE2>::type result_type;
 		const FixedMatrix<TYPE2, COLS, COLS2, CONTAINER2> rightT = right.transpose();
 		const FixedMatrix<TYPE, COLS, ROWS, CONTAINER> &left = *this;
-		FixedMatrix<TYPE2, COLS2, ROWS, CONTAINER2> ret;
+		FixedMatrix<result_type, COLS2, ROWS> ret;
 
 		for( size_t c = 0; c < right.columns; c++ ) { //result has as much columns as right
 			const TYPE2 *rstart = &rightT.elem( 0, c );
 
 			for( size_t r = 0; r < left.rows; r++ ) { //result has as much rows as left
 				const TYPE *lstart = &left.elem( 0, r ), *lend = lstart + left.columns;
-				ret.elem( c, r ) = std::inner_product( lstart, lend, rstart, TYPE2() );
+				ret.elem( c, r ) = std::inner_product( lstart, lend, rstart, result_type() );
 			}
 		}
 
@@ -142,15 +147,16 @@ public:
 	}
 
 
-	template<typename TYPE2, typename CONTAINER2> FixedVector<TYPE2, COLS, CONTAINER2>
+	template<typename TYPE2, typename CONTAINER2> FixedVector<typename result_of_mult<TYPE,TYPE2>::type, COLS>
 	dot( const FixedVector<TYPE2, COLS, CONTAINER2> &right )const {
 		const FixedMatrix<TYPE, COLS, ROWS, CONTAINER> &left = *this;
-		FixedVector<TYPE2, ROWS, CONTAINER2> ret;
+		typedef typename result_of_mult<TYPE,TYPE2>::type result_type;
+		FixedVector<result_type, ROWS> ret;
 		const TYPE2 *rstart = &right[0];
 
 		for( size_t r = 0; r < rows; r++ ) { //result has as much rows as left
 			const TYPE *lstart = &elem( 0, r ), *lend = lstart + left.columns;
-			ret[r] = std::inner_product( lstart, lend, rstart, TYPE2() );
+			ret[r] = std::inner_product( lstart, lend, rstart, result_type() );
 		}
 
 		return ret;
