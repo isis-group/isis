@@ -11,7 +11,10 @@
 ############################################################
 # include ISIS core header files
 ############################################################
+find_package(PythonInterp)
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+
+set(PYTHON_VERSIONS ${PYTHON_EXECUTABLE} CACHE STRING "Python interpreters to install the python interace for")
 
 find_package(Boost REQUIRED COMPONENTS python)
 find_package(PythonLibs REQUIRED)
