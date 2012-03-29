@@ -1,3 +1,9 @@
+isis (0.5.1-2) UNRELEASED; urgency=low
+
+  * fix missing config.hpp in libisis-core-dev
+
+ -- Enrico Reimer <reimer@island.cbs.mpg.de>  Thu, 29 Mar 2012 16:06:39 +0200
+
 isis (0.5.1-1) UNRELEASED; urgency=low
 
   * fix python interface of IOFactory.load/write
