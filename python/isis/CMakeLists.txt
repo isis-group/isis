@@ -16,24 +16,16 @@
 #package install path in order to replace it with the cmake install prefix
 set(PYTHON_PACKAGE_PATH_PREFIX "/usr/")
 
-message(STATUS "Building python package for: ${PYTHON_VERSIONS}")
-
 foreach(pv ${PYTHON_VERSIONS})
-  execute_process ( COMMAND ${pv} -c "from distutils.sysconfig import get_python_lib; print get_python_lib().lstrip('${PYTHON_PACKAGE_PATH_PREFIX}')" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process ( COMMAND ${pv} -c "from distutils.sysconfig import get_python_lib; print get_python_lib().lstrip('${PYTHON_PACKAGE_PATH_PREFIX}')" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+	set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES}")
+	configure_file(__init__.py ${CMAKE_BINARY_DIR}/python/isis/__init__.py COPYONLY)
 
-
-set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES}")
-
-configure_file(__init__.py
-  ${CMAKE_BINARY_DIR}/python/isis/__init__.py COPYONLY)
-
-############################################################
-# installation
-############################################################
-message(STATUS 
-  "Installing python modules to ${PYTHON_INSTALL_PATH}") 
-install(FILES __init__.py
-  DESTINATION ${PYTHON_INSTALL_PATH}/isis)
+	############################################################
+	# installation
+	############################################################
+	message(STATUS "Installing python modules to ${PYTHON_INSTALL_PATH}")
+	install(FILES __init__.py DESTINATION ${PYTHON_INSTALL_PATH}/isis)
 endforeach(pv)
 
 add_subdirectory(core)
