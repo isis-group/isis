@@ -846,9 +846,9 @@ util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::Propert
 void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 {
 	// srow_? is the linear map from image space to nifti space (not isis space)
-	// [x_nii] [ nifti/srow_x ]   [i]
-	// [y_nii]=[ nifti/srow_y ] * [j]
-	// [z_nii] [ nifti/srow_z ]   [k]
+	// [x] [ nifti/srow_x ]   [i]
+	// [y]=[ nifti/srow_y ] * [j]
+	// [z] [ nifti/srow_z ]   [k]
 
 	LOG( Debug, info ) << "Using sform (" << props.propertyValue( "nifti/sform_code" ).toString() << ") " << util::MSubject(
 		props.propertyValue( "nifti/srow_x" ).toString() + "-" +
@@ -863,7 +863,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 		props.getPropertyAs<util::fvector4>( "nifti/srow_y" ),
 		props.getPropertyAs<util::fvector4>( "nifti/srow_z" )
 	);
-	util::Matrix4x4<float> image2isis = image2nifti.dot( nifti2isis ); // add transform to isis-space
+	util::Matrix4x4<float> image2isis = nifti2isis.dot( image2nifti ); // add transform to isis-space
 
 	//get position of image-voxel 0,0,0,0 in isis space
 	const util::fvector4 origin = image2isis.dot( util::fvector4( 0, 0, 0, 1 ) );
@@ -935,12 +935,12 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
 	<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
 
-	const util::Matrix4x4<double> image2nifti(
+	const util::Matrix4x4<double> M(
 		util::fvector4( a * a + b * b - c * c - d * d, 2 * b * c - 2 * a * d, 2 * b * d + 2 * a * c ),
 		util::fvector4( 2 * b * c + 2 * a * d, a * a + c * c - b * b - d * d, 2 * c * d - 2 * a * b ),
 		util::fvector4( 2 * b * d - 2 * a * c, 2 * c * d + 2 * a * b, a * a + d * d - c * c - b * b )*props.getPropertyAs<float>( "nifti/qfac" )
 	);
-	const util::Matrix4x4<double> image2isis =  image2nifti.dot( nifti2isis );
+	const util::Matrix4x4<double> image2isis = nifti2isis.dot( M );
 
 	props.setPropertyAs<util::fvector4>( "rowVec", image2isis.transpose().getRow( 0 ) );
 	props.setPropertyAs<util::fvector4>( "columnVec", image2isis.transpose().getRow( 1 ) );
