@@ -847,8 +847,8 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 {
 	// srow_? is the linear map from image space to nifti space (not isis space)
 	// [x_nii] [ nifti/srow_x ]   [i]
-	// [y_nii]=[ nifti/srow_y ] * [j]
-	// [z_nii] [ nifti/srow_z ]   [k]
+	// [x_nii]=[ nifti/srow_y ] * [j]
+	// [x_nii] [ nifti/srow_z ]   [k]
 
 	LOG( Debug, info ) << "Using sform (" << props.propertyValue( "nifti/sform_code" ).toString() << ") " << util::MSubject(
 		props.propertyValue( "nifti/srow_x" ).toString() + "-" +
@@ -863,7 +863,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 		props.getPropertyAs<util::fvector4>( "nifti/srow_y" ),
 		props.getPropertyAs<util::fvector4>( "nifti/srow_z" )
 	);
-	util::Matrix4x4<float> image2isis = image2nifti.dot( nifti2isis ); // add transform to isis-space
+	util::Matrix4x4<float> image2isis = nifti2isis.dot( image2nifti ); // add transform to isis-space
 
 	//get position of image-voxel 0,0,0,0 in isis space
 	const util::fvector4 origin = image2isis.dot( util::fvector4( 0, 0, 0, 1 ) );
@@ -912,7 +912,6 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	// orientation //////////////////////////////////////////////////////////////////////////////////
 	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
-	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform.html for qfac
 	util::dvector4 quaternion(
 		0,//a
@@ -930,17 +929,34 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	}
 
 	LOG( Debug, info )
-			<< "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
-	<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
-	<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
-	<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
+		<< "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
+		<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
+		<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
+		<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
+
+	const double a2 = a * a, b2 = b * b, c2 = c * c, d2 = d * d;
+	const double _2ab = 2 * a * b, _2ac = 2 * a * c, _2ad = 2 * a * d;
+	const double _2bc = 2 * b * c, _2bd = 2 * b * d;
+	const double _2cd = 2 * c * d;
+
+	const double r_11 = a2 + b2 - c2 - d2, r_12 = _2bc - _2ad,  r_13 = _2bd + _2ac;
+	const double r_21 = _2bc + _2ad,  r_22 = a2 - b2 + c2 - d2, r_23 = _2cd - _2ab;
+	const double r_31 = _2bd - _2ac,  r_32 = _2cd + _2ab,  r_33 = a2 - b2 - c2 + d2;
+	const int qfac = props.getPropertyAs<float>( "nifti/qfac" );
 
 	const util::Matrix4x4<double> image2nifti(
-		util::fvector4( a * a + b * b - c * c - d * d, 2 * b * c - 2 * a * d, 2 * b * d + 2 * a * c ),
-		util::fvector4( 2 * b * c + 2 * a * d, a * a + c * c - b * b - d * d, 2 * c * d - 2 * a * b ),
-		util::fvector4( 2 * b * d - 2 * a * c, 2 * c * d + 2 * a * b, a * a + d * d - c * c - b * b )*props.getPropertyAs<float>( "nifti/qfac" )
+		util::fvector4( r_11, r_12, r_13 * qfac ),
+		util::fvector4( r_21, r_22, r_23 * qfac ),
+		util::fvector4( r_31, r_32, r_33 * qfac )
 	);
-	const util::Matrix4x4<double> image2isis =  image2nifti.dot( nifti2isis );
+
+	LOG( Debug, info )
+		<< "The matrix made from the qform is "
+		<< util::fvector4( r_11, r_12, r_13 * qfac ) << "-"
+		<< util::fvector4( r_21, r_22, r_23 * qfac ) << "-"
+		<< util::fvector4( r_31, r_32, r_33 * qfac );
+
+	const util::Matrix4x4<double> image2isis = nifti2isis.dot( image2nifti );
 
 	props.setPropertyAs<util::fvector4>( "rowVec", image2isis.transpose().getRow( 0 ) );
 	props.setPropertyAs<util::fvector4>( "columnVec", image2isis.transpose().getRow( 1 ) );
