@@ -1,3 +1,10 @@
+isis (0.5.2-1) UNRELEASED; urgency=low
+  * get the qform=>matrix in nifti_sa right (hopefully)
+  * add some missing "BOOST_FILESYSTEM_VERSION 2"
+  * clean up linking a bit (less dpkg-shlibdeps whimper)
+
+ -- Enrico Reimer <enni@Yatima.Reimer>  Tue, 03 Apr 2012 18:36:36 +0200
+
 isis (0.5.1-2) UNRELEASED; urgency=low
 
   * fix missing config.hpp in libisis-core-dev
