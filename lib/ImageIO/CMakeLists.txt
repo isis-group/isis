@@ -203,7 +203,7 @@ endif(ISIS_IOPLUGIN_TAR)
 ############################################################
 if(ISIS_IOPLUGIN_FLIST)
 	add_library(isisImageFormat_flist SHARED imageFormat_flist.cpp)
-	target_link_libraries(isisImageFormat_flist isis_core ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+	target_link_libraries(isisImageFormat_flist isis_core)
 	set(TARGETS ${TARGETS} isisImageFormat_flist)
 endif(ISIS_IOPLUGIN_FLIST)
 
@@ -212,7 +212,7 @@ endif(ISIS_IOPLUGIN_FLIST)
 ############################################################
 if(ISIS_IOPLUGIN_PROCESS)
 	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
-	target_link_libraries(isisImageFormat_process isis_core ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+	target_link_libraries(isisImageFormat_process isis_core)
 	set(TARGETS ${TARGETS} isisImageFormat_process)
 endif(ISIS_IOPLUGIN_PROCESS)
 

@@ -912,7 +912,6 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	// orientation //////////////////////////////////////////////////////////////////////////////////
 	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
-	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform.html for qfac
 	util::dvector4 quaternion(
 		0,//a
