@@ -24,7 +24,7 @@ endif(ISIS_USE_LIBOIL)
 ############################################################
 # export library dependencies of isis_core
 ############################################################
-set(ISIS_LIB_DEPENDS ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} INTERNAL "Additional libraries to link when linking ISIS core")
+set(ISIS_LIB_DEPENDS ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} "Additional libraries to link when linking ISIS core")
 
 ############################################################
 # Build config
@@ -46,7 +46,7 @@ file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 ############################################################
 macro( build_core name type)
     add_library( ${name} ${type} ${CORE_SRC_FILES} )
-	target_link_libraries( ${name} LINK_PRIVATE ${CMAKE_DL_LIBS} ${LibOil_LIBRARY} LINK_PUBLIC ${Boost_LIBRARIES})
+	target_link_libraries( ${name} ${CMAKE_DL_LIBS} ${LibOil_LIBRARY} ${Boost_LIBRARIES})
     set_target_properties( ${name} PROPERTIES
 		${ISIS_BUILD_PROPERTIES}
 		SOVERSION ${ISIS_CORE_VERSION_SO}
