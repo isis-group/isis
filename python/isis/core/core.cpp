@@ -42,8 +42,8 @@ BOOST_PYTHON_MODULE( _core )
 	//#######################################################################################
 	using namespace isis::python::core::PropertyMap;
 	class_<isis::util::PropertyMap>( "PropertyMap", init<>() )
-	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
-	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
+	.def( "hasProperty", &_hasProperty )
+	.def( "hasBranch", &_hasBranch )
 	.def( "getBranch", &_branch )
 	//  .def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) ) //TODO adapt this to the new api
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
