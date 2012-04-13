@@ -56,7 +56,6 @@ struct PyObjectGenerator<false, boost::gregorian::date> : PyObjectGeneratorBase 
 	virtual api::object convert( util::ValueBase &value ) {
 		PyDateTime_IMPORT;
 		boost::gregorian::date date = value.as<boost::gregorian::date>();
-		std::cout << static_cast<int>( date.year() ) << std::endl;
 		return api::object( handle<>( borrowed( PyDate_FromDate( static_cast<int>( date.year() ),
 												static_cast<int>( date.month() ),
 												static_cast<int>( date.day() ) ) ) ) );
