@@ -35,6 +35,8 @@ void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::o
 
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );
 
+bool _hasProperty( const isis::util::PropertyMap &base, const std::string &key );
+bool _hasBranch( const isis::util::PropertyMap &base, const std::string &key );
 
 isis::util::PropertyMap _branch( const isis::util::PropertyMap &base, const std::string &key );
 

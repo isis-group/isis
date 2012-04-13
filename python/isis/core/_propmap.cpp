@@ -24,9 +24,21 @@ void _setProperty( util::PropertyMap &base, const std::string &key, boost::pytho
 
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key )
 {
-	return util::Singletons::get<_internal::TypesMap, 10>().at(
-			   base.propertyValue( key.c_str() ).getTypeID() )->convert( *base.propertyValue( key.c_str() ) );
+	const util::PropertyValue &value= base.propertyValue( key.c_str() );
+	if(value.isEmpty())
+		return api::object();
+	else 
+		return util::Singletons::get<_internal::TypesMap, 10>()[value.getTypeID()]->convert( *value );
+}
 
+bool _hasProperty( const isis::util::PropertyMap &base, const std::string &key )
+{
+	return base.hasProperty( key.c_str() );
+}
+
+bool _hasBranch( const isis::util::PropertyMap &base, const std::string &key )
+{
+	return base.hasBranch( key.c_str() );
 }
 
 util::PropertyMap _branch( const isis::util::PropertyMap &base, const std::string &key )
