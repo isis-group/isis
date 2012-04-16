@@ -21,14 +21,14 @@ add_executable( selectionTest selectionTest.cpp )
 add_executable( commonTest commonTest.cpp )
 add_executable( istringTest istringTest.cpp )
 
-target_link_libraries( commonTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
-target_link_libraries( propertyTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( valueTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( vectorTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( propMapTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( singletonTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( selectionTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
-target_link_libraries( istringTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
+target_link_libraries( commonTest ${Boost_LIBRARIES} isis_core )
+target_link_libraries( propertyTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( valueTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( vectorTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( propMapTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( singletonTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( selectionTest ${Boost_LIBRARIES} isis_core)
+target_link_libraries( istringTest ${Boost_LIBRARIES} isis_core)
 
 ############################################################
 # add ctest targets

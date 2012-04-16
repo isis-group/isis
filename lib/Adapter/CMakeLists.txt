@@ -58,7 +58,7 @@ if(ISIS_QT4)
 	      INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 	      OUTPUT_NAME "isisAdapter_qt4")
 
-  target_link_libraries(isisAdapter_qt4 isis_core ${ISIS_LIB_DEPENDS} ${QT_LIBRARIES} ${CMAKE_C_STANDARD_LIBRARIES})
+  target_link_libraries(isisAdapter_qt4 isis_core ${QT_LIBRARIES} ${CMAKE_C_STANDARD_LIBRARIES})
 
   # configure install destination
   install (TARGETS isisAdapter_qt4

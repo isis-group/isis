@@ -1,3 +1,35 @@
+isis (0.5.3-1) UNRELEASED; urgency=low
+
+  * in the Python interface remove a stray debugging ouput in getProperty
+  * in the Python interface make getProperty return time if a stored timestamp only consists of a time-part
+  * in the Python interface make getProperty return an empty object if requested property is not set (instead of crashing)
+  * fix python interface of hasProperty and hasBranch
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Sat, 14 Apr 2012 00:59:48 +0200
+
+isis (0.5.2-1) UNRELEASED; urgency=low
+
+  * get the qform=>matrix in nifti_sa right (hopefully)
+  * add some missing "BOOST_FILESYSTEM_VERSION 2"
+  * clean up linking a bit (less dpkg-shlibdeps whimper)
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Tue, 03 Apr 2012 18:36:36 +0200
+
+isis (0.5.1-2) UNRELEASED; urgency=low
+
+  * fix missing config.hpp in libisis-core-dev
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Thu, 29 Mar 2012 16:06:39 +0200
+
+isis (0.5.1-1) UNRELEASED; urgency=low
+
+  * fix python interface of IOFactory.load/write
+  * enable detection of python interpreters outside of debuild
+  * automatically determine the result type of FixedMatrix::dot
+  * fix logic bug in reading nifti geometries
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Thu, 29 Mar 2012 11:22:05 +0200
+
 isis (0.5.0-1) UNRELEASED; urgency=low
 
   * minor performance improvements and cleanup
@@ -35,7 +67,7 @@ isis (0.5.0-1) UNRELEASED; urgency=low
   * rename ValuePtr to ValueArray
   * rename type.{ch}pp files to value.{ch}pp
 
- -- Enrico Reimer <reimer@island.cbs.mpg.de>  Thu, 15 Mar 2012 11:39:54 +0100
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Thu, 15 Mar 2012 11:39:54 +0100
 
 isis (0.4.7-1) UNRELEASED; urgency=low
 

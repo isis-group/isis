@@ -19,7 +19,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "5")
-set(ISIS_VERSION_PATCH "0")
+set(ISIS_VERSION_PATCH "3")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -33,8 +33,6 @@ set(ISIS_CORE_VERSION_API "1.0.0")
 set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
-
-
 
 
 
