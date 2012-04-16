@@ -1,11 +1,13 @@
 isis (0.5.3-1) UNRELEASED; urgency=low
 
-  * in the Python interface remove a stray debugging ouput in getProperty
-  * in the Python interface make getProperty return time if a stored timestamp only consists of a time-part
-  * in the Python interface make getProperty return an empty object if requested property is not set (instead of crashing)
+  * in the Python interface remove a stray debugging output in getProperty
+  * in the Python interface make getProperty return time if a stored timestamp 
+    only consists of a time-part
+  * in the Python interface make getProperty return an empty object if requested
+    property is not set (instead of crashing)
   * fix python interface of hasProperty and hasBranch
 
- -- Enrico Reimer <reimer@cbs.mpg.de>  Sat, 14 Apr 2012 00:59:48 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Sat, 14 Apr 2012 00:59:48 +0200
 
 isis (0.5.2-1) UNRELEASED; urgency=low
 
