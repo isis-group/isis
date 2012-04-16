@@ -24,7 +24,7 @@ endif(ISIS_USE_LIBOIL)
 ############################################################
 # export library dependencies of isis_core
 ############################################################
-set(ISIS_LIB_DEPENDS ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} "Additional libraries to link when linking ISIS core")
+set(ISIS_LIB_DEPENDS ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 
 ############################################################
 # Build config
