@@ -175,25 +175,42 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		dicomTree.rename( "SiemensNumberOfImagesInMosaic", "SliceOrientation" );
 	}
 
-	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
-	if ( hasOrTell( prefix + "SeriesTime", object, warning ) && hasOrTell( prefix + "SeriesDate", object, warning ) ) {
-		const ptime sequenceStart = genTimeStamp( dicomTree.getPropertyAs<date>( "SeriesDate" ), dicomTree.getPropertyAs<ptime>( "SeriesTime" ) );
+	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
+	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
+		ptime sequenceStart = dicomTree.getPropertyAs<ptime>( "SeriesTime" );
+		dicomTree.remove( "SeriesTime" );
+
+		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
+		BOOST_FOREACH( const char * d, dates ) {
+			if( dicomTree.hasProperty( d ) ) {
+				sequenceStart = genTimeStamp( dicomTree.getPropertyAs<date>( d ), sequenceStart );
+				dicomTree.remove( d );
+				break;
+			}
+		}
 
 		// compute acquisitionTime
-		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
-			const ptime acTime = genTimeStamp( dicomTree.getPropertyAs<date>( "AcquisitionDate" ), dicomTree.getPropertyAs<ptime>( "AcquisitionTime" ) );
+		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
+			ptime acTime = dicomTree.getPropertyAs<ptime>( "AcquisitionTime" );
+			dicomTree.remove( "AcquisitionTime" );
+
+			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
+			BOOST_FOREACH( const char * d, dates ) {
+				if( dicomTree.hasProperty( d ) ) {
+					acTime = genTimeStamp( dicomTree.getPropertyAs<date>( d ), acTime );
+					dicomTree.remove( d );
+					break;
+				}
+			}
+
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
 			object.setPropertyAs( "acquisitionTime", fAcDist );
-			dicomTree.remove( "AcquisitionTime" );
-			dicomTree.remove( "AcquisitionDate" );
 		}
 
 		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
 		object.setPropertyAs( "sequenceStart", sequenceStart );
-		dicomTree.remove( "SeriesTime" );
-		dicomTree.remove( "SeriesDate" );
 	}
 
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
@@ -435,6 +452,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
 		acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
+	} else {
+		LOG_IF( haveAcqTimeList, Runtime, warning ) << " decomposing acquisition time offsets of a mosaic having no acquisition time, this will cause each mosaic to be detected as a separate image";
 	}
 
 	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
