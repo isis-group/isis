@@ -24,10 +24,11 @@ void _setProperty( util::PropertyMap &base, const std::string &key, boost::pytho
 
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key )
 {
-	const util::PropertyValue &value= base.propertyValue( key.c_str() );
-	if(value.isEmpty())
+	const util::PropertyValue &value = base.propertyValue( key.c_str() );
+
+	if( value.isEmpty() )
 		return api::object();
-	else 
+	else
 		return util::Singletons::get<_internal::TypesMap, 10>()[value.getTypeID()]->convert( *value );
 }
 
