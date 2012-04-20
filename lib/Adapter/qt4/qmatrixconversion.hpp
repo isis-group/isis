@@ -30,8 +30,12 @@
 #define ISIS_QMATRIXCONVERSION_HPP
 
 #include <QMatrix>
-#include <QMatrix4x4>
 #include <CoreUtils/matrix.hpp>
+
+#if QT_VERSION >= 0x040600
+#include <QMatrix4x4>
+#endif
+
 
 namespace isis
 {
@@ -41,8 +45,10 @@ namespace qt4
 isis::util::FixedMatrix<qreal, 2, 2> QMatrix2FixedMatrix2x2( const QMatrix &matrix );
 QMatrix FixedMatrix2QMatrix2x2( const util::FixedMatrix<qreal, 2, 2> &matrix );
 
+#if QT_VERSION >= 0x040600
 isis::util::Matrix4x4<qreal> QMatrix2FixedMatrix4x4( const QMatrix4x4 &matrix );
 QMatrix4x4 FixedMatrix2QMatrix4x4( const util::Matrix4x4<qreal> &matrix );
+#endif
 
 template<typename TYPE, unsigned int COLUMN, unsigned int ROW>
 isis::util::FixedMatrix<TYPE, COLUMN, ROW> QMatrix2FixedMatrix( const QGenericMatrix<ROW, COLUMN, TYPE> &matrix )
