@@ -50,6 +50,8 @@ util::FixedMatrix< qreal, 2, 2 > QMatrix2FixedMatrix2x2 ( const QMatrix &matrix 
 	return ret;
 }
 
+#if QT_VERSION >= 0x040600
+
 QMatrix4x4 FixedMatrix2QMatrix4x4 ( const util::Matrix4x4< qreal >& matrix )
 {
 	QMatrix4x4 ret( matrix.elem( 0, 0 ), matrix.elem( 1, 0 ), matrix.elem( 2, 0 ), matrix.elem( 3, 0 ),
@@ -73,6 +75,7 @@ util::Matrix4x4< qreal > QMatrix2FixedMatrix4x4 ( const QMatrix4x4 &matrix )
 	return ret;
 }
 
+#endif
 
 
 
