@@ -115,20 +115,6 @@ BOOST_PYTHON_MODULE ( _data )
 	.def ( "__iter__", iterator<isis::data::Image>() )
 	;
 	//#######################################################################################
-	//  ImageList
-	//#######################################################################################
-	typedef std::list<isis::data::Image> IList;
-	class_< IList > ( "ImageList", init<IList>() )
-	.def ( init<>() )
-	.def ( "__len__", &IList::size )
-	.def ( "clear", &IList::clear )
-	.def ( "append", &std_list<IList>::add, with_custodian_and_ward<1, 2>() )
-	.def ( "__getitem__", &std_list<IList>::get, return_value_policy<copy_non_const_reference>() )
-	.def ( "__setitem__", &std_list<IList>::set, with_custodian_and_ward<1, 2>() )
-	.def ( "__delitem__", &std_list<IList>::del )
-	.def ( "__iter__", iterator< std::list< isis::data::Image > > () )
-	;
-	//#######################################################################################
 	//  Chunk
 	//#######################################################################################
 	class_<isis::data::Chunk, _Chunk, bases< isis::data::_internal::NDimensional<4>, isis::util::PropertyMap> > ( "Chunk", init<_Chunk>() )
@@ -142,32 +128,17 @@ BOOST_PYTHON_MODULE ( _data )
 	.def ( "convertToType", ( bool ( ::_Chunk:: * ) ( const unsigned short, float, size_t ) ) ( &_Chunk::_convertToType ), ( arg ( "ID" ), arg ( "scaling" ), arg ( "offset" ) ) )
 	;
 	//#######################################################################################
-	//  ChunkList
-	//#######################################################################################
-	typedef std::list<isis::data::Chunk> CList;
-	class_< CList > ( "ChunkList", init<CList>() )
-	.def ( init<>() )
-	.def ( "__len__", &CList::size )
-	.def ( "clear", &CList::clear )
-	.def ( "append", &std_list<CList>::add, with_custodian_and_ward<1, 2>() )
-	.def ( "__getitem__", &std_list<CList>::get, return_value_policy<copy_non_const_reference>() )
-	.def ( "__setitem__", &std_list<CList>::set, with_custodian_and_ward<1, 2>() )
-	.def ( "__delitem__", &std_list<CList>::del )
-	.def ( "__iter__", iterator<std::list< isis::data::Chunk> > () )
-
-	;
-	//#######################################################################################
 	//  IOFactory
 	//#######################################################################################
 	bool ( *_writeImage1 ) ( const isis::data::Image &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
 	bool ( *_writeImage2 ) ( const isis::data::Image &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
 	bool ( *_writeImage3 ) ( const isis::data::Image &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages1 ) ( std::list<isis::data::Image> &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages2 ) ( std::list<isis::data::Image> &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages3 ) ( std::list<isis::data::Image> &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	std::list<isis::data::Image> ( *_loadImages1 ) ( const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
-	std::list<isis::data::Image> ( *_loadImages2 ) ( const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
-	std::list<isis::data::Image> ( *_loadImages3 ) ( const std::string & ) = isis::python::data::_IOFactory::_load;
+	bool ( *_writeImages1 ) ( const list &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages2 ) ( const list &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages3 ) ( const list &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	list ( *_loadImages1 ) ( const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
+	list ( *_loadImages2 ) ( const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
+	list ( *_loadImages3 ) ( const std::string & ) = isis::python::data::_IOFactory::_load;
 
 	class_< _IOFactory> ( "IOFactory", no_init )
 	.def ( "write", _writeImage1, ( arg ( "image" ), arg ( "path" ), arg ( "suffix_override" ), arg ( "dialect" ) ) )

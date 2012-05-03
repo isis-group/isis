@@ -24,14 +24,9 @@ _Image::_Image ( PyObject *p, const isis::data::Image &base )
 	: Image ( base ), boost::python::wrapper< Image >(), self ( p )
 {}
 
-std::list< Chunk > _Image::_getChunksAsVector ( void )
+list _Image::_getChunksAsVector ( void )
 {
-	std::list<Chunk> retChunkList;
-	std::vector<Chunk>  chunkList ( copyChunksToVector() );
-	BOOST_FOREACH ( std::vector<Chunk> ::reference ref, chunkList ) {
-		retChunkList.push_back ( ref );
-	}
-	return retChunkList;
+	return _internal::stdIter2PyList<std::vector<Chunk> >(copyChunksToVector());
 }
 
 Chunk _Image::_getChunkAs ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const std::string &type )

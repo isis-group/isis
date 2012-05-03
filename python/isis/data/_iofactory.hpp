@@ -11,6 +11,7 @@
 #include <DataStorage/io_factory.hpp>
 #include <DataStorage/io_interface.h>
 #include <boost/python.hpp>
+#include "common.hpp"
 
 struct stat;
 using namespace isis::data;
@@ -28,15 +29,15 @@ public:
 	_IOFactory( PyObject *p ) : self( p ) {}
 	_IOFactory() {}
 
-	static std::list<Image> _load ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
-		return IOFactory::load( path, suffix_override.c_str(), dialect.c_str() );
+	static boost::python::list _load ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path, suffix_override.c_str(), dialect.c_str() ));
 	}
-	static std::list<Image> _load ( const std::string &path, const std::string &suffix_override ) {
-		return IOFactory::load( path, suffix_override.c_str() );
+	static boost::python::list _load ( const std::string &path, const std::string &suffix_override ) {
+		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path, suffix_override.c_str() ) );
 	}
 
-	static std::list<Image> _load ( const std::string &path ) {
-		return IOFactory::load( path );
+	static boost::python::list _load ( const std::string &path ) {
+		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path ) );
 	}
 
 	static bool _write( const isis::data::Image &image, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
@@ -49,15 +50,15 @@ public:
 	static bool _write( const isis::data::Image &image, const std::string &path ) {
 		return IOFactory::write( image, path, "", "" );
 	}
-	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
-		return IOFactory::write( images, path, suffix_override.c_str(), dialect.c_str() );
+	static bool _write( const boost::python::list &images, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+		return IOFactory::write( _internal::pyList2StdList<Image>( images ), path, suffix_override.c_str(), dialect.c_str() );
 	}
 
-	static bool _write( std::list<isis::data::Image> &images, const std::string &path, const std::string &suffix_override ) {
-		return IOFactory::write( images, path, suffix_override.c_str(), "" );
+	static bool _write( const boost::python::list &images, const std::string &path, const std::string &suffix_override ) {
+		return IOFactory::write( _internal::pyList2StdList<Image>( images ), path, suffix_override.c_str(), "" );
 	}
-	static bool _write( std::list<isis::data::Image> &images, const std::string &path ) {
-		return IOFactory::write( images, path, "", "" );
+	static bool _write( const boost::python::list &images, const std::string &path ) {
+		return IOFactory::write( _internal::pyList2StdList<Image>( images ), path, "", "" );
 	}
 
 	static boost::python::list _getFormats() {
