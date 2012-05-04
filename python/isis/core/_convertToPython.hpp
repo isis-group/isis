@@ -70,28 +70,29 @@ struct  PyObjectGenerator<false, boost::posix_time::ptime> : PyObjectGeneratorBa
 	virtual api::object convert( util::ValueBase &value ) {
 		PyDateTime_IMPORT;
 		const boost::posix_time::ptime datetime = value.as<boost::posix_time::ptime>();
-		const boost::posix_time::ptime min(boost::gregorian::min_date_time);
-		if(datetime.date()!=min.date()){ // if our timestamp actually has a date different from min
+		const boost::posix_time::ptime min( boost::gregorian::min_date_time );
+
+		if( datetime.date() != min.date() ) { // if our timestamp actually has a date different from min
 			return api::object(
-				handle<>( borrowed( PyDateTime_FromDateAndTime(
-					static_cast<int>(datetime.date().year() ),
-					static_cast<int>( datetime.date().month() ),
-					static_cast<int>( datetime.date().day() ),
-					static_cast<int>( datetime.time_of_day().hours() ),
-					static_cast<int>( datetime.time_of_day().minutes() ),
-					static_cast<int>( datetime.time_of_day().seconds() ),
-					static_cast<int>( datetime.time_of_day().total_milliseconds() )
-				)))
-			);
+					   handle<>( borrowed( PyDateTime_FromDateAndTime(
+											   static_cast<int>( datetime.date().year() ),
+											   static_cast<int>( datetime.date().month() ),
+											   static_cast<int>( datetime.date().day() ),
+											   static_cast<int>( datetime.time_of_day().hours() ),
+											   static_cast<int>( datetime.time_of_day().minutes() ),
+											   static_cast<int>( datetime.time_of_day().seconds() ),
+											   static_cast<int>( datetime.time_of_day().total_milliseconds() )
+										   ) ) )
+				   );
 		} else {
 			return api::object(
-				handle<>( borrowed( PyTime_FromTime(
-					static_cast<int>( datetime.time_of_day().hours() ),
-					static_cast<int>( datetime.time_of_day().minutes() ),
-					static_cast<int>( datetime.time_of_day().seconds() ),
-					static_cast<int>( datetime.time_of_day().total_milliseconds() )
-				)))
-			);
+					   handle<>( borrowed( PyTime_FromTime(
+											   static_cast<int>( datetime.time_of_day().hours() ),
+											   static_cast<int>( datetime.time_of_day().minutes() ),
+											   static_cast<int>( datetime.time_of_day().seconds() ),
+											   static_cast<int>( datetime.time_of_day().total_milliseconds() )
+										   ) ) )
+				   );
 		}
 	}
 };

@@ -36,6 +36,7 @@
 //SYSTEM INCLUDES
 #include <nifti1_io.h>
 #include <string>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>

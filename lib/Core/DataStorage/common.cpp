@@ -150,7 +150,7 @@ boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sour
 		return sources.front();
 	else {
 		BOOST_FOREACH( boost::filesystem::path & ref, sources )
-		ref.remove_filename();
+		ref.remove_leaf();//@todo switch to ref.remove_filename() as soon as we drop support for boost < 1.44
 		return getCommonSource( sources );
 	}
 }
