@@ -109,6 +109,24 @@ struct VoxelOp {
 
 };
 
+template <typename TYPE>
+list stdIter2PyList( const TYPE &stdList ) {
+	list retList;
+	BOOST_FOREACH( const typename TYPE::const_reference listItem, stdList ) {
+		retList.append( listItem );
+	}
+	return retList;
+}
+
+template <typename TYPE>
+std::list<TYPE> pyList2StdList( const list &pyList ) {
+	 std::list<TYPE> retList;
+	 for( unsigned short i = 0; i < boost::python::len( pyList ); i++ ) {
+		retList.push_back( extract<TYPE>( pyList[i] ) );
+	 }
+	 return retList;
+}
+
 }
 }
 } //namespace python

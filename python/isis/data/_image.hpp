@@ -71,7 +71,7 @@ public:
 		return _setVoxel ( coord[0], coord[1], coord[2], coord[3], value );
 	}
 
-	std::list<Chunk> _getChunksAsVector ( void );
+	list _getChunksAsVector ( void );
 
 	const isis::util::ivector4 _getSizeAsVector( ) {
 		return this->getSizeAsVector();
