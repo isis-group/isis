@@ -19,17 +19,7 @@
 #ifndef VISTASAPARSER_HPP
 #define VISTASAPARSER_HPP
 
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/variant/recursive_variant.hpp>
-#include <boost/foreach.hpp>
-
-#include "DataStorage/fileptr.hpp"
+#include "DataStorage/valuearray.hpp"
 
 namespace isis
 {
@@ -38,77 +28,10 @@ namespace image_io
 namespace _internal
 {
 
-namespace fusion = boost::fusion;
-namespace phoenix = boost::phoenix;
-namespace qi = boost::spirit::qi;
-namespace ascii = boost::spirit::ascii;
-
-
-struct VistaHeader
-
-{
-
-};
-
-
-template<typename Iterator>
-struct vista_header_grammer : qi::grammar<Iterator, VistaHeader(), ascii::space_type > {
-
-	vista_header_grammer() : vista_header_grammer::base_type ( vista_header ) {
-	using qi::lit;
-	using qi::lexeme;
-	using ascii::char_;
-	using ascii::string;
-	using namespace qi::labels;
-
-	using phoenix::at_c;
-	using phoenix::push_back;
-
-	start_tag = lit ( "V-data 2 {" );
-
-}
-qi::rule<Iterator, VistaHeader(), ascii::space_type > vista_header;
-qi::rule<Iterator, std::string, ascii::space_type> start_tag;
-qi::rule<Iterator, void ( std::string ), ascii::space_type> end_tag;
-};
-
-
-
-
-
-
-struct VistaObject {
-	data::ValueArrayReference data;
-};
-
-class VistaSaParser
-{
-public:
-
-	VistaSaParser ( data::FilePtr fPtr );
-	typedef boost::shared_ptr< VistaHeader > HeaderType;
-	typedef std::list< HeaderType > HeaderListType;
-	typedef std::list< std::pair< HeaderType, VistaObject > > HeaderObjectListType;
-
-	HeaderObjectListType getHeaderObjectMap();
-
-
-private:
-	HeaderListType parseHeader( );
-
-	data::FilePtr m_filePtr;
-	HeaderListType m_vheader;
-
-
-
-
-};
-
-
-}
+bool parse_vista( data::ValueArray< uint8_t >::iterator &first, data::ValueArray< uint8_t >::iterator last, isis::util::PropertyMap &vista_map, std::list<isis::util::PropertyMap> &ch_list );
 
 
 }
 }
-
+}
 #endif // VISTASAPARSER_HPP

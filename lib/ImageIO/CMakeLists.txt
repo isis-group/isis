@@ -18,6 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
@@ -59,6 +60,13 @@ endif(ISIS_IOPLUGIN_NIFTI_SA)
 ############################################################
 # vista
 ############################################################
+
+if(ISIS_IOPLUGIN_VISTA_SA)
+	add_library(isisImageFormat_Vista_sa SHARED Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp)
+	target_link_libraries(isisImageFormat_Vista_sa isis_core )
+	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
+endif(ISIS_IOPLUGIN_VISTA_SA)
+
 if(ISIS_IOPLUGIN_VISTA)
   # This code snipped was taken from the lipsia source package.
 

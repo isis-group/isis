@@ -19,6 +19,7 @@
 #define IMAGEFORMAT_VISTA_SA_HPP
 
 #include <DataStorage/io_interface.h>
+#include "DataStorage/fileptr.hpp"
 
 #include "VistaSaParser.hpp"
 
@@ -30,20 +31,21 @@ namespace image_io
 
 class ImageFormat_VistaSa: public FileFormat
 {
+private:
+	typedef isis::data::ValueArrayReference ( *readerPtr )( isis::data::FilePtr data, size_t offset, size_t size );
+	std::map<isis::util::istring, readerPtr> vista2isis;
 
+	data::Chunk makeChunk( data::FilePtr data, data::FilePtr::iterator data_start, const util::PropertyMap &props, uint32_t acqNum );
 public:
 	ImageFormat_VistaSa();
-	std::string getName()const;
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & );
+	std::string getName()const {return "Vista standalone";}
+	int load ( std::list< isis::data::Chunk >& chunks, const std::string &filename, const isis::util::istring &dialect ) throw ( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
+	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
 
 protected:
-	util::istring suffixes( io_modes mode = both )const;
-
-	boost::shared_ptr< _internal::VistaHeader> m_vheader;
-
+	util::istring suffixes( io_modes /*mode = both */ )const {return ".v";}
 };
 
 }
