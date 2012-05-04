@@ -22,7 +22,9 @@
 
 #include <QApplication>
 #include <QMatrix>
+#if QT_VERSION >= 0x040600
 #include <QMatrix4x4>
+#endif
 
 #include <CoreUtils/application.hpp>
 #include <CoreUtils/matrix.hpp>

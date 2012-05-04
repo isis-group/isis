@@ -98,7 +98,6 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 			return fetchEntry( rootRef[*at].getBranch(), next, pathEnd ); // and continue there
 		}
 	} else { //if its the leaf
-		LOG_IF( rootRef.find( *at ) == rootRef.end() , Debug, verbose_info ) << "Creating an empty entry " << *at << " trough fetching";
 		return rootRef[*at]; // (create and) return that entry
 	}
 }

@@ -77,7 +77,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
 	bool err = false;
-	m_filename = boost::filesystem::path( argv[0] ).filename();
+	m_filename = boost::filesystem::path( argv[0] ).leaf();//@todo switch to filename() as soon as we drop support for boost < 1.44
 
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {

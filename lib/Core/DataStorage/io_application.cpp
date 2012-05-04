@@ -101,7 +101,7 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 
 	parameters[std::string( "wdialect" )+suffix] = std::string();
 	parameters[std::string( "wdialect" )+suffix].needed() = false;
-	parameters[std::string( "wdialect" )+suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help\" for a list of the plugins and their supported dialects" );
+	parameters[std::string( "wdialect" )+suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help-io\" for a list of the plugins and their supported dialects" );
 	std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 	// remove some types which are useless as representation
 	// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
