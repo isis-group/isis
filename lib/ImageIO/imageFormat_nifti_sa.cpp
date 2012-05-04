@@ -378,8 +378,7 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 		);
 		props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
 
-		LOG( Runtime, info )
-				<< "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
+		LOG( Runtime, info ) << "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
 		<< ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
 		<< " from SPM8 description.";
 
@@ -696,12 +695,10 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 			data_src = mfile.atByID( type, header->vox_offset, size.product(), swap_endian );
 
 			if( swap_endian ) {
-				LOG( Runtime, info )
-						<< "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
+				LOG( Runtime, info ) << "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
 				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
 			} else {
-				LOG( Runtime, info )
-						<< "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
+				LOG( Runtime, info ) << "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
 				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
 			}
 
@@ -897,8 +894,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 	props.setPropertyAs<util::fvector4>( "columnVec", image2isis.transpose().getRow( 1 ) );
 	props.setPropertyAs<util::fvector4>( "sliceVec", image2isis.transpose().getRow( 2 ) );
 
-	LOG( Debug, info )
-			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
+	LOG( Debug, info ) << "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
 	<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
 	<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from sform";
 
@@ -928,11 +924,10 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
 	}
 
-	LOG( Debug, info )
-		<< "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
-		<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
-		<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
-		<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
+	LOG( Debug, info ) << "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
+	<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
+	<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
+	<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
 
 	const double a2 = a * a, b2 = b * b, c2 = c * c, d2 = d * d;
 	const double _2ab = 2 * a * b, _2ac = 2 * a * c, _2ad = 2 * a * d;
@@ -950,11 +945,10 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 		util::fvector4( r_31, r_32, r_33 * qfac )
 	);
 
-	LOG( Debug, info )
-		<< "The matrix made from the qform is "
-		<< util::fvector4( r_11, r_12, r_13 * qfac ) << "-"
-		<< util::fvector4( r_21, r_22, r_23 * qfac ) << "-"
-		<< util::fvector4( r_31, r_32, r_33 * qfac );
+	LOG( Debug, info ) << "The matrix made from the qform is "
+	<< util::fvector4( r_11, r_12, r_13 * qfac ) << "-"
+	<< util::fvector4( r_21, r_22, r_23 * qfac ) << "-"
+	<< util::fvector4( r_31, r_32, r_33 * qfac );
 
 	const util::Matrix4x4<double> image2isis = nifti2isis.dot( image2nifti );
 
@@ -962,8 +956,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	props.setPropertyAs<util::fvector4>( "columnVec", image2isis.transpose().getRow( 1 ) );
 	props.setPropertyAs<util::fvector4>( "sliceVec", image2isis.transpose().getRow( 2 ) );
 
-	LOG( Debug, info )
-			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
+	LOG( Debug, info ) << "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
 	<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
 	<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from qform";
 

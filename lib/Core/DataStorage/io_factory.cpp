@@ -283,7 +283,7 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 	}
 
 	if( dialect.empty() ) {
-		LOG( Debug, info ) << "No dialect given. Will use all " << ret.size() << " plugins";
+		LOG_IF( ret.size() > 1, Debug, info ) << "No dialect given. Will use all " << ret.size() << " plugins";
 	} else {//remove everything which lacks the dialect if there was some given
 		remove_op.dialect = dialect;
 		remove_op.filename = filename;
