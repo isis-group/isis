@@ -1,3 +1,9 @@
+isis (0.5.4-2) UNRELEASED; urgency=low
+
+  * add conflict with libisiscore0 and old io-plugins
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Fri, 7 May 2012 14:15:32 +0200
+
 isis (0.5.4-1) UNRELEASED; urgency=low
 
   * in the Python interface remove ImageList and ChunkList;
