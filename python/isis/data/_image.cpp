@@ -7,14 +7,6 @@ namespace python
 namespace data
 {
 
-_WritingValueAdapter::_WritingValueAdapter ( PyObject *p, const isis::data::_internal::WritingValueAdapter &base )
-	: isis::data::_internal::WritingValueAdapter ( base ), boost::python::wrapper< isis::data::_internal::WritingValueAdapter >(), self ( p )
-{}
-
-object _WritingValueAdapter::_as ( )
-{
-	return isis::util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at ( ( *this )->getTypeID() )->convert ( ( *this ).operator * () );
-}
 
 _Image::_Image ( PyObject *p )
 	: boost::python::wrapper< Image >(), self ( p )

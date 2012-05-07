@@ -30,19 +30,6 @@ namespace python
 namespace data
 {
 
-class _WritingValueAdapter : public isis::data::_internal::WritingValueAdapter, boost::python::wrapper<isis::data::_internal::WritingValueAdapter>
-{
-public:
-	_WritingValueAdapter ( PyObject *p, const isis::data::_internal::WritingValueAdapter &base );
-	//  _WritingValueAdapter( PyObject *p, const
-
-	api::object _as( );
-
-private:
-	PyObject *self;
-
-};
-
 class _Image : public Image, public boost::python::wrapper<Image>
 {
 

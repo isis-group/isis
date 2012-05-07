@@ -15,6 +15,7 @@
 #include "_ioapplication.hpp"
 #include "_ndimensional.hpp"
 #include "_image.hpp"
+#include "_writingvalueadapter.hpp"
 #include "_chunk.hpp"
 #include "_iofactory.hpp"
 #include "std_item.hpp"
@@ -75,7 +76,8 @@ BOOST_PYTHON_MODULE ( _data )
 	//  WritingValueAdapter
 	//#######################################################################################
 	class_<isis::data::_internal::WritingValueAdapter, _WritingValueAdapter > ( "WritingValueAdapter", no_init )
-	.def ( "value", &_WritingValueAdapter::_as );
+	.def ( "get", &_WritingValueAdapter::_get )
+	.def ( "set", &_WritingValueAdapter::_set );
 
 	//#######################################################################################
 	//  Image
