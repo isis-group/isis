@@ -35,19 +35,19 @@ public:
 
 	template<typename TYPE>
 	void setParameter( const std::string &key, const TYPE &value ) {
-		m_parameterMap.setPropertyAs<TYPE>( key.c_str(), value );
+		parameterMap.setPropertyAs<TYPE>( key.c_str(), value );
 	}
 	template<typename TYPE>
-	const TYPE &getResult( const std::string &key ) {
-		if( !m_resultMap.hasProperty(key.c_str() ) ) {
+	TYPE getResult( const std::string &key ) {
+		if( !resultMap.hasProperty(key.c_str() ) ) {
 			LOG( data::Runtime, error ) << "The filter " << getFilterName()
 										<< " has no result with the key " << key;
 			return TYPE();
 		} else {
-			return m_resultMap.getPropertyAs<TYPE>(key.c_str() );
+			return resultMap.getPropertyAs<TYPE>(key.c_str() );
 		}
 	}
-	const util::PropertyMap& getResultMap() const { return m_resultMap; }
+	const util::PropertyMap& getResultMap() const { return resultMap; }
 
 protected:
 	FilterBase();
@@ -59,36 +59,32 @@ protected:
 
 	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
 
-	util::PropertyMap m_parameterMap;
-	util::PropertyMap m_resultMap;
+	util::PropertyMap parameterMap;
+	util::PropertyMap resultMap;
 };
-
 
 
 template<typename TYPE>
-class Filter11Base : public _internal::FilterBase
+class FilterInPlaceBase : public FilterBase
 {
 public:
-	void setInput( const TYPE& input ) {
-		m_input = boost::shared_ptr<TYPE>( new TYPE( input ) );
-		m_inputIsSet = true;
-	};
-
-	const TYPE& getOutput() const { return *m_output.get(); }
-	TYPE getOutput() { return *m_output.get(); }
-
+	void setInput( TYPE& input ) {
+		workingImage = &input;
+	}
 protected:
-	boost::shared_ptr< TYPE > m_input;
-	boost::shared_ptr< TYPE > m_output;
-
+    FilterInPlaceBase()
+	: workingImage(NULL)
+	{};
+	TYPE* workingImage;
 };
+
 
 } // end _internal namespace
 
-class ImageFilter11 : public _internal::Filter11Base<data::Image>
+class ImageFilterInPlace : public _internal::FilterInPlaceBase<data::Image>
 {};
 
-class ChunkFilter11 : public _internal::Filter11Base<data::Chunk>
+class ChunkFilterInPlace : public _internal::FilterInPlaceBase<data::Chunk>
 {};
 
 
