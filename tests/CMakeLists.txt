@@ -30,6 +30,7 @@ add_subdirectory(CoreUtils)
 add_subdirectory(DataStorage)
 add_subdirectory(ImageIO)
 add_subdirectory(ExternalLibraryAdapter)
+add_subdirectory(Filter)
 
 # addition option: build benchmarks
 option(ISIS_BUILD_BENCHMARKS "Build the ISIS stress tests. For internal use only" OFF)

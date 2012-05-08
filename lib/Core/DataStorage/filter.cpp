@@ -7,16 +7,20 @@ namespace filter
 namespace _internal
 {
 
-bool _internal::FilterBase::run( boost::shared_ptr< util::ProgressFeedback > )
+bool FilterBase::run( )
 {
 	if( isValid() ) {
-		return process();
+		filterStartedSignal( getFilterName() );
+		bool success = process();
+		filterFinishedSignal( getFilterName(), success );
+		return success;
 	} else {
 		LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
 									  << "\" is not valid. Will not run it!";
 		return false;
 	}
 }
+
 
 }
 }
