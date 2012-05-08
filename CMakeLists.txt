@@ -156,7 +156,6 @@ endif(GIT_REVISION)
 ############################################################
 option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_PYTHON_EXT "Build the ISIS python extension. It provides access to the ISIS core image functions from python" OFF)
 
 ###########################################################
 # CPack config
@@ -208,11 +207,6 @@ if(ISIS_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
-
-# build the ISIS python extension.
-if(ISIS_BUILD_PYTHON_EXT)
-  add_subdirectory(python)
-endif(ISIS_BUILD_PYTHON_EXT)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
