@@ -21,7 +21,6 @@ class FilterBase
 public:
 	bool run();
 
-
 	void setProgressFeedback( boost::shared_ptr< util::ProgressFeedback > pfb ) { m_progressfeedback = pfb; }
 	boost::shared_ptr< util::ProgressFeedback > getProgressFeedback() const  { return m_progressfeedback; }
 
@@ -34,20 +33,33 @@ public:
 	boost::signals2::signal<void (const std::string &)> filterStartedSignal;
 	boost::signals2::signal<void (const std::string &, bool)> filterFinishedSignal;
 
-	void setInputParameter( const util::PropertyMap &inputParameter ) { m_inputParameterMap = inputParameter; }
+	template<typename TYPE>
+	void setParameter( const std::string &key, const TYPE &value ) {
+		m_parameterMap.setPropertyAs<TYPE>( key.c_str(), value );
+	}
+	template<typename TYPE>
+	const TYPE &getResult( const std::string &key ) {
+		if( !m_resultMap.hasProperty(key.c_str() ) ) {
+			LOG( data::Runtime, error ) << "The filter " << getFilterName()
+										<< " has no result with the key " << key;
+			return TYPE();
+		} else {
+			return m_resultMap.getPropertyAs<TYPE>(key.c_str() );
+		}
+	}
 	const util::PropertyMap& getResultMap() const { return m_resultMap; }
 
 protected:
-	FilterBase(){};
+	FilterBase();
 
 	//has to be implemented by the author of the filter
-	virtual bool process() const = 0;
+	virtual bool process() = 0;
 
 	bool m_inputIsSet;
 
 	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
 
-	util::PropertyMap m_inputParameterMap;
+	util::PropertyMap m_parameterMap;
 	util::PropertyMap m_resultMap;
 };
 

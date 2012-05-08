@@ -6,6 +6,9 @@ namespace filter
 {
 namespace _internal
 {
+FilterBase::FilterBase()
+	: m_inputIsSet(false)
+{}
 
 bool FilterBase::run( )
 {
