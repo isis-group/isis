@@ -19,9 +19,9 @@ namespace filter
 {
 bool hasOMPSupport();
 #ifdef _OPENMP
-	void setNumberOfThreadsOMP(const uint16_t &threads );
-	void setUseAllAvailableThreadsOMP();
-	uint16_t getNumberOfAvailableThreadsOMP();
+void setNumberOfThreadsOMP( const uint16_t &threads );
+void setUseAllAvailableThreadsOMP();
+uint16_t getNumberOfAvailableThreadsOMP();
 #endif
 
 namespace _internal
@@ -37,12 +37,12 @@ public:
 	//pure virtual
 	virtual bool isValid() const = 0;
 	virtual std::string getFilterName() const = 0;
-	virtual std::string getDescription() const { return std::string("not_set");};
+	virtual std::string getDescription() const { return std::string( "not_set" );};
 	virtual ~FilterBase() {}
 
 	//signals
-	boost::signals2::signal<void (const std::string &)> filterStartedSignal;
-	boost::signals2::signal<void (const std::string &, bool)> filterFinishedSignal;
+	boost::signals2::signal<void ( const std::string & )> filterStartedSignal;
+	boost::signals2::signal<void ( const std::string &, bool )> filterFinishedSignal;
 
 	template<typename TYPE>
 	void setParameter( const std::string &key, const TYPE &value ) {
@@ -52,15 +52,15 @@ public:
 
 	template<typename TYPE>
 	TYPE getResult( const std::string &key ) {
-		if( !resultMap.hasProperty(key.c_str() ) ) {
+		if( !resultMap.hasProperty( key.c_str() ) ) {
 			LOG( data::Runtime, error ) << "The filter " << getFilterName()
 										<< " has no result with the key " << key;
 			return TYPE();
 		} else {
-			return resultMap.getPropertyAs<TYPE>(key.c_str() );
+			return resultMap.getPropertyAs<TYPE>( key.c_str() );
 		}
 	}
-	const util::PropertyMap& getResultMap() const { return resultMap; }
+	const util::PropertyMap &getResultMap() const { return resultMap; }
 
 protected:
 	FilterBase();
@@ -78,8 +78,7 @@ template<typename TYPE>
 class NotInPlace : public FilterBase
 {
 public:
-	bool run()
-	{
+	bool run() {
 		if( isValid() ) {
 			filterStartedSignal( getFilterName() );
 			const bool success = process();
@@ -87,7 +86,7 @@ public:
 			return success;
 		} else {
 			LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
-										<< "\" is not valid. Will not run it!";
+										  << "\" is not valid. Will not run it!";
 			return false;
 		}
 	}
@@ -99,29 +98,22 @@ template<typename TYPE>
 class InPlace : public FilterBase
 {
 public:
-	bool run( TYPE& input )
-	{
+	bool run( TYPE &input ) {
 		if( isValid() ) {
 			filterStartedSignal( getFilterName() );
-			const bool success = process(input);
+			const bool success = process( input );
 			filterFinishedSignal( getFilterName(), success );
 			return success;
 		} else {
 			LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
-										<< "\" is not valid. Will not run it!";
+										  << "\" is not valid. Will not run it!";
 			return false;
 		}
 	}
 protected:
-	virtual bool process( TYPE& input ) = 0;
+	virtual bool process( TYPE &input ) = 0;
 };
 
-template<typename TYPE>
-class FilterInPlaceBase : public InPlace<TYPE>
-{
-protected:
-    FilterInPlaceBase(){};
-};
 
 template<typename TYPE>
 class OutputFilterBase : public NotInPlace<TYPE>
@@ -129,18 +121,17 @@ class OutputFilterBase : public NotInPlace<TYPE>
 public:
 	TYPE getOutput() const { return *output; }
 protected:
-
-	OutputFilterBase(){};
+	OutputFilterBase() {};
 	boost::shared_ptr<TYPE> output;
 
 };
 
 } // end _internal namespace
 
-class ImageFilterInPlace : public _internal::FilterInPlaceBase<data::Image>
+class ImageFilterInPlace : public _internal::InPlace<data::Image>
 {};
 
-class ChunkFilterInPlace : public _internal::FilterInPlaceBase<data::Chunk>
+class ChunkFilterInPlace : public _internal::InPlace<data::Chunk>
 {};
 
 class ImageOutputFilter : public _internal::OutputFilterBase<data::Image>
