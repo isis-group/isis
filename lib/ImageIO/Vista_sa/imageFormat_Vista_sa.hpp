@@ -35,14 +35,19 @@ private:
 	typedef isis::data::ValueArrayReference ( *readerPtr )( isis::data::FilePtr data, size_t offset, size_t size );
 	std::map<isis::util::istring, readerPtr> vista2isis;
 
-	data::Chunk makeChunk( data::FilePtr data, data::FilePtr::iterator data_start, const util::PropertyMap &props, uint32_t acqNum );
+	data::Chunk makeChunk( data::FilePtr data, data::FilePtr::iterator data_start, const util::PropertyMap &props);
 public:
 	ImageFormat_VistaSa();
 	std::string getName()const {return "Vista standalone";}
 	int load ( std::list< isis::data::Chunk >& chunks, const std::string &filename, const isis::util::istring &dialect ) throw ( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & );
+
 	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
+
+	void sanitize(util::PropertyMap &obj);
+	bool isFunctional(const std::list< isis::data::Chunk >& chunks);
+	std::list< data::Chunk > transformFunctional(const std::list< data::Chunk >& in_chunks);
 
 protected:
 	util::istring suffixes( io_modes /*mode = both */ )const {return ".v";}
