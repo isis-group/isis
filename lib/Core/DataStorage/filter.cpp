@@ -9,22 +9,34 @@ namespace _internal
 FilterBase::FilterBase()
 	: m_inputIsSet(false)
 {}
+}
 
-bool FilterBase::run( )
+
+bool hasOMPSupport()
 {
-	if( isValid() ) {
-		filterStartedSignal( getFilterName() );
-		bool success = process();
-		filterFinishedSignal( getFilterName(), success );
-		return success;
-	} else {
-		LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
-									  << "\" is not valid. Will not run it!";
-		return false;
-	}
+#ifdef _OPENMP
+	return true;
+#else
+	return false;
+#endif
 }
 
-
+#ifdef _OPENMP
+void setNumberOfOMPThreads ( const uint16_t& threads )
+{
+	omp_set_num_threads( threads );
 }
+
+void setUseAllAvailableThreadsOMP()
+{
+	omp_set_num_threads( omp_get_num_procs() );
+}
+
+uint16_t getNumberOfAvailableThreadsOMP() {
+	return omp_get_num_procs();
+}
+#endif
+
+
 }
 }

@@ -41,6 +41,7 @@ if(NOT WIN32)
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+set(ISIS_FILTER_INFIX lib/isis/filter)
 endif(NOT WIN32)
 
 ############################################################
@@ -156,6 +157,7 @@ endif(GIT_REVISION)
 ############################################################
 option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
+option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
 
 ###########################################################
 # CPack config
@@ -200,6 +202,18 @@ add_subdirectory(design)
 if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
+
+#build the filter
+if(ISIS_BUILD_FILTER )
+  add_subdirectory(lib/Filter)
+  #omp settings
+  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
+
+  if(ISIS_FILTER_ENABLE_OMP)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+  endif(ISIS_FILTER_ENABLE_OMP)
+endif(ISIS_BUILD_FILTER)
 
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)

@@ -9,17 +9,27 @@
 #include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif /*_OPENMP*/
+
 namespace isis
 {
 namespace filter
 {
+bool hasOMPSupport();
+#ifdef _OPENMP
+	void setNumberOfThreadsOMP(const uint16_t &threads );
+	void setUseAllAvailableThreadsOMP();
+	uint16_t getNumberOfAvailableThreadsOMP();
+#endif
+
 namespace _internal
 {
 
 class FilterBase
 {
 public:
-	bool run();
 
 	void setProgressFeedback( boost::shared_ptr< util::ProgressFeedback > pfb ) { m_progressfeedback = pfb; }
 	boost::shared_ptr< util::ProgressFeedback > getProgressFeedback() const  { return m_progressfeedback; }
@@ -27,6 +37,7 @@ public:
 	//pure virtual
 	virtual bool isValid() const = 0;
 	virtual std::string getFilterName() const = 0;
+	virtual std::string getDescription() const { return std::string("not_set");};
 	virtual ~FilterBase() {}
 
 	//signals
@@ -37,6 +48,8 @@ public:
 	void setParameter( const std::string &key, const TYPE &value ) {
 		parameterMap.setPropertyAs<TYPE>( key.c_str(), value );
 	}
+	void setParameterMap( const util::PropertyMap &pMap ) { parameterMap = pMap; }
+
 	template<typename TYPE>
 	TYPE getResult( const std::string &key ) {
 		if( !resultMap.hasProperty(key.c_str() ) ) {
@@ -52,32 +65,75 @@ public:
 protected:
 	FilterBase();
 
-	//has to be implemented by the author of the filter
-	virtual bool process() = 0;
-
 	bool m_inputIsSet;
 
 	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
 
 	util::PropertyMap parameterMap;
 	util::PropertyMap resultMap;
-};
 
+};
 
 template<typename TYPE>
-class FilterInPlaceBase : public FilterBase
+class NotInPlace : public FilterBase
 {
 public:
-	void setInput( TYPE& input ) {
-		workingImage = &input;
+	bool run()
+	{
+		if( isValid() ) {
+			filterStartedSignal( getFilterName() );
+			const bool success = process();
+			filterFinishedSignal( getFilterName(), success );
+			return success;
+		} else {
+			LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
+										<< "\" is not valid. Will not run it!";
+			return false;
+		}
 	}
 protected:
-    FilterInPlaceBase()
-	: workingImage(NULL)
-	{};
-	TYPE* workingImage;
+	virtual bool process() = 0;
 };
 
+template<typename TYPE>
+class InPlace : public FilterBase
+{
+public:
+	bool run( TYPE& input )
+	{
+		if( isValid() ) {
+			filterStartedSignal( getFilterName() );
+			const bool success = process(input);
+			filterFinishedSignal( getFilterName(), success );
+			return success;
+		} else {
+			LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
+										<< "\" is not valid. Will not run it!";
+			return false;
+		}
+	}
+protected:
+	virtual bool process( TYPE& input ) = 0;
+};
+
+template<typename TYPE>
+class FilterInPlaceBase : public InPlace<TYPE>
+{
+protected:
+    FilterInPlaceBase(){};
+};
+
+template<typename TYPE>
+class OutputFilterBase : public NotInPlace<TYPE>
+{
+public:
+	TYPE getOutput() const { return *output; }
+protected:
+
+	OutputFilterBase(){};
+	boost::shared_ptr<TYPE> output;
+
+};
 
 } // end _internal namespace
 
@@ -87,6 +143,11 @@ class ImageFilterInPlace : public _internal::FilterInPlaceBase<data::Image>
 class ChunkFilterInPlace : public _internal::FilterInPlaceBase<data::Chunk>
 {};
 
+class ImageOutputFilter : public _internal::OutputFilterBase<data::Image>
+{};
+
+class ChunkOutputFilter : public _internal::OutputFilterBase<data::Chunk>
+{};
 
 }
 }
