@@ -17,11 +17,20 @@ namespace isis
 {
 namespace filter
 {
-bool hasOMPSupport();
+
 #ifdef _OPENMP
-void setNumberOfThreadsOMP( const uint16_t &threads );
-void setUseAllAvailableThreadsOMP();
-uint16_t getNumberOfAvailableThreadsOMP();
+struct omp {
+	static void setNumberOfThreads( const uint16_t &threads ) {
+		omp_set_num_threads( threads );
+	}
+
+	static void useAllAvailableThreads() {
+		omp_set_num_threads( omp_get_num_procs() );
+	}
+	static uint16_t getNumberOfAvailableThreads() {
+		return omp_get_num_procs();
+	}
+};
 #endif
 
 namespace _internal
@@ -62,6 +71,9 @@ public:
 	}
 	const util::PropertyMap &getResultMap() const { return resultMap; }
 
+	void setInput( const std::string &label, const data::Image & );
+	void setInput( const std::string &label, const data::Chunk & );
+
 protected:
 	FilterBase();
 
@@ -71,6 +83,9 @@ protected:
 
 	util::PropertyMap parameterMap;
 	util::PropertyMap resultMap;
+
+	std::map< std::string, boost::shared_ptr<data::Image> > m_additionalImages;
+	std::map< std::string, boost::shared_ptr<data::Chunk> > m_additionalChunks;
 
 };
 

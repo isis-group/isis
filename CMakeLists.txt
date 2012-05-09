@@ -189,6 +189,18 @@ else(WIN32)
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 endif(WIN32)
 
+#build the filter
+if(ISIS_BUILD_FILTER )
+  #omp settings
+  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
+  if(ISIS_FILTER_ENABLE_OMP)
+	message(STATUS "Enabling omp support" )
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+  endif(ISIS_FILTER_ENABLE_OMP)
+  add_subdirectory(lib/Filter)
+endif(ISIS_BUILD_FILTER)
+
 # build the ISIS libraries
 add_subdirectory(lib)
 
@@ -203,17 +215,8 @@ if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
-#build the filter
-if(ISIS_BUILD_FILTER )
-  add_subdirectory(lib/Filter)
-  #omp settings
-  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
 
-  if(ISIS_FILTER_ENABLE_OMP)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
-  endif(ISIS_FILTER_ENABLE_OMP)
-endif(ISIS_BUILD_FILTER)
+
 
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)

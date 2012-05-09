@@ -1,9 +1,9 @@
 #ifndef ISIS_FILTER_GAUSSIAN
 #define ISIS_FILTER_GAUSSIAN
 
-#include "DataStorage/filter.hpp"
 #include "GaussianKernelFilter.hpp"
 #include "ConvolutionFilter.hpp"
+#include "DataStorage/filter.hpp"
 
 namespace isis
 {

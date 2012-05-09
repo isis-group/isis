@@ -8,6 +8,8 @@
 # 
 ############################################################
 
+
 add_subdirectory(Core)
 add_subdirectory(ImageIO)
 add_subdirectory(Adapter)
+

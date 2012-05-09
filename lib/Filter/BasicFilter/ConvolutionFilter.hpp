@@ -18,15 +18,12 @@ public:
 		return  parameterMap.hasProperty( "convolveRow" )
 				&& parameterMap.hasProperty( "convolveColumn" )
 				&& parameterMap.hasProperty( "convolveSlice" )
-				&& m_kernel;
+				&& m_additionalChunks.find( "kernel" ) != m_additionalChunks.end();
 	}
 	bool process( data::Chunk & );
 
-	void setKernel( const data::Chunk &kernel );
-
 private:
 	void convolve( data::Chunk &chunk, const data::Chunk &kernel, data::dimensions dim );
-	boost::shared_ptr<data::Chunk> m_kernel;
 
 };
 

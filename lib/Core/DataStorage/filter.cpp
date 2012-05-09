@@ -4,40 +4,23 @@ namespace isis
 {
 namespace filter
 {
+
 namespace _internal
 {
 FilterBase::FilterBase()
 	: m_inputIsSet( false )
 {}
-}
 
-
-bool hasOMPSupport()
+void FilterBase::setInput ( const std::string &label, const data::Image &image )
 {
-#ifdef _OPENMP
-	return true;
-#else
-	return false;
-#endif
+	m_additionalImages[label] = boost::shared_ptr<data::Image> ( new data::Image( image ) );
 }
 
-#ifdef _OPENMP
-void setNumberOfOMPThreads ( const uint16_t &threads )
+void FilterBase::setInput ( const std::string &label, const data::Chunk &chunk )
 {
-	omp_set_num_threads( threads );
+	m_additionalChunks[label] = boost::shared_ptr<data::Chunk> ( new data::Chunk( chunk ) );
 }
 
-void setUseAllAvailableThreadsOMP()
-{
-	omp_set_num_threads( omp_get_num_procs() );
 }
-
-uint16_t getNumberOfAvailableThreadsOMP()
-{
-	return omp_get_num_procs();
-}
-#endif
-
-
 }
 }

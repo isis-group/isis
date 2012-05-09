@@ -5,24 +5,20 @@ namespace isis
 namespace filter
 {
 
-void ConvolutionFilter::setKernel ( const data::Chunk &kernel )
-{
-	m_kernel = boost::shared_ptr<data::Chunk>( new data::MemChunk<ValueType>( kernel ) );
-}
-
-
 bool ConvolutionFilter::process ( data::Chunk &chunk )
 {
+	const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernel" ) );
+
 	if( parameterMap.getPropertyAs<bool>( "convolveRow" ) ) {
-		convolve( chunk, *m_kernel, data::rowDim );
+		convolve( chunk, kernel, data::rowDim );
 	}
 
 	if( parameterMap.getPropertyAs<bool>( "convolveColumn" ) ) {
-		convolve( chunk, *m_kernel, data::columnDim );
+		convolve( chunk, kernel, data::columnDim );
 	}
 
 	if( parameterMap.getPropertyAs<bool>( "convolveSlice" ) ) {
-		convolve( chunk, *m_kernel, data::sliceDim );
+		convolve( chunk, kernel, data::sliceDim );
 	}
 
 	return true;
@@ -42,6 +38,7 @@ void ConvolutionFilter::convolve ( data::Chunk &chunk, const data::Chunk &kernel
 
 	for( int32_t k = start[2]; k < size[2]; k++ ) {
 		for( int32_t j = start[1]; j < size[1]; j++ ) {
+
 			for( int32_t i = start[0]; i < size[0] - d; i++ ) {
 				coords = util::ivector4( i, j, k );
 				sum = 0;

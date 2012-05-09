@@ -1,4 +1,3 @@
-#include "DataStorage/filter.hpp"
 #include "GaussianFilter.hpp"
 
 namespace isis
@@ -22,7 +21,7 @@ bool GaussianFilter::process( data::Image &image )
 	m_ConvolutionFilter.setParameter<bool>( "convolveRow", true );
 	m_ConvolutionFilter.setParameter<bool>( "convolveColumn", true );
 	m_ConvolutionFilter.setParameter<bool>( "convolveSlice", true );
-	m_ConvolutionFilter.setKernel( kernel );
+	m_ConvolutionFilter.setInput( "kernel", kernel );
 
 	data::MemChunk<ValueType> ch( image.getChunk( 0 ) );
 
