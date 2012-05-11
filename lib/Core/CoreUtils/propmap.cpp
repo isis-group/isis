@@ -494,16 +494,6 @@ void PropertyMap::addNeeded( const key_type &key )
 }
 
 
-void PropertyMap::addNeededFromString( const std::string &needed )
-{
-	const std::list<std::string> needList = util::stringToList<std::string>( needed );
-	//@todo util::stringToList<std::string>( needed,' ' ) would be faster but less robust
-	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
-	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
-		addNeeded( key_type( ref.c_str() ) );
-	}
-}
-
 bool PropertyMap::hasProperty( const PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );

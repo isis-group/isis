@@ -300,7 +300,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean ( false ) {
-		addNeededFromString ( neededProperties );
+		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromContainer ( chunks );
@@ -313,7 +313,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean ( false ), minIndexingDim ( min_dim ) {
-		addNeededFromString ( neededProperties );
+		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromContainer ( chunks );

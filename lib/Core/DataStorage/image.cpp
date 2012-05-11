@@ -35,7 +35,7 @@ ChunkOp::~ChunkOp() {}
 
 Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
-	addNeededFromString( neededProperties );
+	addNeededFromString<Image>( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
@@ -45,7 +45,7 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
 	clean( false )
 {
-	addNeededFromString( neededProperties );
+	addNeededFromString<Image>( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 

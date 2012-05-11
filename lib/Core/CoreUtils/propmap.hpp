@@ -124,7 +124,12 @@ protected:
 	 * \param needed string made of space serparated property-names which
 	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
 	 */
-	void addNeededFromString( const std::string &needed );
+	template<typename CONTAINER> void addNeededFromString( const std::string &needed ){
+		static const std::list<key_type> neededs=util::stringToList<key_type>(needed);
+		BOOST_FOREACH(const key_type &ref,neededs){
+			addNeeded(ref);
+		}
+	}
 	/**
 	 * Adds a property with status needed.
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
