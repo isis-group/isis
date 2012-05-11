@@ -44,7 +44,7 @@ template<> isis::data::ValueArrayReference reader<bool>( isis::data::FilePtr dat
 
 }
 
-data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data::ValueArray< uint8_t >::iterator data_start, const isis::util::PropertyMap& props )
+data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data::ValueArray< uint8_t >::iterator data_start, const isis::util::PropertyMap &props )
 {
 	const size_t ch_offset = props.getPropertyAs<uint64_t>( "data" );
 	isis::util::vector4<size_t> ch_size(
@@ -68,56 +68,70 @@ data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data
 	isis::data::Chunk ret = isis::data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2], ch_size[3] );
 
 	ret.branch( "vista" ) = props;
-	sanitize(ret);
+	sanitize( ret );
 
 	return ret;
 }
 
-void ImageFormat_VistaSa::sanitize(util::PropertyMap& obj)
+void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	obj.remove( "vista/data" );
 	obj.remove( "vista/ncolumns" );
 	obj.remove( "vista/nrows" );
 	obj.remove( "vista/nbands" );
 	obj.remove( "vista/repn" );
-	
+
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) {
 		obj.transform<isis::util::fvector4>( "vista/columnVec", "rowVec" );
 		obj.transform<isis::util::fvector4>( "vista/rowVec", "columnVec" );
 		transformOrTell<isis::util::fvector4>( "vista/sliceVec", "sliceVec", obj, warning );
 	} else {
-		obj.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+		obj.setPropertyAs( "rowVec",    util::fvector4( 1, 0 ) );
 		obj.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		obj.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+		obj.setPropertyAs( "sliceVec",  util::fvector4( 0, 0, 1 ) );
+		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
-	
+
 	if( !transformOrTell<isis::util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ) {
 		obj.setPropertyAs( "indexOrigin", util::fvector4( 0, 0 ) );
 	}
-	
+
 	if( !transformOrTell<isis::util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
 		obj.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	}
 }
 
-bool ImageFormat_VistaSa::isFunctional(const std::list< data::Chunk >& chunks)
+bool ImageFormat_VistaSa::isFunctional( const std::list< data::Chunk >& chunks )
 {
-	//if we have a group with more than 1 short image, we assume a functional image
-	return chunks.size()>1 && chunks.front().getTypeID()==data::ValueArray<int16_t>::staticID;
+	//if we have only one chunk, its not functional
+	if(chunks.size() <= 1)return false;
+	const data::Chunk& front=chunks.front();
+	const bool is_short=front.is<int16_t>();
+
+	//if we have proper vista/ntimesteps its functional
+	if(front.hasProperty("vista/ntimesteps") && front.getPropertyAs<uint32_t>("vista/ntimesteps")==front.getSizeAsVector()[data::sliceDim]){
+		LOG_IF(is_short,Runtime,warning) << "Functional data found which is not VShort";
+		return true;
+	} else if(is_short) { //if we have short, its functional
+		LOG(Runtime,warning) << "Functional data found, but ntimesteps is not set or wrong (should be " << front.getSizeAsVector()[data::sliceDim] << ")";
+		return true;
+	}
+	return  false;
 }
 
 
-std::list< data::Chunk > ImageFormat_VistaSa::transformFunctional(const std::list< data::Chunk >& in_chunks)
+std::list< data::Chunk > ImageFormat_VistaSa::transformFunctional( const std::list< data::Chunk >& in_chunks )
 {
-	LOG(Runtime,info) << "Transforming " << in_chunks.size() << " chunks for fMRI";
+	LOG( Runtime, info ) << "Transforming " << in_chunks.size() << " chunks for fMRI";
 	std::list< data::Chunk > ret;
-	const uint32_t acqStride=in_chunks.size();
-	BOOST_FOREACH(const data::Chunk &ch,in_chunks){
-		size_t timestep=0;
-		BOOST_FOREACH(data::Chunk ch,ch.splice(data::sliceDim)){
-			uint32_t &acq=ch.propertyValue("acquisitionNumber").castTo<uint32_t>();
-			acq=acq+acqStride*timestep;
-			ret.push_back(ch);
+	const uint32_t acqStride = in_chunks.size();
+	BOOST_FOREACH( data::Chunk ch, in_chunks ) {
+		size_t timestep = 0;
+		ch.remove("vista/ntimesteps");
+		BOOST_FOREACH( data::Chunk ch, ch.splice( data::sliceDim ) ) {
+			uint32_t &acq = ch.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
+			acq = acq + acqStride * timestep;
+			ret.push_back( ch );
 			timestep++;
 		}
 	}
@@ -157,30 +171,33 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 	std::list<std::list<data::Chunk> > groups;
 
 	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
-		unsigned short last_type=0;
+		unsigned short last_type = 0;
 		util::fvector4 last_voxelsize;
 
 		uint32_t acqNum;
 		BOOST_FOREACH( const isis::util::PropertyMap & chMap, ch_list ) {
 			isis::data::Chunk ch = makeChunk( mfile, data_start, chMap );
+
 			// start new group if the chunk's type differs from the last, or its the first chunk (different type probably means a new image)
-			if(last_type!=ch.getTypeID() || last_voxelsize!=ch.getPropertyAs<util::fvector4>("voxelSize") ){
-				groups.push_back(std::list<data::Chunk>());
-				last_type=ch.getTypeID();
-				last_voxelsize=ch.getPropertyAs<util::fvector4>("voxelSize");
-				acqNum=0;
+			if( last_type != ch.getTypeID() || last_voxelsize != ch.getPropertyAs<util::fvector4>( "voxelSize" ) ) {
+				groups.push_back( std::list<data::Chunk>() );
+				last_type = ch.getTypeID();
+				last_voxelsize = ch.getPropertyAs<util::fvector4>( "voxelSize" );
+				acqNum = 0;
 			}
+
 			ch.setPropertyAs( "acquisitionNumber", acqNum++ );
-			groups.back().push_back(ch);
+			groups.back().push_back( ch );
 		}
 		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
 
-		
 
-		BOOST_FOREACH(std::list<data::Chunk> &group,groups){
-			if(isFunctional(group))
-				group=transformFunctional(group);
-			BOOST_FOREACH(data::Chunk &ch,group){
+
+		BOOST_FOREACH( std::list<data::Chunk> &group, groups ) {
+			if( isFunctional( group ) )
+				group = transformFunctional( group );
+
+			BOOST_FOREACH( data::Chunk & ch, group ) {
 				ch.branch( "vista" ).join( root_map );
 				chunks.push_back( ch );
 			}
