@@ -68,7 +68,7 @@ private:
 	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
 	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
-	std::list<util::PropertyMap::KeyType> equalProps;
+	std::list<util::PropertyMap::PropPath> equalProps;
 public:
 
 	//initialisation

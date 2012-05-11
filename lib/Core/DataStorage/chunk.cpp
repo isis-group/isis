@@ -30,7 +30,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 {
 	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 	init( idx );
-	addNeededFromString( neededProperties );
+	addNeededFromString<ChunkBase>( neededProperties );
 	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 }
