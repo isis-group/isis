@@ -67,10 +67,10 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props )	
+SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props )
 {
-	const std::list< isis::util::PropertyMap::KeyType > p_list=util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' );
-	equalProps.insert(equalProps.end(),p_list.begin(),p_list.end());
+	const std::list< isis::util::PropertyMap::KeyType > p_list = util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' );
+	equalProps.insert( equalProps.end(), p_list.begin(), p_list.end() );
 }
 
 
@@ -111,7 +111,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 }
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
-	static const util::PropertyMap::PropPath rowVecProb("rowVec"),columnVecProb("columnVec"),sliceVecProb("sliceVec"),indexOriginProb("indexOrigin");
+	static const util::PropertyMap::PropPath rowVecProb( "rowVec" ), columnVecProb( "columnVec" ), sliceVecProb( "sliceVec" ), indexOriginProb( "indexOrigin" );
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
