@@ -5,6 +5,8 @@
 #include "ConvolutionFilter.hpp"
 #include "DataStorage/filter.hpp"
 
+#include <numeric>
+
 namespace isis
 {
 namespace filter
@@ -17,7 +19,8 @@ public:
 	std::string getFilterName() const { return std::string( "GaussianFilter" ); }
 	std::string getDescription() const { return std::string( "Inplace filter that performs a gaussian kernel to an image." ); }
 	bool isValid() const {
-		return  !parameters[ "sigma" ].isEmpty() || !parameters[ "fwhm" ].isEmpty();
+		return  ( !parameters["sigma"].isEmpty() && !std::isnan( parameters["sigma"].as<float>() ) )
+				|| ( !parameters[ "fwhm" ].isEmpty() && !std::isnan( parameters["fwhm"].as<float>() ) ) ;
 	}
 	bool process( data::Image & );
 

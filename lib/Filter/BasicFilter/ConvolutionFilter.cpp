@@ -38,7 +38,6 @@ void ConvolutionFilter::convolve ( data::Chunk &chunk, const data::Chunk &kernel
 
 	for( int32_t k = start[2]; k < size[2]; k++ ) {
 		for( int32_t j = start[1]; j < size[1]; j++ ) {
-
 			for( int32_t i = start[0]; i < size[0] - d; i++ ) {
 				coords = util::ivector4( i, j, k );
 				sum = 0;

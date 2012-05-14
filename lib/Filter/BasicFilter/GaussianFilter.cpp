@@ -10,11 +10,10 @@ bool GaussianFilter::process( data::Image &image )
 {
 	ValueType sigma;
 
-	if( !parameters["sigma"].isEmpty() ) {
+	if( !parameters["sigma"].isEmpty() && !std::isnan( parameters["sigma"].as<float>() ) ) {
 		sigma = parameters["sigma"].as<ValueType>();
 	} else {
 		sigma = _internal::FWHM2Sigma( parameters["fwhm"].as<ValueType>() );
-		std::cout << sigma << std::endl;
 	}
 
 	if( sigma <= 0 ) {
