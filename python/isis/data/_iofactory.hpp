@@ -30,14 +30,14 @@ public:
 	_IOFactory() {}
 
 	static boost::python::list _load ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
-		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path, suffix_override.c_str(), dialect.c_str() ));
+		return _internal::stdIter2PyList<std::list<Image> >( IOFactory::load( path, suffix_override.c_str(), dialect.c_str() ) );
 	}
 	static boost::python::list _load ( const std::string &path, const std::string &suffix_override ) {
-		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path, suffix_override.c_str() ) );
+		return _internal::stdIter2PyList<std::list<Image> >( IOFactory::load( path, suffix_override.c_str() ) );
 	}
 
 	static boost::python::list _load ( const std::string &path ) {
-		return _internal::stdIter2PyList<std::list<Image> >(IOFactory::load( path ) );
+		return _internal::stdIter2PyList<std::list<Image> >( IOFactory::load( path ) );
 	}
 
 	static bool _write( const isis::data::Image &image, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {

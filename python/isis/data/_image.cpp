@@ -26,7 +26,7 @@ _Image::_Image ( PyObject *p, const isis::data::Image &base )
 
 list _Image::_getChunksAsVector ( void )
 {
-	return _internal::stdIter2PyList<std::vector<Chunk> >(copyChunksToVector());
+	return _internal::stdIter2PyList<std::vector<Chunk> >( copyChunksToVector() );
 }
 
 Chunk _Image::_getChunkAs ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const std::string &type )
