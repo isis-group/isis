@@ -9,7 +9,7 @@ namespace filter
 
 bool GaussianKernelFilter::process()
 {
-	const ValueType sigma = parameterMap.getPropertyAs<ValueType>( "sigma" );
+	const ValueType sigma = parameters["sigma"];
 	const int dim = 3.0 * sigma + 1;
 	const int n = 2 * dim + 1;
 	ValueType sum = 0;

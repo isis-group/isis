@@ -9,15 +9,15 @@ bool ConvolutionFilter::process ( data::Chunk &chunk )
 {
 	const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernel" ) );
 
-	if( parameterMap.getPropertyAs<bool>( "convolveRow" ) ) {
+	if( parameters["convolveRow"] ) {
 		convolve( chunk, kernel, data::rowDim );
 	}
 
-	if( parameterMap.getPropertyAs<bool>( "convolveColumn" ) ) {
+	if( parameters["convolveColumn"] ) {
 		convolve( chunk, kernel, data::columnDim );
 	}
 
-	if( parameterMap.getPropertyAs<bool>( "convolveSlice" ) ) {
+	if( parameters["convolveSlice"] ) {
 		convolve( chunk, kernel, data::sliceDim );
 	}
 

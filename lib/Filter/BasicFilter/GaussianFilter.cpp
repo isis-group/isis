@@ -1,4 +1,5 @@
 #include "GaussianFilter.hpp"
+#include "common.hpp"
 
 namespace isis
 {
@@ -7,20 +8,27 @@ namespace filter
 
 bool GaussianFilter::process( data::Image &image )
 {
-	const ValueType sigma = parameterMap.getPropertyAs<ValueType>( "sigma" );
+	ValueType sigma;
+
+	if( !parameters["sigma"].isEmpty() ) {
+		sigma = parameters["sigma"].as<ValueType>();
+	} else {
+		sigma = _internal::FWHM2Sigma( parameters["fwhm"].as<ValueType>() );
+		std::cout << sigma << std::endl;
+	}
 
 	if( sigma <= 0 ) {
 		LOG( data::Runtime, error ) << getFilterName() << ": parameter \"sigma\" has to be positive!";
 		return false;
 	}
 
-	m_GaussianKernelFilter.setParameter<ValueType>( "sigma", sigma );
+	m_GaussianKernelFilter.parameters["sigma"] = sigma;
 	m_GaussianKernelFilter.run();
 	data::Chunk kernel = m_GaussianKernelFilter.getOutput();
 
-	m_ConvolutionFilter.setParameter<bool>( "convolveRow", true );
-	m_ConvolutionFilter.setParameter<bool>( "convolveColumn", true );
-	m_ConvolutionFilter.setParameter<bool>( "convolveSlice", true );
+	m_ConvolutionFilter.parameters["convolveRow"] = true;
+	m_ConvolutionFilter.parameters["convolveColumn"] = true;
+	m_ConvolutionFilter.parameters["convolveSlice"] = true;
 	m_ConvolutionFilter.setInput( "kernel", kernel );
 
 	data::MemChunk<ValueType> ch( image.getChunk( 0 ) );

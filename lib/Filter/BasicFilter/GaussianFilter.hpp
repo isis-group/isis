@@ -10,14 +10,14 @@ namespace isis
 namespace filter
 {
 
-class GaussianFilter : public ImageFilterInPlace
+class GaussianFilter : public _internal::ImageFilterInPlace
 {
 	typedef float ValueType;
 public:
 	std::string getFilterName() const { return std::string( "GaussianFilter" ); }
 	std::string getDescription() const { return std::string( "Inplace filter that performs a gaussian kernel to an image." ); }
 	bool isValid() const {
-		return  parameterMap.hasProperty( "sigma" );
+		return  !parameters[ "sigma" ].isEmpty() || !parameters[ "fwhm" ].isEmpty();
 	}
 	bool process( data::Image & );
 

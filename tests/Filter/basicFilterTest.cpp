@@ -22,17 +22,17 @@ data::Image createEmptyImage( util::ivector4 size )
 	return data::Image( myChunk );
 }
 
-class TestFilter1 : public filter::ImageFilterInPlace
+class TestFilter1 : public filter::_internal::ImageFilterInPlace
 {
 public:
 	std::string getFilterName() const { return std::string( "TestFilter1" ); }
 
 	bool isValid() const {
-		return parameterMap.hasProperty( "value_to_add" );
+		return !parameters[ "value_to_add" ].isEmpty();
 	}
 
 	bool process( data::Image &image ) {
-		const uint16_t vta = parameterMap.getPropertyAs<uint16_t>( "value_to_add" );
+		const uint16_t vta = parameters.at( "value_to_add" );
 		data::TypedImage<uint16_t> tImage ( image );
 
 		for( data::TypedImage<uint16_t>::iterator iIter = tImage.begin(); iIter != tImage.end(); iIter++ ) {
@@ -44,16 +44,16 @@ public:
 	}
 };
 
-class CheckFilter : public filter::ImageFilterInPlace
+class CheckFilter : public filter::_internal::ImageFilterInPlace
 {
 	std::string getFilterName() const { return std::string( "CheckFilter" ); }
 
 	bool isValid() const {
-		return parameterMap.hasProperty( "value_to_check" );
+		return !parameters[ "value_to_check" ].isEmpty();
 	}
 	bool process( data::Image &image ) {
 		bool isCorrect = true;
-		const uint16_t value_to_check = parameterMap.getPropertyAs<uint16_t>( "value_to_check" );
+		const uint16_t value_to_check = parameters["value_to_check"];
 		data::TypedImage<uint16_t> tImage ( image );
 
 		for( data::TypedImage<uint16_t>::iterator iIter = tImage.begin(); iIter != tImage.end(); iIter++ ) {
@@ -62,7 +62,7 @@ class CheckFilter : public filter::ImageFilterInPlace
 			}
 		}
 
-		resultMap.setPropertyAs<bool>( "isCorrect", isCorrect );
+		results["isCorrect"] = isCorrect;
 		return true;
 	}
 };
@@ -74,12 +74,12 @@ BOOST_AUTO_TEST_CASE( basic_filter_test )
 	CheckFilter myCheckFilter;
 	BOOST_CHECK_EQUAL( myTestFilter1.getFilterName(), std::string( "TestFilter1" ) );
 	BOOST_CHECK( !myTestFilter1.isValid() );
-	myTestFilter1.setParameter<uint16_t>( "value_to_add", 10 );
+	myTestFilter1.parameters["value_to_add" ] = 10;
 	BOOST_CHECK( myTestFilter1.isValid() );
 	myTestFilter1.run( myImage );
-	myCheckFilter.setParameter<uint16_t>( "value_to_check", 10 );
+	myCheckFilter.parameters["value_to_check"] = 10;
 	myCheckFilter.run( myImage );
-	BOOST_CHECK_EQUAL( myCheckFilter.getResult<bool>( "isCorrect" ), true );
+	BOOST_CHECK_EQUAL( myCheckFilter.results["isCorrect"], true );
 
 }
 
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( gaussian_filter_test )
 {
 	data::Image myImage = createEmptyImage( util::ivector4( 200, 200, 200, 1 ) );
 	filter::GaussianFilter myGaussianFilter;
-	myGaussianFilter.setParameter<float>( "sigma", 1.5 );
+	myGaussianFilter.parameters["sigma"] = 1.5;
 	myGaussianFilter.run( myImage );
 }
 

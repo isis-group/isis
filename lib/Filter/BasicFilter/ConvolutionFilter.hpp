@@ -8,16 +8,16 @@ namespace isis
 namespace filter
 {
 
-class ConvolutionFilter : public ChunkFilterInPlace
+class ConvolutionFilter : public _internal::ChunkFilterInPlace
 {
 	typedef float ValueType;
 public:
 	std::string getFilterName() const { return std::string( "ConvolveFilter" ); }
 	std::string getDescription() const { return std::string( "Inplace filter that performs a convolution with a given kernel to a chunk." ); }
 	bool isValid() const {
-		return  parameterMap.hasProperty( "convolveRow" )
-				&& parameterMap.hasProperty( "convolveColumn" )
-				&& parameterMap.hasProperty( "convolveSlice" )
+		return  !parameters["convolveRow"].isEmpty()
+				&& !parameters["convolveColumn"].isEmpty()
+				&& !parameters["convolveSlice"].isEmpty()
 				&& m_additionalChunks.find( "kernel" ) != m_additionalChunks.end();
 	}
 	bool process( data::Chunk & );

@@ -4,6 +4,7 @@
 #include "chunk.hpp"
 #include "image.hpp"
 #include "../CoreUtils/progressfeedback.hpp"
+#include "../CoreUtils/progparameter.hpp"
 
 #include <list>
 #include <boost/signals2.hpp>
@@ -53,26 +54,11 @@ public:
 	boost::signals2::signal<void ( const std::string & )> filterStartedSignal;
 	boost::signals2::signal<void ( const std::string &, bool )> filterFinishedSignal;
 
-	template<typename TYPE>
-	void setParameter( const std::string &key, const TYPE &value ) {
-		parameterMap.setPropertyAs<TYPE>( key.c_str(), value );
-	}
-	void setParameterMap( const util::PropertyMap &pMap ) { parameterMap = pMap; }
-
-	template<typename TYPE>
-	TYPE getResult( const std::string &key ) {
-		if( !resultMap.hasProperty( key.c_str() ) ) {
-			LOG( data::Runtime, error ) << "The filter " << getFilterName()
-										<< " has no result with the key " << key;
-			return TYPE();
-		} else {
-			return resultMap.getPropertyAs<TYPE>( key.c_str() );
-		}
-	}
-	const util::PropertyMap &getResultMap() const { return resultMap; }
-
 	void setInput( const std::string &label, const data::Image & );
 	void setInput( const std::string &label, const data::Chunk & );
+
+	util::ParameterMap parameters;
+	util::ParameterMap results;
 
 protected:
 	FilterBase();
@@ -80,9 +66,6 @@ protected:
 	bool m_inputIsSet;
 
 	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
-
-	util::PropertyMap parameterMap;
-	util::PropertyMap resultMap;
 
 	std::map< std::string, boost::shared_ptr<data::Image> > m_additionalImages;
 	std::map< std::string, boost::shared_ptr<data::Chunk> > m_additionalChunks;
@@ -141,7 +124,7 @@ protected:
 
 };
 
-} // end _internal namespace
+
 
 class ImageFilterInPlace : public _internal::InPlace<data::Image>
 {};
@@ -155,6 +138,7 @@ class ImageOutputFilter : public _internal::OutputFilterBase<data::Image>
 class ChunkOutputFilter : public _internal::OutputFilterBase<data::Chunk>
 {};
 
+} // end _internal namespace
 }
 }
 
