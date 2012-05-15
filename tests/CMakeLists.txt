@@ -8,6 +8,9 @@
 # 
 ############################################################
 
+INCLUDE(CTest)
+ENABLE_TESTING()
+
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -38,3 +41,5 @@ if(ISIS_BUILD_BENCHMARKS)
   message(STATUS "Building stress tests")
   add_subdirectory(benchmarks)
 endif(ISIS_BUILD_BENCHMARKS)
+
+
