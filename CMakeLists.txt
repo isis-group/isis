@@ -233,4 +233,3 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 # set up doxygen
 ############################################################
 include(UseDoxygen)
-
