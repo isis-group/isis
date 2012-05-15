@@ -18,6 +18,8 @@
 
 #include "imageFormat_Vista_sa.hpp"
 #include "VistaSaParser.hpp"
+#include <boost/date_time/posix_time/time_parsers.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace isis
 {
@@ -42,6 +44,25 @@ template<> isis::data::ValueArrayReference reader<bool>( isis::data::FilePtr dat
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
 
+template<typename T> data::ValueArray<util::color<T> > toColor( const data::ValueArrayReference ref, size_t slice_size )
+{
+	assert( ref->getLength() % 3 == 0 );
+	const std::vector< data::ValueArrayReference > layers = ref->as<T>().splice( slice_size ); //colors are stored slice-wise in the 3d block
+	data::ValueArray<util::color<T> > ret( ref->getLength() / 3 );
+
+	typename data::ValueArray<util::color<T> >::iterator d_pix = ret.begin();
+
+	for( std::vector< data::ValueArrayReference >::const_iterator l = layers.begin(); l != layers.end(); ) {
+		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).r = s_pix; //red
+		d_pix -= slice_size; //return to the slice start
+		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).g = s_pix; //green
+		d_pix -= slice_size; //return to the slice start
+		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).b = s_pix; //blue
+	}
+
+	return ret;
+}
+
 }
 
 data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data::ValueArray< uint8_t >::iterator data_start, const isis::util::PropertyMap &props )
@@ -59,7 +80,12 @@ data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data
 	if( !reader )
 		throwGenericError( std::string( "Cannot handle repn " ) + props.getPropertyAs<std::string>( "repn" ) );
 
-	const isis::data::ValueArrayReference ch_data = reader( data, std::distance( data.begin(), data_start ) + ch_offset, ch_size.product() );
+	data::ValueArrayReference ch_data = reader( data, std::distance( data.begin(), data_start ) + ch_offset, ch_size.product() );
+
+	if( props.hasProperty( "component_repn" ) && props.getPropertyAs<std::string>( "component_repn" ) == "rgb" ) { // if its color
+		ch_data = _internal::toColor<uint8_t>( ch_data, ch_size.product() / ch_size[data::sliceDim] );
+		ch_size[data::sliceDim] /= 3;
+	}
 
 	LOG( Runtime, verbose_info )
 			<< "Creating " << ch_data->getTypeName() << "-Chunk of size "
@@ -88,7 +114,7 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	} else {
 		obj.setPropertyAs( "rowVec",    util::fvector4( 1, 0 ) );
 		obj.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		obj.setPropertyAs( "sliceVec",  util::fvector4( 0, 0, 1 ) );
+		obj.setPropertyAs( "sliceVec",  util::fvector4( 0, 0, -1 ) );
 		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
 
@@ -99,23 +125,60 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	if( !transformOrTell<isis::util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
 		obj.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	}
+
+	if( obj.hasProperty( "vista/diffusionBValue" ) ) {
+		const float len = obj.getPropertyAs<float>( "vista/diffusionBValue" );
+
+		if( len > 0 && transformOrTell<isis::util::fvector4>( "vista/diffusionGradientOrientation", "diffusionGradient", obj, warning ) ) {
+			util::fvector4 &vec = obj.propertyValue( "diffusionGradient" ).castTo<util::fvector4>();
+			vec.norm();
+			vec *= len;
+			obj.remove( "vista/diffusionBValue" );
+		}
+	}
+
+	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, warning );
+	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
+
+	if( obj.hasProperty( "vista/sex" ) ) {
+		util::Selection gender( "male,female,other" );
+		gender.set( obj.getPropertyAs<std::string>( "vista/sex" ).c_str() );
+
+		if( ( int )gender ) {
+			obj.setPropertyAs( "subjectGender", gender );
+			obj.remove( "vista/sex" );
+		}
+	}
+
+	//  if(obj.hasProperty("vista/date") && obj.hasProperty("vista/time")){
+	//      boost::posix_time::ptime stamp=boost::posix_time::time_from_string(obj.getPropertyAs<std::string>("vista/date") + " " + obj.getPropertyAs<std::string>("vista/time"));
+	//      obj.setPropertyAs("hasProperty",stamp);
+	//      obj.remove("vista/date");
+	//      obj.remove("vista/time");
+	//  }
+
 }
 
 bool ImageFormat_VistaSa::isFunctional( const std::list< data::Chunk >& chunks )
 {
 	//if we have only one chunk, its not functional
-	if(chunks.size() <= 1)return false;
-	const data::Chunk& front=chunks.front();
-	const bool is_short=front.is<int16_t>();
+	if( chunks.size() <= 1 )return false;
+
+	const data::Chunk &front = chunks.front();
+	const bool is_short = front.is<int16_t>();
+
+	if( front.hasProperty( "vista/diffusionGradientOrientation" ) )
+		return false; // dwi data look the same, but must not be transformed
 
 	//if we have proper vista/ntimesteps its functional
-	if(front.hasProperty("vista/ntimesteps") && front.getPropertyAs<uint32_t>("vista/ntimesteps")==front.getSizeAsVector()[data::sliceDim]){
-		LOG_IF(is_short,Runtime,warning) << "Functional data found which is not VShort";
+	if( front.hasProperty( "vista/ntimesteps" ) && front.getPropertyAs<uint32_t>( "vista/ntimesteps" ) == front.getSizeAsVector()[data::sliceDim] ) {
+		LOG_IF( is_short, Runtime, warning ) << "Functional data found which is not VShort";
 		return true;
-	} else if(is_short) { //if we have short, its functional
-		LOG(Runtime,warning) << "Functional data found, but ntimesteps is not set or wrong (should be " << front.getSizeAsVector()[data::sliceDim] << ")";
+	} else if( is_short ) { //if we have short, its functional
+		LOG( Runtime, warning ) << "Functional data found, but ntimesteps is not set or wrong (should be " << front.getSizeAsVector()[data::sliceDim] << ")";
 		return true;
 	}
+
 	return  false;
 }
 
@@ -127,7 +190,7 @@ std::list< data::Chunk > ImageFormat_VistaSa::transformFunctional( const std::li
 	const uint32_t acqStride = in_chunks.size();
 	BOOST_FOREACH( data::Chunk ch, in_chunks ) {
 		size_t timestep = 0;
-		ch.remove("vista/ntimesteps");
+		ch.remove( "vista/ntimesteps" );
 		BOOST_FOREACH( data::Chunk ch, ch.splice( data::sliceDim ) ) {
 			uint32_t &acq = ch.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
 			acq = acq + acqStride * timestep;

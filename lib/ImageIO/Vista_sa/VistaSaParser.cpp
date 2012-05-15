@@ -16,6 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define BOOST_SPIRIT_DEBUG_PRINT_SOME 50
+#define BOOST_SPIRIT_DEBUG_INDENT 5
+
 #include "VistaSaParser.hpp"
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
@@ -109,15 +112,15 @@ bool parse_vista( data::ValueArray< uint8_t >::iterator &first, data::ValueArray
 
 	qi::rule<Iterator, int(), SKIP_TYPE> magic = "V-data" >> int_;
 	qi::rule<Iterator, std::string(), SKIP_TYPE> word = lexeme[+( ascii::char_ - '"' - '{'-'}'-skipper )];
-	qi::rule<Iterator, std::string(), SKIP_TYPE> quoted_string = lexeme['"' >> *( ascii::char_ - '"' ) >> '"'];
-	qi::rule<Iterator, std::string(), SKIP_TYPE> label = lexeme[+( ascii::alnum|'_'|'-' )] >> ':';
+	qi::rule<Iterator, std::string(), SKIP_TYPE> quoted_string = lexeme['"' >> *( lit( "\\\"" )|( ascii::char_ - '"' ) ) >> '"'];
+	qi::rule<Iterator, std::string(), SKIP_TYPE> label = lexeme[+( ascii::alnum|'_'|'-'|'.'|'#' )] >> ':';
 	qi::rule<Iterator, s_entry(), SKIP_TYPE> entry = label >> ( quoted_string | word ) >> !lit( '{' );
 
 	qi::rule<Iterator, isis::util::PropertyMap(), SKIP_TYPE> block, chunk;
 	qi::rule<Iterator, std::vector<s_entry>(), SKIP_TYPE> hist_block = lit( "history" ) >> ':' >> '{' >> *entry >> '}';
 	qi::rule<Iterator, fusion::vector3<std::string, boost::optional<std::string >, isis::util::PropertyMap>(), SKIP_TYPE> named_block = label >> -word >> block;
 
-	chunk = lit( "image" ) >> ':' >> "image" >> block[addChunk<Iterator>]; //@todo cannot use automatic apply, because PropertyMap is uncleanly derived from std::map
+	chunk = ( lit( "image" ) | lit( "3DVectorfield" ) ) >> ':' >> "image" >> block[addChunk<Iterator>]; //@todo cannot use automatic apply, because PropertyMap is uncleanly derived from std::map
 	block = ( '{' >> *( entry[addEntry<Iterator>] | hist_block[addHist<Iterator>] | chunk[phoenix::push_back( phoenix::ref( ch_list ), _1 )] | named_block[addBlock<Iterator>] ) >> '}' );
 
 	qi::rule<Iterator, SKIP_TYPE> vista = magic[phoenix::ref( version ) =_1] >> block[phoenix::ref( vista_map )=_1];
@@ -131,14 +134,14 @@ bool parse_vista( data::ValueArray< uint8_t >::iterator &first, data::ValueArray
 	word.name( "word" );
 	chunk.name( "chunk" );
 
-	//     qi::debug(block);
-	//     qi::debug(magic);
-	//     qi::debug(entry);
-	//     qi::debug(label);
-	//     qi::debug(quoted_string);
-	//     qi::debug(word);
-	//     qi::debug(named_block);
-	//     qi::debug(chunk);
+	//  qi::debug(block);
+	//  qi::debug(magic);
+	//  qi::debug(entry);
+	//  qi::debug(label);
+	//  qi::debug(quoted_string);
+	//  qi::debug(word);
+	//  qi::debug(named_block);
+	//  qi::debug(chunk);
 
 	return phrase_parse( first, last, vista, skipper );
 }
