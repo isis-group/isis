@@ -7,21 +7,24 @@ namespace filter
 
 bool ConvolutionFilter::process ( data::Chunk &chunk )
 {
-	const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernel" ) );
 
 	if( parameters["convolveRow"] ) {
+		const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernelRow" ) );
 		convolve( chunk, kernel, data::rowDim );
 	}
 
 	if( parameters["convolveColumn"] ) {
+		const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernelColumn" ) );
 		convolve( chunk, kernel, data::columnDim );
 	}
 
 	if( parameters["convolveSlice"] ) {
+		const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernelSlice" ) );
 		convolve( chunk, kernel, data::sliceDim );
 	}
 
 	if( parameters["convolveTime"] ) {
+		const data::MemChunk<ValueType> kernel ( *m_additionalChunks.at( "kernelTime" ) );
 		convolve( chunk, kernel, data::timeDim );
 	}
 

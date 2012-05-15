@@ -12,6 +12,7 @@ GaussianFilter::GaussianFilter()
 	parameters["columnDim"] = true;
 	parameters["sliceDim"] = true;
 	parameters["timeDim"] = false;
+	parameters["physicalSpace"] = true;
 }
 
 bool GaussianFilter::process( data::Image &image )
@@ -29,14 +30,46 @@ bool GaussianFilter::process( data::Image &image )
 		return false;
 	}
 
-	m_GaussianKernelFilter.setParameter( "sigma", sigma );
-	m_GaussianKernelFilter.run();
-	data::Chunk kernel = m_GaussianKernelFilter.getOutput();
+	util::fvector4 sigmaVec( sigma, sigma, sigma, sigma );
+
+	if( parameters["physicalSpace"] ) {
+		util::fvector4 voxelSize = image.getPropertyAs<util::fvector4>( "voxelSize" );
+
+		if( image.hasProperty( "voxelGap" ) ) {
+			voxelSize += image.getPropertyAs<util::fvector4>( "voxelGap" );
+		}
+
+		sigmaVec /= voxelSize;
+	}
+
 	m_ConvolutionFilter.setParameter( "convolveRow", parameters["rowDim"] );
 	m_ConvolutionFilter.setParameter( "convolveColumn", parameters["columnDim"] );
 	m_ConvolutionFilter.setParameter( "convolveSlice", parameters["sliceDim"] );
 	m_ConvolutionFilter.setParameter( "convolveTime", parameters["timeDim"] );
-	m_ConvolutionFilter.setInput( "kernel", kernel );
+
+	if( parameters["rowDim"] ) {
+		m_GaussianKernelFilter.setParameter( "sigma", sigmaVec[0] );
+		m_GaussianKernelFilter.run();
+		m_ConvolutionFilter.setInput( "kernelRow", m_GaussianKernelFilter.getOutput() );
+	}
+
+	if( parameters["columnDim"] ) {
+		m_GaussianKernelFilter.setParameter( "sigma", sigmaVec[1] );
+		m_GaussianKernelFilter.run();
+		m_ConvolutionFilter.setInput( "kernelColumn", m_GaussianKernelFilter.getOutput() );
+	}
+
+	if( parameters["sliceDim"] ) {
+		m_GaussianKernelFilter.setParameter( "sigma", sigmaVec[2] );
+		m_GaussianKernelFilter.run();
+		m_ConvolutionFilter.setInput( "kernelSlice", m_GaussianKernelFilter.getOutput() );
+	}
+
+	if( parameters["timeDim"] ) {
+		m_GaussianKernelFilter.setParameter( "sigma", sigmaVec[3] );
+		m_GaussianKernelFilter.run();
+		m_ConvolutionFilter.setInput( "kernelTime", m_GaussianKernelFilter.getOutput() );
+	}
 
 	data::MemChunk<ValueType> ch( image.getChunk( 0 ) );
 
