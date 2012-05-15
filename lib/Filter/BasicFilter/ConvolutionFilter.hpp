@@ -2,6 +2,7 @@
 #define ISIS_FILTER_CONVOLUTION
 
 #include "DataStorage/filter.hpp"
+#include "../common.hpp"
 
 namespace isis
 {

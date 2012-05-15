@@ -4,6 +4,7 @@
 #include "GaussianKernelFilter.hpp"
 #include "ConvolutionFilter.hpp"
 #include "DataStorage/filter.hpp"
+#include "../common.hpp"
 
 #include <numeric>
 

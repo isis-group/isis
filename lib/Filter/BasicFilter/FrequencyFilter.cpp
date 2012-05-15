@@ -9,22 +9,36 @@ namespace filter
 
 FrequencyFilter::FrequencyFilter()
 {
+	parameters["stop"] = false;
+	parameters["high"] = 90;
+	parameters["low"] = 10;
+	parameters["sharp"] = 0.8;
+	parameters["dim"] = 3;
 }
 
 
 bool FrequencyFilter::process ( data::Image &image )
 {
+	if( parameters["sharp"].as<double>() <= 0.001 ) {
+		LOG( Runtime, error )   << "The parameter \"sharp\" has to be bigger than 0.001 but is "
+								<< parameters["sharp"].as<double>() << ". Abort.";
+		return false;
+	}
+
+	const uint8_t dim = parameters["dim"].as<uint8_t>();
 
 	data::TypedImage<short> tImage( image );
 
 	const util::ivector4 size = image.getSizeAsVector();
+
 	uint16_t repTime;
 
 	if( parameters["repetitionTime"].isEmpty() ) {
 		if( image.hasProperty( "repetitionTime" ) ) {
 			repTime = image.getPropertyAs<uint16_t>( "repetitionTime" );
 		} else {
-			repTime = 1000;
+			LOG( Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
+			return false;
 		}
 	} else {
 		repTime = parameters["repetitionTime"];
@@ -37,7 +51,7 @@ bool FrequencyFilter::process ( data::Image &image )
 	const bool stop = parameters["stop"].as<bool>();
 	const ValueType sharp = parameters["sharp"].as<ValueType>();
 
-	int32_t n = size[3];
+	int32_t n = size[dim];
 
 	int tail = n / 10;
 
@@ -64,17 +78,13 @@ bool FrequencyFilter::process ( data::Image &image )
 	fftw_plan p2 = fftw_plan_dft_c2r_1d( n, out, in, FFTW_ESTIMATE );
 
 	float alpha = repTime * n;
-	double *highp;
-	double *lowp;
 
-	if( sharp > 0 ) {
-		highp = ( double * )malloc( sizeof( double ) * nc );
-		lowp = ( double * )malloc( sizeof( double ) * nc );
+	double *highp = ( double * )malloc( sizeof( double ) * nc );
+	double *lowp = ( double * )malloc( sizeof( double ) * nc );
 
-		for( uint16_t i = 1; i < nc; i++ ) {
-			highp[i] = 1.0 / ( 1.0 + exp( ( alpha / high - ( double )i ) * sharp ) );
-			lowp[i] = 1.0 / ( 1.0 + exp( ( ( double )i - alpha / low ) * sharp ) );
-		}
+	for( uint16_t i = 1; i < nc; i++ ) {
+		highp[i] = 1.0 / ( 1.0 + exp( ( alpha / high - ( double )i ) * sharp ) );
+		lowp[i] = 1.0 / ( 1.0 + exp( ( ( double )i - alpha / low ) * sharp ) );
 	}
 
 	double sum;
@@ -96,13 +106,13 @@ bool FrequencyFilter::process ( data::Image &image )
 					l++;
 				}
 
-				for( uint16_t j = 0; j < size[3]; j++ ) {
+				for( uint16_t j = 0; j < size[dim]; j++ ) {
 					in[l] = ( double )tImage.voxel<short>( r, c, s, j );
 					sum += in[l];
 					l++;
 				}
 
-				uint16_t j = size[3] - 2;
+				uint16_t j = size[dim] - 2;
 
 				while( l < n && j - 1 >= 0 ) {
 					in[l] = ( double )tImage.voxel<short>( r, c, s, j );

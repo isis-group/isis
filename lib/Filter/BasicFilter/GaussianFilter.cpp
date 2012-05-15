@@ -26,7 +26,7 @@ bool GaussianFilter::process( data::Image &image )
 	}
 
 	if( sigma <= 0 ) {
-		LOG( data::Runtime, error ) << getFilterName() << ": parameter \"sigma\" has to be positive!";
+		LOG( Runtime, error ) << getFilterName() << ": parameter \"sigma\" has to be positive!";
 		return false;
 	}
 
