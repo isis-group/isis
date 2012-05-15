@@ -12,24 +12,24 @@ FrequencyFilter::FrequencyFilter()
 	parameters["stop"] = false;
 	parameters["high"] = 90;
 	parameters["low"] = 10;
-	parameters["sharp"] = 0.8;
-	parameters["dim"] = 3;
+	parameters["sharpness"] = 0.8;
+	parameters["dimension"] = 3;
 }
 
 
 bool FrequencyFilter::process ( data::Image &image )
 {
-	if( parameters["sharp"].as<double>() <= 0.001 ) {
-		LOG( Runtime, error )   << "The parameter \"sharp\" has to be bigger than 0.001 but is "
-								<< parameters["sharp"].as<double>() << ". Abort.";
+	if( parameters["sharpness"].as<double>() <= 0.001 ) {
+		LOG( data::Runtime, error )   << "The parameter \"sharpness\" has to be bigger than 0.001 but is "
+								<< parameters["sharpness"].as<double>() << ". Abort.";
 		return false;
 	}
 
-	const uint8_t dim = parameters["dim"].as<uint8_t>();
+	const uint8_t dim = parameters["dimension"].as<uint8_t>();
 
 	data::TypedImage<short> tImage( image );
 
-	const util::ivector4 size = image.getSizeAsVector();
+	util::ivector4 size = image.getSizeAsVector();
 
 	uint16_t repTime;
 
@@ -37,7 +37,7 @@ bool FrequencyFilter::process ( data::Image &image )
 		if( image.hasProperty( "repetitionTime" ) ) {
 			repTime = image.getPropertyAs<uint16_t>( "repetitionTime" );
 		} else {
-			LOG( Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
+			LOG( data::Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
 			return false;
 		}
 	} else {
@@ -49,7 +49,7 @@ bool FrequencyFilter::process ( data::Image &image )
 	const ValueType high = parameters["high"].as<ValueType>();
 	const ValueType low = parameters["low"].as<ValueType>();
 	const bool stop = parameters["stop"].as<bool>();
-	const ValueType sharp = parameters["sharp"].as<ValueType>();
+	const ValueType sharpness = parameters["sharpness"].as<ValueType>();
 
 	int32_t n = size[dim];
 
@@ -83,8 +83,8 @@ bool FrequencyFilter::process ( data::Image &image )
 	double *lowp = ( double * )malloc( sizeof( double ) * nc );
 
 	for( uint16_t i = 1; i < nc; i++ ) {
-		highp[i] = 1.0 / ( 1.0 + exp( ( alpha / high - ( double )i ) * sharp ) );
-		lowp[i] = 1.0 / ( 1.0 + exp( ( ( double )i - alpha / low ) * sharp ) );
+		highp[i] = 1.0 / ( 1.0 + exp( ( alpha / high - ( double )i ) * sharpness ) );
+		lowp[i] = 1.0 / ( 1.0 + exp( ( ( double )i - alpha / low ) * sharpness ) );
 	}
 
 	double sum;
@@ -93,81 +93,88 @@ bool FrequencyFilter::process ( data::Image &image )
 	double x_low;
 	double x;
 	double freq;
+	size[dim] = 0;
+	for( uint16_t t = 0; t < size[3]; t++ ) {
+		  for( uint16_t s = 0; s < size[2]; s++ ) {
+			for( uint16_t c = 0; c < size[1]; c++ ) {
+			    for( uint16_t r = 0; r < size[0]; r++ ) {
+				  util::ivector4 coords(r,c,s,t);
+				  sum = 0;
+				  l = 0;
 
-	for( uint16_t s = 0; s < size[2]; s++ ) {
-		for( uint16_t c = 0; c < size[1]; c++ ) {
-			for( uint16_t r = 0; r < size[0]; r++ ) {
-				sum = 0;
-				l = 0;
+				  for( uint16_t j = 0; j < tail; j++ ) {
+					  coords[dim] = tail - j;
+					  in[l] =  ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+					  sum += in[l];
+					  l++;
+				  }
 
-				for( uint16_t j = 0; j < tail; j++ ) {
-					in[l] =  ( double )tImage.voxel<short>( r, c, s, tail - j );
-					sum += in[l];
-					l++;
-				}
+				  for( uint16_t j = 0; j < size[dim]; j++ ) {
+					  coords[dim] = j;
+					  in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+					  sum += in[l];
+					  l++;
+				  }
 
-				for( uint16_t j = 0; j < size[dim]; j++ ) {
-					in[l] = ( double )tImage.voxel<short>( r, c, s, j );
-					sum += in[l];
-					l++;
-				}
+				  uint16_t j = size[dim] - 2;
 
-				uint16_t j = size[dim] - 2;
+				  while( l < n && j - 1 >= 0 ) {
+					  coords[dim] = j;
+					  in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+					  sum += in[l];
+					  j--;
+					  l++;
+				  }
 
-				while( l < n && j - 1 >= 0 ) {
-					in[l] = ( double )tImage.voxel<short>( r, c, s, j );
-					sum += in[l];
-					j--;
-					l++;
-				}
+				  if( std::abs( sum ) > std::numeric_limits<float>::epsilon() ) {
+					  fftw_execute( p1 );
 
-				if( std::abs( sum ) > std::numeric_limits<float>::epsilon() ) {
-					fftw_execute( p1 );
+					  for( uint16_t i = 1; i < nc; i++ ) {
+						  if( sharpness > 0 ) {
+							  if( high > 0 ) {
+								  x_high = highp[i];
+							  } else {
+								  x_high = 1.0;
+							  }
 
-					for( uint16_t i = 1; i < nc; i++ ) {
-						if( sharp > 0 ) {
-							if( high > 0 ) {
-								x_high = highp[i];
-							} else {
-								x_high = 1.0;
-							}
+							  if( low > 0 ) {
+								  x_low = lowp[i];
+							  } else {
+								  x_low = 1.0;
+							  }
 
-							if( low > 0 ) {
-								x_low = lowp[i];
-							} else {
-								x_low = 1.0;
-							}
+							  x = x_high + x_low - 1.0;
 
-							x = x_high + x_low - 1.0;
+							  if( stop ) {
+								  x = std::abs( 1 - x );
+							  }
 
-							if( stop ) {
-								x = std::abs( 1 - x );
-							}
+							  out[i][0] *= x;
+							  out[i][1] *= x;
+						  } else {
+							  freq = 1.0 / ( double )i * alpha;
 
-							out[i][0] *= x;
-							out[i][1] *= x;
-						} else {
-							freq = 1.0 / ( double )i * alpha;
+							  if( ( !stop && ( freq < low || ( freq > high && high > 0 ) ) )
+								  || ( stop && !( freq < low || ( freq > high && high > 0 ) ) ) ) {
+								  out[i][0] = out[i][1] = 0;
+							  }
+						  }
+					  }
 
-							if( ( !stop && ( freq < low || ( freq > high && high > 0 ) ) )
-								|| ( stop && !( freq < low || ( freq > high && high > 0 ) ) ) ) {
-								out[i][0] = out[i][1] = 0;
-							}
-						}
-					}
+					  fftw_execute( p2 );
 
-					fftw_execute( p2 );
+					  for( uint16_t i = 0; i < n; i++ ) {
+						  in[i] /= ( double )n;
+					  }
 
-					for( uint16_t i = 0; i < n; i++ ) {
-						in[i] /= ( double )n;
-					}
-
-					for( uint16_t j = tail; j < n - tail; j++ ) {
-						tImage.voxel<short>( r, c, s, j - tail ) = static_cast<short>( in[j] );
-					}
-				}
-			}
-		}
+					  for( uint16_t j = tail; j < n - tail; j++ ) {
+						  coords[dim] = j - tail;
+						  tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] ) = static_cast<short>( in[j] );
+					  }
+				  }
+			  }
+		 }
+	    }
 	}
 
 	image = tImage;

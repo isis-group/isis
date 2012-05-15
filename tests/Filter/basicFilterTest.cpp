@@ -4,6 +4,7 @@
 #include <DataStorage/filter.hpp>
 
 #include "BasicFilter/GaussianFilter.hpp"
+#include "BasicFilter/FrequencyFilter.hpp"
 #include <DataStorage/io_factory.hpp>
 
 namespace isis
@@ -32,7 +33,7 @@ public:
 	}
 
 	bool process( data::Image &image ) {
-		const uint16_t vta = parameters.at( "value_to_add" );
+		const int32_t vta = parameters["value_to_add"].as<int32_t>();
 		data::TypedImage<uint16_t> tImage ( image );
 
 		for( data::TypedImage<uint16_t>::iterator iIter = tImage.begin(); iIter != tImage.end(); iIter++ ) {
@@ -53,7 +54,7 @@ class CheckFilter : public filter::_internal::ImageFilterInPlace
 	}
 	bool process( data::Image &image ) {
 		bool isCorrect = true;
-		const uint16_t value_to_check = parameters["value_to_check"];
+		const int32_t value_to_check = parameters["value_to_check"].as<int32_t>();
 		data::TypedImage<uint16_t> tImage ( image );
 
 		for( data::TypedImage<uint16_t>::iterator iIter = tImage.begin(); iIter != tImage.end(); iIter++ ) {
@@ -88,7 +89,15 @@ BOOST_AUTO_TEST_CASE( gaussian_filter_test )
 	data::Image myImage = createEmptyImage( util::ivector4( 200, 200, 200, 1 ) );
 	filter::GaussianFilter myGaussianFilter;
 	myGaussianFilter.setParameter( "sigma", 1.5 );
-	myGaussianFilter.run( myImage );
+	BOOST_CHECK( myGaussianFilter.run( myImage ) );
+}
+
+BOOST_AUTO_TEST_CASE( frequency_filter_test)
+{
+	data::Image myImage = createEmptyImage( util::ivector4(100,100,100,100) );
+	myImage.setPropertyAs<uint16_t>("repetitionTime", 2000);
+	filter::FrequencyFilter myFrequencyFilter;
+	BOOST_CHECK( myFrequencyFilter.run( myImage ) );
 }
 
 }
