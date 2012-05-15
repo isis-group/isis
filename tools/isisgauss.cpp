@@ -28,6 +28,7 @@ int main( int argc, char **argv )
 	gaussFilter.setParameters( app.parameters );
 	data::Image image = app.fetchImage();
 
+
 	if( gaussFilter.run( image ) ) {
 		app.autowrite( image );
 		return EXIT_SUCCESS;

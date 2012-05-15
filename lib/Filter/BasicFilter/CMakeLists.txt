@@ -2,12 +2,15 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 
 set(BASIC_FILTER 	GaussianFilter.cpp
 					GaussianKernelFilter.cpp
-					ConvolutionFilter.cpp)
+					ConvolutionFilter.cpp
+					FrequencyFilter.cpp )
 
 file(GLOB FILTER_HDR_FILES "*.hpp")
 
+find_package(FFTW3 REQUIRED)
+
 add_library(isisFilter_Basic SHARED ${BASIC_FILTER})
-target_link_libraries(isisFilter_Basic isis_core)
+target_link_libraries(isisFilter_Basic isis_core ${FFTW3_FFTW3_LIBRARY})
 
 if(WIN32)
 install(TARGETS isisFilter_Basic  RUNTIME DESTINATION bin COMPONENT "filter")
