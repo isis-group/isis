@@ -6,6 +6,14 @@ namespace isis
 namespace filter
 {
 
+GaussianFilter::GaussianFilter()
+{
+	parameters["rowDim"] = true;
+	parameters["columnDim"] = true;
+	parameters["sliceDim"] = true;
+	parameters["timeDim"] = false;
+}
+
 bool GaussianFilter::process( data::Image &image )
 {
 	ValueType sigma;
@@ -21,18 +29,20 @@ bool GaussianFilter::process( data::Image &image )
 		return false;
 	}
 
-	m_GaussianKernelFilter.parameters["sigma"] = sigma;
+	m_GaussianKernelFilter.setParameter( "sigma", sigma );
 	m_GaussianKernelFilter.run();
 	data::Chunk kernel = m_GaussianKernelFilter.getOutput();
-
-	m_ConvolutionFilter.parameters["convolveRow"] = true;
-	m_ConvolutionFilter.parameters["convolveColumn"] = true;
-	m_ConvolutionFilter.parameters["convolveSlice"] = true;
+	m_ConvolutionFilter.setParameter( "convolveRow", parameters["rowDim"] );
+	m_ConvolutionFilter.setParameter( "convolveColumn", parameters["columnDim"] );
+	m_ConvolutionFilter.setParameter( "convolveSlice", parameters["sliceDim"] );
+	m_ConvolutionFilter.setParameter( "convolveTime", parameters["timeDim"] );
 	m_ConvolutionFilter.setInput( "kernel", kernel );
 
 	data::MemChunk<ValueType> ch( image.getChunk( 0 ) );
 
-	m_ConvolutionFilter.run( ch );
+	if( !m_ConvolutionFilter.run( ch ) ) {
+		return false;
+	}
 
 	data::Image im ( ch );
 	image = im;

@@ -57,13 +57,19 @@ public:
 	void setInput( const std::string &label, const data::Image & );
 	void setInput( const std::string &label, const data::Chunk & );
 
-	util::ParameterMap parameters;
-	util::ParameterMap results;
+	util::ParameterMap getParameters() const { return parameters; }
+	util::ProgParameter getParameter( const std::string &parameter ) { return parameters.at( parameter ); }
+	util::ParameterMap getResults() const { return results; }
+
+	void setParameters( const util::ParameterMap &map );
+	void setParameter( const std::string &parameter, util::ProgParameter val ) {
+		parameters[parameter] = val;
+	}
 
 protected:
-	FilterBase();
-
-	bool m_inputIsSet;
+	FilterBase() {};
+	util::ParameterMap parameters;
+	util::ParameterMap results;
 
 	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
 

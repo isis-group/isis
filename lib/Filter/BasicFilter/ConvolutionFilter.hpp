@@ -18,6 +18,7 @@ public:
 		return  !parameters["convolveRow"].isEmpty()
 				&& !parameters["convolveColumn"].isEmpty()
 				&& !parameters["convolveSlice"].isEmpty()
+				&& !parameters["convolveTime"].isEmpty()
 				&& m_additionalChunks.find( "kernel" ) != m_additionalChunks.end();
 	}
 	bool process( data::Chunk & );

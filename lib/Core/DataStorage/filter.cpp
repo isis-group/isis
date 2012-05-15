@@ -7,9 +7,6 @@ namespace filter
 
 namespace _internal
 {
-FilterBase::FilterBase()
-	: m_inputIsSet( false )
-{}
 
 void FilterBase::setInput ( const std::string &label, const data::Image &image )
 {
@@ -20,6 +17,14 @@ void FilterBase::setInput ( const std::string &label, const data::Chunk &chunk )
 {
 	m_additionalChunks[label] = boost::shared_ptr<data::Chunk> ( new data::Chunk( chunk ) );
 }
+
+void FilterBase::setParameters ( const util::ParameterMap &map )
+{
+	BOOST_FOREACH( util::ParameterMap::const_reference mapElem, map ) {
+		parameters[mapElem.first] = mapElem.second;
+	}
+}
+
 
 }
 }

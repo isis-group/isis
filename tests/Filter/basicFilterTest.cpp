@@ -74,12 +74,12 @@ BOOST_AUTO_TEST_CASE( basic_filter_test )
 	CheckFilter myCheckFilter;
 	BOOST_CHECK_EQUAL( myTestFilter1.getFilterName(), std::string( "TestFilter1" ) );
 	BOOST_CHECK( !myTestFilter1.isValid() );
-	myTestFilter1.parameters["value_to_add" ] = 10;
+	myTestFilter1.setParameter( "value_to_add", 10 );
 	BOOST_CHECK( myTestFilter1.isValid() );
 	myTestFilter1.run( myImage );
-	myCheckFilter.parameters["value_to_check"] = 10;
+	myCheckFilter.setParameter( "value_to_check", 10 );
 	myCheckFilter.run( myImage );
-	BOOST_CHECK_EQUAL( myCheckFilter.results["isCorrect"], true );
+	BOOST_CHECK_EQUAL( myCheckFilter.getResults()["isCorrect"], true );
 
 }
 
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( gaussian_filter_test )
 {
 	data::Image myImage = createEmptyImage( util::ivector4( 200, 200, 200, 1 ) );
 	filter::GaussianFilter myGaussianFilter;
-	myGaussianFilter.parameters["sigma"] = 1.5;
+	myGaussianFilter.setParameter( "sigma", 1.5 );
 	myGaussianFilter.run( myImage );
 }
 

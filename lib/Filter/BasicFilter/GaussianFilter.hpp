@@ -16,8 +16,11 @@ class GaussianFilter : public _internal::ImageFilterInPlace
 {
 	typedef float ValueType;
 public:
+	GaussianFilter();
+
 	std::string getFilterName() const { return std::string( "GaussianFilter" ); }
 	std::string getDescription() const { return std::string( "Inplace filter that performs a gaussian kernel to an image." ); }
+
 	bool isValid() const {
 		return  ( !parameters["sigma"].isEmpty() && !std::isnan( parameters["sigma"].as<float>() ) )
 				|| ( !parameters[ "fwhm" ].isEmpty() && !std::isnan( parameters["fwhm"].as<float>() ) ) ;
