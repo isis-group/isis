@@ -18,8 +18,9 @@
 
 #include "imageFormat_Vista_sa.hpp"
 #include "VistaSaParser.hpp"
-#include <boost/date_time/posix_time/time_parsers.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <time.h>
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 
 namespace isis
 {
@@ -106,25 +107,44 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	obj.remove( "vista/nrows" );
 	obj.remove( "vista/nbands" );
 	obj.remove( "vista/repn" );
+	obj.remove( "vista/component_repn" );
+	obj.remove( "vista/ncomponents" );
 
-	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) {
+
+	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		obj.transform<isis::util::fvector4>( "vista/columnVec", "rowVec" );
 		obj.transform<isis::util::fvector4>( "vista/rowVec", "columnVec" );
 		transformOrTell<isis::util::fvector4>( "vista/sliceVec", "sliceVec", obj, warning );
-	} else {
+	} else if( obj.hasProperty( "vista/imageOrientationPatient" ) ) {
+		const util::dlist vecs = obj.getPropertyAs<util::dlist>( "vista/imageOrientationPatient" ); // if we have the dicom style partial orientation
+		util::dlist::const_iterator begin = vecs.begin(), middle = vecs.begin(), end = vecs.end();
+		std::advance( middle, 3 );
+		obj.setPropertyAs( "rowVec",    util::fvector4() ).castTo<util::fvector4>().copyFrom( begin, middle );
+		obj.setPropertyAs( "columnVec", util::fvector4() ).castTo<util::fvector4>().copyFrom( middle, end );
+	} else { // if we dont have an orientation
 		obj.setPropertyAs( "rowVec",    util::fvector4( 1, 0 ) );
 		obj.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 		obj.setPropertyAs( "sliceVec",  util::fvector4( 0, 0, -1 ) );
 		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
 
-	if( !transformOrTell<isis::util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ) {
+	if(
+		transformOrTell<isis::util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ||
+		transformOrTell<isis::util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, warning )
+	);
+	else {
+		LOG( Runtime, warning ) << "No position info was found, assuming 0 0 0";
 		obj.setPropertyAs( "indexOrigin", util::fvector4( 0, 0 ) );
 	}
 
-	if( !transformOrTell<isis::util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
+	if( transformOrTell<isis::util::fvector4>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
+		if( hasOrTell( "vista/voxel", obj, info ) ) { // use that as voxel size, and the difference to voxel as voxel gap
+			obj.setPropertyAs<util::fvector4>( "voxelGap", obj.getPropertyAs<util::fvector4>( "vista/voxel" ) - obj.getPropertyAs<util::fvector4>( "voxelSize" ) ) ;
+			obj.remove( "vista/voxel" );
+		}
+	} else if( transformOrTell<isis::util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
+	} else
 		obj.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-	}
 
 	if( obj.hasProperty( "vista/diffusionBValue" ) ) {
 		const float len = obj.getPropertyAs<float>( "vista/diffusionBValue" );
@@ -137,10 +157,15 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 
+	transformOrTell<std::string>( "vista/seriesDescription", "sequenceDescription", obj, warning ) ||
+	transformOrTell<std::string>( "vista/protocol", "sequenceDescription", obj, warning ) ||
 	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, warning );
-	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
-	if( obj.hasProperty( "vista/sex" ) ) {
+	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
+	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, info );
+	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, info );
+
+	if( hasOrTell( "vista/sex", obj, warning ) ) {
 		util::Selection gender( "male,female,other" );
 		gender.set( obj.getPropertyAs<std::string>( "vista/sex" ).c_str() );
 
@@ -150,13 +175,25 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 
-	//  if(obj.hasProperty("vista/date") && obj.hasProperty("vista/time")){
-	//      boost::posix_time::ptime stamp=boost::posix_time::time_from_string(obj.getPropertyAs<std::string>("vista/date") + " " + obj.getPropertyAs<std::string>("vista/time"));
-	//      obj.setPropertyAs("hasProperty",stamp);
-	//      obj.remove("vista/date");
-	//      obj.remove("vista/time");
-	//  }
+	//@todo implement "vista/date" and "vista/time"
 
+	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
+	transformOrTell<float>( "vista/echoTime", "echoTime", obj, warning );
+
+	tm buff;
+	memset( &buff, 0, sizeof( tm ) );
+
+	if( hasOrTell( "vista/date", obj, info ) ) {
+		strptime( obj.getPropertyAs<std::string>( "vista/date" ).c_str(), "%d.%m.%Y", &buff );
+		obj.remove( "vista/date" );
+	}
+
+	if( hasOrTell( "vista/time", obj, info ) ) {
+		strptime( obj.getPropertyAs<std::string>( "vista/time" ).c_str(), "%T", &buff );
+		obj.remove( "vista/time" );
+	}
+
+	obj.setPropertyAs( "sequenceStart", boost::posix_time::ptime_from_tm( buff ) );
 }
 
 bool ImageFormat_VistaSa::isFunctional( const std::list< data::Chunk >& chunks )
