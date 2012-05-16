@@ -20,7 +20,7 @@ FrequencyFilter::FrequencyFilter()
 bool FrequencyFilter::process ( data::Image &image )
 {
 	if( parameters["sharpness"].as<double>() <= 0.001 ) {
-		LOG( data::Runtime, error )   << "The parameter \"sharpness\" has to be bigger than 0.001 but is "
+		LOG( Runtime, error )   << "The parameter \"sharpness\" has to be bigger than 0.001 but is "
 								<< parameters["sharpness"].as<double>() << ". Abort.";
 		return false;
 	}
@@ -37,7 +37,7 @@ bool FrequencyFilter::process ( data::Image &image )
 		if( image.hasProperty( "repetitionTime" ) ) {
 			repTime = image.getPropertyAs<uint16_t>( "repetitionTime" );
 		} else {
-			LOG( data::Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
+			LOG( Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
 			return false;
 		}
 	} else {
