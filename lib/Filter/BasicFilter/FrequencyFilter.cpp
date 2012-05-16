@@ -53,6 +53,12 @@ bool FrequencyFilter::process ( data::Image &image )
 
 	int32_t n = size[dim];
 
+	LOG( Debug, info ) 	<< "FrequencyFilter with high=" << high << ", low="
+						<< low << ", sharpness=" << sharpness << ", stop="
+						<< stop << ", dim=" << (float)dim;
+	std::cout << "FrequencyFilter with high=" << high << ", low="
+						<< low << ", sharpness=" << sharpness << ", stop="
+						<< stop << ", dim=" << (float)dim << std::endl;
 	int tail = n / 10;
 
 	if( tail < 50 ) tail = 50;
@@ -93,11 +99,12 @@ bool FrequencyFilter::process ( data::Image &image )
 	double x_low;
 	double x;
 	double freq;
-	size[dim] = 0;
-	for( uint16_t t = 0; t < size[3]; t++ ) {
-		  for( uint16_t s = 0; s < size[2]; s++ ) {
-			for( uint16_t c = 0; c < size[1]; c++ ) {
-			    for( uint16_t r = 0; r < size[0]; r++ ) {
+	util::ivector4 countSize = size;
+	countSize[dim] = 1;
+	for( uint16_t t = 0; t < countSize[3]; t++ ) {
+		  for( uint16_t s = 0; s < countSize[2]; s++ ) {
+			for( uint16_t c = 0; c < countSize[1]; c++ ) {
+			    for( uint16_t r = 0; r < countSize[0]; r++ ) {
 				  util::ivector4 coords(r,c,s,t);
 				  sum = 0;
 				  l = 0;
@@ -118,7 +125,7 @@ bool FrequencyFilter::process ( data::Image &image )
 
 				  uint16_t j = size[dim] - 2;
 
-				  while( l < n && j - 1 >= 0 ) {
+				  while( l < n && j >= 0 ) {
 					  coords[dim] = j;
 					  in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
 					  sum += in[l];
@@ -128,7 +135,6 @@ bool FrequencyFilter::process ( data::Image &image )
 
 				  if( std::abs( sum ) > std::numeric_limits<float>::epsilon() ) {
 					  fftw_execute( p1 );
-
 					  for( uint16_t i = 1; i < nc; i++ ) {
 						  if( sharpness > 0 ) {
 							  if( high > 0 ) {
