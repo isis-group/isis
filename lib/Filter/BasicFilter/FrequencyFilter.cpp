@@ -53,12 +53,12 @@ bool FrequencyFilter::process ( data::Image &image )
 
 	int32_t n = size[dim];
 
-	LOG( Debug, info ) 	<< "FrequencyFilter with high=" << high << ", low="
+	LOG( Debug, info )  << "FrequencyFilter with high=" << high << ", low="
 						<< low << ", sharpness=" << sharpness << ", stop="
-						<< stop << ", dim=" << (float)dim;
+						<< stop << ", dim=" << ( float )dim;
 	std::cout << "FrequencyFilter with high=" << high << ", low="
-						<< low << ", sharpness=" << sharpness << ", stop="
-						<< stop << ", dim=" << (float)dim << std::endl;
+			  << low << ", sharpness=" << sharpness << ", stop="
+			  << stop << ", dim=" << ( float )dim << std::endl;
 	int tail = n / 10;
 
 	if( tail < 50 ) tail = 50;
@@ -101,86 +101,88 @@ bool FrequencyFilter::process ( data::Image &image )
 	double freq;
 	util::ivector4 countSize = size;
 	countSize[dim] = 1;
+
 	for( uint16_t t = 0; t < countSize[3]; t++ ) {
-		  for( uint16_t s = 0; s < countSize[2]; s++ ) {
+		for( uint16_t s = 0; s < countSize[2]; s++ ) {
 			for( uint16_t c = 0; c < countSize[1]; c++ ) {
-			    for( uint16_t r = 0; r < countSize[0]; r++ ) {
-				  util::ivector4 coords(r,c,s,t);
-				  sum = 0;
-				  l = 0;
+				for( uint16_t r = 0; r < countSize[0]; r++ ) {
+					util::ivector4 coords( r, c, s, t );
+					sum = 0;
+					l = 0;
 
-				  for( uint16_t j = 0; j < tail; j++ ) {
-					  coords[dim] = tail - j;
-					  in[l] =  ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
-					  sum += in[l];
-					  l++;
-				  }
+					for( uint16_t j = 0; j < tail; j++ ) {
+						coords[dim] = tail - j;
+						in[l] =  ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+						sum += in[l];
+						l++;
+					}
 
-				  for( uint16_t j = 0; j < size[dim]; j++ ) {
-					  coords[dim] = j;
-					  in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
-					  sum += in[l];
-					  l++;
-				  }
+					for( uint16_t j = 0; j < size[dim]; j++ ) {
+						coords[dim] = j;
+						in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+						sum += in[l];
+						l++;
+					}
 
-				  uint16_t j = size[dim] - 2;
+					uint16_t j = size[dim] - 2;
 
-				  while( l < n && j >= 0 ) {
-					  coords[dim] = j;
-					  in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
-					  sum += in[l];
-					  j--;
-					  l++;
-				  }
+					while( l < n && j >= 0 ) {
+						coords[dim] = j;
+						in[l] = ( double )tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] );
+						sum += in[l];
+						j--;
+						l++;
+					}
 
-				  if( std::abs( sum ) > std::numeric_limits<float>::epsilon() ) {
-					  fftw_execute( p1 );
-					  for( uint16_t i = 1; i < nc; i++ ) {
-						  if( sharpness > 0 ) {
-							  if( high > 0 ) {
-								  x_high = highp[i];
-							  } else {
-								  x_high = 1.0;
-							  }
+					if( std::abs( sum ) > std::numeric_limits<float>::epsilon() ) {
+						fftw_execute( p1 );
 
-							  if( low > 0 ) {
-								  x_low = lowp[i];
-							  } else {
-								  x_low = 1.0;
-							  }
+						for( uint16_t i = 1; i < nc; i++ ) {
+							if( sharpness > 0 ) {
+								if( high > 0 ) {
+									x_high = highp[i];
+								} else {
+									x_high = 1.0;
+								}
 
-							  x = x_high + x_low - 1.0;
+								if( low > 0 ) {
+									x_low = lowp[i];
+								} else {
+									x_low = 1.0;
+								}
 
-							  if( stop ) {
-								  x = std::abs( 1 - x );
-							  }
+								x = x_high + x_low - 1.0;
 
-							  out[i][0] *= x;
-							  out[i][1] *= x;
-						  } else {
-							  freq = 1.0 / ( double )i * alpha;
+								if( stop ) {
+									x = std::abs( 1 - x );
+								}
 
-							  if( ( !stop && ( freq < low || ( freq > high && high > 0 ) ) )
-								  || ( stop && !( freq < low || ( freq > high && high > 0 ) ) ) ) {
-								  out[i][0] = out[i][1] = 0;
-							  }
-						  }
-					  }
+								out[i][0] *= x;
+								out[i][1] *= x;
+							} else {
+								freq = 1.0 / ( double )i * alpha;
 
-					  fftw_execute( p2 );
+								if( ( !stop && ( freq < low || ( freq > high && high > 0 ) ) )
+									|| ( stop && !( freq < low || ( freq > high && high > 0 ) ) ) ) {
+									out[i][0] = out[i][1] = 0;
+								}
+							}
+						}
 
-					  for( uint16_t i = 0; i < n; i++ ) {
-						  in[i] /= ( double )n;
-					  }
+						fftw_execute( p2 );
 
-					  for( uint16_t j = tail; j < n - tail; j++ ) {
-						  coords[dim] = j - tail;
-						  tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] ) = static_cast<short>( in[j] );
-					  }
-				  }
-			  }
-		 }
-	    }
+						for( uint16_t i = 0; i < n; i++ ) {
+							in[i] /= ( double )n;
+						}
+
+						for( uint16_t j = tail; j < n - tail; j++ ) {
+							coords[dim] = j - tail;
+							tImage.voxel<short>( coords[0], coords[1], coords[2], coords[3] ) = static_cast<short>( in[j] );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	image = tImage;

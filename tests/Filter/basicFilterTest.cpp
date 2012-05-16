@@ -92,16 +92,16 @@ BOOST_AUTO_TEST_CASE( gaussian_filter_test )
 	BOOST_CHECK( myGaussianFilter.run( myImage ) );
 }
 
-BOOST_AUTO_TEST_CASE( frequency_filter_test)
+BOOST_AUTO_TEST_CASE( frequency_filter_test )
 {
-	data::Image myImage = data::IOFactory::load("/SCR/DATA/gaby/ldopa/raw/ldopa_s01.v").front();
-// 	data::Image myImage = createEmptyImage( util::ivector4(100,100,100,100) );
-// 	myImage.setPropertyAs<uint16_t>("repetitionTime", 2000);
+	data::Image myImage = data::IOFactory::load( "/SCR/DATA/gaby/ldopa/raw/ldopa_s01.v" ).front();
+	//  data::Image myImage = createEmptyImage( util::ivector4(100,100,100,100) );
+	//  myImage.setPropertyAs<uint16_t>("repetitionTime", 2000);
 	filter::FrequencyFilter myFrequencyFilter;
-	myFrequencyFilter.setParameter("dimension", 3);
+	myFrequencyFilter.setParameter( "dimension", 3 );
 	myFrequencyFilter.run( myImage );
-// 	BOOST_CHECK( myFrequencyFilter.run( myImage ) );
-	data::IOFactory::write(myImage, "/tmp/muddi.nii");
+	//  BOOST_CHECK( myFrequencyFilter.run( myImage ) );
+	data::IOFactory::write( myImage, "/tmp/muddi.nii" );
 }
 
 }
