@@ -32,12 +32,7 @@ namespace _internal
 {
 template<typename T> isis::data::ValueArrayReference reader( isis::data::FilePtr data, size_t offset, size_t size )
 {
-	return data.atByID( isis::data::ValueArray<T>::staticID, offset, size, true );
-}
-
-template<> isis::data::ValueArrayReference reader<uint8_t>( isis::data::FilePtr data, size_t offset, size_t size )
-{
-	return data.atByID( isis::data::ValueArray<uint8_t>::staticID, offset, size, false );
+	return data.atByID( isis::data::ValueArray<T>::staticID, offset, size );
 }
 
 template<> isis::data::ValueArrayReference reader<bool>( isis::data::FilePtr data, size_t offset, size_t size )
@@ -45,30 +40,39 @@ template<> isis::data::ValueArrayReference reader<bool>( isis::data::FilePtr dat
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
 
-template<typename T> data::ValueArray<util::color<T> > toColor( const data::ValueArrayReference ref, size_t slice_size )
+}
+
+ImageFormat_VistaSa::VistaProtoImage::VistaProtoImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start ), big_endian( true )
 {
-	assert( ref->getLength() % 3 == 0 );
-	const std::vector< data::ValueArrayReference > layers = ref->as<T>().splice( slice_size ); //colors are stored slice-wise in the 3d block
-	data::ValueArray<util::color<T> > ret( ref->getLength() / 3 );
+	vista2isis["bit"] =   _internal::reader<bool>;
+	vista2isis["ubyte"] = _internal::reader<uint8_t>;
+	vista2isis["short"] = _internal::reader<int16_t>;
+	vista2isis["long"] =  _internal::reader<int32_t>;
+	vista2isis["float"] = _internal::reader<float>;
+	vista2isis["double"] = _internal::reader<double>;
+}
 
-	typename data::ValueArray<util::color<T> >::iterator d_pix = ret.begin();
+bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
+{
 
-	for( std::vector< data::ValueArrayReference >::const_iterator l = layers.begin(); l != layers.end(); ) {
-		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).r = s_pix; //red
-		d_pix -= slice_size; //return to the slice start
-		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).g = s_pix; //green
-		d_pix -= slice_size; //return to the slice start
-		BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).b = s_pix; //blue
+	if( empty() ) {
+		last_voxelsize = props.getPropertyAs<util::fvector4>( "voxelSize" );
+		last_repn = props.getPropertyAs<std::string>( "repn" ).c_str();
+		last_component = props.propertyValue( "component_repn" );
+
+		if( !( m_reader = vista2isis[last_repn] ) )
+			throwGenericError( std::string( "Cannot handle repn " ) + props.getPropertyAs<std::string>( "repn" ) );
+
+	} else  if(
+		last_voxelsize != props.getPropertyAs<util::fvector4>( "voxelSize" ) ||
+		last_repn != props.getPropertyAs<std::string>( "repn" ).c_str() ||
+		last_component != props.propertyValue( "component_repn" )
+	) {
+		return false;
 	}
 
-	return ret;
-}
-
-}
-
-data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data::ValueArray< uint8_t >::iterator data_start, const isis::util::PropertyMap &props )
-{
 	const size_t ch_offset = props.getPropertyAs<uint64_t>( "data" );
+
 	isis::util::vector4<size_t> ch_size(
 		props.getPropertyAs<uint32_t>( "ncolumns" ),
 		props.getPropertyAs<uint32_t>( "nrows" ),
@@ -76,41 +80,39 @@ data::Chunk ImageFormat_VistaSa::makeChunk( isis::data::FilePtr data, isis::data
 		1
 	);
 
-	readerPtr reader = vista2isis[props.getPropertyAs<std::string>( "repn" ).c_str()];
+	data::ValueArrayReference ch_data = m_reader( m_fileptr, std::distance( m_fileptr.begin(), m_data_start ) + ch_offset, ch_size.product() );
 
-	if( !reader )
-		throwGenericError( std::string( "Cannot handle repn " ) + props.getPropertyAs<std::string>( "repn" ) );
+	//those are not needed anymore
+	props.remove( "ncolumns" );
 
-	data::ValueArrayReference ch_data = reader( data, std::distance( data.begin(), data_start ) + ch_offset, ch_size.product() );
+	props.remove( "nrows" );
 
-	if( props.hasProperty( "component_repn" ) && props.getPropertyAs<std::string>( "component_repn" ) == "rgb" ) { // if its color
-		ch_data = _internal::toColor<uint8_t>( ch_data, ch_size.product() / ch_size[data::sliceDim] );
+	props.remove( "nbands" );
+
+	props.remove( "data" );
+
+	props.remove( "repn" );
+
+
+	if( last_component  == std::string( "rgb" ) ) { // if its color replace original data by an ValueArray<util::color<uint8_t> > (endianess swapping is done there as well)
+		ch_data = toColor<uint8_t>( ch_data, ch_size.product() / ch_size[data::sliceDim] );
 		ch_size[data::sliceDim] /= 3;
+		props.remove( "component_repn" );
 	}
 
-	LOG( Runtime, verbose_info )
-			<< "Creating " << ch_data->getTypeName() << "-Chunk of size "
-			<< ch_size << " and range " << ch_data->getMinMax().first << "/" << ch_data->getMinMax().second << " (offset was " << std::hex << std::distance( data.begin(), data_start ) + ch_offset << "/" << std::dec << std::distance( data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), data.end() ) << " bytes are left)";
+	LOG( Runtime, verbose_info ) << "Creating " << ch_data->getTypeName() << "-Chunk of size "
+								 << ch_size << " (offset was " << std::hex << std::distance( m_fileptr.begin(), m_data_start ) + ch_offset << "/"
+								 << std::dec << std::distance( m_data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), m_fileptr.end() ) << " bytes are left)";
 
-	isis::data::Chunk ret = isis::data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2], ch_size[3] );
+	push_back( data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2], ch_size[3] ) );
 
-	ret.branch( "vista" ) = props;
-	sanitize( ret );
-
-	return ret;
+	back().branch( "vista" ) = props;
+	sanitize( back() );
+	return true;
 }
 
-void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
+void ImageFormat_VistaSa::VistaProtoImage::sanitize( isis::util::PropertyMap &obj )
 {
-	obj.remove( "vista/data" );
-	obj.remove( "vista/ncolumns" );
-	obj.remove( "vista/nrows" );
-	obj.remove( "vista/nbands" );
-	obj.remove( "vista/repn" );
-	obj.remove( "vista/component_repn" );
-	obj.remove( "vista/ncomponents" );
-
-
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		obj.transform<isis::util::fvector4>( "vista/columnVec", "rowVec" );
 		obj.transform<isis::util::fvector4>( "vista/rowVec", "columnVec" );
@@ -162,8 +164,12 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, warning );
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
-	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, info );
-	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, info );
+
+	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, info ) ||
+	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
+
+	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, info ) ||
+	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, info );
 
 	if( hasOrTell( "vista/sex", obj, warning ) ) {
 		util::Selection gender( "male,female,other" );
@@ -196,59 +202,78 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	obj.setPropertyAs( "sequenceStart", boost::posix_time::ptime_from_tm( buff ) );
 }
 
-bool ImageFormat_VistaSa::isFunctional( const std::list< data::Chunk >& chunks )
+bool ImageFormat_VistaSa::VistaProtoImage::isFunctional() const
 {
 	//if we have only one chunk, its not functional
-	if( chunks.size() <= 1 )return false;
+	if( size() > 1 ) {
+		if( front().hasProperty( "vista/diffusionGradientOrientation" ) )
+			return false; // dwi data look the same, but must not be transformed
 
-	const data::Chunk &front = chunks.front();
-	const bool is_short = front.is<int16_t>();
-
-	if( front.hasProperty( "vista/diffusionGradientOrientation" ) )
-		return false; // dwi data look the same, but must not be transformed
-
-	//if we have proper vista/ntimesteps its functional
-	if( front.hasProperty( "vista/ntimesteps" ) && front.getPropertyAs<uint32_t>( "vista/ntimesteps" ) == front.getSizeAsVector()[data::sliceDim] ) {
-		LOG_IF( is_short, Runtime, warning ) << "Functional data found which is not VShort";
-		return true;
-	} else if( is_short ) { //if we have short, its functional
-		LOG( Runtime, warning ) << "Functional data found, but ntimesteps is not set or wrong (should be " << front.getSizeAsVector()[data::sliceDim] << ")";
-		return true;
-	}
-
-	return  false;
-}
-
-
-std::list< data::Chunk > ImageFormat_VistaSa::transformFunctional( const std::list< data::Chunk >& in_chunks )
-{
-	LOG( Runtime, info ) << "Transforming " << in_chunks.size() << " chunks for fMRI";
-	std::list< data::Chunk > ret;
-	const uint32_t acqStride = in_chunks.size();
-	BOOST_FOREACH( data::Chunk ch, in_chunks ) {
-		size_t timestep = 0;
-		ch.remove( "vista/ntimesteps" );
-		BOOST_FOREACH( data::Chunk ch, ch.splice( data::sliceDim ) ) {
-			uint32_t &acq = ch.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
-			acq = acq + acqStride * timestep;
-			ret.push_back( ch );
-			timestep++;
+		//if we have proper vista/ntimesteps its functional
+		if( front().hasProperty( "vista/ntimesteps" ) && front().getPropertyAs<uint32_t>( "vista/ntimesteps" ) == front().getSizeAsVector()[data::sliceDim] ) {
+			LOG_IF( front().is<int16_t>(), Runtime, warning ) << "Functional data found which is not VShort";
+			return true;
+		} else if( front().is<int16_t>() ) { //if we have short, its functional
+			LOG( Runtime, warning ) << "Functional data found, but ntimesteps is not set or wrong (should be " << front().getSizeAsVector()[data::sliceDim] << ")";
+			return true;
 		}
 	}
-	return ret;
+
+	return false;
 }
 
 
-ImageFormat_VistaSa::ImageFormat_VistaSa()
+void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 {
-	vista2isis["bit"] =   _internal::reader<bool>;
-	vista2isis["ubyte"] = _internal::reader<uint8_t>;
-	vista2isis["short"] = _internal::reader<int16_t>;
-	vista2isis["long"] =  _internal::reader<int32_t>;
-	vista2isis["float"] = _internal::reader<float>;
-	vista2isis["double"] = _internal::reader<double>;
+	/*  const bool has_Tr= !group.empty() && group.front().hasProperty("repetitionTime");
+	 *  const bool has_Ts= !group.empty() && group.front().hasProperty("repetitionTime");*/
 
+	LOG( Runtime, info ) << "Transforming " << size() << " chunks for fMRI through splicing";
+	/*  std::list< data::Chunk > ret;
+	 *  const uint32_t acqStride = in_chunks.size();
+	 *  BOOST_FOREACH( VistaChunk ch, in_chunks ) {
+	 *      size_t timestep = 0;
+	 *      ch.remove( "vista/ntimesteps" );
+	 *      BOOST_FOREACH( data::Chunk ch, ch.splice( data::sliceDim ) ) {
+	 *          uint32_t &acq = ch.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
+	 *          acq = acq + acqStride * timestep;
+	 *          ret.push_back( ch );
+	 *          timestep++;
+	 }
+	 }
+	 return ret;*/
 }
+
+void ImageFormat_VistaSa::VistaProtoImage::swapEndian( data::ValueArrayBase &array )
+{
+	uint_fast8_t elemsize = array.bytesPerElem();
+	boost::shared_ptr<uint8_t> raw = boost::shared_static_cast<uint8_t>( array.getRawAddress() );
+	uint8_t *ptr = raw.get();
+
+	for( size_t i = 0; i < array.getLength(); i++ ) {
+		for( uint8_t p = 0; p < elemsize / 2; p++ ) {
+			std::swap( ptr[p], ptr[elemsize - 1 - p] );
+		}
+
+		ptr += elemsize;
+	}
+}
+
+void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map )
+{
+	uint32_t acqNum = 0;
+
+	while( !empty() ) {
+		out.push_back( front() );
+		pop_front();
+		out.back().branch( "vista" ).join( root_map );
+		out.back().setPropertyAs( "acquisitionNumber", acqNum++ );
+
+		if( big_endian )
+			swapEndian( out.back().asValueArrayBase() ); //if endianess wasn't swapped till now, do it now
+	}
+}
+
 
 int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & )
 {
@@ -262,45 +287,30 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 			throwGenericError ( filename + " could not be opened" );
 	}
 
-
 	//parse the vista header
 	isis::data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
 	isis::util::PropertyMap root_map;
 	std::list<isis::util::PropertyMap> ch_list;
 	size_t old_size = chunks.size();
-	std::list<std::list<data::Chunk> > groups;
 
 	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
-		unsigned short last_type = 0;
-		util::fvector4 last_voxelsize;
 
-		uint32_t acqNum;
+		std::list<VistaProtoImage> groups;
+		groups.push_back( VistaProtoImage( mfile, data_start ) );
+
 		BOOST_FOREACH( const isis::util::PropertyMap & chMap, ch_list ) {
-			isis::data::Chunk ch = makeChunk( mfile, data_start, chMap );
-
-			// start new group if the chunk's type differs from the last, or its the first chunk (different type probably means a new image)
-			if( last_type != ch.getTypeID() || last_voxelsize != ch.getPropertyAs<util::fvector4>( "voxelSize" ) ) {
-				groups.push_back( std::list<data::Chunk>() );
-				last_type = ch.getTypeID();
-				last_voxelsize = ch.getPropertyAs<util::fvector4>( "voxelSize" );
-				acqNum = 0;
+			if( !groups.back().add( chMap ) ) { //if current ProtoImage doesnt like
+				groups.push_back( VistaProtoImage( mfile, data_start ) ); // try a new one
+				assert( groups.back().add( chMap ) ); //a new one should always work
 			}
-
-			ch.setPropertyAs( "acquisitionNumber", acqNum++ );
-			groups.back().push_back( ch );
 		}
 		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
 
+		BOOST_FOREACH( VistaProtoImage & group, groups ) {
+			if( group.isFunctional() )
+				group.transformFunctional();
 
-
-		BOOST_FOREACH( std::list<data::Chunk> &group, groups ) {
-			if( isFunctional( group ) )
-				group = transformFunctional( group );
-
-			BOOST_FOREACH( data::Chunk & ch, group ) {
-				ch.branch( "vista" ).join( root_map );
-				chunks.push_back( ch );
-			}
+			group.store( chunks, root_map );
 		}
 		return chunks.size() - old_size;
 	} else {

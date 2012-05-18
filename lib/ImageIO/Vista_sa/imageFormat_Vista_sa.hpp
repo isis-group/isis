@@ -33,11 +33,52 @@ class ImageFormat_VistaSa: public FileFormat
 {
 private:
 	typedef isis::data::ValueArrayReference ( *readerPtr )( isis::data::FilePtr data, size_t offset, size_t size );
-	std::map<isis::util::istring, readerPtr> vista2isis;
 
-	data::Chunk makeChunk( data::FilePtr data, data::FilePtr::iterator data_start, const util::PropertyMap &props );
+	class VistaProtoImage: private std::list<data::Chunk>
+	{
+		readerPtr m_reader;
+		data::FilePtr m_fileptr;
+		data::ValueArray< uint8_t >::iterator m_data_start;
+
+		unsigned short last_type;
+		util::fvector4 last_voxelsize;
+		util::istring last_repn;
+		util::PropertyValue last_component;
+		bool big_endian;
+
+		void sanitize( util::PropertyMap &obj );
+		std::map<isis::util::istring, readerPtr> vista2isis;
+
+		void swapEndian( data::ValueArrayBase &array );
+
+		template<typename T> data::ValueArray<util::color<T> > toColor( const data::ValueArrayReference ref, size_t slice_size ) {
+			assert( ref->getLength() % 3 == 0 );
+			const std::vector< data::ValueArrayReference > layers = ref->as<T>().splice( slice_size ); //colors are stored slice-wise in the 3d block
+			data::ValueArray<util::color<T> > ret( ref->getLength() / 3 );
+
+			typename data::ValueArray<util::color<T> >::iterator d_pix = ret.begin();
+
+			for( std::vector< data::ValueArrayReference >::const_iterator l = layers.begin(); l != layers.end(); ) {
+				BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).r = data::endianSwap( s_pix ); //red
+				d_pix -= slice_size; //return to the slice start
+				BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).g = data::endianSwap( s_pix ); //green
+				d_pix -= slice_size; //return to the slice start
+				BOOST_FOREACH( T s_pix, ( *l++ )->castToValueArray<T>() )( *( d_pix++ ) ).b = data::endianSwap( s_pix ); //blue
+			}
+
+			big_endian = false;
+			return ret;
+		}
+
+	public:
+		VistaProtoImage( isis::data::FilePtr fileptr, isis::data::ValueArray< uint8_t >::iterator data_start );
+		bool add( isis::util::PropertyMap props );
+		bool isFunctional()const;
+		void transformFunctional( );
+		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map );
+	};
+
 public:
-	ImageFormat_VistaSa();
 	std::string getName()const {return "Vista standalone";}
 	int load ( std::list< isis::data::Chunk >& chunks, const std::string &filename, const isis::util::istring &dialect ) throw ( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & );
@@ -45,9 +86,6 @@ public:
 	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
 
-	void sanitize( util::PropertyMap &obj );
-	bool isFunctional( const std::list< isis::data::Chunk >& chunks );
-	std::list< data::Chunk > transformFunctional( const std::list< data::Chunk >& in_chunks );
 
 protected:
 	util::istring suffixes( io_modes /*mode = both */ )const {return ".v";}
