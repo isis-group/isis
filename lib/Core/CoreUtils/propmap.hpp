@@ -487,12 +487,14 @@ template<class Predicate> struct PropertyMap::walkTree {
 	walkTree( KeyList &out, const KeyType &prefix ): m_out( out ), m_prefix( prefix ) {}
 	walkTree( KeyList &out ): m_out( out ) {}
 	void operator()( const_reference ref ) const {
+		const KeyType name = ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first;
+
 		if ( ref.second.is_leaf() ) {
 			if ( Predicate()( ref ) )
-				m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
+				m_out.insert( m_out.end(), name );
 		} else {
 			const PropertyMap &sub = ref.second.getBranch();
-			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
+			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, name ) );
 		}
 	}
 };
