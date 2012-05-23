@@ -20,6 +20,7 @@
 # find and configure the isis core library
 ###########################################################
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+include_directories(${CMAKE_SOURCE_DIR}/lib)
 
 ############################################################
 # configure the targets
@@ -49,6 +50,11 @@ target_link_libraries(isisraw isis_core)
 set_target_properties(isisraw PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisraw "read or write raw data files from/to isis images")
 
+add_executable(isisgauss isisgauss.cpp)
+target_link_libraries(isisgauss isis_core isisFilter_Basic)
+set_target_properties(isisgauss PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisgauss "apply gauss kernel to an image")
+
 # the install targets.
 install(TARGETS
   isisdump
@@ -56,5 +62,6 @@ install(TARGETS
   isisconv
   isisflip
   isisraw
+  isisgauss
   RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 

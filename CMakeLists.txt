@@ -41,6 +41,7 @@ if(NOT WIN32)
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+set(ISIS_FILTER_INFIX lib/isis/filter)
 endif(NOT WIN32)
 
 ############################################################
@@ -156,7 +157,7 @@ endif(GIT_REVISION)
 ############################################################
 option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_PYTHON_EXT "Build the ISIS python extension. It provides access to the ISIS core image functions from python" OFF)
+option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
 
 ###########################################################
 # CPack config
@@ -188,6 +189,18 @@ else(WIN32)
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 endif(WIN32)
 
+#build the filter
+if(ISIS_BUILD_FILTER )
+  #omp settings
+  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
+  if(ISIS_FILTER_ENABLE_OMP)
+	message(STATUS "Enabling omp support" )
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+  endif(ISIS_FILTER_ENABLE_OMP)
+  add_subdirectory(lib/Filter)
+endif(ISIS_BUILD_FILTER)
+
 # build the ISIS libraries
 add_subdirectory(lib)
 
@@ -202,17 +215,15 @@ if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
+
+
+
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)
   message(STATUS "Building unit tests")
   enable_testing()
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
-
-# build the ISIS python extension.
-if(ISIS_BUILD_PYTHON_EXT)
-  add_subdirectory(python)
-endif(ISIS_BUILD_PYTHON_EXT)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
@@ -222,4 +233,3 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 # set up doxygen
 ############################################################
 include(UseDoxygen)
-
