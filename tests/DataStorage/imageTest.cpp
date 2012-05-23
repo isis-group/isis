@@ -810,6 +810,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	unsigned int nrY = 64;
 	unsigned int nrS = 20;
 	unsigned int nrT = 20;
+	const char *needed[] = {"voxelSize", "rowVec", "columnVec", "sliceVec"};
 	static boost::numeric::converter < uint16_t, double,
 		   boost::numeric::conversion_traits<uint16_t, double>,
 		   boost::numeric::def_overflow_handler,
@@ -821,7 +822,6 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
 			chunks.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
-			BOOST_CHECK( chunks.back().propertyValue( "indexOrigin" ).needed() );
 			chunks.back().setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
 			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
 			chunks.back().setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
@@ -831,6 +831,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	}
 
 	data::Image img( chunks );
+	BOOST_FOREACH( const char * str, needed ) {
+		BOOST_CHECK( img.propertyValue( str ).needed() );
+	}
+
 	BOOST_REQUIRE( img.isClean() );
 
 	srand ( time( NULL ) );

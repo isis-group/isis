@@ -18,11 +18,18 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( chunk_init_test )
 {
+	const char *needed[] = {"indexOrigin", "acquisitionNumber", "voxelSize", "rowVec", "columnVec"};
 	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( DataLog, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
+
+	BOOST_FOREACH( const char * str, needed ) {
+		BOOST_CHECK( ch.propertyValue( str ).needed() );
+	}
+
+
 	BOOST_CHECK_EQUAL( ch.getVolume(), 1 * 2 * 3 * 4 );
 	BOOST_CHECK_EQUAL( ch.getDimSize( data::rowDim ), 4 );
 	BOOST_CHECK_EQUAL( ch.getDimSize( data::columnDim ), 3 );
