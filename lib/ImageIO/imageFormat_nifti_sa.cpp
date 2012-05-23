@@ -537,6 +537,15 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/cal_min", head->cal_min );
 	}
 
+	util::fvector4 vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector4>();
+
+	for( short i = 0; i < std::min<short>( head->dim[0], 3 ); i++ ) {
+		if( vsize[i] == 0 ) {
+			LOG( Runtime, warning ) << "The voxelSize[" << i << "] is 0. Assuming \"1\"";
+			vsize[i] = 1;
+		}
+	}
+
 	return parseSliceOrdering( head, props );
 }
 

@@ -185,6 +185,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	const util::fvector4 distance = voxelSize + voxelGap;
 	size_t atDim = getRelevantDims() - 1;
 
+	LOG_IF( distance[atDim] == 0 && atDim < data::timeDim, Runtime, error ) << "The voxel distance (voxelSize + voxelGap) at the splicing direction (" << atDim << ") is zero. This will likely cause errors in the Images structure.";
+
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :
 		offset = this->propertyValue( "rowVec" ).castTo<util::fvector4>();
