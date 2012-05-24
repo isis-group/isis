@@ -279,20 +279,22 @@ bool Image::updateOrientationMatrices()
 bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
 	//for transforming we have to ensure to have the below properties in our chunks and image
-	std::list<std::string > neededProps;
-	neededProps.push_back ( "indexOrigin" );
-	neededProps.push_back ( "rowVec" );
-	neededProps.push_back ( "columnVec" );
-	neededProps.push_back ( "sliceVec" );
-	neededProps.push_back ( "voxelSize" );
+	static const char  *neededProps[]={"indexOrigin","rowVec","columnVec","sliceVec","voxelSize"};
 	//propagate needed properties to chunks
-	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-		BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
-			if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
-				chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
-			}
-		}
 
+	BOOST_FOREACH ( const char* prop, neededProps ) {
+		if(hasProperty ( prop )){
+			const util::fvector4 p=getPropertyAs<util::fvector4> ( prop );
+			BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+				if (!chRef->hasProperty ( prop ) )chRef->setPropertyAs<util::fvector4> ( prop, p );
+			}
+		} else {
+			LOG(Runtime,error) << "Cannot do transformCoords on image without " << prop;
+			return false;
+		}
+	}
+
+	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
 		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
 			return false;
 		}
