@@ -46,6 +46,17 @@ void FileFormat::write( const std::list< isis::data::Image >& images, const std:
 		}
 	}
 }
+bool FileFormat::setGender( util::PropertyMap &object, const char *set, const char *entries )
+{
+	util::Selection g( entries );
+
+	if( g.set( set ) ) {
+		object.setPropertyAs( "subjectGender", g );
+		return true;
+	}
+
+	return false;
+}
 
 bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::util::PropertyMap &object, isis::LogLevel level )
 {

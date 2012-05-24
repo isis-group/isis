@@ -37,6 +37,12 @@ protected:
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
+	static bool setGender( util::PropertyMap &object, const char *set,const char *entries="female,male,other" );
+	/**
+	 * Check if a given property exists in the given PropMap.
+	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
+	 * \returns object.hasProperty(name)
+	 */
 	static bool hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
