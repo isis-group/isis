@@ -12,6 +12,9 @@ struct ImageIoDebug {static const char *name() {return "ImageIODebug";}; enum {u
 
 struct DataLog {static const char *name() {return "Data";}; enum {use = _ENABLE_LOG};};
 struct DataDebug {static const char *name() {return "DataDebug";}; enum {use = _ENABLE_DEBUG};};
+
+struct FilterLog {static const char *name() {return "Filter";}; enum {use = _ENABLE_LOG};};
+struct FilterDebug {static const char *name() {return "FilterDebug";}; enum {use = _ENABLE_DEBUG};};
 }
 /// @endcond
 

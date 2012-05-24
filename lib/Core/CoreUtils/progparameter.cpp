@@ -165,6 +165,7 @@ bool ParameterMap::isComplete()const
 	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
+
 const ProgParameter ParameterMap::operator[] ( const std::string key ) const
 {
 	std::map<std::string, ProgParameter>::const_iterator at = find( key );
