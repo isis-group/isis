@@ -200,22 +200,24 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 {
 	const util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 _ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
-								vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-								vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
-								vec1[3] );
+										  vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
+										  vec1[3] );
 
 	if( restrictedToImageBox ) {
-		const util::vector4<size_t> size = getSizeAsVector();
+		const util::vector4<size_t> _size = getSizeAsVector();
 
 		for( unsigned short i = 0; i < 4; i ++ ) {
 			if( _ret[i] < 0 ) {
 				_ret[i] =  0;
 			}
-			if( _ret[i] >=  size[i] ) {
-				_ret[i] = ( size[i] - 1 );
+
+			if( _ret[i] > ( _size[i] - 1 ) ) {
+				_ret[i] = ( _size[i] - 1 );
 			}
 		}
 	}
+
 	return _ret + 0.5;
 }
 
