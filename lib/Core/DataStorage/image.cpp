@@ -57,13 +57,13 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	}
 }
 
-Image::Image( const isis::data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
+Image::Image( const data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
 	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
 
-Image &Image::operator=( const isis::data::Image &ref )
+Image &Image::operator=( const data::Image &ref )
 {
 	//deep copy bases
 	static_cast<util::PropertyMap &>( *this ) = static_cast<const util::PropertyMap &>( ref );
@@ -200,9 +200,9 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 {
 	const util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 _ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
-								vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-								vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
-								vec1[3] );
+										  vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
+										  vec1[3] );
 
 	if( restrictedToImageBox ) {
 		const util::vector4<size_t> size = getSizeAsVector();
@@ -211,11 +211,13 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 			if( _ret[i] < 0 ) {
 				_ret[i] =  0;
 			}
+
 			if( _ret[i] >=  size[i] ) {
 				_ret[i] = ( size[i] - 1 );
 			}
 		}
 	}
+
 	return _ret + 0.5;
 }
 

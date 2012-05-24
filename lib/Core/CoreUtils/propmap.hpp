@@ -125,7 +125,7 @@ protected:
 	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
 	 */
 	template<typename CONTAINER> void addNeededFromString( const std::string &needed ) {
-		static const std::list<key_type> neededs = util::stringToList<key_type>( needed );
+		static const std::list<key_type> neededs = util::stringToList<key_type>( needed );//@todo really bad voodoo
 		BOOST_FOREACH( const key_type & ref, neededs ) {
 			addNeeded( ref );
 		}
