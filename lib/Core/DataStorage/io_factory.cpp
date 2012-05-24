@@ -238,7 +238,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename.file_string() ) << ": " << it->getName();
 
 			try {
-				return it->load( ret, filename.file_string(), dialect );
+				return it->load( ret, filename.file_string(), dialect, m_feedback );
 			} catch ( std::runtime_error &e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
@@ -402,7 +402,7 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 						);
 
 			try {
-				it->write( images, path, dialect );
+				it->write( images, path, dialect, get().m_feedback );
 				LOG( Runtime, info )
 						<< images.size()
 						<< " images written to " << path << " using " <<  it->getName()

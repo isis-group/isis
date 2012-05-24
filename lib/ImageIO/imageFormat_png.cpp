@@ -188,12 +188,12 @@ public:
 		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		chunks.push_back( read_png( filename ) );
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;

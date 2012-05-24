@@ -628,7 +628,7 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header *header )
 }
 
 
-int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & )
+int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
 
@@ -767,7 +767,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype

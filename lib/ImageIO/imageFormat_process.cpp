@@ -33,7 +33,7 @@ public:
 	}
 	std::string getName()const {return "process proxy (gets filenames from child process given in the filename)";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		size_t red = 0;
 		LOG( Runtime, info ) << "Running " << util::MSubject( filename );
 		FILE *in = popen( filename.c_str(), "r" );
@@ -66,7 +66,7 @@ public:
 		return red;
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

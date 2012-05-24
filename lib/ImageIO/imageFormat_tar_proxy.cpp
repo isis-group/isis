@@ -94,7 +94,7 @@ public:
 	}
 	std::string getName()const {return "tar decompression proxy for other formats";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		int ret = 0;
 
 		const util::istring suffix = makeBasename( filename ).second.c_str();
@@ -183,7 +183,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Writing to tar is not (yet) implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

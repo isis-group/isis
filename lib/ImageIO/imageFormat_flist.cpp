@@ -52,7 +52,7 @@ public:
 		return red;
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		if( filename.empty() ) {
 			LOG( Runtime, info ) << "getting filelist from stdin";
 			return doLoad( std::cin, chunks, dialect );
@@ -64,7 +64,7 @@ public:
 		}
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

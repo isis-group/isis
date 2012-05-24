@@ -25,7 +25,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END
 
-void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< isis::data::Image >& images, const std::string &filename, const isis::util::istring &dialect, boost::shared_ptr< isis::util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -33,7 +33,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 		std::string uniquePath = *( inames++ );
 
 		try {
-			write( ref, uniquePath, dialect );
+			write( ref, uniquePath, dialect, progress );
 			LOG( Runtime, notice )
 					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
 					<< " using " <<  getName() << ( dialect.empty() ?
