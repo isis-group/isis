@@ -215,10 +215,10 @@ public:
 	/**
 	 * Create new data in memory containg a (converted) copy of this.
 	 * Allocates new memory of the requested type and copies the (converted) content of this into that memory.
-	 * \param ID the ID of the type the new ValueArray (referenced by the Reference returned) should have
+	 * \param ID the ID of the type the new ValueArray (referenced by the Reference returned) should have (if not given, type of the source is used)
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	Reference copyByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
+	Reference copyByID( unsigned short ID = 0, scaling_pair scaling = scaling_pair() ) const;
 
 	/**
 	 * Copies elements from this into another ValueArray.

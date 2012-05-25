@@ -81,6 +81,13 @@ bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 	return true;
 }
 
+Chunk Chunk::copyByID( short unsigned int ID, scaling_pair scaling ) const
+{
+	Chunk ret = *this; //make copy of the chunk
+	static_cast<ValueArrayReference &>( ret ) = getValueArrayBase().copyByID( ID, scaling ); // replace its data by the copy
+	return ret;
+}
+
 size_t Chunk::getBytesPerVoxel()const
 {
 	return getValueArrayBase().bytesPerElem();

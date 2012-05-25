@@ -279,17 +279,17 @@ bool Image::updateOrientationMatrices()
 bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
 	//for transforming we have to ensure to have the below properties in our chunks and image
-	static const char  *neededProps[]={"indexOrigin","rowVec","columnVec","sliceVec","voxelSize"};
+	static const char  *neededProps[] = {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"};
 	//propagate needed properties to chunks
 
-	BOOST_FOREACH ( const char* prop, neededProps ) {
-		if(hasProperty ( prop )){
-			const util::fvector4 p=getPropertyAs<util::fvector4> ( prop );
+	BOOST_FOREACH ( const char * prop, neededProps ) {
+		if( hasProperty ( prop ) ) {
+			const util::fvector4 p = getPropertyAs<util::fvector4> ( prop );
 			BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-				if (!chRef->hasProperty ( prop ) )chRef->setPropertyAs<util::fvector4> ( prop, p );
+				if ( !chRef->hasProperty ( prop ) )chRef->setPropertyAs<util::fvector4> ( prop, p );
 			}
 		} else {
-			LOG(Runtime,error) << "Cannot do transformCoords on image without " << prop;
+			LOG( Runtime, error ) << "Cannot do transformCoords on image without " << prop;
 			return false;
 		}
 	}
@@ -632,6 +632,37 @@ void Image::copyToValueArray( ValueArrayBase &dst, scaling_pair scaling ) const
 	} else {
 		LOG ( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 	}
+}
+
+Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
+{
+	Image ret( *this ); // ok we just cheap-copied the whole image
+
+	//we want deep copies of the chunks, and we want them to be of type ID
+	struct : _internal::SortedChunkList::chunkPtrOperator {
+		std::pair<util::ValueReference, util::ValueReference> scale;
+		unsigned short ID;
+		boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr ) {
+			return boost::shared_ptr<Chunk> ( new Chunk ( ptr->copyByID( ID, scale ) ) );
+		}
+	} conv_op;
+
+	if( ID && ( scaling.first.isEmpty() || scaling.second.isEmpty() ) ) // if we have an ID but no scaling, compute it
+		conv_op.scale = getScalingTo( ID );
+
+	conv_op.ID = ID;
+
+	ret.set.transform ( conv_op );
+
+	if ( ret.isClean() ) {
+		ret.lookup = ret.set.getLookup(); // the lookup table still points to the old chunks
+	} else {
+		LOG ( Debug, info ) << "Copied unclean image. Running reIndex on the copy.";
+		ret.reIndex();
+	}
+
+	return *this;
+
 }
 
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
