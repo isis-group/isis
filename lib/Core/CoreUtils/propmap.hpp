@@ -466,6 +466,15 @@ public:
 	bool operator==( const treeNode &ref )const {
 		return m_branch == ref.m_branch && m_leaf == ref.m_leaf;
 	}
+	void insert( const treeNode &ref ) {
+		m_branch = ref.m_branch;
+		m_leaf.resize( ref.m_leaf.size() );
+		std::vector<PropertyValue>::iterator dst = m_leaf.begin();
+		BOOST_FOREACH( std::vector<PropertyValue>::const_reference src, ref.m_leaf ) {
+			const bool needed = dst->isNeeded();
+			( *dst = src ).needed() = needed;;
+		}
+	}
 	std::string toString()const {
 		std::ostringstream o;
 		o << *this;
