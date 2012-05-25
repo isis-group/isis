@@ -279,17 +279,22 @@ bool Image::updateOrientationMatrices()
 bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
 	//for transforming we have to ensure to have the below properties in our chunks and image
-	static const char  *neededProps[]={"indexOrigin","rowVec","columnVec","sliceVec","voxelSize"};
+	static const char  *neededProps[] = {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"};
 	//propagate needed properties to chunks
+	std::set<PropPath> propPathList;
+	BOOST_FOREACH ( const char * prop, neededProps ) {
+		const util::PropertyMap::PropPath pPath( prop );
 
-	BOOST_FOREACH ( const char* prop, neededProps ) {
-		if(hasProperty ( prop )){
-			const util::fvector4 p=getPropertyAs<util::fvector4> ( prop );
+		if( hasProperty ( pPath ) ) {
+			const util::fvector4 p = getPropertyAs<util::fvector4> ( pPath );
 			BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-				if (!chRef->hasProperty ( prop ) )chRef->setPropertyAs<util::fvector4> ( prop, p );
+				if ( !chRef->hasProperty ( pPath ) ) {
+					chRef->setPropertyAs<util::fvector4> ( pPath, p );
+					propPathList.insert( pPath );
+				}
 			}
 		} else {
-			LOG(Runtime,error) << "Cannot do transformCoords on image without " << prop;
+			LOG( Runtime, error ) << "Cannot do transformCoords on image without " << prop;
 			return false;
 		}
 	}
@@ -297,6 +302,10 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
 		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
 			return false;
+		}
+
+		BOOST_FOREACH( std::list<PropPath>::const_reference pPathNotNeeded, propPathList ) {
+			chRef->remove( pPathNotNeeded );
 		}
 	}
 	//      establish initial state
@@ -311,7 +320,6 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 		return false;
 	}
 
-	deduplicateProperties();
 	return true;
 }
 

@@ -249,14 +249,13 @@ public:
 	 * with caution!
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		if( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) && hasProperty( "sliceVec" )
-			&& hasProperty( "voxelSize" ) && hasProperty( "indexOrigin" ) ) {
-			if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-				LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
-				return false;
-			}
+		LOG_IF(  !hasProperty( "rowVec" ) || !hasProperty( "columnVec" ) || !hasProperty( "sliceVec" )
+				 || !hasProperty( "voxelSize" ) || !hasProperty( "indexOrigin" ), Debug, error )
+				<< "Cannot do Chunk::transformCoords because of missing properties!";
 
-			return true;
+		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+			LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
+			return false;
 		}
 
 		return true;

@@ -40,7 +40,6 @@ namespace _internal
 class FilterBase
 {
 public:
-
 	void setProgressFeedback( boost::shared_ptr< util::ProgressFeedback > pfb ) { m_progressfeedback = pfb; }
 	boost::shared_ptr< util::ProgressFeedback > getProgressFeedback() const  { return m_progressfeedback; }
 
