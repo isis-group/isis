@@ -189,7 +189,9 @@ public:
 		return ret;
 	}
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
-		chunks.push_back( read_png( filename ) );
+		data::Chunk ch = read_png( filename );
+		ch.setPropertyAs( "sequenceNumber", ( uint16_t )1 );
+		chunks.push_back( ch );
 		return 0;
 	}
 
