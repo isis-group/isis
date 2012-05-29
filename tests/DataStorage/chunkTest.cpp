@@ -230,20 +230,40 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
 
+	data::scaling_pair no_scale(util::Value<int>(1),util::Value<int>(0));
+	
 	data::Chunk ch2 = ch1;//This shall clone the underlying ValueArray-Object
-	//but it should of course of the same type and contain the same data
-	BOOST_CHECK( ch1.getValueArrayBase().isSameType( ch2.getValueArrayBase() ) );
+	data::Chunk copyF = ch2.copyByID(); // this shall copy as the same as ch2 (float)
+	data::Chunk copyI = ch2.copyByID(data::ValueArray<uint32_t>::staticID,no_scale); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
+	
+	//but it should of course be of the same type and contain the same data
 	BOOST_CHECK( ch1.getValueArrayBase().is<float>() );
+	BOOST_CHECK( ch1.getValueArrayBase().isSameType( ch2.getValueArrayBase() ) );
+	BOOST_CHECK( copyF.getValueArrayBase().isSameType( ch2.getValueArrayBase() ) );
+	BOOST_CHECK( copyI.getValueArrayBase().is<uint32_t>() );
+	
 	BOOST_CHECK_EQUAL( ch1.getVolume(), ch2.getVolume() );
+	BOOST_CHECK_EQUAL( ch1.getVolume(), copyF.getVolume() );
+	BOOST_CHECK_EQUAL( ch1.getVolume(), copyI.getVolume() );
 
-	for ( size_t i = 0; i < ch2.getVolume(); i++ )
+	// all entries should be the same as for ch1
+	for ( size_t i = 0; i < ch2.getVolume(); i++ ){
 		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], i );
+		BOOST_CHECK_EQUAL( copyF.getValueArray<float>()[i], i );
+		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
+	}
 
-	//cloning chunks is a cheap copy, thus any copied chunk shares data
+	
 	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
+		//cloning chunks is a cheap copy, thus any copied chunk shares data
 		ch1.asValueArray<float>()[i] = 0;
 		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], 0 );
+		// but deep copies should not be changed
+		BOOST_CHECK_EQUAL( copyF.getValueArray<float>()[i], i );
+		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
 	}
+
+	
 }
 BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 {
