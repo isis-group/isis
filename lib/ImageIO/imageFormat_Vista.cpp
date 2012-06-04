@@ -83,7 +83,8 @@ throw( std::runtime_error & )
 
 		acquisitionTimeList.sort();
 		float sliceTimeOffset = acquisitionTimeList.front();
-		progress->show( dims[2] );
+
+		if( progress )  progress->show( dims[2], "Creating functional vista image..." );
 
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
@@ -99,8 +100,11 @@ throw( std::runtime_error & )
 
 			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
-			progress->progress();
+
+			if( progress ) progress->progress();
 		}
+
+		if( progress ) progress->close();
 
 		// dims[3] > 1 ?
 		// 3D image data
@@ -474,7 +478,9 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				}
 			}
 		}
-		progress->show( vistaChunkList.size() );
+
+		if( progress ) progress->show( vistaChunkList.size() );
+
 		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
@@ -625,9 +631,12 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 			/******************** add chunks to output ********************/
 			std::back_insert_iterator<std::list<data::Chunk> > dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
-			progress->progress();
+
+			if( progress ) progress->progress();
 		} // END foreach vistaChunkList
-		progress->close();
+
+		if ( progress ) progress->close();
+
 		//handle the residual images
 		uint16_t sequenceNumber = 0;
 		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
