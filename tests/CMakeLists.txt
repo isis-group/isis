@@ -8,6 +8,9 @@
 # 
 ############################################################
 
+INCLUDE(CTest)
+ENABLE_TESTING()
+
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -31,6 +34,10 @@ add_subdirectory(DataStorage)
 add_subdirectory(ImageIO)
 add_subdirectory(ExternalLibraryAdapter)
 
+if(ISIS_BUILD_FILTER )
+	add_subdirectory(Filter)
+endif(ISIS_BUILD_FILTER)
+
 # addition option: build benchmarks
 option(ISIS_BUILD_BENCHMARKS "Build the ISIS stress tests. For internal use only" OFF)
 
@@ -38,3 +45,5 @@ if(ISIS_BUILD_BENCHMARKS)
   message(STATUS "Building stress tests")
   add_subdirectory(benchmarks)
 endif(ISIS_BUILD_BENCHMARKS)
+
+

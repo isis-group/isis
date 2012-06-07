@@ -30,7 +30,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 {
 	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 	init( idx );
-	addNeededFromString( neededProperties );
+	addNeededFromString<ChunkBase>( neededProperties );
 	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 }
@@ -52,6 +52,7 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 		setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
 		setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+		setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 	}
 }
 
@@ -79,6 +80,13 @@ bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 		static_cast<ValueArrayReference &>( *this ) = newPtr; // otherwise replace my own ValueArray with the new one
 
 	return true;
+}
+
+Chunk Chunk::copyByID( short unsigned int ID, scaling_pair scaling ) const
+{
+	Chunk ret = *this; //make copy of the chunk
+	static_cast<ValueArrayReference &>( ret ) = getValueArrayBase().copyByID( ID, scaling ); // replace its data by the copy
+	return ret;
 }
 
 size_t Chunk::getBytesPerVoxel()const
@@ -184,6 +192,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 	size_t atDim = getRelevantDims() - 1;
+
+	LOG_IF( distance[atDim] == 0 && atDim < data::timeDim, Runtime, error ) << "The voxel distance (voxelSize + voxelGap) at the splicing direction (" << atDim << ") is zero. This will likely cause errors in the Images structure.";
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :

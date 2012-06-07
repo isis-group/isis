@@ -38,6 +38,14 @@ void ConsoleFeedback::show( size_t max, std::string header )
 	header += "\n";
 	disp.reset( new boost::progress_display( max, std::cout, header ) );
 }
+
+size_t ConsoleFeedback::extend( size_t by )
+{
+	long unsigned int at = disp->count();
+	disp->restart( disp->expected_count() + by );
+	return disp->operator+=( at );
+}
+
 void ConsoleFeedback::close()
 {
 	disp.reset();

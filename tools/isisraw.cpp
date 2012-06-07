@@ -12,9 +12,9 @@ using namespace isis;
 class FakedRawFormat: public image_io::FileFormat
 {
 	std::string getName()const {return "";};
-	int load( std::list< data::Chunk >& /*chunks*/, const std::string& /*filename*/, const util::istring& /*dialect*/ ) throw( std::runtime_error & ) {return 0;}
+	int load( std::list< data::Chunk >& /*chunks*/, const std::string& /*filename*/, const util::istring& /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return 0;}
 	util::istring suffixes( io_modes /*modes = both*/ ) const {return "";}
-	void write( const data::Image& /*image*/, const std::string& /*filename*/, const util::istring& /*dialect*/ ) throw( std::runtime_error & ) {}
+	void write( const data::Image& /*image*/, const std::string& /*filename*/, const util::istring& /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
 	std::pair< std::string, std::string > makeBasename( const std::string &filename ) {
 		return std::make_pair( filename, std::string( "" ) );
 	}
@@ -43,6 +43,14 @@ int main( int argc, char *argv[] )
 	app.parameters["rawdims"] = util::ivector4( 0, 1, 1, 1 );
 	app.parameters["rawdims"].needed() = false;
 	app.parameters["rawdims"].setDescription( "the dimensions of the raw image, at least number of columns must be given (ignored when read_repn is not given)" );
+
+	app.parameters["voxel"] = util::fvector4( 1, 1, 1 );
+	app.parameters["voxel"].needed() = false;
+	app.parameters["voxel"].setDescription( "the size of the voxels in each direction" );
+
+	app.parameters["origin"] = util::fvector4( );
+	app.parameters["origin"].needed() = false;
+	app.parameters["origin"].setDescription( "the position of the first voxel in isis space" );
 
 	app.addExample( "-in my_file.nii -out /tmp/raw.file -repn u8bit", "Write the image data of a nifti file in a u8bit raw file" );
 	app.addExample( "-in raw.file -read_repn s16bit -out new_image.nii -rawdims 384 384 12 -offset 500", "Read 384*384*12 s16bit blocks from a raw file skipping 500 bytes and store them as a nifti image." );
@@ -78,8 +86,11 @@ int main( int argc, char *argv[] )
 
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
-		data::Image out( data::Chunk( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true ) );
-		app.autowrite( out, true );
+		data::Chunk ch( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true );
+		ch.setPropertyAs<util::fvector4>( "indexOrigin", app.parameters["origin"] );
+		ch.setPropertyAs<util::fvector4>( "voxelSize", app.parameters["voxel"] );
+
+		app.autowrite( data::Image( ch ), true );
 	} else { // writing raw
 		app.autoload( true ); //load "normal" images
 

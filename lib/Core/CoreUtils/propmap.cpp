@@ -394,7 +394,7 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { // if the element is allready here
 			if ( thisIt->second.empty() ) { // if ours is empty
 				LOG( Debug, verbose_info ) << "Replacing empty property " << MSubject( thisIt->first ) << " by " << MSubject( otherIt->second );
-				thisIt->second = otherIt->second;
+				thisIt->second.insert( otherIt->second );
 			} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { // if both are a subtree
 				PropertyMap &thisMap = thisIt->second.getBranch();
 				const PropertyMap &refMap = otherIt->second.getBranch();
@@ -493,16 +493,6 @@ void PropertyMap::addNeeded( const key_type &key )
 	propertyValue( key ).needed() = true;
 }
 
-
-void PropertyMap::addNeededFromString( const std::string &needed )
-{
-	const std::list<std::string> needList = util::stringToList<std::string>( needed );
-	//@todo util::stringToList<std::string>( needed,' ' ) would be faster but less robust
-	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
-	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
-		addNeeded( key_type( ref.c_str() ) );
-	}
-}
 
 bool PropertyMap::hasProperty( const PropPath &path ) const
 {

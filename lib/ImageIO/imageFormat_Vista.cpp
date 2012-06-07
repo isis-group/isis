@@ -48,7 +48,8 @@ boost::is_unsigned<VBit>::type,
 
 void
 ImageFormat_Vista::write( const data::Image &image,
-						  const std::string &filename, const util::istring &/*dialect*/ )
+						  const std::string &filename, const util::istring &/*dialect*/,
+						  boost::shared_ptr<util::ProgressFeedback> progress )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -83,6 +84,8 @@ throw( std::runtime_error & )
 		acquisitionTimeList.sort();
 		float sliceTimeOffset = acquisitionTimeList.front();
 
+		if( progress )  progress->show( dims[2], "Creating functional vista image..." );
+
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 
@@ -97,7 +100,11 @@ throw( std::runtime_error & )
 
 			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
+
+			if( progress ) progress->progress();
 		}
+
+		if( progress ) progress->close();
 
 		// dims[3] > 1 ?
 		// 3D image data
@@ -209,7 +216,9 @@ throw( std::runtime_error & )
 
 
 int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &filename,
-							 const util::istring &dialect ) throw ( std::runtime_error & )
+							 const util::istring &dialect,
+							 boost::shared_ptr<util::ProgressFeedback> progress
+						   ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
@@ -469,6 +478,9 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				}
 			}
 		}
+
+		if( progress ) progress->show( vistaChunkList.size() );
+
 		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
@@ -619,7 +631,12 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 			/******************** add chunks to output ********************/
 			std::back_insert_iterator<std::list<data::Chunk> > dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
+
+			if( progress ) progress->progress();
 		} // END foreach vistaChunkList
+
+		if ( progress ) progress->close();
+
 		//handle the residual images
 		uint16_t sequenceNumber = 0;
 		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
@@ -636,10 +653,8 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	// first image found will be saved in a float MemChunk and added to the output.
 	else if( myDialect == "map" ) {
 		// print a warning message when there are more than one image.
-		if( nimages >= 1 ) {
-			LOG( image_io::Runtime, warning )
-					<< "Multiple images found. Will use the first VFloat image I can find.";
-		}
+		LOG_IF( nimages >= 1, image_io::Runtime, warning )
+				<< "Multiple images found. Will use the first VFloat image I can find.";
 
 		// have a look for the first float image -> destroy the other images
 		for( unsigned k = 0; k < nimages; k++ ) {
@@ -975,7 +990,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 template <typename TInput> void ImageFormat_Vista::addChunk( std::list< isis::data::Chunk >& chunks, VImage image )
 {
+	static uint16_t sNum = 0;
 	chunks.push_back( VistaChunk<TInput>( image, false ) );
+	chunks.back().setPropertyAs( "sequenceNumber", sNum++ );// some voodoo to fake a sequenceNumber
 }
 
 template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )

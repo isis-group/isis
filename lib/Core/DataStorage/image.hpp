@@ -300,7 +300,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean ( false ) {
-		addNeededFromString ( neededProperties );
+		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromContainer ( chunks );
@@ -313,7 +313,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean ( false ), minIndexingDim ( min_dim ) {
-		addNeededFromString ( neededProperties );
+		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromContainer ( chunks );
@@ -693,6 +693,16 @@ public:
 	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
 	void copyToValueArray ( data::ValueArrayBase &dst,  scaling_pair scaling = scaling_pair() ) const;
+
+	/**
+	 * Create a new Image of consisting of deep copied chunks.
+	 * If neccessary a conversion into the requested type is done using the given scale.
+	 * \param ID the ID of the requested type (type of the respective source chunk is used if not given)
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 * \return a new deep copied Image of the same size
+	 */
+	Image copyByID( unsigned short ID = 0, scaling_pair scaling = scaling_pair() )const;
+
 
 	/**
 	* Get a sorted list of the chunks of the image.

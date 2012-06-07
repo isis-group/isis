@@ -20,6 +20,7 @@
 # find and configure the isis core library
 ###########################################################
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+include_directories(${CMAKE_SOURCE_DIR}/lib)
 
 ############################################################
 # configure the targets
@@ -55,6 +56,5 @@ install(TARGETS
   isisdiff
   isisconv
   isisflip
-  isisraw
-  RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+  isisraw RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 

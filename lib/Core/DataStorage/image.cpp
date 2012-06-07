@@ -35,7 +35,7 @@ ChunkOp::~ChunkOp() {}
 
 Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
-	addNeededFromString( neededProperties );
+	addNeededFromString<Image>( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
@@ -45,7 +45,7 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
 	clean( false )
 {
-	addNeededFromString( neededProperties );
+	addNeededFromString<Image>( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 
@@ -57,13 +57,13 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	}
 }
 
-Image::Image( const isis::data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
+Image::Image( const data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
 	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
 
-Image &Image::operator=( const isis::data::Image &ref )
+Image &Image::operator=( const data::Image &ref )
 {
 	//deep copy bases
 	static_cast<util::PropertyMap &>( *this ) = static_cast<const util::PropertyMap &>( ref );
@@ -198,25 +198,27 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 
 util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords, bool restrictedToImageBox ) const
 {
-	util::fvector4 vec1 = physicalCoords - m_Offset;
-	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
-										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
-										 vec1[3] );
-
-	util::ivector4 retAsIvector4 = util::Value<util::fvector4>( ret ).as<util::ivector4>();
+	const util::fvector4 vec1 = physicalCoords - m_Offset;
+	util::fvector4 _ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
+										  vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
+										  vec1[3] );
 
 	if( restrictedToImageBox ) {
 		const util::vector4<size_t> size = getSizeAsVector();
 
 		for( unsigned short i = 0; i < 4; i ++ ) {
-			if( retAsIvector4[i] < 0 )retAsIvector4[i] =  0;
+			if( _ret[i] < 0 ) {
+				_ret[i] =  0;
+			}
 
-			if( retAsIvector4[i] >= static_cast<int>( size[i] ) )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
+			if( _ret[i] >=  size[i] ) {
+				_ret[i] = ( size[i] - 1 );
+			}
 		}
 	}
 
-	return  retAsIvector4;
+	return _ret + 0.5;
 }
 
 
@@ -277,22 +279,33 @@ bool Image::updateOrientationMatrices()
 bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
 	//for transforming we have to ensure to have the below properties in our chunks and image
-	std::list<std::string > neededProps;
-	neededProps.push_back ( "indexOrigin" );
-	neededProps.push_back ( "rowVec" );
-	neededProps.push_back ( "columnVec" );
-	neededProps.push_back ( "sliceVec" );
-	neededProps.push_back ( "voxelSize" );
+	static const char  *neededProps[] = {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"};
 	//propagate needed properties to chunks
-	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-		BOOST_FOREACH ( std::list<std::string>::reference props, neededProps ) {
-			if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) ) {
-				chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
-			}
-		}
+	std::set<PropPath> propPathList;
+	BOOST_FOREACH ( const char * prop, neededProps ) {
+		const util::PropertyMap::PropPath pPath( prop );
 
+		if( hasProperty ( pPath ) ) {
+			const util::fvector4 p = getPropertyAs<util::fvector4> ( pPath );
+			BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+				if ( !chRef->hasProperty ( pPath ) ) {
+					chRef->setPropertyAs<util::fvector4> ( pPath, p );
+					propPathList.insert( pPath );
+				}
+			}
+		} else {
+			LOG( Runtime, error ) << "Cannot do transformCoords on image without " << prop;
+			return false;
+		}
+	}
+
+	BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
 		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
 			return false;
+		}
+
+		BOOST_FOREACH( std::list<PropPath>::const_reference pPathNotNeeded, propPathList ) {
+			chRef->remove( pPathNotNeeded );
 		}
 	}
 	//      establish initial state
@@ -307,7 +320,6 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 		return false;
 	}
 
-	deduplicateProperties();
 	return true;
 }
 
@@ -628,6 +640,37 @@ void Image::copyToValueArray( ValueArrayBase &dst, scaling_pair scaling ) const
 	} else {
 		LOG ( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 	}
+}
+
+Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
+{
+	Image ret( *this ); // ok we just cheap-copied the whole image
+
+	//we want deep copies of the chunks, and we want them to be of type ID
+	struct : _internal::SortedChunkList::chunkPtrOperator {
+		std::pair<util::ValueReference, util::ValueReference> scale;
+		unsigned short ID;
+		boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr ) {
+			return boost::shared_ptr<Chunk> ( new Chunk ( ptr->copyByID( ID, scale ) ) );
+		}
+	} conv_op;
+
+	if( ID && ( scaling.first.isEmpty() || scaling.second.isEmpty() ) ) // if we have an ID but no scaling, compute it
+		conv_op.scale = getScalingTo( ID );
+
+	conv_op.ID = ID;
+
+	ret.set.transform ( conv_op );
+
+	if ( ret.isClean() ) {
+		ret.lookup = ret.set.getLookup(); // the lookup table still points to the old chunks
+	} else {
+		LOG ( Debug, info ) << "Copied unclean image. Running reIndex on the copy.";
+		ret.reIndex();
+	}
+
+	return *this;
+
 }
 
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const

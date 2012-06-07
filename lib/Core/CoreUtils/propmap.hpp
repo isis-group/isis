@@ -124,7 +124,12 @@ protected:
 	 * \param needed string made of space serparated property-names which
 	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
 	 */
-	void addNeededFromString( const std::string &needed );
+	template<typename CONTAINER> void addNeededFromString( const std::string &needed ) {
+		static const std::list<key_type> neededs = util::stringToList<key_type>( needed );//@todo really bad voodoo
+		BOOST_FOREACH( const key_type & ref, neededs ) {
+			addNeeded( ref );
+		}
+	}
 	/**
 	 * Adds a property with status needed.
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
@@ -461,6 +466,15 @@ public:
 	bool operator==( const treeNode &ref )const {
 		return m_branch == ref.m_branch && m_leaf == ref.m_leaf;
 	}
+	void insert( const treeNode &ref ) {
+		m_branch = ref.m_branch;
+		m_leaf.resize( ref.m_leaf.size() );
+		std::vector<PropertyValue>::iterator dst = m_leaf.begin();
+		BOOST_FOREACH( std::vector<PropertyValue>::const_reference src, ref.m_leaf ) {
+			const bool needed = dst->isNeeded();
+			( *dst = src ).needed() = needed;;
+		}
+	}
 	std::string toString()const {
 		std::ostringstream o;
 		o << *this;
@@ -482,12 +496,14 @@ template<class Predicate> struct PropertyMap::walkTree {
 	walkTree( KeyList &out, const KeyType &prefix ): m_out( out ), m_prefix( prefix ) {}
 	walkTree( KeyList &out ): m_out( out ) {}
 	void operator()( const_reference ref ) const {
+		const KeyType name = ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first;
+
 		if ( ref.second.is_leaf() ) {
 			if ( Predicate()( ref ) )
-				m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
+				m_out.insert( m_out.end(), name );
 		} else {
 			const PropertyMap &sub = ref.second.getBranch();
-			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
+			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, name ) );
 		}
 	}
 };

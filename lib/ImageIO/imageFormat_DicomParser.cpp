@@ -540,14 +540,18 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 
 		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
-		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) ) { //CSAImageHeaderInfo
-			LOG( Debug, info ) << "Using " << tag.toString() << " as CSAImageHeaderInfo";
-			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
-		} else if ( tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSASeriesHeaderInfo
-			LOG( Debug, info ) << "Using " << tag.toString() << " as CSASeriesHeaderInfo";
-			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
+		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) || tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSAImageHeaderInfo
+			bool known = map.hasProperty( "Private Code for (0029,1000)-(0029,10ff)" );
+			std::string as = map.getPropertyAs<std::string>( "Private Code for (0029,1000)-(0029,10ff)" );
+
+			if( known && as == "SIEMENS CSA HEADER" ) {
+				const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
+				LOG( Debug, info ) << "Using " << tag.toString() << " as " << name;
+				DcmElement *elem = dynamic_cast<DcmElement *>( obj );
+				parseCSA( elem, map.branch( name ), dialect );
+			} else {
+				LOG( Runtime, warning ) << "Ignoring entry " << tag.toString() << ", binary format " << as << " is not known";
+			}
 		} else if ( tag == DcmTagKey( 0x0029, 0x0020 ) ) { //MedComHistoryInformation
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();

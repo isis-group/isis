@@ -537,6 +537,15 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/cal_min", head->cal_min );
 	}
 
+	util::fvector4 vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector4>();
+
+	for( short i = 0; i < std::min<short>( head->dim[0], 3 ); i++ ) {
+		if( vsize[i] == 0 ) {
+			LOG( Runtime, warning ) << "The voxelSize[" << i << "] is 0. Assuming \"1\"";
+			vsize[i] = 1;
+		}
+	}
+
 	return parseSliceOrdering( head, props );
 }
 
@@ -619,7 +628,7 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header *header )
 }
 
 
-int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & )
+int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
 
@@ -758,7 +767,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype

@@ -4,19 +4,27 @@ namespace isis
 {
 namespace filter
 {
+
 namespace _internal
 {
 
-bool _internal::FilterBase::run( boost::shared_ptr< util::ProgressFeedback > )
+void FilterBase::setInput ( const std::string &label, const data::Image &image )
 {
-	if( isValid() ) {
-		return process();
-	} else {
-		LOG( data::Runtime, warning ) << "The filter \"" << getFilterName()
-									  << "\" is not valid. Will not run it!";
-		return false;
+	m_additionalImages[label] = boost::shared_ptr<data::Image> ( new data::Image( image ) );
+}
+
+void FilterBase::setInput ( const std::string &label, const data::Chunk &chunk )
+{
+	m_additionalChunks[label] = boost::shared_ptr<data::Chunk> ( new data::Chunk( chunk ) );
+}
+
+void FilterBase::setParameters ( const util::ParameterMap &map )
+{
+	BOOST_FOREACH( util::ParameterMap::const_reference mapElem, map ) {
+		parameters[mapElem.first] = mapElem.second;
 	}
 }
+
 
 }
 }

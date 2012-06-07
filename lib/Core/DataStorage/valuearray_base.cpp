@@ -97,6 +97,8 @@ size_t ValueArrayBase::compare( size_t start, size_t end, const ValueArrayBase &
 
 ValueArrayBase::Reference ValueArrayBase::copyByID( unsigned short ID, scaling_pair scaling ) const
 {
+	if( !ID )ID = getTypeID();
+
 	const Converter &conv = getConverterTo( ID );
 
 	if( conv ) {

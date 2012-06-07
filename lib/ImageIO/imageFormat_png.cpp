@@ -28,6 +28,7 @@ protected:
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
 
 			png_read_image( png_ptr, row_pointers.get() );
+			ret.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
 			return ret;
 		}
 	};
@@ -45,11 +46,16 @@ public:
 	util::istring dialects( const std::string &/*filename*/ ) const {
 		return "middle";
 	}
-	bool write_png( const std::string &filename, const data::Chunk &buff, int color_type, int bit_depth ) {
+	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
+		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
-		assert( buff.getRelevantDims() == 2 );
+
+		//buff has to be swapped along the png-x-axis
+		data::Chunk buff = src.copyByID(); //make a deep copy to not interfere with the source
+		buff.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+
 		util::vector4<size_t> size = buff.getSizeAsVector();
 
 		/* open the file */
@@ -188,12 +194,14 @@ public:
 		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
-		chunks.push_back( read_png( filename ) );
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+		data::Chunk ch = read_png( filename );
+		ch.setPropertyAs( "sequenceNumber", ( uint16_t )1 );
+		chunks.push_back( ch );
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
