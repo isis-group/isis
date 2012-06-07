@@ -51,7 +51,7 @@ int main( int argc, char *argv[] )
 	app.parameters["origin"] = util::fvector4( );
 	app.parameters["origin"].needed() = false;
 	app.parameters["origin"].setDescription( "the position of the first voxel in isis space" );
-	
+
 	app.addExample( "-in my_file.nii -out /tmp/raw.file -repn u8bit", "Write the image data of a nifti file in a u8bit raw file" );
 	app.addExample( "-in raw.file -read_repn s16bit -out new_image.nii -rawdims 384 384 12 -offset 500", "Read 384*384*12 s16bit blocks from a raw file skipping 500 bytes and store them as a nifti image." );
 
@@ -87,9 +87,9 @@ int main( int argc, char *argv[] )
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
 		data::Chunk ch( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true );
-		ch.setPropertyAs<util::fvector4>("indexOrigin",app.parameters["origin"]);
-		ch.setPropertyAs<util::fvector4>("voxelSize",app.parameters["voxel"]);
-		
+		ch.setPropertyAs<util::fvector4>( "indexOrigin", app.parameters["origin"] );
+		ch.setPropertyAs<util::fvector4>( "voxelSize", app.parameters["voxel"] );
+
 		app.autowrite( data::Image( ch ), true );
 	} else { // writing raw
 		app.autoload( true ); //load "normal" images

@@ -639,7 +639,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	// first image found will be saved in a float MemChunk and added to the output.
 	else if( myDialect == "map" ) {
 		// print a warning message when there are more than one image.
-		LOG_IF(nimages >= 1, image_io::Runtime, warning )
+		LOG_IF( nimages >= 1, image_io::Runtime, warning )
 				<< "Multiple images found. Will use the first VFloat image I can find.";
 
 		// have a look for the first float image -> destroy the other images
@@ -976,7 +976,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 template <typename TInput> void ImageFormat_Vista::addChunk( std::list< isis::data::Chunk >& chunks, VImage image )
 {
-	static uint16_t sNum=0;
+	static uint16_t sNum = 0;
 	chunks.push_back( VistaChunk<TInput>( image, false ) );
 	chunks.back().setPropertyAs( "sequenceNumber", sNum++ );// some voodoo to fake a sequenceNumber
 }
