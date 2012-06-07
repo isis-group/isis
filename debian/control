@@ -19,7 +19,7 @@ Package: libisis-core1
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Recommends: libisis-ioplugins-common, libisis-ioplugins-dicom
+Recommends: libisis-ioplugins-common, libisis-ioplugins-dicom, isis-utils
 Conflicts: libisiscore0, isisio0-nifti, isisio0-nifti-sa, isisio0-vista, isisio0-dicom, isisio0-tar-proxy, isisio0-gz-proxy, isisio0-png
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
