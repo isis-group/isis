@@ -59,7 +59,11 @@ Package: libisis-core-dev
 Section: libdevel
 Architecture: all
 Depends: libisis-core1 (>= ${source:Version}),
- libisis-core1 (<< ${source:Version}.1~), ${misc:Depends}
+ libisis-core1 (<< ${source:Version}.1~), ${misc:Depends}, cmake, liboil0.3-dev,
+ libboost-date-time-dev (>= 1.42.0~ ),
+ libboost-dev (>= 1.42.0~ ),
+ libboost-filesystem-dev (>= 1.42.0~ ),
+ libboost-regex-dev (>= 1.42.0~ )
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
