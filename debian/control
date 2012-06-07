@@ -108,15 +108,3 @@ Description: Qt4 bindings for ISIS data I/O framework (development headers)
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.
-
-
-Package: python-isis
-Section: python
-Architecture: any
-Conflicts: isis-python
-Replaces: isis-python
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
-Description: Python bindings for ISIS data I/O framework (development headers)
- This framework aids access of and conversion between various established
- neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
- is extensible with plugins to add support for additional data formats.
