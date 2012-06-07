@@ -252,6 +252,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
+	tmpChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
 	tmpChunk.setPropertyAs( "indexOrigin", util::fvector4( static_cast<float>( indexOrigin[0] ),
 							static_cast<float>( indexOrigin[1] ),
 							static_cast<float>( indexOrigin[2] ),
