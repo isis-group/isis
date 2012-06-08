@@ -32,7 +32,7 @@ namespace image_io
 class ImageFormat_VistaSa: public FileFormat
 {
 private:
-	typedef isis::data::ValueArrayReference ( *readerPtr )( isis::data::FilePtr data, size_t offset, size_t size );
+	typedef data::ValueArrayReference ( *readerPtr )( data::FilePtr data, size_t offset, size_t size );
 
 	class VistaProtoImage: private std::list<data::Chunk>
 	{
@@ -47,7 +47,7 @@ private:
 		bool big_endian;
 
 		void sanitize( util::PropertyMap &obj );
-		std::map<isis::util::istring, readerPtr> vista2isis;
+		std::map<util::istring, readerPtr> vista2isis;
 
 		void swapEndian( data::ValueArrayBase &array );
 
@@ -71,20 +71,23 @@ private:
 		}
 
 	public:
-		VistaProtoImage( isis::data::FilePtr fileptr, isis::data::ValueArray< uint8_t >::iterator data_start );
-		bool add( isis::util::PropertyMap props );
+		VistaProtoImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start );
+		/// add a chunk to the protoimage
+		bool add( util::PropertyMap props );
 		bool isFunctional()const;
 		void transformFunctional( );
-		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map );
+
+		/// store the protoimage's' chunks into the output list, do byteswap if necessary
+		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map,uint16_t sequence );
 	};
 
 public:
 	std::string getName()const {return "Vista standalone";}
-	int load ( std::list< isis::data::Chunk >& chunks, const std::string &filename, const isis::util::istring &dialect ) throw ( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & );
+	int load ( std::list< data::Chunk >& chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > ) throw ( std::runtime_error & );
+	void write( const data::Image&, const std::string&, const util::istring&, boost::shared_ptr< util::ProgressFeedback > )  throw( std::runtime_error & );
 
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
+	util::istring dialects( const std::string &/*filename*/ )const {return "";}
 
 
 protected:

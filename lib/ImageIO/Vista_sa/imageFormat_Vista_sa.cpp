@@ -30,12 +30,12 @@ namespace image_io
 
 namespace _internal
 {
-template<typename T> isis::data::ValueArrayReference reader( isis::data::FilePtr data, size_t offset, size_t size )
+template<typename T> data::ValueArrayReference reader( data::FilePtr data, size_t offset, size_t size )
 {
-	return data.atByID( isis::data::ValueArray<T>::staticID, offset, size );
+	return data.atByID( data::ValueArray<T>::staticID, offset, size );
 }
 
-template<> isis::data::ValueArrayReference reader<bool>( isis::data::FilePtr data, size_t offset, size_t size )
+template<> data::ValueArrayReference reader<bool>( data::FilePtr data, size_t offset, size_t size )
 {
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
@@ -58,7 +58,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 	if( empty() ) {
 		last_voxelsize = props.getPropertyAs<util::fvector4>( "voxelSize" );
 		last_repn = props.getPropertyAs<std::string>( "repn" ).c_str();
-		last_component = props.propertyValue( "component_repn" );
+		if(props.hasProperty("component_repn"))last_component = props.propertyValue( "component_repn" ) ;
 
 		if( !( m_reader = vista2isis[last_repn] ) )
 			throwGenericError( std::string( "Cannot handle repn " ) + props.getPropertyAs<std::string>( "repn" ) );
@@ -66,14 +66,14 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 	} else  if(
 		last_voxelsize != props.getPropertyAs<util::fvector4>( "voxelSize" ) ||
 		last_repn != props.getPropertyAs<std::string>( "repn" ).c_str() ||
-		last_component != props.propertyValue( "component_repn" )
+		(props.hasProperty("component_repn") && last_component != props.propertyValue( "component_repn" ))
 	) {
 		return false;
 	}
 
 	const size_t ch_offset = props.getPropertyAs<uint64_t>( "data" );
 
-	isis::util::vector4<size_t> ch_size(
+	util::vector4<size_t> ch_size(
 		props.getPropertyAs<uint32_t>( "ncolumns" ),
 		props.getPropertyAs<uint32_t>( "nrows" ),
 		props.getPropertyAs<uint32_t>( "nbands" ),
@@ -111,12 +111,12 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 	return true;
 }
 
-void ImageFormat_VistaSa::VistaProtoImage::sanitize( isis::util::PropertyMap &obj )
+void ImageFormat_VistaSa::VistaProtoImage::sanitize( util::PropertyMap &obj )
 {
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
-		obj.transform<isis::util::fvector4>( "vista/columnVec", "rowVec" );
-		obj.transform<isis::util::fvector4>( "vista/rowVec", "columnVec" );
-		transformOrTell<isis::util::fvector4>( "vista/sliceVec", "sliceVec", obj, warning );
+		obj.transform<util::fvector4>( "vista/columnVec", "rowVec" );
+		obj.transform<util::fvector4>( "vista/rowVec", "columnVec" );
+		transformOrTell<util::fvector4>( "vista/sliceVec", "sliceVec", obj, warning );
 	} else if( obj.hasProperty( "vista/imageOrientationPatient" ) ) {
 		const util::dlist vecs = obj.getPropertyAs<util::dlist>( "vista/imageOrientationPatient" ); // if we have the dicom style partial orientation
 		util::dlist::const_iterator begin = vecs.begin(), middle = vecs.begin(), end = vecs.end();
@@ -131,27 +131,27 @@ void ImageFormat_VistaSa::VistaProtoImage::sanitize( isis::util::PropertyMap &ob
 	}
 
 	if(
-		transformOrTell<isis::util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ||
-		transformOrTell<isis::util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, warning )
+		transformOrTell<util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ||
+		transformOrTell<util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, warning )
 	);
 	else {
 		LOG( Runtime, warning ) << "No position info was found, assuming 0 0 0";
 		obj.setPropertyAs( "indexOrigin", util::fvector4( 0, 0 ) );
 	}
 
-	if( transformOrTell<isis::util::fvector4>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
+	if( transformOrTell<util::fvector4>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
 		if( hasOrTell( "vista/voxel", obj, info ) ) { // use that as voxel size, and the difference to voxel as voxel gap
 			obj.setPropertyAs<util::fvector4>( "voxelGap", obj.getPropertyAs<util::fvector4>( "vista/voxel" ) - obj.getPropertyAs<util::fvector4>( "voxelSize" ) ) ;
 			obj.remove( "vista/voxel" );
 		}
-	} else if( transformOrTell<isis::util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
+	} else if( transformOrTell<util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
 	} else
 		obj.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 	if( obj.hasProperty( "vista/diffusionBValue" ) ) {
 		const float len = obj.getPropertyAs<float>( "vista/diffusionBValue" );
 
-		if( len > 0 && transformOrTell<isis::util::fvector4>( "vista/diffusionGradientOrientation", "diffusionGradient", obj, warning ) ) {
+		if( len > 0 && transformOrTell<util::fvector4>( "vista/diffusionGradientOrientation", "diffusionGradient", obj, warning ) ) {
 			util::fvector4 &vec = obj.propertyValue( "diffusionGradient" ).castTo<util::fvector4>();
 			vec.norm();
 			vec *= len;
@@ -228,20 +228,82 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 	/*  const bool has_Tr= !group.empty() && group.front().hasProperty("repetitionTime");
 	 *  const bool has_Ts= !group.empty() && group.front().hasProperty("repetitionTime");*/
 
-	LOG( Runtime, info ) << "Transforming " << size() << " chunks for fMRI through splicing";
-	/*  std::list< data::Chunk > ret;
-	 *  const uint32_t acqStride = in_chunks.size();
-	 *  BOOST_FOREACH( VistaChunk ch, in_chunks ) {
-	 *      size_t timestep = 0;
-	 *      ch.remove( "vista/ntimesteps" );
-	 *      BOOST_FOREACH( data::Chunk ch, ch.splice( data::sliceDim ) ) {
-	 *          uint32_t &acq = ch.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
-	 *          acq = acq + acqStride * timestep;
-	 *          ret.push_back( ch );
-	 *          timestep++;
-	 }
-	 }
-	 return ret;*/
+	const uint32_t slices = size(); // the amount of slices in the image (amount of slice/time chunks in this proto image)
+	util::vector4<size_t> size = front().getSizeAsVector();
+	const float Tr=front().getPropertyAs<float>("repetitionTime"); //the time between to volumes taken (time between two slices in a slice/time chunk)
+
+	// first combine the slices
+	data::Chunk dst=front().cloneToNew(size[0],size[1],slices,size[2]);
+	dst.join(front());
+	for(size_t timestep=0;timestep<size[2];timestep++){
+		size_t slice_num=0;
+		for(iterator slice=begin();slice!=end();slice++,slice_num++) {
+			slice->copySlice(timestep,0,dst,slice_num,timestep);
+		}
+	}
+
+	//then splice up into volumes again
+	dst.remove("vista/slice_time");
+	dst.setPropertyAs<uint32_t>("acquisitionNumber",0);
+	list< data::Chunk > ret=dst.autoSplice();
+	util::PropertyMap::DiffMap differences=front().getDifference(back()); // figure out which properties differ between the timesteps
+	differences.erase("acquisitionNumber"); // this will be set later
+
+	// and fill the properties which differ
+
+	// if we have a repetitionTime and differing slice_timing set acquisitionTime/Number per slice
+	if(Tr && differences.find("vista/slice_time")!=differences.end()){
+		uint32_t s=0;
+		for(iterator i=begin();i!=end();i++,s++) {
+			const float acq_first=i->getPropertyAs<float>("vista/slice_time"); //slice_time of the chunk is the acquisitionTime of this slice on the first repetition
+			uint32_t t=0;
+			BOOST_FOREACH(data::Chunk &ref,ret){
+				ref.propertyValueAt("acquisitionTime",s)=acq_first+Tr*t;
+				ref.propertyValueAt("acquisitionNumber",s)=s+slices*t;
+				t++;
+			}
+		}
+	} else { // we need at least an acquisitionNumber per volume
+		uint32_t a=0;
+		BOOST_FOREACH(data::Chunk &ref,ret){
+			ref.setPropertyAs<uint32_t>("acquisitionNumber",a++);
+		}
+	}
+
+	// fill the remaining props (e.g. indexOrigin)
+	BOOST_FOREACH(util::PropertyMap::DiffMap::const_reference diff,differences){
+		size_t n=0;
+		for(const_iterator i=begin();i!=end();i++,n++){
+			const util::PropertyValue p=i->propertyValue(diff.first);
+			LOG(Debug,info) << "Copying per timestep property " << std::make_pair(diff.first, p) << " into " << ret.size() << " volumes";
+			BOOST_FOREACH(data::Chunk &ref,ret){
+				ref.propertyValueAt(diff.first,n)=p;
+			}
+		}
+	}
+
+	// replace old chunks by the new 
+	this->assign(ret.begin(),ret.end());
+	
+/*	if(Tr && front().getPropertyAs<float>("vista/slice_time") != back().getPropertyAs<float>("vista/slice_time")){ // if we have a repetitionTime and slice_timing use the slicing aproach
+		LOG( Runtime, info ) << "Transforming " << size() << " chunks for fMRI through splicing";
+		uint32_t n=0;
+		for(iterator i=begin();i!=end();i++,n++) {
+			const float acq_first=i->getPropertyAs<float>("vista/slice_time"); //slice_time of the chunk is the acquisitionTime of this slice on the first repetition
+			
+			i->remove( "vista/ntimesteps" );
+			i->remove( "vista/slice_time" );
+			uint32_t t=0;
+			BOOST_FOREACH( data::Chunk ch, i->splice( data::sliceDim ) ) {
+				ch.setPropertyAs("acquisitionTime",Tr*t+acq_first); // the acquisitionTime of a slice time of the first slice plus the time between the volumes
+				ch.setPropertyAs("acquisitionNumber",slices*t+n);
+				ret.push_back( ch );
+				t++;
+			}
+		}
+		this->assign(ret.begin(),ret.end());
+	}*/
+	
 }
 
 void ImageFormat_VistaSa::VistaProtoImage::swapEndian( data::ValueArrayBase &array )
@@ -259,15 +321,15 @@ void ImageFormat_VistaSa::VistaProtoImage::swapEndian( data::ValueArrayBase &arr
 	}
 }
 
-void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map )
+void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out, const util::PropertyMap& root_map, uint16_t sequence )
 {
-	uint32_t acqNum = 0;
-
 	while( !empty() ) {
 		out.push_back( front() );
 		pop_front();
 		out.back().branch( "vista" ).join( root_map );
-		out.back().setPropertyAs( "acquisitionNumber", acqNum++ );
+		if(!out.back().hasProperty( "sequenceNumber"))
+			out.back().setPropertyAs("sequenceNumber",sequence);
+		assert(out.back().hasProperty( "acquisitionNumber"));
 
 		if( big_endian )
 			swapEndian( out.back().asValueArrayBase() ); //if endianess wasn't swapped till now, do it now
@@ -275,7 +337,8 @@ void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out,
 }
 
 
-int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & )
+
+int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/  ) throw( std::runtime_error & )
 {
 	data::FilePtr mfile ( filename );
 
@@ -288,9 +351,9 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 	}
 
 	//parse the vista header
-	isis::data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
-	isis::util::PropertyMap root_map;
-	std::list<isis::util::PropertyMap> ch_list;
+	data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
+	util::PropertyMap root_map;
+	std::list<util::PropertyMap> ch_list;
 	size_t old_size = chunks.size();
 
 	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
@@ -298,7 +361,7 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 		std::list<VistaProtoImage> groups;
 		groups.push_back( VistaProtoImage( mfile, data_start ) );
 
-		BOOST_FOREACH( const isis::util::PropertyMap & chMap, ch_list ) {
+		BOOST_FOREACH( const util::PropertyMap & chMap, ch_list ) {
 			if( !groups.back().add( chMap ) ) { //if current ProtoImage doesnt like
 				groups.push_back( VistaProtoImage( mfile, data_start ) ); // try a new one
 				assert( groups.back().add( chMap ) ); //a new one should always work
@@ -306,11 +369,12 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 		}
 		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
 
+		uint16_t sequence=0;
 		BOOST_FOREACH( VistaProtoImage & group, groups ) {
 			if( group.isFunctional() )
 				group.transformFunctional();
 
-			group.store( chunks, root_map );
+			group.store( chunks, root_map, sequence++ );
 		}
 		return chunks.size() - old_size;
 	} else {
@@ -321,7 +385,7 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 
 
 
-void ImageFormat_VistaSa::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/ )  throw( std::runtime_error & )
+void ImageFormat_VistaSa::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/  )  throw( std::runtime_error & )
 {
 	throwGenericError( "Not available yet" );
 }
