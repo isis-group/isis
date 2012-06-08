@@ -7,6 +7,7 @@
 # Date: Tue, 05 Apr 2011 10:50:31 +0200
 #
 ############################################################
+FIND_PACKAGE(Git)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -41,6 +42,7 @@ if(NOT WIN32)
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+set(ISIS_FILTER_INFIX lib/isis/filter)
 endif(NOT WIN32)
 
 ############################################################
@@ -131,16 +133,14 @@ endmacro( build_manpage )
 ############################################################
 # The revision number is based on GIT commit informations.
 # It will be stored in GIT_REVISION.
-find_program(GIT_COMMAND git DOC "The rcs revision description information tool.")
-
 if (NOT GIT_REVISION)
-  if (GIT_COMMAND)
-    execute_process(COMMAND ${GIT_COMMAND} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if (GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
     string(REGEX MATCH "[0-9]+-[^-]+$" GIT_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${GIT_REVISION}-${CMAKE_SYSTEM_NAME}-${PROCESSOR}-${CMAKE_BUILD_TYPE})
   else(GIT_COMMAND)
     message(STATUS "git not found")
-  endif (GIT_COMMAND)
+  endif (GIT_FOUND)
 endif (NOT GIT_REVISION)
 
 if (GIT_REVISION)
@@ -156,7 +156,7 @@ endif(GIT_REVISION)
 ############################################################
 option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_PYTHON_EXT "Build the ISIS python extension. It provides access to the ISIS core image functions from python" OFF)
+option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
 
 ###########################################################
 # CPack config
@@ -188,6 +188,18 @@ else(WIN32)
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 endif(WIN32)
 
+#build the filter
+if(ISIS_BUILD_FILTER )
+  #omp settings
+  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
+  if(ISIS_FILTER_ENABLE_OMP)
+	message(STATUS "Enabling omp support" )
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+  endif(ISIS_FILTER_ENABLE_OMP)
+  add_subdirectory(lib/Filter)
+endif(ISIS_BUILD_FILTER)
+
 # build the ISIS libraries
 add_subdirectory(lib)
 
@@ -202,17 +214,15 @@ if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
+
+
+
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)
   message(STATUS "Building unit tests")
   enable_testing()
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
-
-# build the ISIS python extension.
-if(ISIS_BUILD_PYTHON_EXT)
-  add_subdirectory(python)
-endif(ISIS_BUILD_PYTHON_EXT)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
@@ -222,4 +232,3 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 # set up doxygen
 ############################################################
 include(UseDoxygen)
-

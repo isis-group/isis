@@ -33,6 +33,7 @@ template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, 
 
 	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )acnum );
 	ch.setPropertyAs( "acquisitionTime", ( float )acnum );
+	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 	return ch;
 }
 
@@ -174,6 +175,22 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::vector4<size_t>( size ) ) );
 }
 
+BOOST_AUTO_TEST_CASE ( copy_image_test )
+{
+	data::Chunk ch = genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
+	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
+	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
+	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
+	
+	data::Image img( chunks );
+	const size_t size[] = {4, 4, 1, 2};
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_REQUIRE( img.isValid() );
+
+	data::Image copy=img.copyByID();
+	BOOST_CHECK(img.compare(copy)==0);
+}
+
 BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 {
 	data::Chunk ch = genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
@@ -204,6 +221,8 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
+
 
 	for( int i = 0; i < 4; i++ ) {
 		ch.propertyValueAt( "acquisitionNumber", 3 - i ) = ( uint32_t )i; //change the acquisitionNumber of that to 1
@@ -687,6 +706,7 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 
 	data::Image img( ch );
 	BOOST_REQUIRE( img.isClean() );
@@ -810,6 +830,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	unsigned int nrY = 64;
 	unsigned int nrS = 20;
 	unsigned int nrT = 20;
+	const char *needed[] = {"voxelSize", "rowVec", "columnVec", "sliceVec", "sequenceNumber"};
 	static boost::numeric::converter < uint16_t, double,
 		   boost::numeric::conversion_traits<uint16_t, double>,
 		   boost::numeric::def_overflow_handler,
@@ -821,7 +842,6 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
 			chunks.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
-			BOOST_CHECK( chunks.back().propertyValue( "indexOrigin" ).needed() );
 			chunks.back().setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
 			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
 			chunks.back().setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
@@ -831,6 +851,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	}
 
 	data::Image img( chunks );
+	BOOST_FOREACH( const char * str, needed ) {
+		BOOST_CHECK( img.propertyValue( str ).needed() );
+	}
+
 	BOOST_REQUIRE( img.isClean() );
 
 	srand ( time( NULL ) );
@@ -895,6 +919,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	original.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	original.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0 ) );
 	original.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0 ) );
+	original.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
@@ -1070,6 +1095,7 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 	original.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	original.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0 ) );
 	original.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0 ) );
+	original.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );

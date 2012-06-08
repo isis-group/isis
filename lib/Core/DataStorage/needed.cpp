@@ -28,6 +28,7 @@ const char *isis::data::Image::neededProperties = "\
 	rowVec\
 	columnVec\
 	sliceVec\
+	sequenceNumber\
 ";
 
 /// @endcond _internal

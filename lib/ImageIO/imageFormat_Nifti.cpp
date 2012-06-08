@@ -133,7 +133,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( std::list<data::Chunk> &retList, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & ) {
+	int load( std::list<data::Chunk> &retList, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		//read the file with the function from nifti1_io.h
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 
@@ -190,7 +190,7 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &imageOrig, const std::string &filename, const util::istring &sdialect ) throw( std::runtime_error & ) {
+	void write( const data::Image &imageOrig, const std::string &filename, const util::istring &sdialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		const util::istring dialect( sdialect.begin(), sdialect.end() );
 		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.getMajorTypeName() << " as nifti";
 

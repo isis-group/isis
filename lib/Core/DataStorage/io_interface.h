@@ -19,6 +19,7 @@
 #include "image.hpp"
 #include "common.hpp"
 #include "../CoreUtils/istring.hpp"
+#include "../CoreUtils/progressfeedback.hpp"
 
 namespace isis
 {
@@ -31,6 +32,12 @@ class FileFormat
 public:
 	enum io_modes{read_only=1,write_only=2,both=3};
 protected:
+	/**
+	 * Check if a given property exists in the given PropMap.
+	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
+	 * \returns object.hasProperty(name)
+	 */
+	static bool setGender( util::PropertyMap &object, const char *set,const char *entries="female,male,other" );
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
@@ -96,7 +103,8 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	throw( std::runtime_error & ) = 0; //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
@@ -105,7 +113,8 @@ public:
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & ) = 0;
+	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	throw( std::runtime_error & ) = 0;
 
 	/**
 	 * Write a image list.
@@ -115,7 +124,8 @@ public:
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect ) throw( std::runtime_error & );
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	throw( std::runtime_error & );
 
 	virtual ~FileFormat() {}
 };

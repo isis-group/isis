@@ -26,11 +26,9 @@ namespace _internal
 
 bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
 {
-	if( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
-		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
-		LOG( Runtime, error ) << "Missing one of the properties (rowVec, columnVec, sliceVec, voxelSize, indexOrigin)";
-		return false;
-	}
+	LOG_IF( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
+			|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ), Debug, error )
+			<< "Missing one of the properties (rowVec, columnVec, sliceVec, voxelSize, indexOrigin)";
 
 	using namespace boost::numeric::ublas;
 	// this implementation assumes that the PropMap properties is either a

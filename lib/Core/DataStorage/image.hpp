@@ -695,6 +695,16 @@ public:
 	void copyToValueArray ( data::ValueArrayBase &dst,  scaling_pair scaling = scaling_pair() ) const;
 
 	/**
+	 * Create a new Image of consisting of deep copied chunks.
+	 * If neccessary a conversion into the requested type is done using the given scale.
+	 * \param ID the ID of the requested type (type of the respective source chunk is used if not given)
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 * \return a new deep copied Image of the same size
+	 */
+	Image copyByID( unsigned short ID = 0, scaling_pair scaling = scaling_pair() )const;
+
+
+	/**
 	* Get a sorted list of the chunks of the image.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
 	* \note These chunks will be cheap copies, so changing their voxels will change the voxels of the image. But you can for example use \code

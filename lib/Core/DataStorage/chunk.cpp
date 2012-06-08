@@ -81,6 +81,13 @@ bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 	return true;
 }
 
+Chunk Chunk::copyByID( short unsigned int ID, scaling_pair scaling ) const
+{
+	Chunk ret = *this; //make copy of the chunk
+	static_cast<ValueArrayReference &>( ret ) = getValueArrayBase().copyByID( ID, scaling ); // replace its data by the copy
+	return ret;
+}
+
 size_t Chunk::getBytesPerVoxel()const
 {
 	return getValueArrayBase().bytesPerElem();
@@ -184,6 +191,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 	size_t atDim = getRelevantDims() - 1;
+
+	LOG_IF( distance[atDim] == 0 && atDim < data::timeDim, Runtime, error ) << "The voxel distance (voxelSize + voxelGap) at the splicing direction (" << atDim << ") is zero. This will likely cause errors in the Images structure.";
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :

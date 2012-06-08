@@ -394,7 +394,7 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { // if the element is allready here
 			if ( thisIt->second.empty() ) { // if ours is empty
 				LOG( Debug, verbose_info ) << "Replacing empty property " << MSubject( thisIt->first ) << " by " << MSubject( otherIt->second );
-				thisIt->second = otherIt->second;
+				thisIt->second.insert( otherIt->second );
 			} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { // if both are a subtree
 				PropertyMap &thisMap = thisIt->second.getBranch();
 				const PropertyMap &refMap = otherIt->second.getBranch();
