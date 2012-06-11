@@ -225,9 +225,9 @@ bool ImageFormat_VistaSa::VistaProtoImage::isFunctional() const
 
 void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 {
-	/*  const bool has_Tr= !group.empty() && group.front().hasProperty("repetitionTime");
-	 *  const bool has_Ts= !group.empty() && group.front().hasProperty("repetitionTime");*/
 
+	LOG(Debug,info)<< "Transforming " << size() << " functional slices";
+	
 	const uint32_t slices = size(); // the amount of slices in the image (amount of slice/time chunks in this proto image)
 	util::vector4<size_t> size = front().getSizeAsVector();
 	const float Tr=front().getPropertyAs<float>("repetitionTime"); //the time between to volumes taken (time between two slices in a slice/time chunk)
@@ -254,6 +254,7 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 	// if we have a repetitionTime and differing slice_timing set acquisitionTime/Number per slice
 	if(Tr && differences.find("vista/slice_time")!=differences.end()){
 		uint32_t s=0;
+		LOG(Debug,info)<< "Computing acquisitionTime from vista/slice_time";
 		for(iterator i=begin();i!=end();i++,s++) {
 			const float acq_first=i->getPropertyAs<float>("vista/slice_time"); //slice_time of the chunk is the acquisitionTime of this slice on the first repetition
 			uint32_t t=0;
@@ -265,6 +266,7 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 		}
 	} else { // we need at least an acquisitionNumber per volume
 		uint32_t a=0;
+		LOG(Debug,info)<< "NoComputing acquisitionTime from vista/slice_time";
 		BOOST_FOREACH(data::Chunk &ref,ret){
 			ref.setPropertyAs<uint32_t>("acquisitionNumber",a++);
 		}
@@ -306,6 +308,14 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 	
 }
 
+void ImageFormat_VistaSa::VistaProtoImage::fakeAcqNum()
+{
+	uint32_t acqNum=0;
+	for(iterator i=begin();i!=end();i++)
+		i->setPropertyAs("acquisitionNumber",acqNum++);
+	
+}
+
 void ImageFormat_VistaSa::VistaProtoImage::swapEndian( data::ValueArrayBase &array )
 {
 	uint_fast8_t elemsize = array.bytesPerElem();
@@ -329,7 +339,6 @@ void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out,
 		out.back().branch( "vista" ).join( root_map );
 		if(!out.back().hasProperty( "sequenceNumber"))
 			out.back().setPropertyAs("sequenceNumber",sequence);
-		assert(out.back().hasProperty( "acquisitionNumber"));
 
 		if( big_endian )
 			swapEndian( out.back().asValueArrayBase() ); //if endianess wasn't swapped till now, do it now
@@ -373,6 +382,8 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 		BOOST_FOREACH( VistaProtoImage & group, groups ) {
 			if( group.isFunctional() )
 				group.transformFunctional();
+			else
+				group.fakeAcqNum(); // we have to the acquisitionNumber
 
 			group.store( chunks, root_map, sequence++ );
 		}

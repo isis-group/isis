@@ -76,6 +76,7 @@ private:
 		bool add( util::PropertyMap props );
 		bool isFunctional()const;
 		void transformFunctional( );
+		void fakeAcqNum();
 
 		/// store the protoimage's' chunks into the output list, do byteswap if necessary
 		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map,uint16_t sequence );
