@@ -46,7 +46,6 @@ private:
 		util::PropertyValue last_component;
 		bool big_endian;
 
-		void sanitize( util::PropertyMap &obj );
 		std::map<util::istring, readerPtr> vista2isis;
 
 		void swapEndian( data::ValueArrayBase &array );
@@ -79,16 +78,17 @@ private:
 		void fakeAcqNum();
 
 		/// store the protoimage's' chunks into the output list, do byteswap if necessary
-		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map,uint16_t sequence );
+		void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence );
 	};
 
 public:
 	std::string getName()const {return "Vista standalone";}
 	int load ( std::list< data::Chunk >& chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > ) throw ( std::runtime_error & );
-	void write( const data::Image&, const std::string&, const util::istring&, boost::shared_ptr< util::ProgressFeedback > )  throw( std::runtime_error & );
+	void write( const data::Image &, const std::string &, const util::istring &, boost::shared_ptr< util::ProgressFeedback > )  throw( std::runtime_error & );
 
 	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "";}
+	static void sanitize( util::PropertyMap &obj );
 
 
 protected:
