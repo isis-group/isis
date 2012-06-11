@@ -126,8 +126,8 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	}
 
 	if(
-		transformOrTell<util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning ) ||
-		transformOrTell<util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, warning )
+		transformOrTell<util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, info ) ||
+		transformOrTell<util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning )
 	);
 	else {
 		LOG( Runtime, warning ) << "No position info was found, assuming 0 0 0";
