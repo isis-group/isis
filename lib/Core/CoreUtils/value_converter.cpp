@@ -189,7 +189,7 @@ template<> boost::numeric::range_check_result str2scalar<Selection>( const std::
 template<bool IS_NUM> struct Tokenizer { //jump from number to number in the string ignoring anything else
 	static std::list<std::string> run( const std::string &src ) {
 		std::list<std::string> ret;
-		const char *mask = "0123456789-.";
+		const char *mask = "0123456789-eE.";
 
 		for( size_t i = src.find_first_of( mask ), end; i < std::string::npos; i = src.find_first_of( mask, end ) ) {
 			end = src.find_first_not_of( mask, i );

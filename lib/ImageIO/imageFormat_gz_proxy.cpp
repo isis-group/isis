@@ -11,6 +11,9 @@
 #define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/counter.hpp>
 
 namespace isis
 {
@@ -20,14 +23,16 @@ namespace image_io
 class ImageFormat_CompProxy: public FileFormat
 {
 private:
+	static const size_t buff_size = 2048 * 1024;
+
 	static void gz_compress( std::ifstream &in, gzFile out ) {
 		char buf[2048 * 1024];
 		int len;
 
 		for (
-			in.read( buf, 2048 * 1024 );
+			in.read( buf, buff_size );
 			( len = ( int )in.gcount() );
-			in.read( buf, 2048 * 1024 )
+			in.read( buf, buff_size )
 		) {
 			if ( gzwrite( out, buf, len ) != len ) {
 				int err;
@@ -64,14 +69,14 @@ private:
 	}
 
 	static void gz_uncompress( gzFile in, std::ofstream &out ) {
-		char buf[2048 * 1024];
+		char buf[buff_size];
 		int len;
 		size_t bytes = 0;
 
 		for (
-			len = gzread( in, buf, 2048 * 1024 );
+			len = gzread( in, buf, buff_size );
 			len;
-			len = gzread( in, buf, 2048 * 1024 )
+			len = gzread( in, buf, buff_size )
 		) {
 			if ( len < 0 ) {
 				int err;
@@ -154,6 +159,10 @@ public:
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the unzipped suffix of \"" + filename + "\" because no io-plugin was found for it" );
 		}
+
+		const boost::filesystem::path p( filename );
+
+		const boost::uintmax_t fileSize = boost::filesystem::file_size( p );
 
 		const std::pair<std::string, std::string> realBase = formats.front()->makeBasename( proxyBase.first );
 

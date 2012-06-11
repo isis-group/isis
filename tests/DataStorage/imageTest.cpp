@@ -181,14 +181,14 @@ BOOST_AUTO_TEST_CASE ( copy_image_test )
 	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
 	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
 	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
-	
+
 	data::Image img( chunks );
 	const size_t size[] = {4, 4, 1, 2};
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 
-	data::Image copy=img.copyByID();
-	BOOST_CHECK(img.compare(copy)==0);
+	data::Image copy = img.copyByID();
+	BOOST_CHECK( img.compare( copy ) == 0 );
 }
 
 BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
