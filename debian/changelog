@@ -1,3 +1,9 @@
+isis (0.6.1-1) UNRELEASED; urgency=low
+
+  * fixed Image::getIndexFromPhysicalCoords for index coordinates which are outside the image bounding box
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 11 Jun 2012 14:51:35 +0200
+
 isis (0.6.0-1) UNRELEASED; urgency=low
 
   * add experimental filter infrastructure
