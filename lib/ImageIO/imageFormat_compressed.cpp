@@ -16,16 +16,50 @@
 
 #include <fstream>
 #include "DataStorage/fileptr.hpp"
+#include <boost/iostreams/categories.hpp>  // tags
 
 namespace isis
 {
 namespace image_io
 {
+namespace _internal{
+
+class progress_filter {
+public:
+	progress_filter(util::ProgressFeedback &feedback):m_feedback(feedback),remain(0){}
+	util::ProgressFeedback &m_feedback;
+	std::streamsize remain;
+	static const std::streamsize blocksize=0x10000;//64k
+	typedef char char_type;
+	
+	struct category : boost::iostreams::dual_use_filter_tag, boost::iostreams::multichar_tag{ };
+
+	void progress(std::streamsize n){
+		remain+=n;
+		if(remain>=blocksize){
+			m_feedback.progress("",remain/blocksize);
+			remain=remain%blocksize;
+		}
+	}
+	template<typename Source>
+	std::streamsize read(Source& src, char* s, std::streamsize n)
+	{
+		progress(n);
+		return boost::iostreams::read(src,s,n);
+	}
+	template<typename Sink>
+	std::streamsize write(Sink& dest, const char* s, std::streamsize n)
+	{
+		progress(n);;
+		return boost::iostreams::write(dest,s,n);
+	}
+};
+}
 
 class ImageFormat_Compressed: public FileFormat
 {
 protected:
-	util::istring suffixes( io_modes modes = both )const {return "gz bz2 Z";}
+	util::istring suffixes( io_modes /*modes = both*/ )const {return "gz bz2 Z";}
 public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 
@@ -41,7 +75,7 @@ public:
 	}
 	std::string getName()const {return "(de)compression proxy for other formats";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
 	throw( std::runtime_error & ) {
 		std::list<data::Chunk>::iterator prev = chunks.end();--prev; //memory current position in the output list
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
@@ -66,6 +100,10 @@ public:
 		else if( suffix == ".bz2" )in.push( boost::iostreams::bzip2_decompressor() );
 		else if( suffix == ".Z" )in.push( boost::iostreams::zlib_decompressor() );
 
+		if(progress){
+			progress->show(boost::filesystem::file_size(filename)/_internal::progress_filter::blocksize,std::string("decompressing ")+filename);
+			in.push( _internal::progress_filter(*progress));
+		}
 		in.push( input );
 		boost::iostreams::copy(in,output);
 
@@ -83,7 +121,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
 		
@@ -104,6 +142,11 @@ public:
 		output.exceptions( std::ios::badbit );
 		
 		boost::iostreams::filtering_ostream out;
+
+		if(progress){
+			progress->show(boost::filesystem::file_size(tmpFile)/_internal::progress_filter::blocksize,std::string("compressing ")+filename);
+			out.push( _internal::progress_filter(*progress));
+		}
 		
 		if( suffix == ".gz" )out.push( boost::iostreams::gzip_compressor() );
 		else if( suffix == ".bz2" )out.push( boost::iostreams::bzip2_compressor() );
