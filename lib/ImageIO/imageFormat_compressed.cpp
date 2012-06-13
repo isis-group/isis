@@ -80,15 +80,22 @@ private:
 	} tar_header;
 	bool read_header( const boost::iostreams::filtering_istream &src, size_t &size, size_t &next_header_in ) {
 		if( boost::iostreams::read( src, reinterpret_cast<char *>( &tar_header ), 512 ) == 512 ) {
-			//get the size
-			std::stringstream buff( tar_header.size );
-			size = 0, next_header_in = 0;
-			
-			if( tar_header.size[10] != 0 ) {
+			if(tar_header.size[0]&0x80){ // its base-256
+				size=0;
+				for(uint_fast8_t i=4;i<11;i++){
+					size|=reinterpret_cast<uint8_t*>(tar_header.size)[i];
+					size=size<<8;
+				}
+				size|=tar_header.size[11];
+			} else if( tar_header.size[10] != 0 ) { //normal octal
+				//get the size
+				std::stringstream buff( tar_header.size );
+				size = 0, next_header_in = 0;
+
 				buff >> std::oct >> size;
-				next_header_in = ( size / 512 ) * 512 + ( size % 512 ? 512 : 0 );
-			}
-			
+			} else
+				return false;
+			next_header_in = ( size / 512 ) * 512 + ( size % 512 ? 512 : 0 );
 			return true;
 		} else
 			return false;
@@ -140,13 +147,15 @@ public:
 		else if( suffix == ".tbz" )in.push( boost::iostreams::bzip2_decompressor() );
 		else if( suffix == ".taz" )in.push( boost::iostreams::zlib_decompressor() );
 		else {
-			if(suffix.find(".tar")==0)suffix=suffix.substr(4); // there is an .tar.*, as well
+			if(suffix.find(".tar")==0)suffix=suffix.substr(4); // if there is an .tar*, as well
 			else isTar=false; // else not
-			
-			if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() );
+
+			// i case the input is compressed (tar.gz or .gz)
+			if( isTar && suffix.empty() ); //if its tar having not compression is ok
+			else if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() ); 
 			else if( suffix == ".bz2" )in.push( boost::iostreams::bzip2_decompressor() );
 			else if( suffix == ".Z" )in.push( boost::iostreams::zlib_decompressor() );
-			else {
+			else { // if its tar having no compression is fine
 				throwGenericError( "Cannot determine the compression format of \"" + filename + "\"" );
 			}
 		}
