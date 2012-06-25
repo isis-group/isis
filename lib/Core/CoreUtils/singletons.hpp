@@ -11,7 +11,7 @@ namespace isis
 {
 namespace util
 {
-	
+
 /**
  * Static class to handle singletons of a given type and priority.
  *
@@ -32,20 +32,20 @@ class Singletons
 {
 	template <typename C> class Singleton
 	{
-		static void destruct()
-		{
-			if(_instance)delete _instance;
+		static void destruct() {
+			if( _instance )delete _instance;
+
 			_instance = 0;
 		}
-		static C* _instance;
+		static C *_instance;
 		Singleton () { }
 	public:
 		friend class Singletons;
 	};
-	
-	typedef void(*destructer)();
+
+	typedef void( *destructer )();
 	typedef std::multimap<int, destructer> prioMap;
-	
+
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
@@ -57,15 +57,16 @@ public:
 	 * \return a reference to the same object of type T.
 	 */
 	template<typename T, int PRIO> static T &get() {
-		if (!Singleton<T>::_instance){
+		if ( !Singleton<T>::_instance ) {
 			Singleton<T>::_instance = new T();
 			prioMap &map = getMaster().map;
 			map.insert( map.find( PRIO ), std::make_pair( PRIO, Singleton<T>::destruct ) );
 		}
+
 		return *Singleton<T>::_instance;
 	}
 };
-template <typename C> C* Singletons::Singleton<C>::_instance = 0;
+template <typename C> C *Singletons::Singleton<C>::_instance = 0;
 
 }
 }
