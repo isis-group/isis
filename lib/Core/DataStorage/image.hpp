@@ -276,8 +276,6 @@ protected:
 	/// Creates an empty Image object.
 	Image();
 
-
-
 	util::fvector4 m_RowVec;
 	util::fvector4 m_RowVecInv;
 	util::fvector4 m_ColumnVec;
@@ -285,6 +283,7 @@ protected:
 	util::fvector4 m_SliceVec;
 	util::fvector4 m_SliceVecInv;
 	util::fvector4 m_Offset;
+
 public:
 	/**
 	 * Copy constructor.
@@ -617,7 +616,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
+	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector4 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
