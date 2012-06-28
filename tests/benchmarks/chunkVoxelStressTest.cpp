@@ -8,14 +8,15 @@ const size_t chunk_size = 120;
 template<typename TYPE>
 void check( const data::Chunk &chunk, const TYPE &value )
 {
-	class DoCheck:public data::VoxelOp<TYPE>{
+	class DoCheck: public data::VoxelOp<TYPE>
+	{
 		const TYPE &value;
 	public:
-		bool operator()( TYPE &vox, const util::vector4<size_t> & ){return vox==value;}
-		DoCheck(const TYPE &_value):value(_value){}
-	}doCheck(value);
+		bool operator()( TYPE &vox, const util::vector4<size_t> & ) {return vox == value;}
+		DoCheck( const TYPE &_value ): value( _value ) {}
+	} doCheck( value );
 
-	if( const_cast<data::Chunk&>(chunk).foreachVoxel(doCheck)==0 ) {
+	if( const_cast<data::Chunk &>( chunk ).foreachVoxel( doCheck ) == 0 ) {
 		std::cout << "check ok!" << std::endl;
 	} else {
 		std::cout << "check failed!" << std::endl;

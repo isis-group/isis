@@ -345,10 +345,11 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
-		if(dialect=="siemens"){
-			LOG(Runtime,warning) << "Removing acquisitionTime from siemens DWI data as it is probably broken";
-			object.remove("acquisitionTime");
+		if( dialect == "siemens" ) {
+			LOG( Runtime, warning ) << "Removing acquisitionTime from siemens DWI data as it is probably broken";
+			object.remove( "acquisitionTime" );
 		}
+
 		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() ).castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
@@ -458,8 +459,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
 	else {
 		acqNum = source.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
-		LOG_IF(haveAcqTimeList,Runtime,info) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
-		haveAcqTimeList=false;
+		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
+		haveAcqTimeList = false;
 	}
 
 	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
@@ -490,7 +491,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		if( haveAcqTimeList ) {
 			dest.propertyValueAt( "acquisitionTime", slice ) = float( acqTime +  * ( acqTimeIt++ ) );
 		} else {
-			dest.propertyValueAt( "acquisitionNumber", slice ) = uint32_t(acqNum*images +  slice);
+			dest.propertyValueAt( "acquisitionNumber", slice ) = uint32_t( acqNum * images +  slice );
 		}
 	}
 

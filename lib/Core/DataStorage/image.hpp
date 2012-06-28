@@ -310,15 +310,15 @@ public:
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean ( false ), minIndexingDim ( min_dim ) {
+		clean ( false ) {
 		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
-		std::list<T> tmp(chunks.begin(),chunks.end());
+		std::list<T> tmp( chunks.begin(), chunks.end() );
 		insertChunksFromList ( tmp );
-		chunks.assign(tmp.begin(),tmp.end());
+		chunks.assign( tmp.begin(), tmp.end() );
 	}
 
 	/**
