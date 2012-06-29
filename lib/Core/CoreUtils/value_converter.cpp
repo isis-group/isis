@@ -190,8 +190,9 @@ template<bool IS_NUM> struct Tokenizer { //jump from number to number in the str
 	static std::list<std::string> run( const std::string &src ) {
 		std::list<std::string> ret;
 		const char *mask = "0123456789-eE.";
+		const char *start_mask = "0123456789-";
 
-		for( size_t i = src.find_first_of( mask ), end; i < std::string::npos; i = src.find_first_of( mask, end ) ) {
+		for( size_t i = src.find_first_of( start_mask ), end; i < std::string::npos; i = src.find_first_of( start_mask, end ) ) {
 			end = src.find_first_not_of( mask, i );
 			const std::string numstr = src.substr( i, end - i );
 			ret.push_back( numstr );
