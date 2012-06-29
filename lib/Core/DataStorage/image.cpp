@@ -196,7 +196,7 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 
 
 
-util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords, bool restrictedToImageBox ) const
+util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords ) const
 {
 	const util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 _ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
@@ -204,21 +204,12 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
 										  vec1[3] );
 
-	if( restrictedToImageBox ) {
-		const util::vector4<size_t> size = getSizeAsVector();
-
-		for( unsigned short i = 0; i < 4; i ++ ) {
-			if( _ret[i] < 0 ) {
-				_ret[i] =  0;
-			}
-
-			if( _ret[i] >=  size[i] ) {
-				_ret[i] = ( size[i] - 1 );
-			}
-		}
+	for( uint8_t i = 0; i < 3; i++ ) {
+		if( _ret[i] < 0 ) _ret -= 0.5;
+		else _ret[i] += 0.5;
 	}
 
-	return _ret + 0.5;
+	return _ret;
 }
 
 
