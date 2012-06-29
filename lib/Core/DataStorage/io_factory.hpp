@@ -40,7 +40,7 @@ public:
 	typedef boost::shared_ptr< image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 	friend class util::Singletons;
-	
+
 private:
 	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:

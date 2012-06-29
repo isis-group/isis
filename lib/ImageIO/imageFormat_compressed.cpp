@@ -22,36 +22,37 @@ namespace isis
 {
 namespace image_io
 {
-namespace _internal{
+namespace _internal
+{
 
-class progress_filter {
+class progress_filter
+{
 public:
-	progress_filter(util::ProgressFeedback &feedback):m_feedback(feedback),remain(0){}
+	progress_filter( util::ProgressFeedback &feedback ): m_feedback( feedback ), remain( 0 ) {}
 	util::ProgressFeedback &m_feedback;
 	std::streamsize remain;
-	static const std::streamsize blocksize=0x10000;//64k
+	static const std::streamsize blocksize = 0x10000; //64k
 	typedef char char_type;
-	
-	struct category : boost::iostreams::dual_use_filter_tag, boost::iostreams::multichar_tag{ };
 
-	void progress(std::streamsize n){
-		remain+=n;
-		if(remain>=blocksize){
-			m_feedback.progress("",remain/blocksize);
-			remain=remain%blocksize;
+	struct category : boost::iostreams::dual_use_filter_tag, boost::iostreams::multichar_tag { };
+
+	void progress( std::streamsize n ) {
+		remain += n;
+
+		if( remain >= blocksize ) {
+			m_feedback.progress( "", remain / blocksize );
+			remain = remain % blocksize;
 		}
 	}
 	template<typename Source>
-	std::streamsize read(Source& src, char* s, std::streamsize n)
-	{
-		progress(n);
-		return boost::iostreams::read(src,s,n);
+	std::streamsize read( Source &src, char *s, std::streamsize n ) {
+		progress( n );
+		return boost::iostreams::read( src, s, n );
 	}
 	template<typename Sink>
-	std::streamsize write(Sink& dest, const char* s, std::streamsize n)
-	{
-		progress(n);;
-		return boost::iostreams::write(dest,s,n);
+	std::streamsize write( Sink &dest, const char *s, std::streamsize n ) {
+		progress( n );;
+		return boost::iostreams::write( dest, s, n );
 	}
 };
 }
@@ -80,13 +81,15 @@ private:
 	} tar_header;
 	bool read_header( const boost::iostreams::filtering_istream &src, size_t &size, size_t &next_header_in ) {
 		if( boost::iostreams::read( src, reinterpret_cast<char *>( &tar_header ), 512 ) == 512 ) {
-			if(tar_header.size[0]&0x80){ // its base-256
-				size=0;
-				for(uint_fast8_t i=4;i<11;i++){
-					size|=reinterpret_cast<uint8_t*>(tar_header.size)[i];
-					size=size<<8;
+			if( tar_header.size[0] & 0x80 ) { // its base-256
+				size = 0;
+
+				for( uint_fast8_t i = 4; i < 11; i++ ) {
+					size |= reinterpret_cast<uint8_t *>( tar_header.size )[i];
+					size = size << 8;
 				}
-				size|=tar_header.size[11];
+
+				size |= tar_header.size[11];
 			} else if( tar_header.size[10] != 0 ) { //normal octal
 				//get the size
 				std::stringstream buff( tar_header.size );
@@ -95,6 +98,7 @@ private:
 				buff >> std::oct >> size;
 			} else
 				return false;
+
 			next_header_in = ( size / 512 ) * 512 + ( size % 512 ? 512 : 0 );
 			return true;
 		} else
@@ -102,11 +106,11 @@ private:
 	}
 	static size_t tar_readstream( const boost::iostreams::filtering_istream &src, void *dst, size_t size, const std::string &log_title ) {
 		size_t red = boost::iostreams::read( src, ( char * )dst, size ); // read data from the stream into the mapped memory
-		
+
 		if( red != size ) { // read the data from the stream
 			LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << util::MSubject( log_title );
 		}
-		
+
 		return red;
 	}
 protected:
@@ -133,36 +137,38 @@ public:
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
 	throw( std::runtime_error & ) {
-		std::list<data::Chunk>::iterator prev = chunks.end();--prev; //memory current position in the output list
-		
+		std::list<data::Chunk>::iterator prev = chunks.end();
+		--prev; //memory current position in the output list
+
 		//select filters for input
 		boost::iostreams::filtering_istream in;
-		
+
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		util::istring suffix = proxyBase.second.c_str();
-		bool isTar=true;
-		int ret=0;
+		bool isTar = true;
+		int ret = 0;
 
 		if( suffix == ".tgz" )in.push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
 		else if( suffix == ".tbz" )in.push( boost::iostreams::bzip2_decompressor() );
 		else if( suffix == ".taz" )in.push( boost::iostreams::zlib_decompressor() );
 		else {
-			if(suffix.find(".tar")==0)suffix=suffix.substr(4); // if there is an .tar*, as well
-			else isTar=false; // else not
+			if( suffix.find( ".tar" ) == 0 )suffix = suffix.substr( 4 ); // if there is an .tar*, as well
+			else isTar = false; // else not
 
 			// i case the input is compressed (tar.gz or .gz)
 			if( isTar && suffix.empty() ); //if its tar having not compression is ok
-			else if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() ); 
+			else if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() );
 			else if( suffix == ".bz2" )in.push( boost::iostreams::bzip2_decompressor() );
 			else if( suffix == ".Z" )in.push( boost::iostreams::zlib_decompressor() );
 			else { // if its tar having no compression is fine
 				throwGenericError( "Cannot determine the compression format of \"" + filename + "\"" );
 			}
 		}
+
 		// add progress filter
-		if(progress){
-			progress->show(boost::filesystem::file_size(filename)/_internal::progress_filter::blocksize,std::string("decompressing ")+filename);
-			in.push( _internal::progress_filter(*progress));
+		if( progress ) {
+			progress->show( boost::filesystem::file_size( filename ) / _internal::progress_filter::blocksize, std::string( "decompressing " ) + filename );
+			in.push( _internal::progress_filter( *progress ) );
 		}
 
 		// and on the top the source file
@@ -170,7 +176,7 @@ public:
 		input.exceptions( std::ios::badbit );
 		in.push( input );
 
-		if(isTar){ // if it is tar we use out own tar "parser"
+		if( isTar ) { // if it is tar we use out own tar "parser"
 			size_t size, next_header_in;
 
 			while( in.good() && read_header( in, size, next_header_in ) ) { //read the header block
@@ -234,22 +240,23 @@ public:
 
 				in.ignore( next_header_in ); // skip the remaining input until the next header
 			}
-		
+
 		} else { // otherwise just decompress the file and read it
 			const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first, dialect );
-			
+
 			if( formats.empty() ) {
 				throwGenericError( "Cannot determine the uncompressed suffix of \"" + filename + "\" because no io-plugin was found for it" );
 			}
-			
+
 			// set up the input stream
 			util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
-			std::ofstream output(tmpFile.file_string().c_str(), std::ios_base::binary );
+			std::ofstream output( tmpFile.file_string().c_str(), std::ios_base::binary );
 			output.exceptions( std::ios::badbit );
-			
-			boost::iostreams::copy(in,output);
-			
+
+			boost::iostreams::copy( in, output );
+
 			ret = data::IOFactory::load( chunks, tmpFile.file_string().c_str(), dialect );
+
 			if( ret ) { //re-set source of all new chunks
 				prev++;
 				LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
@@ -257,43 +264,45 @@ public:
 				for( ; prev != chunks.end(); ++prev )prev->setPropertyAs( "source", filename );
 			}
 		}
+
 		return ret;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
-		
+
 		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first, dialect );
-		
+
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the uncompressed suffix of \"" + filename + "\" because no io-plugin was found for it" );
 		}
 
 		// create the intermediate file
 		util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
-		if(!data::IOFactory::write(image,tmpFile.file_string(),dialect)){throwGenericError(tmpFile.file_string()+" failed to write");} 
+
+		if( !data::IOFactory::write( image, tmpFile.file_string(), dialect ) ) {throwGenericError( tmpFile.file_string() + " failed to write" );}
 
 		// set up the compression stream
-		std::ifstream input(tmpFile.file_string().c_str(), std::ios_base::binary );
+		std::ifstream input( tmpFile.file_string().c_str(), std::ios_base::binary );
 		std::ofstream output( filename.c_str(), std::ios_base::binary );
 		input.exceptions( std::ios::badbit );
 		output.exceptions( std::ios::badbit );
-		
+
 		boost::iostreams::filtering_ostream out;
 
-		if(progress){
-			progress->show(boost::filesystem::file_size(tmpFile)/_internal::progress_filter::blocksize,std::string("compressing ")+filename);
-			out.push( _internal::progress_filter(*progress));
+		if( progress ) {
+			progress->show( boost::filesystem::file_size( tmpFile ) / _internal::progress_filter::blocksize, std::string( "compressing " ) + filename );
+			out.push( _internal::progress_filter( *progress ) );
 		}
-		
+
 		if( suffix == ".gz" )out.push( boost::iostreams::gzip_compressor() );
 		else if( suffix == ".bz2" )out.push( boost::iostreams::bzip2_compressor() );
 		else if( suffix == ".Z" )out.push( boost::iostreams::zlib_compressor() );
 
 		// write it
 		out.push( output );
-		boost::iostreams::copy(input,out);
+		boost::iostreams::copy( input, out );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 };

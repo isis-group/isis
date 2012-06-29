@@ -143,7 +143,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic";}
 
 
 
@@ -163,7 +163,7 @@ void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 }
 
 
-void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*dialect*/ )
+void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring dialect )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	util::PropertyMap &dicomTree = object.branch( dicomTagTreeName );
@@ -345,6 +345,11 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
+		if( dialect == "siemens" ) {
+			LOG( Runtime, warning ) << "Removing acquisitionTime from siemens DWI data as it is probably broken";
+			object.remove( "acquisitionTime" );
+		}
+
 		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() ).castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
@@ -439,9 +444,10 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	//store and remove acquisitionTime
 	std::list<double> acqTimeList;
 	std::list<double>::const_iterator acqTimeIt;
-	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 
+	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 	float acqTime = 0;
+	size_t acqNum = 0;
 
 	if( haveAcqTimeList ) {
 		acqTimeList = source.getPropertyAs<std::list<double> >( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
@@ -450,10 +456,11 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		LOG( Debug, info ) << "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
 	}
 
-	if( source.hasProperty( "acquisitionTime" ) ) {
-		acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
-	} else {
-		LOG_IF( haveAcqTimeList, Runtime, warning ) << " decomposing acquisition time offsets of a mosaic having no acquisition time, this will cause each mosaic to be detected as a separate image";
+	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.propertyValue( "acquisitionTime" ).castTo<float>();
+	else {
+		acqNum = source.propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
+		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
+		haveAcqTimeList = false;
 	}
 
 	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
@@ -483,6 +490,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 		if( haveAcqTimeList ) {
 			dest.propertyValueAt( "acquisitionTime", slice ) = float( acqTime +  * ( acqTimeIt++ ) );
+		} else {
+			dest.propertyValueAt( "acquisitionNumber", slice ) = uint32_t( acqNum * images +  slice );
 		}
 	}
 
@@ -499,7 +508,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	if ( loaded.good() ) {
 		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
 		//we got a chunk from the file
-		sanitise( chunk, "" );
+		sanitise( chunk, dialect );
 		chunk.setPropertyAs( "source", filename );
 		const util::slist iType = chunk.getPropertyAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 

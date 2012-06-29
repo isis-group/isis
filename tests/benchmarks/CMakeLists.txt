@@ -17,12 +17,14 @@ add_executable( typePtrStresstest typePtrStresstest.cpp )
 add_executable( valueIteratorStresstest valueIteratorStresstest.cpp)
 add_executable( typedIteratorStresstest typedIteratorStresstest.cpp)
 add_executable( vectorStresstest vectorStresstest.cpp)
+add_executable( chunkVoxelStressTest chunkVoxelStressTest.cpp )
 
 target_link_libraries( valueIteratorStresstest ${Boost_LIBRARIES} isis_core )
 target_link_libraries( typedIteratorStresstest ${Boost_LIBRARIES} isis_core )
 target_link_libraries( imageStresstest ${Boost_LIBRARIES} isis_core )
 target_link_libraries( typePtrStresstest ${Boost_LIBRARIES} isis_core )
 target_link_libraries( vectorStresstest ${Boost_LIBRARIES} isis_core )
+target_link_libraries( chunkVoxelStressTest ${Boost_LIBRARIES} isis_core )
 
 ############################################################
 # add unit test targets

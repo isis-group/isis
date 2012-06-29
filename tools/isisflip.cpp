@@ -43,6 +43,8 @@ int main( int argc, char **argv )
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
 	BOOST_FOREACH( data::Image & refImage, app.images ) {
+		std::vector< data::Chunk > delme = refImage.copyChunksToVector( true );
+		isis::data::Image dummy( delme );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {

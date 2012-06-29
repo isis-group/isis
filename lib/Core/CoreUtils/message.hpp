@@ -94,7 +94,9 @@ class DefaultMsgPrint : public MessageHandlerBase
 {
 protected:
 	static std::ostream *o;
-	std::string last;
+	static const int max_age = 500;
+	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
+
 public:
 	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ) {}
 	virtual ~DefaultMsgPrint() {}

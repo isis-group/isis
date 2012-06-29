@@ -303,20 +303,22 @@ public:
 		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
-		insertChunksFromContainer ( chunks );
+		insertChunksFromList ( chunks );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean ( false ), minIndexingDim ( min_dim ) {
+		clean ( false ) {
 		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
-		insertChunksFromContainer ( chunks );
+		std::list<T> tmp( chunks.begin(), chunks.end() );
+		insertChunksFromList ( tmp );
+		chunks.assign( tmp.begin(), tmp.end() );
 	}
 
 	/**
@@ -324,11 +326,11 @@ public:
 	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
 	 * \returns amount of successfully inserted chunks
 	 */
-	template<typename T> size_t insertChunksFromContainer ( T &chunks ) {
-		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type > ) );
+	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks ) {
+		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, T> ) );
 		size_t cnt = 0;
 
-		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
 			if ( insertChunk ( *i ) ) {
 				chunks.erase ( i++ );
 				cnt++;
