@@ -35,8 +35,8 @@ using util::ValueBase;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( test_type_init )
 {
-	//  ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, info );
-	//  ENABLE_LOG( CoreLog, util::DefaultMsgPrint, info );
+/*	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, verbose_info );
+	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, verbose_info );*/
 	Value<int32_t> tInt( 42 );   // integer
 	Value<std::string> tStr( std::string( "Hello World" ) ); // string
 	// implicit conversion from double -> float
@@ -191,6 +191,21 @@ BOOST_AUTO_TEST_CASE( color_conversion_test )
 	BOOST_CHECK_EQUAL( vc24.as<util::color48>(), c24 ); // conversion to 16bit color
 }
 
+// TestCase object instantiation
+BOOST_AUTO_TEST_CASE( vector_convert_test )
+{
+	util::fvector3 v1;
+	v1.fill(42.1);
+	util::dvector4 v2=util::Value<util::fvector3>(v1).as<util::dvector4>();
+	util::ivector4 v3=util::Value<util::fvector3>(v1).as<util::ivector4>();
+	
+	for(int i=0;i<3;i++){
+		BOOST_CHECK_EQUAL(v1[i],v2[i]);
+		BOOST_CHECK_EQUAL((int)v1[i],v3[i]);
+	}
+}
+
+
 BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 {
 	// convert a string into a list of strings
@@ -215,6 +230,7 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
 }
+
 
 }
 }

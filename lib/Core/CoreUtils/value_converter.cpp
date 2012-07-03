@@ -221,6 +221,16 @@ template<typename DST> struct StrTransformer {
 	}
 };
 
+//helper to convert strings to FixedVectors
+template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, FixedVector<DST,NUM> &dstList ) {
+	const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+	std::list< std::string >::const_iterator end = srcList.begin();
+	std::advance( end, std::min<size_t>( srcList.size(), NUM ) ); // use a max of NUM tokens
+	StrTransformer<DST> transformer; // create a transformer from string to DST
+	std::transform( srcList.begin(), end, dstList.begin(), transformer ); // transform the found strings to the destination
+	return transformer.range_ok;
+}
+
 // additional base for converters which use another converter
 template<typename SRC, typename DST> struct SubValueConv {
 	boost::shared_ptr<const ValueConverterBase> sub_conv;
@@ -249,6 +259,25 @@ template<typename T> std::string toStringConv( const T &src )
 }
 template<> std::string toStringConv<uint8_t>( const uint8_t &src ) {return toStringConv( static_cast<uint16_t>( src ) );}
 template<> std::string toStringConv<int8_t> ( const  int8_t &src ) {return toStringConv( static_cast< int16_t>( src ) );}
+
+
+// convert any fixed vectors
+template<typename SRC,typename DST, int NUM1,int NUM2> boost::numeric::range_check_result
+convertVector2Vector( const FixedVector<SRC,NUM1> &srcVal, FixedVector<DST,NUM2> &dstVal, const ValueConverterBase &sub_conv ) {
+	boost::numeric::range_check_result ret = boost::numeric::cInRange;
+	
+	for ( int i = 0; i < NUM1; i++ ) {//slow and ugly, but flexible
+			Value<DST> elem_dst;
+			const boost::numeric::range_check_result result = sub_conv.convert( Value<SRC>( srcVal[i] ), elem_dst );
+			
+			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
+				ret = result;
+			
+			dstVal[i] = ( DST )elem_dst;
+	}
+	
+	return ret;
+}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -351,15 +380,14 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vector4 to vector4 version -- uses ValueConverter on every element
+// vectorX to vectorX version -- uses ValueConverter on every element
 /////////////////////////////////////////////////////////////////////////////
+// vector4 => vector4
 template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector4<DST> >:
-	public ValueGenerator<vector4<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
+public ValueGenerator<vector4<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
 {
 	ValueConverter( ) {
-		LOG( Debug, verbose_info )
-				<< "Creating vector converter from "
-				<< Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
 	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 public:
@@ -367,21 +395,41 @@ public:
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		vector4<DST> &dstVal = dst.castTo<vector4<DST> >();
-		const vector4<SRC> &srcVal = src.castTo<vector4<SRC> >();
-		boost::numeric::range_check_result ret = boost::numeric::cInRange;
-
-		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
-			Value<DST> elem_dst;
-			const boost::numeric::range_check_result result = this->sub_conv->convert( Value<SRC>( srcVal[i] ), elem_dst );
-
-			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
-				ret = result;
-
-			dstVal[i] = ( DST )elem_dst;
-		}
-
-		return ret;
+		return _internal::convertVector2Vector<SRC,DST,4,4>(src.castTo<vector4<SRC> >(),dst.castTo<vector4<DST> >(),*this->sub_conv);
+	}
+	virtual ~ValueConverter() {}
+};
+// vector3 => vector4
+template<typename SRC, typename DST > class ValueConverter<false, false, vector3<SRC>, vector4<DST> >:
+public ValueGenerator<vector3<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return _internal::convertVector2Vector<SRC,DST,3,4>(src.castTo<vector3<SRC> >(),dst.castTo<vector4<DST> >(),*this->sub_conv);
+	}
+	virtual ~ValueConverter() {}
+};
+// vector3 => vector3
+template<typename SRC, typename DST > class ValueConverter<false, false, vector3<SRC>, vector3<DST> >:
+public ValueGenerator<vector3<SRC>, vector3<DST> >, private SubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return _internal::convertVector2Vector<SRC,DST,3,3>(src.castTo<vector3<SRC> >(),dst.castTo<vector3<DST> >(),*this->sub_conv);
 	}
 	virtual ~ValueConverter() {}
 };
@@ -520,8 +568,7 @@ public:
 template<typename DST> class ValueConverter<false, false, std::string, vector4<DST> >: public ValueGenerator<std::string, vector4<DST> >  //string => vector4
 {
 	ValueConverter() {
-		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
+		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -529,13 +576,23 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		vector4<DST> &dstList = dst.castTo<vector4<DST> >();
-		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
-		std::list< std::string >::const_iterator end = srcList.begin();
-		std::advance( end, std::min<size_t>( srcList.size(), 4 ) ); // use a max of 4 tokens
-		StrTransformer<DST> transformer; // create a transformer from string to DST
-		std::transform( srcList.begin(), end, dstList.begin(), transformer ); // transform the found strings to the destination
-		return transformer.range_ok;
+		return _internal::convertStr2Vector<DST,4>(src, dst.castTo<vector4<DST> >());
+	}
+	virtual ~ValueConverter() {}
+};
+
+template<typename DST> class ValueConverter<false, false, std::string, vector3<DST> >: public ValueGenerator<std::string, vector3<DST> >  //string => vector3
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector3<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, vector3<DST> > *ret = new ValueConverter<false, false, std::string, vector3<DST> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return _internal::convertStr2Vector<DST,3>(src, dst.castTo<vector3<DST> >());
 	}
 	virtual ~ValueConverter() {}
 };

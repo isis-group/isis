@@ -328,6 +328,20 @@ public:
 	}
 };
 
+template<typename TYPE>
+class vector3 : public FixedVector<TYPE, 3>
+{
+public:
+	vector3() {}
+	template<typename TYPE2, typename CONTAINER2> vector3( const FixedVector<TYPE2, 3, CONTAINER2> &src ) : FixedVector< TYPE, 3> ( src ) {}
+	vector3( const TYPE src[3] ): FixedVector< TYPE, 3>( src ) {}
+	vector3( TYPE first, TYPE second, TYPE third = 0 ) {
+		this->operator[]( 2 ) = third;
+		this->operator[]( 1 ) = second;
+		this->operator[]( 0 ) = first;
+	}
+};
+
 template<typename TYPE, size_t SIZE, typename CONTAINER1, typename CONTAINER2>
 FixedVector<TYPE, SIZE> maxVector( const FixedVector<TYPE, SIZE, CONTAINER1> &first, const FixedVector<TYPE, SIZE, CONTAINER2> &second )
 {
@@ -351,6 +365,8 @@ FixedVector<TYPE, SIZE> minVector( const FixedVector<TYPE, SIZE, CONTAINER1> &fi
 
 typedef vector4<float> fvector4;
 typedef vector4<double> dvector4;
+typedef vector3<float> fvector3;
+typedef vector3<double> dvector3;
 typedef vector4<int32_t> ivector4;
 }
 }
