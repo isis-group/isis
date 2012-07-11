@@ -47,11 +47,11 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 	assert( ( *this )->getLength() == getVolume() );
 
 	if( fakeValid ) {
-		setPropertyAs( "indexOrigin", util::fvector4() );
+		setPropertyAs( "indexOrigin", util::fvector3() );
 		setPropertyAs( "acquisitionNumber", 0 );
-		setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-		setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+		setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+		setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
 		setPropertyAs( "sequenceNumber", ( uint16_t )0 );
 	}
 }
@@ -183,32 +183,32 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		return std::list<Chunk>();
 	}
 
-	util::fvector4 offset;
-	const util::fvector4 voxelSize = propertyValue( "voxelSize" ).castTo<util::fvector4>();
-	util::fvector4 voxelGap;
+	util::fvector3 offset;
+	const util::fvector3 voxelSize = propertyValue( "voxelSize" ).castTo<util::fvector3>();
+	util::fvector3 voxelGap;
 
 	if( hasProperty( "voxelGap" ) )
-		voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector4>();
+		voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector3>();
 
-	const util::fvector4 distance = voxelSize + voxelGap;
+	const util::fvector3 distance = voxelSize + voxelGap;
 	size_t atDim = getRelevantDims() - 1;
 
-	LOG_IF( distance[atDim] == 0 && atDim < data::timeDim, Runtime, error ) << "The voxel distance (voxelSize + voxelGap) at the splicing direction (" << atDim << ") is zero. This will likely cause errors in the Images structure.";
+	LOG_IF( atDim < data::timeDim && distance[atDim] == 0, Runtime, error ) << "The voxel distance (voxelSize + voxelGap) at the splicing direction (" << atDim << ") is zero. This will likely cause errors in the Images structure.";
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :
-		offset = this->propertyValue( "rowVec" ).castTo<util::fvector4>();
+		offset = this->propertyValue( "rowVec" ).castTo<util::fvector3>();
 		break;
 	case columnDim:
-		offset = this->propertyValue( "columnVec" ).castTo<util::fvector4>();
+		offset = this->propertyValue( "columnVec" ).castTo<util::fvector3>();
 		break;
 	case sliceDim:
 
 		if( this->hasProperty( "sliceVec" ) ) {
-			offset = this->propertyValue( "sliceVec" ).castTo<util::fvector4>();
+			offset = this->propertyValue( "sliceVec" ).castTo<util::fvector3>();
 		} else {
-			const util::fvector4 row = this->propertyValue( "rowVec" ).castTo<util::fvector4>();
-			const util::fvector4 column = this->propertyValue( "columnVec" ).castTo<util::fvector4>();
+			const util::fvector3 &row = this->propertyValue( "rowVec" ).castTo<util::fvector3>();
+			const util::fvector3 &column = this->propertyValue( "columnVec" ).castTo<util::fvector3>();
 			assert( util::fuzzyEqual<float>( row.sqlen(), 1 ) );
 			assert( util::fuzzyEqual<float>( column.sqlen(), 1 ) );
 			offset[0] = row[1] * column[2] - row[2] * column[1];
@@ -218,12 +218,11 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 		break;
 	case timeDim :
-		offset = util::fvector4( 0, 0, 0, 1 );
+		LOG_IF(acquisitionNumberStride==0,Debug,error) << "Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail";
 	}
 
 	// prepare some attributes
-	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
-	const util::fvector4 indexOriginOffset = offset * distance[atDim];
+	const util::fvector3 indexOriginOffset = atDim<data::timeDim ? offset * distance[atDim]:util::fvector3();
 
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
@@ -232,14 +231,14 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	it++;// skip the first one
 
 	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them
-		util::fvector4 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector4>();
+		util::fvector3 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector3>();
 
-		if( orig == ret.front().getPropertyAs<util::fvector4>( "indexOrigin" ) ) { // fix pos if its the same as for the first
+		if( orig == ret.front().getPropertyAs<util::fvector3>( "indexOrigin" ) ) { // fix pos if its the same as for the first
 			LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
 			orig = orig + indexOriginOffset * ( float )cnt;
 		}
 
-		uint32_t &acq = it->propertyValue( "acquisitionNumber" ).castTo<uint32_t>();
+		uint32_t &acq = it->propertyValue( "acquisitionNumber" ).castTo<uint32_t>();//@todo acquisitionTime needs to be fixed as well
 
 		if( acq == ret.front().getPropertyAs<uint32_t>( "acquisitionNumber" ) ) {
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acq << " will be moved by " << acquisitionNumberStride << "*"  << cnt;

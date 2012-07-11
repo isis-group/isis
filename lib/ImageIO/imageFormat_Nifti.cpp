@@ -374,35 +374,35 @@ public:
 	 ****************************************/
 private:
 
-	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
-		row.castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		column.castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
-		slice.castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
+	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector3 &div ) {
+		row.castTo<util::fvector3>() = util::fvector3( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
+		column.castTo<util::fvector3>() = util::fvector3( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+		slice.castTo<util::fvector3>() = util::fvector3( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
 	void copyHeaderFromNifti( data::Chunk &retChunk, const nifti_image &ni ) {
-		util::fvector4 dimensions( ni.dim[1], ni.ndim >= 2 ? ni.dim[2] : 1,
+		util::fvector3 dimensions( ni.dim[1], ni.ndim >= 2 ? ni.dim[2] : 1,
 								   ni.ndim >= 3 ? ni.dim[3] : 1, ni.ndim >= 4 ? ni.dim[4] : 1 );
 		LOG( ImageIoLog, info ) << "size of chunk " << dimensions << "/" << ni.ndim;
 
 		for ( int t = 0; t < dimensions[3]; t++ ) {
-			util::fvector4 offsets( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 );
+			util::fvector3 offsets( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 );
 			//retChunk.setPropertyAs("acquisitionTime", );
 			retChunk.setPropertyAs<uint32_t>( "acquisitionNumber", t );
 			retChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
 			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change row/column dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
-			retChunk.setPropertyAs( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
+			retChunk.setPropertyAs( "indexOrigin", util::fvector3( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z ) );
 
 			retChunk.setPropertyAs( "nifti/qform_code", ni.qform_code );
 			retChunk.setPropertyAs( "nifti/sform_code", ni.sform_code );
-			const util::fvector4 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) ).castTo<util::fvector4>();
+			const util::fvector3 &voxel_size = retChunk.setPropertyAs( "voxelSize", getVector( ni, voxelSizeVec ) ).castTo<util::fvector3>();
 
 			if( ni.sform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
-					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
-					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector3() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector3() ),
+					retChunk.setPropertyAs( "sliceVec", util::fvector3() ),
 					ni.sto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using sto_xyz as primary orientation "
@@ -410,9 +410,9 @@ private:
 
 				if( ni.qform_code ) {
 					geometryFromNifti(
-						retChunk.setPropertyAs( "nifti/qrowVec", util::fvector4() ),
-						retChunk.setPropertyAs( "nifti/qcolumnVec", util::fvector4() ),
-						retChunk.setPropertyAs( "nifti/qsliceVec", util::fvector4() ),
+						retChunk.setPropertyAs( "nifti/qrowVec", util::fvector3() ),
+						retChunk.setPropertyAs( "nifti/qcolumnVec", util::fvector3() ),
+						retChunk.setPropertyAs( "nifti/qsliceVec", util::fvector3() ),
 						ni.qto_xyz, voxel_size
 					);
 					LOG( Debug, info ) << "Using qto_xyz as secondary orientation "
@@ -420,18 +420,18 @@ private:
 				}
 			} else if( ni.qform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
-					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
-					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector3() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector3() ),
+					retChunk.setPropertyAs( "sliceVec", util::fvector3() ),
 					ni.qto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using qto_xyz as primary orientation "
 								   << retChunk.propertyValue( "rowVec" ) << " " << retChunk.propertyValue( "columnVec" ) << retChunk.propertyValue( "sliceVec" );
 			} else {
 				LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
-				retChunk.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
-				retChunk.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-				retChunk.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+				retChunk.setPropertyAs( "rowVec",  util::fvector3( 1, 0, 0 ) );
+				retChunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+				retChunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 			}
 
 			//now we try to transform
@@ -455,7 +455,7 @@ private:
 				retChunk.setPropertyAs<std::string>( "inplanePhaseEncodingDirection", "COL" );
 			}
 
-			retChunk.setPropertyAs( "voxelGap", util::fvector4() ); // not extra included in Nifti, so set to zero
+			retChunk.setPropertyAs( "voxelGap", util::fvector3() ); // not extra included in Nifti, so set to zero
 			//just some LOGS
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
@@ -514,13 +514,13 @@ private:
 			retChunk.setPropertyAs<uint16_t>( "repetitionTime", ni.pixdim[ni.ndim] * 1000 );
 		}
 
-		util::fvector4 newVoxelSize = retChunk.getPropertyAs<util::fvector4>( "voxelSize" );
+		util::fvector3 newVoxelSize = retChunk.getPropertyAs<util::fvector3>( "voxelSize" );
 		newVoxelSize[3] = 0;
-		retChunk.setPropertyAs<util::fvector4>( "voxelSize", newVoxelSize );
+		retChunk.setPropertyAs<util::fvector3>( "voxelSize", newVoxelSize );
 	}
 
-	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {
-		util::fvector4 retVec( 0, 0, 0, 0 );
+	util::fvector3 getVector( const nifti_image &ni, const enum vectordirection &dir ) {
+		util::fvector3 retVec( 0, 0, 0 );
 		float units; // conversion-factor to mm
 
 		switch ( ni.xyz_units ) {
@@ -542,7 +542,7 @@ private:
 
 		if ( ni.nifti_type > 0 ) { // only for non-ANALYZE
 			//      RotMatrix scaleMat;//method 2
-			util::fvector4 qto, sto;
+			util::fvector3 qto, sto;
 
 			//get qto
 			for ( int i = 0; i < 3; i++ ) {
@@ -603,7 +603,7 @@ private:
 		ni.cal_max = minmax.second;
 	}
 
-	void geometryToNifti( const util::fvector4 &row, const util::fvector4 &column, const util::fvector4 &slice, const util::fvector4 &offset, mat44 &geo, const util::fvector4 &factor ) {
+	void geometryToNifti( const util::fvector3 &row, const util::fvector3 &column, const util::fvector3 &slice, const util::fvector3 &offset, mat44 &geo, const util::fvector3 &factor ) {
 		for ( int y = 0; y < 3; y++ ) {
 			geo.m[y][0] = row[y] * factor[0];
 			geo.m[y][1] = column[y] * factor[1];
@@ -641,7 +641,7 @@ private:
 
 		ni.xyz_units = NIFTI_UNITS_MM;
 		ni.time_units = NIFTI_UNITS_MSEC;
-		util::fvector4 dimensions = image.getSizeAsVector();
+		util::fvector3 dimensions = image.getSizeAsVector();
 		LOG( ImageIoLog, info ) << dimensions;
 		ni.ndim = ni.dim[0] = image.getRelevantDims();
 		ni.nx = ni.dim[1] = dimensions[0];
@@ -649,10 +649,10 @@ private:
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
 		ni.nvox = image.getVolume();
-		util::fvector4 rowVec = image.getPropertyAs<util::fvector4>( "rowVec" );
-		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
-		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
-		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
+		util::fvector3 rowVec = image.getPropertyAs<util::fvector3>( "rowVec" );
+		util::fvector3 columnVec = image.getPropertyAs<util::fvector3>( "columnVec" );
+		util::fvector3 sliceVec = image.getPropertyAs<util::fvector3>( "sliceVec" );
+		util::fvector3 indexOrigin = image.getPropertyAs<util::fvector3>( "indexOrigin" );
 
 		if( image.hasProperty( "nifti/qform_code" ) )
 			ni.qform_code =  image.getPropertyAs<int>( "nifti/qform_code" );
@@ -663,11 +663,11 @@ private:
 		// don't switch the z-AXIS!!!
 		//indexOrigin[2] = -indexOrigin[2];
 		LOG( ImageIoLog, info ) << indexOrigin;
-		util::fvector4 voxelSizeVector = image.getPropertyAs<util::fvector4>( "voxelSize" );
-		util::fvector4 voxelGap;
+		util::fvector3 voxelSizeVector = image.getPropertyAs<util::fvector3>( "voxelSize" );
+		util::fvector3 voxelGap;
 
 		if( image.hasProperty( "voxelGap" ) ) {
-			voxelGap = image.getPropertyAs<util::fvector4>( "voxelGap" );
+			voxelGap = image.getPropertyAs<util::fvector3>( "voxelGap" );
 		}
 
 		ni.dx = ni.pixdim[1] = voxelSizeVector[0] + voxelGap[0];
@@ -716,17 +716,17 @@ private:
 
 			if( ni.qform_code ) { // if both was set - qform would be stored in "nifti/"
 				geometryToNifti(
-					image.getPropertyAs<util::fvector4>( "nifti/qrowVec" ),
-					image.getPropertyAs<util::fvector4>( "nifti/qcolumnVec" ),
-					image.getPropertyAs<util::fvector4>( "nifti/qsliceVec" ),
-					indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 )
+					image.getPropertyAs<util::fvector3>( "nifti/qrowVec" ),
+					image.getPropertyAs<util::fvector3>( "nifti/qcolumnVec" ),
+					image.getPropertyAs<util::fvector3>( "nifti/qsliceVec" ),
+					indexOrigin, ni.qto_xyz, util::fvector3( 1, 1, 1 )
 				);
 			}
 		} else { // if only qform code was set qform was used as geometry
 			if( !ni.qform_code ) //if none was set, default qform to NIFTI_XFORM_SCANNER_ANAT
 				ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;
 
-			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 ) );
+			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector3( 1, 1, 1 ) );
 		}
 
 		if( ni.qform_code ) {

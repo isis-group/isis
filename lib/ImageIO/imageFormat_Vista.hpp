@@ -143,7 +143,7 @@ private:
 					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( x, y, z, 1 ) );
+					chunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( x, y, z, 1 ) );
 					continue;
 				}
 
@@ -162,44 +162,44 @@ private:
 					if( functional ) {
 						// axial is the reference
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
 							continue;
 						}
 					} else {
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( -1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, -1, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( -1, 0, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, -1 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
 							continue;
 						}
 					}
@@ -261,31 +261,31 @@ private:
 
 				// OPTIONAL: columnVec -> rowVec, overwrite old values
 				if( strcmp( name, "columnVec" ) == 0 ) {
-					util::fvector4 rowVec;
+					util::fvector3 rowVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					rowVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "rowVec", rowVec );
+					chunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
 					continue;
 				}
 
 				// OPTIONAL: rowVec -> columnVec, overwrite old values
 				if( strcmp( name, "rowVec" ) == 0 ) {
-					util::fvector4 columnVec;
+					util::fvector3 columnVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					columnVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "columnVec", columnVec );
+					chunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
 					continue;
 				}
 
 				// OPTIONAL: sliceVec -> sliceVec, overwrite old values
 				if( strcmp( name, "sliceVec" ) == 0 ) {
-					util::fvector4 sliceVec;
+					util::fvector3 sliceVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "sliceVec", sliceVec );
+					chunk.setPropertyAs<util::fvector3>( "sliceVec", sliceVec );
 					continue;
 				}
 
@@ -295,7 +295,7 @@ private:
 					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( x, y, z, 0 ) );
+					chunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( x, y, z ) );
 					continue;
 				}
 
@@ -445,14 +445,14 @@ private:
 			//if not set yet, set row, column and slice vector.
 			// DEFAULT: axial
 			if( !chunk.hasProperty( "rowVec" ) ) {
-				chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-				chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
-				chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+				chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0, 0 ) );
+				chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0, 0 ) );
+				chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1, 0 ) );
 			}
 
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
-			chunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
+			chunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3( 0, 0, 0, 0 ) );
 
 			// set acquisitionNumber. This values is always missing
 			if( !chunk.hasProperty( "acquisitionNumber" ) )
@@ -510,7 +510,7 @@ private:
 	 * the voxel space relative to the scanner space available, the routine assumes
 	 * that the voxel space is placed with the center near the scanner iso center.
 	 */
-	util::fvector4 calculateIndexOrigin( data::Chunk &chunk, util::ivector4 &dims );
+	util::fvector3 calculateIndexOrigin( data::Chunk &chunk, util::ivector4 &dims );
 };
 
 }

@@ -31,6 +31,17 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	elem->getOFStringArray( buff );
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
+
+template <typename S,typename V> void arrayToVecPropImp(S* array,util::PropertyMap &dest,const util::PropertyMap::PropPath &name,size_t len){
+	V vector;
+	vector.copyFrom( array, array + len );
+	dest.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
+}
+template <typename S> void arrayToVecProp(S* array,util::PropertyMap &dest,const util::PropertyMap::PropPath &name,size_t len){
+	if(len<=3)arrayToVecPropImp<S,util::vector3<S> >(array,dest,name,len);
+	else arrayToVecPropImp<S,util::vector4<S> >(array,dest,name,len);
+}
+
 }
 
 
@@ -266,17 +277,13 @@ void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::PropertyMap::
 	case EVR_FL: {
 		Float32 *buff;
 		elem->getFloat32Array( buff );
-		util::fvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
+		_internal::arrayToVecProp<Float32>(buff,map,name,len);
 	}
 	break;
 	case EVR_FD: {
 		Float64 *buff;
 		elem->getFloat64Array( buff );
-		util::dvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float64 is double its fine, if not we will get an linker error here
+		_internal::arrayToVecProp<Float64>(buff,map,name,len);
 	}
 	break;
 	case EVR_IS: {

@@ -276,13 +276,13 @@ protected:
 	/// Creates an empty Image object.
 	Image();
 
-	util::fvector4 m_RowVec;
-	util::fvector4 m_RowVecInv;
-	util::fvector4 m_ColumnVec;
-	util::fvector4 m_ColumnVecInv;
-	util::fvector4 m_SliceVec;
-	util::fvector4 m_SliceVecInv;
-	util::fvector4 m_Offset;
+	util::fvector3 m_RowVec;
+	util::fvector3 m_RowVecInv;
+	util::fvector3 m_ColumnVec;
+	util::fvector3 m_ColumnVecInv;
+	util::fvector3 m_SliceVec;
+	util::fvector3 m_SliceVecInv;
+	util::fvector3 m_Offset;
 
 public:
 	/**
@@ -609,7 +609,7 @@ public:
 	 *  \param index the voxel index from which you want to get the physical coordinates
 	 *  \return physical coordinates associated with the given voxel index
 	 */
-	util::fvector4 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
+	util::fvector3 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
 
 
 	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
@@ -618,7 +618,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector3 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -768,7 +768,7 @@ public:
 	/// \returns the number of timesteps of the image
 	size_t getNrOfTimesteps() const;
 
-	util::fvector4 getFoV() const;
+	util::fvector3 getFoV() const;
 	bool updateOrientationMatrices();
 
 	/**
