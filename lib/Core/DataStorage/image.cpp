@@ -35,7 +35,7 @@ ChunkOp::~ChunkOp() {}
 
 Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 {
-	addNeededFromString<Image>( neededProperties );
+	util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
@@ -43,7 +43,7 @@ Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),set( defaultChunkEqualitySet ),clean( false )
 {
-	addNeededFromString<Image>( neededProperties );
+	util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 

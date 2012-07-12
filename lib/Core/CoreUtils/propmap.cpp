@@ -488,9 +488,9 @@ const PropertyMap::KeyList PropertyMap::getMissing() const
 }
 
 
-void PropertyMap::addNeeded( const key_type &key )
+void PropertyMap::addNeeded(const PropPath &path )
 {
-	propertyValue( key ).needed() = true;
+	propertyValue( path ).needed() = true;
 }
 
 

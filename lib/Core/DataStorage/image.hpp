@@ -205,6 +205,7 @@ public:
 	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
+	static const char *neededProperties;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -246,7 +247,6 @@ private:
 
 protected:
 	bool clean;
-	static const char *neededProperties;
 	static const char *defaultChunkEqualitySet;
 
 	/**
@@ -299,8 +299,9 @@ public:
 	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
-		clean ( false ) {
-		addNeededFromString<Image> ( neededProperties );
+		clean ( false ) 
+	{
+		util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromList ( chunks );
@@ -313,7 +314,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
-		addNeededFromString<Image> ( neededProperties );
+		util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		std::list<T> tmp( chunks.begin(), chunks.end() );
