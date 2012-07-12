@@ -37,7 +37,6 @@ namespace _internal
 class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
-	static const char *neededProperties;
 	ChunkBase() {}; //do not use this
 public:
 	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
@@ -45,6 +44,7 @@ public:
 
 	ChunkBase( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps );
 	virtual ~ChunkBase(); //needed to make it polymorphic
+	static const char *neededProperties;
 };
 }
 /// @endcond _internal

@@ -109,6 +109,18 @@ private:
 	bool recursiveRemove( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
 
 protected:
+	template<typename T> class NeededsList:public std::list<PropPath>{
+	public:
+		NeededsList(){
+			const list< key_type > buff=util::stringToList<key_type>( T::neededProperties );//@todo really bad voodoo
+			assign(buff.begin(),buff.end());
+		}
+		void applyTo(PropertyMap &props){
+			BOOST_FOREACH( const PropPath & ref, *this ) {
+				props.addNeeded( ref );
+			}
+		}
+	};
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// rw-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -120,21 +132,10 @@ protected:
 		return k;
 	}
 	/**
-	 * Make Properties given by a space separated list needed.
-	 * \param needed string made of space serparated property-names which
-	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
-	 */
-	template<typename CONTAINER> void addNeededFromString( const std::string &needed ) {
-		static const std::list<key_type> neededs = util::stringToList<key_type>( needed );//@todo really bad voodoo
-		BOOST_FOREACH( const key_type & ref, neededs ) {
-			addNeeded( ref );
-		}
-	}
-	/**
 	 * Adds a property with status needed.
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
 	 */
-	void addNeeded( const KeyType &path );
+	void addNeeded(const PropPath &path );
 
 	/**
 	 * Remove every PropertyValue which is also in the other PropertyMap and where operator== returns true.
