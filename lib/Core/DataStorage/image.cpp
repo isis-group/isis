@@ -198,7 +198,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector3 &ph
 										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2]);
 
 	for( uint8_t i = 0; i < 3; i++ ) {
-		if( _ret[i] < 0 ) _ret -= 0.5;
+		if( _ret[i] < 0 ) _ret[i] -= 0.5;
 		else _ret[i] += 0.5;
 	}
 
