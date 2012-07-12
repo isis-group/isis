@@ -205,7 +205,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 										  vec1[3] );
 
 	for( uint8_t i = 0; i < 3; i++ ) {
-		if( _ret[i] < 0 ) _ret -= 0.5;
+		if( _ret[i] < 0 ) _ret[i] -= 0.5;
 		else _ret[i] += 0.5;
 	}
 
