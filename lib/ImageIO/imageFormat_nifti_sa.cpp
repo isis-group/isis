@@ -538,7 +538,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/cal_min", head->cal_min );
 	}
 
-	util::fvector3 vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector3>();
+	util::fvector3 &vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector3>();
 
 	for( short i = 0; i < std::min<short>( head->dim[0], 3 ); i++ ) {
 		if( vsize[i] == 0 ) {
