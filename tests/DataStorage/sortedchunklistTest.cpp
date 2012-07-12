@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	BOOST_CHECK( ! chunks.isRectangular() );
 
 	// add the renmaining acquisitionNumber=1-chunks
-	for ( int j = 0; j < 3; j++ ) {
+	for ( int j = 1; j < 3; j++ ) { //0 is already there
 		data::MemChunk<float> ch( 3, 3 );
 		ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, j ) );
 		ch.setPropertyAs( "acquisitionNumber", 1 );
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 		BOOST_REQUIRE( chunks.insert( ch ) );
 	}
 
-	// there should be exactly 3*3 *2 chunks in the list
-	BOOST_CHECK_EQUAL( chunks.getLookup().size(), 18 );
+	// there should be exactly 3*2 chunks in the list
+	BOOST_CHECK_EQUAL( chunks.getLookup().size(), 6 );
 	// and it should be rectangular by now
 	BOOST_CHECK( chunks.isRectangular() );
 }
