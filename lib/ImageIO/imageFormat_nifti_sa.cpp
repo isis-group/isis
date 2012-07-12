@@ -286,7 +286,9 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 	if( dims < 3 ) { // if there is only one slice, there is no use in numbering
 		return std::list<data::Chunk>( 1, current );
 	} else {// if there are timesteps we have to get a bit dirty
-		std::list< data::Chunk > newChList = ( dims == 4 ? current.autoSplice() : std::list<data::Chunk>( 1, current ) ); // make sure we have a list of 3D-Chunks
+		// make sure we have a list of 3D-Chunks (acquisitionNumberStride doesn't matter, we will reset it anyway)
+		std::list< data::Chunk > newChList = ( dims == 4 ? current.autoSplice(1) : std::list<data::Chunk>( 1, current ) ); 
+		
 		uint32_t offset = 0;
 
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
@@ -890,6 +892,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 		image2isis.dot( util::fvector4( 0, 0, 1 ) ).len()
 	);
 
+	props.setPropertyAs( "voxelSize", voxelSize );
 	LOG( Debug, info ) << "Computed voxelSize=" << props.propertyValue("voxelSize" ) << " from sform";
 
 
@@ -984,7 +987,10 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	props.remove( "nifti/qoffset" );
 
 	// voxelSize //////////////////////////////////////////////////////////////////////////////////
-	props.transform<util::fvector3>( "nifti/pixdim", "voxelSize" ); //@todo is conversion dlist > fvector3 available
+	const util::dlist::iterator pixdimStart = props.propertyValue("nifti/pixdim").castTo<util::dlist>().begin();
+	util::dlist::iterator pixdimEnd = pixdimStart; std::advance(pixdimEnd,3);
+	props.setPropertyAs("voxelSize",util::fvector3()).castTo<util::fvector3>().copyFrom(pixdimStart,pixdimEnd); //@todo is conversion dlist > fvector3 available
+	props.remove("nifti/pixdim");
 	LOG( Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from qform";
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
@@ -997,7 +1003,7 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 
 	for( int i = 0; i < 3; i++ ) {
 		const util::dvector4 buff = nifti2image.getRow( i );
-		col[i].copyFrom(buff.begin(),buff.end()); //nth column in image2nifti
+		col[i].copyFrom(buff.begin(),buff.begin()+3); //nth column in image2nifti
 		head->pixdim[i + 1] = col[i].len(); //store voxel size (don't use voxelSize, thats without voxelGap)
 		col[i].norm(); // normalize the columns
 	}

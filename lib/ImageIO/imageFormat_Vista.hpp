@@ -143,7 +143,7 @@ private:
 					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( x, y, z, 1 ) );
+					chunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( x, y, z ) );
 					continue;
 				}
 
@@ -445,14 +445,14 @@ private:
 			//if not set yet, set row, column and slice vector.
 			// DEFAULT: axial
 			if( !chunk.hasProperty( "rowVec" ) ) {
-				chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0, 0 ) );
-				chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0, 0 ) );
-				chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1, 0 ) );
+				chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+				chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+				chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 			}
 
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
-			chunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3( 0, 0, 0, 0 ) );
+			chunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3( 0, 0, 0 ) );
 
 			// set acquisitionNumber. This values is always missing
 			if( !chunk.hasProperty( "acquisitionNumber" ) )
