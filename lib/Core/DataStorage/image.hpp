@@ -247,6 +247,7 @@ private:
 protected:
 	bool clean;
 	static const char *neededProperties;
+	static const char *defaultChunkEqualitySet;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.
@@ -297,7 +298,7 @@ public:
 	 */
 	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
-		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
 		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
@@ -310,7 +311,7 @@ public:
 	 */
 	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set ( defaultChunkEqualitySet ),
 		clean ( false ), minIndexingDim ( min_dim ) {
 		addNeededFromString<Image> ( neededProperties );
 		set.addSecondarySort ( "acquisitionNumber" );
