@@ -35,19 +35,19 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	// data::Chunk or a data::Image object. Hence it should contain the
 	// properties rowVec, columnVec, sliceVec and indexOrigin.
 	// get row, column and slice vector from property map
-	isis::util::fvector4 row = properties.getPropertyAs<util::fvector4>( "rowVec" );
-	isis::util::fvector4 column = properties.getPropertyAs<util::fvector4>( "columnVec" );
-	isis::util::fvector4 slice = properties.getPropertyAs<util::fvector4>( "sliceVec" );
+	isis::util::fvector3 row = properties.getPropertyAs<util::fvector3>( "rowVec" );
+	isis::util::fvector3 column = properties.getPropertyAs<util::fvector3>( "columnVec" );
+	isis::util::fvector3 slice = properties.getPropertyAs<util::fvector3>( "sliceVec" );
 	// get index origin from property map
-	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
+	isis::util::fvector3 indexorig = properties.getPropertyAs<util::fvector3>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
 	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
-	isis::util::fvector4 scaling;
+	isis::util::fvector3 scaling;
 
 	if( properties.hasProperty( "voxelGap" ) ) {
-		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) +  properties.getPropertyAs<util::fvector4>( "voxelGap" );
+		scaling  = properties.getPropertyAs<util::fvector3>( "voxelSize" ) +  properties.getPropertyAs<util::fvector3>( "voxelGap" );
 	} else {
-		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" );
+		scaling  = properties.getPropertyAs<util::fvector3>( "voxelSize" );
 	}
 
 	// create boost::numeric data structures
@@ -128,10 +128,10 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	}
 
 	// write modified values back into property map
-	properties.setPropertyAs<util::fvector4>( "indexOrigin", indexorig );
-	properties.setPropertyAs<util::fvector4>( "rowVec", row );
-	properties.setPropertyAs<util::fvector4>( "columnVec", column );
-	properties.setPropertyAs<util::fvector4>( "sliceVec", slice );
+	properties.setPropertyAs( "indexOrigin", indexorig );
+	properties.setPropertyAs( "rowVec", row );
+	properties.setPropertyAs( "columnVec", column );
+	properties.setPropertyAs( "sliceVec", slice );
 	return true;
 }
 

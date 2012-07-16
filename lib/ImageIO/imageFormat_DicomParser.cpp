@@ -31,6 +31,19 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	elem->getOFStringArray( buff );
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
+
+template <typename S, typename V> void arrayToVecPropImp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
+	V vector;
+	vector.copyFrom( array, array + len );
+	dest.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
+}
+template <typename S> void arrayToVecProp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
+	if( len <= 3 )arrayToVecPropImp<S, util::vector3<S> >( array, dest, name, len );
+	else arrayToVecPropImp<S, util::vector4<S> >( array, dest, name, len );
+}
+
 }
 
 
@@ -255,88 +268,6 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	}
 	break;
 	}
-}
-
-void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
-{
-	OFString buff;
-	size_t len = elem->getVM();
-
-	switch ( elem->getVR() ) {
-	case EVR_FL: {
-		Float32 *buff;
-		elem->getFloat32Array( buff );
-		util::fvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
-	}
-	break;
-	case EVR_FD: {
-		Float64 *buff;
-		elem->getFloat64Array( buff );
-		util::dvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float64 is double its fine, if not we will get an linker error here
-	}
-	break;
-	case EVR_IS: {
-		const util::ilist tokens = _internal::dcmtkListString2list<int>( elem );
-		util::ivector4 vector;
-		vector.copyFrom( tokens.begin(), tokens.end() );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_SL: {
-		Sint32 *buff;
-		elem->getSint32Array( buff );
-		util::ivector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_US: {
-		Uint16 *buff;
-		elem->getUint16Array( buff );
-		util::ivector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_CS: // Code String (string)
-	case EVR_SH: //short string
-	case EVR_ST: { //short text
-		map.propertyValue( name ) = _internal::dcmtkListString2list<std::string>( elem );
-	}
-	break;
-	case EVR_DS: {
-		const util::dlist tokens = _internal::dcmtkListString2list<double>( elem );
-		util::dvector4 vector;
-		vector.copyFrom( tokens.begin(), tokens.end() );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_AS:
-	case EVR_DA:
-	case EVR_TM:
-	case EVR_SS:
-	case EVR_UL:
-	case EVR_AE: //Application Entity (string)
-	case EVR_LT: //long text
-	case EVR_LO: //long string
-	case EVR_UT: //Unlimited Text
-	case EVR_UI: //Unique Identifier [0-9\.]
-	case EVR_PN:
-	default: {
-		elem->getOFStringArray( buff );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
-	}
-	break;
-	}
-
-	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue( name );
 }
 
 void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -573,10 +504,8 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject( tag2Name( tag ) );
 			else if ( mult == 1 )
 				parseScalar( elem, tag2Name( tag ), map );
-			else if ( mult <= 4 )
-				parseVector( elem, tag2Name( tag ), map );
 			else
-				parseList( elem, tag2Name( tag ), map ); // for any other value
+				parseList( elem, tag2Name( tag ), map );
 		} else {
 			dcmObject2PropMap( obj, map.branch( tag2Name( tag ) ), dialect );
 		}

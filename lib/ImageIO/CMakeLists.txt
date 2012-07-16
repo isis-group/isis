@@ -16,7 +16,6 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 # add global options
 ############################################################
-option(ISIS_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
 option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
@@ -35,21 +34,6 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 ############################################################
 # NIFTI plugin
 ############################################################
-if(ISIS_IOPLUGIN_NIFTI)
-  find_library(LIB_NIFTIIO niftiio)
-  find_library(LIB_ZNZ znz)
-  find_library(LIB_Z z)
-
-  find_path(INCPATH_NIFTI "nifti1_io.h" PATH_SUFFIXES "nifti")
-  find_path(INCPATH_ZNZ "znzlib.h" PATH_SUFFIXES "nifti")
-
-  include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
-  add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-  target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LIB_Z} isis_core )
-
-  set(TARGETS ${TARGETS} isisImageFormat_Nifti)
-endif(ISIS_IOPLUGIN_NIFTI)
-
 if(ISIS_IOPLUGIN_NIFTI_SA)
   add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
   target_link_libraries(isisImageFormat_Nifti_sa isis_core )

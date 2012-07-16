@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		BOOST_REQUIRE( data::IOFactory::write( null, niifile.file_string() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
-		null.propertyValue( "voxelSize" ).castTo<util::fvector4>() += null.propertyValue( "voxelGap" ).castTo<util::fvector4>();
+		null.propertyValue( "voxelSize" ).castTo<util::fvector3>() += null.propertyValue( "voxelGap" ).castTo<util::fvector3>();
 		null.remove( "voxelGap" );
 
 		// that will be set by the nifti reader
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 			// because of the quaternions we get some rounding errors in rowVec and columnVec
 			const char *fuzzies[] = {"rowVec", "columnVec", "voxelSize"};
 			BOOST_FOREACH( const char * fuzz, fuzzies ) {
-				const util::fvector4 niiVec = niiChunks[i].getPropertyAs<util::fvector4>( fuzz );
-				const util::fvector4 nullVec = nullChunks[i].getPropertyAs<util::fvector4>( fuzz );
+				const util::fvector3 niiVec = niiChunks[i].getPropertyAs<util::fvector3>( fuzz );
+				const util::fvector3 nullVec = nullChunks[i].getPropertyAs<util::fvector3>( fuzz );
 				BOOST_REQUIRE( niiVec.fuzzyEqual( nullVec ) );
 				niiChunks[i].remove( fuzz );
 				nullChunks[i].remove( fuzz );
@@ -107,11 +107,11 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	aligned.set( "ALIGNED_ANAT" );
 
 	data::MemChunk<short> ch( size[0], size[1] );
-	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0 ) );
-	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
+	ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
 	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
 	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
 	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
-	chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 1 ) );
+	chunks.back().setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 1 ) );
 
 	data::Image img( chunks );
 	BOOST_CHECK( img.isClean() );
