@@ -518,7 +518,7 @@ bool Image::reIndex()
 
 		bool ok = true;
 
-		for ( size_t i = 0; i < dims; i++ ) {
+		for ( size_t i = 0; i < 3; i++ ) {
 			if ( propFoV[i] != -std::numeric_limits<float>::infinity() ) {
 				ok &= util::fuzzyEqual( propFoV[i], calcFoV[i] );
 			} else
@@ -1059,7 +1059,7 @@ util::fvector3 Image::getFoV() const
 	if ( hasProperty( "voxelGap" ) ) {
 		voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
 
-		for ( size_t i = 0; i < dims; i++ )
+		for ( size_t i = 0; i < 3; i++ )
 			if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
 				LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
 				voxelGap[i] = 0;
@@ -1067,6 +1067,7 @@ util::fvector3 Image::getFoV() const
 	}
 
 	const util::fvector4 ret = _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
+	LOG_IF(ret[timeDim],Runtime,warning) << "Ignoring fourth dim extend of " << ret[timeDim] << " in Image";
 	return util::fvector3(ret[0],ret[1],ret[2]);
 }
 
