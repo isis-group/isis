@@ -6,10 +6,10 @@ using namespace isis;
 template<typename T> data::MemChunk<T> makeChunk( size_t size, short slice )
 {
 	data::MemChunk<T> ret( size, size );
-	ret.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ret.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ret.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, slice ) );
-	ret.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
+	ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+	ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+	ret.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+	ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	return ret;
 }
 

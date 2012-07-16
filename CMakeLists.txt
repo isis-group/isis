@@ -7,6 +7,7 @@
 # Date: Tue, 05 Apr 2011 10:50:31 +0200
 #
 ############################################################
+FIND_PACKAGE(Git)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -18,7 +19,7 @@ project(ISIS)
 # set isis version number
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
-set(ISIS_VERSION_MINOR "6")
+set(ISIS_VERSION_MINOR "7")
 set(ISIS_VERSION_PATCH "0")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
@@ -29,7 +30,7 @@ set(ISIS_VERSION
   ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
   CACHE INTERNAL "The current Version of the ISIS project")
 
-set(ISIS_CORE_VERSION_API "2.0.0")
+set(ISIS_CORE_VERSION_API "3.0.0")
 set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
@@ -132,16 +133,14 @@ endmacro( build_manpage )
 ############################################################
 # The revision number is based on GIT commit informations.
 # It will be stored in GIT_REVISION.
-find_program(GIT_COMMAND git DOC "The rcs revision description information tool.")
-
 if (NOT GIT_REVISION)
-  if (GIT_COMMAND)
-    execute_process(COMMAND ${GIT_COMMAND} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if (GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
     string(REGEX MATCH "[0-9]+-[^-]+$" GIT_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${GIT_REVISION}-${CMAKE_SYSTEM_NAME}-${PROCESSOR}-${CMAKE_BUILD_TYPE})
   else(GIT_COMMAND)
     message(STATUS "git not found")
-  endif (GIT_COMMAND)
+  endif (GIT_FOUND)
 endif (NOT GIT_REVISION)
 
 if (GIT_REVISION)

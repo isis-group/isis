@@ -35,7 +35,7 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::KeyType &prop_name ): propertyName( prop_name ) {}
 
-bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
+bool SortedChunkList::posCompare::operator()( const util::fvector3 &posA, const util::fvector3 &posB ) const
 {
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by in-image position (" << posA << " below " << posB << ")";
@@ -80,7 +80,7 @@ boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyVal
 	const SecondaryMap::iterator found = map.find( key );
 	return found != map.end() ? found->second : boost::shared_ptr<Chunk>();
 }
-SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector4 &key )
+SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector3 &key )
 {
 	const PrimaryMap::iterator found = chunks.find( key );
 	return found != chunks.end() ? &found->second : NULL;
@@ -116,17 +116,17 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( indexOriginProb ).castTo<util::fvector4>();
+	const util::fvector3 &origin = ch.propertyValue( indexOriginProb ).castTo<util::fvector3>();
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &rowVec = ch.propertyValue( rowVecProb ).castTo<util::fvector4>();
-	const util::fvector4 &columnVec = ch.propertyValue( columnVecProb ).castTo<util::fvector4>();
-	const util::fvector4 sliceVec = ch.hasProperty( sliceVecProb ) ?
-									ch.propertyValue( sliceVecProb ).castTo<util::fvector4>() :
-									util::fvector4(
+	const util::fvector3 &rowVec = ch.propertyValue( rowVecProb ).castTo<util::fvector3>();
+	const util::fvector3 &columnVec = ch.propertyValue( columnVecProb ).castTo<util::fvector3>();
+	const util::fvector3 sliceVec = ch.hasProperty( sliceVecProb ) ?
+									ch.propertyValue( sliceVecProb ).castTo<util::fvector3>() :
+									util::fvector3(
 										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
 										rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
@@ -134,7 +134,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
-	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
+	const util::fvector3 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ) );
 	const scalarPropCompare &secondaryComp = secondarySort.top();
 
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)

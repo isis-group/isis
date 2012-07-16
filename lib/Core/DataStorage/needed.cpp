@@ -31,4 +31,6 @@ const char *isis::data::Image::neededProperties = "\
 	sequenceNumber\
 ";
 
+const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers";
+
 /// @endcond _internal

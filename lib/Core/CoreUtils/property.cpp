@@ -39,6 +39,17 @@ bool PropertyValue::operator== ( const ValueBase &second )const
 
 PropertyValue::PropertyValue ( ) : m_needed( false ) {}
 
+std::string PropertyValue::getTypeName() const
+{
+	LOG_IF( !*this, Debug, error ) << "Doing getTypeName on empty property, this will crash";
+	return ( **this ).getTypeName();
+}
+
+short unsigned int PropertyValue::getTypeID() const
+{
+	LOG_IF( !*this, Debug, error ) << "Doing getTypeID on empty property, this will crash";
+	return ( **this ).getTypeID();
+}
 
 }
 }

@@ -44,11 +44,11 @@ int main( int argc, char *argv[] )
 	app.parameters["rawdims"].needed() = false;
 	app.parameters["rawdims"].setDescription( "the dimensions of the raw image, at least number of columns must be given (ignored when read_repn is not given)" );
 
-	app.parameters["voxel"] = util::fvector4( 1, 1, 1 );
+	app.parameters["voxel"] = util::fvector3( 1, 1, 1 );
 	app.parameters["voxel"].needed() = false;
 	app.parameters["voxel"].setDescription( "the size of the voxels in each direction" );
 
-	app.parameters["origin"] = util::fvector4( );
+	app.parameters["origin"] = util::fvector3( );
 	app.parameters["origin"].needed() = false;
 	app.parameters["origin"].setDescription( "the position of the first voxel in isis space" );
 
@@ -87,8 +87,8 @@ int main( int argc, char *argv[] )
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
 		data::Chunk ch( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true );
-		ch.setPropertyAs<util::fvector4>( "indexOrigin", app.parameters["origin"] );
-		ch.setPropertyAs<util::fvector4>( "voxelSize", app.parameters["voxel"] );
+		ch.setPropertyAs<util::fvector3>( "indexOrigin", app.parameters["origin"] );
+		ch.setPropertyAs<util::fvector3>( "voxelSize", app.parameters["voxel"] );
 
 		app.autowrite( data::Image( ch ), true );
 	} else { // writing raw
