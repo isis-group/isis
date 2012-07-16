@@ -915,7 +915,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 {
 	data::MemChunk<uint8_t> original( 10, 10, 10, 10 );
 	original.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
-	original.setPropertyAs( "indexOrigin", util::fvector3(0,0) );
+	original.setPropertyAs( "indexOrigin", util::fvector3( 0, 0 ) );
 	original.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	original.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
 	original.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
@@ -925,7 +925,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
 
-	util::DefaultMsgPrint::stopBelow(warning);
+	util::DefaultMsgPrint::stopBelow( warning );
 	img.spliceDownTo( data::sliceDim );
 	std::vector<data::Chunk > chunks = img.copyChunksToVector( false );
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );

@@ -30,7 +30,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 {
 	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 	init( idx );
-	util::Singletons::get<NeededsList<Chunk>,0>().applyTo(*this);
+	util::Singletons::get<NeededsList<Chunk>, 0>().applyTo( *this );
 	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 }
@@ -218,11 +218,11 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 		break;
 	case timeDim :
-		LOG_IF(acquisitionNumberStride==0,Debug,error) << "Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail";
+		LOG_IF( acquisitionNumberStride == 0, Debug, error ) << "Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail";
 	}
 
 	// prepare some attributes
-	const util::fvector3 indexOriginOffset = atDim<data::timeDim ? offset * distance[atDim]:util::fvector3();
+	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3();
 
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist

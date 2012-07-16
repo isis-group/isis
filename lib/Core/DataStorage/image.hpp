@@ -299,9 +299,8 @@ public:
 	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
-		clean ( false ) 
-	{
-		util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
+		clean ( false ) {
+		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromList ( chunks );
@@ -314,7 +313,7 @@ public:
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
-		util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
+		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
 		std::list<T> tmp( chunks.begin(), chunks.end() );

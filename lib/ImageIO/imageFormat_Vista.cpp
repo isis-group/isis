@@ -1014,7 +1014,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	return true;
 }
 
-util::fvector3 ImageFormat_Vista::calculateIndexOrigin( isis::data::Chunk& chunk, isis::util::ivector4& dims )
+util::fvector3 ImageFormat_Vista::calculateIndexOrigin( isis::data::Chunk &chunk, isis::util::ivector4 &dims )
 {
 	// IMPORTANT: We don't use the dims from the chunks since we are not sure if
 	// if the 3rd dimension contains geometrical or time information. Hence it's
@@ -1025,7 +1025,7 @@ util::fvector3 ImageFormat_Vista::calculateIndexOrigin( isis::data::Chunk& chunk
 	util::fvector3 ioTmp(
 		-( ( dims[0] - 1 )*voxels[0] ) / 2,
 		-( ( dims[1] - 1 )*voxels[1] ) / 2,
-		-( ( dims[2] - 1 )*voxels[2] ) / 2);
+		-( ( dims[2] - 1 )*voxels[2] ) / 2 );
 	util::fvector3 readV = chunk.getPropertyAs<util::fvector3>( "rowVec" );
 	util::fvector3 phaseV = chunk.getPropertyAs<util::fvector3>( "columnVec" );
 	util::fvector3 sliceV = chunk.getPropertyAs<util::fvector3>( "sliceVec" );
@@ -1033,7 +1033,7 @@ util::fvector3 ImageFormat_Vista::calculateIndexOrigin( isis::data::Chunk& chunk
 	util::fvector3 iOrig(
 		readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
 		readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
-		readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2]);
+		readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2] );
 	return iOrig;
 }
 

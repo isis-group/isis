@@ -35,15 +35,15 @@ ChunkOp::~ChunkOp() {}
 
 Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 {
-	util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
+	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
 
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
-	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),set( defaultChunkEqualitySet ),clean( false )
+	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ), set( defaultChunkEqualitySet ), clean( false )
 {
-	util::Singletons::get<NeededsList<Image>,0>().applyTo(*this);
+	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 
@@ -183,7 +183,7 @@ util::fvector3 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 {
 	return  util::fvector3( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
 							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
-							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2])
+							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2] )
 			+ m_Offset ;
 }
 
@@ -195,7 +195,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector3 &ph
 	const util::fvector3 vec1 = physicalCoords - m_Offset;
 	util::fvector4 _ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
 										  vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2]);
+										  vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2] );
 
 	for( uint8_t i = 0; i < 3; i++ ) {
 		if( _ret[i] < 0 ) _ret[i] -= 0.5;
@@ -1067,8 +1067,10 @@ util::fvector3 Image::getFoV() const
 	}
 
 	const util::fvector4 ret = _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
-	LOG_IF(ret[timeDim],Runtime,warning) << "Ignoring fourth dim extend of " << ret[timeDim] << " in Image";
-	return util::fvector3(ret[0],ret[1],ret[2]);
+
+	LOG_IF( ret[timeDim], Runtime, warning ) << "Ignoring fourth dim extend of " << ret[timeDim] << " in Image";
+
+	return util::fvector3( ret[0], ret[1], ret[2] );
 }
 
 Image::iterator Image::begin()

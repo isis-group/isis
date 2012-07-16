@@ -109,13 +109,14 @@ private:
 	bool recursiveRemove( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
 
 protected:
-	template<typename T> class NeededsList:public std::list<PropPath>{
+	template<typename T> class NeededsList: public std::list<PropPath>
+	{
 	public:
-		NeededsList(){
-			const list< key_type > buff=util::stringToList<key_type>( T::neededProperties );//@todo really bad voodoo
-			assign(buff.begin(),buff.end());
+		NeededsList() {
+			const list< key_type > buff = util::stringToList<key_type>( T::neededProperties ); //@todo really bad voodoo
+			assign( buff.begin(), buff.end() );
 		}
-		void applyTo(PropertyMap &props){
+		void applyTo( PropertyMap &props ) {
 			BOOST_FOREACH( const PropPath & ref, *this ) {
 				props.addNeeded( ref );
 			}
@@ -135,7 +136,7 @@ protected:
 	 * Adds a property with status needed.
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
 	 */
-	void addNeeded(const PropPath &path );
+	void addNeeded( const PropPath &path );
 
 	/**
 	 * Remove every PropertyValue which is also in the other PropertyMap and where operator== returns true.

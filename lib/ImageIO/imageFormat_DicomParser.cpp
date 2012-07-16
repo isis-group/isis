@@ -32,14 +32,16 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
 
-template <typename S,typename V> void arrayToVecPropImp(S* array,util::PropertyMap &dest,const util::PropertyMap::PropPath &name,size_t len){
+template <typename S, typename V> void arrayToVecPropImp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
 	V vector;
 	vector.copyFrom( array, array + len );
 	dest.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
 }
-template <typename S> void arrayToVecProp(S* array,util::PropertyMap &dest,const util::PropertyMap::PropPath &name,size_t len){
-	if(len<=3)arrayToVecPropImp<S,util::vector3<S> >(array,dest,name,len);
-	else arrayToVecPropImp<S,util::vector4<S> >(array,dest,name,len);
+template <typename S> void arrayToVecProp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
+	if( len <= 3 )arrayToVecPropImp<S, util::vector3<S> >( array, dest, name, len );
+	else arrayToVecPropImp<S, util::vector4<S> >( array, dest, name, len );
 }
 
 }
@@ -503,7 +505,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			else if ( mult == 1 )
 				parseScalar( elem, tag2Name( tag ), map );
 			else
-				parseList( elem, tag2Name( tag ), map ); 
+				parseList( elem, tag2Name( tag ), map );
 		} else {
 			dcmObject2PropMap( obj, map.branch( tag2Name( tag ) ), dialect );
 		}

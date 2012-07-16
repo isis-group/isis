@@ -127,7 +127,7 @@ public:
 	 * hook for \link ValueBase::as \endlink
 	 */
 	template<class T> T as()const {
-		LOG_IF(!*this, Debug,error) << "Doing as<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
+		LOG_IF( !*this, Debug, error ) << "Doing as<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
 		return ( **this ).as<T>();
 	}
 
@@ -136,7 +136,7 @@ public:
 	 * hook for \link ValueBase::is \endlink
 	 */
 	template<class T> bool is()const {
-		LOG_IF(!*this, Debug,error) << "Doing is<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
+		LOG_IF( !*this, Debug, error ) << "Doing is<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
 		return ( **this ).is<T>();
 	}
 
@@ -151,13 +151,13 @@ public:
 	 * hook for \link ValueBase::getTypeID \endlink
 	 */
 	unsigned short getTypeID()const;
-	
+
 	/**
 	 * \copybrief ValueBase::castTo
 	 * hook for \link ValueBase::castTo \endlink
 	 */
 	template<class T> T &castTo()const {
-		LOG_IF(!*this, Debug,error) << "Casting empty property to " << util::MSubject(util::Value<T>::staticName()) << ", this will crash";
+		LOG_IF( !*this, Debug, error ) << "Casting empty property to " << util::MSubject( util::Value<T>::staticName() ) << ", this will crash";
 		return ( **this ).castTo<T>();
 	}
 };

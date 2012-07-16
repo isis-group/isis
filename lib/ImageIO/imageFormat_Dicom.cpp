@@ -420,8 +420,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	uint16_t images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
 	const util::vector4<size_t> tSize = source.getSizeAsVector();
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
-	const util::vector3<size_t> size(tSize[0]/matrixSize,tSize[1] / matrixSize,images);
-	
+	const util::vector3<size_t> size( tSize[0] / matrixSize, tSize[1] / matrixSize, images );
+
 	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into a " << size << " volume";
 	// fix the properties of the source (we 'll need them later)
 	util::fvector3 voxelGap;
