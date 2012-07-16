@@ -15,7 +15,7 @@ Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git
 Vcs-Git: git://git.debian.org/git/pkg-exppsy/isis.git
 
 
-Package: libisis-core2
+Package: libisis-core3
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -33,7 +33,7 @@ Description: I/O framework for neuroimaging data
 Package: libisis-ioplugins-common
 Section: libs
 Architecture: any
-Depends: libisis-core2 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis-core3 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: data format plugins for the ISIS framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -46,7 +46,7 @@ Description: data format plugins for the ISIS framework
 Package: libisis-ioplugins-dicom
 Section: science
 Architecture: any
-Depends: libisis-core2 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis-core3 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: dicom io plugin for the ISIS framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -58,8 +58,8 @@ Description: dicom io plugin for the ISIS framework
 Package: libisis-core-dev
 Section: libdevel
 Architecture: all
-Depends: libisis-core2 (>= ${source:Version}),
- libisis-core2 (<< ${source:Version}.1~), ${misc:Depends}, cmake, liboil0.3-dev,
+Depends: libisis-core3 (>= ${source:Version}),
+ libisis-core3 (<< ${source:Version}.1~), ${misc:Depends}, cmake, liboil0.3-dev,
  libboost-date-time-dev (>= 1.42.0~ ),
  libboost-dev (>= 1.42.0~ ),
  libboost-filesystem-dev (>= 1.42.0~ ),
@@ -75,7 +75,7 @@ Description: I/O framework for neuroimaging data
 Package: isis-utils
 Section: science
 Architecture: any
-Depends: libisis-core2 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis-core3 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: utilities for the ISIS neuroimaging data I/O framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -90,7 +90,7 @@ Section: libs
 Conflicts: isis-qt4
 Replaces: isis-qt4
 Architecture: any
-Depends: libisis-core2 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis-core3 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Qt4 bindings for ISIS data I/O framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS

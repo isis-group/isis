@@ -1,3 +1,24 @@
+isis (0.7.0-1) natty; urgency=low
+
+  * API version changed to 3.0.0
+  * added vector3<float> and vector3<double> and use it for the image geometry
+    (row/column/sliceVec, indexOrigin and voxelSize/Gap)
+  * added automatic conversion between vector3/4 and lists
+  * use a more robust approach for singletons
+  * fix bug in string=>number conversion (there must not be a "e" or "." as 
+    first "digit)
+  * change behaviour of DefaultMsgPrint to print a message only if it wasn't 
+    send already within the last half second
+  * add dialect "siemens" in dicom IO to deal with broken AcquisitionTime in DWI
+    data
+  * improve performance of the type casting by skipping one type check
+  * replace separate plugin for gz and tar by a generic proxy for compressed 
+    data
+  * fix recognition of scientific notation in type conversion from string
+  * use FindGit cmake module
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 16 Jul 2012 15:52:05 +0200
+
 isis (0.6.0-1) UNRELEASED; urgency=low
 
   * add experimental filter infrastructure
