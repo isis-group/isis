@@ -54,7 +54,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 	util::PropertyMap &vistaTree = props.branch( "vista" );
 
 	if( empty() ) {
-		last_voxelsize = props.getPropertyAs<util::fvector4>( "voxelSize" );
+		last_voxelsize = props.getPropertyAs<util::fvector3>( "voxelSize" );
 		last_repn = vistaTree.getPropertyAs<std::string>( "repn" ).c_str();
 
 		if( vistaTree.hasProperty( "component_repn" ) )last_component = vistaTree.propertyValue( "component_repn" ) ;
@@ -63,7 +63,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 			throwGenericError( std::string( "Cannot handle repn " ) + vistaTree.getPropertyAs<std::string>( "repn" ) );
 
 	} else  if(
-		last_voxelsize != props.getPropertyAs<util::fvector4>( "voxelSize" ) ||
+		last_voxelsize != props.getPropertyAs<util::fvector3>( "voxelSize" ) ||
 		last_repn != vistaTree.getPropertyAs<std::string>( "repn" ).c_str() ||
 		( vistaTree.hasProperty( "component_repn" ) && last_component != vistaTree.propertyValue( "component_repn" ) )
 	) {

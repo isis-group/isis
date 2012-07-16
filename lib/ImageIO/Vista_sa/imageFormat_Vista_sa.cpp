@@ -31,45 +31,45 @@ namespace image_io
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
-		obj.transform<util::fvector4>( "vista/columnVec", "rowVec" );
-		obj.transform<util::fvector4>( "vista/rowVec", "columnVec" );
-		transformOrTell<util::fvector4>( "vista/sliceVec", "sliceVec", obj, warning );
+		obj.transform<util::fvector3>( "vista/columnVec", "rowVec" );
+		obj.transform<util::fvector3>( "vista/rowVec", "columnVec" );
+		transformOrTell<util::fvector3>( "vista/sliceVec", "sliceVec", obj, warning );
 	} else if( obj.hasProperty( "vista/imageOrientationPatient" ) ) {
 		const util::dlist vecs = obj.getPropertyAs<util::dlist>( "vista/imageOrientationPatient" ); // if we have the dicom style partial orientation
 		util::dlist::const_iterator begin = vecs.begin(), middle = vecs.begin(), end = vecs.end();
 		std::advance( middle, 3 );
-		obj.setPropertyAs( "rowVec",    util::fvector4() ).castTo<util::fvector4>().copyFrom( begin, middle );
-		obj.setPropertyAs( "columnVec", util::fvector4() ).castTo<util::fvector4>().copyFrom( middle, end );
+		obj.setPropertyAs( "rowVec",    util::fvector3() ).castTo<util::fvector3>().copyFrom( begin, middle );
+		obj.setPropertyAs( "columnVec", util::fvector3() ).castTo<util::fvector3>().copyFrom( middle, end );
 	} else { // if we dont have an orientation
-		obj.setPropertyAs( "rowVec",    util::fvector4( 1, 0 ) );
-		obj.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		obj.setPropertyAs( "sliceVec",  util::fvector4( 0, 0, -1 ) );
+		obj.setPropertyAs( "rowVec",    util::fvector3( 1, 0 ) );
+		obj.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+		obj.setPropertyAs( "sliceVec",  util::fvector3( 0, 0, -1 ) );
 		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
 
 	if(
-		transformOrTell<util::fvector4>( "vista/imagePositionPatient", "indexOrigin", obj, info ) ||
-		transformOrTell<util::fvector4>( "vista/indexOrigin", "indexOrigin", obj, warning )
+		transformOrTell<util::fvector3>( "vista/imagePositionPatient", "indexOrigin", obj, info ) ||
+		transformOrTell<util::fvector3>( "vista/indexOrigin", "indexOrigin", obj, warning )
 	);
 	else {
 		LOG( Runtime, warning ) << "No position info was found, assuming 0 0 0";
-		obj.setPropertyAs( "indexOrigin", util::fvector4( 0, 0 ) );
+		obj.setPropertyAs( "indexOrigin", util::fvector3( 0, 0 ) );
 	}
 
-	if( transformOrTell<util::fvector4>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
+	if( transformOrTell<util::fvector3>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
 		if( hasOrTell( "vista/voxel", obj, info ) ) { // use that as voxel size, and the difference to voxel as voxel gap
-			obj.setPropertyAs<util::fvector4>( "voxelGap", obj.getPropertyAs<util::fvector4>( "vista/voxel" ) - obj.getPropertyAs<util::fvector4>( "voxelSize" ) ) ;
+			obj.setPropertyAs<util::fvector3>( "voxelGap", obj.getPropertyAs<util::fvector3>( "vista/voxel" ) - obj.getPropertyAs<util::fvector3>( "voxelSize" ) ) ;
 			obj.remove( "vista/voxel" );
 		}
-	} else if( transformOrTell<util::fvector4>( "vista/voxel", "voxelSize", obj, warning ) ) {
+	} else if( transformOrTell<util::fvector3>( "vista/voxel", "voxelSize", obj, warning ) ) {
 	} else
-		obj.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		obj.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 	if( obj.hasProperty( "vista/diffusionBValue" ) ) {
 		const float len = obj.getPropertyAs<float>( "vista/diffusionBValue" );
 
-		if( len > 0 && transformOrTell<util::fvector4>( "vista/diffusionGradientOrientation", "diffusionGradient", obj, warning ) ) {
-			util::fvector4 &vec = obj.propertyValue( "diffusionGradient" ).castTo<util::fvector4>();
+		if( len > 0 && transformOrTell<util::fvector3>( "vista/diffusionGradientOrientation", "diffusionGradient", obj, warning ) ) {
+			util::fvector3 &vec = obj.propertyValue( "diffusionGradient" ).castTo<util::fvector3>();
 			vec.norm();
 			vec *= len;
 			obj.remove( "vista/diffusionBValue" );

@@ -41,7 +41,7 @@ private:
 		data::ValueArray< uint8_t >::iterator m_data_start;
 
 		unsigned short last_type;
-		util::fvector4 last_voxelsize;
+		util::fvector3 last_voxelsize;
 		util::istring last_repn;
 		util::PropertyValue last_component;
 		bool big_endian;
