@@ -21,7 +21,6 @@ gitver = $(shell [ -x /usr/bin/git ] && git describe --tags --match '*\.*\.*' $$
 # an already installed package -- upstream is working on a fix
 CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DCMAKE_BUILD_TYPE=Release \
-            -DPYTHON_VERSIONS:LIST="$$(pyversions -s | sed -e 's/ /;/g')" \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
             -DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined" \
@@ -30,21 +29,17 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_BUILD_TOOLS:BOOL=ON \
             -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_IOPLUGIN_DICOM:BOOL=ON \
-            -DISIS_IOPLUGIN_GZ:BOOL=ON \
-            -DISIS_IOPLUGIN_NIFTI:BOOL=OFF \
             -DISIS_IOPLUGIN_NIFTI_SA:BOOL=ON \
+            -DISIS_IOPLUGIN_COMP:BOOL=ON \
             -DISIS_IOPLUGIN_NULL:BOOL=ON \
             -DISIS_IOPLUGIN_PNG:BOOL=ON \
-            -DISIS_IOPLUGIN_TAR:BOOL=ON \
             -DISIS_IOPLUGIN_VISTA:BOOL=ON \
-	    -DISIS_IOPLUGIN_VISTA_SA:BOOL=OFF \
             -DISIS_IOPLUGIN_FLIST:BOOL=ON \
             -DISIS_IOPLUGIN_PROCESS:BOOL=ON \
             -DISIS_ITK:BOOL=OFF \
             -DISIS_QT4:BOOL=ON \
             -DISIS_USE_LIBOIL:BOOL=ON \
             -DISIS_RUNTIME_LOG:BOOL=ON \
-            -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_DEBUG_LOG:BOOL=OFF \
             -DMANPAGES:BOOL=OFF \
             -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
