@@ -416,10 +416,10 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 }
 
 
-void PropertyMap::makeFlatMap( FlatMap &out, key_type key_prefix ) const
+void PropertyMap::makeFlatMap( FlatMap &out, KeyType key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
-		key_type key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
+		KeyType key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
 
 		if ( i->second.is_leaf()  ) {
 			out.insert( std::make_pair( key, i->second.getLeaf()[0] ) );
@@ -503,7 +503,7 @@ bool PropertyMap::hasProperty( const PropPath &path ) const
 isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch ) const
 {
 	// make sure we only get the last part of the path if its one
-	const PropPath path = util::stringToList<key_type>( key, pathSeperator );
+	const PropPath path = util::stringToList<KeyType>( key, pathSeperator );
 
 	if( path.empty() ) {
 		LOG( Debug, error ) << "Search key " << util::MSubject( key ) << " is invalid, won't search";
@@ -557,7 +557,7 @@ bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 	}
 }
 
-void PropertyMap::toCommonUnique( PropertyMap &common, std::set<key_type> &uniques, bool init )const
+void PropertyMap::toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const
 {
 	if ( init ) {
 		common = *this;

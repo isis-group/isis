@@ -113,7 +113,7 @@ protected:
 	{
 	public:
 		NeededsList() {
-			const list< key_type > buff = util::stringToList<key_type>( T::neededProperties ); //@todo really bad voodoo
+			const list< KeyType > buff = util::stringToList<KeyType>( T::neededProperties ); //@todo really bad voodoo
 			assign( buff.begin(), buff.end() );
 		}
 		void applyTo( PropertyMap &props ) {
