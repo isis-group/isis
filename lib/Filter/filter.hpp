@@ -1,10 +1,10 @@
 #ifndef ISIS_FILTER_HPP
 #define ISIS_FILTER_HPP
 
-#include "chunk.hpp"
-#include "image.hpp"
-#include "../CoreUtils/progressfeedback.hpp"
-#include "../CoreUtils/progparameter.hpp"
+#include <DataStorage/chunk.hpp>
+#include <DataStorage/image.hpp>
+#include <CoreUtils/progressfeedback.hpp>
+#include <CoreUtils/progparameter.hpp>
 
 #include <list>
 #include <boost/signals2.hpp>

@@ -3,8 +3,8 @@
 
 #include "GaussianKernelFilter.hpp"
 #include "ConvolutionFilter.hpp"
-#include "DataStorage/filter.hpp"
-#include "../common.hpp"
+#include <Filter/filter.hpp>
+#include <Filter/common.hpp>
 
 #include <numeric>
 

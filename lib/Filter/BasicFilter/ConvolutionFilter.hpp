@@ -1,8 +1,8 @@
 #ifndef ISIS_FILTER_CONVOLUTION
 #define ISIS_FILTER_CONVOLUTION
 
-#include "DataStorage/filter.hpp"
-#include "../common.hpp"
+#include <Filter/filter.hpp>
+#include <Filter/common.hpp>
 
 namespace isis
 {
