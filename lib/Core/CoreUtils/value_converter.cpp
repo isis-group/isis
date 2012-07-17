@@ -189,9 +189,10 @@ template<> boost::numeric::range_check_result str2scalar<Selection>( const std::
 template<bool IS_NUM> struct Tokenizer { //jump from number to number in the string ignoring anything else
 	static std::list<std::string> run( const std::string &src ) {
 		std::list<std::string> ret;
-		const char *mask = "0123456789-.";
+		const char *mask = "0123456789-eE.";
+		const char *start_mask = "0123456789-";
 
-		for( size_t i = src.find_first_of( mask ), end; i < std::string::npos; i = src.find_first_of( mask, end ) ) {
+		for( size_t i = src.find_first_of( start_mask ), end; i < std::string::npos; i = src.find_first_of( start_mask, end ) ) {
 			end = src.find_first_not_of( mask, i );
 			const std::string numstr = src.substr( i, end - i );
 			ret.push_back( numstr );
@@ -220,9 +221,48 @@ template<typename DST> struct StrTransformer {
 	}
 };
 
+//helper to convert strings to FixedVectors
+template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, FixedVector<DST, NUM> &dstList )
+{
+	const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+	std::list< std::string >::const_iterator end = srcList.begin();
+	std::advance( end, std::min<size_t>( srcList.size(), NUM ) ); // use a max of NUM tokens
+	StrTransformer<DST> transformer; // create a transformer from string to DST
+	std::transform( srcList.begin(), end, dstList.begin(), transformer ); // transform the found strings to the destination
+	return transformer.range_ok;
+}
+
 // additional base for converters which use another converter
 template<typename SRC, typename DST> struct SubValueConv {
 	boost::shared_ptr<const ValueConverterBase> sub_conv;
+};
+template<typename SRC, typename DST> struct IterableSubValueConv: SubValueConv<SRC, DST> {
+	template<typename SRC_LST, typename DST_LST> boost::numeric::range_check_result
+	convertIter2Iter( const SRC_LST &srcLst, DST_LST &dstLst )const {
+		boost::numeric::range_check_result ret = boost::numeric::cInRange;
+
+		typename SRC_LST::const_iterator srcAt = srcLst.begin(), srcEnd = srcLst.end();
+		typename DST_LST::iterator dstBegin = dstLst.begin(), dstEnd = dstLst.end();
+
+		while( srcAt != srcEnd ) { //slow and ugly, but flexible
+
+			if( dstBegin != dstEnd ) {
+				Value<DST> elem_dst;
+				const boost::numeric::range_check_result result = SubValueConv<SRC, DST>::sub_conv->convert( Value<SRC>( *srcAt ), elem_dst );
+
+				if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
+					ret = result;
+
+				*( dstBegin++ ) = ( DST )elem_dst;
+			} else if( *srcAt != SRC() )
+				return boost::numeric::cPosOverflow; // abort and send positive overflow if source wont fit into destination
+
+			srcAt++;
+		}
+
+		return ret;
+	}
+
 };
 template<typename CLASS, typename SRC, typename DST> static boost::shared_ptr<const ValueConverterBase> getFor()
 {
@@ -350,15 +390,14 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vector4 to vector4 version -- uses ValueConverter on every element
+// vectorX to vectorX version -- uses IterableSubValueConv::convertIter2Iter
 /////////////////////////////////////////////////////////////////////////////
+// vector4 => vector4
 template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector4<DST> >:
-	public ValueGenerator<vector4<SRC>, vector4<DST> >, private SubValueConv<SRC, DST >
+	public ValueGenerator<vector4<SRC>, vector4<DST> >, private IterableSubValueConv<SRC, DST >
 {
 	ValueConverter( ) {
-		LOG( Debug, verbose_info )
-				<< "Creating vector converter from "
-				<< Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
 	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 public:
@@ -366,30 +405,67 @@ public:
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		vector4<DST> &dstVal = dst.castTo<vector4<DST> >();
-		const vector4<SRC> &srcVal = src.castTo<vector4<SRC> >();
-		boost::numeric::range_check_result ret = boost::numeric::cInRange;
-
-		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
-			Value<DST> elem_dst;
-			const boost::numeric::range_check_result result = this->sub_conv->convert( Value<SRC>( srcVal[i] ), elem_dst );
-
-			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
-				ret = result;
-
-			dstVal[i] = ( DST )elem_dst;
-		}
-
-		return ret;
+		return convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector4<DST> >() );
+	}
+	virtual ~ValueConverter() {}
+};
+// vector3 => vector4
+template<typename SRC, typename DST > class ValueConverter<false, false, vector3<SRC>, vector4<DST> >:
+	public ValueGenerator<vector3<SRC>, vector4<DST> >, private IterableSubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector4<DST> >() );
+	}
+	virtual ~ValueConverter() {}
+};
+// vector4 => vector3
+template<typename SRC, typename DST > class ValueConverter<false, false, vector4<SRC>, vector3<DST> >:
+	public ValueGenerator<vector4<SRC>, vector3<DST> >, private IterableSubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector4<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector3<DST> >() );
+	}
+	virtual ~ValueConverter() {}
+};
+// vector3 => vector3
+template<typename SRC, typename DST > class ValueConverter<false, false, vector3<SRC>, vector3<DST> >:
+	public ValueGenerator<vector3<SRC>, vector3<DST> >, private IterableSubValueConv<SRC, DST >
+{
+	ValueConverter( ) {
+		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector3<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// list to list version -- uses ValueConverter on every element
+// list to list version -- uses IterableSubValueConv::convertIter2Iter
 /////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, std::list<DST> >:
-	public ValueGenerator<std::list<SRC>, std::list<DST> >, private SubValueConv<SRC, DST >
+	public ValueGenerator<std::list<SRC>, std::list<DST> >, private IterableSubValueConv<SRC, DST >
 {
 	ValueConverter() {
 		LOG( Debug, verbose_info )
@@ -407,19 +483,48 @@ public:
 				<< "Storing into non empty list while conversion from "
 				<< Value<std::list<SRC> >::staticName() << " to " << Value<std::list<DST> >::staticName();
 		const std::list<SRC> &srcVal = src.castTo<std::list<SRC> >();
-		boost::numeric::range_check_result ret = boost::numeric::cInRange;
+		dstVal.resize( srcVal.size() );
 
-		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
-			Value<DST> elem_dst;
-			const boost::numeric::range_check_result result = this->sub_conv->convert( Value<SRC>( *i ), elem_dst );
-
-			if ( ret == boost::numeric::cInRange && result != boost::numeric::cInRange )
-				ret = result;
-
-			dstVal.push_back( ( DST )elem_dst );
-		}
-
-		return ret;
+		return convertIter2Iter( srcVal, dstVal );
+	}
+	virtual ~ValueConverter() {}
+};
+/////////////////////////////////////////////////////////////////////////////
+// list to vectorX version -- uses IterableSubValueConv::convertIter2Iter
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, vector3<DST> >:
+	public ValueGenerator<std::list<SRC>, vector3<DST> >, private IterableSubValueConv<SRC, DST >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating list converter from "
+				<< Value<std::list<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector3<DST> >() );
+	}
+	virtual ~ValueConverter() {}
+};
+template<typename SRC, typename DST > class ValueConverter<false, false, std::list<SRC>, vector4<DST> >:
+	public ValueGenerator<std::list<SRC>, vector4<DST> >, private IterableSubValueConv<SRC, DST >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating list converter from "
+				<< Value<std::list<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
+	};
+	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		return getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector4<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -519,8 +624,7 @@ public:
 template<typename DST> class ValueConverter<false, false, std::string, vector4<DST> >: public ValueGenerator<std::string, vector4<DST> >  //string => vector4
 {
 	ValueConverter() {
-		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Value<vector4<DST> >::staticName();
+		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValueConverterBase> get() {
@@ -528,13 +632,23 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		vector4<DST> &dstList = dst.castTo<vector4<DST> >();
-		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
-		std::list< std::string >::const_iterator end = srcList.begin();
-		std::advance( end, std::min<size_t>( srcList.size(), 4 ) ); // use a max of 4 tokens
-		StrTransformer<DST> transformer; // create a transformer from string to DST
-		std::transform( srcList.begin(), end, dstList.begin(), transformer ); // transform the found strings to the destination
-		return transformer.range_ok;
+		return _internal::convertStr2Vector<DST, 4>( src, dst.castTo<vector4<DST> >() );
+	}
+	virtual ~ValueConverter() {}
+};
+
+template<typename DST> class ValueConverter<false, false, std::string, vector3<DST> >: public ValueGenerator<std::string, vector3<DST> >  //string => vector3
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector3<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, vector3<DST> > *ret = new ValueConverter<false, false, std::string, vector3<DST> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		return _internal::convertStr2Vector<DST, 3>( src, dst.castTo<vector3<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };

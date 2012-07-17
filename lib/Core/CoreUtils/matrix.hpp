@@ -210,6 +210,25 @@ public:
 	}
 };
 
+template<typename TYPE>
+class Matrix3x3: public FixedMatrix<TYPE, 3, 3>
+{
+public:
+	Matrix3x3() {};
+
+	Matrix3x3( const FixedMatrix<TYPE, 3, 3> &src ): FixedMatrix<TYPE, 3, 3>( src ) {}
+
+	Matrix3x3( const TYPE src[9] ): FixedMatrix<TYPE, 3, 3>( src ) {}
+	template<typename TYPE2> Matrix3x3(
+		const FixedVector<TYPE2, 3> &row1,
+		const FixedVector<TYPE2, 3> &row2,
+		const FixedVector<TYPE2, 3> &row3 = vector3<TYPE2>( 0, 0, 1 )
+	) {
+		const vector3<TYPE2> src[3] = {row1, row2, row3};
+		FixedMatrix<TYPE, 3, 3>::copyFrom( src );
+	}
+};
+
 }
 }
 /// Streaming output for FixedMatrix

@@ -205,6 +205,7 @@ public:
 	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
+	static const char *neededProperties;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -246,7 +247,7 @@ private:
 
 protected:
 	bool clean;
-	static const char *neededProperties;
+	static const char *defaultChunkEqualitySet;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.
@@ -276,15 +277,14 @@ protected:
 	/// Creates an empty Image object.
 	Image();
 
+	util::fvector3 m_RowVec;
+	util::fvector3 m_RowVecInv;
+	util::fvector3 m_ColumnVec;
+	util::fvector3 m_ColumnVecInv;
+	util::fvector3 m_SliceVec;
+	util::fvector3 m_SliceVecInv;
+	util::fvector3 m_Offset;
 
-
-	util::fvector4 m_RowVec;
-	util::fvector4 m_RowVecInv;
-	util::fvector4 m_ColumnVec;
-	util::fvector4 m_ColumnVecInv;
-	util::fvector4 m_SliceVec;
-	util::fvector4 m_SliceVecInv;
-	util::fvector4 m_Offset;
 public:
 	/**
 	 * Copy constructor.
@@ -298,25 +298,27 @@ public:
 	 */
 	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
-		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
-		addNeededFromString<Image> ( neededProperties );
+		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
-		insertChunksFromContainer ( chunks );
+		insertChunksFromList ( chunks );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),
-		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean ( false ), minIndexingDim ( min_dim ) {
-		addNeededFromString<Image> ( neededProperties );
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
+		set ( defaultChunkEqualitySet ),
+		clean ( false ) {
+		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
 		set.addSecondarySort ( "acquisitionTime" );
-		insertChunksFromContainer ( chunks );
+		std::list<T> tmp( chunks.begin(), chunks.end() );
+		insertChunksFromList ( tmp );
+		chunks.assign( tmp.begin(), tmp.end() );
 	}
 
 	/**
@@ -324,11 +326,11 @@ public:
 	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
 	 * \returns amount of successfully inserted chunks
 	 */
-	template<typename T> size_t insertChunksFromContainer ( T &chunks ) {
-		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type > ) );
+	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks ) {
+		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, T> ) );
 		size_t cnt = 0;
 
-		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
 			if ( insertChunk ( *i ) ) {
 				chunks.erase ( i++ );
 				cnt++;
@@ -608,7 +610,7 @@ public:
 	 *  \param index the voxel index from which you want to get the physical coordinates
 	 *  \return physical coordinates associated with the given voxel index
 	 */
-	util::fvector4 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
+	util::fvector3 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
 
 
 	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
@@ -617,7 +619,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
+	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector3 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -767,7 +769,7 @@ public:
 	/// \returns the number of timesteps of the image
 	size_t getNrOfTimesteps() const;
 
-	util::fvector4 getFoV() const;
+	util::fvector3 getFoV() const;
 	bool updateOrientationMatrices();
 
 	/**

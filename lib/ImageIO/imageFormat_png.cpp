@@ -188,10 +188,10 @@ public:
 		fclose( fp );
 		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
 		ret.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-		ret.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0 ) );
-		ret.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1 ) );
-		ret.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0 ) );
-		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+		ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+		ret.setPropertyAs( "indexOrigin", util::fvector3( ) );
+		ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 		return ret;
 	}
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {

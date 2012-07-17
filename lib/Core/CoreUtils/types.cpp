@@ -59,7 +59,9 @@ DEF_TYPE( double, double );
 DEF_TYPE( color24, color24 );
 DEF_TYPE( color48, color48 );
 
+DEF_TYPE( fvector3, fvector3 );
 DEF_TYPE( fvector4, fvector4 );
+DEF_TYPE( dvector3, dvector3 );
 DEF_TYPE( dvector4, dvector4 );
 DEF_TYPE( ivector4, ivector4 );
 

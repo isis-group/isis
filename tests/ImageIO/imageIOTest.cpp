@@ -21,12 +21,12 @@ namespace test
 BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 {
 	data::MemChunk<uint8_t> ch( 5, 5, 5 );
-	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
 	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch.setPropertyAs<float>( "acquisitionTime", 0 );
-	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 	data::Image img( ch );
 
@@ -44,12 +44,12 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 BOOST_AUTO_TEST_CASE ( imageNameUseFormatTest )
 {
 	data::MemChunk<uint8_t> ch( 5, 32, 1 );
-	ch.setPropertyAs( "indexOrigin", util::fvector4( 7, 3, 2 ) );
+	ch.setPropertyAs( "indexOrigin", util::fvector3( 7, 3, 2 ) );
 	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch.setPropertyAs<float>( "acquisitionTime", 0 );
-	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	ch.setPropertyAs( "subjectName", std::string( "My Name is Bunny" ) );
 	ch.setPropertyAs( "anotherName", std::string( "x" ) );
 
@@ -152,12 +152,12 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	data::MemChunk<uint8_t> ch1( 5, 5, 5 );
 	std::list<data::Chunk> chunks;
 
-	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch1.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch1.setPropertyAs<float>( "acquisitionTime", 0 );
-	ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ch1.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch1.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch1.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch1.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 	for( uint32_t i = 0; i < 5; i++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list
 		data::MemChunk<uint8_t> ch( ch1 );

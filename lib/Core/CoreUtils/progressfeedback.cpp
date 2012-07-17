@@ -36,14 +36,24 @@ ProgressFeedback::~ProgressFeedback() {}
 void ConsoleFeedback::show( size_t max, std::string header )
 {
 	header += "\n";
-	disp.reset( new boost::progress_display( max, std::cout, header ) );
+
+	if( disp )
+		extend( max );
+	else
+		disp.reset( new boost::progress_display( max, std::cout, header ) );
 }
 
 size_t ConsoleFeedback::extend( size_t by )
 {
-	long unsigned int at = disp->count();
-	disp->restart( disp->expected_count() + by );
-	return disp->operator+=( at );
+	if( disp ) {
+		long unsigned int at = disp->count();
+		disp->restart( disp->expected_count() + by );
+		return disp->operator+=( at );
+	} else {
+		LOG( Debug, warning ) << "You should not use extend, if there is no progress bar shown already. (use show instead)";
+		show( by, "" );
+		return 0;
+	}
 }
 
 void ConsoleFeedback::close()

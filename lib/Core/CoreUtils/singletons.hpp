@@ -30,27 +30,25 @@ namespace util
  */
 class Singletons
 {
-	class SingletonBase: public boost::noncopyable
+	template <typename C> class Singleton
 	{
-	public:
-		virtual ~SingletonBase();
-	};
-	template<typename BASE> class Singleton: public SingletonBase, public BASE {};
+		static void destruct() {
+			if( _instance )delete _instance;
 
-	typedef std::multimap<int, SingletonBase *const> prioMap;
+			_instance = 0;
+		}
+		static C *_instance;
+		Singleton () { }
+	public:
+		friend class Singletons;
+	};
+
+	typedef void( *destructer )();
+	typedef std::multimap<int, destructer> prioMap;
+
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
-	template<typename T> Singleton<T> *create( int priority ) {
-		Singleton<T>* ret( new Singleton<T> );
-		map.insert( map.find( priority ), std::make_pair( priority, ret ) );
-		return ret;
-	}
-	template<typename T> static Singleton<T>& request( int priority ) {
-		static Singleton<T> *s = getMaster().create<T>( priority );
-		//ok this might become a dead ref as well. But its no complex object, and therefore won't be "destructed".
-		return *s;
-	}
 	static Singletons &getMaster();
 public:
 	/**
@@ -58,10 +56,18 @@ public:
 	 * all repetetive calls return this object.
 	 * \return a reference to the same object of type T.
 	 */
-	template<typename T, int PRIO> static Singleton<T> &get() {
-		return request<T>( PRIO );
+	template<typename T, int PRIO> static T &get() {
+		if ( !Singleton<T>::_instance ) {
+			Singleton<T>::_instance = new T();
+			prioMap &map = getMaster().map;
+			map.insert( map.find( PRIO ), std::make_pair( PRIO, Singleton<T>::destruct ) );
+		}
+
+		return *Singleton<T>::_instance;
 	}
 };
+template <typename C> C *Singletons::Singleton<C>::_instance = 0;
+
 }
 }
 #endif //SINGLETONS_HPP_INCLUDED
