@@ -405,7 +405,7 @@ public:
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector4<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector4<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -422,7 +422,7 @@ public:
 		return getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector4<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector4<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -439,7 +439,7 @@ public:
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector3<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<vector4<SRC> >(), dst.castTo<vector3<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -456,7 +456,7 @@ public:
 		return getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector3<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<vector3<SRC> >(), dst.castTo<vector3<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -485,7 +485,7 @@ public:
 		const std::list<SRC> &srcVal = src.castTo<std::list<SRC> >();
 		dstVal.resize( srcVal.size() );
 
-		return convertIter2Iter( srcVal, dstVal );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( srcVal, dstVal );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -506,7 +506,7 @@ public:
 		return getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector3<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector3<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
@@ -524,7 +524,7 @@ public:
 		return getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		return convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector4<DST> >() );
+		return IterableSubValueConv<SRC, DST >::convertIter2Iter( src.castTo<std::list<SRC> >(), dst.castTo<vector4<DST> >() );
 	}
 	virtual ~ValueConverter() {}
 };
