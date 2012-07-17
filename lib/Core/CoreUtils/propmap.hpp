@@ -95,25 +95,25 @@ private:
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// internal recursion-function for join
-	void joinTree( const isis::util::PropertyMap &other, bool overwrite, KeyType prefix, PropertyMap::KeyList &rejects );
+	void joinTree( const PropertyMap &other, bool overwrite, KeyType prefix, KeyList &rejects );
 	/// internal recursion-function for diff
 	void diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret, KeyType prefix ) const;
 
-	static mapped_type &fetchEntry( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
+	static mapped_type &fetchEntry( PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	mapped_type &fetchEntry( const PropPath &path );
 
 	static const mapped_type *findEntry( const util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	const mapped_type *findEntry( const PropPath &path )const;
 
 	/// internal recursion-function for remove
-	bool recursiveRemove( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
+	bool recursiveRemove( PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
 
 protected:
 	template<typename T> class NeededsList: public std::list<PropPath>
 	{
 	public:
 		NeededsList() {
-			const list< key_type > buff = util::stringToList<key_type>( T::neededProperties ); //@todo really bad voodoo
+			const std::list< PropertyMap::KeyType > buff = util::stringToList<PropertyMap::KeyType>( T::neededProperties ); //@todo really bad voodoo
 			assign( buff.begin(), buff.end() );
 		}
 		void applyTo( PropertyMap &props ) {
@@ -143,7 +143,7 @@ protected:
 	 * \param other the other property tree to compare to
 	 * \param removeNeeded if a property should also be deleted it is needed
 	 */
-	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
+	void removeEqual( const PropertyMap &other, bool removeNeeded = false );
 
 	/**
 	 * Get common and unique properties from the tree.
@@ -317,7 +317,7 @@ public:
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::KeyList join( const isis::util::PropertyMap &other, bool overwrite = false );
+	PropertyMap::KeyList join( const PropertyMap &other, bool overwrite = false );
 
 	/**
 	 * Transform an existing property into another.
@@ -381,7 +381,7 @@ public:
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
 	 * If that conversion failes an error is send to Runtime.
 	 * \code
-	 * getPropertyAs<isis::util::fvector4>( "MyPropertyName" );
+	 * getPropertyAs<fvector4>( "MyPropertyName" );
 	 * \endcode
 	 * \param path the path to the property
 	 * \returns the property with given type, if not set yet T() is returned.

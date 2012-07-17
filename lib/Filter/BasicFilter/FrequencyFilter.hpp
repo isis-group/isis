@@ -1,7 +1,7 @@
 #ifndef ISIS_FILTER_FREQUENCY
 #define ISIS_FILTER_FREQUENCY
 
-#include "DataStorage/filter.hpp"
+#include "../filter.hpp"
 #include "../common.hpp"
 
 namespace isis
