@@ -27,7 +27,6 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_APPS_CALC:BOOL=ON \
             -DISIS_BUILD_TESTS:BOOL=OFF \
             -DISIS_BUILD_TOOLS:BOOL=ON \
-            -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_IOPLUGIN_DICOM:BOOL=ON \
             -DISIS_IOPLUGIN_NIFTI_SA:BOOL=ON \
             -DISIS_IOPLUGIN_COMP:BOOL=ON \
@@ -43,7 +42,9 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_DEBUG_LOG:BOOL=OFF \
             -DMANPAGES:BOOL=OFF \
             -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
-            -DGIT_REVISION="Debian-$(debver)"
+            -DGIT_REVISION="Debian-$(debver)" \
+            -DCMAKE_C_FLAGS=-msse2 \
+            -DCMAKE_CXX_FLAGS=-msse2
 
 override_dh_auto_test:
 	# don't work ATM
