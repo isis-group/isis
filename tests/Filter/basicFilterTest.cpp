@@ -1,11 +1,11 @@
 #define BOOST_TEST_MODULE FilterTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <DataStorage/filter.hpp>
 
 #include "BasicFilter/GaussianFilter.hpp"
 #include "BasicFilter/FrequencyFilter.hpp"
 #include <DataStorage/io_factory.hpp>
+#include "filter.hpp"
 
 namespace isis
 {

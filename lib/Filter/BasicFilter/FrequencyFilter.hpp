@@ -1,8 +1,8 @@
 #ifndef ISIS_FILTER_FREQUENCY
 #define ISIS_FILTER_FREQUENCY
 
-#include <Filter/filter.hpp>
-#include <Filter/common.hpp>
+#include "../filter.hpp"
+#include "../common.hpp"
 
 namespace isis
 {

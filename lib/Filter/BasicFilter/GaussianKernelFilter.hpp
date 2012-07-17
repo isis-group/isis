@@ -1,8 +1,8 @@
 #ifndef ISIS_FILTER_GAUSSIANKERNEL_HPP
 #define ISIS_FILTER_GAUSSIANKERNEL_HPP
 
-#include <Filter/filter.hpp>
-#include <Filter/common.hpp>
+#include "../filter.hpp"
+#include "../common.hpp"
 
 namespace isis
 {

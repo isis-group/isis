@@ -9,7 +9,7 @@ file(GLOB FILTER_HDR_FILES "*.hpp")
 
 find_package(FFTW3 REQUIRED)
 
-add_library(isisFilter_Basic SHARED ${BASIC_FILTER})
+add_library(isisFilter_Basic SHARED ${BASIC_FILTER} ../filter.cpp)
 target_link_libraries(isisFilter_Basic isis_core ${FFTW3_FFTW3_LIBRARY})
 
 if(WIN32)
