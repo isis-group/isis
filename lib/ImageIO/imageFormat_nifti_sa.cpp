@@ -523,7 +523,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 	if( !parseDescripForSPM( props, head->descrip ) ) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
 		props.setPropertyAs<std::string>( "sequenceDescription", head->descrip ); // use it the usual way
 
-	// TODO: at the moment scaling not supported due to data type changes
+	// TODO: at the moment scaling is not supported due to data type changes
 	if ( !head->scl_slope == 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
 		//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
@@ -542,11 +542,8 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 	util::fvector3 &vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector3>();
 
-	for( short i = 0; i < std::min<short>( head->dim[0], 3 ); i++ ) {
-		if( vsize[i] == 0 ) {
-			LOG( Runtime, warning ) << "The voxelSize[" << i << "] is 0. Assuming \"1\"";
-			vsize[i] = 1;
-		}
+	for( short i = 0; i < 3 ; i++ ) {
+		if( vsize[i] == 0 ) vsize[i] = 1;
 	}
 
 	return parseSliceOrdering( head, props );
@@ -987,12 +984,8 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	props.remove( "nifti/qoffset" );
 
 	// voxelSize //////////////////////////////////////////////////////////////////////////////////
-	const util::dlist::iterator pixdimStart = props.propertyValue( "nifti/pixdim" ).castTo<util::dlist>().begin();
-	util::dlist::iterator pixdimEnd = pixdimStart;
-	std::advance( pixdimEnd, 3 );
-	props.setPropertyAs( "voxelSize", util::fvector3() ).castTo<util::fvector3>().copyFrom( pixdimStart, pixdimEnd ); //@todo is conversion dlist > fvector3 available
-	props.remove( "nifti/pixdim" );
-	LOG( Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from qform";
+	transformOrTell<util::fvector3>("nifti/pixdim","voxelSize",props,warning);
+	LOG_IF(props.hasProperty("voxelSize"), Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from qform";
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
