@@ -1,3 +1,10 @@
+isis (0.7.1-1) natty; urgency=low
+
+  * fix problem when copying voxelSize from qform/pixdim
+  * consider any voxelSize of 0 as invalid in Image::reIndex
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 18 Jul 2012 13:40:12 +0200
+
 isis (0.7.0-1) natty; urgency=low
 
   * API version changed to 3.0.0
