@@ -420,7 +420,7 @@ bool Image::reIndex()
 
 	for( int i = 0; i < 3; i++ ) {
 		if( std::isinf( voxeSize[i] ) ) {
-			LOG( Runtime, warning ) << "voxelSize[" << i << "] is invalid, using 1";
+			LOG( Runtime, warning ) << "voxelSize[" << i << "]=="  << voxeSize[i] << " is invalid, using 1";
 			voxeSize[i] = 1;
 		}
 	}
