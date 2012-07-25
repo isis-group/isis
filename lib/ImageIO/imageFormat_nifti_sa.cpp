@@ -277,7 +277,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 	const size_t dims = current.getRelevantDims();
 	assert( dims <= 4 ); // more than 4 dimenstions are ... well, not expected
 
-	if( head->slice_code == 0 || head->slice_code == NIFTI_SLICE_SEQ_INC ) {
+	if( head->slice_code <= NIFTI_SLICE_SEQ_INC  || head->slice_code > NIFTI_SLICE_ALT_DEC) {
 		if( head->slice_duration == 0 ) { // and there is no slice duration, there is no use in numbering
 			return std::list<data::Chunk>( 1, current );
 		}
@@ -294,6 +294,8 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
 
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
+			default:
+				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( (int)head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
 			case 0:
 			case NIFTI_SLICE_SEQ_INC:
 
@@ -315,7 +317,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 
 				for( cnt = 1; i < ( uint32_t )head->dim[3]; i++, cnt += 2 )
 					ch.propertyValueAt( "acquisitionNumber", i ) = cnt + offset;
-			}
+				}
 			break;
 			case NIFTI_SLICE_ALT_DEC: {
 				uint32_t i = 0, cnt;
@@ -325,11 +327,8 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 
 				for( cnt = 1; i < ( uint32_t )head->dim[3]; i++, cnt += 2 )
 					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = cnt + offset;
-			}
+				}
 			break;
-			default:
-				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( head->slice_code );
-				break;
 			}
 
 			if( head->slice_duration ) {
