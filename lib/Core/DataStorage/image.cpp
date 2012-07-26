@@ -419,15 +419,8 @@ bool Image::reIndex()
 	util::fvector3 &voxeSize = propertyValue( "voxelSize" ).castTo<util::fvector3>();
 
 	for( int i = 0; i < 3; i++ ) {
-		<<< <<< < HEAD
-
 		if( voxeSize[i] == 0 || std::isinf( voxeSize[i] ) ) {
-			LOG( Runtime, warning ) << "voxelSize[" << i << "] is invalid, using 1";
-			== == == =
-
-			if( std::isinf( voxeSize[i] ) ) {
 				LOG( Runtime, warning ) << "voxelSize[" << i << "]=="  << voxeSize[i] << " is invalid, using 1";
-				>>> >>> > master
 				voxeSize[i] = 1;
 			}
 		}
