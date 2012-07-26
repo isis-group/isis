@@ -346,7 +346,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
 		if( dialect == "siemens" ) {
-			LOG( Runtime, warning ) << "Removing acquisitionTime=" << util::MSubject(object.propertyValue("acquisitionTime").toString(false)) << " from siemens DWI data as it is probably broken";
+			LOG( Runtime, warning ) << "Removing acquisitionTime=" << util::MSubject( object.propertyValue( "acquisitionTime" ).toString( false ) ) << " from siemens DWI data as it is probably broken";
 			object.remove( "acquisitionTime" );
 		}
 
