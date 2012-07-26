@@ -68,9 +68,9 @@ void Application::removeLogging( std::string name )
 	logs.erase( name );
 }
 
-void Application::addExample ( std::string parameters, std::string desc )
+void Application::addExample ( std::string params, std::string desc )
 {
-	m_examples.push_back( std::make_pair( parameters, desc ) );
+	m_examples.push_back( std::make_pair( params, desc ) );
 }
 
 bool Application::init( int argc, char **argv, bool exitOnError )

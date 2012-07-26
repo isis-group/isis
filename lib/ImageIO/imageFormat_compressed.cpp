@@ -89,7 +89,7 @@ private:
 					size = size << 8;
 				}
 
-				size |= tar_header.size[11];
+				size |= reinterpret_cast<uint8_t *>( tar_header.size )[11];
 			} else if( tar_header.size[10] != 0 ) { //normal octal
 				//get the size
 				std::stringstream buff( tar_header.size );
