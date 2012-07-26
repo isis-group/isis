@@ -277,7 +277,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 	const size_t dims = current.getRelevantDims();
 	assert( dims <= 4 ); // more than 4 dimenstions are ... well, not expected
 
-	if( head->slice_code == 0 || head->slice_code == NIFTI_SLICE_SEQ_INC ) {
+	if( head->slice_code <= NIFTI_SLICE_SEQ_INC  || head->slice_code > NIFTI_SLICE_ALT_DEC ) {
 		if( head->slice_duration == 0 ) { // and there is no slice duration, there is no use in numbering
 			return std::list<data::Chunk>( 1, current );
 		}
@@ -294,6 +294,8 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
 
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
+			default:
+				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
 			case 0:
 			case NIFTI_SLICE_SEQ_INC:
 
@@ -327,9 +329,6 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = cnt + offset;
 			}
 			break;
-			default:
-				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( head->slice_code );
-				break;
 			}
 
 			if( head->slice_duration ) {
@@ -978,10 +977,10 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	props.remove( "nifti/qoffset" );
 
 	// use pixdim[1-3] as voxelSize //////////////////////////////////////////////////////////////////////////////////
-	util::dlist vsize=props.getPropertyAs<util::dlist>("nifti/pixdim");
-	vsize.resize(3,1);
-	props.setPropertyAs("voxelSize",util::Value<util::dlist>(vsize).as<util::fvector3>());
-	LOG_IF(props.hasProperty("voxelSize"), Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from pixdim " << props.propertyValue("nifti/pixdim");
+	util::dlist vsize = props.getPropertyAs<util::dlist>( "nifti/pixdim" );
+	vsize.resize( 3, 1 );
+	props.setPropertyAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
+	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from pixdim " << props.propertyValue( "nifti/pixdim" );
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {

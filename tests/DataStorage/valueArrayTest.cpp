@@ -353,7 +353,12 @@ BOOST_AUTO_TEST_CASE( ValueArray_boolean_conversion_test )
 
 BOOST_AUTO_TEST_CASE( ValueArray_minmax_test )
 {
-	const float init[] = { -1. / 0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, static_cast<float>( sqrt( -1 ) ), 1. / 0, 0.6, 0.2};
+	const float init[] = {
+		-std::numeric_limits<float>::infinity(),
+		-1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3,
+		static_cast<float>( sqrt( -1 ) ),
+		std::numeric_limits<float>::infinity(), 0.6, 0.2
+	};
 	data::ValueArray<float> floatArray( sizeof( init ) / sizeof( float ) );
 	//without scaling
 	floatArray.copyFromMem( init, sizeof( init ) / sizeof( float ) );

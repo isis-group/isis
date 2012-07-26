@@ -134,7 +134,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 
 			if ( true == isFormatUsed ) {
 				size_t overallDigits = 0;
-				unsigned short tID = ( *props.propertyValue( prop ) ).getTypeID();
+				unsigned short tID;
 
 				switch ( tID = ( *props.propertyValue( prop ) ).getTypeID() ) {
 				case util::Value<uint8_t>::staticID:
