@@ -68,6 +68,13 @@ Image &Image::operator=( const data::Image &ref )
 	static_cast<_internal::NDimensional< 4 >&>( *this ) = static_cast<const _internal::NDimensional< 4 >&>( ref );
 	//deep copy members
 	chunkVolume = ref.chunkVolume;
+	m_Offset = ref.m_Offset;
+	m_ColumnVecInv = ref.m_ColumnVecInv;
+	m_RowVecInv = ref.m_RowVecInv;
+	m_SliceVecInv = ref.m_SliceVecInv;
+	m_RowVec = ref.m_RowVec;
+	m_ColumnVec = ref.m_ColumnVec;
+	m_SliceVec = ref.m_SliceVec;
 	clean = ref.clean;
 	set = ref.set;
 	minIndexingDim = ref.minIndexingDim;
