@@ -17,7 +17,8 @@
 */
 
 
-#include "imageFormat_Vista_sa.hpp"
+#include "vistaprotoimage.hpp"
+#include "DataStorage/io_interface.h"
 
 namespace isis
 {
@@ -35,11 +36,23 @@ template<> data::ValueArrayReference reader<bool>( data::FilePtr data, size_t of
 {
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
-
+void VistaProtoImage::swapEndian(data::ValueArrayBase& array)
+{
+	const uint_fast8_t elemsize = array.bytesPerElem();
+	boost::shared_ptr<uint8_t> raw = boost::shared_static_cast<uint8_t>( array.getRawAddress() );
+	uint8_t *ptr = raw.get();
+	size_t cnt=array.getLength();
+	
+	while( cnt--) {
+		for( uint8_t p = 0; p < elemsize / 2; p++ ) {
+			std::swap( ptr[p], ptr[elemsize - 1 - p] );
+		}
+		
+		ptr += elemsize;
+	}
 }
 
-
-ImageFormat_VistaSa::VistaProtoImage::VistaProtoImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start ), big_endian( true )
+VistaInputImage::VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start ), big_endian( true )
 {
 	vista2isis["bit"] =   _internal::reader<bool>;
 	vista2isis["ubyte"] = _internal::reader<uint8_t>;
@@ -49,7 +62,7 @@ ImageFormat_VistaSa::VistaProtoImage::VistaProtoImage( data::FilePtr fileptr, da
 	vista2isis["double"] = _internal::reader<double>;
 }
 
-bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
+bool VistaInputImage::add( util::PropertyMap props )
 {
 	util::PropertyMap &vistaTree = props.branch( "vista" );
 
@@ -60,7 +73,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 		if( vistaTree.hasProperty( "component_repn" ) )last_component = vistaTree.propertyValue( "component_repn" ) ;
 
 		if( !( m_reader = vista2isis[last_repn] ) )
-			throwGenericError( std::string( "Cannot handle repn " ) + vistaTree.getPropertyAs<std::string>( "repn" ) );
+			FileFormat::throwGenericError( std::string( "Cannot handle repn " ) + vistaTree.getPropertyAs<std::string>( "repn" ) );
 
 	} else  if(
 		last_voxelsize != props.getPropertyAs<util::fvector3>( "voxelSize" ) ||
@@ -103,7 +116,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::add( util::PropertyMap props )
 	return true;
 }
 
-bool ImageFormat_VistaSa::VistaProtoImage::isFunctional() const
+bool VistaInputImage::isFunctional() const
 {
 	//if we have only one chunk, its not functional
 	if( size() > 1 ) {
@@ -124,7 +137,7 @@ bool ImageFormat_VistaSa::VistaProtoImage::isFunctional() const
 }
 
 
-void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
+void VistaInputImage::transformFromFunctional()
 {
 
 	LOG( Debug, info ) << "Transforming " << size() << " functional slices";
@@ -170,7 +183,7 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 		}
 	} else { // we need at least an acquisitionNumber per volume
 		uint32_t a = 0;
-		LOG( Debug, info ) << "NoComputing acquisitionTime from vista/slice_time";
+		LOG( Debug, info ) << "No valid vista/slice_time found - faking acquisitionNumber";
 		BOOST_FOREACH( data::Chunk & ref, ret ) {
 			ref.setPropertyAs<uint32_t>( "acquisitionNumber", a++ );
 		}
@@ -193,7 +206,7 @@ void ImageFormat_VistaSa::VistaProtoImage::transformFunctional()
 	this->assign( ret.begin(), ret.end() );
 }
 
-void ImageFormat_VistaSa::VistaProtoImage::fakeAcqNum()
+void VistaInputImage::fakeAcqNum()
 {
 	uint32_t acqNum = 0;
 
@@ -202,22 +215,7 @@ void ImageFormat_VistaSa::VistaProtoImage::fakeAcqNum()
 
 }
 
-void ImageFormat_VistaSa::VistaProtoImage::swapEndian( data::ValueArrayBase &array )
-{
-	uint_fast8_t elemsize = array.bytesPerElem();
-	boost::shared_ptr<uint8_t> raw = boost::shared_static_cast<uint8_t>( array.getRawAddress() );
-	uint8_t *ptr = raw.get();
-
-	for( size_t i = 0; i < array.getLength(); i++ ) {
-		for( uint8_t p = 0; p < elemsize / 2; p++ ) {
-			std::swap( ptr[p], ptr[elemsize - 1 - p] );
-		}
-
-		ptr += elemsize;
-	}
-}
-
-void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence )
+void VistaInputImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence )
 {
 	while( !empty() ) {
 		out.push_back( front() );
@@ -232,8 +230,41 @@ void ImageFormat_VistaSa::VistaProtoImage::store( std::list< data::Chunk >& out,
 	}
 }
 
+VistaOutputImage::VistaOutputImage(data::Image src){
+	bool functional=false;
+	if(src.getRelevantDims()>3){
+		functional=true;
+	}
+
+	const unsigned short typeID=src.getMajorTypeID(); //all chunks of a image must have the same type in vista
+	const std::vector< data::Chunk > chunks=src.copyChunksToVector(false);
+
+	util::vector4<size_t> imgSize=src.getSizeAsVector();
+
+	data::dimensions disiredDims;
+	imageProps=src; // copy common metata from the image
+	
+	if(functional){
+		LOG(Runtime,info) << "Got functional a "  << imgSize << "-Image for writing";
+		chunksPerVistaImage=imgSize[data::timeDim];
+		disiredDims=data::sliceDim;
+		for(size_t slice=0;slice<imgSize[data::sliceDim];slice++)
+			for(size_t time=0;time<imgSize[data::timeDim];time++){
+				push_back(src.getChunk(0,0,slice,time,false)); // store the chunks in the list dim-swapped
+			}
+	} else {
+		
+		LOG(Runtime,info) << "Got normal a "  << imgSize << "-Image for writing";
+		assign(chunks.begin(),chunks.end());
+
+		chunksPerVistaImage=1;
+		disiredDims=data::timeDim;
+	}
+	for(iterator i=begin();i!=end();i++)
+		i->convertToType(typeID);//all chunks of a image must have the same type in vista
+}
 
 
-
+}
 }
 }

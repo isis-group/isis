@@ -44,6 +44,7 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		obj.setPropertyAs( "rowVec",    util::fvector3( 1, 0 ) );
 		obj.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
 		obj.setPropertyAs( "sliceVec",  util::fvector3( 0, 0, -1 ) );
+		obj.setPropertyAs( "vista/no_geometry",  true );
 		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
 
@@ -148,8 +149,8 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 
 	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
 
-		std::list<VistaProtoImage> groups;
-		groups.push_back( VistaProtoImage( mfile, data_start ) );
+		std::list<_internal::VistaInputImage> groups;
+		groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
 
 		BOOST_FOREACH( const util::PropertyMap & chMap, ch_list ) {
 			util::PropertyMap root;
@@ -157,16 +158,16 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 			sanitize( root );
 
 			if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
-				groups.push_back( VistaProtoImage( mfile, data_start ) ); // try a new one
+				groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
 				assert( groups.back().add( root ) ); //a new one should always work
 			}
 		}
 		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
 
 		uint16_t sequence = 0;
-		BOOST_FOREACH( VistaProtoImage & group, groups ) {
+		BOOST_FOREACH( _internal::VistaInputImage & group, groups ) {
 			if( group.isFunctional() )
-				group.transformFunctional();
+				group.transformFromFunctional();
 			else
 				group.fakeAcqNum(); // we have to fake the acquisitionNumber
 
@@ -179,11 +180,10 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 	}
 }
 
-
-
-void ImageFormat_VistaSa::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/  )  throw( std::runtime_error & )
+void ImageFormat_VistaSa::write( const data::Image &, const std::string &, const util::istring &, boost::shared_ptr< util::ProgressFeedback > )  throw( std::runtime_error & ){}
+void ImageFormat_VistaSa::write(const std::list< data::Image >& images, const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress)throw( std::runtime_error & )
 {
-	throwGenericError( "Not available yet" );
+	std::list<_internal::VistaOutputImage> vimages(images.begin(),images.end());
 }
 
 }
