@@ -83,10 +83,10 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
-	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, info ) ||
+	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, verbose_info ) ||
 	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
 
-	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, info ) ||
+	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, verbose_info ) ||
 	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, info );
 
 	if( hasOrTell( "vista/sex", obj, warning ) ) {
@@ -99,7 +99,27 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 
-	//@todo implement "vista/date" and "vista/time"
+	try{
+		if(hasOrTell("vista/date",obj,warning)){
+			const std::string dString=obj.getPropertyAs<std::string>("vista/date");
+			int iDay,iMonth,iYear;
+			sscanf(dString.c_str(),"%d.%d.%d",&iDay,&iMonth,&iYear);
+			boost::gregorian::date date(iYear,iMonth,iDay);
+			boost::posix_time::time_duration time;
+			
+			if(hasOrTell("vista/time",obj,warning)){
+				time = boost::posix_time::duration_from_string(obj.getPropertyAs<std::string>("vista/time"));
+				if(!time.is_not_a_date_time())
+					obj.remove("vista/time");
+			}
+			if(!date.is_not_a_date()){
+				obj.remove("vista/date");
+				obj.setPropertyAs("sequenceStart",boost::posix_time::ptime(date,time));
+			}
+		}
+	} catch(...){
+		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.propertyValue("vista/date") << "/" << obj.propertyValue("vista/time");
+	}
 
 	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
 	transformOrTell<float>( "vista/echoTime", "echoTime", obj, warning );
