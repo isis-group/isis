@@ -302,7 +302,6 @@ public:
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromList ( chunks );
 	}
 	/**
@@ -315,7 +314,6 @@ public:
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		set.addSecondarySort ( "acquisitionTime" );
 		std::list<T> tmp( chunks.begin(), chunks.end() );
 		insertChunksFromList ( tmp );
 		chunks.assign( tmp.begin(), tmp.end() );

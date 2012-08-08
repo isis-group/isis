@@ -37,7 +37,6 @@ Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
-	set.addSecondarySort( "acquisitionTime" );
 }
 
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
@@ -45,7 +44,6 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
-	set.addSecondarySort( "acquisitionTime" );
 
 	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
 		LOG( Runtime, error ) << "Failed to create image from single chunk.";
