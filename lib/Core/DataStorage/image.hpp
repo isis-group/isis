@@ -302,7 +302,6 @@ public:
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		set.addSecondarySort ( "acquisitionTime" );
 		insertChunksFromList ( chunks );
 	}
 	/**
@@ -315,7 +314,6 @@ public:
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		set.addSecondarySort ( "acquisitionTime" );
 		std::list<T> tmp( chunks.begin(), chunks.end() );
 		insertChunksFromList ( tmp );
 		chunks.assign( tmp.begin(), tmp.end() );
@@ -669,7 +667,7 @@ public:
 	template<typename T> MemChunk<T> copyAsMemChunk() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
-		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
+		copyToMem<T> ( &ret.voxel<T>(0,0), ret.getVolume() );
 		static_cast<util::PropertyMap &>( ret ) = static_cast<const util::PropertyMap &>( getChunkAt( 0 ) );
 		return ret;
 	}
@@ -683,7 +681,6 @@ public:
 	 * \returns a ValueArray containing the voxeldata of the Image (but not its Properties)
 	 */
 	template<typename T> ValueArray<T> copyAsValueArray() const {
-		const util::vector4<size_t> size = getSizeAsVector();
 		data::ValueArray<T> ret ( getVolume() );
 		copyToMem<T> ( ret.begin().operator->(), ret.getLength() );
 		return ret;

@@ -277,7 +277,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 	const size_t dims = current.getRelevantDims();
 	assert( dims <= 4 ); // more than 4 dimenstions are ... well, not expected
 
-	if( head->slice_code == 0 || head->slice_code == NIFTI_SLICE_SEQ_INC ) {
+	if( head->slice_code <= NIFTI_SLICE_SEQ_INC  || head->slice_code > NIFTI_SLICE_ALT_DEC ) {
 		if( head->slice_duration == 0 ) { // and there is no slice duration, there is no use in numbering
 			return std::list<data::Chunk>( 1, current );
 		}
@@ -294,6 +294,8 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
 
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
+			default:
+				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
 			case 0:
 			case NIFTI_SLICE_SEQ_INC:
 
@@ -327,9 +329,6 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal:
 					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = cnt + offset;
 			}
 			break;
-			default:
-				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( head->slice_code );
-				break;
 			}
 
 			if( head->slice_duration ) {
@@ -491,7 +490,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
 		props.setPropertyAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
-		// voxel size
+		// copy pixdim
 		util::dlist v_size( dims );
 		std::copy( head->pixdim + 1, head->pixdim + dims + 1, v_size.begin() ); //@todo implement size_fac
 		props.setPropertyAs( "nifti/pixdim", v_size );
@@ -516,14 +515,14 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 	props.propertyValue( "indexOrigin" ).castTo<util::fvector3>() *= size_fac;
 
 	// Tr
-	if( head->pixdim[dims] != 0 ) // if pixdim is given for the uppermost dim, assume its repetitionTime
-		props.setPropertyAs<uint16_t>( "repetitionTime", head->pixdim[dims]*time_fac );
+	if( head->pixdim[4] != 0 ) // if pixdim is given for the 4th dim, assume its repetitionTime
+		props.setPropertyAs<uint16_t>( "repetitionTime", head->pixdim[4]*time_fac );
 
 	// sequenceDescription
 	if( !parseDescripForSPM( props, head->descrip ) ) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
 		props.setPropertyAs<std::string>( "sequenceDescription", head->descrip ); // use it the usual way
 
-	// TODO: at the moment scaling not supported due to data type changes
+	// TODO: at the moment scaling is not supported due to data type changes
 	if ( !head->scl_slope == 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
 		//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
@@ -538,15 +537,6 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 	if( head->cal_max != 0 || head->cal_min != 0 ) { // maybe someone needs that, we dont ...
 		props.setPropertyAs( "nifti/cal_max", head->cal_max );
 		props.setPropertyAs( "nifti/cal_min", head->cal_min );
-	}
-
-	util::fvector3 &vsize = props.propertyValue( "voxelSize" ).castTo<util::fvector3>();
-
-	for( short i = 0; i < std::min<short>( head->dim[0], 3 ); i++ ) {
-		if( vsize[i] == 0 ) {
-			LOG( Runtime, warning ) << "The voxelSize[" << i << "] is 0. Assuming \"1\"";
-			vsize[i] = 1;
-		}
 	}
 
 	return parseSliceOrdering( head, props );
@@ -662,11 +652,20 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		header->slice_duration = 0;
 	}
 
-	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
-	util::vector4<size_t> size;
-	size.fill( 1 );
+	//set up the size - copy dim[0] values from dim[1]..dim[5]
+	util::vector4<size_t> size;uint8_t tDims=0;
+	for(uint_fast8_t i=1;i<5;i++){
+		if(header->dim[i]<=0){
+			LOG(Runtime,warning) << "Resetting invalid dim[" << i <<"] to 1";
+			header->dim[i]=1;
+		} 
+		if(header->dim[i]>1)
+			tDims=i;
+	}
+	LOG_IF(tDims!=header->dim[0],Runtime,warning) << "dim[0]==" << header->dim[0] << " doesn't fit the image, assuming " << (int)tDims;
+	header->dim[0]=tDims;
 
-	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
+	size.copyFrom( header->dim + 1, header->dim + 1 + 4 );
 	data::ValueArrayReference data_src;
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
@@ -986,13 +985,11 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	LOG( Debug, info ) << "Computed indexOrigin=" << props.propertyValue( "indexOrigin" ) << " from qform";
 	props.remove( "nifti/qoffset" );
 
-	// voxelSize //////////////////////////////////////////////////////////////////////////////////
-	const util::dlist::iterator pixdimStart = props.propertyValue( "nifti/pixdim" ).castTo<util::dlist>().begin();
-	util::dlist::iterator pixdimEnd = pixdimStart;
-	std::advance( pixdimEnd, 3 );
-	props.setPropertyAs( "voxelSize", util::fvector3() ).castTo<util::fvector3>().copyFrom( pixdimStart, pixdimEnd ); //@todo is conversion dlist > fvector3 available
-	props.remove( "nifti/pixdim" );
-	LOG( Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from qform";
+	// use pixdim[1-3] as voxelSize //////////////////////////////////////////////////////////////////////////////////
+	util::dlist vsize = props.getPropertyAs<util::dlist>( "nifti/pixdim" );
+	vsize.resize( 3, 1 );
+	props.setPropertyAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
+	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from pixdim " << props.propertyValue( "nifti/pixdim" );
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {

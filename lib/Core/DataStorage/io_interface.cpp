@@ -93,13 +93,10 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
 	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
-		size_t at = ifilename.rfind( suffix );
-
-		if( at != ifilename.npos ) {
-			if( at && ifilename[at - 1] == '.' )
-				at--;
-
-			return std::make_pair( filename.substr( 0, at ), filename.substr( at ) );
+		util::istring check=ifilename.substr(ifilename.length()-suffix.length(),suffix.length());
+		
+		if(filename[filename.length()-suffix.length()-1]=='.' && check == suffix ) {
+			return std::make_pair( filename.substr( 0, filename.length()-suffix.length()-1 ), filename.substr( filename.length()-suffix.length()-1 ) );
 		}
 	}
 	return std::make_pair( filename, std::string() );
@@ -134,7 +131,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 
 			if ( true == isFormatUsed ) {
 				size_t overallDigits = 0;
-				unsigned short tID = ( *props.propertyValue( prop ) ).getTypeID();
+				unsigned short tID;
 
 				switch ( tID = ( *props.propertyValue( prop ) ).getTypeID() ) {
 				case util::Value<uint8_t>::staticID:
