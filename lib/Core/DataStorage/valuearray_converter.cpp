@@ -51,7 +51,7 @@ size_t getConvertSize( const ValueArrayBase &src, const ValueArrayBase &dst )
 {
 
 	LOG_IF( src.getLength() > dst.getLength(), Runtime, error ) << "The " << src.getLength() << " elements of src wont fit into the destination. Will only convert " << dst.getLength() << " elements.";
-	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
+	LOG_IF( src.getLength() < dst.getLength(), Debug, info ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
 	return std::min( src.getLength(), dst.getLength() );
 }
 static bool checkScale( const scaling_pair &scaling )
