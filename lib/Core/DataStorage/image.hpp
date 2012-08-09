@@ -669,7 +669,7 @@ public:
 	template<typename T> MemChunk<T> copyAsMemChunk() const {
 		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
-		copyToMem<T> ( ret.begin().operator->(), ret.getVolume() );
+		copyToMem<T> ( &ret.voxel<T>(0,0), ret.getVolume() );
 		static_cast<util::PropertyMap &>( ret ) = static_cast<const util::PropertyMap &>( getChunkAt( 0 ) );
 		return ret;
 	}
