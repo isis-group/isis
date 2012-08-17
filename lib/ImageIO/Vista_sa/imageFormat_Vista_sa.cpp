@@ -18,15 +18,15 @@
 
 #include "imageFormat_Vista_sa.hpp"
 #include "VistaSaParser.hpp"
-#include <time.h>
-#include "boost/date_time/posix_time/posix_time.hpp"
-
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <fstream>
 
 namespace isis
 {
 
 namespace image_io
 {
+const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vista_date_facet());
 
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
@@ -83,6 +83,13 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
+	if ( obj.hasProperty( "vista/age" ) ) {
+		obj.setPropertyAs( "subjectAge",obj.getPropertyAs<uint16_t>("vista/age")*365.2425 );
+		obj.remove( "vista/age" );
+	}
+
+	transformOrTell<uint16_t>( "vista/age", "subjectAge", obj, warning );
+
 	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, verbose_info ) ||
 	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
 
@@ -101,12 +108,12 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	try{
 		if(hasOrTell("vista/date",obj,warning)){
-			const std::string dString=obj.getPropertyAs<std::string>("vista/date");
-			int iDay,iMonth,iYear;
-			sscanf(dString.c_str(),"%d.%d.%d",&iDay,&iMonth,&iYear);
-			boost::gregorian::date date(iYear,iMonth,iDay);
+			boost::gregorian::date date;
 			boost::posix_time::time_duration time;
-			
+
+			std::stringstream ss(obj.getPropertyAs<std::string>("vista/date"));
+			ss.imbue(vista_locale);ss >> date;
+
 			if(hasOrTell("vista/time",obj,warning)){
 				time = boost::posix_time::duration_from_string(obj.getPropertyAs<std::string>("vista/time"));
 				if(!time.is_not_a_date_time())
@@ -116,36 +123,62 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 				obj.remove("vista/date");
 				obj.setPropertyAs("sequenceStart",boost::posix_time::ptime(date,time));
 			}
+			LOG(Debug,info) << "Parsed sequenceStart from date/time pair as " << obj.propertyValue("sequenceStart");
 		}
+		
 	} catch(...){
 		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.propertyValue("vista/date") << "/" << obj.propertyValue("vista/time");
 	}
 
 	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
 	transformOrTell<float>( "vista/echoTime", "echoTime", obj, warning );
+}
 
-	tm buff;
-	util::istring date_string;
-	memset( &buff, 0, sizeof( tm ) );
+void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
+{
+	
+	static const char *renamePairs[][2]={
+		{"sequenceDescription","protocol"},
+		{"voxelSize","lattice"},
+		{"subjectName","patient"},
+		{"subjectGender","sex"},
+		{"transmitCoil","CoilID"},
+		{"caPos","ca"},
+		{"cpPos","cp"},
+		{"repetitionTime","repetition_time"}
+	};
 
-	if( hasOrTell( "vista/date", obj, info ) ) {
-		strptime( obj.getPropertyAs<std::string>( "vista/date" ).c_str(), "%d.%m.%Y", &buff );
-		date_string = "vista/date";
+	//store sequenceStart
+	if(obj.hasProperty("sequenceStart")){
+		const boost::posix_time::ptime stamp=obj.getPropertyAs<boost::posix_time::ptime>("sequenceStart");
+		setPropFormated("date",stamp.date(),obj);
+		setPropFormated("time",stamp.time_of_day(),obj);
+		obj.remove("sequenceStart");
 	}
 
-	if( hasOrTell( "vista/time", obj, info ) ) {
-		strptime( obj.getPropertyAs<std::string>( "vista/time" ).c_str(), "%T", &buff );
-		date_string = "vista/time";
-		obj.remove( "vista/time" );
-		obj.setPropertyAs( "sequenceStart", boost::posix_time::ptime_from_tm( buff ) );
+	//store birth
+	if(obj.hasProperty("subjectBirth")){
+		setPropFormated("birth",obj.getPropertyAs<boost::gregorian::date>("subjectBirth"),obj);
+		obj.remove("subjectBirth");
 	}
 
-	if( !date_string.empty() )try {
-			obj.setPropertyAs( "sequenceStart", boost::posix_time::ptime_from_tm( buff ) );
-			obj.remove( "vista/date" );
-		} catch( std::out_of_range &e ) {
-			LOG( Runtime, warning ) << "Failed to parse " << std::make_pair( date_string, obj.propertyValue( date_string ) ) << " " << e.what();
-		}
+	if ( obj.hasProperty( "subjectAge" ) ) {
+		// age in days
+		uint16_t age = obj.getPropertyAs<uint16_t>( "subjectAge" );
+		age = ( ( age / 365.2425 ) - floor( age / 365.2425 ) ) < 0.5 ?
+			  floor( age / 365.2425 ) : ceil( age / 365.2425 );
+		obj.setPropertyAs("age", age );
+		obj.remove( "subjectAge" );
+	}
+
+	// "voxel" should be the voxelSize voxelGap
+	obj.setPropertyAs<util::fvector3>("voxel",obj.getPropertyAs<util::fvector3>("voxelSize")+obj.getPropertyAs<util::fvector3>("voxelGap"));
+	
+	// rename some props
+	BOOST_FOREACH(const char** ref,renamePairs) 
+		if(obj.hasProperty(ref[0]))
+			obj.rename(ref[0],ref[1]);
+
 }
 
 
@@ -204,6 +237,25 @@ void ImageFormat_VistaSa::write( const data::Image &, const std::string &, const
 void ImageFormat_VistaSa::write(const std::list< data::Image >& images, const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress)throw( std::runtime_error & )
 {
 	std::list<_internal::VistaOutputImage> vimages(images.begin(),images.end());
+	std::ofstream out(filename.c_str(),std::ios_base::out|std::ios_base::trunc|std::ios_base::binary);
+	out.exceptions( std::ios::badbit );
+
+	out << "V-data 2 {" << std::endl;
+
+	size_t offset=0;
+	util::slist history;
+	BOOST_FOREACH(_internal::VistaOutputImage &ref,vimages)
+		ref.extractHistory(history);
+	if(!history.empty())
+		util::listToOStream(history.begin(),history.end(),out,"\n\t","history: {\n\t","\n}\n");
+		
+	BOOST_FOREACH(_internal::VistaOutputImage &ref,vimages)
+		ref.storeHeaders(out,offset);
+		
+	out << "}" << std::endl << (char)0xC << std::endl;
+	
+	BOOST_FOREACH(_internal::VistaOutputImage &ref,vimages)
+		ref.storeVImages(out);
 }
 
 }
@@ -212,5 +264,6 @@ void ImageFormat_VistaSa::write(const std::list< data::Image >& images, const st
 
 isis::image_io::FileFormat *factory()
 {
+	isis::util::DefaultMsgPrint::stopBelow(isis::warning);
 	return new isis::image_io::ImageFormat_VistaSa();
 }

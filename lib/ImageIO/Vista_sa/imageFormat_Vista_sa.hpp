@@ -19,7 +19,7 @@
 #define IMAGEFORMAT_VISTA_SA_HPP
 
 #include <DataStorage/io_interface.h>
-#include "DataStorage/fileptr.hpp"
+#include <DataStorage/fileptr.hpp>
 
 #include "VistaSaParser.hpp"
 #include "vistaprotoimage.hpp"
@@ -33,7 +33,17 @@ namespace image_io
 class ImageFormat_VistaSa: public FileFormat
 {
 private:
-
+	static const std::locale vista_locale;
+	class vista_date_facet : public std::time_get< std::stringstream::char_type >{
+        virtual dateorder do_date_order() const{return std::time_base::dmy;}
+	};
+	template<typename STORED> static util::PropertyValue& setPropFormated(util::PropertyMap::PropPath name,const STORED &prop, util::PropertyMap &obj){
+		std::stringstream ss;
+		ss.imbue(vista_locale);
+		ss << prop;
+		return obj.setPropertyAs(name,ss.str());
+	}
+	
 public:
 	std::string getName()const {return "Vista standalone";}
 	int load ( std::list< data::Chunk >& chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > ) throw ( std::runtime_error & );
@@ -43,6 +53,7 @@ public:
 	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "";}
 	static void sanitize( util::PropertyMap &obj );
+	static void unsanitize( util::PropertyMap &obj );
 
 
 protected:

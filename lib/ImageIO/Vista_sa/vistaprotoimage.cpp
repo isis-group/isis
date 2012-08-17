@@ -18,7 +18,9 @@
 
 
 #include "vistaprotoimage.hpp"
-#include "DataStorage/io_interface.h"
+#include "imageFormat_Vista_sa.hpp"
+#include <DataStorage/io_interface.h>
+#include <fstream>
 
 namespace isis
 {
@@ -27,6 +29,7 @@ namespace image_io
 
 namespace _internal
 {
+	
 template<typename T> data::ValueArrayReference reader( data::FilePtr data, size_t offset, size_t size )
 {
 	return data.atByID( data::ValueArray<T>::staticID, offset, size );
@@ -51,6 +54,7 @@ void VistaProtoImage::swapEndian(data::ValueArrayBase& array)
 		ptr += elemsize;
 	}
 }
+
 
 VistaInputImage::VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start ), big_endian( true )
 {
@@ -86,6 +90,12 @@ bool VistaInputImage::add( util::PropertyMap props )
 	const size_t ch_offset = vistaTree.getPropertyAs<uint64_t>( "data" );
 
 	util::vector4<size_t> ch_size( vistaTree.getPropertyAs<uint32_t>( "ncolumns" ), vistaTree.getPropertyAs<uint32_t>( "nrows" ), vistaTree.getPropertyAs<uint32_t>( "nbands" ), 1 );
+	if(vistaTree.propertyValue( "nbands" ) == vistaTree.propertyValue( "nframes" ))
+		vistaTree.remove("nframes");
+	else
+		LOG(Runtime,warning) 
+		<< "Don't know what to do with nframes="<< vistaTree.propertyValue( "nframes" ) 
+		<< " that differs from nbands=" << vistaTree.propertyValue( "nbands" );
 
 	data::ValueArrayReference ch_data = m_reader( m_fileptr, std::distance( m_fileptr.begin(), m_data_start ) + ch_offset, ch_size.product() );
 
@@ -99,6 +109,12 @@ bool VistaInputImage::add( util::PropertyMap props )
 	vistaTree.remove( "data" );
 
 	vistaTree.remove( "repn" );
+	
+	if(vistaTree.hasProperty( "length" )){
+		LOG_IF(vistaTree.getPropertyAs<uint64_t>("length") != (ch_data->getLength()*ch_data->bytesPerElem()),Runtime,warning)
+			<< "Length given in the header (" << util::MSubject( vistaTree.propertyValue("length")) <<") does not fit the images size " << util::MSubject(ch_size);
+		vistaTree.remove( "length" );
+	}
 
 
 	if( last_component  == std::string( "rgb" ) ) { // if its color replace original data by an ValueArray<util::color<uint8_t> > (endianess swapping is done there as well)
@@ -161,7 +177,7 @@ void VistaInputImage::transformFromFunctional()
 	//then splice up into volumes again
 	dst.remove( "vista/slice_time" );
 	dst.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-	list< data::Chunk > ret = dst.autoSplice();
+	list< data::Chunk > ret = dst.autoSplice(1);
 	util::PropertyMap::DiffMap differences = front().getDifference( back() ); // figure out which properties differ between the timesteps
 	differences.erase( "acquisitionNumber" ); // this will be set later
 
@@ -232,36 +248,176 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 
 VistaOutputImage::VistaOutputImage(data::Image src){
 	bool functional=false;
+	
+	isis2vista[(unsigned short)data::ValueArray<bool>::staticID]="bit";
+	isis2vista[(unsigned short)data::ValueArray<uint8_t>::staticID]="ubyte";
+	isis2vista[(unsigned short)data::ValueArray<int16_t>::staticID]="short";
+	isis2vista[(unsigned short)data::ValueArray<int32_t>::staticID]="long";
+	isis2vista[(unsigned short)data::ValueArray<float>::staticID]="float";
+	isis2vista[(unsigned short)data::ValueArray<double>::staticID]="double";
+	
+	isis2size[(unsigned short)data::ValueArray<uint8_t>::staticID]=sizeof(uint8_t);
+	isis2size[(unsigned short)data::ValueArray<int16_t>::staticID]=sizeof(int16_t);
+	isis2size[(unsigned short)data::ValueArray<int32_t>::staticID]=sizeof(int32_t);
+	isis2size[(unsigned short)data::ValueArray<float>::staticID]=  sizeof(float);
+	isis2size[(unsigned short)data::ValueArray<double>::staticID]= sizeof(double);
+
+
 	if(src.getRelevantDims()>3){
 		functional=true;
 	}
 
-	const unsigned short typeID=src.getMajorTypeID(); //all chunks of a image must have the same type in vista
-	const std::vector< data::Chunk > chunks=src.copyChunksToVector(false);
+	storeTypeID=src.getMajorTypeID(); //all chunks of a image must have the same type in vista
+	switch(storeTypeID){
+		case data::ValueArray<bool>::staticID:storeTypeID=data::ValueArray<uint8_t>::staticID;//ok .. somehow
+		case data::ValueArray<uint8_t>::staticID:break;//ok
+		case data::ValueArray<int8_t>::staticID: typeFallback<int8_t,int16_t>(storeTypeID);//fall back to short
+		case data::ValueArray<int16_t>::staticID:break; //ok
+		case data::ValueArray<uint16_t>::staticID:typeFallback<uint16_t,int32_t>(storeTypeID); //fall back to int
+		case data::ValueArray<int32_t>::staticID:break; //ok
+		case data::ValueArray<float>::staticID:break; //ok
+		case data::ValueArray<double>::staticID:break; //ok
+		case data::ValueArray<util::color48>::staticID:typeFallback<util::color48,util::color24>(storeTypeID);
+		case data::ValueArray<util::color24>::staticID:break; //ok
+		default:
+			ImageFormat_VistaSa::throwGenericError(src.getMajorTypeName()+ " is not supported in vista");
+	}
 
 	util::vector4<size_t> imgSize=src.getSizeAsVector();
 
 	data::dimensions disiredDims;
 	imageProps=src; // copy common metata from the image
+	const util::PropertyMap::PropPath indexOrigin("indexOrigin");
 	
 	if(functional){
-		LOG(Runtime,info) << "Got functional a "  << imgSize << "-Image for writing";
+		LOG(Runtime,info) << "Got a functional "  << imgSize << "-Image for writing";
+		const util::PropertyMap::PropPath acquisitionNumber("acquisitionNumber"),acquisitionTime("acquisitionTime");
 		chunksPerVistaImage=imgSize[data::timeDim];
 		disiredDims=data::sliceDim;
+		src.spliceDownTo(data::sliceDim);// @todo this will do an unneeded reIndex
 		for(size_t slice=0;slice<imgSize[data::sliceDim];slice++)
 			for(size_t time=0;time<imgSize[data::timeDim];time++){
 				push_back(src.getChunk(0,0,slice,time,false)); // store the chunks in the list dim-swapped
+				back().remove(acquisitionNumber);
+				back().remove(acquisitionTime);
 			}
+		imageProps.remove(indexOrigin); // we use the positions of the chunks in this case
 	} else {
-		
-		LOG(Runtime,info) << "Got normal a "  << imgSize << "-Image for writing";
+		LOG(Runtime,info) << "Got a normal "  << imgSize << "-Image for writing";
+		const std::vector< data::Chunk > chunks=src.copyChunksToVector(false);
 		assign(chunks.begin(),chunks.end());
+		BOOST_FOREACH(data::Chunk &ref,static_cast<std::list<data::Chunk>&>(*this)){
+			ref.remove(indexOrigin);
+		}
 
 		chunksPerVistaImage=1;
 		disiredDims=data::timeDim;
 	}
-	for(iterator i=begin();i!=end();i++)
-		i->convertToType(typeID);//all chunks of a image must have the same type in vista
+}
+
+void VistaOutputImage::storeVImages(std::ofstream& out)
+{
+	while(!empty()){
+		data::Chunk &ch=front();
+		if(!ch.convertToType(storeTypeID)){
+			LOG(Runtime,error) << "Failed to store "  << ch.getTypeName() << "-Chunk as " << isis2vista[storeTypeID];
+		}
+		storeVImage(front().asValueArrayBase(),out);
+		pop_front();
+	}
+}
+bool VistaOutputImage::storeVImage(const isis::data::ValueArrayBase& ref, std::ofstream& out)
+{
+	const size_t size = ref.bytesPerElem()*ref.getLength();
+	boost::shared_ptr<const char> raw = boost::shared_static_cast<const char>( ref.getRawAddress() );
+	out.write(raw.get(),size);
+}
+void VistaOutputImage::storeHeaders(std::ofstream& out,size_t &offset)
+{
+	ImageFormat_VistaSa::unsanitize(imageProps);
+	for(std::list<data::Chunk>::const_iterator c=begin();c!=end();){
+		util::PropertyMap store;
+		util::vector4<size_t> size=c->getSizeAsVector();
+		size[c->getRelevantDims()]=chunksPerVistaImage;
+		for(size_t i=0;i<chunksPerVistaImage;i++,c++){
+			const util::PropertyMap::KeyList rejected=store.join(*c);
+			LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to merge chunk properties into VImage because there are already some with the same name: " << rejected;
+		}
+		storeHeader(store,size,offset,out);
+		offset+=size.product()*isis2size[storeTypeID];
+	}
+}
+void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vector4<size_t> size, size_t data_offset, std::ofstream& out)
+{
+	util::PropertyMap store(imageProps);
+	util::PropertyMap::KeyList rejected=store.join(ch);
+	LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to store chunk properties because there are already some from the image with the same name: " << rejected;
+
+	//store offset and length of the data
+	store.setPropertyAs("data",data_offset);
+	store.setPropertyAs("length",size.product()*isis2size[storeTypeID]);
+	store.setPropertyAs("repn",isis2vista[storeTypeID]);
+
+	// store chunks size
+	store.setPropertyAs<uint64_t>("ncolumns",size[data::rowDim]);
+	store.setPropertyAs<uint64_t>("nrows",   size[data::columnDim]);
+	store.setPropertyAs<uint64_t>("nframes", size[data::sliceDim]);
+	store.setPropertyAs<uint64_t>("nbands",  size[data::sliceDim]);
+	
+	// those names are swapped in vista
+	std::swap(store.propertyValue("rowVec"),store.propertyValue("columnVec"));
+	
+	if(store.hasBranch("vista")){
+		util::PropertyMap vista;vista.branch("vista")=store.branch("vista"); //workaround for #66
+		store.remove(vista);
+		util::PropertyMap::KeyList rejected= store.join(vista.branch("vista"));
+		LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to store properties from the vista branch because there are already some with the same name: " << rejected;
+	}
+
+	writeMetadata(out,store,"image: image");
+}
+
+void VistaOutputImage::extractHistory(util::slist& ref)
+{
+	static const util::PropertyMap::PropPath history("vista/history");
+	
+	if(imageProps.hasProperty(history)){
+		const util::slist hist=imageProps.getPropertyAs<util::slist>(history);
+		if(ref.empty() || ref==hist)imageProps.remove(history);
+		if(ref.empty())ref=hist;
+		LOG_IF(ref!=hist,Runtime,warning)<< "Not extracting history conflicting history " << util::MSubject(hist);
+	}
+}
+
+void VistaOutputImage::writeMetadata(std::ofstream& out, const isis::util::PropertyMap& data, const std::string& title, size_t indent)
+{
+	std::string indenter(indent,'\t');
+	out << indenter << title << " {" << std::endl ;
+	BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ref,data.getFlatMap()){
+		out << indenter  << "\t" << ref.first << ": ";
+		util::slist list;
+		switch(ref.second.getTypeID()){
+			case util::Value<std::string>::staticID: // string need to be in ""
+				out << "\"" << ref.second.castTo<std::string>() << "\"";
+				break;
+			case util::Value<util::fvector3>::staticID: //value lists and vectors need to be in "" and space separated
+			case util::Value<util::fvector4>::staticID:
+			case util::Value<util::dvector3>::staticID: 
+			case util::Value<util::dvector4>::staticID:
+			case util::Value<util::ivector4>::staticID:
+			case util::Value<util::ilist>::staticID:
+			case util::Value<util::dlist>::staticID:
+			case util::Value<util::slist>::staticID:
+				list=ref.second.as<util::slist>();
+				util::listToOStream(list.begin(),list.end(),out," ","\"","\"");
+				break;
+			default:
+				out << ref.second.as<std::string>();
+				break;
+		}
+		out << std::endl;
+	}
+	out << indenter << "}" << std::endl;
 }
 
 

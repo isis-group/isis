@@ -83,7 +83,7 @@ template<typename Iterator> void addHist(
 
 	if( hist.is<isis::util::slist>() ) {
 		BOOST_FOREACH( const s_entry & ref, a )
-		hist.castTo<isis::util::slist>().push_back( ref.m0 + ":" + ref.m1 );
+		hist.castTo<isis::util::slist>().push_back( ref.m0 + ":\t\"" + ref.m1 + "\"");
 	}
 }
 

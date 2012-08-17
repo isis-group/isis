@@ -20,8 +20,8 @@
 #define VISTAPROTOIMAGE_HPP
 
 #include <list>
-#include "DataStorage/chunk.hpp"
-#include "DataStorage/fileptr.hpp"
+#include <DataStorage/chunk.hpp>
+#include <DataStorage/fileptr.hpp>
 
 namespace isis{namespace image_io{namespace _internal{
 
@@ -77,8 +77,23 @@ public:
 class VistaOutputImage:public VistaProtoImage{
 	size_t chunksPerVistaImage;
 	util::PropertyMap imageProps;
+	void writeMetadata(std::ofstream& out, const isis::util::PropertyMap& data, const std::string& title, size_t indent=0);
+	std::map<unsigned short,std::string> isis2vista;
+	std::map<unsigned short,uint8_t> isis2size;
+	unsigned short storeTypeID;
+	template<typename FIRST,typename SECOND> static void typeFallback(unsigned short typeID){
+		LOG(Runtime,notice) 
+			<< util::MSubject(data::ValueArray<FIRST>::staticName()) << " is not supported in vista falling back to " 
+			<< util::MSubject(data::ValueArray<SECOND>::staticName());
+		typeID=data::ValueArray<SECOND>::staticID;
+	}
 public:
 	VistaOutputImage(data::Image src);
+	void storeVImages(std::ofstream &out);
+	void extractHistory(util::slist &ref);
+	void storeHeaders(std::ofstream& out, size_t& offset);
+	   bool storeVImage( const isis::data::ValueArrayBase& ref, std::ofstream& out );
+	void storeHeader( const isis::util::PropertyMap& ch, const isis::util::vector4< size_t > size, size_t data_offset, std::ofstream& out );
 };
 
 	
