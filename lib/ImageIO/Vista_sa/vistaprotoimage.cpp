@@ -249,38 +249,15 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 VistaOutputImage::VistaOutputImage(data::Image src){
 	bool functional=false;
 	
-	isis2vista[(unsigned short)data::ValueArray<bool>::staticID]="bit";
-	isis2vista[(unsigned short)data::ValueArray<uint8_t>::staticID]="ubyte";
-	isis2vista[(unsigned short)data::ValueArray<int16_t>::staticID]="short";
-	isis2vista[(unsigned short)data::ValueArray<int32_t>::staticID]="long";
-	isis2vista[(unsigned short)data::ValueArray<float>::staticID]="float";
-	isis2vista[(unsigned short)data::ValueArray<double>::staticID]="double";
+	typeInfo::insert<bool>(isis2vista,"bit",1);
+	typeInfo::insert<uint8_t>(isis2vista,"ubyte",2);
+	typeInfo::insert<int16_t>(isis2vista,"short",3);
+	typeInfo::insert<int32_t>(isis2vista,"long",4);
+	typeInfo::insert<float>(isis2vista,"long",5);
+	typeInfo::insert<double>(isis2vista,"long",6);
 	
-	isis2size[(unsigned short)data::ValueArray<uint8_t>::staticID]=sizeof(uint8_t);
-	isis2size[(unsigned short)data::ValueArray<int16_t>::staticID]=sizeof(int16_t);
-	isis2size[(unsigned short)data::ValueArray<int32_t>::staticID]=sizeof(int32_t);
-	isis2size[(unsigned short)data::ValueArray<float>::staticID]=  sizeof(float);
-	isis2size[(unsigned short)data::ValueArray<double>::staticID]= sizeof(double);
-
-
 	if(src.getRelevantDims()>3){
 		functional=true;
-	}
-
-	storeTypeID=src.getMajorTypeID(); //all chunks of a image must have the same type in vista
-	switch(storeTypeID){
-		case data::ValueArray<bool>::staticID:storeTypeID=data::ValueArray<uint8_t>::staticID;//ok .. somehow
-		case data::ValueArray<uint8_t>::staticID:break;//ok
-		case data::ValueArray<int8_t>::staticID: typeFallback<int8_t,int16_t>(storeTypeID);//fall back to short
-		case data::ValueArray<int16_t>::staticID:break; //ok
-		case data::ValueArray<uint16_t>::staticID:typeFallback<uint16_t,int32_t>(storeTypeID); //fall back to int
-		case data::ValueArray<int32_t>::staticID:break; //ok
-		case data::ValueArray<float>::staticID:break; //ok
-		case data::ValueArray<double>::staticID:break; //ok
-		case data::ValueArray<util::color48>::staticID:typeFallback<util::color48,util::color24>(storeTypeID);
-		case data::ValueArray<util::color24>::staticID:break; //ok
-		default:
-			ImageFormat_VistaSa::throwGenericError(src.getMajorTypeName()+ " is not supported in vista");
 	}
 
 	util::vector4<size_t> imgSize=src.getSizeAsVector();
@@ -313,6 +290,40 @@ VistaOutputImage::VistaOutputImage(data::Image src){
 		chunksPerVistaImage=1;
 		disiredDims=data::timeDim;
 	}
+	
+	
+	storeTypeID=0;
+	for(const_iterator c=begin();c!=end();c++){
+		unsigned short myID=c->getTypeID();
+		switch(myID){ // some types need fallbacks @todo messages should not be repeating
+			case data::ValueArray<int8_t>::staticID: typeFallback<int8_t,int16_t>(myID);//fall back to short
+			case data::ValueArray<uint16_t>::staticID:typeFallback<uint16_t,int32_t>(myID); //fall back to int
+			case data::ValueArray<util::color48>::staticID:typeFallback<util::color48,util::color24>(myID);
+		}
+
+		const std::map< unsigned short, typeInfo >::const_iterator me = isis2vista.find(myID);
+		if(me!=isis2vista.end()){//if myID is a supported type
+			if(storeTypeID==0){
+				storeTypeID=myID;
+				continue;
+			}
+			if(storeTypeID!=myID){ // if we already have a type but its not the same, check if we can switch
+				const typeInfo &myInfo=isis2vista[myID],&storeInfo=isis2vista[storeTypeID];
+				if(myInfo.isInt != storeInfo.isInt || myInfo.isFloat != storeInfo.isFloat ){
+					LOG(Runtime,error) << "Cannot store image of incompatible data types " << util::MSubject(myInfo.vistaName) << " and " << util::MSubject(storeInfo.vistaName);
+					ImageFormat_VistaSa::throwGenericError("incompatible types");
+				}
+				if(myInfo.priority>storeInfo.priority)
+					storeTypeID=myID;
+			}
+				
+		} else {
+			LOG(Runtime,error) << "Chunk data type " << util::MSubject(c->getTypeName()) << " is not supported, aborting ..";
+			ImageFormat_VistaSa::throwGenericError("unsupported type");
+		}
+	}
+	assert(storeTypeID);
+
 }
 
 void VistaOutputImage::storeVImages(std::ofstream& out)
@@ -320,13 +331,13 @@ void VistaOutputImage::storeVImages(std::ofstream& out)
 	while(!empty()){
 		data::Chunk &ch=front();
 		if(!ch.convertToType(storeTypeID)){
-			LOG(Runtime,error) << "Failed to store "  << ch.getTypeName() << "-Chunk as " << isis2vista[storeTypeID];
+			LOG(Runtime,error) << "Failed to store "  << ch.getTypeName() << "-Chunk as " << isis2vista[storeTypeID].vistaName;
 		}
 		storeVImage(front().asValueArrayBase(),out);
 		pop_front();
 	}
 }
-bool VistaOutputImage::storeVImage(const isis::data::ValueArrayBase& ref, std::ofstream& out)
+void VistaOutputImage::storeVImage(const isis::data::ValueArrayBase& ref, std::ofstream& out)
 {
 	const size_t size = ref.bytesPerElem()*ref.getLength();
 	boost::shared_ptr<const char> raw = boost::shared_static_cast<const char>( ref.getRawAddress() );
@@ -344,7 +355,7 @@ void VistaOutputImage::storeHeaders(std::ofstream& out,size_t &offset)
 			LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to merge chunk properties into VImage because there are already some with the same name: " << rejected;
 		}
 		storeHeader(store,size,offset,out);
-		offset+=size.product()*isis2size[storeTypeID];
+		offset+=size.product()*isis2vista[storeTypeID].elemSize;
 	}
 }
 void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vector4<size_t> size, size_t data_offset, std::ofstream& out)
@@ -355,8 +366,8 @@ void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vect
 
 	//store offset and length of the data
 	store.setPropertyAs("data",data_offset);
-	store.setPropertyAs("length",size.product()*isis2size[storeTypeID]);
-	store.setPropertyAs("repn",isis2vista[storeTypeID]);
+	store.setPropertyAs("length",size.product()*isis2vista[storeTypeID].elemSize);
+	store.setPropertyAs("repn",isis2vista[storeTypeID].vistaName);
 
 	// store chunks size
 	store.setPropertyAs<uint64_t>("ncolumns",size[data::rowDim]);

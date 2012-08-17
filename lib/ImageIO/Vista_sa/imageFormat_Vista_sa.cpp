@@ -264,6 +264,6 @@ void ImageFormat_VistaSa::write(const std::list< data::Image >& images, const st
 
 isis::image_io::FileFormat *factory()
 {
-	isis::util::DefaultMsgPrint::stopBelow(isis::warning);
+// 	isis::util::DefaultMsgPrint::stopBelow(isis::warning);
 	return new isis::image_io::ImageFormat_VistaSa();
 }

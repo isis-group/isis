@@ -22,6 +22,9 @@
 #include <list>
 #include <DataStorage/chunk.hpp>
 #include <DataStorage/fileptr.hpp>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/type_traits/is_integral.hpp>
+
 
 namespace isis{namespace image_io{namespace _internal{
 
@@ -75,11 +78,20 @@ public:
 	void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence );
 };
 class VistaOutputImage:public VistaProtoImage{
+	struct typeInfo{
+		uint8_t elemSize;
+		std::string vistaName;
+		int8_t priority;
+		bool isInt,isFloat;
+		template<typename T> static void insert(std::map<unsigned short,typeInfo> &map,std::string name,uint8_t prio){
+			const typeInfo tI={sizeof(T),name,prio,boost::is_integral<T>::value,boost::is_float<T>::value};
+			map.insert(std::make_pair(data::ValueArray<T>::staticID,tI));
+		}
+	};
 	size_t chunksPerVistaImage;
 	util::PropertyMap imageProps;
 	void writeMetadata(std::ofstream& out, const isis::util::PropertyMap& data, const std::string& title, size_t indent=0);
-	std::map<unsigned short,std::string> isis2vista;
-	std::map<unsigned short,uint8_t> isis2size;
+	std::map<unsigned short,typeInfo> isis2vista;
 	unsigned short storeTypeID;
 	template<typename FIRST,typename SECOND> static void typeFallback(unsigned short typeID){
 		LOG(Runtime,notice) 
@@ -92,7 +104,7 @@ public:
 	void storeVImages(std::ofstream &out);
 	void extractHistory(util::slist &ref);
 	void storeHeaders(std::ofstream& out, size_t& offset);
-	   bool storeVImage( const isis::data::ValueArrayBase& ref, std::ofstream& out );
+	void storeVImage( const isis::data::ValueArrayBase& ref, std::ofstream& out );
 	void storeHeader( const isis::util::PropertyMap& ch, const isis::util::vector4< size_t > size, size_t data_offset, std::ofstream& out );
 };
 
