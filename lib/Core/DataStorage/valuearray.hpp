@@ -27,6 +27,7 @@
 #include "../CoreUtils/value.hpp"
 #include "common.hpp"
 #include <boost/type_traits/remove_const.hpp>
+#include "endianess.hpp"
 
 namespace isis
 {
@@ -368,6 +369,9 @@ public:
 			assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
 			return ValueArrayBase::getScalingTo( typeID, minmax, scaleopt );
 		}
+	}
+    void endianSwap(){
+		data::endianSwapArray(begin(),end(),begin());
 	}
 };
 /// @cond _internal
