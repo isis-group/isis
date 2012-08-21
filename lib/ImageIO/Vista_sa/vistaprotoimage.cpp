@@ -39,25 +39,10 @@ template<> data::ValueArrayReference reader<bool>( data::FilePtr data, size_t of
 {
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
-void VistaProtoImage::swapEndian(data::ValueArrayBase& array)
-{
-	const uint_fast8_t elemsize = array.bytesPerElem();
-	boost::shared_ptr<uint8_t> raw = boost::shared_static_cast<uint8_t>( array.getRawAddress() );
-	uint8_t *ptr = raw.get();
-	size_t cnt=array.getLength();
-	
-	while( cnt--) {
-		for( uint8_t p = 0; p < elemsize / 2; p++ ) {
-			std::swap( ptr[p], ptr[elemsize - 1 - p] );
-		}
-		
-		ptr += elemsize;
-	}
-}
 
-
-VistaInputImage::VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start ), big_endian( true )
+VistaInputImage::VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start )
 {
+	big_endian=true;
 	vista2isis["bit"] =   _internal::reader<bool>;
 	vista2isis["ubyte"] = _internal::reader<uint8_t>;
 	vista2isis["short"] = _internal::reader<int16_t>;
@@ -242,12 +227,13 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 			out.back().setPropertyAs( "sequenceNumber", sequence );
 
 		if( big_endian )
-			swapEndian( out.back().asValueArrayBase() ); //if endianess wasn't swapped till now, do it now
+			out.back().asValueArrayBase().endianSwap(); //if endianess wasn't swapped till now, do it now
 	}
 }
 
 VistaOutputImage::VistaOutputImage(data::Image src){
 	bool functional=false;
+	big_endian = false;
 	
 	typeInfo::insert<bool>(isis2vista,"bit",1);
 	typeInfo::insert<uint8_t>(isis2vista,"ubyte",2);
@@ -333,7 +319,11 @@ void VistaOutputImage::storeVImages(std::ofstream& out)
 		if(!ch.convertToType(storeTypeID)){
 			LOG(Runtime,error) << "Failed to store "  << ch.getTypeName() << "-Chunk as " << isis2vista[storeTypeID].vistaName;
 		}
-		storeVImage(front().asValueArrayBase(),out);
+
+		if(!big_endian)
+			ch.asValueArrayBase().endianSwap();
+		
+		storeVImage(ch.asValueArrayBase(),out);
 		pop_front();
 	}
 }

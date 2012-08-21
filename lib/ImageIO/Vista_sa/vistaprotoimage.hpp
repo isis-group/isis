@@ -29,8 +29,8 @@
 namespace isis{namespace image_io{namespace _internal{
 
 class VistaProtoImage: protected std::list<data::Chunk>{
-public:
-	void swapEndian( data::ValueArrayBase &array );
+protected:
+	bool big_endian;
 };
 
 class VistaInputImage: public VistaProtoImage{
@@ -43,7 +43,6 @@ class VistaInputImage: public VistaProtoImage{
 	util::fvector3 last_voxelsize;
 	util::istring last_repn;
 	util::PropertyValue last_component;
-	bool big_endian;
 	
 	std::map<util::istring, readerPtr> vista2isis;
 	
