@@ -332,7 +332,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is " << set.getHorizontalSize() << ")";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (geometric size is " << set.getHorizontalSize() << ")";
 		return false;
 	}
 
@@ -991,24 +991,24 @@ bool Image::reIndex()
 
 	size_t Image::foreachChunk( ChunkOp & op, bool copyMetaData ) {
 		size_t err = 0;
-		checkMakeClean();
-		util::vector4<size_t> imgSize = getSizeAsVector();
-		util::vector4<size_t> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
-		util::vector4<size_t> pos;
+		if(checkMakeClean()){
+			util::vector4<size_t> imgSize = getSizeAsVector();
+			util::vector4<size_t> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
+			util::vector4<size_t> pos;
 
-		for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
-			for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {
-				for( pos[columnDim] = 0; pos[columnDim] < imgSize[columnDim]; pos[columnDim] += chunkSize[columnDim] ) {
-					for( pos[rowDim] = 0; pos[rowDim] < imgSize[rowDim]; pos[rowDim] += chunkSize[rowDim] ) {
-						Chunk ch = getChunk( pos[rowDim], pos[columnDim], pos[sliceDim], pos[timeDim], copyMetaData );
+			for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
+				for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {
+					for( pos[columnDim] = 0; pos[columnDim] < imgSize[columnDim]; pos[columnDim] += chunkSize[columnDim] ) {
+						for( pos[rowDim] = 0; pos[rowDim] < imgSize[rowDim]; pos[rowDim] += chunkSize[rowDim] ) {
+							Chunk ch = getChunk( pos[rowDim], pos[columnDim], pos[sliceDim], pos[timeDim], copyMetaData );
 
-						if( op( ch, pos ) == false )
-							err++;
+							if( op( ch, pos ) == false )
+								err++;
+						}
 					}
 				}
 			}
 		}
-
 		return err;
 	}
 
