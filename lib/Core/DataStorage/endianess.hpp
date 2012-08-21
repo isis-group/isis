@@ -4,6 +4,7 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
+#include <bits/byteswap.h>
 
 namespace isis
 {
@@ -26,10 +27,23 @@ template<uint_fast8_t SIZE> struct SwapImpl {
 		return ret;
 	}
 };
+
 // specialisation (swapping 1 byte might be a bit useless)
 template<> struct SwapImpl<1> {
 	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return src;}
 };
+
+//specializations for 16 32 and 64 bit
+template<> struct SwapImpl<2> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_16(src);}
+};
+template<> struct SwapImpl<4> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_32(src);}
+};
+template<> struct SwapImpl<8> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_64(src);}
+};
+
 
 
 // gatekeeper for SwapImpl (do not allow swapping of types we do not know about)
