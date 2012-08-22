@@ -77,7 +77,13 @@ bool VistaInputImage::add( util::PropertyMap props )
 	util::vector4<size_t> ch_size( vistaTree.getPropertyAs<uint32_t>( "ncolumns" ), vistaTree.getPropertyAs<uint32_t>( "nrows" ), vistaTree.getPropertyAs<uint32_t>( "nbands" ), 1 );
 	if(vistaTree.propertyValue( "nbands" ) == vistaTree.propertyValue( "nframes" ))
 		vistaTree.remove("nframes");
-	else
+	else if(
+		vistaTree.hasProperty( "ncomponents" ) && 
+		vistaTree.getPropertyAs<uint64_t>( "nbands" ) / vistaTree.getPropertyAs<uint64_t>( "ncomponents" ) == vistaTree.getPropertyAs<uint64_t>( "nframes" )
+	) {
+		vistaTree.remove("nframes");
+		vistaTree.remove( "ncomponents" );
+	} else
 		LOG(Runtime,warning) 
 		<< "Don't know what to do with nframes="<< vistaTree.propertyValue( "nframes" ) 
 		<< " that differs from nbands=" << vistaTree.propertyValue( "nbands" );
