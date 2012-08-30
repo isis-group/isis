@@ -161,6 +161,37 @@ template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptim
 			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
+template<> boost::numeric::range_check_result str2scalar<boost::gregorian::date>( const std::string &str, boost::gregorian::date &dst )
+{
+	dst=boost::gregorian::date(boost::gregorian::not_a_date_time);
+
+	// first try ISO format
+	try{dst=boost::gregorian::date_from_iso_string(str);} catch(boost::bad_lexical_cast &e){
+		LOG(Debug,verbose_info) << "Failed to parse " << util::MSubject(str) << " as iso date: " << e.what();
+	}
+	if(!dst.is_not_a_date())return boost::numeric::cInRange;
+
+	// second try some default formats
+	typedef boost::gregorian::date(*date_parser)(const std::string);
+	const date_parser parsers[] = {boost::gregorian::from_simple_string,boost::gregorian::from_uk_string,boost::gregorian::from_us_string};
+	
+	BOOST_FOREACH(date_parser parser,parsers){
+		try{dst=parser(str);} catch(std::out_of_range &e){
+			LOG(Debug,verbose_info) << "Failed to parse " << util::MSubject(str) << " as date: " << e.what();
+		}
+		if(!dst.is_not_a_date())return boost::numeric::cInRange;
+	}
+
+	// last try try - stream io
+	std::stringstream ss(str);ss >> dst;
+	if(dst.is_not_a_date())
+	{
+		LOG(Debug,verbose_info) << "Failed to parse " << util::MSubject(str) << " using stream io";
+	} else 
+		return boost::numeric::cInRange;
+	
+	return boost::numeric::cPosOverflow;
+}
 // this as well (interpret everything like true/false yes/no y/n)
 template<> boost::numeric::range_check_result str2scalar<bool>( const std::string &src, bool &dst )
 {
