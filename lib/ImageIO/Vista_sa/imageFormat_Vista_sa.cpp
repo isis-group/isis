@@ -108,21 +108,22 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	try{
 		if(hasOrTell("vista/date",obj,warning)){
-			boost::gregorian::date date;
+			boost::gregorian::date date=obj.getPropertyAs<boost::gregorian::date>("vista/date");
 			boost::posix_time::time_duration time;
 
-			std::stringstream ss(obj.getPropertyAs<std::string>("vista/date"));
-			ss.imbue(vista_locale);ss >> date;
-
-			if(hasOrTell("vista/time",obj,warning)){
-				time = boost::posix_time::duration_from_string(obj.getPropertyAs<std::string>("vista/time"));
-				if(!time.is_not_a_date_time())
-					obj.remove("vista/time");
-			}
-			if(!date.is_not_a_date()){
+			if(date.is_not_a_date()){
+				LOG(Runtime,warning) << "Failed to parse date " << util::MSubject( obj.propertyValue("vista/date"));
+			} else {
 				obj.remove("vista/date");
+
+				if(hasOrTell("vista/time",obj,warning)){
+					time = boost::posix_time::duration_from_string(obj.getPropertyAs<std::string>("vista/time"));
+					if(!time.is_not_a_date_time())
+						obj.remove("vista/time");
+				}
 				obj.setPropertyAs("sequenceStart",boost::posix_time::ptime(date,time));
 			}
+			 
 			LOG(Debug,info) << "Parsed sequenceStart from date/time pair as " << obj.propertyValue("sequenceStart");
 		}
 		
