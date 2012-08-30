@@ -28,10 +28,35 @@
 
 namespace isis{namespace image_io{namespace _internal{
 
-class VistaProtoImage: protected std::list<data::Chunk>{
+class WriterSpec{
 protected:
-	bool big_endian;
+	bool m_isInt,m_isFloat;
+	WriterSpec(std::string repn,std::string name, uint8_t prio, bool isInt, bool isFloat, uint8_t sizeFact, uint16_t storeTypeID);
+	uint16_t m_storeTypeID;
+public:
+	uint8_t m_sizeFact,m_priority;
+	std::string m_vistaRepnName,m_vistaImageName;
+	bool isCompatible(const WriterSpec &other)const{
+		return (m_isInt != other.m_isInt || m_isFloat != other.m_isFloat );
+	}
+	virtual uint16_t storeVImageImpl(std::list< isis::data::Chunk >& chunks, std::ofstream& out, data::scaling_pair scaling );
+	virtual void modHeaderImpl(isis::util::PropertyMap& props, const isis::util::vector4< size_t > &size);
+	virtual ~WriterSpec(){};
 };
+template<typename T> class typeSpecImpl:public WriterSpec{
+public:
+	typeSpecImpl(std::string repn,uint8_t prio):
+		WriterSpec(repn,"image",prio,boost::is_integral<T>::value,boost::is_float<T>::value,sizeof(T),data::ValueArray<T>::staticID){}
+};
+template<> class typeSpecImpl<util::color24>:public WriterSpec{
+public:
+	typeSpecImpl(std::string repn,uint8_t prio):
+		WriterSpec(repn,"3DVectorfield",prio,false,false,3,data::ValueArray<util::color24>::staticID){}
+	uint16_t storeVImageImpl(std::list< isis::data::Chunk >& chunks, std::ofstream& out, data::scaling_pair scaling );
+	void modHeaderImpl(isis::util::PropertyMap& props, const isis::util::vector4< size_t > &size);
+};
+
+class VistaProtoImage: protected std::list<data::Chunk>{};
 
 class VistaInputImage: public VistaProtoImage{
 	typedef data::ValueArrayReference ( *readerPtr )( data::FilePtr data, size_t offset, size_t size );
@@ -45,6 +70,7 @@ class VistaInputImage: public VistaProtoImage{
 	util::PropertyValue last_component;
 	
 	std::map<util::istring, readerPtr> vista2isis;
+	bool big_endian;
 	
 	template<typename T> data::ValueArray<util::color<T> > toColor( const data::ValueArrayReference ref, size_t slice_size ) {
 		assert( ref->getLength() % 3 == 0 );
@@ -77,21 +103,16 @@ public:
 	void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence );
 };
 class VistaOutputImage:public VistaProtoImage{
-	struct typeInfo{
-		uint8_t elemSize;
-		std::string vistaName;
-		int8_t priority;
-		bool isInt,isFloat;
-		template<typename T> static void insert(std::map<unsigned short,typeInfo> &map,std::string name,uint8_t prio){
-			const typeInfo tI={sizeof(T),name,prio,boost::is_integral<T>::value,boost::is_float<T>::value};
-			map.insert(std::make_pair(data::ValueArray<T>::staticID,tI));
-		}
-	};
+	template<typename T> void insertSpec(std::map<unsigned short,boost::shared_ptr<WriterSpec> > &map,std::string name,uint8_t prio){
+		map[(uint16_t)data::ValueArray<T>::staticID].reset(new typeSpecImpl<T>(name,prio));
+	}
 	size_t chunksPerVistaImage;
 	util::PropertyMap imageProps;
 	void writeMetadata(std::ofstream& out, const isis::util::PropertyMap& data, const std::string& title, size_t indent=0);
-	std::map<unsigned short,typeInfo> isis2vista;
+	std::map<unsigned short,boost::shared_ptr<WriterSpec> > isis2vista;
 	unsigned short storeTypeID;
+	data::scaling_pair scaling;
+    std::_Rb_tree_iterator< std::pair< const int, boost::shared_ptr< WriterSpec > > > me;
 	template<typename FIRST,typename SECOND> static void typeFallback(unsigned short typeID){
 		LOG(Runtime,notice) 
 			<< util::MSubject(data::ValueArray<FIRST>::staticName()) << " is not supported in vista falling back to " 
@@ -103,7 +124,6 @@ public:
 	void storeVImages(std::ofstream &out);
 	void extractHistory(util::slist &ref);
 	void storeHeaders(std::ofstream& out, size_t& offset);
-	void storeVImage( const isis::data::ValueArrayBase& ref, std::ofstream& out );
 	void storeHeader( const isis::util::PropertyMap& ch, const isis::util::vector4< size_t > size, size_t data_offset, std::ofstream& out );
 };
 

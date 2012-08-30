@@ -237,16 +237,73 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// writing
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//general writer spec
+WriterSpec::WriterSpec(std::string repn, std::string name, uint8_t prio, bool isInt, bool isFloat, uint8_t sizeFact, uint16_t storeTypeID):
+	m_isInt(isInt),m_isFloat(isFloat),m_storeTypeID(storeTypeID),m_sizeFact(sizeFact),m_priority(prio),m_vistaRepnName(repn),m_vistaImageName(name){}
+void WriterSpec::modHeaderImpl(isis::util::PropertyMap& props, const isis::util::vector4<size_t>& size)
+{
+	props.setPropertyAs("length",size.product()*m_sizeFact);
+	props.setPropertyAs("repn",m_vistaRepnName);
+
+	// store chunks size
+	props.setPropertyAs<uint64_t>("ncolumns",size[data::rowDim]);
+	props.setPropertyAs<uint64_t>("nrows",   size[data::columnDim]);
+	props.setPropertyAs<uint64_t>("nframes", size[data::sliceDim]);
+	props.setPropertyAs<uint64_t>("nbands",  size[data::sliceDim]);
+
+}
+uint16_t WriterSpec::storeVImageImpl(std::list< isis::data::Chunk >& chunks, std::ofstream& out, isis::data::scaling_pair scaling)
+{
+	while(!chunks.empty()){
+		data::ValueArrayReference ref = chunks.front().asValueArrayBase().convertByID( m_storeTypeID, scaling );
+		if(ref.isEmpty()) // if conversion failed
+			return chunks.front().getTypeID(); // abort writing and return the failed type
+		
+		ref->endianSwap();
+		const size_t size = m_sizeFact*ref->getLength();
+		boost::shared_ptr<const char> raw = boost::shared_static_cast<const char>( ref->getRawAddress() );
+		out.write(raw.get(),size);
+		chunks.pop_front(); //remove written chunk - we wont need it anymore
+	}
+	return 0;
+}
+// special writer spec for color images
+void typeSpecImpl< util::color24 >::modHeaderImpl(util::PropertyMap& props, const util::vector4<size_t>& size)
+{
+	WriterSpec::modHeaderImpl(props, size);
+	props.setPropertyAs<uint64_t>("nbands",  size[data::sliceDim]*3); //nbands is nframes*3 in color images
+}
+uint16_t typeSpecImpl< util::color24 >::storeVImageImpl(std::list< isis::data::Chunk >& chunks, std::ofstream& out, isis::data::scaling_pair scaling )
+{
+	
+	BOOST_FOREACH(data::Chunk &ref,chunks){ //first make shure all are util::color24 (they might be color48)
+		if(!ref.convertToType( data::ValueArray<util::color24>::staticID, scaling )) // if conversion failed
+			return ref.getTypeID(); // abort writing and return the failed type
+	}
+	
+	BOOST_FOREACH(data::Chunk &ch,chunks)BOOST_FOREACH(util::color24 &col,ch.asValueArray<util::color24>())out.put(col.r);//write red from each voxel from each chunk
+	BOOST_FOREACH(data::Chunk &ch,chunks)BOOST_FOREACH(util::color24 &col,ch.asValueArray<util::color24>())out.put(col.g);//same for green
+	BOOST_FOREACH(data::Chunk &ch,chunks)BOOST_FOREACH(util::color24 &col,ch.asValueArray<util::color24>())out.put(col.b);//same for blue
+	return 0;
+}
+
+
 VistaOutputImage::VistaOutputImage(data::Image src){
 	bool functional=false;
-	big_endian = false;
 	
-	typeInfo::insert<bool>(isis2vista,"bit",1);
-	typeInfo::insert<uint8_t>(isis2vista,"ubyte",2);
-	typeInfo::insert<int16_t>(isis2vista,"short",3);
-	typeInfo::insert<int32_t>(isis2vista,"long",4);
-	typeInfo::insert<float>(isis2vista,"long",5);
-	typeInfo::insert<double>(isis2vista,"long",6);
+	insertSpec<bool>(isis2vista,"bit",1);
+	insertSpec<uint8_t>(isis2vista,"ubyte",2);
+	insertSpec<int16_t>(isis2vista,"short",3);
+	insertSpec<int32_t>(isis2vista,"long",4);
+	
+	insertSpec<float>(isis2vista,"float",10);
+	insertSpec<double>(isis2vista,"double",11);
+	
+	insertSpec<util::color24>(isis2vista,"ubyte",20);
 	
 	if(src.getRelevantDims()>3){
 		functional=true;
@@ -276,7 +333,7 @@ VistaOutputImage::VistaOutputImage(data::Image src){
 		const std::vector< data::Chunk > chunks=src.copyChunksToVector(false);
 		assign(chunks.begin(),chunks.end());
 		BOOST_FOREACH(data::Chunk &ref,static_cast<std::list<data::Chunk>&>(*this)){
-			ref.remove(indexOrigin);
+			if(ref.hasProperty(indexOrigin)) ref.remove(indexOrigin);
 		}
 
 		chunksPerVistaImage=1;
@@ -293,19 +350,19 @@ VistaOutputImage::VistaOutputImage(data::Image src){
 			case data::ValueArray<util::color48>::staticID:typeFallback<util::color48,util::color24>(myID);
 		}
 
-		const std::map< unsigned short, typeInfo >::const_iterator me = isis2vista.find(myID);
+		std::map<unsigned short,boost::shared_ptr<WriterSpec> >::const_iterator me = isis2vista.find(myID);
 		if(me!=isis2vista.end()){//if myID is a supported type
 			if(storeTypeID==0){
 				storeTypeID=myID;
 				continue;
 			}
 			if(storeTypeID!=myID){ // if we already have a type but its not the same, check if we can switch
-				const typeInfo &myInfo=isis2vista[myID],&storeInfo=isis2vista[storeTypeID];
-				if(myInfo.isInt != storeInfo.isInt || myInfo.isFloat != storeInfo.isFloat ){
-					LOG(Runtime,error) << "Cannot store image of incompatible data types " << util::MSubject(myInfo.vistaName) << " and " << util::MSubject(storeInfo.vistaName);
+				const WriterSpec &mySpec=*isis2vista[myID],&storeSpec=*isis2vista[storeTypeID];
+				if(mySpec.isCompatible(storeSpec)){
+					LOG(Runtime,error) << "Cannot store image of incompatible data types " << util::MSubject(mySpec.m_vistaRepnName) << " and " << util::MSubject(storeSpec.m_vistaRepnName);
 					ImageFormat_VistaSa::throwGenericError("incompatible types");
 				}
-				if(myInfo.priority>storeInfo.priority)
+				if(mySpec.m_priority>storeSpec.m_priority)
 					storeTypeID=myID;
 			}
 				
@@ -314,30 +371,19 @@ VistaOutputImage::VistaOutputImage(data::Image src){
 			ImageFormat_VistaSa::throwGenericError("unsupported type");
 		}
 	}
+	scaling = src.getScalingTo(storeTypeID); //@todo we only need this if we do a type conversion
 	assert(storeTypeID);
 
 }
 
 void VistaOutputImage::storeVImages(std::ofstream& out)
 {
-	while(!empty()){
-		data::Chunk &ch=front();
-		if(!ch.convertToType(storeTypeID)){
-			LOG(Runtime,error) << "Failed to store "  << ch.getTypeName() << "-Chunk as " << isis2vista[storeTypeID].vistaName;
-		}
-
-		if(!big_endian)
-			ch.asValueArrayBase().endianSwap();
-		
-		storeVImage(ch.asValueArrayBase(),out);
-		pop_front();
+	const uint16_t fail=isis2vista[storeTypeID]->storeVImageImpl(*this,out,scaling);
+	
+	if(fail){
+		LOG(Runtime,error) << "Failed to store "  << util::getTypeMap(false,true)[fail] << "-Chunk as " << isis2vista[storeTypeID]->m_vistaRepnName;
+		clear();//clear this proto image
 	}
-}
-void VistaOutputImage::storeVImage(const isis::data::ValueArrayBase& ref, std::ofstream& out)
-{
-	const size_t size = ref.bytesPerElem()*ref.getLength();
-	boost::shared_ptr<const char> raw = boost::shared_static_cast<const char>( ref.getRawAddress() );
-	out.write(raw.get(),size);
 }
 void VistaOutputImage::storeHeaders(std::ofstream& out,size_t &offset)
 {
@@ -351,7 +397,7 @@ void VistaOutputImage::storeHeaders(std::ofstream& out,size_t &offset)
 			LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to merge chunk properties into VImage because there are already some with the same name: " << rejected;
 		}
 		storeHeader(store,size,offset,out);
-		offset+=size.product()*isis2vista[storeTypeID].elemSize;
+		offset+=size.product()*isis2vista[storeTypeID]->m_sizeFact;
 	}
 }
 void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vector4<size_t> size, size_t data_offset, std::ofstream& out)
@@ -362,14 +408,7 @@ void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vect
 
 	//store offset and length of the data
 	store.setPropertyAs("data",data_offset);
-	store.setPropertyAs("length",size.product()*isis2vista[storeTypeID].elemSize);
-	store.setPropertyAs("repn",isis2vista[storeTypeID].vistaName);
-
-	// store chunks size
-	store.setPropertyAs<uint64_t>("ncolumns",size[data::rowDim]);
-	store.setPropertyAs<uint64_t>("nrows",   size[data::columnDim]);
-	store.setPropertyAs<uint64_t>("nframes", size[data::sliceDim]);
-	store.setPropertyAs<uint64_t>("nbands",  size[data::sliceDim]);
+	isis2vista[storeTypeID]->modHeaderImpl(store,size); // type specific properties
 	
 	// those names are swapped in vista
 	std::swap(store.propertyValue("rowVec"),store.propertyValue("columnVec"));
@@ -381,7 +420,7 @@ void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vect
 		LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to store properties from the vista branch because there are already some with the same name: " << rejected;
 	}
 
-	writeMetadata(out,store,"image: image");
+	writeMetadata(out,store,isis2vista[storeTypeID]->m_vistaImageName+": image");
 }
 
 void VistaOutputImage::extractHistory(util::slist& ref)
