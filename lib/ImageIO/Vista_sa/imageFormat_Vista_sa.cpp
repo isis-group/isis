@@ -31,21 +31,23 @@ const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vist
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
+		LOG(Debug,info) << "Directly using vista/rowVec and vista/columnVec";
 		obj.transform<util::fvector3>( "vista/columnVec", "rowVec" );
 		obj.transform<util::fvector3>( "vista/rowVec", "columnVec" );
 		transformOrTell<util::fvector3>( "vista/sliceVec", "sliceVec", obj, warning );
 	} else if( obj.hasProperty( "vista/imageOrientationPatient" ) ) {
+		LOG(Debug,info) << "using vista/imageOrientationPatient " << obj.propertyValue("vista/imageOrientationPatient");
 		const util::dlist vecs = obj.getPropertyAs<util::dlist>( "vista/imageOrientationPatient" ); // if we have the dicom style partial orientation
 		util::dlist::const_iterator begin = vecs.begin(), middle = vecs.begin(), end = vecs.end();
 		std::advance( middle, 3 );
 		obj.setPropertyAs( "rowVec",    util::fvector3() ).castTo<util::fvector3>().copyFrom( begin, middle );
 		obj.setPropertyAs( "columnVec", util::fvector3() ).castTo<util::fvector3>().copyFrom( middle, end );
 	} else { // if we dont have an orientation
+		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 		obj.setPropertyAs( "rowVec",    util::fvector3( 1, 0 ) );
 		obj.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
 		obj.setPropertyAs( "sliceVec",  util::fvector3( 0, 0, -1 ) );
 		obj.setPropertyAs( "vista/no_geometry",  true );
-		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
 	}
 
 	if(
@@ -183,7 +185,7 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 }
 
 
-int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/  ) throw( std::runtime_error & )
+int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback ) throw( std::runtime_error & )
 {
 	data::FilePtr mfile ( filename );
 
@@ -205,7 +207,7 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 
 		std::list<_internal::VistaInputImage> groups;
 		groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
-
+		
 		BOOST_FOREACH( const util::PropertyMap & chMap, ch_list ) {
 			util::PropertyMap root;
 			root.branch( "vista" ) = chMap;
@@ -217,15 +219,18 @@ int ImageFormat_VistaSa::load( std::list<data::Chunk> &chunks, const std::string
 			}
 		}
 		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
-
+		
 		uint16_t sequence = 0;
+		if(feedback && ch_list.size()>10)
+			feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
+
 		BOOST_FOREACH( _internal::VistaInputImage & group, groups ) {
 			if( group.isFunctional() )
 				group.transformFromFunctional();
 			else
 				group.fakeAcqNum(); // we have to fake the acquisitionNumber
 
-			group.store( chunks, root_map, sequence++ ); //put the chunk group into the output
+			group.store( chunks, root_map, sequence++,feedback ); //put the chunk group into the output
 		}
 		return chunks.size() - old_size;
 	} else {

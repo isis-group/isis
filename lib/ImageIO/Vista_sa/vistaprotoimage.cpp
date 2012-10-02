@@ -222,7 +222,7 @@ void VistaInputImage::fakeAcqNum()
 
 }
 
-void VistaInputImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence )
+void VistaInputImage::store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence, const boost::shared_ptr<util::ProgressFeedback> &feedback )
 {
 	while( !empty() ) {
 		out.push_back( front() );
@@ -234,6 +234,8 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 
 		if( big_endian )
 			out.back().asValueArrayBase().endianSwap(); //if endianess wasn't swapped till now, do it now
+		if(feedback) 
+			++(*feedback);
 	}
 }
 

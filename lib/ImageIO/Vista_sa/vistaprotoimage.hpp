@@ -22,6 +22,7 @@
 #include <list>
 #include <DataStorage/chunk.hpp>
 #include <DataStorage/fileptr.hpp>
+#include <CoreUtils/progressfeedback.hpp>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
 
@@ -100,7 +101,7 @@ public:
 	void fakeAcqNum();
 	
 	/// store the protoimage's' chunks into the output list, do byteswap if necessary
-	void store( std::list< data::Chunk >& out, const util::PropertyMap &root_map, uint16_t sequence );
+	void store( std::list< data::Chunk >& out, const util::PropertyMap& root_map, uint16_t sequence, const boost::shared_ptr< util::ProgressFeedback > &feedback );
 };
 class VistaOutputImage:public VistaProtoImage{
 	template<typename T> void insertSpec(std::map<unsigned short,boost::shared_ptr<WriterSpec> > &map,std::string name,uint8_t prio){
