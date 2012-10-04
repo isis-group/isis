@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -66,13 +66,15 @@ Inheritance diagram for isis::util::ProgressFeedback:</div>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#a4df847f33b92b3f03ae3ffd4e2e28382">close</a> ()=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Close/undisplay a progress display.  <a href="#a4df847f33b92b3f03ae3ffd4e2e28382"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#a313c8680fdb3c9fb7394496c5c3b9c77">extend</a> (size_t by)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">extend the progress bars maximum by the given value  <a href="#a313c8680fdb3c9fb7394496c5c3b9c77"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#abd064a62a2a77777b3a00f93e2139599">getMax</a> ()=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">ProgressFeedback</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#ae8ebb9c7558e5fe080c5cbb7ffcb2e47">operator++</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment the "progress" by one.  <a href="#ae8ebb9c7558e5fe080c5cbb7ffcb2e47"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#aab1205f54ef716680ea8cb3b44308a98">progress</a> (const std::string message=&quot;&quot;, size_t step=1)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the actual "progress".  <a href="#aab1205f54ef716680ea8cb3b44308a98"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#a71233226989398c2f7f643c521029add">show</a> (size_t max, std::string header=&quot;&quot;)=0</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">(Re)Set the progress display to the given maximum value and "show" it.  <a href="#a71233226989398c2f7f643c521029add"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the progress display to the given maximum value and "show" it.  <a href="#a71233226989398c2f7f643c521029add"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1ProgressFeedback.html#a998e0b80c50c5551d8d868fd30db42d4">~ProgressFeedback</a> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
@@ -115,6 +117,27 @@ Public Member Functions</h2></td></tr>
 <p>Close/undisplay a progress display. </p>
 
 <p>Implemented in <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html#a0f221242fb53e12c0fd798023bc415cf">isis::util::ConsoleFeedback</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a313c8680fdb3c9fb7394496c5c3b9c77"></a><!-- doxytag: member="isis::util::ProgressFeedback::extend" ref="a313c8680fdb3c9fb7394496c5c3b9c77" args="(size_t by)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t isis::util::ProgressFeedback::extend </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>by</em></td><td>)</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>extend the progress bars maximum by the given value </p>
+
+<p>Implemented in <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html#a85b776e31b3ba84146547fd3bfdb251a">isis::util::ConsoleFeedback</a>.</p>
 
 </div>
 </div>
@@ -222,19 +245,19 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>(Re)Set the progress display to the given maximum value and "show" it. </p>
-<p>This will also reset the progress to 0. </p>
+<p>Set the progress display to the given maximum value and "show" it. </p>
+<p>This will also extend already displayed progress bars. </p>
 
 <p>Implemented in <a class="el" href="classisis_1_1util_1_1ConsoleFeedback.html#af4b59b5f83b557301e92e5362b18b917">isis::util::ConsoleFeedback</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="progressfeedback_8hpp_source.html">progressfeedback.hpp</a></li>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="progressfeedback_8cpp_source.html">progressfeedback.cpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="progressfeedback_8hpp_source.html">progressfeedback.hpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="progressfeedback_8cpp_source.html">progressfeedback.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:15 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

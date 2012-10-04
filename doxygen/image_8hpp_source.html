@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/DataStorage/image.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/DataStorage/image.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/DataStorage/image.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/DataStorage/image.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="image_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -229,73 +229,73 @@
 <a name="l00205"></a><a class="code" href="classisis_1_1data_1_1Image.html#a21407a9c75b9ea3f50e52664d4f7a19e">00205</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html" title="Generic iterator for voxels in Images.">_internal::ImageIteratorTemplate&lt;const Chunk&gt;</a> <a class="code" href="classisis_1_1data_1_1Image.html#a21407a9c75b9ea3f50e52664d4f7a19e">const_iterator</a>;
 <a name="l00206"></a><a class="code" href="classisis_1_1data_1_1Image.html#a4cb25846b5e8e6539e710416b81d4e61">00206</a>     <span class="keyword">typedef</span> iterator::reference <a class="code" href="classisis_1_1data_1_1Image.html#a4cb25846b5e8e6539e710416b81d4e61">reference</a>;
 <a name="l00207"></a><a class="code" href="classisis_1_1data_1_1Image.html#aaaebaaac8caa5b11a0d81c6a286c55e4">00207</a>     <span class="keyword">typedef</span> const_iterator::reference <a class="code" href="classisis_1_1data_1_1Image.html#aaaebaaac8caa5b11a0d81c6a286c55e4">const_reference</a>;
-<a name="l00208"></a>00208 <span class="keyword">protected</span>:
-<a name="l00209"></a><a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">00209</a>     _internal::SortedChunkList <span class="keyword">set</span>;
-<a name="l00210"></a><a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">00210</a>     std::vector&lt;boost::shared_ptr&lt;Chunk&gt; &gt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>;
-<a name="l00211"></a>00211 <span class="keyword">private</span>:
-<a name="l00212"></a>00212     <span class="keywordtype">size_t</span> chunkVolume;
-<a name="l00213"></a>00213 
-<a name="l00214"></a>00214     <span class="keywordtype">void</span> deduplicateProperties();
-<a name="l00215"></a>00215 
-<a name="l00221"></a>00221     <span class="keyword">const</span> boost::shared_ptr&lt;Chunk&gt; &amp;chunkPtrAt ( <span class="keywordtype">size_t</span> at ) <span class="keyword">const</span>;
-<a name="l00222"></a>00222 
-<a name="l00234"></a>00234     <span class="keyword">inline</span> std::pair&lt;size_t, size_t&gt; commonGet ( <span class="keywordtype">size_t</span> first, <span class="keywordtype">size_t</span> second, <span class="keywordtype">size_t</span> third, <span class="keywordtype">size_t</span> fourth )<span class="keyword"> const </span>{
-<a name="l00235"></a>00235         <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {first, second, third, fourth};
-<a name="l00236"></a>00236         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( ! <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a>, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00237"></a>00237                 &lt;&lt; <span class="stringliteral">&quot;Getting data from a non indexed image will result in undefined behavior. Run reIndex first.&quot;</span>;
-<a name="l00238"></a>00238         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( <span class="keyword">set</span>.<a class="code" href="classisis_1_1data_1_1Image.html#a9fb0c9f8351fddc6a2fea609d487aa2b">isEmpty</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00239"></a>00239                 &lt;&lt; <span class="stringliteral">&quot;Getting data from a empty image will result in undefined behavior.&quot;</span>;
-<a name="l00240"></a>00240         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( !<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e" title="Check if index fits into the dimensional size of the object.">isInRange</a> ( idx ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
-<a name="l00241"></a>00241                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> ( idx ) &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00242"></a>00242         <span class="keyword">const</span> <span class="keywordtype">size_t</span> index = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0" title="Compute linear index from n-dimensional index,.">getLinearIndex</a> ( idx );
-<a name="l00243"></a>00243         <span class="keywordflow">return</span> std::make_pair ( index / chunkVolume, index % chunkVolume );
-<a name="l00244"></a>00244     }
-<a name="l00245"></a>00245 
+<a name="l00208"></a><a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">00208</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a>;
+<a name="l00209"></a>00209 <span class="keyword">protected</span>:
+<a name="l00210"></a><a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">00210</a>     _internal::SortedChunkList <span class="keyword">set</span>;
+<a name="l00211"></a><a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">00211</a>     std::vector&lt;boost::shared_ptr&lt;Chunk&gt; &gt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>;
+<a name="l00212"></a>00212 <span class="keyword">private</span>:
+<a name="l00213"></a>00213     <span class="keywordtype">size_t</span> chunkVolume;
+<a name="l00214"></a>00214 
+<a name="l00215"></a>00215     <span class="keywordtype">void</span> deduplicateProperties();
+<a name="l00216"></a>00216 
+<a name="l00222"></a>00222     <span class="keyword">const</span> boost::shared_ptr&lt;Chunk&gt; &amp;chunkPtrAt ( <span class="keywordtype">size_t</span> at ) <span class="keyword">const</span>;
+<a name="l00223"></a>00223 
+<a name="l00235"></a>00235     <span class="keyword">inline</span> std::pair&lt;size_t, size_t&gt; commonGet ( <span class="keywordtype">size_t</span> first, <span class="keywordtype">size_t</span> second, <span class="keywordtype">size_t</span> third, <span class="keywordtype">size_t</span> fourth )<span class="keyword"> const </span>{
+<a name="l00236"></a>00236         <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {first, second, third, fourth};
+<a name="l00237"></a>00237         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( ! <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a>, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00238"></a>00238                 &lt;&lt; <span class="stringliteral">&quot;Getting data from a non indexed image will result in undefined behavior. Run reIndex first.&quot;</span>;
+<a name="l00239"></a>00239         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( <span class="keyword">set</span>.<a class="code" href="classisis_1_1data_1_1Image.html#a9fb0c9f8351fddc6a2fea609d487aa2b">isEmpty</a>(), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00240"></a>00240                 &lt;&lt; <span class="stringliteral">&quot;Getting data from a empty image will result in undefined behavior.&quot;</span>;
+<a name="l00241"></a>00241         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a> ( !<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e" title="Check if index fits into the dimensional size of the object.">isInRange</a> ( idx ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
+<a name="l00242"></a>00242                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> ( idx ) &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00243"></a>00243         <span class="keyword">const</span> <span class="keywordtype">size_t</span> index = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0" title="Compute linear index from n-dimensional index,.">getLinearIndex</a> ( idx );
+<a name="l00244"></a>00244         <span class="keywordflow">return</span> std::make_pair ( index / chunkVolume, index % chunkVolume );
+<a name="l00245"></a>00245     }
 <a name="l00246"></a>00246 
-<a name="l00247"></a>00247 <span class="keyword">protected</span>:
-<a name="l00248"></a><a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">00248</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a>;
-<a name="l00249"></a><a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">00249</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a>;
-<a name="l00250"></a>00250 
-<a name="l00269"></a>00269     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#aece4ae886cea93d0e05087c9b3e2c85b" title="Search for a dimensional break in all stored chunks.">getChunkStride</a> ( <span class="keywordtype">size_t</span> base_stride = 1 );
-<a name="l00275"></a>00275     <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a087ed8c4884cea467e47c386c65d5be2" title="Access a chunk via index (and the lookup table) The Chunk will only have metadata which are unique to...">chunkAt</a> ( <span class="keywordtype">size_t</span> at );
-<a name="l00277"></a>00277     <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a>();
-<a name="l00278"></a>00278 
+<a name="l00247"></a>00247 
+<a name="l00248"></a>00248 <span class="keyword">protected</span>:
+<a name="l00249"></a><a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">00249</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a>;
+<a name="l00250"></a><a class="code" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">00250</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">defaultChunkEqualitySet</a>;
+<a name="l00251"></a>00251 
+<a name="l00270"></a>00270     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#aece4ae886cea93d0e05087c9b3e2c85b" title="Search for a dimensional break in all stored chunks.">getChunkStride</a> ( <span class="keywordtype">size_t</span> base_stride = 1 );
+<a name="l00276"></a>00276     <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a087ed8c4884cea467e47c386c65d5be2" title="Access a chunk via index (and the lookup table) The Chunk will only have metadata which are unique to...">chunkAt</a> ( <span class="keywordtype">size_t</span> at );
+<a name="l00278"></a>00278     <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a>();
 <a name="l00279"></a>00279 
-<a name="l00280"></a>00280 
-<a name="l00281"></a><a class="code" href="classisis_1_1data_1_1Image.html#af304cf98a684a4ea2e9e1e1283f0025a">00281</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#af304cf98a684a4ea2e9e1e1283f0025a">m_RowVec</a>;
-<a name="l00282"></a><a class="code" href="classisis_1_1data_1_1Image.html#a374ae697c25b616628a0baded99903aa">00282</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a374ae697c25b616628a0baded99903aa">m_RowVecInv</a>;
-<a name="l00283"></a><a class="code" href="classisis_1_1data_1_1Image.html#a8fa8b27baf0db3b33521c01015000ebe">00283</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a8fa8b27baf0db3b33521c01015000ebe">m_ColumnVec</a>;
-<a name="l00284"></a><a class="code" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">00284</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">m_ColumnVecInv</a>;
-<a name="l00285"></a><a class="code" href="classisis_1_1data_1_1Image.html#ac55db4f806fb53523b0ed5c599c360ab">00285</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#ac55db4f806fb53523b0ed5c599c360ab">m_SliceVec</a>;
-<a name="l00286"></a><a class="code" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">00286</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">m_SliceVecInv</a>;
-<a name="l00287"></a><a class="code" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">00287</a>     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">m_Offset</a>;
+<a name="l00280"></a><a class="code" href="classisis_1_1data_1_1Image.html#a94c5a4dae0eb700c87401ea6eac87c40">00280</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a94c5a4dae0eb700c87401ea6eac87c40">m_RowVec</a>;
+<a name="l00281"></a><a class="code" href="classisis_1_1data_1_1Image.html#a7c8dfbee9badb073f6096ba8e21475af">00281</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a7c8dfbee9badb073f6096ba8e21475af">m_RowVecInv</a>;
+<a name="l00282"></a><a class="code" href="classisis_1_1data_1_1Image.html#a409a8858502576ece0e23851306294f6">00282</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a409a8858502576ece0e23851306294f6">m_ColumnVec</a>;
+<a name="l00283"></a><a class="code" href="classisis_1_1data_1_1Image.html#ae29cf093eaec130b17a464c8adf9f0fc">00283</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#ae29cf093eaec130b17a464c8adf9f0fc">m_ColumnVecInv</a>;
+<a name="l00284"></a><a class="code" href="classisis_1_1data_1_1Image.html#a6512a575ed4322de1a439944773fafb0">00284</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a6512a575ed4322de1a439944773fafb0">m_SliceVec</a>;
+<a name="l00285"></a><a class="code" href="classisis_1_1data_1_1Image.html#a080d2483667cd366d95aaf64276a9c1d">00285</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a080d2483667cd366d95aaf64276a9c1d">m_SliceVecInv</a>;
+<a name="l00286"></a><a class="code" href="classisis_1_1data_1_1Image.html#aa48ea22c820fcb5748582c42167f47b6">00286</a>     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#aa48ea22c820fcb5748582c42167f47b6">m_Offset</a>;
+<a name="l00287"></a>00287 
 <a name="l00288"></a>00288 <span class="keyword">public</span>:
 <a name="l00293"></a>00293     <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;ref );
 <a name="l00294"></a>00294 
 <a name="l00299"></a><a class="code" href="classisis_1_1data_1_1Image.html#ac8448f89faef184720e5ae079873c7ee">00299</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a> ( std::list&lt;T&gt; &amp;chunks, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> min_dim = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> ) :
 <a name="l00300"></a>00300         _internal::<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">NDimensional</a>&lt;4&gt;(), util::<a class="code" href="classisis_1_1util_1_1PropertyMap.html#afcc2f4657fbd500284e60e0ef442bbe6">PropertyMap</a>(), minIndexingDim ( min_dim ),
-<a name="l00301"></a>00301         <a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">set</a> ( <span class="stringliteral">&quot;sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers&quot;</span> ),
+<a name="l00301"></a>00301         <a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">set</a> ( <a class="code" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">defaultChunkEqualitySet</a> ),
 <a name="l00302"></a>00302         <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a> ( false ) {
-<a name="l00303"></a>00303         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#afc8dc03ba6f2f6988b133ab57e1aa26c" title="Make Properties given by a space separated list needed.">addNeededFromString</a> ( <a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a> );
+<a name="l00303"></a>00303         util::Singletons::get&lt;NeededsList&lt;Image&gt;, 0&gt;().applyTo( *<span class="keyword">this</span> );
 <a name="l00304"></a>00304         <span class="keyword">set</span>.addSecondarySort ( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> );
-<a name="l00305"></a>00305         <span class="keyword">set</span>.addSecondarySort ( <span class="stringliteral">&quot;acquisitionTime&quot;</span> );
-<a name="l00306"></a>00306         <a class="code" href="classisis_1_1data_1_1Image.html#a507228763078c1c0ed6cc5b92c4cc65a" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromContainer</a> ( chunks );
-<a name="l00307"></a>00307     }
-<a name="l00312"></a><a class="code" href="classisis_1_1data_1_1Image.html#af9539532e4fb1458c559f13a6b770174">00312</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a> ( std::vector&lt;T&gt; &amp;chunks, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> min_dim = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> ) :
-<a name="l00313"></a>00313         _internal::<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">NDimensional</a>&lt;4&gt;(), util::<a class="code" href="classisis_1_1util_1_1PropertyMap.html#afcc2f4657fbd500284e60e0ef442bbe6">PropertyMap</a>(),
-<a name="l00314"></a>00314         <a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">set</a> ( <span class="stringliteral">&quot;sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers&quot;</span> ),
-<a name="l00315"></a>00315         <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a> ( false ), minIndexingDim ( min_dim ) {
-<a name="l00316"></a>00316         <a class="code" href="classisis_1_1util_1_1PropertyMap.html#afc8dc03ba6f2f6988b133ab57e1aa26c" title="Make Properties given by a space separated list needed.">addNeededFromString</a> ( <a class="code" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a> );
-<a name="l00317"></a>00317         <span class="keyword">set</span>.addSecondarySort ( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> );
-<a name="l00318"></a>00318         <span class="keyword">set</span>.addSecondarySort ( <span class="stringliteral">&quot;acquisitionTime&quot;</span> );
-<a name="l00319"></a>00319         <a class="code" href="classisis_1_1data_1_1Image.html#a507228763078c1c0ed6cc5b92c4cc65a" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromContainer</a> ( chunks );
+<a name="l00305"></a>00305         <a class="code" href="classisis_1_1data_1_1Image.html#ae94b9bb6689b5caae2e0885d71ffad83" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromList</a> ( chunks );
+<a name="l00306"></a>00306     }
+<a name="l00311"></a><a class="code" href="classisis_1_1data_1_1Image.html#af9539532e4fb1458c559f13a6b770174">00311</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1data_1_1Image.html#afe4f8006b3f04f60f68b5027ed8bbebc" title="Creates an empty Image object.">Image</a> ( std::vector&lt;T&gt; &amp;chunks, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> min_dim = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> ) :
+<a name="l00312"></a>00312         _internal::<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">NDimensional</a>&lt;4&gt;(), util::<a class="code" href="classisis_1_1util_1_1PropertyMap.html#afcc2f4657fbd500284e60e0ef442bbe6">PropertyMap</a>(), minIndexingDim ( min_dim ),
+<a name="l00313"></a>00313         <a class="code" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">set</a> ( <a class="code" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">defaultChunkEqualitySet</a> ),
+<a name="l00314"></a>00314         <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a> ( false ) {
+<a name="l00315"></a>00315         util::Singletons::get&lt;NeededsList&lt;Image&gt;, 0&gt;().applyTo( *<span class="keyword">this</span> );
+<a name="l00316"></a>00316         <span class="keyword">set</span>.addSecondarySort ( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> );
+<a name="l00317"></a>00317         std::list&lt;T&gt; tmp( chunks.begin(), chunks.end() );
+<a name="l00318"></a>00318         <a class="code" href="classisis_1_1data_1_1Image.html#ae94b9bb6689b5caae2e0885d71ffad83" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromList</a> ( tmp );
+<a name="l00319"></a>00319         chunks.assign( tmp.begin(), tmp.end() );
 <a name="l00320"></a>00320     }
 <a name="l00321"></a>00321 
-<a name="l00327"></a><a class="code" href="classisis_1_1data_1_1Image.html#a507228763078c1c0ed6cc5b92c4cc65a">00327</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a507228763078c1c0ed6cc5b92c4cc65a" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromContainer</a> ( T &amp;chunks ) {
-<a name="l00328"></a>00328         BOOST_MPL_ASSERT ( ( boost::is_base_of&lt;Chunk, typename T::value_type &gt; ) );
+<a name="l00327"></a><a class="code" href="classisis_1_1data_1_1Image.html#ae94b9bb6689b5caae2e0885d71ffad83">00327</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#ae94b9bb6689b5caae2e0885d71ffad83" title="Insert Chunks or objects with the base Chunk from a sequence container into the Image.">insertChunksFromList</a> ( std::list&lt;T&gt; &amp;chunks ) {
+<a name="l00328"></a>00328         BOOST_MPL_ASSERT ( ( boost::is_base_of&lt;Chunk, T&gt; ) );
 <a name="l00329"></a>00329         <span class="keywordtype">size_t</span> cnt = 0;
 <a name="l00330"></a>00330 
-<a name="l00331"></a>00331         <span class="keywordflow">for</span> ( <span class="keyword">typename</span> T::iterator i = chunks.begin(); i != chunks.end(); ) { <span class="comment">// for all remaining chunks</span>
+<a name="l00331"></a>00331         <span class="keywordflow">for</span> ( <span class="keyword">typename</span> std::list&lt;T&gt;::iterator i = chunks.begin(); i != chunks.end(); ) { <span class="comment">// for all remaining chunks</span>
 <a name="l00332"></a>00332             <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#a14a33c4d2ba857b38c2188fb8e8abfd9" title="Insert a Chunk into the Image.">insertChunk</a> ( *i ) ) {
 <a name="l00333"></a>00333                 chunks.erase ( i++ );
 <a name="l00334"></a>00334                 cnt++;
@@ -394,10 +394,10 @@
 <a name="l00589"></a>00589 
 <a name="l00603"></a>00603     <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> <a class="code" href="classisis_1_1data_1_1Image.html#a153f570319fc42ea6f1123a5a5eb309c" title="Maps the given scanner Axis to the dimension with the minimal angle.">mapScannerAxisToImageDimension</a> ( <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> scannerAxes );
 <a name="l00604"></a>00604 
-<a name="l00611"></a>00611     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a2e83ae32400db8cea79ece348a0acffe" title="Computes the physical coordinates (in scanner space) of the given voxel index.">getPhysicalCoordsFromIndex</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> &amp;index ) <span class="keyword">const</span>;
+<a name="l00611"></a>00611     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#a35f4ff9c8816a66469d7aaa5b693ae70" title="Computes the physical coordinates (in scanner space) of the given voxel index.">getPhysicalCoordsFromIndex</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> &amp;index ) <span class="keyword">const</span>;
 <a name="l00612"></a>00612 
 <a name="l00613"></a>00613 
-<a name="l00620"></a>00620     <a class="code" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#aacbf0d66df0ec2ddfe0e8d73d2eddc39" title="Computes the voxel index of the given physical coordinates (coordinates in scanner space) This functi...">getIndexFromPhysicalCoords</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;physicalCoords, <span class="keywordtype">bool</span> restrictedToImageBox = <span class="keyword">false</span> ) <span class="keyword">const</span>;
+<a name="l00620"></a>00620     <a class="code" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a9d380dbc3dc9f40ebf8b6409e11d488c" title="Computes the voxel index of the given physical coordinates (coordinates in scanner space) This functi...">getIndexFromPhysicalCoords</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;physicalCoords ) <span class="keyword">const</span>;
 <a name="l00621"></a>00621 
 <a name="l00629"></a><a class="code" href="classisis_1_1data_1_1Image.html#a1849844422ad86be44556bbab0d55088">00629</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Image.html#a1849844422ad86be44556bbab0d55088" title="Copy all voxel data of the image into memory.">copyToMem</a> ( T *dst, <span class="keywordtype">size_t</span> len,  scaling_pair scaling = scaling_pair() )<span class="keyword"> const </span>{
 <a name="l00630"></a>00630         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a> ) {
@@ -430,156 +430,158 @@
 <a name="l00667"></a><a class="code" href="classisis_1_1data_1_1Image.html#a5ef4434d95f796e456991e941c2e6751">00667</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk&lt;T&gt;</a> <a class="code" href="classisis_1_1data_1_1Image.html#a5ef4434d95f796e456991e941c2e6751" title="Copy all voxel data into a new MemChunk.">copyAsMemChunk</a>()<span class="keyword"> const </span>{
 <a name="l00668"></a>00668         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> size = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
 <a name="l00669"></a>00669         <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">data::MemChunk&lt;T&gt;</a> ret ( size[0], size[1], size[2], size[3] );
-<a name="l00670"></a>00670         copyToMem&lt;T&gt; ( &amp;ret.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;T&gt; ( 0, 0, 0, 0 ), ret.getVolume() );
+<a name="l00670"></a>00670         copyToMem&lt;T&gt; ( &amp;ret.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;T&gt;(0,0), ret.getVolume() );
 <a name="l00671"></a>00671         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;<span class="keyword">&gt;</span>( ret ) = static_cast&lt;const util::PropertyMap &amp;&gt;( <a class="code" href="classisis_1_1data_1_1Image.html#a27cfa5f9ced2077e578ad4bcc064e028" title="Get a chunk via index (and the lookup table).">getChunkAt</a>( 0 ) );
 <a name="l00672"></a>00672         <span class="keywordflow">return</span> ret;
 <a name="l00673"></a>00673     }
 <a name="l00674"></a>00674 
 <a name="l00683"></a><a class="code" href="classisis_1_1data_1_1Image.html#ab94b524daf0b9172d90704c447f16e03">00683</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;</a> <a class="code" href="classisis_1_1data_1_1Image.html#ab94b524daf0b9172d90704c447f16e03" title="Copy all voxel data into a new ValueArray.">copyAsValueArray</a>()<span class="keyword"> const </span>{
-<a name="l00684"></a>00684         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> size = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
-<a name="l00685"></a>00685         <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;T&gt;</a> ret ( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() );
-<a name="l00686"></a>00686         copyToMem&lt;T&gt; ( ret.<a class="code" href="classisis_1_1data_1_1ValueArray.html#acf527fc5f2e1678f0c336889eccc5911">begin</a>().operator-&gt;(), ret.<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a81bed4f18dff15ffe27fad3521eb0aeb">getLength</a>() );
-<a name="l00687"></a>00687         <span class="keywordflow">return</span> ret;
-<a name="l00688"></a>00688     }
-<a name="l00695"></a>00695     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Image.html#ada16d33e2a19b88df23c393845ebd9a3" title="Copy all voxel data of the image into an existing ValueArray using its type.">copyToValueArray</a> ( <a class="code" href="classisis_1_1data_1_1ValueArrayBase.html">data::ValueArrayBase</a> &amp;dst,  scaling_pair scaling = scaling_pair() ) <span class="keyword">const</span>;
-<a name="l00696"></a>00696 
-<a name="l00705"></a>00705     std::vector&lt;isis::data::Chunk&gt; <a class="code" href="classisis_1_1data_1_1Image.html#a2fd76bb61355c14ef7035e740b462a5e" title="Get a sorted list of the chunks of the image.">copyChunksToVector</a> ( <span class="keywordtype">bool</span> copy_metadata = <span class="keyword">true</span> ) <span class="keyword">const</span>;
-<a name="l00706"></a>00706 
-<a name="l00713"></a>00713     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, isis::data::autoscaleOption scaleopt = autoscale );
-<a name="l00714"></a>00714 
-<a name="l00719"></a>00719     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a94fda5b511c9bfdff550d9691937aea1" title="Automatically splice the given dimension and all dimensions above.">spliceDownTo</a> ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim );
-<a name="l00720"></a>00720 
-<a name="l00727"></a>00727     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#aac647fb29128d16d528059d481c79874" title="Run a functor with the base ChunkOp on every cunk in the image.">foreachChunk</a> ( <a class="code" href="classisis_1_1data_1_1ChunkOp.html" title="Base class for operators used for foreachChunk.">ChunkOp</a> &amp;op, <span class="keywordtype">bool</span> copyMetaData = <span class="keyword">false</span> );
-<a name="l00728"></a>00728 
+<a name="l00684"></a>00684         <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;T&gt;</a> ret ( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() );
+<a name="l00685"></a>00685         copyToMem&lt;T&gt; ( ret.<a class="code" href="classisis_1_1data_1_1ValueArray.html#acf527fc5f2e1678f0c336889eccc5911">begin</a>().operator-&gt;(), ret.<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a81bed4f18dff15ffe27fad3521eb0aeb">getLength</a>() );
+<a name="l00686"></a>00686         <span class="keywordflow">return</span> ret;
+<a name="l00687"></a>00687     }
+<a name="l00694"></a>00694     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Image.html#ada16d33e2a19b88df23c393845ebd9a3" title="Copy all voxel data of the image into an existing ValueArray using its type.">copyToValueArray</a> ( <a class="code" href="classisis_1_1data_1_1ValueArrayBase.html">data::ValueArrayBase</a> &amp;dst,  scaling_pair scaling = scaling_pair() ) <span class="keyword">const</span>;
+<a name="l00695"></a>00695 
+<a name="l00703"></a>00703     <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> <a class="code" href="classisis_1_1data_1_1Image.html#aa79f18c9661aaca6db909453921eae22" title="Create a new Image of consisting of deep copied chunks.">copyByID</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> ID = 0, scaling_pair scaling = scaling_pair() )<span class="keyword">const</span>;
+<a name="l00704"></a>00704 
+<a name="l00705"></a>00705 
+<a name="l00714"></a>00714     std::vector&lt;isis::data::Chunk&gt; <a class="code" href="classisis_1_1data_1_1Image.html#a2fd76bb61355c14ef7035e740b462a5e" title="Get a sorted list of the chunks of the image.">copyChunksToVector</a> ( <span class="keywordtype">bool</span> copy_metadata = <span class="keyword">true</span> ) <span class="keyword">const</span>;
+<a name="l00715"></a>00715 
+<a name="l00722"></a>00722     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, isis::data::autoscaleOption scaleopt = autoscale );
+<a name="l00723"></a>00723 
+<a name="l00728"></a>00728     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a94fda5b511c9bfdff550d9691937aea1" title="Automatically splice the given dimension and all dimensions above.">spliceDownTo</a> ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim );
 <a name="l00729"></a>00729 
-<a name="l00737"></a><a class="code" href="classisis_1_1data_1_1Image.html#a22b33e80caee653a22653f6aa04bd048">00737</a>     <span class="keyword">template</span> &lt;<span class="keyword">typename</span> TYPE&gt; <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a22b33e80caee653a22653f6aa04bd048" title="Run a functor with the base VoxelOp on every chunk in the image.">foreachVoxel</a> ( <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;op ) {
-<a name="l00738"></a>00738         <span class="keyword">class </span>_proxy: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1ChunkOp.html" title="Base class for operators used for foreachChunk.">ChunkOp</a>
-<a name="l00739"></a>00739         {
-<a name="l00740"></a>00740             <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;op;
-<a name="l00741"></a>00741         <span class="keyword">public</span>:
-<a name="l00742"></a>00742             _proxy ( <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;_op ) : op ( _op ) {}
-<a name="l00743"></a>00743             <span class="keywordtype">bool</span> operator() ( <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch, <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> posInImage ) {
-<a name="l00744"></a>00744                 <span class="keywordflow">return</span> ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#a99e5865871bcb988bcfd60ce81dcbb2c" title="Run a functor on every Voxel in the chunk.">foreachVoxel</a>&lt;TYPE&gt; ( op, posInImage ) == 0;
-<a name="l00745"></a>00745             }
-<a name="l00746"></a>00746         };
-<a name="l00747"></a>00747         _proxy prx ( op );
-<a name="l00748"></a>00748         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;TYPE&gt;::staticID</a> ) &amp;&amp; <a class="code" href="classisis_1_1data_1_1Image.html#aac647fb29128d16d528059d481c79874" title="Run a functor with the base ChunkOp on every cunk in the image.">foreachChunk</a> ( prx, <span class="keyword">false</span> );
-<a name="l00749"></a>00749     }
-<a name="l00750"></a>00750 
-<a name="l00752"></a>00752     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#ace627e4628e39615cbae3b6b43b9d915">getNrOfRows</a>() <span class="keyword">const</span>;
-<a name="l00754"></a>00754     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a01c02d76de0a741e527ff1e43b39422b">getNrOfColumns</a>() <span class="keyword">const</span>;
-<a name="l00756"></a>00756     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a922ea56dd2eb60fbb6e0299138dcde70">getNrOfSlices</a>() <span class="keyword">const</span>;
-<a name="l00758"></a>00758     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a142c7b80e200d9822c28fc604bb031ee">getNrOfTimesteps</a>() <span class="keyword">const</span>;
+<a name="l00736"></a>00736     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#aac647fb29128d16d528059d481c79874" title="Run a functor with the base ChunkOp on every cunk in the image.">foreachChunk</a> ( <a class="code" href="classisis_1_1data_1_1ChunkOp.html" title="Base class for operators used for foreachChunk.">ChunkOp</a> &amp;op, <span class="keywordtype">bool</span> copyMetaData = <span class="keyword">false</span> );
+<a name="l00737"></a>00737 
+<a name="l00738"></a>00738 
+<a name="l00746"></a><a class="code" href="classisis_1_1data_1_1Image.html#a22b33e80caee653a22653f6aa04bd048">00746</a>     <span class="keyword">template</span> &lt;<span class="keyword">typename</span> TYPE&gt; <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a22b33e80caee653a22653f6aa04bd048" title="Run a functor with the base VoxelOp on every chunk in the image.">foreachVoxel</a> ( <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;op ) {
+<a name="l00747"></a>00747         <span class="keyword">class </span>_proxy: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1ChunkOp.html" title="Base class for operators used for foreachChunk.">ChunkOp</a>
+<a name="l00748"></a>00748         {
+<a name="l00749"></a>00749             <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;op;
+<a name="l00750"></a>00750         <span class="keyword">public</span>:
+<a name="l00751"></a>00751             _proxy ( <a class="code" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp&lt;TYPE&gt;</a> &amp;_op ) : op ( _op ) {}
+<a name="l00752"></a>00752             <span class="keywordtype">bool</span> operator() ( <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ch, <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> posInImage ) {
+<a name="l00753"></a>00753                 <span class="keywordflow">return</span> ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#a99e5865871bcb988bcfd60ce81dcbb2c" title="Run a functor on every Voxel in the chunk.">foreachVoxel</a>&lt;TYPE&gt; ( op, posInImage ) == 0;
+<a name="l00754"></a>00754             }
+<a name="l00755"></a>00755         };
+<a name="l00756"></a>00756         _proxy prx ( op );
+<a name="l00757"></a>00757         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">data::ValueArray&lt;TYPE&gt;::staticID</a> ) &amp;&amp; <a class="code" href="classisis_1_1data_1_1Image.html#aac647fb29128d16d528059d481c79874" title="Run a functor with the base ChunkOp on every cunk in the image.">foreachChunk</a> ( prx, <span class="keyword">false</span> );
+<a name="l00758"></a>00758     }
 <a name="l00759"></a>00759 
-<a name="l00760"></a>00760     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="classisis_1_1data_1_1Image.html#a36e107da6a3d4744468b3c837534291b">getFoV</a>() <span class="keyword">const</span>;
-<a name="l00761"></a>00761     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#aa2d4ca5ab19f210830ba7a871cb24406">updateOrientationMatrices</a>();
-<a name="l00762"></a>00762 
-<a name="l00772"></a>00772     std::string <a class="code" href="classisis_1_1data_1_1Image.html#ae125f95b23e6d29b100969883597ee9e" title="Generate a string identifying the image The identifier is made ofsequenceNumbersequenceDescription if...">identify</a>( <span class="keywordtype">bool</span> withpath = <span class="keyword">true</span> )<span class="keyword">const</span>;
-<a name="l00773"></a>00773 };
-<a name="l00774"></a>00774 
-<a name="l00779"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html">00779</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a>
-<a name="l00780"></a>00780 {
-<a name="l00781"></a>00781 <span class="keyword">protected</span>:
-<a name="l00782"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a071c1e7c3fe1b6e274b7330921b4f29c">00782</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a071c1e7c3fe1b6e274b7330921b4f29c">TypedImage</a>() {} <span class="comment">// to be used only by inheriting classes</span>
-<a name="l00783"></a>00783 <span class="keyword">public</span>:
-<a name="l00784"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">00784</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html" title="Generic iterator for voxels in Images.">_internal::ImageIteratorTemplate&lt;data::ValueArray&lt;T&gt;</a> &gt; <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a>;
-<a name="l00785"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">00785</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html" title="Generic iterator for voxels in Images.">_internal::ImageIteratorTemplate&lt;const data::ValueArray&lt;T&gt;</a> &gt; <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a>;
-<a name="l00786"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a8d8fe2a535b6429d38fcab5576132d6a">00786</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> iterator::reference <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8d8fe2a535b6429d38fcab5576132d6a">reference</a>;
-<a name="l00787"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#aacdc5f9d936c90b39eddc2c4db8d2827">00787</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> const_iterator::reference <a class="code" href="classisis_1_1data_1_1TypedImage.html#aacdc5f9d936c90b39eddc2c4db8d2827">const_reference</a>;
-<a name="l00789"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a05f095de7c8b6146f067769591d7f0c5">00789</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a05f095de7c8b6146f067769591d7f0c5" title="cheap copy another Image and make sure all chunks have type T">TypedImage</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;src ) : <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> ( src ) { <span class="comment">// ok we just copied the whole image</span>
-<a name="l00790"></a>00790         <span class="comment">//but we want it to be of type T</span>
-<a name="l00791"></a>00791         <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
-<a name="l00792"></a>00792     }
-<a name="l00794"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b">00794</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;<a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;ref ) { <span class="comment">//its already of the given type - so just copy it</span>
-<a name="l00795"></a>00795         <a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">Image::operator= </a>( ref );
-<a name="l00796"></a>00796         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00797"></a>00797     }
-<a name="l00799"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a16654e67097e9e70a1bcc16b84bdd640">00799</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;<a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;ref ) { <span class="comment">// copy the image, and make sure its of the given type</span>
-<a name="l00800"></a>00800         <a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">Image::operator= </a>( ref );
-<a name="l00801"></a>00801         <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
-<a name="l00802"></a>00802         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00803"></a>00803     }
-<a name="l00804"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a32b8263ed887ddf4ad21fdb35796aacd">00804</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a32b8263ed887ddf4ad21fdb35796aacd">copyToMem</a> ( <span class="keywordtype">void</span> *dst ) {
-<a name="l00805"></a>00805         Image::copyToMem&lt;T&gt; ( ( T * ) dst );
+<a name="l00761"></a>00761     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#ace627e4628e39615cbae3b6b43b9d915">getNrOfRows</a>() <span class="keyword">const</span>;
+<a name="l00763"></a>00763     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a01c02d76de0a741e527ff1e43b39422b">getNrOfColumns</a>() <span class="keyword">const</span>;
+<a name="l00765"></a>00765     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a922ea56dd2eb60fbb6e0299138dcde70">getNrOfSlices</a>() <span class="keyword">const</span>;
+<a name="l00767"></a>00767     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Image.html#a142c7b80e200d9822c28fc604bb031ee">getNrOfTimesteps</a>() <span class="keyword">const</span>;
+<a name="l00768"></a>00768 
+<a name="l00769"></a>00769     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="code" href="classisis_1_1data_1_1Image.html#af19507da716adaa0a2ba4c9b8ea08005">getFoV</a>() <span class="keyword">const</span>;
+<a name="l00770"></a>00770     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Image.html#aa2d4ca5ab19f210830ba7a871cb24406">updateOrientationMatrices</a>();
+<a name="l00771"></a>00771 
+<a name="l00781"></a>00781     std::string <a class="code" href="classisis_1_1data_1_1Image.html#ae125f95b23e6d29b100969883597ee9e" title="Generate a string identifying the image The identifier is made ofsequenceNumbersequenceDescription if...">identify</a>( <span class="keywordtype">bool</span> withpath = <span class="keyword">true</span> )<span class="keyword">const</span>;
+<a name="l00782"></a>00782 };
+<a name="l00783"></a>00783 
+<a name="l00788"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html">00788</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a>
+<a name="l00789"></a>00789 {
+<a name="l00790"></a>00790 <span class="keyword">protected</span>:
+<a name="l00791"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a071c1e7c3fe1b6e274b7330921b4f29c">00791</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a071c1e7c3fe1b6e274b7330921b4f29c">TypedImage</a>() {} <span class="comment">// to be used only by inheriting classes</span>
+<a name="l00792"></a>00792 <span class="keyword">public</span>:
+<a name="l00793"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">00793</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html" title="Generic iterator for voxels in Images.">_internal::ImageIteratorTemplate&lt;data::ValueArray&lt;T&gt;</a> &gt; <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a>;
+<a name="l00794"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">00794</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html" title="Generic iterator for voxels in Images.">_internal::ImageIteratorTemplate&lt;const data::ValueArray&lt;T&gt;</a> &gt; <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a>;
+<a name="l00795"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a8d8fe2a535b6429d38fcab5576132d6a">00795</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> iterator::reference <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8d8fe2a535b6429d38fcab5576132d6a">reference</a>;
+<a name="l00796"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#aacdc5f9d936c90b39eddc2c4db8d2827">00796</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> const_iterator::reference <a class="code" href="classisis_1_1data_1_1TypedImage.html#aacdc5f9d936c90b39eddc2c4db8d2827">const_reference</a>;
+<a name="l00798"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a05f095de7c8b6146f067769591d7f0c5">00798</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a05f095de7c8b6146f067769591d7f0c5" title="cheap copy another Image and make sure all chunks have type T">TypedImage</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;src ) : <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> ( src ) { <span class="comment">// ok we just copied the whole image</span>
+<a name="l00799"></a>00799         <span class="comment">//but we want it to be of type T</span>
+<a name="l00800"></a>00800         <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
+<a name="l00801"></a>00801     }
+<a name="l00803"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b">00803</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;<a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;ref ) { <span class="comment">//its already of the given type - so just copy it</span>
+<a name="l00804"></a>00804         <a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">Image::operator= </a>( ref );
+<a name="l00805"></a>00805         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
 <a name="l00806"></a>00806     }
-<a name="l00807"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#aa76b45b6e85fa810e63b472bde5f25f8">00807</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#aa76b45b6e85fa810e63b472bde5f25f8">copyToMem</a> ( <span class="keywordtype">void</span> *dst )<span class="keyword"> const </span>{
-<a name="l00808"></a>00808         Image::copyToMem&lt;T&gt; ( ( T * ) dst );
-<a name="l00809"></a>00809     }
-<a name="l00810"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">00810</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() {
-<a name="l00811"></a>00811         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#acd213fa6d0856d45e6413801f9bdec66">checkMakeClean</a>() ) {
-<a name="l00812"></a>00812             std::vector&lt;data::ValueArray&lt;T&gt;*&gt; vec ( <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size() );
-<a name="l00813"></a>00813 
-<a name="l00814"></a>00814             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size(); i++ )
-<a name="l00815"></a>00815                 vec[i] = &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>[i]-&gt;<span class="keyword">template</span> asValueArray&lt;T&gt;();
-<a name="l00816"></a>00816 
-<a name="l00817"></a>00817             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> ( vec );
-<a name="l00818"></a>00818         } <span class="keywordflow">else</span> {
-<a name="l00819"></a>00819             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )  &lt;&lt; <span class="stringliteral">&quot;Image is not clean. Returning empty iterator ...&quot;</span>;
-<a name="l00820"></a>00820             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a>();
-<a name="l00821"></a>00821         }
-<a name="l00822"></a>00822     }
-<a name="l00823"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a510cd35b1115a31a26c5d7b231d67907">00823</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a510cd35b1115a31a26c5d7b231d67907">end</a>() {
-<a name="l00824"></a>00824         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() + <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>();
-<a name="l00825"></a>00825     };
-<a name="l00826"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#ae03769fb22a4b5b013cf1a0d8c2a409c">00826</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae03769fb22a4b5b013cf1a0d8c2a409c">begin</a>()<span class="keyword"> const </span>{
-<a name="l00827"></a>00827         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() ) {
-<a name="l00828"></a>00828             std::vector&lt;const data::ValueArray&lt;T&gt;*&gt; vec ( <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size() );
-<a name="l00829"></a>00829 
-<a name="l00830"></a>00830             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size(); i++ )
-<a name="l00831"></a>00831                 vec[i] = &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>[i]-&gt;<span class="keyword">template</span> asValueArray&lt;T&gt;();
-<a name="l00832"></a>00832 
-<a name="l00833"></a>00833             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> ( vec );
-<a name="l00834"></a>00834         } <span class="keywordflow">else</span> {
-<a name="l00835"></a>00835             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )  &lt;&lt; <span class="stringliteral">&quot;Image is not clean. Returning empty iterator ...&quot;</span>;
-<a name="l00836"></a>00836             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a>();
-<a name="l00837"></a>00837         }
-<a name="l00838"></a>00838     }
-<a name="l00839"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a7d6e6d04889c61bb9899df125ec2939e">00839</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a7d6e6d04889c61bb9899df125ec2939e">end</a>()<span class="keyword"> const </span>{
-<a name="l00840"></a>00840         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() + <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>();
-<a name="l00841"></a>00841     };
-<a name="l00842"></a>00842 };
-<a name="l00843"></a>00843 
-<a name="l00848"></a><a class="code" href="classisis_1_1data_1_1MemImage.html">00848</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1MemImage.html" title="An Image which always uses its own memory and a specific type.">MemImage</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a>&lt;T&gt;
-<a name="l00849"></a>00849 {
-<a name="l00850"></a>00850 <span class="keyword">public</span>:
-<a name="l00856"></a><a class="code" href="classisis_1_1data_1_1MemImage.html#a7bcae94f698adcb22d4ec30b8075d40b">00856</a>     <a class="code" href="classisis_1_1data_1_1MemImage.html#a7bcae94f698adcb22d4ec30b8075d40b" title="Copy contructor.">MemImage</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;src ) {
-<a name="l00857"></a>00857         <a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">operator= </a>( src );
-<a name="l00858"></a>00858     }
-<a name="l00859"></a>00859 
-<a name="l00865"></a><a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f">00865</a>     <a class="code" href="classisis_1_1data_1_1MemImage.html" title="An Image which always uses its own memory and a specific type.">MemImage</a> &amp;<a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;ref ) { <span class="comment">// copy the image, and make sure its of the given type</span>
-<a name="l00866"></a>00866 
-<a name="l00867"></a>00867         <a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">Image::operator= </a>( ref ); <span class="comment">// ok we just copied the whole image</span>
+<a name="l00808"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a16654e67097e9e70a1bcc16b84bdd640">00808</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> &amp;<a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;ref ) { <span class="comment">// copy the image, and make sure its of the given type</span>
+<a name="l00809"></a>00809         <a class="code" href="classisis_1_1data_1_1TypedImage.html#a39da1b4e2f0785e43efa6a3a797e416b" title="cheap copy another TypedImage">Image::operator= </a>( ref );
+<a name="l00810"></a>00810         <a class="code" href="classisis_1_1data_1_1Image.html#a2a6069b9490517355362b55e3af2424b" title="Ensure, the image has the type with the requested ID.">convertToType</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
+<a name="l00811"></a>00811         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00812"></a>00812     }
+<a name="l00813"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a32b8263ed887ddf4ad21fdb35796aacd">00813</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a32b8263ed887ddf4ad21fdb35796aacd">copyToMem</a> ( <span class="keywordtype">void</span> *dst ) {
+<a name="l00814"></a>00814         Image::copyToMem&lt;T&gt; ( ( T * ) dst );
+<a name="l00815"></a>00815     }
+<a name="l00816"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#aa76b45b6e85fa810e63b472bde5f25f8">00816</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#aa76b45b6e85fa810e63b472bde5f25f8">copyToMem</a> ( <span class="keywordtype">void</span> *dst )<span class="keyword"> const </span>{
+<a name="l00817"></a>00817         Image::copyToMem&lt;T&gt; ( ( T * ) dst );
+<a name="l00818"></a>00818     }
+<a name="l00819"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">00819</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() {
+<a name="l00820"></a>00820         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#acd213fa6d0856d45e6413801f9bdec66">checkMakeClean</a>() ) {
+<a name="l00821"></a>00821             std::vector&lt;data::ValueArray&lt;T&gt;*&gt; vec ( <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size() );
+<a name="l00822"></a>00822 
+<a name="l00823"></a>00823             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size(); i++ )
+<a name="l00824"></a>00824                 vec[i] = &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>[i]-&gt;<span class="keyword">template</span> asValueArray&lt;T&gt;();
+<a name="l00825"></a>00825 
+<a name="l00826"></a>00826             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> ( vec );
+<a name="l00827"></a>00827         } <span class="keywordflow">else</span> {
+<a name="l00828"></a>00828             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )  &lt;&lt; <span class="stringliteral">&quot;Image is not clean. Returning empty iterator ...&quot;</span>;
+<a name="l00829"></a>00829             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a>();
+<a name="l00830"></a>00830         }
+<a name="l00831"></a>00831     }
+<a name="l00832"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a510cd35b1115a31a26c5d7b231d67907">00832</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a8bd93e9bf0e9140dc97704105720e5da">iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a510cd35b1115a31a26c5d7b231d67907">end</a>() {
+<a name="l00833"></a>00833         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() + <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>();
+<a name="l00834"></a>00834     };
+<a name="l00835"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#ae03769fb22a4b5b013cf1a0d8c2a409c">00835</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae03769fb22a4b5b013cf1a0d8c2a409c">begin</a>()<span class="keyword"> const </span>{
+<a name="l00836"></a>00836         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() ) {
+<a name="l00837"></a>00837             std::vector&lt;const data::ValueArray&lt;T&gt;*&gt; vec ( <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size() );
+<a name="l00838"></a>00838 
+<a name="l00839"></a>00839             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>.size(); i++ )
+<a name="l00840"></a>00840                 vec[i] = &amp;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a>[i]-&gt;<span class="keyword">template</span> asValueArray&lt;T&gt;();
+<a name="l00841"></a>00841 
+<a name="l00842"></a>00842             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> ( vec );
+<a name="l00843"></a>00843         } <span class="keywordflow">else</span> {
+<a name="l00844"></a>00844             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )  &lt;&lt; <span class="stringliteral">&quot;Image is not clean. Returning empty iterator ...&quot;</span>;
+<a name="l00845"></a>00845             <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a>();
+<a name="l00846"></a>00846         }
+<a name="l00847"></a>00847     }
+<a name="l00848"></a><a class="code" href="classisis_1_1data_1_1TypedImage.html#a7d6e6d04889c61bb9899df125ec2939e">00848</a>     <a class="code" href="classisis_1_1data_1_1TypedImage.html#a12cf72b6d3c0c174e92d5bec191a2b86">const_iterator</a> <a class="code" href="classisis_1_1data_1_1TypedImage.html#a7d6e6d04889c61bb9899df125ec2939e">end</a>()<span class="keyword"> const </span>{
+<a name="l00849"></a>00849         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">begin</a>() + <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>();
+<a name="l00850"></a>00850     };
+<a name="l00851"></a>00851 };
+<a name="l00852"></a>00852 
+<a name="l00857"></a><a class="code" href="classisis_1_1data_1_1MemImage.html">00857</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1MemImage.html" title="An Image which always uses its own memory and a specific type.">MemImage</a>: <span class="keyword">public</span> <a class="code" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a>&lt;T&gt;
+<a name="l00858"></a>00858 {
+<a name="l00859"></a>00859 <span class="keyword">public</span>:
+<a name="l00865"></a><a class="code" href="classisis_1_1data_1_1MemImage.html#a7bcae94f698adcb22d4ec30b8075d40b">00865</a>     <a class="code" href="classisis_1_1data_1_1MemImage.html#a7bcae94f698adcb22d4ec30b8075d40b" title="Copy contructor.">MemImage</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;src ) {
+<a name="l00866"></a>00866         <a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">operator= </a>( src );
+<a name="l00867"></a>00867     }
 <a name="l00868"></a>00868 
-<a name="l00869"></a>00869         <span class="comment">//we want deep copies of the chunks, and we want them to be of type T</span>
-<a name="l00870"></a>00870         <span class="keyword">struct </span>: _internal::SortedChunkList::chunkPtrOperator {
-<a name="l00871"></a>00871             std::pair&lt;util::ValueReference, util::ValueReference&gt; scale;
-<a name="l00872"></a>00872             boost::shared_ptr&lt;Chunk&gt; operator() ( <span class="keyword">const</span> boost::shared_ptr&lt; Chunk &gt;&amp; ptr ) {
-<a name="l00873"></a>00873                 <span class="keywordflow">return</span> boost::shared_ptr&lt;Chunk&gt; ( <span class="keyword">new</span> <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk&lt;T&gt;</a> ( *ptr, scale ) );
-<a name="l00874"></a>00874             }
-<a name="l00875"></a>00875         } conv_op;
-<a name="l00876"></a>00876         conv_op.scale = ref.<a class="code" href="classisis_1_1data_1_1Image.html#a789138e66345f3e5a73c65dbf05b2940" title="for each chunk get the scaling (and offset) which would be used in an conversion to the given type...">getScalingTo</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
-<a name="l00877"></a>00877         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Computed scaling for conversion from source image: [&quot;</span> &lt;&lt; conv_op.scale &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;
-<a name="l00878"></a>00878 
-<a name="l00879"></a>00879         this-&gt;<span class="keyword">set</span>.transform ( conv_op );
-<a name="l00880"></a>00880 
-<a name="l00881"></a>00881         <span class="keywordflow">if</span> ( ref.<a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() ) {
-<a name="l00882"></a>00882             this-&gt;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a> = this-&gt;<span class="keyword">set</span>.getLookup(); <span class="comment">// the lookup table still points to the old chunks</span>
-<a name="l00883"></a>00883         } <span class="keywordflow">else</span> {
-<a name="l00884"></a>00884             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Copied unclean image. Running reIndex on the copy.&quot;</span>;
-<a name="l00885"></a>00885             this-&gt;<a class="code" href="classisis_1_1data_1_1Image.html#a801a02eb15ae94b384aaa97061e2ad1c" title="(Re)computes the image layout and metadata.">reIndex</a>();
-<a name="l00886"></a>00886         }
+<a name="l00874"></a><a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f">00874</a>     <a class="code" href="classisis_1_1data_1_1MemImage.html" title="An Image which always uses its own memory and a specific type.">MemImage</a> &amp;<a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">operator= </a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> &amp;ref ) { <span class="comment">// copy the image, and make sure its of the given type</span>
+<a name="l00875"></a>00875 
+<a name="l00876"></a>00876         <a class="code" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f" title="Copy operator.">Image::operator= </a>( ref ); <span class="comment">// ok we just copied the whole image</span>
+<a name="l00877"></a>00877 
+<a name="l00878"></a>00878         <span class="comment">//we want deep copies of the chunks, and we want them to be of type T</span>
+<a name="l00879"></a>00879         <span class="keyword">struct </span>: _internal::SortedChunkList::chunkPtrOperator {
+<a name="l00880"></a>00880             std::pair&lt;util::ValueReference, util::ValueReference&gt; scale;
+<a name="l00881"></a>00881             boost::shared_ptr&lt;Chunk&gt; operator() ( <span class="keyword">const</span> boost::shared_ptr&lt; Chunk &gt;&amp; ptr ) {
+<a name="l00882"></a>00882                 <span class="keywordflow">return</span> boost::shared_ptr&lt;Chunk&gt; ( <span class="keyword">new</span> <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk&lt;T&gt;</a> ( *ptr, scale ) );
+<a name="l00883"></a>00883             }
+<a name="l00884"></a>00884         } conv_op;
+<a name="l00885"></a>00885         conv_op.scale = ref.<a class="code" href="classisis_1_1data_1_1Image.html#a789138e66345f3e5a73c65dbf05b2940" title="for each chunk get the scaling (and offset) which would be used in an conversion to the given type...">getScalingTo</a> ( <a class="code" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray&lt;T&gt;::staticID</a> );
+<a name="l00886"></a>00886         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Computed scaling for conversion from source image: [&quot;</span> &lt;&lt; conv_op.scale &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;
 <a name="l00887"></a>00887 
-<a name="l00888"></a>00888         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00889"></a>00889     }
-<a name="l00890"></a>00890 };
-<a name="l00891"></a>00891 
-<a name="l00892"></a>00892 }
-<a name="l00893"></a>00893 }
-<a name="l00894"></a>00894 
-<a name="l00895"></a>00895 <span class="preprocessor">#endif // IMAGE_H</span>
+<a name="l00888"></a>00888         this-&gt;<span class="keyword">set</span>.transform ( conv_op );
+<a name="l00889"></a>00889 
+<a name="l00890"></a>00890         <span class="keywordflow">if</span> ( ref.<a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() ) {
+<a name="l00891"></a>00891             this-&gt;<a class="code" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a> = this-&gt;<span class="keyword">set</span>.getLookup(); <span class="comment">// the lookup table still points to the old chunks</span>
+<a name="l00892"></a>00892         } <span class="keywordflow">else</span> {
+<a name="l00893"></a>00893             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a> ( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Copied unclean image. Running reIndex on the copy.&quot;</span>;
+<a name="l00894"></a>00894             this-&gt;<a class="code" href="classisis_1_1data_1_1Image.html#a801a02eb15ae94b384aaa97061e2ad1c" title="(Re)computes the image layout and metadata.">reIndex</a>();
+<a name="l00895"></a>00895         }
+<a name="l00896"></a>00896 
+<a name="l00897"></a>00897         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00898"></a>00898     }
+<a name="l00899"></a>00899 };
+<a name="l00900"></a>00900 
+<a name="l00901"></a>00901 }
+<a name="l00902"></a>00902 }
+<a name="l00903"></a>00903 
+<a name="l00904"></a>00904 <span class="preprocessor">#endif // IMAGE_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

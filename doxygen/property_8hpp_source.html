@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/property.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/property.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/property.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/property.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="property_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -108,25 +108,34 @@
 <a name="l00122"></a>00122         <span class="keywordflow">return</span> <span class="keyword">false</span>;
 <a name="l00123"></a>00123     }
 <a name="l00124"></a>00124 
-<a name="l00129"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#af7db404b5497a9dfbbc254044e6d7ca3">00129</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; T <a class="code" href="classisis_1_1util_1_1PropertyValue.html#af7db404b5497a9dfbbc254044e6d7ca3" title="Interpret the value as value of any (other) type.  hook for ValueBase::as">as</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> ( **this ).as&lt;T&gt;();}
-<a name="l00130"></a>00130 
-<a name="l00135"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#a88eb102c6a4b1eb475777306e835682d">00135</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#a88eb102c6a4b1eb475777306e835682d" title=" hook for ValueBase::is">is</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> ( **this ).is&lt;T&gt;();}
-<a name="l00136"></a>00136 
-<a name="l00141"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39">00141</a>     std::string <a class="code" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39" title=" hook for ValueBase::getTypeName">getTypeName</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> ( **this ).getTypeName();}
+<a name="l00129"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#af7db404b5497a9dfbbc254044e6d7ca3">00129</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; T <a class="code" href="classisis_1_1util_1_1PropertyValue.html#af7db404b5497a9dfbbc254044e6d7ca3" title="Interpret the value as value of any (other) type.  hook for ValueBase::as">as</a>()<span class="keyword">const </span>{
+<a name="l00130"></a>00130         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !*<span class="keyword">this</span>, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Doing as&lt;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;T&gt;::staticName</a>() &lt;&lt;  <span class="stringliteral">&quot;&gt;() on empty property, this will crash&quot;</span>;
+<a name="l00131"></a>00131         <span class="keywordflow">return</span> ( **this ).<a class="code" href="classisis_1_1util_1_1ValueBase.html#a0beecb81c7b41156f230bee6cabd8343" title="Interpret the value as value of any (other) type.">as</a>&lt;T&gt;();
+<a name="l00132"></a>00132     }
+<a name="l00133"></a>00133 
+<a name="l00138"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#a88eb102c6a4b1eb475777306e835682d">00138</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#a88eb102c6a4b1eb475777306e835682d" title=" hook for ValueBase::is">is</a>()<span class="keyword">const </span>{
+<a name="l00139"></a>00139         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !*<span class="keyword">this</span>, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Doing is&lt;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;T&gt;::staticName</a>() &lt;&lt;  <span class="stringliteral">&quot;&gt;() on empty property, this will crash&quot;</span>;
+<a name="l00140"></a>00140         <span class="keywordflow">return</span> ( **this ).<a class="code" href="classisis_1_1util_1_1ValueBase.html#a1eb3ec95ef9955dc6cafa2abcde1fed5">is</a>&lt;T&gt;();
+<a name="l00141"></a>00141     }
 <a name="l00142"></a>00142 
-<a name="l00147"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#a9dbabdacfa18efbf4e3d127ef614b8bc">00147</a>     <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#a9dbabdacfa18efbf4e3d127ef614b8bc" title=" hook for ValueBase::getTypeID">getTypeID</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> ( **this ).getTypeID();}
+<a name="l00147"></a>00147     std::string <a class="code" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39" title=" hook for ValueBase::getTypeName">getTypeName</a>()<span class="keyword">const</span>;
 <a name="l00148"></a>00148 
-<a name="l00153"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684">00153</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; T &amp;<a class="code" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684" title="Dynamically cast the ValueBase up to its actual value of type T.  hook for ValueBase::castTo">castTo</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> ( **this ).castTo&lt;T&gt;();}
-<a name="l00154"></a>00154 };
-<a name="l00155"></a>00155 
-<a name="l00156"></a>00156 }
-<a name="l00157"></a>00157 }
-<a name="l00158"></a>00158 <span class="preprocessor">#endif</span>
-<a name="l00159"></a>00159 <span class="preprocessor"></span>
-<a name="l00160"></a>00160 
+<a name="l00153"></a>00153     <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#ad667807666f161e1bfdc300002bba119" title=" hook for ValueBase::getTypeID">getTypeID</a>()<span class="keyword">const</span>;
+<a name="l00154"></a>00154 
+<a name="l00159"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684">00159</a>     <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; T &amp;<a class="code" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684" title="Dynamically cast the ValueBase up to its actual value of type T.  hook for ValueBase::castTo">castTo</a>()<span class="keyword">const </span>{
+<a name="l00160"></a>00160         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !*<span class="keyword">this</span>, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Casting empty property to &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">util::MSubject</a>( <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;T&gt;::staticName</a>() ) &lt;&lt; <span class="stringliteral">&quot;, this will crash&quot;</span>;
+<a name="l00161"></a>00161         <span class="keywordflow">return</span> ( **this ).castTo&lt;T&gt;();
+<a name="l00162"></a>00162     }
+<a name="l00163"></a>00163 };
+<a name="l00164"></a>00164 
+<a name="l00165"></a>00165 }
+<a name="l00166"></a>00166 }
+<a name="l00167"></a>00167 <span class="preprocessor">#endif</span>
+<a name="l00168"></a>00168 <span class="preprocessor"></span>
+<a name="l00169"></a>00169 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

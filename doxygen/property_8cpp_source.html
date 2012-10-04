@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/property.cpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/property.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/property.cpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/property.cpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="property_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -80,12 +80,23 @@
 <a name="l00039"></a>00039 
 <a name="l00040"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#ad5df4011f83d0292eb91cb68ce10d723">00040</a> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#ad5df4011f83d0292eb91cb68ce10d723" title="Empty constructor.">PropertyValue::PropertyValue</a> ( ) : m_needed( false ) {}
 <a name="l00041"></a>00041 
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 }
-<a name="l00044"></a>00044 }
+<a name="l00042"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39">00042</a> std::string <a class="code" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39" title=" hook for ValueBase::getTypeName">PropertyValue::getTypeName</a>()<span class="keyword"> const</span>
+<a name="l00043"></a>00043 <span class="keyword"></span>{
+<a name="l00044"></a>00044     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !*<span class="keyword">this</span>, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Doing getTypeName on empty property, this will crash&quot;</span>;
+<a name="l00045"></a>00045     <span class="keywordflow">return</span> ( **this ).getTypeName();
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 
+<a name="l00048"></a><a class="code" href="classisis_1_1util_1_1PropertyValue.html#ad667807666f161e1bfdc300002bba119">00048</a> <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html#ad667807666f161e1bfdc300002bba119" title=" hook for ValueBase::getTypeID">PropertyValue::getTypeID</a>()<span class="keyword"> const</span>
+<a name="l00049"></a>00049 <span class="keyword"></span>{
+<a name="l00050"></a>00050     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( !*<span class="keyword">this</span>, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Doing getTypeID on empty property, this will crash&quot;</span>;
+<a name="l00051"></a>00051     <span class="keywordflow">return</span> ( **this ).getTypeID();
+<a name="l00052"></a>00052 }
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 }
+<a name="l00055"></a>00055 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

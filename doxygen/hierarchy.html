@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -47,12 +47,10 @@
 </ul>
 </li>
 <li><a class="el" href="class__internal_1_1array.html">array</a><ul>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; data::Chunk &gt;, NInput &gt;</a></li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; data::Chunk &gt;, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; data::Image &gt;, NInput &gt;</a></li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; data::Image &gt;, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; InType &gt;, NInput &gt;</a></li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; boost::shared_ptr&lt; OutType &gt;, NOutput &gt;</a></li>
+<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, 3 &gt;</a><ul>
+<li><a class="el" href="classisis_1_1util_1_1vector3.html">isis::util::vector3&lt; TYPE &gt;</a></li>
+</ul>
+</li>
 <li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, 4 &gt;</a><ul>
 <li><a class="el" href="classisis_1_1util_1_1vector4.html">isis::util::vector4&lt; TYPE &gt;</a></li>
 </ul>
@@ -63,16 +61,12 @@
 <li><a class="el" href="structisis_1_1util_1_1checkType.html">isis::util::checkType&lt; T &gt;</a></li>
 <li><a class="el" href="classisis_1_1data_1_1ChunkOp.html">isis::data::ChunkOp</a></li>
 <li><a class="el" href="structisis_1_1util_1_1color.html">isis::util::color&lt; T &gt;</a></li>
-<li><a class="el" href="classCONTAINER.html">CONTAINER</a><ul>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, ROWS *COLS, CONTAINER &gt;</a><ul>
-<li><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a></li>
-</ul>
-</li>
 <li><a class="el" href="classtypename_01FixedVector_1_1container__type.html">container_type</a><ul>
 <li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, ROWS *COLS, typename FixedVector&lt; TYPE, ROWS *COLS &gt;::container_type &gt;</a><ul>
+<li><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix&lt; TYPE, 3, 3 &gt;</a><ul>
+<li><a class="el" href="classisis_1_1util_1_1Matrix3x3.html">isis::util::Matrix3x3&lt; TYPE &gt;</a></li>
+</ul>
+</li>
 <li><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix&lt; TYPE, 4, 4 &gt;</a><ul>
 <li><a class="el" href="classisis_1_1util_1_1Matrix4x4.html">isis::util::Matrix4x4&lt; TYPE &gt;</a></li>
 </ul>
@@ -87,30 +81,6 @@
 </li>
 <li><a class="el" href="classisis_1_1data_1_1ValueArrayBase_1_1DelProxy.html">isis::data::ValueArrayBase::DelProxy</a></li>
 <li><a class="el" href="classisis_1_1image__io_1_1FileFormat.html">isis::image_io::FileFormat</a></li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html">isis::filter::_internal::FilterBase</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">isis::filter::_internal::HasNInput&lt; data::Chunk, NInput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; data::Chunk, data::Chunk, NInput, NOutput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1ChunkFilter.html">isis::filter::ChunkFilter&lt; NInput, NOutput &gt;</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">isis::filter::_internal::HasNInput&lt; data::Image, NInput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; data::Image, data::Image, NInput, NOutput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1ImageFilter.html">isis::filter::ImageFilter&lt; NInput, NOutput &gt;</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">isis::filter::_internal::HasNInput&lt; InType, NInput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; InType, OutType, NInput, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html">isis::filter::_internal::Filter&lt; InType, OutType, NInput,-1 &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html">isis::filter::_internal::Filter&lt; InType, OutType,-1, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html">isis::filter::_internal::HasNInput&lt; TYPE, NInput &gt;</a></li>
-</ul>
-</li>
 <li><a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">isis::util::_internal::GenericReference&lt; TYPE_TYPE &gt;</a><ul>
 <li><a class="el" href="classisis_1_1data_1_1Chunk.html">isis::data::Chunk</a><ul>
 <li><a class="el" href="classisis_1_1data_1_1MemChunk.html">isis::data::MemChunk&lt; TYPE &gt;</a></li>
@@ -138,20 +108,6 @@
 </li>
 </ul>
 </li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">isis::filter::_internal::HasNOutput&lt; TYPE, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">isis::filter::_internal::HasNOutput&lt; data::Chunk, NOutput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; data::Chunk, data::Chunk, NInput, NOutput &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">isis::filter::_internal::HasNOutput&lt; data::Image, NOutput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; data::Image, data::Image, NInput, NOutput &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html">isis::filter::_internal::HasNOutput&lt; OutType, NOutput &gt;</a><ul>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter.html">isis::filter::_internal::Filter&lt; InType, OutType, NInput, NOutput &gt;</a></li>
-<li><a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html">isis::filter::_internal::Filter&lt; InType, OutType,-1, NOutput &gt;</a></li>
-</ul>
-</li>
 <li><a class="el" href="classisis_1_1data_1_1__internal_1_1ImageIteratorTemplate.html">isis::data::_internal::ImageIteratorTemplate&lt; CHUNK_TYPE &gt;</a></li>
 <li><a class="el" href="classisis_1_1data_1_1IOFactory.html">isis::data::IOFactory</a></li>
 <li><a class="el" href="classisis_1_1util_1_1Message.html">isis::util::Message</a></li>
@@ -171,6 +127,7 @@
 </li>
 </ul>
 </li>
+<li><a class="el" href="classisis_1_1util_1_1PropertyMap_1_1NeededsList.html">isis::util::PropertyMap::NeededsList&lt; T &gt;</a></li>
 <li><a class="el" href="structisis_1_1data_1_1ValueArray_1_1NonDeleter.html">isis::data::ValueArray&lt; TYPE &gt;::NonDeleter</a></li>
 <li><a class="el" href="classisis_1_1util_1_1ParameterMap.html">isis::util::ParameterMap</a></li>
 <li><a class="el" href="structisis_1_1data_1_1FilePtr_1_1GeneratorMap_1_1proc.html">isis::data::FilePtr::GeneratorMap::proc</a></li>
@@ -183,15 +140,24 @@
 </ul>
 </li>
 <li><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">isis::util::PropertyMap::PropPath</a></li>
+<li><a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;::result_of_mult&lt; A, B &gt;</a></li>
 <li><a class="el" href="classisis_1_1util_1_1Selection.html">isis::util::Selection</a></li>
 <li><a class="el" href="classisis_1_1util_1_1Singletons.html">isis::util::Singletons</a></li>
 <li><a class="el" href="classisis_1_1util_1_1TmpFile.html">isis::util::TmpFile</a></li>
 <li><a class="el" href="classisis_1_1data_1_1__internal_1_1ValueArrayIterator.html">isis::data::_internal::ValueArrayIterator&lt; TYPE &gt;</a></li>
 <li><a class="el" href="classisis_1_1data_1_1VoxelOp.html">isis::data::VoxelOp&lt; TYPE &gt;</a></li>
 <li><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html">isis::util::PropertyMap::walkTree&lt; Predicate &gt;</a></li>
+<li><a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a><ul>
+<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, ROWS *COLS, CONTAINER &gt;</a><ul>
+<li><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</a></li>
+</ul>
+</li>
+<li><a class="el" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt; TYPE, SIZE, CONTAINER &gt;</a></li>
+</ul>
+</li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/log_modules.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/log_modules.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/log_modules.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/log_modules.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="log__modules_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef LOG_MOUDLES_HPP_INCLUDED</span>
@@ -52,12 +52,15 @@
 <a name="l00012"></a>00012 
 <a name="l00013"></a>00013 <span class="keyword">struct </span>DataLog {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;Data&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_LOG};};
 <a name="l00014"></a>00014 <span class="keyword">struct </span>DataDebug {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;DataDebug&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_DEBUG};};
-<a name="l00015"></a>00015 }
-<a name="l00017"></a>00017 
-<a name="l00018"></a>00018 <span class="preprocessor">#endif //LOG_MOUDLES_HPP_INCLUDED</span>
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016 <span class="keyword">struct </span>FilterLog {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;Filter&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_LOG};};
+<a name="l00017"></a>00017 <span class="keyword">struct </span>FilterDebug {<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *name() {<span class="keywordflow">return</span> <span class="stringliteral">&quot;FilterDebug&quot;</span>;}; <span class="keyword">enum</span> {use = _ENABLE_DEBUG};};
+<a name="l00018"></a>00018 }
+<a name="l00020"></a>00020 
+<a name="l00021"></a>00021 <span class="preprocessor">#endif //LOG_MOUDLES_HPP_INCLUDED</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

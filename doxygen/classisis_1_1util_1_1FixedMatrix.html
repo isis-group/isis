@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -45,6 +45,7 @@
 </div>
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a>  </div>
@@ -61,10 +62,13 @@ Inheritance diagram for isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER 
   <img src="classisis_1_1util_1_1FixedMatrix.png" usemap="#isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;_map" alt=""/>
   <map id="isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;_map" name="isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;_map">
 <area href="classisis_1_1util_1_1FixedVector.html" alt="isis::util::FixedVector&lt; TYPE, ROWS *COLS, CONTAINER &gt;" shape="rect" coords="0,56,356,80"/>
-<area href="classCONTAINER.html" alt="CONTAINER" shape="rect" coords="0,0,356,24"/>
+<area href="classisis_1_1util_1_1CONTAINER.html" alt="CONTAINER" shape="rect" coords="0,0,356,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">result_of_mult</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef TYPE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">value_type</a></td></tr>
@@ -73,11 +77,13 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a2bfbda2e56917b588750e62fba45bfb2">copyFrom</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt; src[ROWS])</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , size_t COLS2, typename CONTAINER2 &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; TYPE2, COLS2, <br class="typebreak"/>
-ROWS, CONTAINER2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#abeafe3fd60bc78822f2a82679e921a56">dot</a> (const <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; TYPE2, COLS2, COLS, CONTAINER2 &gt; &amp;right) const </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; typename <br class="typebreak"/>
+<a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">result_of_mult</a>&lt; TYPE, TYPE2 &gt;<br class="typebreak"/>
+::type, COLS2, ROWS &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a8870764fa9ed5de08ffde19c69046b7a">dot</a> (const <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; TYPE2, COLS2, COLS, CONTAINER2 &gt; &amp;right) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, <br class="typebreak"/>
-CONTAINER2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a1a0889d57fe64a7af554424381a0290a">dot</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt; &amp;right) const </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; typename <br class="typebreak"/>
+<a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">result_of_mult</a>&lt; TYPE, TYPE2 &gt;<br class="typebreak"/>
+::type, COLS &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a0e7bcee1578f9c90cbebdcc1e3a1b73c">dot</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt; &amp;right) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TYPE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a600324601e68d2238acebe25a3ae7c63">elem</a> (size_t column, size_t row)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const TYPE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html#ad285eeac5ff84b742511495407df94c4">elem</a> (size_t column, size_t row) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE2 , typename CONTAINER2 &gt; </td></tr>
@@ -101,7 +107,7 @@ Static Public Attributes</h2></td></tr>
  class isis::util::FixedMatrix&lt; TYPE, COLS, ROWS, CONTAINER &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00036">36</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00037">37</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 </div><hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="a9a89431513d5fd68258e08df920aacf4"></a><!-- doxytag: member="isis::util::FixedMatrix::value_type" ref="a9a89431513d5fd68258e08df920aacf4" args="" -->
 <div class="memitem">
@@ -110,7 +116,7 @@ Static Public Attributes</h2></td></tr>
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef TYPE <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">value_type</a></td>
+          <td class="memname">typedef TYPE <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a9a89431513d5fd68258e08df920aacf4">value_type</a></td>
         </tr>
       </table>
 </div>
@@ -118,7 +124,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 
 <p>Reimplemented from <a class="el" href="classisis_1_1util_1_1FixedVector.html#af353ca4a24e418aa96a36aa50dd7eda0">isis::util::FixedVector&lt; TYPE, ROWS *COLS, CONTAINER &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00042">42</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00046">46</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -130,7 +136,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [inline]</code></td>
@@ -139,7 +145,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00052">52</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00056">56</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -152,7 +158,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE2 &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
           <td>(</td>
           <td class="paramtype">const TYPE2&#160;</td>
           <td class="paramname"><em>src</em>[ROWS *COLS]</td><td>)</td>
@@ -162,7 +168,7 @@ template&lt;typename TYPE2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00055">55</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00059">59</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -175,7 +181,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt;&#160;</td>
           <td class="paramname"><em>src</em>[ROWS]</td><td>)</td>
@@ -185,7 +191,7 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00058">58</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00062">62</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -196,7 +202,7 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a> </td>
           <td>(</td>
           <td class="paramtype">const boost::numeric::ublas::matrix&lt; TYPE &gt; &amp;&#160;</td>
           <td class="paramname"><em>boost_matrix</em></td><td>)</td>
@@ -206,7 +212,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00060">60</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00064">64</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +226,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::copyFrom </td>
+          <td class="memname">void <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::copyFrom </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt;&#160;</td>
           <td class="paramname"><em>src</em>[ROWS]</td><td>)</td>
@@ -230,11 +236,11 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00045">45</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00049">49</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1a0889d57fe64a7af554424381a0290a"></a><!-- doxytag: member="isis::util::FixedMatrix::dot" ref="a1a0889d57fe64a7af554424381a0290a" args="(const FixedVector&lt; TYPE2, COLS, CONTAINER2 &gt; &amp;right) const " -->
+<a class="anchor" id="a0e7bcee1578f9c90cbebdcc1e3a1b73c"></a><!-- doxytag: member="isis::util::FixedMatrix::dot" ref="a0e7bcee1578f9c90cbebdcc1e3a1b73c" args="(const FixedVector&lt; TYPE2, COLS, CONTAINER2 &gt; &amp;right) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -243,7 +249,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE2, COLS, CONTAINER2&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::dot </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;typename <a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">result_of_mult</a>&lt;TYPE, TYPE2&gt;::type, COLS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::dot </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE2, COLS, CONTAINER2 &gt; &amp;&#160;</td>
           <td class="paramname"><em>right</em></td><td>)</td>
@@ -253,11 +259,11 @@ template&lt;typename TYPE2 , typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00146">146</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00151">151</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abeafe3fd60bc78822f2a82679e921a56"></a><!-- doxytag: member="isis::util::FixedMatrix::dot" ref="abeafe3fd60bc78822f2a82679e921a56" args="(const FixedMatrix&lt; TYPE2, COLS2, COLS, CONTAINER2 &gt; &amp;right) const " -->
+<a class="anchor" id="a8870764fa9ed5de08ffde19c69046b7a"></a><!-- doxytag: member="isis::util::FixedMatrix::dot" ref="a8870764fa9ed5de08ffde19c69046b7a" args="(const FixedMatrix&lt; TYPE2, COLS2, COLS, CONTAINER2 &gt; &amp;right) const " -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -266,7 +272,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE2 , size_t COLS2, typename CONTAINER2 &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE2, COLS2, ROWS, CONTAINER2&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::dot </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;typename <a class="el" href="structisis_1_1util_1_1FixedMatrix_1_1result__of__mult.html">result_of_mult</a>&lt;TYPE, TYPE2&gt;::type, COLS2, ROWS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::dot </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt; TYPE2, COLS2, COLS, CONTAINER2 &gt; &amp;&#160;</td>
           <td class="paramname"><em>right</em></td><td>)</td>
@@ -276,7 +282,7 @@ template&lt;typename TYPE2 , size_t COLS2, typename CONTAINER2 &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00126">126</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00130">130</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +293,7 @@ template&lt;typename TYPE2 , size_t COLS2, typename CONTAINER2 &gt; </div>
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">TYPE&amp; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::elem </td>
+          <td class="memname">TYPE&amp; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::elem </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>column</em>, </td>
@@ -307,7 +313,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00075">75</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00079">79</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +324,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const TYPE&amp; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::elem </td>
+          <td class="memname">const TYPE&amp; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::elem </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>column</em>, </td>
@@ -338,7 +344,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00076">76</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00080">80</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,7 +355,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">boost::numeric::ublas::matrix&lt;TYPE&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::getBoostMatrix </td>
+          <td class="memname">boost::numeric::ublas::matrix&lt;TYPE&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::getBoostMatrix </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -358,7 +364,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00078">78</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00082">82</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -369,7 +375,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, COLS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::getRow </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, COLS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::getRow </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>rownum</em></td><td>)</td>
@@ -379,7 +385,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00159">159</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00165">165</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -390,7 +396,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, COLS, ROWS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::inverse </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, COLS, ROWS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::inverse </td>
           <td>(</td>
           <td class="paramtype">bool &amp;&#160;</td>
           <td class="paramname"><em>invertible</em></td><td>)</td>
@@ -400,7 +406,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00101">101</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00105">105</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -411,7 +417,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, ROWS, COLS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::transpose </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1FixedMatrix.html">FixedMatrix</a>&lt;TYPE, ROWS, COLS&gt; <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::transpose </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -420,7 +426,7 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00090">90</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00094">94</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -432,13 +438,13 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const size_t <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a> = COLS<code> [static]</code></td>
+          <td class="memname">const size_t <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a2fd7021725d60d855efc74723736ebd7">columns</a> = COLS<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00040">40</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00044">44</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -449,21 +455,21 @@ template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typena
 template&lt;typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector&lt;TYPE, ROWS *COLS&gt;::container_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const size_t <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classCONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a> = ROWS<code> [static]</code></td>
+          <td class="memname">const size_t <a class="el" href="classisis_1_1util_1_1FixedMatrix.html">isis::util::FixedMatrix</a>&lt; TYPE, COLS, ROWS, <a class="el" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> &gt;::<a class="el" href="classisis_1_1util_1_1FixedMatrix.html#a946b57582564fa86f054942f9ed2fad0">rows</a> = ROWS<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00039">39</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p>Definition at line <a class="el" href="matrix_8hpp_source.html#l00043">43</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="matrix_8hpp_source.html">matrix.hpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="matrix_8hpp_source.html">matrix.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:15 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -47,6 +47,7 @@
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pro-static-attribs">Static Protected Attributes</a>  </div>
@@ -107,6 +108,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1ValueArray.html">ValueArray</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ab94b524daf0b9172d90704c447f16e03">copyAsValueArray</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy all voxel data into a new <a class="el" href="classisis_1_1data_1_1ValueArray.html" title="Generic class for type (and length) - aware pointers.">ValueArray</a>.  <a href="#ab94b524daf0b9172d90704c447f16e03"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#aa79f18c9661aaca6db909453921eae22">copyByID</a> (unsigned short ID=0, scaling_pair scaling=scaling_pair()) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> of consisting of deep copied chunks.  <a href="#aa79f18c9661aaca6db909453921eae22"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">isis::data::Chunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a2fd76bb61355c14ef7035e740b462a5e">copyChunksToVector</a> (bool copy_metadata=true) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a sorted list of the chunks of the image.  <a href="#a2fd76bb61355c14ef7035e740b462a5e"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
@@ -135,9 +138,9 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a chunk via index (and the lookup table).  <a href="#a27cfa5f9ced2077e578ad4bcc064e028"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">util::PropertyValue</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a97524a597e61074c8b4b2e6e0ebdf8e6">getChunksProperties</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;key, bool unique=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a list of the properties of the chunks for the given key.  <a href="#a97524a597e61074c8b4b2e6e0ebdf8e6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a36e107da6a3d4744468b3c837534291b">getFoV</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#aacbf0d66df0ec2ddfe0e8d73d2eddc39">getIndexFromPhysicalCoords</a> (const <a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;physicalCoords, bool restrictedToImageBox=false) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the voxel index of the given physical coordinates (coordinates in scanner space) This function does not perform any test if the physical coordinates are inside the image.  <a href="#aacbf0d66df0ec2ddfe0e8d73d2eddc39"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#af19507da716adaa0a2ba4c9b8ea08005">getFoV</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a9d380dbc3dc9f40ebf8b6409e11d488c">getIndexFromPhysicalCoords</a> (const <a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;physicalCoords) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the voxel index of the given physical coordinates (coordinates in scanner space) This function does not perform any test if the physical coordinates are inside the image.  <a href="#a9d380dbc3dc9f40ebf8b6409e11d488c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Image.html#ac83f7eecffd172b0c0759cb5ee7dd633">orientation</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a5d4c287dbd53f05174f3070029e19ce9">getMainOrientation</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a601eaac6eedf7eaf6fdb6c31b1e8765d">getMajorTypeID</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type of the chunk with "biggest" type.  <a href="#a601eaac6eedf7eaf6fdb6c31b1e8765d"></a><br/></td></tr>
@@ -155,8 +158,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ace627e4628e39615cbae3b6b43b9d915">getNrOfRows</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a922ea56dd2eb60fbb6e0299138dcde70">getNrOfSlices</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a142c7b80e200d9822c28fc604bb031ee">getNrOfTimesteps</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a2e83ae32400db8cea79ece348a0acffe">getPhysicalCoordsFromIndex</a> (const <a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> &amp;index) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the physical coordinates (in scanner space) of the given voxel index.  <a href="#a2e83ae32400db8cea79ece348a0acffe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a35f4ff9c8816a66469d7aaa5b693ae70">getPhysicalCoordsFromIndex</a> (const <a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> &amp;index) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the physical coordinates (in scanner space) of the given voxel index.  <a href="#a35f4ff9c8816a66469d7aaa5b693ae70"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">scaling_pair&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a789138e66345f3e5a73c65dbf05b2940">getScalingTo</a> (unsigned short typeID, autoscaleOption scaleopt=autoscale) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">for each chunk get the scaling (and offset) which would be used in an conversion to the given type  <a href="#a789138e66345f3e5a73c65dbf05b2940"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericReference.html">util::ValueReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ab07f75534c9edeab26dc46c68c99771a">getVoxelValue</a> (size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0) const </td></tr>
@@ -182,8 +185,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a14a33c4d2ba857b38c2188fb8e8abfd9">insertChunk</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;chunk)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> into the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a>.  <a href="#a14a33c4d2ba857b38c2188fb8e8abfd9"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a507228763078c1c0ed6cc5b92c4cc65a">insertChunksFromContainer</a> (T &amp;chunks)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert Chunks or objects with the base <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> from a sequence container into the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a>.  <a href="#a507228763078c1c0ed6cc5b92c4cc65a"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ae94b9bb6689b5caae2e0885d71ffad83">insertChunksFromList</a> (std::list&lt; T &gt; &amp;chunks)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert Chunks or objects with the base <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> from a sequence container into the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a>.  <a href="#ae94b9bb6689b5caae2e0885d71ffad83"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a9fb0c9f8351fddc6a2fea609d487aa2b">isEmpty</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a153f570319fc42ea6f1123a5a5eb309c">mapScannerAxisToImageDimension</a> (<a class="el" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> scannerAxes)</td></tr>
@@ -201,11 +204,14 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the image coordinate system into an other system by multiplying the orientation matrix with a user defined transformation matrix.  <a href="#a10667fe639484021089fd983caaf58ea"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#aa2d4ca5ab19f210830ba7a871cb24406">updateOrientationMatrices</a> ()</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a31aecea5e2a012d677c59222ebe13198">voxel</a> (size_t first, size_t second=0, size_t third=0, size_t fourth=0)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This method returns a reference to the voxel value at the given coordinates.  <a href="#a31aecea5e2a012d677c59222ebe13198"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a907da37c72907fa34c67ed937a34c83a">voxel</a> (size_t first, size_t second=0, size_t third=0, size_t fourth=0) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reference to the voxel value at the given coordinates.  <a href="#a907da37c72907fa34c67ed937a34c83a"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a31aecea5e2a012d677c59222ebe13198">voxel</a> (size_t first, size_t second=0, size_t third=0, size_t fourth=0)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This method returns a reference to the voxel value at the given coordinates.  <a href="#a31aecea5e2a012d677c59222ebe13198"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a087ed8c4884cea467e47c386c65d5be2">chunkAt</a> (size_t at)</td></tr>
@@ -219,17 +225,17 @@ Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a07dfbac4eb23def6dd10ab2182d98eeb">clean</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; boost::shared_ptr<br class="typebreak"/>
 &lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a9c80a4fa8768d5df1c8bf67129e2cae9">lookup</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a8fa8b27baf0db3b33521c01015000ebe">m_ColumnVec</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">m_ColumnVecInv</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">m_Offset</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#af304cf98a684a4ea2e9e1e1283f0025a">m_RowVec</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a374ae697c25b616628a0baded99903aa">m_RowVecInv</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ac55db4f806fb53523b0ed5c599c360ab">m_SliceVec</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">m_SliceVecInv</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a409a8858502576ece0e23851306294f6">m_ColumnVec</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ae29cf093eaec130b17a464c8adf9f0fc">m_ColumnVecInv</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#aa48ea22c820fcb5748582c42167f47b6">m_Offset</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a94c5a4dae0eb700c87401ea6eac87c40">m_RowVec</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a7c8dfbee9badb073f6096ba8e21475af">m_RowVecInv</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a6512a575ed4322de1a439944773fafb0">m_SliceVec</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a080d2483667cd366d95aaf64276a9c1d">m_SliceVecInv</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">_internal::SortedChunkList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#af3656b415fa1872a8da29f82cb98ed6e">set</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">neededProperties</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">defaultChunkEqualitySet</a></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Main class for generic 4D-images. </p>
@@ -375,7 +381,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Copy constructor. </p>
 <p>Copies all elements, only the voxel-data (in the chunks) are referenced. </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00060">60</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00056">56</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -443,7 +449,7 @@ template&lt;typename T &gt; </div>
 <p>Create image from a vector of Chunks or objects with the base <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a>. </p>
 <p>Removes used chunks from the given list. So afterwards the list consists of the rejected chunks. </p>
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00312">312</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00311">311</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +480,7 @@ template&lt;typename T &gt; </div>
 
 <p>Create image from a single chunk. </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00043">43</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00042">42</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -495,7 +501,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1TypedImage.html#ae0eb2a2c2e9862d8730239d7afb3aec2">isis::data::TypedImage&lt; T &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01045">1045</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01048">1048</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,7 +521,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1TypedImage.html#ae03769fb22a4b5b013cf1a0d8c2a409c">isis::data::TypedImage&lt; T &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01060">1060</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01062">1062</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -533,7 +539,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00088">88</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00084">84</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +560,7 @@ template&lt;typename T &gt; </div>
 
 <p>Access a chunk via index (and the lookup table) The <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> will only have metadata which are unique to it - so it might be invalid (run join on it using the image as parameter to insert all non-unique-metadata). </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00579">579</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00570">570</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -576,7 +582,7 @@ template&lt;typename T &gt; </div>
 <p>Compares the voxel-values of this image to the given. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the amount of the different voxels </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00786">786</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00797">797</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +615,7 @@ template&lt;typename T &gt; </div>
 <p>If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version. The conversion is done using the value range of the image. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>false if there was an error </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00904">904</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00911">911</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -632,7 +638,7 @@ template&lt;typename T &gt; </div>
 <p>Copy all voxel data into a new <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a>. </p>
 <p>This creates a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> of the requested type and the same size as the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> and then copies all voxeldata of the image into that <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a>.</p>
 <p>If neccessary a conversion into T is done using min/max of the image.</p>
-<p>Also the properties of the first chunk are <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a8f5f0388f7901b9f4ee4afeb7732ba42">join</a>-ed with those of the image and copied. </p>
+<p>Also the properties of the first chunk are <a class="el" href="classisis_1_1util_1_1PropertyMap.html#afcc784b918ef67c115c0fc9138254e59">join</a>-ed with those of the image and copied. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This is a deep copy, no data will be shared between the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> and the <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a>. It will waste a lot of memory, use it wisely. </dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> containing the voxeldata and the properties of the <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> </dd></dl>
 
@@ -666,6 +672,44 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="aa79f18c9661aaca6db909453921eae22"></a><!-- doxytag: member="isis::data::Image::copyByID" ref="aa79f18c9661aaca6db909453921eae22" args="(unsigned short ID=0, scaling_pair scaling=scaling_pair()) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Image.html">Image</a> isis::data::Image::copyByID </td>
+          <td>(</td>
+          <td class="paramtype">unsigned short&#160;</td>
+          <td class="paramname"><em>ID</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">scaling_pair&#160;</td>
+          <td class="paramname"><em>scaling</em> = <code>scaling_pair()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a new <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> of consisting of deep copied chunks. </p>
+<p>If neccessary a conversion into the requested type is done using the given scale. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ID</td><td>the ID of the requested type (type of the respective source chunk is used if not given) </td></tr>
+    <tr><td class="paramname">scaling</td><td>the scaling to be used when converting the data (will be determined automatically if not given) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a new deep copied <a class="el" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> of the same size </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a2fd76bb61355c14ef7035e740b462a5e"></a><!-- doxytag: member="isis::data::Image::copyChunksToVector" ref="a2fd76bb61355c14ef7035e740b462a5e" args="(bool copy_metadata=true) const " -->
 <div class="memitem">
 <div class="memproto">
@@ -692,7 +736,7 @@ template&lt;typename T &gt; </div>
  std::vector&lt; data::MemChunk&lt;float&gt; &gt; memchunks(cheapchunks.begin(),cheapchunks.end()); <span class="comment">// this is not not</span>
 </pre></div> to get deep copies. </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00633">633</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00650">650</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -779,7 +823,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00596">596</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00584">584</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -799,7 +843,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1TypedImage.html#a7d6e6d04889c61bb9899df125ec2939e">isis::data::TypedImage&lt; T &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01074">1074</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01075">1075</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -819,7 +863,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1TypedImage.html#a510cd35b1115a31a26c5d7b231d67907">isis::data::TypedImage&lt; T &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01059">1059</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01061">1061</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -858,7 +902,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00986">986</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00991">991</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -888,7 +932,7 @@ template&lt;typename TYPE &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00737">737</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00746">746</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
@@ -949,7 +993,7 @@ template&lt;typename TYPE &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a copy of the chunk that contains the voxel at the given coordinates. (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced) </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00590">590</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00579">579</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1010,7 +1054,70 @@ template&lt;typename TYPE &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a copy of the chunk that contains the voxel at the given coordinates. (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced) </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00584">584</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00574">574</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a815e76cb9cc68006b2bbdad2cd9ded7c"></a><!-- doxytag: member="isis::data::Image::getChunkAs" ref="a815e76cb9cc68006b2bbdad2cd9ded7c" args="(size_t first, size_t second=0, size_t third=0, size_t fourth=0, bool copy_metadata=true) const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename TYPE &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> isis::data::Image::getChunkAs </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>first</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>second</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>third</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>fourth</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>copy_metadata</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the chunk that contains the voxel at the given coordinates in the given type. </p>
+<p>If the accordant chunk has type T a cheap copy is returned. Otherwise a MemChunk-copy of the requested type is created from it. In this case the minimum and maximum values of the image are computed and used for the <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> constructor.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">first</td><td>The first coordinate in voxel space. Usually the x value. </td></tr>
+    <tr><td class="paramname">second</td><td>The second coordinate in voxel space. Usually the y value. </td></tr>
+    <tr><td class="paramname">third</td><td>The third coordinate in voxel space. Ususally the z value. </td></tr>
+    <tr><td class="paramname">fourth</td><td>The fourth coordinate in voxel space. Usually the time value. </td></tr>
+    <tr><td class="paramname">copy_metadata</td><td>if true the metadata of the image are merged into the returned chunk </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a (maybe converted) chunk containing the voxel value at the given coordinates. </dd></dl>
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00483">483</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
@@ -1096,69 +1203,6 @@ template&lt;typename TYPE &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a815e76cb9cc68006b2bbdad2cd9ded7c"></a><!-- doxytag: member="isis::data::Image::getChunkAs" ref="a815e76cb9cc68006b2bbdad2cd9ded7c" args="(size_t first, size_t second=0, size_t third=0, size_t fourth=0, bool copy_metadata=true) const " -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename TYPE &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> isis::data::Image::getChunkAs </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>first</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>second</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>third</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>fourth</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>copy_metadata</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the chunk that contains the voxel at the given coordinates in the given type. </p>
-<p>If the accordant chunk has type T a cheap copy is returned. Otherwise a MemChunk-copy of the requested type is created from it. In this case the minimum and maximum values of the image are computed and used for the <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> constructor.</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">first</td><td>The first coordinate in voxel space. Usually the x value. </td></tr>
-    <tr><td class="paramname">second</td><td>The second coordinate in voxel space. Usually the y value. </td></tr>
-    <tr><td class="paramname">third</td><td>The third coordinate in voxel space. Ususally the z value. </td></tr>
-    <tr><td class="paramname">fourth</td><td>The fourth coordinate in voxel space. Usually the time value. </td></tr>
-    <tr><td class="paramname">copy_metadata</td><td>if true the metadata of the image are merged into the returned chunk </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a (maybe converted) chunk containing the voxel value at the given coordinates. </dd></dl>
-
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00483">483</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a27cfa5f9ced2077e578ad4bcc064e028"></a><!-- doxytag: member="isis::data::Image::getChunkAt" ref="a27cfa5f9ced2077e578ad4bcc064e028" args="(size_t at, bool copy_metadata=true) const " -->
 <div class="memitem">
 <div class="memproto">
@@ -1187,7 +1231,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Get a chunk via index (and the lookup table). </p>
 <p>The returned chunk will be a cheap copy of the original chunk. If copy_metadata is true the metadata of the image is copied into the chunk. </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00571">571</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00563">563</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1225,7 +1269,7 @@ template&lt;typename TYPE &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00708">708</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00723">723</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1256,16 +1300,16 @@ template&lt;typename TYPE &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the length of this chunk-"line" / the stride </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00650">650</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00666">666</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a36e107da6a3d4744468b3c837534291b"></a><!-- doxytag: member="isis::data::Image::getFoV" ref="a36e107da6a3d4744468b3c837534291b" args="() const " -->
+<a class="anchor" id="af19507da716adaa0a2ba4c9b8ea08005"></a><!-- doxytag: member="isis::data::Image::getFoV" ref="af19507da716adaa0a2ba4c9b8ea08005" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> isis::data::Image::getFoV </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> isis::data::Image::getFoV </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1278,26 +1322,16 @@ template&lt;typename TYPE &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="aacbf0d66df0ec2ddfe0e8d73d2eddc39"></a><!-- doxytag: member="isis::data::Image::getIndexFromPhysicalCoords" ref="aacbf0d66df0ec2ddfe0e8d73d2eddc39" args="(const util::fvector4 &amp;physicalCoords, bool restrictedToImageBox=false) const " -->
+<a class="anchor" id="a9d380dbc3dc9f40ebf8b6409e11d488c"></a><!-- doxytag: member="isis::data::Image::getIndexFromPhysicalCoords" ref="a9d380dbc3dc9f40ebf8b6409e11d488c" args="(const util::fvector3 &amp;physicalCoords) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> isis::data::Image::getIndexFromPhysicalCoords </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;&#160;</td>
-          <td class="paramname"><em>physicalCoords</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>restrictedToImageBox</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;&#160;</td>
+          <td class="paramname"><em>physicalCoords</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div>
@@ -1313,7 +1347,7 @@ template&lt;typename TYPE &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>voxel index associated with the given physicalCoords </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00199">199</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00190">190</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1331,7 +1365,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00820">820</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00830">830</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1353,7 +1387,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Determines the minimum and maximum of the image, (and with that the types of these limits). If they are not the same, the type which can store the other type is selected. E.g. if min is "-5(int8_t)" and max is "1000(int16_t)" "int16_t" is selected. Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)" Warning2: the cost of this is O(n) while <a class="el" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">Chunk::getTypeID</a> is O(1) - so do not use it in loops Warning3: the result is not exact - so never use it to determine the type for <a class="el" href="classisis_1_1data_1_1Image.html#a31aecea5e2a012d677c59222ebe13198" title="This method returns a reference to the voxel value at the given coordinates.">Image::voxel</a> (Use <a class="el" href="classisis_1_1data_1_1TypedImage.html" title="An Image where all chunks are guaranteed to have a specific type.">TypedImage</a> to get an image with an guaranteed type) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a number which is equal to the <a class="el" href="classisis_1_1data_1_1ValueArray.html#a8b2046c3039d3afaa9a94622ff8f2d12">ValueArray::staticID</a> of the selected type. </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00867">867</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00876">876</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1372,7 +1406,7 @@ template&lt;typename TYPE &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the typename correspondig to the result of typeID </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00899">899</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00907">907</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1396,7 +1430,7 @@ template&lt;typename TYPE &gt; </div>
 </pre></div> assuming "image" is your image. </dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Get the biggest size (in bytes) accross all voxels in the image. </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00731">731</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00745">745</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1416,7 +1450,7 @@ template&lt;typename TYPE &gt; </div>
 
 <p>Get the maximum and the minimum voxel value of the image as a pair of ValueReference-objects. </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00745">745</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00758">758</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1459,7 +1493,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of columns of the image </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01010">1010</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01014">1014</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1478,7 +1512,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of rows of the image </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01015">1015</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01018">1018</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1497,7 +1531,7 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of slices of the image </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01019">1019</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01021">1021</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1516,16 +1550,16 @@ template&lt;typename T &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of timesteps of the image </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01023">1023</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01024">1024</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2e83ae32400db8cea79ece348a0acffe"></a><!-- doxytag: member="isis::data::Image::getPhysicalCoordsFromIndex" ref="a2e83ae32400db8cea79ece348a0acffe" args="(const util::ivector4 &amp;index) const " -->
+<a class="anchor" id="a35f4ff9c8816a66469d7aaa5b693ae70"></a><!-- doxytag: member="isis::data::Image::getPhysicalCoordsFromIndex" ref="a35f4ff9c8816a66469d7aaa5b693ae70" args="(const util::ivector4 &amp;index) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> isis::data::Image::getPhysicalCoordsFromIndex </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> isis::data::Image::getPhysicalCoordsFromIndex </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1vector4.html">util::ivector4</a> &amp;&#160;</td>
           <td class="paramname"><em>index</em></td><td>)</td>
@@ -1545,7 +1579,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>physical coordinates associated with the given voxel index </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00187">187</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00179">179</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1615,7 +1649,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01076">1076</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01077">1077</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1649,7 +1683,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l01091">1091</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l01090">1090</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1678,20 +1712,20 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> was inserted, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00135">135</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00131">131</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a507228763078c1c0ed6cc5b92c4cc65a"></a><!-- doxytag: member="isis::data::Image::insertChunksFromContainer" ref="a507228763078c1c0ed6cc5b92c4cc65a" args="(T &amp;chunks)" -->
+<a class="anchor" id="ae94b9bb6689b5caae2e0885d71ffad83"></a><!-- doxytag: member="isis::data::Image::insertChunksFromList" ref="ae94b9bb6689b5caae2e0885d71ffad83" args="(std::list&lt; T &gt; &amp;chunks)" -->
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">size_t isis::data::Image::insertChunksFromContainer </td>
+          <td class="memname">size_t isis::data::Image::insertChunksFromList </td>
           <td>(</td>
-          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramtype">std::list&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>chunks</em></td><td>)</td>
           <td><code> [inline]</code></td>
         </tr>
@@ -1721,7 +1755,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00100">100</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00096">96</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1742,7 +1776,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented from <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a4a6bae8173d0a0e910903a634be674af">isis::util::PropertyMap</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00557">557</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00551">551</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1772,7 +1806,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the mapped image dimension </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00314">314</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00307">307</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1796,7 +1830,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1TypedImage.html#a16654e67097e9e70a1bcc16b84bdd640">isis::data::TypedImage&lt; T &gt;</a>, and <a class="el" href="classisis_1_1data_1_1MemImage.html#a734d63e8c8c9d1eec740522451662f7f">isis::data::MemImage&lt; T &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00066">66</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00062">62</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1818,7 +1852,7 @@ template&lt;typename T &gt; </div>
 <p>The image will be "clean" on success. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the image was successfully reindexed and is valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00333">333</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00326">326</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1846,7 +1880,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00177">177</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00169">169</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1915,7 +1949,7 @@ template&lt;typename T &gt; </div>
 <p>Automatically splice the given dimension and all dimensions above. </p>
 <p>e.g. spliceDownTo(sliceDim) will result in an image made of slices (aka 2d-chunks). </p>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00926">926</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00932">932</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1956,7 +1990,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>returns if the transformation was successfuly </dd></dl>
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00277">277</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00260">260</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -1974,7 +2008,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8cpp_source.html#l00223">223</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8cpp_source.html#l00206">206</a> of file <a class="el" href="image_8cpp_source.html">image.cpp</a>.</p>
 
 </div>
 </div>
@@ -2103,7 +2137,22 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00248">248</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00249">249</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4f9d2bc9fbdf23436f89973898c5cfe4"></a><!-- doxytag: member="isis::data::Image::defaultChunkEqualitySet" ref="a4f9d2bc9fbdf23436f89973898c5cfe4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* <a class="el" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">isis::data::Image::defaultChunkEqualitySet</a><code> [static, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00250">250</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
@@ -2118,76 +2167,16 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00210">210</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00211">211</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8fa8b27baf0db3b33521c01015000ebe"></a><!-- doxytag: member="isis::data::Image::m_ColumnVec" ref="a8fa8b27baf0db3b33521c01015000ebe" args="" -->
+<a class="anchor" id="a409a8858502576ece0e23851306294f6"></a><!-- doxytag: member="isis::data::Image::m_ColumnVec" ref="a409a8858502576ece0e23851306294f6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#a8fa8b27baf0db3b33521c01015000ebe">isis::data::Image::m_ColumnVec</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00283">283</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae4c1086fcefdcea6d4c026415732a0bd"></a><!-- doxytag: member="isis::data::Image::m_ColumnVecInv" ref="ae4c1086fcefdcea6d4c026415732a0bd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">isis::data::Image::m_ColumnVecInv</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00284">284</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2e1c0d32c0ffbacafb9bc54ca97fc469"></a><!-- doxytag: member="isis::data::Image::m_Offset" ref="a2e1c0d32c0ffbacafb9bc54ca97fc469" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">isis::data::Image::m_Offset</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00287">287</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af304cf98a684a4ea2e9e1e1283f0025a"></a><!-- doxytag: member="isis::data::Image::m_RowVec" ref="af304cf98a684a4ea2e9e1e1283f0025a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#af304cf98a684a4ea2e9e1e1283f0025a">isis::data::Image::m_RowVec</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00281">281</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a374ae697c25b616628a0baded99903aa"></a><!-- doxytag: member="isis::data::Image::m_RowVecInv" ref="a374ae697c25b616628a0baded99903aa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#a374ae697c25b616628a0baded99903aa">isis::data::Image::m_RowVecInv</a><code> [protected]</code></td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#a409a8858502576ece0e23851306294f6">isis::data::Image::m_ColumnVec</a><code> [protected]</code></td>
         </tr>
       </table>
 </div>
@@ -2197,27 +2186,27 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ac55db4f806fb53523b0ed5c599c360ab"></a><!-- doxytag: member="isis::data::Image::m_SliceVec" ref="ac55db4f806fb53523b0ed5c599c360ab" args="" -->
+<a class="anchor" id="ae29cf093eaec130b17a464c8adf9f0fc"></a><!-- doxytag: member="isis::data::Image::m_ColumnVecInv" ref="ae29cf093eaec130b17a464c8adf9f0fc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#ac55db4f806fb53523b0ed5c599c360ab">isis::data::Image::m_SliceVec</a><code> [protected]</code></td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#ae29cf093eaec130b17a464c8adf9f0fc">isis::data::Image::m_ColumnVecInv</a><code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00285">285</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00283">283</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad164cb7f1033182b3e33dff905f56787"></a><!-- doxytag: member="isis::data::Image::m_SliceVecInv" ref="ad164cb7f1033182b3e33dff905f56787" args="" -->
+<a class="anchor" id="aa48ea22c820fcb5748582c42167f47b6"></a><!-- doxytag: member="isis::data::Image::m_Offset" ref="aa48ea22c820fcb5748582c42167f47b6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="el" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">isis::data::Image::m_SliceVecInv</a><code> [protected]</code></td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#aa48ea22c820fcb5748582c42167f47b6">isis::data::Image::m_Offset</a><code> [protected]</code></td>
         </tr>
       </table>
 </div>
@@ -2227,18 +2216,78 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ad0eb63ce20448f5739077619951b5290"></a><!-- doxytag: member="isis::data::Image::neededProperties" ref="ad0eb63ce20448f5739077619951b5290" args="" -->
+<a class="anchor" id="a94c5a4dae0eb700c87401ea6eac87c40"></a><!-- doxytag: member="isis::data::Image::m_RowVec" ref="a94c5a4dae0eb700c87401ea6eac87c40" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* <a class="el" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">isis::data::Image::neededProperties</a><code> [static, protected]</code></td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#a94c5a4dae0eb700c87401ea6eac87c40">isis::data::Image::m_RowVec</a><code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00249">249</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00280">280</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7c8dfbee9badb073f6096ba8e21475af"></a><!-- doxytag: member="isis::data::Image::m_RowVecInv" ref="a7c8dfbee9badb073f6096ba8e21475af" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#a7c8dfbee9badb073f6096ba8e21475af">isis::data::Image::m_RowVecInv</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00281">281</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6512a575ed4322de1a439944773fafb0"></a><!-- doxytag: member="isis::data::Image::m_SliceVec" ref="a6512a575ed4322de1a439944773fafb0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#a6512a575ed4322de1a439944773fafb0">isis::data::Image::m_SliceVec</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00284">284</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a080d2483667cd366d95aaf64276a9c1d"></a><!-- doxytag: member="isis::data::Image::m_SliceVecInv" ref="a080d2483667cd366d95aaf64276a9c1d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> <a class="el" href="classisis_1_1data_1_1Image.html#a080d2483667cd366d95aaf64276a9c1d">isis::data::Image::m_SliceVecInv</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00285">285</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad0eb63ce20448f5739077619951b5290"></a><!-- doxytag: member="isis::data::Image::neededProperties" ref="ad0eb63ce20448f5739077619951b5290" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* <a class="el" href="classisis_1_1data_1_1Image.html#ad0eb63ce20448f5739077619951b5290">isis::data::Image::neededProperties</a><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00208">208</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
@@ -2253,16 +2302,16 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="image_8hpp_source.html#l00209">209</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
+<p>Definition at line <a class="el" href="image_8hpp_source.html#l00210">210</a> of file <a class="el" href="image_8hpp_source.html">image.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="image_8hpp_source.html">image.hpp</a></li>
-<li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="image_8cpp_source.html">image.cpp</a></li>
+<li>/scr/tee1/isis/lib/Core/DataStorage/<a class="el" href="image_8hpp_source.html">image.hpp</a></li>
+<li>/scr/tee1/isis/lib/Core/DataStorage/<a class="el" href="image_8cpp_source.html">image.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:35 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

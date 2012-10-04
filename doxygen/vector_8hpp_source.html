@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/vector.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/vector.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/vector.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/vector.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="vector_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -86,13 +86,13 @@
 <a name="l00046"></a>00046 }
 <a name="l00048"></a>00048 
 <a name="l00049"></a>00049 <span class="keyword">template</span> &lt; <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER = _<span class="keywordtype">int</span>ernal::array&lt;TYPE, SIZE&gt; &gt;
-<a name="l00050"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html">00050</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>: <span class="keyword">protected</span> <a class="code" href="classCONTAINER.html">CONTAINER</a>
+<a name="l00050"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html">00050</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>: <span class="keyword">protected</span> <a class="code" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a>
 <a name="l00051"></a>00051 {
 <a name="l00052"></a>00052 <span class="keyword">public</span>:
 <a name="l00053"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">00053</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> CONTAINER::iterator <a class="code" href="classisis_1_1util_1_1FixedVector.html#aa4709dea587ab0de026e00cd873e47cb">iterator</a>;
 <a name="l00054"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a6d62e671ecb1e277dbdac40ddb722b27">00054</a>     <span class="keyword">typedef</span> <span class="keyword">typename</span> CONTAINER::const_iterator <a class="code" href="classisis_1_1util_1_1FixedVector.html#a6d62e671ecb1e277dbdac40ddb722b27">const_iterator</a>;
 <a name="l00055"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9aba478fa4be4f8188cdaed0fa0d9e8d">00055</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9aba478fa4be4f8188cdaed0fa0d9e8d">this_class</a>;
-<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">00056</a>     <span class="keyword">typedef</span> <a class="code" href="classCONTAINER.html">CONTAINER</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">container_type</a>;
+<a name="l00056"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">00056</a>     <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1CONTAINER.html">CONTAINER</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a9c98dc7927d4dc21063de0c4bdf5d8b8">container_type</a>;
 <a name="l00057"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#af353ca4a24e418aa96a36aa50dd7eda0">00057</a>     <span class="keyword">typedef</span> TYPE <a class="code" href="classisis_1_1util_1_1FixedVector.html#af353ca4a24e418aa96a36aa50dd7eda0">value_type</a>;
 <a name="l00058"></a>00058 <span class="keyword">protected</span>:
 <a name="l00060"></a><a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48">00060</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OP&gt; <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html#a568f0262d5edf3de99a010693821ee48" title="Generic operations.">binaryOp</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">this_class</a> &amp;src )<span class="keyword">const </span>{
@@ -302,53 +302,69 @@
 <a name="l00328"></a>00328     }
 <a name="l00329"></a>00329 };
 <a name="l00330"></a>00330 
-<a name="l00331"></a>00331 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00332"></a><a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">00332</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">maxVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
+<a name="l00331"></a>00331 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE&gt;
+<a name="l00332"></a><a class="code" href="classisis_1_1util_1_1vector3.html">00332</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1vector3.html">vector3</a> : <span class="keyword">public</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt;TYPE, 3&gt;
 <a name="l00333"></a>00333 {
-<a name="l00334"></a>00334     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
-<a name="l00337"></a>00337         <span class="keywordflow">if</span> ( ret[i] &lt; second[i] )ret[i] = second[i];
-<a name="l00338"></a>00338 
-<a name="l00339"></a>00339     <span class="keywordflow">return</span> ret;
-<a name="l00340"></a>00340 }
-<a name="l00341"></a>00341 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
-<a name="l00342"></a><a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">00342</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">minVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
-<a name="l00343"></a>00343 {
-<a name="l00344"></a>00344     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
-<a name="l00345"></a>00345 
-<a name="l00346"></a>00346     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
-<a name="l00347"></a>00347         <span class="keywordflow">if</span> ( ret[i] &gt; second[i] )ret[i] = second[i];
-<a name="l00348"></a>00348 
-<a name="l00349"></a>00349     <span class="keywordflow">return</span> ret;
-<a name="l00350"></a>00350 }
-<a name="l00351"></a>00351 
-<a name="l00352"></a><a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">00352</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;float&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>;
-<a name="l00353"></a><a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">00353</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;double&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>;
-<a name="l00354"></a><a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">00354</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;int32_t&gt;</a> <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>;
-<a name="l00355"></a>00355 }
-<a name="l00356"></a>00356 }
-<a name="l00357"></a>00357 
-<a name="l00358"></a>00358 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html"></a>
-<a name="l00359"></a><a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">00359</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">operator-</a>( const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
-<a name="l00360"></a>00360 {
-<a name="l00361"></a>00361     <span class="keywordflow">return</span> s.negate();
-<a name="l00362"></a>00362 }
-<a name="l00363"></a>00363 
-<a name="l00365"></a>00365 <span class="keyword">namespace </span>std
-<a name="l00366"></a>00366 {
-<a name="l00367"></a>00367 
-<a name="l00368"></a>00368 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits, <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt; basic_ostream&lt;charT, traits&gt;&amp;
-<a name="l00369"></a><a class="code" href="namespacestd.html#a7b7019b02ab8ef8bfaa3c6556a389d78">00369</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
-<a name="l00370"></a>00370 {
-<a name="l00371"></a>00371     s.writeTo( out );
-<a name="l00372"></a>00372     <span class="keywordflow">return</span> out;
-<a name="l00373"></a>00373 }
-<a name="l00374"></a>00374 }
-<a name="l00375"></a>00375 <span class="preprocessor">#endif //VECTOR_HPP</span>
+<a name="l00334"></a>00334 <span class="keyword">public</span>:
+<a name="l00335"></a><a class="code" href="classisis_1_1util_1_1vector3.html#ab9973609d8fb14f48a1cd9ea5b70816f">00335</a>     <a class="code" href="classisis_1_1util_1_1vector3.html#ab9973609d8fb14f48a1cd9ea5b70816f">vector3</a>() {}
+<a name="l00336"></a><a class="code" href="classisis_1_1util_1_1vector3.html#aa4bca1e69f4ab60d37d2c447a7d38d33">00336</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE2, <span class="keyword">typename</span> CONTAINER2&gt; <a class="code" href="classisis_1_1util_1_1vector3.html#aa4bca1e69f4ab60d37d2c447a7d38d33">vector3</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE2, 3, CONTAINER2&gt;</a> &amp;src ) : <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, 3&gt; ( src ) {}
+<a name="l00337"></a><a class="code" href="classisis_1_1util_1_1vector3.html#ab2aad57e2a36f58ef14a3941581dc959">00337</a>     <a class="code" href="classisis_1_1util_1_1vector3.html#ab2aad57e2a36f58ef14a3941581dc959">vector3</a>( <span class="keyword">const</span> TYPE src[3] ): <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector</a>&lt; TYPE, 3&gt;( src ) {}
+<a name="l00338"></a><a class="code" href="classisis_1_1util_1_1vector3.html#a4628717114ab9f1feb75173ccbdb68b5">00338</a>     <a class="code" href="classisis_1_1util_1_1vector3.html#a4628717114ab9f1feb75173ccbdb68b5">vector3</a>( TYPE first, TYPE second, TYPE third = 0 ) {
+<a name="l00339"></a>00339         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 2 ) = third;
+<a name="l00340"></a>00340         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 1 ) = second;
+<a name="l00341"></a>00341         this-&gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html#a9ceef06fbc094b79856efb1cd72fbe65">operator[]</a>( 0 ) = first;
+<a name="l00342"></a>00342     }
+<a name="l00343"></a>00343 };
+<a name="l00344"></a>00344 
+<a name="l00345"></a>00345 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00346"></a><a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">00346</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a2468bf01677b392524957f1b4035a6ce">maxVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
+<a name="l00347"></a>00347 {
+<a name="l00348"></a>00348     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
+<a name="l00349"></a>00349 
+<a name="l00350"></a>00350     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
+<a name="l00351"></a>00351         <span class="keywordflow">if</span> ( ret[i] &lt; second[i] )ret[i] = second[i];
+<a name="l00352"></a>00352 
+<a name="l00353"></a>00353     <span class="keywordflow">return</span> ret;
+<a name="l00354"></a>00354 }
+<a name="l00355"></a>00355 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER1, <span class="keyword">typename</span> CONTAINER2&gt;
+<a name="l00356"></a><a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">00356</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a7def6d6d3ef7a59b4738766d26416ffe">minVector</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER1&gt;</a> &amp;first, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE, CONTAINER2&gt;</a> &amp;second )
+<a name="l00357"></a>00357 {
+<a name="l00358"></a>00358     <a class="code" href="classisis_1_1util_1_1FixedVector.html">FixedVector&lt;TYPE, SIZE&gt;</a> ret( first );
+<a name="l00359"></a>00359 
+<a name="l00360"></a>00360     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; SIZE; i++ )
+<a name="l00361"></a>00361         <span class="keywordflow">if</span> ( ret[i] &gt; second[i] )ret[i] = second[i];
+<a name="l00362"></a>00362 
+<a name="l00363"></a>00363     <span class="keywordflow">return</span> ret;
+<a name="l00364"></a>00364 }
+<a name="l00365"></a>00365 
+<a name="l00366"></a><a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">00366</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;float&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>;
+<a name="l00367"></a><a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">00367</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;double&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>;
+<a name="l00368"></a><a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">00368</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector3.html">vector3&lt;float&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">fvector3</a>;
+<a name="l00369"></a><a class="code" href="namespaceisis_1_1util.html#a14ff508df82b0112b1964a867db210ff">00369</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector3.html">vector3&lt;double&gt;</a> <a class="code" href="namespaceisis_1_1util.html#a14ff508df82b0112b1964a867db210ff">dvector3</a>;
+<a name="l00370"></a><a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">00370</a> <span class="keyword">typedef</span> <a class="code" href="classisis_1_1util_1_1vector4.html">vector4&lt;int32_t&gt;</a> <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>;
+<a name="l00371"></a>00371 }
+<a name="l00372"></a>00372 }
+<a name="l00373"></a>00373 
+<a name="l00374"></a>00374 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt;<a class="code" href="classisis_1_1util_1_1FixedVector.html"></a>
+<a name="l00375"></a><a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">00375</a> <a class="code" href="classisis_1_1util_1_1FixedVector.html">::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;</a> <a class="code" href="vector_8hpp.html#ab4dfb43e7e176a0a2a0c078cd92de34f">operator-</a>( const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
+<a name="l00376"></a>00376 {
+<a name="l00377"></a>00377     <span class="keywordflow">return</span> s.negate();
+<a name="l00378"></a>00378 }
+<a name="l00379"></a>00379 
+<a name="l00381"></a>00381 <span class="keyword">namespace </span>std
+<a name="l00382"></a>00382 {
+<a name="l00383"></a>00383 
+<a name="l00384"></a>00384 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> <span class="keywordtype">char</span>T, <span class="keyword">typename</span> traits, <span class="keyword">typename</span> TYPE, <span class="keywordtype">size_t</span> SIZE, <span class="keyword">typename</span> CONTAINER &gt; basic_ostream&lt;charT, traits&gt;&amp;
+<a name="l00385"></a><a class="code" href="namespacestd.html#a7b7019b02ab8ef8bfaa3c6556a389d78">00385</a> operator&lt;&lt;( basic_ostream&lt;charT, traits&gt; &amp;out, const ::isis::util::FixedVector&lt;TYPE, SIZE, CONTAINER&gt;&amp; s )
+<a name="l00386"></a>00386 {
+<a name="l00387"></a>00387     s.writeTo( out );
+<a name="l00388"></a>00388     <span class="keywordflow">return</span> out;
+<a name="l00389"></a>00389 }
+<a name="l00390"></a>00390 }
+<a name="l00391"></a>00391 <span class="preprocessor">#endif //VECTOR_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

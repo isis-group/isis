@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -74,17 +74,17 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aff0eaeb932b67a03194aaf6276ad1d44">getName</a> () const =0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#afb7636984df37d50beedff0da1ba211d">getSuffixes</a> (<a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7ea38798b15b4f2ad8abb7183029ba7c">io_modes</a> mode=both) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get all file suffixes a plugin suggests to handle The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.  <a href="#afb7636984df37d50beedff0da1ba211d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#ad2c0a7af5d879fc6b3e17a4b37d1f2c9">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect)=0  throw ( std::runtime_error &amp; )</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the given chunk list.  <a href="#ad2c0a7af5d879fc6b3e17a4b37d1f2c9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#ac1550642c9f44ac95e95804ce4266c7a">load</a> (std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">data::Chunk</a> &gt; &amp;chunks, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt; feedback)=0  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data into the given chunk list.  <a href="#ac1550642c9f44ac95e95804ce4266c7a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::pair&lt; std::string, <br class="typebreak"/>
 std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a9055b81aa6f91a4853991b01e6905f84">makeBasename</a> (const std::string &amp;filename) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts  <a href="#a9055b81aa6f91a4853991b01e6905f84"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a8f2c618a080412b0802d7fa42635e900">makeUniqueFilenames</a> (const std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; &amp;images, const std::string &amp;namePattern) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a884990d926c729a2d8b4c86b0fe8f210">tainted</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a1c3be513ece5476e2e55656a3b984f7c">write</a> (const std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; &amp;images, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect)  throw ( std::runtime_error &amp; )</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a image list.  <a href="#a1c3be513ece5476e2e55656a3b984f7c"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aaa1cdcfeecffc6e5a1f47cea9b71511e">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect)=0  throw ( std::runtime_error &amp; )</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single image to a file.  <a href="#aaa1cdcfeecffc6e5a1f47cea9b71511e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a7b8290139726e51b38b849cbb93d7a17">write</a> (const std::list&lt; <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &gt; &amp;images, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt; feedback)  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a image list.  <a href="#a7b8290139726e51b38b849cbb93d7a17"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a000f992f249b30c245a7a93897b019e8">write</a> (const <a class="el" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, const std::string &amp;filename, const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;dialect, boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt; feedback)=0  throw ( std::runtime_error &amp; )</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single image to a file.  <a href="#a000f992f249b30c245a7a93897b019e8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a0d737a7f7f9fbe268cc0dbee23537ac8">~FileFormat</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -101,6 +101,8 @@ Protected Member Functions</h2></td></tr>
 Static Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a8fe18b623f97871aad19aa96c44d7034">hasOrTell</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;name, const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;object, <a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a given property exists in the given PropMap.  <a href="#a8fe18b623f97871aad19aa96c44d7034"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a1bf2b0c48f928ef5ca18bbd3ce33de7a">setGender</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;object, const char *set, const char *entries=&quot;female,male,other&quot;)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a given property exists in the given PropMap.  <a href="#a1bf2b0c48f928ef5ca18bbd3ce33de7a"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1image__io_1_1FileFormat.html#a869ecd86d5f3eb0b8838abbb59b030bc">transformOrTell</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;from, const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">util::PropertyMap::KeyType</a> &amp;to, <a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;object, <a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a> level)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a given property into another and remove the original in the given PropMap.  <a href="#a869ecd86d5f3eb0b8838abbb59b030bc"></a><br/></td></tr>
@@ -111,7 +113,7 @@ Static Protected Attributes</h2></td></tr>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Base class for image-io-plugins. </p>
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00029">29</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00030">30</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 </div><hr/><h2>Member Enumeration Documentation</h2>
 <a class="anchor" id="a7ea38798b15b4f2ad8abb7183029ba7c"></a><!-- doxytag: member="isis::image_io::FileFormat::io_modes" ref="a7ea38798b15b4f2ad8abb7183029ba7c" args="" -->
 <div class="memitem">
@@ -134,7 +136,7 @@ Static Protected Attributes</h2></td></tr>
 </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00032">32</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00033">33</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
@@ -153,7 +155,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00120">120</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00133">133</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
@@ -174,7 +176,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>a space separated list of the dialects the plugin supports </dd></dl>
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00086">86</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00093">93</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +228,7 @@ Static Protected Attributes</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of suffixes the plugin handles </dd></dl>
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00070">70</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00081">81</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +251,7 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">isis::LogLevel</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82">LogLevel</a>&#160;</td>
           <td class="paramname"><em>level</em>&#160;</td>
         </tr>
         <tr>
@@ -265,11 +267,11 @@ Static Protected Attributes</h2></td></tr>
 <p>If the property doesn't exist a message will be sent to Log using the given loglevel. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>object.hasProperty(name) </dd></dl>
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00050">50</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00061">61</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad2c0a7af5d879fc6b3e17a4b37d1f2c9"></a><!-- doxytag: member="isis::image_io::FileFormat::load" ref="ad2c0a7af5d879fc6b3e17a4b37d1f2c9" args="(std::list&lt; data::Chunk &gt; &amp;chunks, const std::string &amp;filename, const util::istring &amp;dialect)=0" -->
+<a class="anchor" id="ac1550642c9f44ac95e95804ce4266c7a"></a><!-- doxytag: member="isis::image_io::FileFormat::load" ref="ac1550642c9f44ac95e95804ce4266c7a" args="(std::list&lt; data::Chunk &gt; &amp;chunks, const std::string &amp;filename, const util::istring &amp;dialect, boost::shared_ptr&lt; util::ProgressFeedback &gt; feedback)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -289,7 +291,13 @@ Static Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;&#160;</td>
-          <td class="paramname"><em>dialect</em>&#160;</td>
+          <td class="paramname"><em>dialect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -307,6 +315,7 @@ Static Protected Attributes</h2></td></tr>
     <tr><td class="paramname">chunks</td><td>the chunk list where the loaded chunks shall be added to </td></tr>
     <tr><td class="paramname">filename</td><td>the name of the file to load from (the system does NOT check if this file exists) </td></tr>
     <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+    <tr><td class="paramname">feedback</td><td>a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero. </td></tr>
   </table>
   </dd>
 </dl>
@@ -331,7 +340,7 @@ Static Protected Attributes</h2></td></tr>
 
 <p>splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts </p>
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00080">80</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00091">91</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +369,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00097">97</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00105">105</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +398,46 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00179">179</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00187">187</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1bf2b0c48f928ef5ca18bbd3ce33de7a"></a><!-- doxytag: member="isis::image_io::FileFormat::setGender" ref="a1bf2b0c48f928ef5ca18bbd3ce33de7a" args="(util::PropertyMap &amp;object, const char *set, const char *entries=&quot;female,male,other&quot;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::image_io::FileFormat::setGender </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1PropertyMap.html">util::PropertyMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>object</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>entries</em> = <code>&quot;female,male,other&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check if a given property exists in the given PropMap. </p>
+<p>If the property doesn't exist a message will be sent to Log using the given loglevel. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>object.hasProperty(name) </dd></dl>
+
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00049">49</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +474,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>if the plugin is not part of the official distribution </dd></dl>
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00089">89</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00096">96</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
@@ -445,7 +493,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00060">60</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00071">71</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +522,7 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00065">65</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8cpp_source.html#l00076">76</a> of file <a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a>.</p>
 
 </div>
 </div>
@@ -521,11 +569,11 @@ template&lt;typename TYPE &gt; </div>
 <p>If the property doesn't exist a message will be sent to Log using the given loglevel. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the property existed and was transformed. </dd></dl>
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00046">46</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00053">53</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1c3be513ece5476e2e55656a3b984f7c"></a><!-- doxytag: member="isis::image_io::FileFormat::write" ref="a1c3be513ece5476e2e55656a3b984f7c" args="(const std::list&lt; data::Image &gt; &amp;images, const std::string &amp;filename, const util::istring &amp;dialect)" -->
+<a class="anchor" id="a7b8290139726e51b38b849cbb93d7a17"></a><!-- doxytag: member="isis::image_io::FileFormat::write" ref="a7b8290139726e51b38b849cbb93d7a17" args="(const std::list&lt; data::Image &gt; &amp;images, const std::string &amp;filename, const util::istring &amp;dialect, boost::shared_ptr&lt; util::ProgressFeedback &gt; feedback)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -545,7 +593,13 @@ template&lt;typename TYPE &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;&#160;</td>
-          <td class="paramname"><em>dialect</em>&#160;</td>
+          <td class="paramname"><em>dialect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -563,6 +617,7 @@ template&lt;typename TYPE &gt; </div>
     <tr><td class="paramname">images</td><td>a list of the images to be written </td></tr>
     <tr><td class="paramname">filename</td><td>the name to be used as base for the filename generation if neccessary. </td></tr>
     <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+    <tr><td class="paramname">feedback</td><td>a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero. </td></tr>
   </table>
   </dd>
 </dl>
@@ -571,7 +626,7 @@ template&lt;typename TYPE &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="aaa1cdcfeecffc6e5a1f47cea9b71511e"></a><!-- doxytag: member="isis::image_io::FileFormat::write" ref="aaa1cdcfeecffc6e5a1f47cea9b71511e" args="(const data::Image &amp;image, const std::string &amp;filename, const util::istring &amp;dialect)=0" -->
+<a class="anchor" id="a000f992f249b30c245a7a93897b019e8"></a><!-- doxytag: member="isis::image_io::FileFormat::write" ref="a000f992f249b30c245a7a93897b019e8" args="(const data::Image &amp;image, const std::string &amp;filename, const util::istring &amp;dialect, boost::shared_ptr&lt; util::ProgressFeedback &gt; feedback)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -591,7 +646,13 @@ template&lt;typename TYPE &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> &amp;&#160;</td>
-          <td class="paramname"><em>dialect</em>&#160;</td>
+          <td class="paramname"><em>dialect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; <a class="el" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> &gt;&#160;</td>
+          <td class="paramname"><em>feedback</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -609,6 +670,7 @@ template&lt;typename TYPE &gt; </div>
     <tr><td class="paramname">image</td><td>the image to be written </td></tr>
     <tr><td class="paramname">filename</td><td>the name of the file to write (the system does NOT check if this file exists/is writeable) </td></tr>
     <tr><td class="paramname">dialect</td><td>the dialect to be used when loading the file (use "" to not define a dialect) </td></tr>
+    <tr><td class="paramname">feedback</td><td>a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero. </td></tr>
   </table>
   </dd>
 </dl>
@@ -627,7 +689,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00056">56</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00063">63</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
@@ -642,16 +704,16 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00060">60</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
+<p>Definition at line <a class="el" href="io__interface_8h_source.html#l00067">67</a> of file <a class="el" href="io__interface_8h_source.html">io_interface.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="io__interface_8h_source.html">io_interface.h</a></li>
-<li>/SCR/isis/lib/Core/DataStorage/<a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a></li>
+<li>/scr/tee1/isis/lib/Core/DataStorage/<a class="el" href="io__interface_8h_source.html">io_interface.h</a></li>
+<li>/scr/tee1/isis/lib/Core/DataStorage/<a class="el" href="io__interface_8cpp_source.html">io_interface.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:15 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

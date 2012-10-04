@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/istring.cpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/istring.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/istring.cpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/istring.cpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="istring_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
@@ -96,12 +96,12 @@
 <a name="l00056"></a>00056 
 <a name="l00057"></a>00057 <span class="keyword">const</span> <span class="keywordtype">char</span> *ichar_traits::find( <span class="keyword">const</span> <span class="keywordtype">char</span> *s, <span class="keywordtype">size_t</span> n, <span class="keyword">const</span> <span class="keywordtype">char</span> &amp;a )
 <a name="l00058"></a>00058 {
-<a name="l00059"></a>00059     <span class="keyword">const</span> <span class="keywordtype">char</span> lowA = std::tolower( a ), upA = std::toupper( a );
+<a name="l00059"></a>00059     <span class="keyword">const</span> <span class="keywordtype">char</span> lowA = std::tolower( a );
 <a name="l00060"></a>00060 
-<a name="l00061"></a>00061     <span class="keywordflow">if</span>( lowA == upA ) { <span class="comment">// if a has no cases we can do naive search</span>
+<a name="l00061"></a>00061     <span class="keywordflow">if</span>( lowA == std::toupper( a ) ) { <span class="comment">// if a has no cases we can do naive search</span>
 <a name="l00062"></a>00062         <span class="keywordflow">return</span> std::find( s, s + n, a );
 <a name="l00063"></a>00063     } <span class="keywordflow">else</span> <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> i = 0; i &lt; n; i++, s++ ) {
-<a name="l00064"></a>00064             <span class="keywordflow">if</span>( std::tolower( *s ) == a )
+<a name="l00064"></a>00064             <span class="keywordflow">if</span>( std::tolower( *s ) == lowA )
 <a name="l00065"></a>00065                 <span class="keywordflow">return</span> s;
 <a name="l00066"></a>00066         }
 <a name="l00067"></a>00067 
@@ -120,7 +120,7 @@
 <a name="l00081"></a>00081 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

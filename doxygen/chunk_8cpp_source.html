@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/DataStorage/chunk.cpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/DataStorage/chunk.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/DataStorage/chunk.cpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/DataStorage/chunk.cpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="chunk_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -70,7 +70,7 @@
 <a name="l00030"></a>00030 {
 <a name="l00031"></a>00031     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 <a name="l00032"></a>00032     init( idx );
-<a name="l00033"></a>00033     addNeededFromString( neededProperties );
+<a name="l00033"></a>00033     util::Singletons::get&lt;NeededsList&lt;Chunk&gt;, 0&gt;().applyTo( *<span class="keyword">this</span> );
 <a name="l00034"></a>00034     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">NDimensional&lt;4&gt;::getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
 <a name="l00035"></a>00035             &lt;&lt; <span class="stringliteral">&quot;Size &quot;</span> &lt;&lt; nrOfTimesteps &lt;&lt; <span class="stringliteral">&quot;|&quot;</span> &lt;&lt; nrOfSlices &lt;&lt; <span class="stringliteral">&quot;|&quot;</span> &lt;&lt; nrOfRows &lt;&lt; <span class="stringliteral">&quot;|&quot;</span> &lt;&lt; nrOfColumns &lt;&lt; <span class="stringliteral">&quot; is invalid&quot;</span>;
 <a name="l00036"></a>00036 }
@@ -86,340 +86,349 @@
 <a name="l00047"></a>00047     assert( ( *this )-&gt;getLength() == getVolume() );
 <a name="l00048"></a>00048 
 <a name="l00049"></a>00049     <span class="keywordflow">if</span>( fakeValid ) {
-<a name="l00050"></a>00050         setPropertyAs( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>() );
+<a name="l00050"></a>00050         setPropertyAs( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>() );
 <a name="l00051"></a>00051         setPropertyAs( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, 0 );
-<a name="l00052"></a>00052         setPropertyAs( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 1, 1 ) );
-<a name="l00053"></a>00053         setPropertyAs( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 0 ) );
-<a name="l00054"></a>00054         setPropertyAs( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 0, 1 ) );
-<a name="l00055"></a>00055     }
-<a name="l00056"></a>00056 }
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb" title="Creates a new empty Chunk of different size and without properties, but of the same datatype as this...">Chunk::cloneToNew</a>( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )<span class="keyword">const</span>
-<a name="l00059"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">00059</a> <span class="keyword"></span>{
-<a name="l00060"></a>00060     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e" title="Creates a new empty Chunk without properties but of specified type and specified size.">createByID</a>( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">getTypeID</a>(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
-<a name="l00061"></a>00061 }
-<a name="l00062"></a>00062 
-<a name="l00063"></a>00063 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e" title="Creates a new empty Chunk without properties but of specified type and specified size.">Chunk::createByID</a> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> ID, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps, <span class="keywordtype">bool</span> fakeValid )
-<a name="l00064"></a><a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af4bbd40448c21a15c1a18c704ebfd510">00064</a> {
-<a name="l00065"></a>00065     <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
-<a name="l00066"></a>00066     assert( newSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() );
-<a name="l00067"></a>00067     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> created( <a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af4bbd40448c21a15c1a18c704ebfd510" title="Create a ValueArray of given type and length.">ValueArrayBase::createByID</a>( ID, newSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() ) );
-<a name="l00068"></a>00068     <span class="keywordflow">return</span>  <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( created, newSize[0], newSize[1], newSize[2], newSize[3], fakeValid );
-<a name="l00069"></a>00069 }
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c" title="Ensure, the chunk has the type with the requested ID.">Chunk::convertToType</a>( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, scaling_pair scaling )
-<a name="l00072"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">00072</a> {
-<a name="l00073"></a>00073     <span class="comment">//get a converted ValueArray (will be a cheap copy if no conv was needed)</span>
-<a name="l00074"></a>00074     <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> newPtr = <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a74ac6260e52e6f84f039d8e8d4bb0b6d" title="Get this as a ValueArray of a specific type.">convertByID</a>( ID, scaling );
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076     <span class="keywordflow">if</span>( newPtr.<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#ae45ed36ae932ab6d221535458cb70e98">isEmpty</a>() ) <span class="comment">// if the reference is empty the conversion failed</span>
-<a name="l00077"></a>00077         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00078"></a>00078     <span class="keywordflow">else</span>
-<a name="l00079"></a>00079         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> &amp;<span class="keyword">&gt;</span>( *this ) = newPtr; <span class="comment">// otherwise replace my own ValueArray with the new one</span>
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00082"></a>00082 }
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">Chunk::getBytesPerVoxel</a>()<span class="keyword">const</span>
-<a name="l00085"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">00085</a> <span class="keyword"></span>{
-<a name="l00086"></a>00086     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a69ce77d19d3bf3e25c6e38e656c4ad21">bytesPerElem</a>();
-<a name="l00087"></a>00087 }
-<a name="l00088"></a>00088 std::string <a class="code" href="classisis_1_1data_1_1Chunk.html#ad186ef78e6e27101e5a2e898fa0c23a2">Chunk::getTypeName</a>()<span class="keyword">const</span>
-<a name="l00089"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ad186ef78e6e27101e5a2e898fa0c23a2">00089</a> <span class="keyword"></span>{
-<a name="l00090"></a>00090     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">getTypeName</a>();
-<a name="l00091"></a>00091 }
-<a name="l00092"></a>00092 <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">Chunk::getTypeID</a>()<span class="keyword">const</span>
-<a name="l00093"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">00093</a> <span class="keyword"></span>{
-<a name="l00094"></a>00094     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">getTypeID</a>();
+<a name="l00052"></a>00052         setPropertyAs( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>( 1, 1, 1 ) );
+<a name="l00053"></a>00053         setPropertyAs( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>( 1, 0 ) );
+<a name="l00054"></a>00054         setPropertyAs( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>( 0, 1 ) );
+<a name="l00055"></a>00055         setPropertyAs( <span class="stringliteral">&quot;sequenceNumber&quot;</span>, ( uint16_t )0 );
+<a name="l00056"></a>00056     }
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb" title="Creates a new empty Chunk of different size and without properties, but of the same datatype as this...">Chunk::cloneToNew</a>( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )<span class="keyword">const</span>
+<a name="l00060"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">00060</a> <span class="keyword"></span>{
+<a name="l00061"></a>00061     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e" title="Creates a new empty Chunk without properties but of specified type and specified size.">createByID</a>( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">getTypeID</a>(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+<a name="l00062"></a>00062 }
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a2a88b67e68dd908f82dcd1fdb2b39d3e" title="Creates a new empty Chunk without properties but of specified type and specified size.">Chunk::createByID</a> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> ID, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps, <span class="keywordtype">bool</span> fakeValid )
+<a name="l00065"></a><a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af4bbd40448c21a15c1a18c704ebfd510">00065</a> {
+<a name="l00066"></a>00066     <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+<a name="l00067"></a>00067     assert( newSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() );
+<a name="l00068"></a>00068     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> created( <a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af4bbd40448c21a15c1a18c704ebfd510" title="Create a ValueArray of given type and length.">ValueArrayBase::createByID</a>( ID, newSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() ) );
+<a name="l00069"></a>00069     <span class="keywordflow">return</span>  <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( created, newSize[0], newSize[1], newSize[2], newSize[3], fakeValid );
+<a name="l00070"></a>00070 }
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c" title="Ensure, the chunk has the type with the requested ID.">Chunk::convertToType</a>( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, scaling_pair scaling )
+<a name="l00073"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ae8607eff4f684c7934c9f4188a05e24c">00073</a> {
+<a name="l00074"></a>00074     <span class="comment">//get a converted ValueArray (will be a cheap copy if no conv was needed)</span>
+<a name="l00075"></a>00075     <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> newPtr = <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a74ac6260e52e6f84f039d8e8d4bb0b6d" title="Get this as a ValueArray of a specific type.">convertByID</a>( ID, scaling );
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077     <span class="keywordflow">if</span>( newPtr.<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html#ae45ed36ae932ab6d221535458cb70e98">isEmpty</a>() ) <span class="comment">// if the reference is empty the conversion failed</span>
+<a name="l00078"></a>00078         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00079"></a>00079     <span class="keywordflow">else</span>
+<a name="l00080"></a>00080         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> &amp;<span class="keyword">&gt;</span>( *this ) = newPtr; <span class="comment">// otherwise replace my own ValueArray with the new one</span>
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00083"></a>00083 }
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a1cb48cc209885cc180951d2387656f12" title="Create a new Chunk of the requested type and copy all voxel data of the chunk into it...">Chunk::copyByID</a>( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID, scaling_pair scaling )<span class="keyword"> const</span>
+<a name="l00086"></a>00086 <span class="keyword"></span>{
+<a name="l00087"></a>00087     <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> ret = *<span class="keyword">this</span>; <span class="comment">//make copy of the chunk</span>
+<a name="l00088"></a>00088     <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">ValueArrayReference</a> &amp;<span class="keyword">&gt;</span>( ret ) = <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#aca07bcef5faecd7f094cb5b09a8694c9" title="Create new data in memory containg a (converted) copy of this.">copyByID</a>( ID, scaling ); <span class="comment">// replace its data by the copy</span>
+<a name="l00089"></a>00089     <span class="keywordflow">return</span> ret;
+<a name="l00090"></a>00090 }
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">Chunk::getBytesPerVoxel</a>()<span class="keyword">const</span>
+<a name="l00093"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">00093</a> <span class="keyword"></span>{
+<a name="l00094"></a>00094     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a69ce77d19d3bf3e25c6e38e656c4ad21">bytesPerElem</a>();
 <a name="l00095"></a>00095 }
-<a name="l00096"></a>00096 
-<a name="l00097"></a>00097 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">Chunk::copySlice</a>( <span class="keywordtype">size_t</span> thirdDimS, <span class="keywordtype">size_t</span> fourthDimS, <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keywordtype">size_t</span> thirdDimD, <span class="keywordtype">size_t</span> fourthDimD )<span class="keyword"> const</span>
-<a name="l00098"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">00098</a> <span class="keyword"></span>{
-<a name="l00099"></a>00099     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx1[] = {0, 0, thirdDimS, fourthDimS};
-<a name="l00100"></a>00100     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
-<a name="l00101"></a>00101     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx3[] = {0, 0, thirdDimD, fourthDimD};
-<a name="l00102"></a>00102     <a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">copyRange</a>( idx1, idx2, dst, idx3 );
+<a name="l00096"></a>00096 std::string <a class="code" href="classisis_1_1data_1_1Chunk.html#ad186ef78e6e27101e5a2e898fa0c23a2">Chunk::getTypeName</a>()<span class="keyword">const</span>
+<a name="l00097"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ad186ef78e6e27101e5a2e898fa0c23a2">00097</a> <span class="keyword"></span>{
+<a name="l00098"></a>00098     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">getTypeName</a>();
+<a name="l00099"></a>00099 }
+<a name="l00100"></a>00100 <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">Chunk::getTypeID</a>()<span class="keyword">const</span>
+<a name="l00101"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#aaa66a58ddd4cf865cbb92850a2a1d40c">00101</a> <span class="keyword"></span>{
+<a name="l00102"></a>00102     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">getTypeID</a>();
 <a name="l00103"></a>00103 }
 <a name="l00104"></a>00104 
-<a name="l00105"></a>00105 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">Chunk::copyRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_start[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_end[], <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">size_t</span> destination[] )<span class="keyword"> const</span>
-<a name="l00106"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">00106</a> <span class="keyword"></span>{
-<a name="l00107"></a>00107     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_start ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00108"></a>00108             &lt;&lt; <span class="stringliteral">&quot;Copy start &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start )
-<a name="l00109"></a>00109             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the source chunk&quot;</span>;
-<a name="l00110"></a>00110     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_end ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00111"></a>00111             &lt;&lt; <span class="stringliteral">&quot;Copy end &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
-<a name="l00112"></a>00112             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the source chunk&quot;</span>;
-<a name="l00113"></a>00113     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! dst.isInRange( destination ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00114"></a>00114             &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination )
-<a name="l00115"></a>00115             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the destination chunk&quot;</span>;
-<a name="l00116"></a>00116     <span class="keyword">const</span> <span class="keywordtype">size_t</span> sstart = getLinearIndex( source_start );
-<a name="l00117"></a>00117     <span class="keyword">const</span> <span class="keywordtype">size_t</span> send = getLinearIndex( source_end );
-<a name="l00118"></a>00118     <span class="keyword">const</span> <span class="keywordtype">size_t</span> dstart = dst.getLinearIndex( destination );
-<a name="l00119"></a>00119     <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#abfeb0f7ccc3abfa12c4ecd3448068cc3" title="Copy a range of elements to another ValueArray of the same type.">copyRange</a>( sstart, send, *dst, dstart );
-<a name="l00120"></a>00120 }
-<a name="l00121"></a>00121 
-<a name="l00122"></a>00122 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">Chunk::compareRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_start[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_end[], <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">size_t</span> destination[] )<span class="keyword"> const</span>
-<a name="l00123"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">00123</a> <span class="keyword"></span>{
-<a name="l00124"></a>00124     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_start ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00125"></a>00125             &lt;&lt; <span class="stringliteral">&quot;memcmp start &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start )
-<a name="l00126"></a>00126             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the first chunk&quot;</span>;
-<a name="l00127"></a>00127     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_end ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00128"></a>00128             &lt;&lt; <span class="stringliteral">&quot;memcmp end &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
-<a name="l00129"></a>00129             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the first chunk&quot;</span>;
-<a name="l00130"></a>00130     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! dst.isInRange( destination ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00131"></a>00131             &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination )
-<a name="l00132"></a>00132             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the second chunk&quot;</span>;
-<a name="l00133"></a>00133     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00134"></a>00134             &lt;&lt; <span class="stringliteral">&quot;Comparing range from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start ) &lt;&lt; <span class="stringliteral">&quot; to &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
-<a name="l00135"></a>00135             &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination );
-<a name="l00136"></a>00136     <span class="keyword">const</span> <span class="keywordtype">size_t</span> sstart = getLinearIndex( source_start );
-<a name="l00137"></a>00137     <span class="keyword">const</span> <span class="keywordtype">size_t</span> send = getLinearIndex( source_end );
-<a name="l00138"></a>00138     <span class="keyword">const</span> <span class="keywordtype">size_t</span> dstart = dst.getLinearIndex( destination );
-<a name="l00139"></a>00139     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ad0d6e7f7e573aca3bd15a76860eda88b" title="Compare the data of two ValueArray.">compare</a>( sstart, send, dst.<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>(), dstart );
-<a name="l00140"></a>00140 }
-<a name="l00141"></a>00141 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">Chunk::compare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">isis::data::Chunk</a> &amp;dst )<span class="keyword"> const</span>
-<a name="l00142"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">00142</a> <span class="keyword"></span>{
-<a name="l00143"></a>00143     <span class="keywordflow">if</span>( getSizeAsVector() == dst.getSizeAsVector() )
-<a name="l00144"></a>00144         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ad0d6e7f7e573aca3bd15a76860eda88b" title="Compare the data of two ValueArray.">compare</a>( 0, getVolume() - 1, dst.<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>(), 0 );
-<a name="l00145"></a>00145     <span class="keywordflow">else</span>
-<a name="l00146"></a>00146         <span class="keywordflow">return</span> std::max( getVolume(), dst.getVolume() );
-<a name="l00147"></a>00147 }
-<a name="l00148"></a>00148 
-<a name="l00149"></a>00149 
-<a name="l00150"></a>00150 std::pair&lt;util::ValueReference, util::ValueReference&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">Chunk::getMinMax</a> ( )<span class="keyword"> const</span>
-<a name="l00151"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">00151</a> <span class="keyword"></span>{
-<a name="l00152"></a>00152     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af140944dfcba33632cd6aecf6faf6fa6" title="Get minimum/maximum of a ValueArray.">getMinMax</a>();
-<a name="l00153"></a>00153 }
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155 scaling_pair <a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f" title="get the scaling (and offset) which would be used in an conversion to the given type">Chunk::getScalingTo</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> typeID, autoscaleOption scaleopt )<span class="keyword">const</span>
-<a name="l00156"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f">00156</a> <span class="keyword"></span>{
-<a name="l00157"></a>00157     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#aafb70a5eb82b45d24caced56267a893d" title="get the scaling (and offset) which would be used in an conversion">getScalingTo</a>( typeID, scaleopt );
-<a name="l00158"></a>00158 }
-<a name="l00159"></a>00159 scaling_pair <a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f" title="get the scaling (and offset) which would be used in an conversion to the given type">Chunk::getScalingTo</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> typeID, <span class="keyword">const</span> std::pair&lt;util::ValueReference, util::ValueReference&gt; &amp;minmax, autoscaleOption scaleopt )<span class="keyword">const</span>
-<a name="l00160"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab6b7b514d89f624ad435483efae15530">00160</a> <span class="keyword"></span>{
-<a name="l00161"></a>00161     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#aafb70a5eb82b45d24caced56267a893d" title="get the scaling (and offset) which would be used in an conversion">getScalingTo</a>( typeID, minmax, scaleopt );
-<a name="l00162"></a>00162 }
-<a name="l00163"></a>00163 
-<a name="l00164"></a>00164 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">Chunk::operator=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ref )
-<a name="l00165"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">00165</a> {
-<a name="l00166"></a>00166     <a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">_internal::ChunkBase::operator=</a>( static_cast&lt;const _internal::ChunkBase &amp;&gt;( ref ) ); <span class="comment">//copy the metadate of ref</span>
-<a name="l00167"></a>00167     <a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">ValueArrayReference::operator=</a>( static_cast&lt;const ValueArrayReference &amp;&gt;( ref ) ); <span class="comment">// copy the reference of ref&#39;s data</span>
-<a name="l00168"></a>00168     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00169"></a>00169 }
-<a name="l00170"></a>00170 
-<a name="l00171"></a>00171 std::list&lt;Chunk&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245" title="Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber...">Chunk::autoSplice</a> ( uint32_t acquisitionNumberStride )<span class="keyword">const</span>
-<a name="l00172"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245">00172</a> <span class="keyword"></span>{
-<a name="l00173"></a>00173     <span class="keywordflow">if</span> ( !isValid() ) {
-<a name="l00174"></a>00174         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot splice invalid Chunk (missing properties are &quot;</span> &lt;&lt; this-&gt;getMissing() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00175"></a>00175         <span class="keywordflow">return</span> std::list&lt;Chunk&gt;();
-<a name="l00176"></a>00176     }
-<a name="l00177"></a>00177 
-<a name="l00178"></a>00178     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> offset;
-<a name="l00179"></a>00179     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> voxelSize = propertyValue( <span class="stringliteral">&quot;voxelSize&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00180"></a>00180     <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> voxelGap;
-<a name="l00181"></a>00181 
-<a name="l00182"></a>00182     <span class="keywordflow">if</span>( hasProperty( <span class="stringliteral">&quot;voxelGap&quot;</span> ) )
-<a name="l00183"></a>00183         voxelGap = propertyValue( <span class="stringliteral">&quot;voxelGap&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00184"></a>00184 
-<a name="l00185"></a>00185     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> distance = voxelSize + voxelGap;
-<a name="l00186"></a>00186     <span class="keywordtype">size_t</span> atDim = getRelevantDims() - 1;
-<a name="l00187"></a>00187 
-<a name="l00188"></a>00188     <span class="keywordflow">switch</span>( atDim ) { <span class="comment">// init offset with the given direction</span>
-<a name="l00189"></a>00189     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> :
-<a name="l00190"></a>00190         offset = this-&gt;propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00191"></a>00191         <span class="keywordflow">break</span>;
-<a name="l00192"></a>00192     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4d76e19bcda99794dc317e4dfacb2f3c">columnDim</a>:
-<a name="l00193"></a>00193         offset = this-&gt;propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00194"></a>00194         <span class="keywordflow">break</span>;
-<a name="l00195"></a>00195     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a5ac8c76240726965f794dcedcb675d8e">sliceDim</a>:
-<a name="l00196"></a>00196 
-<a name="l00197"></a>00197         <span class="keywordflow">if</span>( this-&gt;hasProperty( <span class="stringliteral">&quot;sliceVec&quot;</span> ) ) {
-<a name="l00198"></a>00198             offset = this-&gt;propertyValue( <span class="stringliteral">&quot;sliceVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00199"></a>00199         } <span class="keywordflow">else</span> {
-<a name="l00200"></a>00200             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> row = this-&gt;propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00201"></a>00201             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> column = this-&gt;propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
-<a name="l00202"></a>00202             assert( util::fuzzyEqual&lt;float&gt;( row.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>(), 1 ) );
-<a name="l00203"></a>00203             assert( util::fuzzyEqual&lt;float&gt;( column.sqlen(), 1 ) );
-<a name="l00204"></a>00204             offset[0] = row[1] * column[2] - row[2] * column[1];
-<a name="l00205"></a>00205             offset[1] = row[2] * column[0] - row[0] * column[2];
-<a name="l00206"></a>00206             offset[2] = row[0] * column[1] - row[1] * column[0];
-<a name="l00207"></a>00207         }
-<a name="l00208"></a>00208 
-<a name="l00209"></a>00209         <span class="keywordflow">break</span>;
-<a name="l00210"></a>00210     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">timeDim</a> :
-<a name="l00211"></a>00211         offset = <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( 0, 0, 0, 1 );
-<a name="l00212"></a>00212     }
-<a name="l00213"></a>00213 
-<a name="l00214"></a>00214     <span class="comment">// prepare some attributes</span>
-<a name="l00215"></a>00215     assert( util::fuzzyEqual&lt;float&gt;( offset.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>(), 1 ) ); <span class="comment">// it should be norm here</span>
-<a name="l00216"></a>00216     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> indexOriginOffset = offset * distance[atDim];
-<a name="l00217"></a>00217 
-<a name="l00218"></a>00218     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Splicing chunk at dimenstion &quot;</span> &lt;&lt; atDim + 1 &lt;&lt; <span class="stringliteral">&quot; with indexOrigin stride &quot;</span> &lt;&lt; indexOriginOffset &lt;&lt; <span class="stringliteral">&quot; and acquisitionNumberStride &quot;</span> &lt;&lt; acquisitionNumberStride;
-<a name="l00219"></a>00219     std::list&lt;Chunk&gt; ret = <a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b" title="Splices the chunk at the given dimension and all dimensions above.">splice</a>( ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> )atDim ); <span class="comment">// do low level splice - get the chunklist</span>
-<a name="l00220"></a>00220 
-<a name="l00221"></a>00221     std::list&lt;Chunk&gt;::iterator it = ret.begin();
-<a name="l00222"></a>00222     it++;<span class="comment">// skip the first one</span>
+<a name="l00105"></a>00105 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">Chunk::copySlice</a>( <span class="keywordtype">size_t</span> thirdDimS, <span class="keywordtype">size_t</span> fourthDimS, <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keywordtype">size_t</span> thirdDimD, <span class="keywordtype">size_t</span> fourthDimD )<span class="keyword"> const</span>
+<a name="l00106"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#abbd201902f0b2ab1f3eed2b16efa6f43">00106</a> <span class="keyword"></span>{
+<a name="l00107"></a>00107     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx1[] = {0, 0, thirdDimS, fourthDimS};
+<a name="l00108"></a>00108     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
+<a name="l00109"></a>00109     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx3[] = {0, 0, thirdDimD, fourthDimD};
+<a name="l00110"></a>00110     <a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">copyRange</a>( idx1, idx2, dst, idx3 );
+<a name="l00111"></a>00111 }
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">Chunk::copyRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_start[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_end[], <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">size_t</span> destination[] )<span class="keyword"> const</span>
+<a name="l00114"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a8d7efa596e75bcc9b8bfd156a5614e31">00114</a> <span class="keyword"></span>{
+<a name="l00115"></a>00115     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_start ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00116"></a>00116             &lt;&lt; <span class="stringliteral">&quot;Copy start &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start )
+<a name="l00117"></a>00117             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the source chunk&quot;</span>;
+<a name="l00118"></a>00118     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_end ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00119"></a>00119             &lt;&lt; <span class="stringliteral">&quot;Copy end &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
+<a name="l00120"></a>00120             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the source chunk&quot;</span>;
+<a name="l00121"></a>00121     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! dst.isInRange( destination ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00122"></a>00122             &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination )
+<a name="l00123"></a>00123             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the destination chunk&quot;</span>;
+<a name="l00124"></a>00124     <span class="keyword">const</span> <span class="keywordtype">size_t</span> sstart = getLinearIndex( source_start );
+<a name="l00125"></a>00125     <span class="keyword">const</span> <span class="keywordtype">size_t</span> send = getLinearIndex( source_end );
+<a name="l00126"></a>00126     <span class="keyword">const</span> <span class="keywordtype">size_t</span> dstart = dst.getLinearIndex( destination );
+<a name="l00127"></a>00127     <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#abfeb0f7ccc3abfa12c4ecd3448068cc3" title="Copy a range of elements to another ValueArray of the same type.">copyRange</a>( sstart, send, *dst, dstart );
+<a name="l00128"></a>00128 }
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">Chunk::compareRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_start[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> source_end[], <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">size_t</span> destination[] )<span class="keyword"> const</span>
+<a name="l00131"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ad88b0e9c3fe2579924ec6ef7ec077eaf">00131</a> <span class="keyword"></span>{
+<a name="l00132"></a>00132     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_start ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00133"></a>00133             &lt;&lt; <span class="stringliteral">&quot;memcmp start &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start )
+<a name="l00134"></a>00134             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the first chunk&quot;</span>;
+<a name="l00135"></a>00135     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! isInRange( source_end ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00136"></a>00136             &lt;&lt; <span class="stringliteral">&quot;memcmp end &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
+<a name="l00137"></a>00137             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the first chunk&quot;</span>;
+<a name="l00138"></a>00138     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! dst.isInRange( destination ), <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00139"></a>00139             &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination )
+<a name="l00140"></a>00140             &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;) at the second chunk&quot;</span>;
+<a name="l00141"></a>00141     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
+<a name="l00142"></a>00142             &lt;&lt; <span class="stringliteral">&quot;Comparing range from &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_start ) &lt;&lt; <span class="stringliteral">&quot; to &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( source_end )
+<a name="l00143"></a>00143             &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( destination );
+<a name="l00144"></a>00144     <span class="keyword">const</span> <span class="keywordtype">size_t</span> sstart = getLinearIndex( source_start );
+<a name="l00145"></a>00145     <span class="keyword">const</span> <span class="keywordtype">size_t</span> send = getLinearIndex( source_end );
+<a name="l00146"></a>00146     <span class="keyword">const</span> <span class="keywordtype">size_t</span> dstart = dst.getLinearIndex( destination );
+<a name="l00147"></a>00147     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ad0d6e7f7e573aca3bd15a76860eda88b" title="Compare the data of two ValueArray.">compare</a>( sstart, send, dst.<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>(), dstart );
+<a name="l00148"></a>00148 }
+<a name="l00149"></a>00149 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">Chunk::compare</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">isis::data::Chunk</a> &amp;dst )<span class="keyword"> const</span>
+<a name="l00150"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab11a147bd2781ef062d4584a2c1d723a">00150</a> <span class="keyword"></span>{
+<a name="l00151"></a>00151     <span class="keywordflow">if</span>( getSizeAsVector() == dst.getSizeAsVector() )
+<a name="l00152"></a>00152         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ad0d6e7f7e573aca3bd15a76860eda88b" title="Compare the data of two ValueArray.">compare</a>( 0, getVolume() - 1, dst.<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>(), 0 );
+<a name="l00153"></a>00153     <span class="keywordflow">else</span>
+<a name="l00154"></a>00154         <span class="keywordflow">return</span> std::max( getVolume(), dst.getVolume() );
+<a name="l00155"></a>00155 }
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158 std::pair&lt;util::ValueReference, util::ValueReference&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">Chunk::getMinMax</a> ( )<span class="keyword"> const</span>
+<a name="l00159"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a7f7307124d91d09ce99661b136d49bc2">00159</a> <span class="keyword"></span>{
+<a name="l00160"></a>00160     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af140944dfcba33632cd6aecf6faf6fa6" title="Get minimum/maximum of a ValueArray.">getMinMax</a>();
+<a name="l00161"></a>00161 }
+<a name="l00162"></a>00162 
+<a name="l00163"></a>00163 scaling_pair <a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f" title="get the scaling (and offset) which would be used in an conversion to the given type">Chunk::getScalingTo</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> typeID, autoscaleOption scaleopt )<span class="keyword">const</span>
+<a name="l00164"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f">00164</a> <span class="keyword"></span>{
+<a name="l00165"></a>00165     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#aafb70a5eb82b45d24caced56267a893d" title="get the scaling (and offset) which would be used in an conversion">getScalingTo</a>( typeID, scaleopt );
+<a name="l00166"></a>00166 }
+<a name="l00167"></a>00167 scaling_pair <a class="code" href="classisis_1_1data_1_1Chunk.html#ae700378263b34d8a0872f9d994a4d05f" title="get the scaling (and offset) which would be used in an conversion to the given type">Chunk::getScalingTo</a>( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> typeID, <span class="keyword">const</span> std::pair&lt;util::ValueReference, util::ValueReference&gt; &amp;minmax, autoscaleOption scaleopt )<span class="keyword">const</span>
+<a name="l00168"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab6b7b514d89f624ad435483efae15530">00168</a> <span class="keyword"></span>{
+<a name="l00169"></a>00169     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#aafb70a5eb82b45d24caced56267a893d" title="get the scaling (and offset) which would be used in an conversion">getScalingTo</a>( typeID, minmax, scaleopt );
+<a name="l00170"></a>00170 }
+<a name="l00171"></a>00171 
+<a name="l00172"></a>00172 <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">Chunk::operator=</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> &amp;ref )
+<a name="l00173"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">00173</a> {
+<a name="l00174"></a>00174     <a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">_internal::ChunkBase::operator=</a>( static_cast&lt;const _internal::ChunkBase &amp;&gt;( ref ) ); <span class="comment">//copy the metadate of ref</span>
+<a name="l00175"></a>00175     <a class="code" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">ValueArrayReference::operator=</a>( static_cast&lt;const ValueArrayReference &amp;&gt;( ref ) ); <span class="comment">// copy the reference of ref&#39;s data</span>
+<a name="l00176"></a>00176     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00177"></a>00177 }
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179 std::list&lt;Chunk&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245" title="Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber...">Chunk::autoSplice</a> ( uint32_t acquisitionNumberStride )<span class="keyword">const</span>
+<a name="l00180"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab51fafa7cb8cbbfb4718c64628a3c245">00180</a> <span class="keyword"></span>{
+<a name="l00181"></a>00181     <span class="keywordflow">if</span> ( !isValid() ) {
+<a name="l00182"></a>00182         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Cannot splice invalid Chunk (missing properties are &quot;</span> &lt;&lt; this-&gt;getMissing() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00183"></a>00183         <span class="keywordflow">return</span> std::list&lt;Chunk&gt;();
+<a name="l00184"></a>00184     }
+<a name="l00185"></a>00185 
+<a name="l00186"></a>00186     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> offset;
+<a name="l00187"></a>00187     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> voxelSize = propertyValue( <span class="stringliteral">&quot;voxelSize&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00188"></a>00188     <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> voxelGap;
+<a name="l00189"></a>00189 
+<a name="l00190"></a>00190     <span class="keywordflow">if</span>( hasProperty( <span class="stringliteral">&quot;voxelGap&quot;</span> ) )
+<a name="l00191"></a>00191         voxelGap = propertyValue( <span class="stringliteral">&quot;voxelGap&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> distance = voxelSize + voxelGap;
+<a name="l00194"></a>00194     <span class="keywordtype">size_t</span> atDim = getRelevantDims() - 1;
+<a name="l00195"></a>00195 
+<a name="l00196"></a>00196     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( atDim &lt; <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">data::timeDim</a> &amp;&amp; distance[atDim] == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;The voxel distance (voxelSize + voxelGap) at the splicing direction (&quot;</span> &lt;&lt; atDim &lt;&lt; <span class="stringliteral">&quot;) is zero. This will likely cause errors in the Images structure.&quot;</span>;
+<a name="l00197"></a>00197 
+<a name="l00198"></a>00198     <span class="keywordflow">switch</span>( atDim ) { <span class="comment">// init offset with the given direction</span>
+<a name="l00199"></a>00199     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> :
+<a name="l00200"></a>00200         offset = this-&gt;propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00201"></a>00201         <span class="keywordflow">break</span>;
+<a name="l00202"></a>00202     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4d76e19bcda99794dc317e4dfacb2f3c">columnDim</a>:
+<a name="l00203"></a>00203         offset = this-&gt;propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00204"></a>00204         <span class="keywordflow">break</span>;
+<a name="l00205"></a>00205     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a5ac8c76240726965f794dcedcb675d8e">sliceDim</a>:
+<a name="l00206"></a>00206 
+<a name="l00207"></a>00207         <span class="keywordflow">if</span>( this-&gt;hasProperty( <span class="stringliteral">&quot;sliceVec&quot;</span> ) ) {
+<a name="l00208"></a>00208             offset = this-&gt;propertyValue( <span class="stringliteral">&quot;sliceVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00209"></a>00209         } <span class="keywordflow">else</span> {
+<a name="l00210"></a>00210             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;row = this-&gt;propertyValue( <span class="stringliteral">&quot;rowVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00211"></a>00211             <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;column = this-&gt;propertyValue( <span class="stringliteral">&quot;columnVec&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00212"></a>00212             assert( util::fuzzyEqual&lt;float&gt;( row.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a7cd0cf667545c9ccbbc98e5c676daf42" title="Get the inner product with itself (aka squared length).">sqlen</a>(), 1 ) );
+<a name="l00213"></a>00213             assert( util::fuzzyEqual&lt;float&gt;( column.sqlen(), 1 ) );
+<a name="l00214"></a>00214             offset[0] = row[1] * column[2] - row[2] * column[1];
+<a name="l00215"></a>00215             offset[1] = row[2] * column[0] - row[0] * column[2];
+<a name="l00216"></a>00216             offset[2] = row[0] * column[1] - row[1] * column[0];
+<a name="l00217"></a>00217         }
+<a name="l00218"></a>00218 
+<a name="l00219"></a>00219         <span class="keywordflow">break</span>;
+<a name="l00220"></a>00220     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">timeDim</a> :
+<a name="l00221"></a>00221         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( acquisitionNumberStride == 0, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail&quot;</span>;
+<a name="l00222"></a>00222     }
 <a name="l00223"></a>00223 
-<a name="l00224"></a>00224     <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> cnt = 1; it != ret.end(); it++, cnt++ ) { <span class="comment">// adapt some metadata in them</span>
-<a name="l00225"></a>00225         <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> &amp;orig = it-&gt;propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
+<a name="l00224"></a>00224     <span class="comment">// prepare some attributes</span>
+<a name="l00225"></a>00225     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> indexOriginOffset = atDim &lt; <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">data::timeDim</a> ? offset * distance[atDim] : <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">util::fvector3</a>();
 <a name="l00226"></a>00226 
-<a name="l00227"></a>00227         <span class="keywordflow">if</span>( orig == ret.front().getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) ) { <span class="comment">// fix pos if its the same as for the first</span>
-<a name="l00228"></a>00228             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Origin was &quot;</span> &lt;&lt; orig &lt;&lt; <span class="stringliteral">&quot; will be moved by &quot;</span> &lt;&lt; indexOriginOffset &lt;&lt; <span class="stringliteral">&quot;*&quot;</span>  &lt;&lt; cnt;
-<a name="l00229"></a>00229             orig = orig + indexOriginOffset * ( float )cnt;
-<a name="l00230"></a>00230         }
-<a name="l00231"></a>00231 
-<a name="l00232"></a>00232         uint32_t &amp;acq = it-&gt;propertyValue( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> ).castTo&lt;uint32_t&gt;();
-<a name="l00233"></a>00233 
-<a name="l00234"></a>00234         <span class="keywordflow">if</span>( acq == ret.front().getPropertyAs&lt;uint32_t&gt;( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> ) ) {
-<a name="l00235"></a>00235             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;acquisitionNumber was &quot;</span> &lt;&lt; acq &lt;&lt; <span class="stringliteral">&quot; will be moved by &quot;</span> &lt;&lt; acquisitionNumberStride &lt;&lt; <span class="stringliteral">&quot;*&quot;</span>  &lt;&lt; cnt;
-<a name="l00236"></a>00236             acq += acquisitionNumberStride * cnt; <span class="comment">//@todo this might cause trouble if we try to insert this chunks into an image</span>
-<a name="l00237"></a>00237         }
-<a name="l00238"></a>00238     }
-<a name="l00239"></a>00239 
-<a name="l00240"></a>00240     <span class="keywordflow">return</span> ret;
-<a name="l00241"></a>00241 }
+<a name="l00227"></a>00227     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Splicing chunk at dimenstion &quot;</span> &lt;&lt; atDim + 1 &lt;&lt; <span class="stringliteral">&quot; with indexOrigin stride &quot;</span> &lt;&lt; indexOriginOffset &lt;&lt; <span class="stringliteral">&quot; and acquisitionNumberStride &quot;</span> &lt;&lt; acquisitionNumberStride;
+<a name="l00228"></a>00228     std::list&lt;Chunk&gt; ret = <a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b" title="Splices the chunk at the given dimension and all dimensions above.">splice</a>( ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> )atDim ); <span class="comment">// do low level splice - get the chunklist</span>
+<a name="l00229"></a>00229 
+<a name="l00230"></a>00230     std::list&lt;Chunk&gt;::iterator it = ret.begin();
+<a name="l00231"></a>00231     it++;<span class="comment">// skip the first one</span>
+<a name="l00232"></a>00232 
+<a name="l00233"></a>00233     <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> cnt = 1; it != ret.end(); it++, cnt++ ) { <span class="comment">// adapt some metadata in them</span>
+<a name="l00234"></a>00234         <a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a> &amp;orig = it-&gt;propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> ).castTo&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;();
+<a name="l00235"></a>00235 
+<a name="l00236"></a>00236         <span class="keywordflow">if</span>( orig == ret.front().getPropertyAs&lt;<a class="code" href="classisis_1_1util_1_1vector3.html">util::fvector3</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) ) { <span class="comment">// fix pos if its the same as for the first</span>
+<a name="l00237"></a>00237             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Origin was &quot;</span> &lt;&lt; orig &lt;&lt; <span class="stringliteral">&quot; will be moved by &quot;</span> &lt;&lt; indexOriginOffset &lt;&lt; <span class="stringliteral">&quot;*&quot;</span>  &lt;&lt; cnt;
+<a name="l00238"></a>00238             orig = orig + indexOriginOffset * ( float )cnt;
+<a name="l00239"></a>00239         }
+<a name="l00240"></a>00240 
+<a name="l00241"></a>00241         uint32_t &amp;acq = it-&gt;propertyValue( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> ).castTo&lt;uint32_t&gt;();<span class="comment">//@todo acquisitionTime needs to be fixed as well</span>
 <a name="l00242"></a>00242 
-<a name="l00243"></a>00243 std::list&lt;Chunk&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b" title="Splices the chunk at the given dimension and all dimensions above.">Chunk::splice</a> ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> atDim )<span class="keyword">const</span>
-<a name="l00244"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b">00244</a> <span class="keyword"></span>{
-<a name="l00245"></a>00245     std::list&lt;Chunk&gt; ret;
-<a name="l00246"></a>00246 
-<a name="l00247"></a>00247     <span class="comment">//@todo should be locking</span>
-<a name="l00248"></a>00248     <span class="keyword">typedef</span> std::vector&lt;ValueArrayReference&gt; ValueArrayList;
-<a name="l00249"></a>00249     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, dims&gt;</a> wholesize = getSizeAsVector();
-<a name="l00250"></a>00250     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, dims&gt;</a> spliceSize;
-<a name="l00251"></a>00251     spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( 1 ); <span class="comment">//init size of one chunk-splice to 1x1x1x1</span>
-<a name="l00252"></a>00252     <span class="comment">//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)</span>
-<a name="l00253"></a>00253     spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( &amp;wholesize[0], &amp;wholesize[atDim] );
-<a name="l00254"></a>00254     <span class="comment">//get the spliced ValueArray&#39;s (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)</span>
-<a name="l00255"></a>00255     <span class="keyword">const</span> ValueArrayList pointers = this-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a69e60814d1b0ec667ad71eac7cfc9da6" title="Splice up the ValueArray into equal sized blocks.">splice</a>( spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() );
-<a name="l00256"></a>00256 
-<a name="l00257"></a>00257     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c" title="a list to store keys only (without the corresponding values)">util::PropertyMap::KeyList</a> lists = this-&gt;findLists();
-<a name="l00258"></a>00258     <span class="keywordtype">size_t</span> list_idx = 0;
-<a name="l00259"></a>00259 
-<a name="l00260"></a>00260     <span class="comment">//create new Chunks from this ValueArray&#39;s</span>
-<a name="l00261"></a>00261     BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
-<a name="l00262"></a>00262         ret.push_back( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); <span class="comment">//@todo make sure this is only one copy-operation</span>
-<a name="l00263"></a>00263         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;<span class="keyword">&gt;</span>( ret.back() ) = static_cast&lt;const util::PropertyMap &amp;&gt;( *<span class="keyword">this</span> ); <span class="comment">// copy all props into the splices</span>
-<a name="l00264"></a>00264         BOOST_FOREACH( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp; key, lists ) { <span class="comment">// override list-entries in the splices with their respective entries</span>
-<a name="l00265"></a>00265             ret.back().<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( key ) = this-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">propertyValueAt</a>( key, list_idx );
-<a name="l00266"></a>00266         }
-<a name="l00267"></a>00267         <span class="comment">//      std::cout &lt;&lt; static_cast&lt;util::PropertyMap &amp;&gt;( ret.back() ) &lt;&lt; std::endl;</span>
-<a name="l00268"></a>00268         list_idx++;
-<a name="l00269"></a>00269     }
-<a name="l00270"></a>00270     <span class="keywordflow">return</span> ret;
-<a name="l00271"></a>00271 }
-<a name="l00272"></a>00272 
-<a name="l00273"></a>00273 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">Chunk::useCount</a>()<span class="keyword"> const</span>
-<a name="l00274"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">00274</a> <span class="keyword"></span>{
-<a name="l00275"></a>00275     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ada551088b4dbef3bc0d7be4618fa7f1f">useCount</a>();
-<a name="l00276"></a>00276 }
-<a name="l00277"></a>00277 
-<a name="l00278"></a>00278 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1" title="Swaps the image along a dimension dim in image space.">Chunk::swapAlong</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim )<span class="keyword"> const</span>
-<a name="l00279"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1">00279</a> <span class="keyword"></span>{
-<a name="l00280"></a>00280     <span class="keyword">const</span> <span class="keywordtype">size_t</span> elSize = <a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">getBytesPerVoxel</a>();
-<a name="l00281"></a>00281     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> whole_size = getSizeAsVector();
-<a name="l00282"></a>00282 
-<a name="l00283"></a>00283     boost::shared_ptr&lt;uint8_t&gt; swap_ptr = boost::shared_static_cast&lt;uint8_t&gt;( <span class="keyword">get</span>()-&gt;getRawAddress() );
-<a name="l00284"></a>00284     uint8_t *swap_start = swap_ptr.get();
-<a name="l00285"></a>00285     <span class="keyword">const</span> uint8_t *<span class="keyword">const</span> swap_end = swap_start + whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() * elSize;
+<a name="l00243"></a>00243         <span class="keywordflow">if</span>( acq == ret.front().getPropertyAs&lt;uint32_t&gt;( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> ) ) {
+<a name="l00244"></a>00244             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;acquisitionNumber was &quot;</span> &lt;&lt; acq &lt;&lt; <span class="stringliteral">&quot; will be moved by &quot;</span> &lt;&lt; acquisitionNumberStride &lt;&lt; <span class="stringliteral">&quot;*&quot;</span>  &lt;&lt; cnt;
+<a name="l00245"></a>00245             acq += acquisitionNumberStride * cnt; <span class="comment">//@todo this might cause trouble if we try to insert this chunks into an image</span>
+<a name="l00246"></a>00246         }
+<a name="l00247"></a>00247     }
+<a name="l00248"></a>00248 
+<a name="l00249"></a>00249     <span class="keywordflow">return</span> ret;
+<a name="l00250"></a>00250 }
+<a name="l00251"></a>00251 
+<a name="l00252"></a>00252 std::list&lt;Chunk&gt; <a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b" title="Splices the chunk at the given dimension and all dimensions above.">Chunk::splice</a> ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> atDim )<span class="keyword">const</span>
+<a name="l00253"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b">00253</a> <span class="keyword"></span>{
+<a name="l00254"></a>00254     std::list&lt;Chunk&gt; ret;
+<a name="l00255"></a>00255 
+<a name="l00256"></a>00256     <span class="comment">//@todo should be locking</span>
+<a name="l00257"></a>00257     <span class="keyword">typedef</span> std::vector&lt;ValueArrayReference&gt; ValueArrayList;
+<a name="l00258"></a>00258     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, dims&gt;</a> wholesize = getSizeAsVector();
+<a name="l00259"></a>00259     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, dims&gt;</a> spliceSize;
+<a name="l00260"></a>00260     spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#af94746a0cc9eb0e48a2a71da0e3a56c6" title="Set all elements to a value.">fill</a>( 1 ); <span class="comment">//init size of one chunk-splice to 1x1x1x1</span>
+<a name="l00261"></a>00261     <span class="comment">//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)</span>
+<a name="l00262"></a>00262     spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a00afc94aa6452abf889ffddc4ebb76fd" title="copy the elements to somthing designed after the output iterator model">copyFrom</a>( &amp;wholesize[0], &amp;wholesize[atDim] );
+<a name="l00263"></a>00263     <span class="comment">//get the spliced ValueArray&#39;s (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)</span>
+<a name="l00264"></a>00264     <span class="keyword">const</span> ValueArrayList pointers = this-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#a69e60814d1b0ec667ad71eac7cfc9da6" title="Splice up the ValueArray into equal sized blocks.">splice</a>( spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() );
+<a name="l00265"></a>00265 
+<a name="l00266"></a>00266     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c" title="a list to store keys only (without the corresponding values)">util::PropertyMap::KeyList</a> lists = this-&gt;findLists();
+<a name="l00267"></a>00267     <span class="keywordtype">size_t</span> list_idx = 0;
+<a name="l00268"></a>00268 
+<a name="l00269"></a>00269     <span class="comment">//create new Chunks from this ValueArray&#39;s</span>
+<a name="l00270"></a>00270     BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
+<a name="l00271"></a>00271         ret.push_back( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); <span class="comment">//@todo make sure this is only one copy-operation</span>
+<a name="l00272"></a>00272         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">util::PropertyMap</a> &amp;<span class="keyword">&gt;</span>( ret.back() ) = static_cast&lt;const util::PropertyMap &amp;&gt;( *<span class="keyword">this</span> ); <span class="comment">// copy all props into the splices</span>
+<a name="l00273"></a>00273         BOOST_FOREACH( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp; key, lists ) { <span class="comment">// override list-entries in the splices with their respective entries</span>
+<a name="l00274"></a>00274             ret.back().<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a4c656dc09e8b6b41f96dd9e396ac20df" title="Access the property referenced by the path.">propertyValue</a>( key ) = this-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">propertyValueAt</a>( key, list_idx );
+<a name="l00275"></a>00275         }
+<a name="l00276"></a>00276         <span class="comment">//      std::cout &lt;&lt; static_cast&lt;util::PropertyMap &amp;&gt;( ret.back() ) &lt;&lt; std::endl;</span>
+<a name="l00277"></a>00277         list_idx++;
+<a name="l00278"></a>00278     }
+<a name="l00279"></a>00279     <span class="keywordflow">return</span> ret;
+<a name="l00280"></a>00280 }
+<a name="l00281"></a>00281 
+<a name="l00282"></a>00282 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">Chunk::useCount</a>()<span class="keyword"> const</span>
+<a name="l00283"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">00283</a> <span class="keyword"></span>{
+<a name="l00284"></a>00284     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#ada551088b4dbef3bc0d7be4618fa7f1f">useCount</a>();
+<a name="l00285"></a>00285 }
 <a name="l00286"></a>00286 
-<a name="l00287"></a>00287     <span class="keywordtype">size_t</span> block_volume = whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>();
-<a name="l00288"></a>00288 
-<a name="l00289"></a>00289     <span class="keywordflow">for</span>( <span class="keywordtype">int</span> i = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">data::timeDim</a>; i &gt;= dim; i-- ) {
-<a name="l00290"></a>00290         assert( ( block_volume % whole_size[i] ) == 0 );
-<a name="l00291"></a>00291         block_volume /= whole_size[i];
-<a name="l00292"></a>00292     }
-<a name="l00293"></a>00293 
-<a name="l00294"></a>00294     assert( block_volume );
-<a name="l00295"></a>00295     block_volume *= elSize;
-<a name="l00296"></a>00296     <span class="keyword">const</span> <span class="keywordtype">size_t</span> swap_volume = block_volume * whole_size[dim];
-<a name="l00297"></a>00297     <span class="keyword">const</span> boost::scoped_array&lt;uint8_t&gt; buff( <span class="keyword">new</span> uint8_t[ block_volume ] );
-<a name="l00298"></a>00298 
-<a name="l00299"></a>00299     <span class="comment">//iterate over all swap-volumes</span>
-<a name="l00300"></a>00300     <span class="keywordflow">for</span>( ; swap_start &lt; swap_end; swap_start += swap_volume ) { <span class="comment">//outer loop</span>
-<a name="l00301"></a>00301         <span class="comment">// swap each block with the one at the oppsite end of the swap_volume</span>
-<a name="l00302"></a>00302         uint8_t *a = swap_start; <span class="comment">//first block</span>
-<a name="l00303"></a>00303         uint8_t *b = swap_start + swap_volume - block_volume; <span class="comment">//last block within the swap-volume</span>
-<a name="l00304"></a>00304 
-<a name="l00305"></a>00305         <span class="keywordflow">for</span>( ; a &lt; b; a += block_volume, b -= block_volume ) { <span class="comment">// grow a, shrink b (inner loop)</span>
-<a name="l00306"></a>00306             memcpy( buff.get(), a, block_volume );
-<a name="l00307"></a>00307             memcpy( a, b, block_volume );
-<a name="l00308"></a>00308             memcpy( b, buff.get(), block_volume );
-<a name="l00309"></a>00309         }
-<a name="l00310"></a>00310 
-<a name="l00311"></a>00311     }
-<a name="l00312"></a>00312 }
+<a name="l00287"></a>00287 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1" title="Swaps the image along a dimension dim in image space.">Chunk::swapAlong</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim )<span class="keyword"> const</span>
+<a name="l00288"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1">00288</a> <span class="keyword"></span>{
+<a name="l00289"></a>00289     <span class="keyword">const</span> <span class="keywordtype">size_t</span> elSize = <a class="code" href="classisis_1_1data_1_1Chunk.html#abb184f06b6654e79f0e44e5ac1f05414">getBytesPerVoxel</a>();
+<a name="l00290"></a>00290     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a> whole_size = getSizeAsVector();
+<a name="l00291"></a>00291 
+<a name="l00292"></a>00292     boost::shared_ptr&lt;uint8_t&gt; swap_ptr = boost::shared_static_cast&lt;uint8_t&gt;( <span class="keyword">get</span>()-&gt;getRawAddress() );
+<a name="l00293"></a>00293     uint8_t *swap_start = swap_ptr.get();
+<a name="l00294"></a>00294     <span class="keyword">const</span> uint8_t *<span class="keyword">const</span> swap_end = swap_start + whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() * elSize;
+<a name="l00295"></a>00295 
+<a name="l00296"></a>00296     <span class="keywordtype">size_t</span> block_volume = whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>();
+<a name="l00297"></a>00297 
+<a name="l00298"></a>00298     <span class="keywordflow">for</span>( <span class="keywordtype">int</span> i = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">data::timeDim</a>; i &gt;= dim; i-- ) {
+<a name="l00299"></a>00299         assert( ( block_volume % whole_size[i] ) == 0 );
+<a name="l00300"></a>00300         block_volume /= whole_size[i];
+<a name="l00301"></a>00301     }
+<a name="l00302"></a>00302 
+<a name="l00303"></a>00303     assert( block_volume );
+<a name="l00304"></a>00304     block_volume *= elSize;
+<a name="l00305"></a>00305     <span class="keyword">const</span> <span class="keywordtype">size_t</span> swap_volume = block_volume * whole_size[dim];
+<a name="l00306"></a>00306     <span class="keyword">const</span> boost::scoped_array&lt;uint8_t&gt; buff( <span class="keyword">new</span> uint8_t[ block_volume ] );
+<a name="l00307"></a>00307 
+<a name="l00308"></a>00308     <span class="comment">//iterate over all swap-volumes</span>
+<a name="l00309"></a>00309     <span class="keywordflow">for</span>( ; swap_start &lt; swap_end; swap_start += swap_volume ) { <span class="comment">//outer loop</span>
+<a name="l00310"></a>00310         <span class="comment">// swap each block with the one at the oppsite end of the swap_volume</span>
+<a name="l00311"></a>00311         uint8_t *a = swap_start; <span class="comment">//first block</span>
+<a name="l00312"></a>00312         uint8_t *b = swap_start + swap_volume - block_volume; <span class="comment">//last block within the swap-volume</span>
 <a name="l00313"></a>00313 
-<a name="l00314"></a>00314 <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">Chunk::propertyValueAt</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;key, <span class="keywordtype">size_t</span> at )
-<a name="l00315"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8">00315</a> {
-<a name="l00316"></a>00316     std::vector&lt; util::PropertyValue &gt; &amp;vec = propertyValueVec( key );
-<a name="l00317"></a>00317     <span class="keyword">const</span> <span class="keywordtype">size_t</span> cSize = getSizeAsVector()[getRelevantDims() - 1];
-<a name="l00318"></a>00318 
-<a name="l00319"></a>00319     <span class="keywordflow">if</span>( vec.size() != cSize ) {
-<a name="l00320"></a>00320         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Resizing sub-property &quot;</span> &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; to size of the chunk (&quot;</span> &lt;&lt; cSize  &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00321"></a>00321         vec.resize( cSize );
-<a name="l00322"></a>00322     }
-<a name="l00323"></a>00323 
-<a name="l00324"></a>00324     <span class="keywordflow">return</span> vec.at( at );
-<a name="l00325"></a>00325 }
-<a name="l00326"></a>00326 <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">Chunk::propertyValueAt</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;key, <span class="keywordtype">size_t</span> at )<span class="keyword"> const</span>
-<a name="l00327"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#acffaf734f63657782130cbf3c89b53f4">00327</a> <span class="keyword"></span>{
-<a name="l00328"></a>00328     <span class="keyword">const</span> std::vector&lt; util::PropertyValue &gt; &amp;vec = propertyValueVec( key );
-<a name="l00329"></a>00329     <span class="keyword">const</span> <span class="keywordtype">size_t</span> cSize = getSizeAsVector()[getRelevantDims() - 1];
-<a name="l00330"></a>00330     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( vec.size() != cSize, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Sub-property &quot;</span> &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; does not have the size of the chunk (&quot;</span> &lt;&lt; cSize  &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00331"></a>00331     <span class="keywordflow">return</span> vec.at( at );
-<a name="l00332"></a>00332 }
-<a name="l00333"></a>00333 
-<a name="l00334"></a>00334 <a class="code" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">Chunk::begin</a>()
-<a name="l00335"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">00335</a> {
-<a name="l00336"></a>00336     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#add26158225fd5d5b6b1ba1482327b866">beginGeneric</a>();
-<a name="l00337"></a>00337 }
-<a name="l00338"></a>00338 
-<a name="l00339"></a>00339 <a class="code" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">Chunk::end</a>()
-<a name="l00340"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">00340</a> {
-<a name="l00341"></a>00341     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af400f2f76b6e09b43386d1f899154fcd">endGeneric</a>();
-<a name="l00342"></a>00342 }
-<a name="l00343"></a>00343 <a class="code" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">Chunk::begin</a>()<span class="keyword">const</span>
-<a name="l00344"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a07d458a2703945cbe76fe4bded7fd333">00344</a> <span class="keyword"></span>{
-<a name="l00345"></a>00345     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#add26158225fd5d5b6b1ba1482327b866">beginGeneric</a>();
+<a name="l00314"></a>00314         <span class="keywordflow">for</span>( ; a &lt; b; a += block_volume, b -= block_volume ) { <span class="comment">// grow a, shrink b (inner loop)</span>
+<a name="l00315"></a>00315             memcpy( buff.get(), a, block_volume );
+<a name="l00316"></a>00316             memcpy( a, b, block_volume );
+<a name="l00317"></a>00317             memcpy( b, buff.get(), block_volume );
+<a name="l00318"></a>00318         }
+<a name="l00319"></a>00319 
+<a name="l00320"></a>00320     }
+<a name="l00321"></a>00321 }
+<a name="l00322"></a>00322 
+<a name="l00323"></a>00323 <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">Chunk::propertyValueAt</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;key, <span class="keywordtype">size_t</span> at )
+<a name="l00324"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8">00324</a> {
+<a name="l00325"></a>00325     std::vector&lt; util::PropertyValue &gt; &amp;vec = propertyValueVec( key );
+<a name="l00326"></a>00326     <span class="keyword">const</span> <span class="keywordtype">size_t</span> cSize = getSizeAsVector()[getRelevantDims() - 1];
+<a name="l00327"></a>00327 
+<a name="l00328"></a>00328     <span class="keywordflow">if</span>( vec.size() != cSize ) {
+<a name="l00329"></a>00329         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Resizing sub-property &quot;</span> &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; to size of the chunk (&quot;</span> &lt;&lt; cSize  &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00330"></a>00330         vec.resize( cSize );
+<a name="l00331"></a>00331     }
+<a name="l00332"></a>00332 
+<a name="l00333"></a>00333     <span class="keywordflow">return</span> vec.at( at );
+<a name="l00334"></a>00334 }
+<a name="l00335"></a>00335 <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">util::PropertyValue</a> &amp;<a class="code" href="classisis_1_1data_1_1Chunk.html#af41cf6c4b3148ece948d762f99ffb4f8" title="Access properties of the next lower dimension (e.g.">Chunk::propertyValueAt</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85" title="type of the keys forming a path">util::PropertyMap::KeyType</a> &amp;key, <span class="keywordtype">size_t</span> at )<span class="keyword"> const</span>
+<a name="l00336"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#acffaf734f63657782130cbf3c89b53f4">00336</a> <span class="keyword"></span>{
+<a name="l00337"></a>00337     <span class="keyword">const</span> std::vector&lt; util::PropertyValue &gt; &amp;vec = propertyValueVec( key );
+<a name="l00338"></a>00338     <span class="keyword">const</span> <span class="keywordtype">size_t</span> cSize = getSizeAsVector()[getRelevantDims() - 1];
+<a name="l00339"></a>00339     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( vec.size() != cSize, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Sub-property &quot;</span> &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; does not have the size of the chunk (&quot;</span> &lt;&lt; cSize  &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00340"></a>00340     <span class="keywordflow">return</span> vec.at( at );
+<a name="l00341"></a>00341 }
+<a name="l00342"></a>00342 
+<a name="l00343"></a>00343 <a class="code" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">Chunk::begin</a>()
+<a name="l00344"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">00344</a> {
+<a name="l00345"></a>00345     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#add26158225fd5d5b6b1ba1482327b866">beginGeneric</a>();
 <a name="l00346"></a>00346 }
 <a name="l00347"></a>00347 
-<a name="l00348"></a>00348 <a class="code" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">Chunk::end</a>()<span class="keyword">const</span>
-<a name="l00349"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a9ac29d0750a5be71ce47414473e5cdbb">00349</a> <span class="keyword"></span>{
-<a name="l00350"></a>00350     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af400f2f76b6e09b43386d1f899154fcd">endGeneric</a>();
+<a name="l00348"></a>00348 <a class="code" href="classisis_1_1data_1_1Chunk.html#ad18285aad71195f299ee841a00a28131">Chunk::iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">Chunk::end</a>()
+<a name="l00349"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">00349</a> {
+<a name="l00350"></a>00350     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a458e4b0fdd8c77a766e12b31de04e000">asValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af400f2f76b6e09b43386d1f899154fcd">endGeneric</a>();
 <a name="l00351"></a>00351 }
-<a name="l00352"></a>00352 
-<a name="l00353"></a>00353 <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">util::ValueReference</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">Chunk::getVoxelValue</a> ( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )<span class="keyword"> const</span>
-<a name="l00354"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">00354</a> <span class="keyword"></span>{
-<a name="l00355"></a>00355     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+<a name="l00352"></a>00352 <a class="code" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">Chunk::begin</a>()<span class="keyword">const</span>
+<a name="l00353"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a07d458a2703945cbe76fe4bded7fd333">00353</a> <span class="keyword"></span>{
+<a name="l00354"></a>00354     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#add26158225fd5d5b6b1ba1482327b866">beginGeneric</a>();
+<a name="l00355"></a>00355 }
 <a name="l00356"></a>00356 
-<a name="l00357"></a>00357     <span class="keywordflow">if</span> ( !isInRange( idx ) ) {
-<a name="l00358"></a>00358         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
-<a name="l00359"></a>00359                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( idx ) &lt;&lt; nrOfTimesteps
-<a name="l00360"></a>00360                 &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00361"></a>00361     }
-<a name="l00362"></a>00362 
-<a name="l00363"></a>00363     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a>()[getLinearIndex( idx )];
-<a name="l00364"></a>00364 }
-<a name="l00365"></a>00365 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">Chunk::setVoxelValue</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">util::ValueReference</a> &amp;val, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )
-<a name="l00366"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">00366</a> {
-<a name="l00367"></a>00367     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
-<a name="l00368"></a>00368 
-<a name="l00369"></a>00369     <span class="keywordflow">if</span> ( !isInRange( idx ) ) {
-<a name="l00370"></a>00370         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
-<a name="l00371"></a>00371                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( idx ) &lt;&lt; nrOfTimesteps
-<a name="l00372"></a>00372                 &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00373"></a>00373     }
-<a name="l00374"></a>00374 
-<a name="l00375"></a>00375     <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a>()[getLinearIndex( idx )] = val;
-<a name="l00376"></a>00376 }
+<a name="l00357"></a>00357 <a class="code" href="classisis_1_1data_1_1Chunk.html#a4d6cdfd2f68ef6abf05bbf1e65e106f3">Chunk::const_iterator</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a28bae2dc11bbaedcfece3c37f886716f">Chunk::end</a>()<span class="keyword">const</span>
+<a name="l00358"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a9ac29d0750a5be71ce47414473e5cdbb">00358</a> <span class="keyword"></span>{
+<a name="l00359"></a>00359     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aac4953ecdcef21aa1beac57a0abe87fc">getValueArrayBase</a>().<a class="code" href="classisis_1_1data_1_1ValueArrayBase.html#af400f2f76b6e09b43386d1f899154fcd">endGeneric</a>();
+<a name="l00360"></a>00360 }
+<a name="l00361"></a>00361 
+<a name="l00362"></a>00362 <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">util::ValueReference</a> <a class="code" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">Chunk::getVoxelValue</a> ( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )<span class="keyword"> const</span>
+<a name="l00363"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a420bf22ea518621582fdc4e0d19761a5">00363</a> <span class="keyword"></span>{
+<a name="l00364"></a>00364     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+<a name="l00365"></a>00365 
+<a name="l00366"></a>00366     <span class="keywordflow">if</span> ( !isInRange( idx ) ) {
+<a name="l00367"></a>00367         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
+<a name="l00368"></a>00368                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( idx ) &lt;&lt; nrOfTimesteps
+<a name="l00369"></a>00369                 &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00370"></a>00370     }
+<a name="l00371"></a>00371 
+<a name="l00372"></a>00372     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a>()[getLinearIndex( idx )];
+<a name="l00373"></a>00373 }
+<a name="l00374"></a>00374 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">Chunk::setVoxelValue</a> ( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1GenericReference.html" title="Base class to store and handle references to Value and ValueArray objects.">util::ValueReference</a> &amp;val, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )
+<a name="l00375"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#acd2c46c4da2bd85a4a73ac6b99bbe68c">00375</a> {
+<a name="l00376"></a>00376     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 <a name="l00377"></a>00377 
-<a name="l00378"></a>00378 
-<a name="l00379"></a>00379 }
-<a name="l00380"></a>00380 }
+<a name="l00378"></a>00378     <span class="keywordflow">if</span> ( !isInRange( idx ) ) {
+<a name="l00379"></a>00379         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="namespaceisis.html#afe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">isis::error</a> )
+<a name="l00380"></a>00380                 &lt;&lt; <span class="stringliteral">&quot;Index &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1vector4.html">util::vector4&lt;size_t&gt;</a>( idx ) &lt;&lt; nrOfTimesteps
+<a name="l00381"></a>00381                 &lt;&lt; <span class="stringliteral">&quot; is out of range (&quot;</span> &lt;&lt; getSizeAsString() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00382"></a>00382     }
+<a name="l00383"></a>00383 
+<a name="l00384"></a>00384     <a class="code" href="classisis_1_1data_1_1Chunk.html#ac5932382fe119da6c8c743a6c2186d31">begin</a>()[getLinearIndex( idx )] = val;
+<a name="l00385"></a>00385 }
+<a name="l00386"></a>00386 
+<a name="l00387"></a>00387 
+<a name="l00388"></a>00388 }
+<a name="l00389"></a>00389 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

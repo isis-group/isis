@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/DataStorage/io_factory.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/DataStorage/io_factory.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/DataStorage/io_factory.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/DataStorage/io_factory.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="io__factory_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -80,50 +80,52 @@
 <a name="l00039"></a>00039 <span class="keyword">public</span>:
 <a name="l00040"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">00040</a>     <span class="keyword">typedef</span> boost::shared_ptr&lt; image_io::FileFormat&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a>;
 <a name="l00041"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">00041</a>     <span class="keyword">typedef</span> std::list&lt;FileFormatPtr&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a>;
-<a name="l00042"></a>00042 <span class="keyword">private</span>:
-<a name="l00043"></a>00043     boost::shared_ptr&lt;util::ProgressFeedback&gt; m_feedback;
-<a name="l00044"></a>00044 <span class="keyword">public</span>:
-<a name="l00053"></a>00053     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;paths, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00061"></a>00061     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00070"></a>00070     <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00073"></a>00073     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00074"></a>00074 
-<a name="l00076"></a>00076     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">getFormats</a>();
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt; feedback );
+<a name="l00042"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a8ffc04ad55b337282b026badd70ddb84">00042</a>     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1Singletons.html" title="Static class to handle singletons of a given type and priority.">util::Singletons</a>;
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044 <span class="keyword">private</span>:
+<a name="l00045"></a>00045     boost::shared_ptr&lt;util::ProgressFeedback&gt; m_feedback;
+<a name="l00046"></a>00046 <span class="keyword">public</span>:
+<a name="l00055"></a>00055     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">util::slist</a> &amp;paths, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00063"></a>00063     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00072"></a>00072     <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ad3be6d7e942ad0b83a0d982a13360b62" title="Load data from a set of files or directories with given paths and dialect.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00075"></a>00075     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aafdb009cac00eece03fec50de2c9757b">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00076"></a>00076 
+<a name="l00078"></a>00078     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2" title="Get a list of all known file-formats (aka. io-plugins loaded)">getFormats</a>();
 <a name="l00079"></a>00079 
-<a name="l00086"></a>00086     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( std::string filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00094"></a>00094     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;chunks );
-<a name="l00095"></a>00095 <span class="keyword">protected</span>:
-<a name="l00096"></a>00096     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00097"></a>00097     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<span class="keyword">get</span>();
-<a name="l00100"></a>00100     <a class="code" href="classisis_1_1data_1_1IOFactory.html#adcdad6a4d9c693887b0d7c2abf7f2ecb">IOFactory</a>();<span class="comment">//shall not be created directly</span>
-<a name="l00101"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">00101</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103     <span class="comment">/*</span>
-<a name="l00104"></a>00104 <span class="comment">     * each ImageFormat will be registered in a map after plugin has been loaded</span>
-<a name="l00105"></a>00105 <span class="comment">     * @param plugin pointer to the plugin to register</span>
-<a name="l00106"></a>00106 <span class="comment">     *</span>
-<a name="l00107"></a>00107 <span class="comment">     * @return true if registration was successful, false otherwise</span>
-<a name="l00108"></a>00108 <span class="comment">     * */</span>
-<a name="l00109"></a>00109     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> plugin );
-<a name="l00110"></a>00110     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( <span class="keyword">const</span> std::string &amp;path );
-<a name="l00111"></a>00111 <span class="keyword">private</span>:
-<a name="l00116"></a>00116     std::map&lt;util::istring, FileFormatList&gt; io_suffix;
-<a name="l00117"></a>00117     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;operator =( <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp; ); <span class="comment">//dont do that</span>
-<a name="l00118"></a>00118 };
-<a name="l00119"></a>00119 
-<a name="l00120"></a>00120 }
-<a name="l00121"></a>00121 }
-<a name="l00122"></a>00122 
-<a name="l00123"></a>00123 <span class="preprocessor">#endif //IO_FACTORY_H</span>
+<a name="l00080"></a>00080     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a29b69e48cca4cedfc868f10d75725214">setProgressFeedback</a>( boost::shared_ptr&lt;util::ProgressFeedback&gt; feedback );
+<a name="l00081"></a>00081 
+<a name="l00088"></a>00088     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a07b407c3480f15d69175ce9a83c30f1f" title="Get all formats which should be able to read/write the given file.">getFileFormatList</a>( std::string filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00096"></a>00096     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;chunks );
+<a name="l00097"></a>00097 <span class="keyword">protected</span>:
+<a name="l00098"></a>00098     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aba182fce9e23d7de63926cf2f3b3bcd9">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00099"></a>00099     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a1c58a724e6088d19d96566c52fed8266">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> suffix_override = <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#aa73187141ea34b93ffedb59c170e4f29">util::istring</a> dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00100"></a>00100 
+<a name="l00101"></a>00101     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<span class="keyword">get</span>();
+<a name="l00102"></a>00102     <a class="code" href="classisis_1_1data_1_1IOFactory.html#adcdad6a4d9c693887b0d7c2abf7f2ecb">IOFactory</a>();<span class="comment">//shall not be created directly</span>
+<a name="l00103"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">00103</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     <span class="comment">/*</span>
+<a name="l00106"></a>00106 <span class="comment">     * each ImageFormat will be registered in a map after plugin has been loaded</span>
+<a name="l00107"></a>00107 <span class="comment">     * @param plugin pointer to the plugin to register</span>
+<a name="l00108"></a>00108 <span class="comment">     *</span>
+<a name="l00109"></a>00109 <span class="comment">     * @return true if registration was successful, false otherwise</span>
+<a name="l00110"></a>00110 <span class="comment">     * */</span>
+<a name="l00111"></a>00111     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a0aa039248796b66aafe118ee31072590">FileFormatPtr</a> plugin );
+<a name="l00112"></a>00112     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( <span class="keyword">const</span> std::string &amp;path );
+<a name="l00113"></a>00113 <span class="keyword">private</span>:
+<a name="l00118"></a>00118     std::map&lt;util::istring, FileFormatList&gt; io_suffix;
+<a name="l00119"></a>00119     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;operator =( <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp; ); <span class="comment">//dont do that</span>
+<a name="l00120"></a>00120 };
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122 }
+<a name="l00123"></a>00123 }
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125 <span class="preprocessor">#endif //IO_FACTORY_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -76,8 +76,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a2e9a477de0bb46993538887db4807684">castTo</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Dynamically cast the <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> up to its actual value of type T. </p>
  hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#acdd97084343fb3d0c1f0eb52d045c464">ValueBase::castTo</a>  <a href="#a2e9a477de0bb46993538887db4807684"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#a9dbabdacfa18efbf4e3d127ef614b8bc">getTypeID</a> () const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">ValueBase::getTypeID</a>  <a href="#a9dbabdacfa18efbf4e3d127ef614b8bc"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#ad667807666f161e1bfdc300002bba119">getTypeID</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">ValueBase::getTypeID</a>  <a href="#ad667807666f161e1bfdc300002bba119"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyValue.html#aaad3a390099113139ddece01167b6b39">getTypeName</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">ValueBase::getTypeName</a>  <a href="#aaad3a390099113139ddece01167b6b39"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
@@ -247,19 +247,19 @@ template&lt;class T &gt; </div>
 <p><p>Dynamically cast the <a class="el" href="classisis_1_1util_1_1ValueBase.html">ValueBase</a> up to its actual value of type T. </p>
  hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#acdd97084343fb3d0c1f0eb52d045c464">ValueBase::castTo</a> </p>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00153">153</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00159">159</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9dbabdacfa18efbf4e3d127ef614b8bc"></a><!-- doxytag: member="isis::util::PropertyValue::getTypeID" ref="a9dbabdacfa18efbf4e3d127ef614b8bc" args="() const " -->
+<a class="anchor" id="ad667807666f161e1bfdc300002bba119"></a><!-- doxytag: member="isis::util::PropertyValue::getTypeID" ref="ad667807666f161e1bfdc300002bba119" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned short isis::util::PropertyValue::getTypeID </td>
+          <td class="memname">short unsigned int isis::util::PropertyValue::getTypeID </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const</td>
         </tr>
       </table>
 </div>
@@ -267,7 +267,7 @@ template&lt;class T &gt; </div>
 
 <p> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#acd463f6f7eb6eb9a5b899daec570ad41">ValueBase::getTypeID</a> </p>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00147">147</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8cpp_source.html#l00048">48</a> of file <a class="el" href="property_8cpp_source.html">property.cpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ template&lt;class T &gt; </div>
           <td class="memname">std::string isis::util::PropertyValue::getTypeName </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
+          <td> const</td>
         </tr>
       </table>
 </div>
@@ -287,7 +287,7 @@ template&lt;class T &gt; </div>
 
 <p> hook for <a class="el" href="classisis_1_1util_1_1__internal_1_1GenericValue.html#ad6c1f5b417b6a58d028b1c4cef85ac7e">ValueBase::getTypeName</a> </p>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00141">141</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8cpp_source.html#l00042">42</a> of file <a class="el" href="property_8cpp_source.html">property.cpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +309,7 @@ template&lt;class T &gt; </div>
 
 <p> hook for <a class="el" href="classisis_1_1util_1_1ValueBase.html#a1eb3ec95ef9955dc6cafa2abcde1fed5">ValueBase::is</a> </p>
 
-<p>Definition at line <a class="el" href="property_8hpp_source.html#l00135">135</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
+<p>Definition at line <a class="el" href="property_8hpp_source.html#l00138">138</a> of file <a class="el" href="property_8hpp_source.html">property.hpp</a>.</p>
 
 </div>
 </div>
@@ -469,11 +469,11 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="property_8hpp_source.html">property.hpp</a></li>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="property_8cpp_source.html">property.cpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="property_8hpp_source.html">property.hpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="property_8cpp_source.html">property.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:15 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

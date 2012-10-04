@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/DataStorage/sortedchunklist.hpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/DataStorage/sortedchunklist.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/DataStorage/sortedchunklist.hpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/DataStorage/sortedchunklist.hpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="sortedchunklist_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
@@ -86,7 +86,7 @@
 <a name="l00046"></a>00046         <span class="keywordtype">bool</span> operator()( <span class="keyword">const</span> util::PropertyValue &amp;a, <span class="keyword">const</span> util::PropertyValue &amp;b ) <span class="keyword">const</span>;
 <a name="l00047"></a>00047     };
 <a name="l00048"></a>00048     <span class="keyword">struct </span>posCompare {
-<a name="l00049"></a>00049         <span class="keywordtype">bool</span> operator()( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;a, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;b ) <span class="keyword">const</span>;
+<a name="l00049"></a>00049         <span class="keywordtype">bool</span> operator()( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">util::fvector3</a> &amp;a, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">util::fvector3</a> &amp;b ) <span class="keyword">const</span>;
 <a name="l00050"></a>00050     };
 <a name="l00051"></a>00051     <span class="keyword">struct </span>chunkPtrOperator {
 <a name="l00052"></a>00052         <span class="keyword">virtual</span> boost::shared_ptr&lt;Chunk&gt; operator()( <span class="keyword">const</span> boost::shared_ptr&lt;Chunk&gt; &amp;ptr ) = 0;
@@ -94,7 +94,7 @@
 <a name="l00054"></a>00054     };
 <a name="l00055"></a>00055 <span class="keyword">private</span>:
 <a name="l00056"></a>00056     <span class="keyword">typedef</span> std::map&lt;util::PropertyValue, boost::shared_ptr&lt;Chunk&gt;, scalarPropCompare&gt; SecondaryMap;
-<a name="l00057"></a>00057     <span class="keyword">typedef</span> std::map&lt;util::fvector4, SecondaryMap, posCompare&gt; PrimaryMap;
+<a name="l00057"></a>00057     <span class="keyword">typedef</span> std::map&lt;util::fvector3, SecondaryMap, posCompare&gt; PrimaryMap;
 <a name="l00058"></a>00058 
 <a name="l00059"></a>00059     std::stack&lt;scalarPropCompare&gt; secondarySort;
 <a name="l00060"></a>00060     posCompare primarySort;
@@ -102,13 +102,13 @@
 <a name="l00062"></a>00062 
 <a name="l00063"></a>00063     <span class="comment">// low level finding</span>
 <a name="l00064"></a>00064     boost::shared_ptr&lt;Chunk&gt; secondaryFind( <span class="keyword">const</span> util::PropertyValue &amp;key, SecondaryMap &amp;map );
-<a name="l00065"></a>00065     SecondaryMap *primaryFind( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;key );
+<a name="l00065"></a>00065     SecondaryMap *primaryFind( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">util::fvector3</a> &amp;key );
 <a name="l00066"></a>00066 
 <a name="l00067"></a>00067     <span class="comment">// low level inserting</span>
 <a name="l00068"></a>00068     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; secondaryInsert( SecondaryMap &amp;map, <span class="keyword">const</span> Chunk &amp;ch );
 <a name="l00069"></a>00069     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; primaryInsert( <span class="keyword">const</span> Chunk &amp;ch );
 <a name="l00070"></a>00070 
-<a name="l00071"></a>00071     std::list&lt;util::PropertyMap::KeyType&gt; equalProps;
+<a name="l00071"></a>00071     std::list&lt;util::PropertyMap::PropPath&gt; equalProps;
 <a name="l00072"></a>00072 <span class="keyword">public</span>:
 <a name="l00073"></a>00073 
 <a name="l00074"></a>00074     <span class="comment">//initialisation</span>
@@ -141,7 +141,7 @@
 <a name="l00116"></a>00116 <span class="preprocessor">#endif // SORTEDCHUNKLIST_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/types.cpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/types.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/types.cpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/types.cpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="types_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
@@ -99,63 +99,65 @@
 <a name="l00059"></a>00059 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#af67f6409e672ff9ee92439de9e21ad9c">color24</a>, <a class="code" href="namespaceisis_1_1util.html#af67f6409e672ff9ee92439de9e21ad9c">color24</a> );
 <a name="l00060"></a>00060 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a8cc8891f552a79b2b7d445dbf5badf0a">color48</a>, <a class="code" href="namespaceisis_1_1util.html#a8cc8891f552a79b2b7d445dbf5badf0a">color48</a> );
 <a name="l00061"></a>00061 
-<a name="l00062"></a>00062 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a> );
-<a name="l00063"></a>00063 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>, <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a> );
-<a name="l00064"></a>00064 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>, <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a> );
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a9cdcb33e5927e2f0fa0da4ad89260706">ilist</a>, list&lt;int32_t&gt; );
-<a name="l00067"></a>00067 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#affd0b87b211416de61a4c318f8b4ac84">dlist</a>, list&lt;double&gt; );
-<a name="l00068"></a>00068 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">slist</a>, list&lt;string&gt; );
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070 DEF_TYPE( std::complex&lt;float&gt;, complex&lt;float&gt; );
-<a name="l00071"></a>00071 DEF_TYPE( std::complex&lt;double&gt;, complex&lt;double&gt; );
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073 DEF_TYPE( std::string, <span class="keywordtype">string</span> );
-<a name="l00074"></a>00074 DEF_TYPE( Selection, selection );
-<a name="l00075"></a>00075 DEF_TYPE( boost::posix_time::ptime, timestamp );
-<a name="l00076"></a>00076 DEF_TYPE( boost::gregorian::date, date );
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078 <a class="code" href="config_8hpp.html#a4121f00721360474a8bd91b291159f18">API_EXCLUDE_BEGIN</a>
-<a name="l00079"></a>00079 <span class="keyword">namespace </span>_internal
-<a name="l00080"></a>00080 {
-<a name="l00081"></a>00081 <span class="keyword">struct </span>type_lister {
-<a name="l00082"></a>00082     std::map&lt; unsigned short, std::string &gt; &amp;m_map;
-<a name="l00083"></a>00083     <span class="keywordtype">bool</span> m_withValues, m_withValueArrays;
-<a name="l00084"></a>00084     type_lister( std::map&lt; unsigned short, std::string &gt; &amp;map, <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays ): m_map( map ), m_withValues( withValues ), m_withValueArrays( withValueArrays ) {}
-<a name="l00085"></a>00085     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC&gt; <span class="keywordtype">void</span> operator()( SRC ) {<span class="comment">//will be called by the mpl::for_each</span>
-<a name="l00086"></a>00086         <span class="keywordflow">if</span>( m_withValues )m_map.insert( std::make_pair( util::Value&lt;SRC&gt;::staticID, util::Value&lt;SRC&gt;::staticName() ) );
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088         <span class="keywordflow">if</span>( m_withValueArrays )m_map.insert( std::make_pair( data::ValueArray&lt;SRC&gt;::staticID, data::ValueArray&lt;SRC&gt;::staticName() ) );
-<a name="l00089"></a>00089     }
-<a name="l00090"></a>00090 };
-<a name="l00091"></a>00091 
-<a name="l00092"></a>00092 }
-<a name="l00093"></a>00093 <a class="code" href="config_8hpp.html#a63e8f68230fde1f0a06d07a8642701fe">API_EXCLUDE_END</a>
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095 std::map&lt; unsigned short, std::string &gt; <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">getTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
-<a name="l00096"></a>00096 {
-<a name="l00097"></a>00097     std::map&lt; unsigned short, std::string &gt; ret;
-<a name="l00098"></a>00098     boost::mpl::for_each&lt;_internal::types&gt;( _internal::type_lister( ret, withValues, withValueArrays ) );
-<a name="l00099"></a>00099     <span class="keywordflow">return</span> ret;
-<a name="l00100"></a>00100 }
-<a name="l00101"></a>00101 
-<a name="l00102"></a>00102 std::map&lt; std::string, unsigned short &gt; <a class="code" href="namespaceisis_1_1util.html#a88c57837190db30ff1d066c7bd0ac15d">getTransposedTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
-<a name="l00103"></a>00103 {
-<a name="l00104"></a>00104     <span class="keyword">typedef</span> std::map&lt; std::string, unsigned short&gt; transposedMapType;
-<a name="l00105"></a>00105     <span class="keyword">typedef</span> std::map&lt; unsigned short, std::string &gt; mapType;
-<a name="l00106"></a>00106     transposedMapType ret;
-<a name="l00107"></a>00107     BOOST_FOREACH( mapType::const_reference ref, <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">util::getTypeMap</a>( withValues, withValueArrays ) ) {
-<a name="l00108"></a>00108         ret[ref.second] = ref.first;
-<a name="l00109"></a>00109     }
-<a name="l00110"></a>00110     <span class="keywordflow">return</span> ret;
-<a name="l00111"></a>00111 }
-<a name="l00112"></a>00112 
+<a name="l00062"></a>00062 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">fvector3</a>, <a class="code" href="namespaceisis_1_1util.html#a6da4c8a9a2cf8ce799f91f4fbacec5e1">fvector3</a> );
+<a name="l00063"></a>00063 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">fvector4</a> );
+<a name="l00064"></a>00064 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a14ff508df82b0112b1964a867db210ff">dvector3</a>, <a class="code" href="namespaceisis_1_1util.html#a14ff508df82b0112b1964a867db210ff">dvector3</a> );
+<a name="l00065"></a>00065 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a>, <a class="code" href="namespaceisis_1_1util.html#a95fd2a2f3c43b5414665ac7640d45f85">dvector4</a> );
+<a name="l00066"></a>00066 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a>, <a class="code" href="namespaceisis_1_1util.html#ae24128f161a50f6a6eabd25c0209cffe">ivector4</a> );
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a9cdcb33e5927e2f0fa0da4ad89260706">ilist</a>, list&lt;int32_t&gt; );
+<a name="l00069"></a>00069 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#affd0b87b211416de61a4c318f8b4ac84">dlist</a>, list&lt;double&gt; );
+<a name="l00070"></a>00070 DEF_TYPE( <a class="code" href="namespaceisis_1_1util.html#a7b97035f60da7a5a491f5ae1ce317592">slist</a>, list&lt;string&gt; );
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 DEF_TYPE( std::complex&lt;float&gt;, complex&lt;float&gt; );
+<a name="l00073"></a>00073 DEF_TYPE( std::complex&lt;double&gt;, complex&lt;double&gt; );
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 DEF_TYPE( std::string, <span class="keywordtype">string</span> );
+<a name="l00076"></a>00076 DEF_TYPE( Selection, selection );
+<a name="l00077"></a>00077 DEF_TYPE( boost::posix_time::ptime, timestamp );
+<a name="l00078"></a>00078 DEF_TYPE( boost::gregorian::date, date );
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080 <a class="code" href="config_8hpp.html#a4121f00721360474a8bd91b291159f18">API_EXCLUDE_BEGIN</a>
+<a name="l00081"></a>00081 <span class="keyword">namespace </span>_internal
+<a name="l00082"></a>00082 {
+<a name="l00083"></a>00083 <span class="keyword">struct </span>type_lister {
+<a name="l00084"></a>00084     std::map&lt; unsigned short, std::string &gt; &amp;m_map;
+<a name="l00085"></a>00085     <span class="keywordtype">bool</span> m_withValues, m_withValueArrays;
+<a name="l00086"></a>00086     type_lister( std::map&lt; unsigned short, std::string &gt; &amp;map, <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays ): m_map( map ), m_withValues( withValues ), m_withValueArrays( withValueArrays ) {}
+<a name="l00087"></a>00087     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC&gt; <span class="keywordtype">void</span> operator()( SRC ) {<span class="comment">//will be called by the mpl::for_each</span>
+<a name="l00088"></a>00088         <span class="keywordflow">if</span>( m_withValues )m_map.insert( std::make_pair( util::Value&lt;SRC&gt;::staticID, util::Value&lt;SRC&gt;::staticName() ) );
+<a name="l00089"></a>00089 
+<a name="l00090"></a>00090         <span class="keywordflow">if</span>( m_withValueArrays )m_map.insert( std::make_pair( data::ValueArray&lt;SRC&gt;::staticID, data::ValueArray&lt;SRC&gt;::staticName() ) );
+<a name="l00091"></a>00091     }
+<a name="l00092"></a>00092 };
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095 <a class="code" href="config_8hpp.html#a63e8f68230fde1f0a06d07a8642701fe">API_EXCLUDE_END</a>
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097 std::map&lt; unsigned short, std::string &gt; <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">getTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
+<a name="l00098"></a>00098 {
+<a name="l00099"></a>00099     std::map&lt; unsigned short, std::string &gt; ret;
+<a name="l00100"></a>00100     boost::mpl::for_each&lt;_internal::types&gt;( _internal::type_lister( ret, withValues, withValueArrays ) );
+<a name="l00101"></a>00101     <span class="keywordflow">return</span> ret;
+<a name="l00102"></a>00102 }
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 std::map&lt; std::string, unsigned short &gt; <a class="code" href="namespaceisis_1_1util.html#a88c57837190db30ff1d066c7bd0ac15d">getTransposedTypeMap</a>( <span class="keywordtype">bool</span> withValues, <span class="keywordtype">bool</span> withValueArrays )
+<a name="l00105"></a>00105 {
+<a name="l00106"></a>00106     <span class="keyword">typedef</span> std::map&lt; std::string, unsigned short&gt; transposedMapType;
+<a name="l00107"></a>00107     <span class="keyword">typedef</span> std::map&lt; unsigned short, std::string &gt; mapType;
+<a name="l00108"></a>00108     transposedMapType ret;
+<a name="l00109"></a>00109     BOOST_FOREACH( mapType::const_reference ref, <a class="code" href="namespaceisis_1_1util.html#a50637b8e341850c8fdf1c2bb9c1cb55b">util::getTypeMap</a>( withValues, withValueArrays ) ) {
+<a name="l00110"></a>00110         ret[ref.second] = ref.first;
+<a name="l00111"></a>00111     }
+<a name="l00112"></a>00112     <span class="keywordflow">return</span> ret;
 <a name="l00113"></a>00113 }
-<a name="l00114"></a>00114 }
-<a name="l00115"></a>00115 
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 }
+<a name="l00116"></a>00116 }
+<a name="l00117"></a>00117 
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -60,7 +60,6 @@
       <li><a href="#index_p"><span>p</span></a></li>
       <li><a href="#index_r"><span>r</span></a></li>
       <li><a href="#index_s"><span>s</span></a></li>
-      <li><a href="#index_v"><span>v</span></a></li>
     </ul>
   </div>
 </div>
@@ -97,6 +96,9 @@
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
+<li>defaultChunkEqualitySet
+: <a class="el" href="classisis_1_1data_1_1Image.html#a4f9d2bc9fbdf23436f89973898c5cfe4">isis::data::Image</a>
+</li>
 <li>dims
 : <a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">isis::data::_internal::NDimensional&lt; DIMS &gt;</a>
 </li>
@@ -125,7 +127,7 @@
 
 <h3><a class="anchor" id="index_l"></a>- l -</h3><ul>
 <li>last
-: <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3283cfd081f74b3eca951391eb851dff">isis::util::DefaultMsgPrint</a>
+: <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a64f47a6475e3728130888776a5e47281">isis::util::DefaultMsgPrint</a>
 </li>
 <li>logs
 : <a class="el" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">isis::util::Application</a>
@@ -138,24 +140,20 @@
 
 <h3><a class="anchor" id="index_m"></a>- m -</h3><ul>
 <li>m_ColumnVec
-: <a class="el" href="classisis_1_1data_1_1Image.html#a8fa8b27baf0db3b33521c01015000ebe">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a409a8858502576ece0e23851306294f6">isis::data::Image</a>
 </li>
 <li>m_ColumnVecInv
-: <a class="el" href="classisis_1_1data_1_1Image.html#ae4c1086fcefdcea6d4c026415732a0bd">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#ae29cf093eaec130b17a464c8adf9f0fc">isis::data::Image</a>
 </li>
 <li>m_file
 : <a class="el" href="classisis_1_1util_1_1Message.html#afba7899ea1dbe788226ecc561e778ad7">isis::util::Message</a>
-</li>
-<li>m_input
-: <a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNInput.html#a59046b002339d239709638e89a797c3b">isis::filter::_internal::HasNInput&lt; TYPE, NInput &gt;</a>
-, <a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00-1_00_01NOutput_01_4.html#a4bc7f73a5081bf15d7f6430a7121942f">isis::filter::_internal::Filter&lt; InType, OutType,-1, NOutput &gt;</a>
 </li>
 <li>m_len
 : <a class="el" href="classisis_1_1data_1_1ValueArrayBase.html#a5e3043cf337256d969b8aeb61b0569a8">isis::data::ValueArrayBase</a>
 </li>
 <li>m_level
-: <a class="el" href="classisis_1_1util_1_1Message.html#a7bdd453f7a04cda8e57b48487faa688e">isis::util::Message</a>
-, <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a95d1320bfe7f2febf64b0ec796857d09">isis::util::MessageHandlerBase</a>
+: <a class="el" href="classisis_1_1util_1_1MessageHandlerBase.html#a95d1320bfe7f2febf64b0ec796857d09">isis::util::MessageHandlerBase</a>
+, <a class="el" href="classisis_1_1util_1_1Message.html#a7bdd453f7a04cda8e57b48487faa688e">isis::util::Message</a>
 </li>
 <li>m_line
 : <a class="el" href="classisis_1_1util_1_1Message.html#aafc4cd2aba969f221d014b8c8dc35c14">isis::util::Message</a>
@@ -170,35 +168,34 @@
 : <a class="el" href="classisis_1_1util_1_1Message.html#a704ce99528bb113851b4442e4c7fbe14">isis::util::Message</a>
 </li>
 <li>m_Offset
-: <a class="el" href="classisis_1_1data_1_1Image.html#a2e1c0d32c0ffbacafb9bc54ca97fc469">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#aa48ea22c820fcb5748582c42167f47b6">isis::data::Image</a>
 </li>
 <li>m_out
 : <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html#a8164b9aa042a1a553c201078aa68c021">isis::util::PropertyMap::walkTree&lt; Predicate &gt;</a>
-</li>
-<li>m_output
-: <a class="el" href="classisis_1_1filter_1_1__internal_1_1Filter_3_01InType_00_01OutType_00_01NInput_00-1_01_4.html#a7824126771b411aa0422b3beb95ce690">isis::filter::_internal::Filter&lt; InType, OutType, NInput,-1 &gt;</a>
-, <a class="el" href="classisis_1_1filter_1_1__internal_1_1HasNOutput.html#a904099daf9a0646d95a03e7aa4d494de">isis::filter::_internal::HasNOutput&lt; TYPE, NOutput &gt;</a>
 </li>
 <li>m_prefix
 : <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1walkTree.html#a5506868dd56fb32baa6890e522fcda34">isis::util::PropertyMap::walkTree&lt; Predicate &gt;</a>
 </li>
 <li>m_RowVec
-: <a class="el" href="classisis_1_1data_1_1Image.html#af304cf98a684a4ea2e9e1e1283f0025a">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a94c5a4dae0eb700c87401ea6eac87c40">isis::data::Image</a>
 </li>
 <li>m_RowVecInv
-: <a class="el" href="classisis_1_1data_1_1Image.html#a374ae697c25b616628a0baded99903aa">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a7c8dfbee9badb073f6096ba8e21475af">isis::data::Image</a>
 </li>
 <li>m_SliceVec
-: <a class="el" href="classisis_1_1data_1_1Image.html#ac55db4f806fb53523b0ed5c599c360ab">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a6512a575ed4322de1a439944773fafb0">isis::data::Image</a>
 </li>
 <li>m_SliceVecInv
-: <a class="el" href="classisis_1_1data_1_1Image.html#ad164cb7f1033182b3e33dff905f56787">isis::data::Image</a>
+: <a class="el" href="classisis_1_1data_1_1Image.html#a080d2483667cd366d95aaf64276a9c1d">isis::data::Image</a>
 </li>
 <li>m_subjects
 : <a class="el" href="classisis_1_1util_1_1Message.html#accd957df71a2300bb0dba389445f33f0">isis::util::Message</a>
 </li>
 <li>m_timeStamp
 : <a class="el" href="classisis_1_1util_1_1Message.html#ab7b2db74c0518ae25d3e3c9ca3e7f42b">isis::util::Message</a>
+</li>
+<li>max_age
+: <a class="el" href="classisis_1_1util_1_1DefaultMsgPrint.html#a988ee5b360c05d2b4a1fbe3df784625c">isis::util::DefaultMsgPrint</a>
 </li>
 </ul>
 
@@ -224,9 +221,6 @@
 <li>plugin_file
 : <a class="el" href="classisis_1_1image__io_1_1FileFormat.html#aaa2bcce8f196ce9a8ee6e8c8de5c683a">isis::image_io::FileFormat</a>
 </li>
-<li>progressfeedback
-: <a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#af9b1906e22615a2d77335456bba0acc7">isis::filter::_internal::FilterBase</a>
-</li>
 </ul>
 
 
@@ -249,15 +243,8 @@
 , <a class="el" href="classisis_1_1util_1_1Value.html#a8eb493234308a7a3231b8e15ba120139">isis::util::Value&lt; TYPE &gt;</a>
 </li>
 </ul>
-
-
-<h3><a class="anchor" id="index_v"></a>- v -</h3><ul>
-<li>valid
-: <a class="el" href="classisis_1_1filter_1_1__internal_1_1FilterBase.html#a0c771be800bdc5c73e2a78f896e6b53e">isis::filter::_internal::FilterBase</a>
-</li>
-</ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:14 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

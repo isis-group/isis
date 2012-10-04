@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -85,6 +85,7 @@ Data Structures</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true when entry is a leaf, needed and empty <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>listP</b></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true when entry is not a scalar <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap_1_1NeededsList.html">NeededsList</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">"Path" type used to locate entries in the tree  <a href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>treeInvalidP</b></td></tr>
@@ -112,8 +113,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the branch referenced by the path, create it if its not there.  <a href="#a85ff9d6b80c5bd55628fd49da3023568"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a7d0ac1e2070a996c40b57db1ab2dc93e">branch</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the branch referenced by the path.  <a href="#a7d0ac1e2070a996c40b57db1ab2dc93e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#abb3518fa3c1e35033b4dee5cf9b2ca60">find</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> key, bool allowProperty=true, bool allowBranch=false) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Search for a property/branch in the whole Tree.  <a href="#abb3518fa3c1e35033b4dee5cf9b2ca60"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a5ed3906771e979f27d935eb74ce93ef7">find</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> key, bool allowProperty=true, bool allowBranch=false) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Search for a property/branch in the whole Tree.  <a href="#a5ed3906771e979f27d935eb74ce93ef7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c">KeyList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a72fdd04ff2b327bfb0c1c382737df54c">findLists</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">find all non scalar entries  <a href="#a72fdd04ff2b327bfb0c1c382737df54c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a0bfc17a3afe4a2a010e75c80f8883102">DiffMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a92da4079cea64f8f92353322653e46bd">getDifference</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;second) const </td></tr>
@@ -133,8 +134,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a4a6bae8173d0a0e910903a634be674af">isEmpty</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc">isValid</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if every property marked as needed is set.  <a href="#a7f4ea1b7c43edfce313d70dc7f68addc"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c">PropertyMap::KeyList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a8f5f0388f7901b9f4ee4afeb7732ba42">join</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;other, bool overwrite=false)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add Properties from another tree.  <a href="#a8f5f0388f7901b9f4ee4afeb7732ba42"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c">PropertyMap::KeyList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#afcc784b918ef67c115c0fc9138254e59">join</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;other, bool overwrite=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add Properties from another tree.  <a href="#afcc784b918ef67c115c0fc9138254e59"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a1e93ada16242a03c04b787bc6ae6f413">operator==</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;src) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a9485ad2dbf2e7f5f8ec393c41d9ebd73">print</a> (std::ostream &amp;out, bool label=false) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">"Print" the property tree.  <a href="#a9485ad2dbf2e7f5f8ec393c41d9ebd73"></a><br/></td></tr>
@@ -162,22 +163,20 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform an existing property into another (statically typed version).  <a href="#a5fa02559317b63e5c6a18cffadefabdd"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a67214438f607248a64bb22a8574d322e">addNeeded</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> &amp;path)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a property with status needed.  <a href="#a67214438f607248a64bb22a8574d322e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#afc8dc03ba6f2f6988b133ab57e1aa26c">addNeededFromString</a> (const std::string &amp;needed)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Properties given by a space separated list needed.  <a href="#afc8dc03ba6f2f6988b133ab57e1aa26c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a90eda36862d9649304c6cc36c3549244">addNeeded</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a property with status needed.  <a href="#a90eda36862d9649304c6cc36c3549244"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class Predicate &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c">KeyList</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#ac6446eac6db55a9e7351fb37924c9386">genKeyList</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">create a list of keys for every entry for which the given scalar predicate is true.  <a href="#ac6446eac6db55a9e7351fb37924c9386"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a380618b20d3c787500207317400ea383">makeFlatMap</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html#a402a5b6b4fed6b673af4fe6fdbd1e957">FlatMap</a> &amp;out, <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> key_prefix=&quot;&quot;) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">copy the tree into a flat key/property-map  <a href="#a380618b20d3c787500207317400ea383"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#af85f7af2c66875efbbb475d5e03f7ed3">propertyValueVec</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the property vector referenced by the path-key, create it if its not there.  <a href="#af85f7af2c66875efbbb475d5e03f7ed3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::vector<br class="typebreak"/>
 &lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#ac1fcaf297115450ea4eaf67b2a68513c">propertyValueVec</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the property vector referenced by the path.  <a href="#ac1fcaf297115450ea4eaf67b2a68513c"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#af85f7af2c66875efbbb475d5e03f7ed3">propertyValueVec</a> (const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;path)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the property vector referenced by the path-key, create it if its not there.  <a href="#af85f7af2c66875efbbb475d5e03f7ed3"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#ad743c0b3afee400fb579b931064196aa">removeEqual</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;other, bool removeNeeded=false)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove every <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> which is also in the other <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> and where operator== returns true.  <a href="#ad743c0b3afee400fb579b931064196aa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a95ae814cce1504baa35601eb1d9c4008">removeEqual</a> (const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;other, bool removeNeeded=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove every <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> which is also in the other <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> and where operator== returns true.  <a href="#a95ae814cce1504baa35601eb1d9c4008"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a8761e90a0f2c2dcd021f2325a4b8f263">toCommonUnique</a> (<a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;common, std::set&lt; <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> &gt; &amp;uniques, bool init) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get common and unique properties from the tree.  <a href="#a8761e90a0f2c2dcd021f2325a4b8f263"></a><br/></td></tr>
 </table>
@@ -304,14 +303,14 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a67214438f607248a64bb22a8574d322e"></a><!-- doxytag: member="isis::util::PropertyMap::addNeeded" ref="a67214438f607248a64bb22a8574d322e" args="(const KeyType &amp;path)" -->
+<a class="anchor" id="a90eda36862d9649304c6cc36c3549244"></a><!-- doxytag: member="isis::util::PropertyMap::addNeeded" ref="a90eda36862d9649304c6cc36c3549244" args="(const PropPath &amp;path)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void isis::util::PropertyMap::addNeeded </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;&#160;</td>
           <td class="paramname"><em>path</em></td><td>)</td>
           <td><code> [protected]</code></td>
         </tr>
@@ -327,34 +326,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00493">493</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afc8dc03ba6f2f6988b133ab57e1aa26c"></a><!-- doxytag: member="isis::util::PropertyMap::addNeededFromString" ref="afc8dc03ba6f2f6988b133ab57e1aa26c" args="(const std::string &amp;needed)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void isis::util::PropertyMap::addNeededFromString </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>needed</em></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Make Properties given by a space separated list needed. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">needed</td><td>string made of space serparated property-names which will (if neccessary) be added to the <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> and flagged as needed. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00499">499</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00492">492</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +354,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the branching <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00210">210</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00209">209</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -411,18 +383,18 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the branching <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00197">197</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00196">196</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abb3518fa3c1e35033b4dee5cf9b2ca60"></a><!-- doxytag: member="isis::util::PropertyMap::find" ref="abb3518fa3c1e35033b4dee5cf9b2ca60" args="(KeyType key, bool allowProperty=true, bool allowBranch=false) const " -->
+<a class="anchor" id="a5ed3906771e979f27d935eb74ce93ef7"></a><!-- doxytag: member="isis::util::PropertyMap::find" ref="a5ed3906771e979f27d935eb74ce93ef7" args="(KeyType key, bool allowProperty=true, bool allowBranch=false) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">isis::util::PropertyMap::KeyType</a> isis::util::PropertyMap::find </td>
+          <td class="memname"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">PropertyMap::KeyType</a> isis::util::PropertyMap::find </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">KeyType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a22562fc95dac243746790a5c6a2aad85">PropertyMap::KeyType</a>&#160;</td>
           <td class="paramname"><em>key</em>, </td>
         </tr>
         <tr>
@@ -457,7 +429,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>full path to the property (including the properties name) if it is found, empty string elsewhise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00515">515</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00504">504</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -477,7 +449,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>find all non scalar entries </p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00477">477</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00476">476</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -499,7 +471,7 @@ template&lt;class Predicate &gt; </div>
 
 <p>create a list of keys for every entry for which the given scalar predicate is true. </p>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00117">117</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00130">130</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -546,7 +518,7 @@ template&lt;class Predicate &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00281">281</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00280">280</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +537,7 @@ template&lt;class Predicate &gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>a flat representation of the whole property tree </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00434">434</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00433">433</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -586,7 +558,7 @@ template&lt;class Predicate &gt; </div>
 <p>Get a list of the paths of all properties. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a flat list of the paths to all properties in the <a class="el" href="classisis_1_1util_1_1PropertyMap.html" title="This class forms a mapping tree to store all kinds of properties (path : value), where:value is:a uti...">PropertyMap</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00470">470</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00469">469</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -607,7 +579,7 @@ template&lt;class Predicate &gt; </div>
 <p>Get a list of missing properties. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of the paths for all properties which are marked as needed and but are empty. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00485">485</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00484">484</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +602,7 @@ template&lt;typename T &gt; </div>
 
 <p>Request a property via the given key in the given type. </p>
 <p>If the requested type is not equal to type the property is stored with, an automatic conversion is done. If that conversion failes an error is send to Runtime. </p>
-<div class="fragment"><pre class="fragment"> getPropertyAs&lt;isis::util::fvector4&gt;( <span class="stringliteral">&quot;MyPropertyName&quot;</span> );
+<div class="fragment"><pre class="fragment"> getPropertyAs&lt;fvector4&gt;( <span class="stringliteral">&quot;MyPropertyName&quot;</span> );
 </pre></div> <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>the path to the property </td></tr>
@@ -639,7 +611,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the property with given type, if not set yet T() is returned. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00496">496</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00514">514</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -667,7 +639,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the given branch does exist and is not empty, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00549">549</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00538">538</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -695,7 +667,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the given property does exist and is not empty, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00509">509</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00498">498</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -716,7 +688,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classisis_1_1data_1_1Image.html#a9fb0c9f8351fddc6a2fea609d487aa2b">isis::data::Image</a>.</p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00276">276</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00275">275</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -737,18 +709,18 @@ template&lt;typename T &gt; </div>
 <p>Check if every property marked as needed is set. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if ALL needed properties are NOT empty, false otherwhise. </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00269">269</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00268">268</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8f5f0388f7901b9f4ee4afeb7732ba42"></a><!-- doxytag: member="isis::util::PropertyMap::join" ref="a8f5f0388f7901b9f4ee4afeb7732ba42" args="(const isis::util::PropertyMap &amp;other, bool overwrite=false)" -->
+<a class="anchor" id="afcc784b918ef67c115c0fc9138254e59"></a><!-- doxytag: member="isis::util::PropertyMap::join" ref="afcc784b918ef67c115c0fc9138254e59" args="(const PropertyMap &amp;other, bool overwrite=false)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classisis_1_1util_1_1PropertyMap.html#a2c8c8105e5fef4b913e634cbf6532a1c">PropertyMap::KeyList</a> isis::util::PropertyMap::join </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;&#160;</td>
           <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
@@ -776,7 +748,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a list of the rejected properties that couldn't be inserted, for success this should be empty </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00384">384</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00383">383</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -807,7 +779,7 @@ template&lt;typename T &gt; </div>
 
 <p>copy the tree into a flat key/property-map </p>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00421">421</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00420">420</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -865,7 +837,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00588">588</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00577">577</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -894,7 +866,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00185">185</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00184">184</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -922,35 +894,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00190">190</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af85f7af2c66875efbbb475d5e03f7ed3"></a><!-- doxytag: member="isis::util::PropertyMap::propertyValueVec" ref="af85f7af2c66875efbbb475d5e03f7ed3" args="(const PropPath &amp;path)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &gt; &amp; isis::util::PropertyMap::propertyValueVec </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Access the property vector referenced by the path-key, create it if its not there. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">path</td><td>the path to the property </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
-
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00177">177</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00189">189</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -979,7 +923,64 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00164">164</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00163">163</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af85f7af2c66875efbbb475d5e03f7ed3"></a><!-- doxytag: member="isis::util::PropertyMap::propertyValueVec" ref="af85f7af2c66875efbbb475d5e03f7ed3" args="(const PropPath &amp;path)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="classisis_1_1util_1_1PropertyValue.html">PropertyValue</a> &gt; &amp; isis::util::PropertyMap::propertyValueVec </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Access the property vector referenced by the path-key, create it if its not there. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>the path to the property </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00176">176</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4db5950cdd32941a590cb75fcc00f3ad"></a><!-- doxytag: member="isis::util::PropertyMap::remove" ref="a4db5950cdd32941a590cb75fcc00f3ad" args="(const PropPath &amp;path)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::util::PropertyMap::remove </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Remove the property adressed by the path. </p>
+<p>This actually only removes properties. Non-empty branches are not deleted. And if an branch becomes empty after deletion of its last entry, it is deleted automatically. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>the path to the property </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true if successful, false otherwise </dd></dl>
+
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00215">215</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1018,7 +1019,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if all properties removed succesfully, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00221">221</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00220">220</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1057,47 +1058,18 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if all properties removed succesfully, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00235">235</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00234">234</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a4db5950cdd32941a590cb75fcc00f3ad"></a><!-- doxytag: member="isis::util::PropertyMap::remove" ref="a4db5950cdd32941a590cb75fcc00f3ad" args="(const PropPath &amp;path)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool isis::util::PropertyMap::remove </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structisis_1_1util_1_1PropertyMap_1_1PropPath.html">PropPath</a> &amp;&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Remove the property adressed by the path. </p>
-<p>This actually only removes properties. Non-empty branches are not deleted. And if an branch becomes empty after deletion of its last entry, it is deleted automatically. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">path</td><td>the path to the property </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true if successful, false otherwise </dd></dl>
-
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00216">216</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ad743c0b3afee400fb579b931064196aa"></a><!-- doxytag: member="isis::util::PropertyMap::removeEqual" ref="ad743c0b3afee400fb579b931064196aa" args="(const isis::util::PropertyMap &amp;other, bool removeNeeded=false)" -->
+<a class="anchor" id="a95ae814cce1504baa35601eb1d9c4008"></a><!-- doxytag: member="isis::util::PropertyMap::removeEqual" ref="a95ae814cce1504baa35601eb1d9c4008" args="(const PropertyMap &amp;other, bool removeNeeded=false)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void isis::util::PropertyMap::removeEqual </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">isis::util::PropertyMap</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1PropertyMap.html">PropertyMap</a> &amp;&#160;</td>
           <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
@@ -1124,7 +1096,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00345">345</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00344">344</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1168,7 +1140,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00555">555</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00544">544</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1183,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a reference to the <a class="el" href="classisis_1_1util_1_1PropertyValue.html" title="A very generic class to store values of properties.">PropertyValue</a> (this can be used later, e.g. if a vector is filled step by step the reference can be used to not ask for the Property each time) </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00357">357</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00364">364</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
@@ -1265,7 +1237,7 @@ template&lt;typename T &gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00572">572</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00561">561</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1319,7 +1291,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the transformation was done, false it failed </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00442">442</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8cpp_source.html#l00441">441</a> of file <a class="el" href="propmap_8cpp_source.html">propmap.cpp</a>.</p>
 
 </div>
 </div>
@@ -1368,16 +1340,16 @@ template&lt;typename DST &gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if the transformation was done, false it failed </dd></dl>
 
-<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00335">335</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
+<p>Definition at line <a class="el" href="propmap_8hpp_source.html#l00342">342</a> of file <a class="el" href="propmap_8hpp_source.html">propmap.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8hpp_source.html">propmap.hpp</a></li>
-<li>/SCR/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8cpp_source.html">propmap.cpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8hpp_source.html">propmap.hpp</a></li>
+<li>/scr/tee1/isis/lib/Core/CoreUtils/<a class="el" href="propmap_8cpp_source.html">propmap.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:36 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:15 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

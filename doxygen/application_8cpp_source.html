@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>ISIS Core Library: /SCR/isis/lib/Core/CoreUtils/application.cpp Source File</title>
+<title>ISIS Core Library: /scr/tee1/isis/lib/Core/CoreUtils/application.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,7 +14,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.5.0 (api 1.0.0)</span></div>
+   <div id="projectname">ISIS Core Library&#160;<span id="projectnumber">0.7.2 (api 3.0.0)</span></div>
   </td>
  </tr>
  </tbody>
@@ -36,7 +36,7 @@
   </div>
 <div class="header">
   <div class="headertitle">
-<h1>/SCR/isis/lib/Core/CoreUtils/application.cpp</h1>  </div>
+<h1>/scr/tee1/isis/lib/Core/CoreUtils/application.cpp</h1>  </div>
 </div>
 <div class="contents">
 <a href="application_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/****************************************************************</span>
@@ -109,16 +109,16 @@
 <a name="l00068"></a>00068     <a class="code" href="classisis_1_1util_1_1Application.html#ad766cb48d4ac2c2e4c5eba68963b5465">logs</a>.erase( name );
 <a name="l00069"></a>00069 }
 <a name="l00070"></a>00070 
-<a name="l00071"></a><a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1">00071</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1" title="Add an example for the programs usage.">Application::addExample</a> ( std::string parameters, std::string desc )
+<a name="l00071"></a><a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1">00071</a> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1Application.html#afe8d3e4dd336f11d95f749c9df6e27b1" title="Add an example for the programs usage.">Application::addExample</a> ( std::string params, std::string desc )
 <a name="l00072"></a>00072 {
-<a name="l00073"></a>00073     m_examples.push_back( std::make_pair( parameters, desc ) );
+<a name="l00073"></a>00073     m_examples.push_back( std::make_pair( params, desc ) );
 <a name="l00074"></a>00074 }
 <a name="l00075"></a>00075 
 <a name="l00076"></a><a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8">00076</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1Application.html#a84cfa64fefcb8221c06892794bc4cec8" title="Initializes the programm parameter map using argc/argv.">Application::init</a>( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <span class="keywordtype">bool</span> exitOnError )
 <a name="l00077"></a>00077 {
 <a name="l00078"></a>00078     <span class="keyword">typedef</span> <span class="keyword">const</span> std::pair&lt; const std::string, std::list&lt; setLogFunction &gt; &gt; &amp; logger_ref;
 <a name="l00079"></a>00079     <span class="keywordtype">bool</span> err = <span class="keyword">false</span>;
-<a name="l00080"></a>00080     m_filename = boost::filesystem::path( argv[0] ).filename();
+<a name="l00080"></a>00080     m_filename = boost::filesystem::path( argv[0] ).leaf();<span class="comment">//@todo switch to filename() as soon as we drop support for boost &lt; 1.44</span>
 <a name="l00081"></a>00081 
 <a name="l00082"></a>00082     <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>.<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( argc, argv ) ) {
 <a name="l00083"></a>00083         <span class="keywordflow">if</span> ( <a class="code" href="classisis_1_1util_1_1Application.html#aa6e216ac203dc3c981ed73f794145d1b">parameters</a>[<span class="stringliteral">&quot;help&quot;</span>] ) {
@@ -229,7 +229,7 @@
 <a name="l00188"></a>00188 <span class="preprocessor"></span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 22 2012 19:19:34 for ISIS Core Library by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 4 2012 17:49:13 for ISIS Core Library by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>
