@@ -309,17 +309,17 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 
 		Image buff( src );
 
-		if ( buff.isClean() ){
+		if ( buff.isClean() ) {
 			if( buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
 				ret.push_back( buff );
-				LOG( Runtime, info ) << "Image " << ret.size() << " with size " << util::MSubject(buff.getSizeAsString()) << " done.";
+				LOG( Runtime, info ) << "Image " << ret.size() << " with size " << util::MSubject( buff.getSizeAsString() ) << " done.";
 			} else {
 				LOG_IF( !buff.getMissing().empty(), Runtime, error )
 						<< "Cannot insert image. Missing properties: " << buff.getMissing();
 				errcnt += before - src.size();
 			}
-		} else 
-			LOG(Runtime,info) << "Dropping non clean Image";
+		} else
+			LOG( Runtime, info ) << "Dropping non clean Image";
 	}
 
 	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";

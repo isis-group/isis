@@ -68,9 +68,9 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 			i++;
 	}
 
-	LOG( DiffLog, info ) 
-	<< images.size() << " candidates left for " << reference.identify() << ", "
-	<< org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
+	LOG( DiffLog, info )
+			<< images.size() << " candidates left for " << reference.identify() << ", "
+			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
 	return images.size();
 }
 

@@ -370,8 +370,8 @@ public:
 			return ValueArrayBase::getScalingTo( typeID, minmax, scaleopt );
 		}
 	}
-    void endianSwap(){
-		data::endianSwapArray(begin(),end(),begin());
+	void endianSwap() {
+		data::endianSwapArray( begin(), end(), begin() );
 	}
 };
 /// @cond _internal

@@ -35,13 +35,13 @@ template<> struct SwapImpl<1> {
 
 //specializations for 16 32 and 64 bit
 template<> struct SwapImpl<2> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_16(src);}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_16( src );}
 };
 template<> struct SwapImpl<4> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_32(src);}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_32( src );}
 };
 template<> struct SwapImpl<8> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_64(src);}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_64( src );}
 };
 
 
