@@ -31,9 +31,9 @@ class ImageFormat_SiemensTcpIp: public FileFormat
 protected:
 	util::istring suffixes( isis::image_io::FileFormat::io_modes iomode )const {
 		if ( write_only == iomode ) {
-			return std::string();
+			return util::istring();
 		} else {
-			return std::string( ".tcpip" );
+			return util::istring( ".tcpip" );
 		}
 	}
 public:
@@ -132,9 +132,9 @@ public:
 					uint16_t seq_number = atol( getStringFromHeader( "meas_uid", header ).c_str() );
 					size_t acq_time = atoi( getStringFromHeader( "acquisition_time", header ).c_str() );
 					uint16_t rep_time = atol( getStringFromHeader( "repetition_time", header ).c_str() );
-					util::fvector4 read_vec = getVectorFromString( getStringFromHeader( "read_vector", header ) );
-					util::fvector4 phase_vec = getVectorFromString( getStringFromHeader( "phase_vector", header ) );
-					util::fvector4 slice_norm_vec = getVectorFromString( getStringFromHeader( "slice_norm_vector", header ) );
+					util::fvector3 read_vec = getVectorFromString( getStringFromHeader( "read_vector", header ) );
+					util::fvector3 phase_vec = getVectorFromString( getStringFromHeader( "phase_vector", header ) );
+					util::fvector3 slice_norm_vec = getVectorFromString( getStringFromHeader( "slice_norm_vector", header ) );
 					int16_t inplane_rot = atoi( getStringFromHeader( "inplane_rotation", header ).c_str() );
 					std::string slice_orient = getStringFromHeader( "slice_orientation", header );
 
@@ -155,7 +155,7 @@ public:
 					size_t dimension_number = atoi( getStringFromHeader( "dimension_number", header ).c_str() );
 					// get voxelGap out of the distance (in percent!) between slices
 					size_t distFactor = atoi( getStringFromHeader( "distance_factor", header ).c_str() );
-					util::fvector4 voxelGap( 0, 0, slice_thickness * ( static_cast<float>( distFactor ) / 100.0 ) );
+					util::fvector3 voxelGap( 0, 0, slice_thickness * ( static_cast<float>( distFactor ) / 100.0 ) );
 
 					// ... copy the data ...
 					/******************************/
@@ -253,20 +253,20 @@ public:
 					myChunk.setPropertyAs<std::string>( "sequenceDescription", seq_descr );
 
 					if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
-						myChunk.setPropertyAs<util::fvector4>( "rowVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector4>( "columnVec", read_vec );
-						myChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( fov_read / width_slice, fov_phase / height_slice, slice_thickness, 0 ) );
+						myChunk.setPropertyAs<util::fvector3>( "rowVec", phase_vec );
+						myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec );
+						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
 					} else {
-						myChunk.setPropertyAs<util::fvector4>( "columnVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector4>( "rowVec", read_vec );
-						myChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( fov_phase / width_slice, fov_read / height_slice, slice_thickness, 0 ) );
+						myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec );
+						myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec );
+						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
 					}
 
 
-					myChunk.setPropertyAs<util::fvector4>( "sliceVec", slice_norm_vec );
+					myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
 					myChunk.setPropertyAs<uint16_t>( "repetitionTime", rep_time );
 					myChunk.setPropertyAs<std::string>( "InPlanePhaseEncodingDirection", InPlanePhaseEncodingDirection );
-					myChunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
+					myChunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3() );
 					std::string sn = boost::posix_time::to_simple_string( boost::posix_time::microsec_clock::local_time() );
 					myChunk.setPropertyAs<std::string>( "source", sn );
 					chunks.push_back( myChunk );
