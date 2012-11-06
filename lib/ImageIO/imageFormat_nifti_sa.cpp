@@ -652,11 +652,20 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		header->slice_duration = 0;
 	}
 
-	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
-	util::vector4<size_t> size;
-	size.fill( 1 );
+	//set up the size - copy dim[0] values from dim[1]..dim[5]
+	util::vector4<size_t> size;uint8_t tDims=0;
+	for(uint_fast8_t i=1;i<5;i++){
+		if(header->dim[i]<=0){
+			LOG(Runtime,warning) << "Resetting invalid dim[" << i <<"] to 1";
+			header->dim[i]=1;
+		} 
+		if(header->dim[i]>1)
+			tDims=i;
+	}
+	LOG_IF(tDims!=header->dim[0],Runtime,warning) << "dim[0]==" << header->dim[0] << " doesn't fit the image, assuming " << (int)tDims;
+	header->dim[0]=tDims;
 
-	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
+	size.copyFrom( header->dim + 1, header->dim + 1 + 4 );
 	data::ValueArrayReference data_src;
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
