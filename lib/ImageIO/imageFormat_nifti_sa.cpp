@@ -3,6 +3,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include <errno.h>
+#include <fstream>
 
 
 namespace isis
@@ -790,6 +791,46 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 				throwGenericError( filename + " could not be opened" );
 		}
 
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to to fsl
+		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
+			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
+			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
+			std::ofstream bvalFile( ( makeBasename( filename ).first + ".bval" ).c_str() );
+			bvecFile.exceptions( std::ios::failbit | std::ios::badbit );
+			bvalFile.exceptions( std::ios::failbit | std::ios::badbit );
+			std::list<util::dvector4> bvecList;
+
+			for( size_t i = 0; i < image.getNrOfTimesteps(); i++ ) { // go through all "volumes"
+				const data::Chunk &chunk = image.getChunk( 0, 0, 0, i );
+				util::dvector4 gradient = chunk.getPropertyAs<util::dvector4>( "diffusionGradient" );
+				const util::Matrix4x4<double> M(
+					chunk.getPropertyAs<util::dvector4>( "rowVec" ),
+					chunk.getPropertyAs<util::dvector4>( "columnVec" ),
+					chunk.getPropertyAs<util::dvector4>( "sliceVec" ),
+					util::dvector4( 0, 0, 0, 1 )
+				);
+
+				// the bvalue is the length of the gradient direction,
+				bvalFile << gradient.len() << " ";
+
+				gradient.norm();// the direction itself must be normalized
+				bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+			}
+
+			// the bvec file is the x-elements of all directions, then all y-elements and so on...
+			// dont ask me, ask fsl ...
+			bvecFile.precision( 14 );
+			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[0] << " ";
+			bvecFile << std::endl;
+			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[1] << " ";
+			bvecFile << std::endl;
+			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[2] << " ";
+			bvecFile << std::endl;
+
+			LOG( Runtime, notice ) << "Stored bvec information for fsl to " << makeBasename( filename ).first + ".bvec";
+			LOG( Runtime, notice ) << "Stored bval information for fsl to " << makeBasename( filename ).first + ".bval";
+		}
+
 
 		// get the first 348 bytes as header
 		_internal::nifti_1_header *header = writer->getHeader();
@@ -817,6 +858,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 		// actually copy the data from each chunk of the image
 		const_cast<data::Image &>( image ).foreachChunk( *writer ); // @todo we _do_ need a const version of foreachChunk/Voxel
+
 	} else {
 		LOG( Runtime, error ) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() ) << " is not supportet for nifti output";
 		throwGenericError( "unsupported datatype" );
