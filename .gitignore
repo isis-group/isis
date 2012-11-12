@@ -12,6 +12,7 @@ debug/
 Debug/
 build/
 Build/
+debug/*
 
 #Packaging##############################
 lib/Core/debian/tmp/
