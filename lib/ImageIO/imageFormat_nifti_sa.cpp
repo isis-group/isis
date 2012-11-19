@@ -13,13 +13,14 @@ namespace image_io
 
 namespace _internal
 {
-WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): data::_internal::NDimensional<4>( image ), m_doFlip( doFlip ), m_bpv( bitsPerVoxel )
+WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel): data::_internal::NDimensional<4>( image ), m_doFlip( false ), m_bpv( bitsPerVoxel ){}
+
+void WriteOp::setFlip( data::dimensions dim )
 {
-	if( doFlip ) {
-		data::Image dummy( image );
-		flip_dim = dummy.mapScannerAxisToImageDimension( data::z );
-	}
+	m_doFlip=true;
+	flip_dim=dim;
 }
+
 size_t WriteOp::getDataSize()
 {
 	size_t bitsize = getVolume() * m_bpv;
@@ -82,8 +83,8 @@ class CommonWriteOp: public WriteOp
 	const unsigned short m_targetId;
 	const data::scaling_pair m_scale;
 public:
-	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel, bool doFlip = false ):
-		WriteOp( image, bitsPerVoxel, doFlip ),
+	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel ):
+		WriteOp( image, bitsPerVoxel ),
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 
 	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
@@ -210,6 +211,21 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 
 }
 util::istring ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return ".nii";}
+
+void ImageFormat_NiftiSa::flipGeometry( data::Image& image, data::dimensions flipdim )
+{
+	static const char *names[]={"rowVec","columnVec","sliceVec"};
+	assert(flipdim<=data::sliceDim);
+	const float vsize=image.getPropertyAs<util::fvector3>("voxelSize")[flipdim] +
+		(image.hasProperty("voxelGap") ? image.getPropertyAs<util::fvector3>("voxelGap")[flipdim]:0);
+	const float middle_to_middle=(image.getSizeAsVector()[flipdim]-1)*vsize; // the distance from the middle of the current first voxel to the "going to be first"
+	util::fvector3 &prop=image.propertyValue(names[flipdim]).castTo<util::fvector3>();
+	util::fvector3 &origin=image.propertyValue("indexOrigin").castTo<util::fvector3>();
+	std::cout << origin << "+" << prop << "*" << middle_to_middle << "=";
+	origin+=prop*middle_to_middle; // move the origin along the repective edge to "the other end"
+	std::cout << image.propertyValue("indexOrigin") << std::endl;
+	prop*=-1; // and invert that vector
+}
 
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
 {
@@ -762,7 +778,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 				throwGenericError( "unsupported datatype" );
 			} else {
 				LOG( Runtime, info ) << data::ValueArray<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
-				return std::auto_ptr<_internal::WriteOp>( new _internal::FslRgbWriteOp( src ) );
+				return std::auto_ptr< _internal::WriteOp >(new _internal::FslRgbWriteOp( src ) );
 			}
 
 			break;
@@ -770,12 +786,13 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	}
 
 	// generic case (use generic scalar writer for the target_id)
-	return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, target_id, bpv, ( dialect == "spm" ) ) );
+	return std::auto_ptr< _internal::WriteOp >(new _internal::CommonWriteOp( src, target_id, bpv ));
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
+	data::Image image=img;
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
@@ -791,7 +808,16 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 				throwGenericError( filename + " could not be opened" );
 		}
 
-		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to to fsl
+		if( dialect == "spm" ) {
+			writer->setFlip(image.mapScannerAxisToImageDimension( data::z ));
+		} else if( dialect == "fsl"){
+			//invert columnVec as the image columns wil be mirrored
+			//don't ask - dcm2nii does it, fsl expects it, so we do it
+			flipGeometry(image,data::columnDim);
+			writer->setFlip(data::columnDim);
+		}
+
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to fsl
 		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
@@ -817,10 +843,9 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 				bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
 			}
 
-			// the bvec file is the x-elements of all directions, then all y-elements and so on...
-			// dont ask me, ask fsl ...
+			// the bvec file is the inverted x-elements of all directions, then all y-elements and so on... dont ask me, ask fsl ...
 			bvecFile.precision( 14 );
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[0] << " ";
+			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << -dir[0] << " ";
 			bvecFile << std::endl;
 			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[1] << " ";
 			bvecFile << std::endl;
@@ -847,7 +872,11 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 			header->cal_max = minmax.second;
 		}
 
-		storeHeader( image.getChunk( 0, 0 ), header ); // store properties of the "lowest" chunk merged with the image's properties into the header
+		{//join the properties of the first chunk into the image and store that to the header
+			util::PropertyMap props=image;
+			props.join(image.getChunkAt( 0,false ));
+			storeHeader( props, header );
+		}
 
 		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );

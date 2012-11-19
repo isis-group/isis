@@ -133,11 +133,11 @@ struct nifti_1_header {
 class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
 {
 protected:
-	const bool m_doFlip;
+	bool m_doFlip;
 	data::dimensions flip_dim;
 	data::FilePtr m_out;
 	size_t m_voxelstart, m_bpv;
-	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
+	WriteOp( const isis::data::Image& image, size_t bitsPerVoxel );
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
 	void applyFlip( data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize );
 public:
@@ -145,8 +145,10 @@ public:
 	nifti_1_header *getHeader();
 	virtual unsigned short getTypeId() = 0;
 	virtual size_t getDataSize();
+	
 	bool operator()( data::Chunk &ch, util::vector4<size_t> posInImage );
 	bool setOutput( const std::string &filename, size_t voxelstart = 352 );
+	void setFlip(data::dimensions dim);
 };
 
 }
@@ -179,6 +181,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( _internal::nifti_1_header *header );
+	void flipGeometry( data::Image& image, data::dimensions flipdim );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
