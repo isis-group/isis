@@ -147,7 +147,8 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	const util::fvector3 indexOrigin( m_ImageISIS->getPropertyAs<util::fvector3>( "indexOrigin" ) );
 	util::fvector3 spacing( m_ImageISIS->getPropertyAs<util::fvector3>( "voxelSize" ) );
 
-	if( spacing[3] == 0 ) { spacing[3] = 1; }
+  //MH FIXME: changed
+	//if( spacing[3] == 0 ) { spacing[3] = 1; }
 
 	const util::fvector3 readVec = m_ImageISIS->getPropertyAs<util::fvector3>( "rowVec" );
 
@@ -188,12 +189,14 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 		itkDirection[1][2] = -sliceVec[1];
 	}
 
+
 	//if the user requests a 4d image we need to set these parameters
 	if ( OutputImageType::ImageDimension == 4 ) {
-		itkSpacing[3] = spacing[3];
-		itkSize[3] = dimensions[3];
+		itkSpacing[3] = m_ImageISIS->getPropertyAs<u_int16_t>( "repetitionTime" );
+		itkSize[3] = m_ImageISIS->getNrOfTimesteps();
 		itkDirection[3][3] = 1; //ensures determinant is unequal 0
 	}
+
 
 	itkRegion.SetSize( itkSize );
 	importer->SetRegion( itkRegion );
