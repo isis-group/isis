@@ -150,7 +150,7 @@ endif(ISIS_IOPLUGIN_PNG)
 if(ISIS_IOPLUGIN_COMP)
   find_package(Boost REQUIRED COMPONENTS iostreams)
   add_library(isisImageFormat_comp_proxy SHARED imageFormat_compressed.cpp)
-  
+
   find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
