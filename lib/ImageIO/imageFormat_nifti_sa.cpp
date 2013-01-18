@@ -813,8 +813,12 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 				// the bvalue is the length of the gradient direction,
 				bvalFile << gradient.len() << " ";
 
-				gradient.norm();// the direction itself must be normalized
-				bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+				if(gradient.len()>0){
+					gradient.norm();// the direction itself must be normalized
+					bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+				} else {
+					bvecList.push_back( util::dvector4(0,0,0) );
+				}
 			}
 
 			// the bvec file is the x-elements of all directions, then all y-elements and so on...
