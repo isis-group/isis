@@ -4,7 +4,7 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
-#include <bits/byteswap.h>
+#include <byteswap.h>
 
 namespace isis
 {
