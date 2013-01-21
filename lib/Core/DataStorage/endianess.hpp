@@ -4,7 +4,10 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
+
+#ifdef HAVE_BYTESWAP
 #include <byteswap.h>
+#endif //HAVE_BYTESWAP
 
 namespace isis
 {
@@ -33,16 +36,18 @@ template<> struct SwapImpl<1> {
 	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return src;}
 };
 
+#ifdef HAVE_BYTESWAP
 //specializations for 16 32 and 64 bit
 template<> struct SwapImpl<2> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_16( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_16( src );}
 };
 template<> struct SwapImpl<4> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_32( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_32( src );}
 };
 template<> struct SwapImpl<8> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return __bswap_64( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_64( src );}
 };
+#endif //HAVE_BYTESWAP
 
 
 
