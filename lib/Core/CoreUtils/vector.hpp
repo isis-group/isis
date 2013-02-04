@@ -265,10 +265,10 @@ public:
 	 * Compute the sum of all elements.
 	 * \returns \f[ \sum_{i=0}^{SIZE-1} this_i \f]
 	 */
-	TYPE sum() {
+	TYPE sum() const {
 		TYPE ret = 0;
 
-		for ( iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
+		for ( const_iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
 			ret += *i;
 
 		return ret;
