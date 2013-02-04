@@ -37,7 +37,6 @@ Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
-	set.addSecondarySort( "acquisitionTime" );
 }
 
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
@@ -45,7 +44,6 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
-	set.addSecondarySort( "acquisitionTime" );
 
 	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
 		LOG( Runtime, error ) << "Failed to create image from single chunk.";
@@ -68,6 +66,13 @@ Image &Image::operator=( const data::Image &ref )
 	static_cast<_internal::NDimensional< 4 >&>( *this ) = static_cast<const _internal::NDimensional< 4 >&>( ref );
 	//deep copy members
 	chunkVolume = ref.chunkVolume;
+	m_Offset = ref.m_Offset;
+	m_ColumnVecInv = ref.m_ColumnVecInv;
+	m_RowVecInv = ref.m_RowVecInv;
+	m_SliceVecInv = ref.m_SliceVecInv;
+	m_RowVec = ref.m_RowVec;
+	m_ColumnVec = ref.m_ColumnVec;
+	m_SliceVec = ref.m_SliceVec;
 	clean = ref.clean;
 	set = ref.set;
 	minIndexingDim = ref.minIndexingDim;
@@ -145,7 +150,6 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 
 	if( clean ) {
-		LOG( Debug, info ) << "Resetting image structure because of new insertion.";
 		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
 
 		// re-gather all properties of the chunks from the image
@@ -334,7 +338,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is " << set.getHorizontalSize() << ")";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (geometric size is " << set.getHorizontalSize() << ")";
 		return false;
 	}
 
@@ -420,7 +424,7 @@ bool Image::reIndex()
 
 	for( int i = 0; i < 3; i++ ) {
 		if( voxeSize[i] == 0 || std::isinf( voxeSize[i] ) ) {
-			LOG( Runtime, warning ) << "voxelSize[" << i << "] is invalid, using 1";
+			LOG( Runtime, warning ) << "voxelSize[" << i << "]=="  << voxeSize[i] << " is invalid, using 1";
 			voxeSize[i] = 1;
 		}
 	}
@@ -550,6 +554,7 @@ bool Image::reIndex()
 	updateOrientationMatrices();
 	return clean = isValid();
 }
+
 bool Image::isEmpty()const
 {
 	return set.isEmpty();
@@ -950,7 +955,7 @@ bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 	return retVal;
 }
 
-size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, timeDim
+size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim, timeDim
 {
 	if( lookup[0]->getRelevantDims() < ( size_t ) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
@@ -1013,19 +1018,21 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 size_t Image::foreachChunk( ChunkOp &op, bool copyMetaData )
 {
 	size_t err = 0;
-	checkMakeClean();
-	util::vector4<size_t> imgSize = getSizeAsVector();
-	util::vector4<size_t> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
-	util::vector4<size_t> pos;
 
-	for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
-		for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {
-			for( pos[columnDim] = 0; pos[columnDim] < imgSize[columnDim]; pos[columnDim] += chunkSize[columnDim] ) {
-				for( pos[rowDim] = 0; pos[rowDim] < imgSize[rowDim]; pos[rowDim] += chunkSize[rowDim] ) {
-					Chunk ch = getChunk( pos[rowDim], pos[columnDim], pos[sliceDim], pos[timeDim], copyMetaData );
+	if( checkMakeClean() ) {
+		util::vector4<size_t> imgSize = getSizeAsVector();
+		util::vector4<size_t> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
+		util::vector4<size_t> pos;
 
-					if( op( ch, pos ) == false )
-						err++;
+		for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
+			for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {
+				for( pos[columnDim] = 0; pos[columnDim] < imgSize[columnDim]; pos[columnDim] += chunkSize[columnDim] ) {
+					for( pos[rowDim] = 0; pos[rowDim] < imgSize[rowDim]; pos[rowDim] += chunkSize[rowDim] ) {
+						Chunk ch = getChunk( pos[rowDim], pos[columnDim], pos[sliceDim], pos[timeDim], copyMetaData );
+
+						if( op( ch, pos ) == false )
+							err++;
+					}
 				}
 			}
 		}

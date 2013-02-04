@@ -101,9 +101,10 @@ public:
 	 * \param chunks the chunk list where the loaded chunks shall be added to
 	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
 	throw( std::runtime_error & ) = 0; //@todo should be locked
 
 	/**
@@ -112,8 +113,9 @@ public:
 	 * \param image the image to be written
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
 	throw( std::runtime_error & ) = 0;
 
 	/**
@@ -123,8 +125,9 @@ public:
 	 * \param images a list of the images to be written
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
 	throw( std::runtime_error & );
 
 	virtual ~FileFormat() {}

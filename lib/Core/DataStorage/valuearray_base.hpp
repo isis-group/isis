@@ -366,6 +366,8 @@ public:
 	 * \returns the amount of elements which actually differ in both ValueArray or the whole length of the range when the types are not equal.
 	 */
 	size_t compare( size_t start, size_t end, const ValueArrayBase &dst, size_t dst_start )const;
+
+	virtual void endianSwap() = 0;
 };
 
 

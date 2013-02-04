@@ -20,7 +20,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "0")
+set(ISIS_VERSION_PATCH "3")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -127,7 +127,6 @@ macro( build_manpage name desc)
 endmacro( build_manpage )
 
 
-
 ############################################################
 # RCS revision number
 ############################################################
@@ -179,15 +178,15 @@ SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
 # status messages
-message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
-message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
-message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
-if(WIN32)
-message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
-else(WIN32)
-message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
-endif(WIN32)
-
+# message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
+# message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
+# message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
+# if(WIN32)
+# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
+# else(WIN32)
+# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
+# endif(WIN32)
+# 
 #build the filter
 if(ISIS_BUILD_FILTER )
   #omp settings

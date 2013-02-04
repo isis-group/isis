@@ -51,15 +51,15 @@ void Application::addLoggingParameter( std::string name )
 	static const Selection dbg_levels( "error,warning,notice,info,verbose_info", "notice" );
 
 	if( parameters.find( std::string( "d" ) + name ) == parameters.end() ) { //only add the parameter if it does not exist yet
-		parameters[std::string( "d" )+name] = dbg_levels;
+		parameters[std::string( "d" ) + name] = dbg_levels;
 
 		if( name.empty() )
-			parameters[std::string( "d" )+name].setDescription( "Log level for \"" + m_name + "\" itself" );
+			parameters[std::string( "d" ) + name].setDescription( "Log level for \"" + m_name + "\" itself" );
 		else
-			parameters[std::string( "d" )+name].setDescription( "Log level for the \"" + name + "\" module(s)" );
+			parameters[std::string( "d" ) + name].setDescription( "Log level for the \"" + name + "\" module(s)" );
 
-		parameters[std::string( "d" )+name].hidden() = true;
-		parameters[std::string( "d" )+name].needed() = false;
+		parameters[std::string( "d" ) + name].hidden() = true;
+		parameters[std::string( "d" ) + name].needed() = false;
 	}
 }
 void Application::removeLogging( std::string name )
@@ -68,9 +68,9 @@ void Application::removeLogging( std::string name )
 	logs.erase( name );
 }
 
-void Application::addExample ( std::string parameters, std::string desc )
+void Application::addExample ( std::string params, std::string desc )
 {
-	m_examples.push_back( std::make_pair( parameters, desc ) );
+	m_examples.push_back( std::make_pair( params, desc ) );
 }
 
 bool Application::init( int argc, char **argv, bool exitOnError )

@@ -68,7 +68,9 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 			i++;
 	}
 
-	LOG( DiffLog, info ) << images.size() << " candidated left, " << org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
+	LOG( DiffLog, info )
+			<< images.size() << " candidates left for " << reference.identify() << ", "
+			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
 	return images.size();
 }
 
@@ -78,8 +80,8 @@ std::list<data::Image> findFitting( const data::Image reference, std::list<data:
 	images.splice( images.begin(), org_images ); //first move all into images
 
 	BOOST_FOREACH( const std::string & prop, props ) {
-		if( doFit( reference, org_images, images, prop.c_str() ) <= 1 ) //now move all with different prop back into org
-			return images; // stop if only one image left
+		if( doFit( reference, org_images, images, prop.c_str() ) < 1 ) //now move all with different prop back into org
+			return images; // abort if no image is left
 	}
 	return images;
 }

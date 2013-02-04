@@ -5,6 +5,10 @@
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
 
+#ifdef HAVE_BYTESWAP
+#include <byteswap.h>
+#endif //HAVE_BYTESWAP
+
 namespace isis
 {
 namespace data
@@ -26,10 +30,25 @@ template<uint_fast8_t SIZE> struct SwapImpl {
 		return ret;
 	}
 };
+
 // specialisation (swapping 1 byte might be a bit useless)
 template<> struct SwapImpl<1> {
 	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return src;}
 };
+
+#ifdef HAVE_BYTESWAP
+//specializations for 16 32 and 64 bit
+template<> struct SwapImpl<2> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_16( src );}
+};
+template<> struct SwapImpl<4> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_32( src );}
+};
+template<> struct SwapImpl<8> {
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_64( src );}
+};
+#endif //HAVE_BYTESWAP
+
 
 
 // gatekeeper for SwapImpl (do not allow swapping of types we do not know about)
