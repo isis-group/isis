@@ -19,12 +19,12 @@ add_executable( imageListTest imageListTest.cpp )
 add_executable( valueArrayTest valueArrayTest.cpp )
 add_executable( filePtrTest filePtrTest.cpp )
 
-target_link_libraries( valueArrayTest ${Boost_LIBRARIES} isis_core )
-target_link_libraries( filePtrTest ${Boost_LIBRARIES} isis_core )
-target_link_libraries( chunkTest ${Boost_LIBRARIES} isis_core )
-target_link_libraries( sortedchunklistTest ${Boost_LIBRARIES} isis_core )
-target_link_libraries( imageTest ${Boost_LIBRARIES} isis_core )
-target_link_libraries( imageListTest ${Boost_LIBRARIES} isis_core )
+target_link_libraries( valueArrayTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( filePtrTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( chunkTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( sortedchunklistTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( imageTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( imageListTest ${Boost_LIBRARIES} ${isis_core_lib} )
 
 ############################################################
 # add unit test targets
