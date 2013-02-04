@@ -1,3 +1,17 @@
+isis (0.7.3-1) UNRELEASED; urgency=low
+
+  * make isis::util::FixedVector::sum const
+  * adapt itkAdapter to use of vector3
+  * some fixes for clang
+  * make nifti_sa for robust against invalid files
+  * not use acquisitionTime as secondary sort anymore
+  * fix bug when reading base256 encoded tar files in compression proxy
+  * tell about the dropped acquisitionTime when reading siemens DWI
+  * add support for conversion vectorX=>list
+  * remove obsolete build dependencies from control file
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 04 Feb 2013 23:30:18 +0100
+
 isis (0.7.1-1) natty; urgency=low
 
   * fix problem when copying voxelSize from qform/pixdim
