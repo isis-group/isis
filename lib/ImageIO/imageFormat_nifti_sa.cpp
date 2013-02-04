@@ -101,7 +101,7 @@ class FslRgbWriteOp: public WriteOp
 {
 	const data::scaling_pair m_scale;
 	struct VoxelCp: data::VoxelOp<util::color24> {
-		int mode;
+		uint8_t mode;
 		uint8_t *ptr;
 		virtual bool operator()( util::color24 &vox, const isis::util::vector4<size_t>& /*pos*/ ) {
 			switch( mode ) {
@@ -140,7 +140,7 @@ public:
 			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 			data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
 			cp.ptr = &out_data[0];
-			cp.mode = posInImage[data::timeDim];
+			cp.mode = (uint8_t)posInImage[data::timeDim]; //the "timesteps" represent the color thus there are just 3
 			ch.foreachVoxel( cp );
 			assert( cp.ptr == &out_data[0] + out_data.getLength() );
 		}

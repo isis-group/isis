@@ -77,13 +77,13 @@ public:
 
 		for ( uint32_t t = 0; t < timesteps; t++ ) {
 			//even numbers
-			for ( uint32_t s = 0; s < ( size / 2. ); s++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
-				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + t * size );
+			for ( uint32_t a = 0; a < ( size / 2. ); a++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
+				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", a * 2 + t * size );
 			}
 
 			//uneven numbers
-			for ( uint32_t s = 0; s < ( size / 2 ); s++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
-				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + 1 + t * size );
+			for ( uint32_t a = 0; a < ( size / 2 ); a++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
+				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", a * 2 + 1 + t * size );
 			}
 		}
 

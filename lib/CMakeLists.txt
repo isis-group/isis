@@ -29,7 +29,7 @@ macro( build_lib name type sources deps soversion version)
 		ARCHIVE DESTINATION lib COMPONENT Development
 	)
 	
-	set(${name}_lib ${name}-${type} PARENT_SCOPE)
+	set(${name}_lib ${name}-${type} CACHE INTERNAL "internal name for ${name}" FORCE)
 endmacro( build_lib )
 
 macro( add_lib name sources deps soversion version)
