@@ -12,9 +12,9 @@ using namespace isis;
 class FakedRawFormat: public image_io::FileFormat
 {
 	std::string getName()const {return "";};
-	int load( std::list< data::Chunk >& /*chunks*/, const std::string& /*filename*/, const util::istring& /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return 0;}
+	int load( std::list< data::Chunk >& /*chunks*/, const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return 0;}
 	util::istring suffixes( io_modes /*modes = both*/ ) const {return "";}
-	void write( const data::Image& /*image*/, const std::string& /*filename*/, const util::istring& /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
+	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
 	std::pair< std::string, std::string > makeBasename( const std::string &filename ) {
 		return std::make_pair( filename, std::string( "" ) );
 	}
