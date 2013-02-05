@@ -83,6 +83,14 @@ endif("${PROCESSOR}" STREQUAL "x86_64" )
 option(ISIS_RUNTIME_LOG "Enable runtime logging" ON)
 option(ISIS_DEBUG_LOG "Enable debug logging" ON)
 
+############################################################
+# optional components
+############################################################
+option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
+option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
+option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
+
+
 # enable RUNTIME_LOG
 if(ISIS_RUNTIME_LOG)
   add_definitions(-D_ENABLE_LOG=1)
@@ -100,8 +108,12 @@ endif(ISIS_DEBUG_LOG)
 
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
-find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
-
+if(ISIS_BUILD_TESTS)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time unit_test_framework)
+else(ISIS_BUILD_TESTS)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
+endif(ISIS_BUILD_TESTS)
+	
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
@@ -149,13 +161,6 @@ if (GIT_REVISION)
 else(GIT_REVISION)
   set(ISIS_CORE_REV_STRING ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH})
 endif(GIT_REVISION)
-
-############################################################
-# optional components
-############################################################
-option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
-option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
 
 ###########################################################
 # CPack config
