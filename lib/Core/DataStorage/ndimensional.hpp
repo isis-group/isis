@@ -27,7 +27,7 @@ namespace data
 {
 namespace _internal
 {
-/// @cond _hidden
+/// @cond _internal
 
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {
@@ -149,7 +149,7 @@ public:
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
 		LOG_IF( getVolume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
 		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
-		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );
+		const util::FixedVector<float, DIMS> gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;
 	}
 };

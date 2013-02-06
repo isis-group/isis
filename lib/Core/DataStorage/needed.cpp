@@ -11,6 +11,8 @@
  * see PropertyObject::sufficient()
  */
 
+/// @cond _internal
+
 // Stuff needed for every Chunk
 const char *isis::data::_internal::ChunkBase::neededProperties = "\
 	indexOrigin\
@@ -26,5 +28,9 @@ const char *isis::data::Image::neededProperties = "\
 	rowVec\
 	columnVec\
 	sliceVec\
+	sequenceNumber\
 ";
 
+const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers";
+
+/// @endcond _internal

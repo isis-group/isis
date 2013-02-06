@@ -34,8 +34,8 @@ class ProgressFeedback: boost::noncopyable // ProgressFeedback should not be cop
 {
 public:
 	/**
-	 * (Re)Set the progress display to the given maximum value and "show" it.
-	 * This will also reset the progress to 0.
+	 * Set the progress display to the given maximum value and "show" it.
+	 * This will also extend already displayed progress bars.
 	 */
 	virtual void show( size_t max, std::string header = "" ) = 0;
 	/**
@@ -50,6 +50,8 @@ public:
 	virtual void close() = 0;
 	/// \returns the current valued which represents 100%
 	virtual size_t getMax() = 0;
+	/// extend the progress bars maximum by the given value
+	virtual size_t extend( size_t by ) = 0;
 	/// Increment the "progress" by one
 	ProgressFeedback &operator++();
 	virtual ~ProgressFeedback();
@@ -66,6 +68,7 @@ public:
 	size_t getMax();
 	size_t progress( const std::string message = "", size_t step = 1 );
 	void show( size_t max, std::string header );
+	size_t extend( size_t by );
 };
 }
 }

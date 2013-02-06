@@ -26,7 +26,12 @@ namespace util
 {
 namespace _internal
 {
-const char *logLevelNames( LogLevel level )
+struct IsEqualMsg {
+	std::string newMsg;
+	bool operator()( const std::pair<boost::posix_time::ptime, std::string>& ms ) {return ms.second == newMsg;}
+};
+}
+const char *logLevelName( LogLevel level )
 {
 	switch( level ) {
 	case error:
@@ -79,7 +84,7 @@ Message::Message( std::string object, std::string module, std::string file, int 
 	  m_object( object ),
 	  m_module( module ),
 	  m_file( file ),
-	  m_timeStamp( boost::posix_time::second_clock::universal_time() ),
+	  m_timeStamp( boost::posix_time::microsec_clock::universal_time() ),
 	  m_line( line ),
 	  m_level( level )
 {}
@@ -139,13 +144,24 @@ bool Message::shouldCommit()const
 LogLevel MessageHandlerBase::m_stop_below = error;
 
 
-} //namespace _internal
-
 std::ostream *DefaultMsgPrint::o = &::std::cerr;
-void DefaultMsgPrint::commit( const _internal::Message &mesg )
+void DefaultMsgPrint::commit( const Message &mesg )
 {
-	if( last.empty() || last != mesg.str() ) {
-		*o << mesg.m_module << ":" << _internal::logLevelNames( mesg.m_level );
+	//first remove everything which is to old anyway
+	std::list< std::pair<boost::posix_time::ptime, std::string> >::iterator begin = last.begin();
+	static const boost::posix_time::millisec dist( max_age );
+
+	while( begin != last.end() && begin->first + dist < mesg.m_timeStamp ) {
+		begin++;
+		last.pop_front();
+	}
+
+	const _internal::IsEqualMsg isEqual = {mesg.str()};
+
+	begin = std::find_if( last.begin(), last.end(), isEqual );
+
+	if( begin == last.end() ) { // its not in the list of the last xxx milliseconds - so print it
+		*o << mesg.m_module << ":" << logLevelName( mesg.m_level );
 #ifndef NDEBUG //if with debug-info
 		*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
 #else
@@ -153,8 +169,11 @@ void DefaultMsgPrint::commit( const _internal::Message &mesg )
 #endif //NDEBUG
 		*o << mesg.merge(); //print the message itself
 		*o << std::endl;
-		last = mesg.str();
+	} else {
+		last.erase( begin ); // it was in the list - remove it
 	}
+
+	last.push_back( std::make_pair( mesg.m_timeStamp, mesg.str() ) ); // put new message on the top
 }
 
 void DefaultMsgPrint::setStream( ::std::ostream &_o )

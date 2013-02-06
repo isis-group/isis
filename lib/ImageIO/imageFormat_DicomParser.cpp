@@ -31,6 +31,19 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	elem->getOFStringArray( buff );
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
+
+template <typename S, typename V> void arrayToVecPropImp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
+	V vector;
+	vector.copyFrom( array, array + len );
+	dest.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
+}
+template <typename S> void arrayToVecProp( S *array, util::PropertyMap &dest, const util::PropertyMap::PropPath &name, size_t len )
+{
+	if( len <= 3 )arrayToVecPropImp<S, util::vector3<S> >( array, dest, name, len );
+	else arrayToVecPropImp<S, util::vector4<S> >( array, dest, name, len );
+}
+
 }
 
 
@@ -47,10 +60,10 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
 	uint16_t, double,
-			boost::numeric::conversion_traits<uint16_t, double>,
-			boost::numeric::def_overflow_handler,
-			boost::numeric::RoundEven<double>
-			> double2uint16;
+			  boost::numeric::conversion_traits<uint16_t, double>,
+			  boost::numeric::def_overflow_handler,
+			  boost::numeric::RoundEven<double>
+			  > double2uint16;
 
 	if ( _internal::try_cast( buff.substr( 0, buff.find_last_of( "0123456789" ) + 1 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {
@@ -257,88 +270,6 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	}
 }
 
-void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
-{
-	OFString buff;
-	size_t len = elem->getVM();
-
-	switch ( elem->getVR() ) {
-	case EVR_FL: {
-		Float32 *buff;
-		elem->getFloat32Array( buff );
-		util::fvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float32 is float its fine, if not we will get an linker error here
-	}
-	break;
-	case EVR_FD: {
-		Float64 *buff;
-		elem->getFloat64Array( buff );
-		util::dvector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector; //if Float64 is double its fine, if not we will get an linker error here
-	}
-	break;
-	case EVR_IS: {
-		const util::ilist tokens = _internal::dcmtkListString2list<int>( elem );
-		util::ivector4 vector;
-		vector.copyFrom( tokens.begin(), tokens.end() );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_SL: {
-		Sint32 *buff;
-		elem->getSint32Array( buff );
-		util::ivector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_US: {
-		Uint16 *buff;
-		elem->getUint16Array( buff );
-		util::ivector4 vector;
-		vector.copyFrom( buff, buff + len );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_CS: // Code String (string)
-	case EVR_SH: //short string
-	case EVR_ST: { //short text
-		map.propertyValue( name ) = _internal::dcmtkListString2list<std::string>( elem );
-	}
-	break;
-	case EVR_DS: {
-		const util::dlist tokens = _internal::dcmtkListString2list<double>( elem );
-		util::dvector4 vector;
-		vector.copyFrom( tokens.begin(), tokens.end() );
-		map.propertyValue( name ) = vector;
-	}
-	break;
-	case EVR_AS:
-	case EVR_DA:
-	case EVR_TM:
-	case EVR_SS:
-	case EVR_UL:
-	case EVR_AE: //Application Entity (string)
-	case EVR_LT: //long text
-	case EVR_LO: //long string
-	case EVR_UT: //Unlimited Text
-	case EVR_UI: //Unique Identifier [0-9\.]
-	case EVR_PN:
-	default: {
-		elem->getOFStringArray( buff );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
-	}
-	break;
-	}
-
-	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue( name );
-}
-
 void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	OFString buff;
@@ -407,7 +338,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const util::istring &dialect )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
@@ -417,7 +348,7 @@ void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, cons
 		pos += parseCSAEntry( array + pos, map, dialect );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const std::string &dialect )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const util::istring &dialect )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -533,21 +464,25 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const std::string &dialect )const
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const util::istring &dialect )const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();
 
 		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
-		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) ) { //CSAImageHeaderInfo
-			LOG( Debug, info ) << "Using " << tag.toString() << " as CSAImageHeaderInfo";
-			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
-		} else if ( tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSASeriesHeaderInfo
-			LOG( Debug, info ) << "Using " << tag.toString() << " as CSASeriesHeaderInfo";
-			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
+		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) || tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSAImageHeaderInfo
+			bool known = map.hasProperty( "Private Code for (0029,1000)-(0029,10ff)" );
+			std::string as = map.getPropertyAs<std::string>( "Private Code for (0029,1000)-(0029,10ff)" );
+
+			if( known && as == "SIEMENS CSA HEADER" ) {
+				const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
+				LOG( Debug, info ) << "Using " << tag.toString() << " as " << name;
+				DcmElement *elem = dynamic_cast<DcmElement *>( obj );
+				parseCSA( elem, map.branch( name ), dialect );
+			} else {
+				LOG( Runtime, warning ) << "Ignoring entry " << tag.toString() << ", binary format " << as << " is not known";
+			}
 		} else if ( tag == DcmTagKey( 0x0029, 0x0020 ) ) { //MedComHistoryInformation
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
@@ -569,10 +504,8 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject( tag2Name( tag ) );
 			else if ( mult == 1 )
 				parseScalar( elem, tag2Name( tag ), map );
-			else if ( mult <= 4 )
-				parseVector( elem, tag2Name( tag ), map );
 			else
-				parseList( elem, tag2Name( tag ), map ); // for any other value
+				parseList( elem, tag2Name( tag ), map );
 		} else {
 			dcmObject2PropMap( obj, map.branch( tag2Name( tag ) ), dialect );
 		}

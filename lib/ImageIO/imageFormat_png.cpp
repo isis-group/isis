@@ -10,9 +10,7 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes /*modes = both */ )const {
-		return std::string( ".png" );
-	}
+	util::istring suffixes( io_modes /*modes = both */ )const {return ".png";}
 	struct Reader {
 		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
 		virtual ~Reader() {}
@@ -30,6 +28,7 @@ protected:
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
 
 			png_read_image( png_ptr, row_pointers.get() );
+			ret.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
 			return ret;
 		}
 	};
@@ -44,14 +43,19 @@ public:
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
-	std::string dialects( const std::string &/*filename*/ ) const {
+	util::istring dialects( const std::string &/*filename*/ ) const {
 		return "middle";
 	}
-	bool write_png( const std::string &filename, const data::Chunk &buff, int color_type, int bit_depth ) {
+	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
+		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
-		assert( buff.getRelevantDims() == 2 );
+
+		//buff has to be swapped along the png-x-axis
+		data::Chunk buff = src.copyByID(); //make a deep copy to not interfere with the source
+		buff.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+
 		util::vector4<size_t> size = buff.getSizeAsVector();
 
 		/* open the file */
@@ -111,10 +115,10 @@ public:
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
-		row_pointers[0] = ( png_byte * )buff.getValuePtrBase().getRawAddress().get();
+		row_pointers[0] = ( png_byte * )buff.getValueArrayBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0] + ( buff.bytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
+			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -184,46 +188,56 @@ public:
 		fclose( fp );
 		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
 		ret.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-		ret.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0 ) );
-		ret.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1 ) );
-		ret.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0 ) );
-		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+		ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+		ret.setPropertyAs( "indexOrigin", util::fvector3( ) );
+		ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
-		chunks.push_back( read_png( filename ) );
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+		data::Chunk ch = read_png( filename );
+		ch.setPropertyAs( "sequenceNumber", ( uint16_t )1 );
+		chunks.push_back( ch );
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
-		tImg.convertToType( isis_data_type ); // make image have unique type
 
 		if( image.getRelevantDims() < 2 ) { // ... make sure its made of slices
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
 
-		tImg.spliceDownTo( data::sliceDim );
-		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
-
-		png_byte color_type, bit_depth = ( png_byte )chunks.front().bytesPerVoxel() * 8;
+		png_byte color_type, bit_depth; ;
 
 		switch( isis_data_type ) {
-		case data::ValuePtr<uint8_t>::staticID:
-		case data::ValuePtr<uint16_t>::staticID:
+		case data::ValueArray< int8_t>::staticID: // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint8_t>::staticID:
+			tImg.convertToType( data::ValueArray<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
+			bit_depth = 8;
+		case data::ValueArray< int16_t>::staticID: // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint16_t>::staticID:
+			tImg.convertToType( data::ValueArray<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
+			color_type = PNG_COLOR_TYPE_GRAY;
+			bit_depth = 16;
 			break;
-		case data::ValuePtr<util::color24>::staticID:
-		case data::ValuePtr<util::color48>::staticID:
+		case data::ValueArray<util::color24>::staticID:
+		case data::ValueArray<util::color48>::staticID:
+			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
-			bit_depth /= 3;
+			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;
 			break;
 		default:
+			color_type = bit_depth = 0;
 			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
 			throwGenericError( "unsupported data type" );
 		}
+
+		tImg.spliceDownTo( data::sliceDim );
+		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
 
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle

@@ -34,16 +34,17 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector25 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector27 < //increase this if a type is added (if >30 consider including vector40 above)
 bool //1
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
 , float, double // 11
 , color24, color48 // 13
-, fvector4, dvector4, ivector4 // 16
-, ilist, dlist, slist // 19
-, std::string, isis::util::Selection //21
-, std::complex<float>, std::complex<double> //23
-, boost::posix_time::ptime, boost::gregorian::date //25
+, fvector3, dvector3 // 15
+, fvector4, dvector4, ivector4 // 18
+, ilist, dlist, slist // 21
+, std::string, isis::util::Selection //23
+, std::complex<float>, std::complex<double> //25
+, boost::posix_time::ptime, boost::gregorian::date //27
 > types;
 
 /**
@@ -77,9 +78,9 @@ template< typename T > struct checkType {
 	);
 };
 
-std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValuePtrs = true );
+std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValueArrays = true );
 
-std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValuePtrs = true );
+std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValueArrays = true );
 }
 }
 

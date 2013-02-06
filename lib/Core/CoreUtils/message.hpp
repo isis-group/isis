@@ -25,10 +25,6 @@
 
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 enum LogLevel {error = 1, warning, notice, info, verbose_info};
 namespace util
 {
@@ -43,11 +39,7 @@ public:
 	}
 };
 
-/// @cond _internal
-namespace _internal
-{
-
-const char *logLevelNames( LogLevel level );
+const char *logLevelName( LogLevel level );
 
 template<class MODULE> class Log;
 class Message;
@@ -61,7 +53,7 @@ protected:
 public:
 	LogLevel m_level;
 	virtual void commit( const Message &msg ) = 0;
-	static void stopBelow( LogLevel = error );
+	static void stopBelow( LogLevel );
 	bool requestStop( LogLevel _level );
 };
 
@@ -75,7 +67,7 @@ public:
 	boost::posix_time::ptime m_timeStamp;
 	int m_line;
 	LogLevel m_level;
-	Message( std::string object, std::string module, std::string file, int line, LogLevel m_level, boost::weak_ptr<MessageHandlerBase> commitTo );
+	Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo );
 	Message( const Message &src );
 	~Message();
 	std::string merge()const;
@@ -91,8 +83,6 @@ public:
 	}
 	bool shouldCommit()const;
 };
-}
-/// @endcond
 
 /**
  * Default message output class.
@@ -100,19 +90,20 @@ public:
  * The default output stream is std::cout. But can be set using setStream.
  * Location is the calling Object/Method if compiled without debug infos (NDEBUG is set) or FILENAME:LINE_NUMER if compiled with debug infos.
  */
-class DefaultMsgPrint : public _internal::MessageHandlerBase
+class DefaultMsgPrint : public MessageHandlerBase
 {
 protected:
 	static std::ostream *o;
-	std::string last;
+	static const int max_age = 500;
+	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
+
 public:
-	DefaultMsgPrint( LogLevel level ): _internal::MessageHandlerBase( level ) {}
+	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ) {}
 	virtual ~DefaultMsgPrint() {}
-	void commit( const _internal::Message &mesg );
+	void commit( const Message &mesg );
 	static void setStream( std::ostream &_o );
 };
 
 }
-/** @} */
 }
 #endif //MESSAGE_H

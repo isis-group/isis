@@ -17,6 +17,8 @@ namespace isis
 {
 namespace util
 {
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 /**
@@ -45,13 +47,14 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 		return true;//not(current <> compare) makes compare == current
 }
 }
-
+/// @endcond _internal
+API_EXCLUDE_END
 
 ///////////////////////////////////////////////////////////////////
 // Contructors
 ///////////////////////////////////////////////////////////////////
 
-PropertyMap::PropertyMap( const isis::util::PropertyMap::Container &src ): Container( src ) {}
+PropertyMap::PropertyMap( const PropertyMap::Container &src ): Container( src ) {}
 
 bool PropertyMap::operator==( const PropertyMap &src )const
 {
@@ -75,7 +78,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry( const PropPath &path )
  */
 PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	PropertyMap &root,
-	const isis::util::PropertyMap::propPathIterator at, const isis::util::PropertyMap::propPathIterator pathEnd )
+	const PropertyMap::propPathIterator at, const PropertyMap::propPathIterator pathEnd )
 {
 	PropPath::const_iterator next = at;
 	next++;
@@ -86,8 +89,8 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 		if ( found != root.end() ) {//and we found the entry
 			mapped_type &ref = found->second;
 			LOG_IF( ref.is_leaf(), Runtime, error )
-					<< util::MSubject( found->first ) << " is a leaf, but was requested as a branch in "
-					<< util::MSubject( util::listToString( at, pathEnd, "/" ) );
+					<< MSubject( found->first ) << " is a leaf, but was requested as a branch in "
+					<< MSubject( listToString( at, pathEnd, "/" ) );
 			return fetchEntry( ref.getBranch(), next, pathEnd ); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)
@@ -95,7 +98,6 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 			return fetchEntry( rootRef[*at].getBranch(), next, pathEnd ); // and continue there
 		}
 	} else { //if its the leaf
-		LOG_IF( rootRef.find( *at ) == rootRef.end() , Debug, verbose_info ) << "Creating an empty entry " << *at << " trough fetching";
 		return rootRef[*at]; // (create and) return that entry
 	}
 }
@@ -110,7 +112,7 @@ const PropertyMap::mapped_type *PropertyMap::findEntry(
 {
 	propPathIterator next = at;
 	next++;
-	util::PropertyMap::const_iterator found = static_cast<const Container &>( root ).find( *at );
+	PropertyMap::const_iterator found = static_cast<const Container &>( root ).find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 		if ( found != root.end() ) {//and we found the entry
@@ -145,7 +147,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 				ret = true;
 			}
 		} else {
-			LOG( Runtime, warning ) << "Entry " << util::MSubject( *path_it ) << " not found, skipping it";
+			LOG( Runtime, warning ) << "Entry " << MSubject( *path_it ) << " not found, skipping it";
 		}
 	}
 
@@ -157,7 +159,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
 
-const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path ) const
+const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
@@ -170,7 +172,7 @@ const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::u
 	}
 }
 
-std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path )
+std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::PropPath &path )
 {
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << path << " as PropertyValue";
@@ -178,19 +180,19 @@ std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::P
 }
 
 
-const PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )const
+const PropertyValue &PropertyMap::propertyValue( const PropertyMap::PropPath &path )const
 {
 	return propertyValueVec( path )[0];
 }
 
-PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )
+PropertyValue &PropertyMap::propertyValue( const PropertyMap::PropPath &path )
 {
 	std::vector< PropertyValue > &p = propertyValueVec( path );
 	p.resize( 1 ); // the user is expecting only one entry, so remove the others
 	return p[0];
 }
 
-const PropertyMap &PropertyMap::branch( const isis::util::PropertyMap::PropPath &path ) const
+const PropertyMap &PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
@@ -228,7 +230,7 @@ bool PropertyMap::remove( const KeyList &removeList, bool keep_needed )
 }
 
 
-bool PropertyMap::remove( const isis::util::PropertyMap &removeMap, bool keep_needed )
+bool PropertyMap::remove( const PropertyMap &removeMap, bool keep_needed )
 {
 	iterator thisIt = begin();
 	bool ret = true;
@@ -338,7 +340,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 	}
 }
 
-void PropertyMap::removeEqual ( const util::PropertyMap &other, bool removeNeeded )
+void PropertyMap::removeEqual ( const PropertyMap &other, bool removeNeeded )
 {
 	iterator thisIt = begin();
 
@@ -377,14 +379,14 @@ void PropertyMap::removeEqual ( const util::PropertyMap &other, bool removeNeede
 }
 
 
-PropertyMap::KeyList PropertyMap::join( const isis::util::PropertyMap &other, bool overwrite )
+PropertyMap::KeyList PropertyMap::join( const PropertyMap &other, bool overwrite )
 {
 	KeyList rejects;
 	joinTree( other, overwrite, "", rejects );
 	return rejects;
 }
 
-void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite, util::istring prefix, PropertyMap::KeyList &rejects )
+void PropertyMap::joinTree( const PropertyMap &other, bool overwrite, istring prefix, KeyList &rejects )
 {
 	iterator thisIt = begin();
 
@@ -392,7 +394,7 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { // if the element is allready here
 			if ( thisIt->second.empty() ) { // if ours is empty
 				LOG( Debug, verbose_info ) << "Replacing empty property " << MSubject( thisIt->first ) << " by " << MSubject( otherIt->second );
-				thisIt->second = otherIt->second;
+				thisIt->second.insert( otherIt->second );
 			} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { // if both are a subtree
 				PropertyMap &thisMap = thisIt->second.getBranch();
 				const PropertyMap &refMap = otherIt->second.getBranch();
@@ -414,10 +416,10 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 }
 
 
-void PropertyMap::makeFlatMap( FlatMap &out, key_type key_prefix ) const
+void PropertyMap::makeFlatMap( FlatMap &out, KeyType key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
-		key_type key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
+		KeyType key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
 
 		if ( i->second.is_leaf()  ) {
 			out.insert( std::make_pair( key, i->second.getLeaf()[0] ) );
@@ -429,7 +431,7 @@ void PropertyMap::makeFlatMap( FlatMap &out, key_type key_prefix ) const
 
 PropertyMap::FlatMap PropertyMap::getFlatMap() const
 {
-	isis::util::PropertyMap::FlatMap buff;
+	FlatMap buff;
 	makeFlatMap( buff );
 	return buff;
 }
@@ -441,9 +443,9 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 	bool ret = false;
 
 	if( ! found.isEmpty() ) {
-		util::ValueReference &dst = static_cast<util::ValueReference &>( propertyValue( to ) );
+		ValueReference &dst = static_cast<ValueReference &>( propertyValue( to ) );
 
-		if ( found->getTypeID() == dstID ) {
+		if ( found.getTypeID() == dstID ) {
 			if( from != to ) {
 				dst = found ;
 				ret = true;
@@ -452,7 +454,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			dst = found->copyByID( dstID );
+			dst = ( *found ).copyByID( dstID );
 			ret = !dst.isEmpty();
 		}
 	}
@@ -486,21 +488,11 @@ const PropertyMap::KeyList PropertyMap::getMissing() const
 }
 
 
-void PropertyMap::addNeeded( const key_type &key )
+void PropertyMap::addNeeded( const PropPath &path )
 {
-	propertyValue( key ).needed() = true;
+	propertyValue( path ).needed() = true;
 }
 
-
-void PropertyMap::addNeededFromString( const std::string &needed )
-{
-	const std::list<std::string> needList = util::stringToList<std::string>( needed );
-	//@todo util::stringToList<std::string>( needed,' ' ) would be faster but less robust
-	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
-	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
-		addNeeded( key_type( ref.c_str() ) );
-	}
-}
 
 bool PropertyMap::hasProperty( const PropPath &path ) const
 {
@@ -508,16 +500,16 @@ bool PropertyMap::hasProperty( const PropPath &path ) const
 	return ( ref && ref->is_leaf() && ! ref->getLeaf()[0].isEmpty() );
 }
 
-isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch ) const
+PropertyMap::KeyType PropertyMap::find( PropertyMap::KeyType key, bool allowProperty, bool allowBranch ) const
 {
 	// make sure we only get the last part of the path if its one
-	const PropPath path = util::stringToList<key_type>( key, pathSeperator );
+	const PropPath path = stringToList<KeyType>( key, pathSeperator );
 
 	if( path.empty() ) {
-		LOG( Debug, error ) << "Search key " << util::MSubject( key ) << " is invalid, won't search";
+		LOG( Debug, error ) << "Search key " << MSubject( key ) << " is invalid, won't search";
 		return KeyType();
 	} else if( path.size() > 1 ) {
-		LOG( Debug, warning ) << "Stripping search key " << util::MSubject( key ) << " to " << path.back();
+		LOG( Debug, warning ) << "Stripping search key " << MSubject( key ) << " to " << path.back();
 	}
 
 	key = path.back();
@@ -565,7 +557,7 @@ bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 	}
 }
 
-void PropertyMap::toCommonUnique( PropertyMap &common, std::set<key_type> &uniques, bool init )const
+void PropertyMap::toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const
 {
 	if ( init ) {
 		common = *this;
@@ -603,7 +595,7 @@ const PropertyMap::mapped_type *PropertyMap::findEntry( const PropPath &path )co
 }
 
 
-bool PropertyMap::listP::operator()( const std::pair< const isis::util::istring, _internal::treeNode >& ref ) const
+bool PropertyMap::listP::operator()( const std::pair< const istring, _internal::treeNode >& ref ) const
 {
 	return ref.second.is_leaf() && ref.second.getLeaf().size() > 1;
 }

@@ -22,6 +22,7 @@
 
 #include "sortedchunklist.hpp"
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -34,7 +35,7 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::KeyType &prop_name ): propertyName( prop_name ) {}
 
-bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
+bool SortedChunkList::posCompare::operator()( const util::fvector3 &posA, const util::fvector3 &posB ) const
 {
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by in-image position (" << posA << " below " << posB << ")";
@@ -45,8 +46,8 @@ bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const 
 }
 bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::_internal::ValueBase &aScal = *a;
-	const util::_internal::ValueBase &bScal = *b;
+	const util::ValueBase &aScal = *a;
+	const util::ValueBase &bScal = *b;
 
 	if ( aScal.lt( bScal ) ) {
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aScal.toString( false ) << " before " << bScal.toString( false ) << ")";
@@ -66,9 +67,11 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props ):
-	equalProps( util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' ) )
-{}
+SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props )
+{
+	const std::list< isis::util::PropertyMap::KeyType > p_list = util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' );
+	equalProps.insert( equalProps.end(), p_list.begin(), p_list.end() );
+}
 
 
 // low level finding
@@ -77,7 +80,7 @@ boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyVal
 	const SecondaryMap::iterator found = map.find( key );
 	return found != map.end() ? found->second : boost::shared_ptr<Chunk>();
 }
-SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector4 &key )
+SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector3 &key )
 {
 	const PrimaryMap::iterator found = chunks.find( key );
 	return found != chunks.end() ? &found->second : NULL;
@@ -108,21 +111,22 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 }
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
+	static const util::PropertyMap::PropPath rowVecProb( "rowVec" ), columnVecProb( "columnVec" ), sliceVecProb( "sliceVec" ), indexOriginProb( "indexOrigin" );
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	const util::fvector3 &origin = ch.propertyValue( indexOriginProb ).castTo<util::fvector3>();
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
-	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
-	const util::fvector4 sliceVec = ch.hasProperty( "sliceVec" ) ?
-									ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
-									util::fvector4(
+	const util::fvector3 &rowVec = ch.propertyValue( rowVecProb ).castTo<util::fvector3>();
+	const util::fvector3 &columnVec = ch.propertyValue( columnVecProb ).castTo<util::fvector3>();
+	const util::fvector3 sliceVec = ch.hasProperty( sliceVecProb ) ?
+									ch.propertyValue( sliceVecProb ).castTo<util::fvector3>() :
+									util::fvector3(
 										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
 										rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
@@ -130,7 +134,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
-	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
+	const util::fvector3 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ) );
 	const scalarPropCompare &secondaryComp = secondarySort.top();
 
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)
@@ -158,7 +162,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 			return false;
 		}
 
-		BOOST_FOREACH( util::PropertyMap::KeyType & ref, equalProps ) { // check all properties which where given to the constructor of the list
+		BOOST_FOREACH( util::PropertyMap::PropPath & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
 				LOG( Debug, verbose_info )
@@ -272,3 +276,4 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 }
 }
 }
+/// @endcond _internal

@@ -8,6 +8,33 @@
 
 using namespace isis;
 
+bool swapProperties( data::Image &image, const unsigned short dim )
+{
+	const util::ivector4 size = image.getSizeAsVector();
+	std::vector<data::Chunk> chunks = image.copyChunksToVector( true );
+
+	if( chunks.front().getRelevantDims() < 2 && dim >= chunks.front().getRelevantDims() ) {
+		LOG( data::Runtime, error ) << "Your data is spliced at dimension " << chunks.front().getRelevantDims()
+									<< " and you trying to flip at dimenstion " << dim << ". Sorry but this has not yet been impleneted.";
+		return false;
+	}
+
+	std::vector<data::Chunk> buffer = chunks;
+	std::vector<data::Chunk> swapped_chunks;
+
+	for( util::ivector4::value_type one_above_dim = 0; one_above_dim < size[dim + 1]; one_above_dim++ ) {
+		util::ivector4::value_type reverse_count = size[dim] - 1;
+
+		for( util::ivector4::value_type count = 0; count < size[dim]; count++, reverse_count-- ) {
+			static_cast<util::PropertyMap &>( chunks[count] ) = static_cast<util::PropertyMap &>( buffer[reverse_count] );
+		}
+	}
+
+	std::list<data::Chunk> chunk_list( chunks.begin(), chunks.end() );
+	image = data::Image( chunk_list );
+	return true;
+}
+
 
 int main( int argc, char **argv )
 {
@@ -43,6 +70,8 @@ int main( int argc, char **argv )
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
 	BOOST_FOREACH( data::Image & refImage, app.images ) {
+		std::vector< data::Chunk > delme = refImage.copyChunksToVector( true );
+		isis::data::Image dummy( delme );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {
@@ -53,8 +82,14 @@ int main( int argc, char **argv )
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			flifu.dim = static_cast<data::dimensions>( dim );
-			refImage.foreachChunk( flifu );
+			if( refImage.copyChunksToVector( false ).front().getRelevantDims() > dim ) {
+				flifu.dim = static_cast<data::dimensions>( dim );
+				refImage.foreachChunk( flifu );
+			} else {
+				if( !swapProperties( refImage, dim ) ) {
+					return EXIT_FAILURE;
+				}
+			}
 		}
 
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
@@ -65,5 +100,4 @@ int main( int argc, char **argv )
 	}
 	app.autowrite( finImageList );
 	return 0;
-};
-
+}

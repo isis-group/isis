@@ -19,6 +19,7 @@
 #include "image.hpp"
 #include "common.hpp"
 #include "../CoreUtils/istring.hpp"
+#include "../CoreUtils/progressfeedback.hpp"
 
 namespace isis
 {
@@ -31,6 +32,12 @@ class FileFormat
 public:
 	enum io_modes{read_only=1,write_only=2,both=3};
 protected:
+	/**
+	 * Check if a given property exists in the given PropMap.
+	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
+	 * \returns object.hasProperty(name)
+	 */
+	static bool setGender( util::PropertyMap &object, const char *set,const char *entries="female,male,other" );
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
@@ -52,7 +59,7 @@ protected:
 		return false;
 	}
 	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes(io_modes modes=both)const = 0;
+	virtual util::istring suffixes(io_modes modes=both)const = 0;
 	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
@@ -83,7 +90,7 @@ public:
 
 
 	/// \return a space separated list of the dialects the plugin supports
-	virtual std::string dialects( const std::string &/*filename*/ )const {return std::string();};
+	virtual util::istring dialects( const std::string &/*filename*/ )const {return util::istring();};
 
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
@@ -94,26 +101,34 @@ public:
 	 * \param chunks the chunk list where the loaded chunks shall be added to
 	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
+	throw( std::runtime_error & ) = 0; //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
+	 * \param image the image to be written
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
+	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
+	throw( std::runtime_error & ) = 0;
 
 	/**
 	 * Write a image list.
 	 * I case of an error std::runtime_error will be thrown.
 	 * The default implementation will call write( const data::Image &, const std::string&, const std::string&) for every image using a generated unique filename.
+	 * \param images a list of the images to be written
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
+	throw( std::runtime_error & );
 
 	virtual ~FileFormat() {}
 };

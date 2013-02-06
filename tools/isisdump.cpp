@@ -12,7 +12,12 @@ int main( int argc, char *argv[] )
 	// ********* Parameters *********
 	app.parameters["chunks"] = false;
 	app.parameters["chunks"].needed() = false;
-	app.parameters["chunks"].setDescription( "print detailed data about the chunks" );
+	app.parameters["chunks"].setDescription( "print detailed data about the subsections (chunks) for each image" );
+
+	app.addExample( "-in file.nii", "Print all metadata of the image in a nifti file." );
+	app.addExample( "-in directory_full_of_dicom_files -rf ima",
+					"Print all metadata of all images red from a directory and enforce the file format \"ima\" (DICOM) when reading the files in that directory." );
+
 	app.init( argc, argv, false ); // if there is a problem, we just get no images and exit cleanly
 	unsigned short count1 = 0;
 
@@ -22,7 +27,7 @@ int main( int argc, char *argv[] )
 	const unsigned short imageDigits = std::log10( app.images.size() ) + 1;
 	std::cout.fill( '0' );
 	BOOST_FOREACH( data::Image & ref, app.images ) {
-		std::cout << "======Image #" << std::setw( imageDigits )  << ++count1 << std::setw( 0 ) << " " << ref.getSizeAsString() << "======Metadata======" << std::endl;
+		std::cout << "======Image #" << std::setw( imageDigits )  << ++count1 << std::setw( 0 ) << " " << ref.getSizeAsString() << " (" << ref.identify( false ) << ") ======" << std::endl;
 		ref.print( std::cout, true );
 		int count2 = 0;
 

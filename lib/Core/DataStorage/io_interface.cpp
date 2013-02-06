@@ -16,12 +16,16 @@ namespace isis
 {
 namespace image_io
 {
+API_EXCLUDE_BEGIN
+/// @cond _internal
 namespace _internal
 {
 bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length() > b.length();}
 }
+/// @endcond _internal
+API_EXCLUDE_END
 
-void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -29,12 +33,12 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 		std::string uniquePath = *( inames++ );
 
 		try {
-			write( ref, uniquePath, dialect );
+			write( ref, uniquePath, dialect, progress );
 			LOG( Runtime, notice )
 					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
 					<< " using " <<  getName() << ( dialect.empty() ?
-													std::string() :
-													std::string( " and dialect " ) + dialect
+													util::istring() :
+													util::istring( " and dialect " ) + dialect
 												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
@@ -42,8 +46,19 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 		}
 	}
 }
+bool FileFormat::setGender( util::PropertyMap &object, const char *set, const char *entries )
+{
+	util::Selection g( entries );
 
-bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::util::PropertyMap &object, isis::LogLevel level )
+	if( g.set( set ) ) {
+		object.setPropertyAs( "subjectGender", g );
+		return true;
+	}
+
+	return false;
+}
+
+bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -65,7 +80,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const
 {
-	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ).c_str() );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
@@ -78,13 +93,10 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
 	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
-		size_t at = ifilename.rfind( suffix );
+		util::istring check = ifilename.substr( ifilename.length() - suffix.length(), suffix.length() );
 
-		if( at != ifilename.npos ) {
-			if( at && ifilename[at - 1] == '.' )
-				at--;
-
-			return std::make_pair( filename.substr( 0, at ), filename.substr( at ) );
+		if( filename[filename.length() - suffix.length() - 1] == '.' && check == suffix ) {
+			return std::make_pair( filename.substr( 0, filename.length() - suffix.length() - 1 ), filename.substr( filename.length() - suffix.length() - 1 ) );
 		}
 	}
 	return std::make_pair( filename, std::string() );
@@ -119,7 +131,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 
 			if ( true == isFormatUsed ) {
 				size_t overallDigits = 0;
-				unsigned short tID = ( *props.propertyValue( prop ) ).getTypeID();
+				unsigned short tID;
 
 				switch ( tID = ( *props.propertyValue( prop ) ).getTypeID() ) {
 				case util::Value<uint8_t>::staticID:

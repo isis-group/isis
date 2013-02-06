@@ -28,6 +28,7 @@ namespace isis
 {
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
 struct ichar_traits: public std::char_traits<char> {
@@ -38,6 +39,7 @@ struct ichar_traits: public std::char_traits<char> {
 	static const char_type *find ( const char_type *s, std::size_t n, const char_type &a );
 };
 }
+/// @endcond _internal
 
 typedef std::basic_string<char, _internal::ichar_traits>    istring;
 }

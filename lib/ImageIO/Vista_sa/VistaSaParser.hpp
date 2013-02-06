@@ -78,7 +78,7 @@ qi::rule<Iterator, void ( std::string ), ascii::space_type> end_tag;
 
 
 struct VistaObject {
-	data::ValuePtrReference data;
+	data::ValueArrayReference data;
 };
 
 class VistaSaParser

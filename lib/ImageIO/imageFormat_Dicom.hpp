@@ -54,30 +54,29 @@ class ImageFormat_Dicom: public FileFormat
 
 		return ret;
 	}
-	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect );
+	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const util::istring &dialect );
 	static bool parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey, util::PropertyMap::PropPath> dictionary;
 protected:
-	std::string suffixes( io_modes modes = both )const;
+	util::istring suffixes( io_modes modes = both )const;
 	util::PropertyMap::PropPath tag2Name( const DcmTagKey &tag ) const;
 public:
 	ImageFormat_Dicom();
 	void addDicomDict( DcmDataDictionary &dict );
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect );
+	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const util::istring &dialect );
 	static void parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static void parseVector( DcmElement *elem, const util::PropertyMap::PropPath &name, isis::util::PropertyMap &map );
 	static void parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, isis::util::PropertyMap &map );
-	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect )const;
-	static void sanitise( util::PropertyMap &object, std::string dialect );
+	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const util::istring &dialect )const;
+	static void sanitise( util::PropertyMap &object, util::istring dialect );
 	std::string getName()const;
-	std::string dialects( const std::string &filename )const;
+	util::istring dialects( const std::string &filename )const;
 
-	int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+	int load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
+	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
 
 	bool tainted()const;
 };

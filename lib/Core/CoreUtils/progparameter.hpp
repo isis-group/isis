@@ -45,7 +45,6 @@ public:
 	 * Thus parameters created using this must be set to any type/value before parse() is called.
 	 */
 	ProgParameter();
-	ProgParameter( const ProgParameter &ref );
 	/**
 	 * Create a programm parameter using an initial value/type.
 	 * \param ref the intial value/type the programm parameter should get
@@ -78,7 +77,7 @@ public:
 	}
 
 
-	operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+	operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 
 	/// \returns true, if the parameter was ever successfully parsed
 	bool isSet()const;
@@ -119,6 +118,8 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 	}
 	bool parsed;
 public:
+	const ProgParameter operator[]( const std::string key )const;
+	ProgParameter &operator[]( const std::string key );
 	/*
 	 * Default constructor to create an empty parameter map
 	 */
@@ -153,7 +154,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 
 	LOG_IF( s.isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 	assert( !s.isEmpty() );
-	out << "default=\"" << s.toString( false ) << "\", type=" << s->getTypeName();
+	out << "default=\"" << s.toString( false ) << "\", type=" << s.getTypeName();
 
 	if ( s.isNeeded() )out << " (needed)";
 

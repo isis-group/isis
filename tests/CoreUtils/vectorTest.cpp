@@ -1,6 +1,4 @@
 /*
-* typeTest.cpp
-*
 * A unit test suite to confirm the capabilities of the
 * utils::Value class.
 *

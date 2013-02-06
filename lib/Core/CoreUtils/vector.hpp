@@ -23,14 +23,13 @@
 #include <numeric>
 #include <cmath>
 
+#include <boost/numeric/ublas/vector.hpp>
+
 namespace isis
 {
-/*! \addtogroup util
- *  Additional documentation for group `mygrp'
- *  @{
- */
 namespace util
 {
+/// @cond _internal
 namespace _internal
 {
 template<typename TYPE, size_t SIZE> class array
@@ -45,6 +44,7 @@ protected:
 	const_iterator end()const {return cont + SIZE;}
 };
 }
+/// @endcond _internal
 
 template < typename TYPE, size_t SIZE, typename CONTAINER = _internal::array<TYPE, SIZE> >
 class FixedVector: protected CONTAINER
@@ -54,6 +54,7 @@ public:
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE, SIZE, CONTAINER> this_class;
 	typedef CONTAINER container_type;
+	typedef TYPE value_type;
 protected:
 	/// Generic operations
 	template<typename OP> this_class binaryOp ( const this_class &src )const {
@@ -162,13 +163,11 @@ public:
 		return !operator==( src );
 	}
 	/**
-	 * Fuzzy comparison.
-	 * Will raise a compiler error when not used with floating point vectors.
-	 * @param other the other vector that should be compared with the current vector.
-	 * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
-	 * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
-	 * If any of the values is greater than "1" the "allowed" difference will be bigger.
-	 * \returns true if the difference between the two types is significantly small compared to the values.
+	 * Fuzzy comparison for vectors.
+	 * Does util::fuzzyEqual for the associated elements of the two vectors.
+	 * @param other the "other" vector to compare to
+	 * @param scale scaling factor forwarded to util::fuzzyEqual
+	 * \returns true if util::fuzzyEqual for all elements
 	 */
 	bool fuzzyEqual( const this_class &other, unsigned short scale = 10 )const {
 		const_iterator b = other.begin();
@@ -266,11 +265,21 @@ public:
 	 * Compute the sum of all elements.
 	 * \returns \f[ \sum_{i=0}^{SIZE-1} this_i \f]
 	 */
-	TYPE sum() {
+	TYPE sum() const {
 		TYPE ret = 0;
 
-		for ( iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
+		for ( const_iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
 			ret += *i;
+
+		return ret;
+	}
+
+	boost::numeric::ublas::vector<TYPE> getBoostVector() const {
+		boost::numeric::ublas::vector<TYPE> ret = boost::numeric::ublas::vector<TYPE>( SIZE );
+
+		for( size_t i = 0; i < SIZE; i++ ) {
+			ret( i ) = operator[]( i );
+		}
 
 		return ret;
 	}
@@ -319,6 +328,20 @@ public:
 	}
 };
 
+template<typename TYPE>
+class vector3 : public FixedVector<TYPE, 3>
+{
+public:
+	vector3() {}
+	template<typename TYPE2, typename CONTAINER2> vector3( const FixedVector<TYPE2, 3, CONTAINER2> &src ) : FixedVector< TYPE, 3> ( src ) {}
+	vector3( const TYPE src[3] ): FixedVector< TYPE, 3>( src ) {}
+	vector3( TYPE first, TYPE second, TYPE third = 0 ) {
+		this->operator[]( 2 ) = third;
+		this->operator[]( 1 ) = second;
+		this->operator[]( 0 ) = first;
+	}
+};
+
 template<typename TYPE, size_t SIZE, typename CONTAINER1, typename CONTAINER2>
 FixedVector<TYPE, SIZE> maxVector( const FixedVector<TYPE, SIZE, CONTAINER1> &first, const FixedVector<TYPE, SIZE, CONTAINER2> &second )
 {
@@ -342,9 +365,10 @@ FixedVector<TYPE, SIZE> minVector( const FixedVector<TYPE, SIZE, CONTAINER1> &fi
 
 typedef vector4<float> fvector4;
 typedef vector4<double> dvector4;
+typedef vector3<float> fvector3;
+typedef vector3<double> dvector3;
 typedef vector4<int32_t> ivector4;
 }
-/** @} */
 }
 
 template<typename TYPE, size_t SIZE, typename CONTAINER >

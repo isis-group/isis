@@ -24,6 +24,7 @@
 #include <stack>
 #include <boost/shared_ptr.hpp>
 
+/// @cond _internal
 namespace isis
 {
 namespace data
@@ -45,7 +46,7 @@ public:
 		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
-		bool operator()( const util::fvector4 &a, const util::fvector4 &b ) const;
+		bool operator()( const util::fvector3 &a, const util::fvector3 &b ) const;
 	};
 	struct chunkPtrOperator {
 		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr ) = 0;
@@ -53,7 +54,7 @@ public:
 	};
 private:
 	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
-	typedef std::map<util::fvector4, SecondaryMap, posCompare> PrimaryMap;
+	typedef std::map<util::fvector3, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
 	posCompare primarySort;
@@ -61,13 +62,13 @@ private:
 
 	// low level finding
 	boost::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
-	SecondaryMap *primaryFind( const util::fvector4 &key );
+	SecondaryMap *primaryFind( const util::fvector3 &key );
 
 	// low level inserting
 	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
 	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
-	std::list<util::PropertyMap::KeyType> equalProps;
+	std::list<util::PropertyMap::PropPath> equalProps;
 public:
 
 	//initialisation
@@ -110,5 +111,6 @@ public:
 }
 }
 }
+/// @endcond _internal
 
 #endif // SORTEDCHUNKLIST_HPP

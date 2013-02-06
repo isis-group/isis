@@ -16,19 +16,15 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 # add global options
 ############################################################
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
+option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
+option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
+option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
+option(ISIS_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
+option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (tar, gz, bzip2 and Z)" ON)
+option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
+option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
+option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 
 ############################################################
 # the plugins ...
@@ -37,45 +33,16 @@ option(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens da
 ############################################################
 # NIFTI plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
-  find_library(LIB_NIFTIIO niftiio)
-  find_library(LIB_ZNZ znz)
-  find_library(LIB_Z z)
-
-  find_path(INCPATH_NIFTI "nifti1_io.h" PATH_SUFFIXES "nifti")
-  find_path(INCPATH_ZNZ "znzlib.h" PATH_SUFFIXES "nifti")
-
-  include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
-  add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-  target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LIB_Z} isis_core  ${ISIS_LIB_DEPENDS})
-
-  set(TARGETS ${TARGETS} isisImageFormat_Nifti)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
-
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
+if(ISIS_IOPLUGIN_NIFTI_SA)
   add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
-  target_link_libraries(isisImageFormat_Nifti_sa isis_core  ${ISIS_LIB_DEPENDS})
+  target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
   set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
-
-############################################################
-# vista_sa
-############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
-
-	set(VISTA_SRC_FILES Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/VistaSaParser.cpp )
-	include_directories(${Boost_INCLUDE_DIR})
-	add_library(isisImageFormat_Vista_sa SHARED ${VISTA_SRC_FILES})
-	add_definitions(-DPHOENIX_LIMIT=10)
-	target_link_libraries(isisImageFormat_Vista_sa isis_core  ${ISIS_LIB_DEPENDS} ${Boost_LIBRARIES})
-	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
-
+endif(ISIS_IOPLUGIN_NIFTI_SA)
 
 ############################################################
 # vista
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
+if(ISIS_IOPLUGIN_VISTA)
   # This code snipped was taken from the lipsia source package.
 
   # - FindVIA.cmake
@@ -141,7 +108,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
     include_directories(${VIA_INCLUDE_DIR} ${VIAIO_INCLUDE_DIR})
     add_library(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
-    target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} isis_core ${ISIS_LIB_DEPENDS})
+    target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} ${isis_core_lib})
     set(TARGETS ${TARGETS} isisImageFormat_Vista)
   else(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
       AND VIA_LIBRARY AND VIAIO_LIBRARY)
@@ -150,21 +117,21 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
   endif(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
     AND VIA_LIBRARY AND VIAIO_LIBRARY)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
+endif(ISIS_IOPLUGIN_VISTA)
 
 ############################################################
 # NULL plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
+if(ISIS_IOPLUGIN_NULL)
   add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
-  target_link_libraries(isisImageFormat_Null isis_core ${ISIS_LIB_DEPENDS})
+  target_link_libraries(isisImageFormat_Null ${isis_core_lib})
   set(TARGETS ${TARGETS} isisImageFormat_Null)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
+endif(ISIS_IOPLUGIN_NULL)
 
 ############################################################
 # PNG plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+if(ISIS_IOPLUGIN_PNG)
   find_library(LIB_Z z)
   find_library(LIB_PNG png12)
 
@@ -172,70 +139,47 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
   include_directories(${INCPATH_PNG})
 
   add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-  target_link_libraries(isisImageFormat_png isis_core ${ISIS_LIB_DEPENDS} ${LIB_PNG} ${LIB_Z})
+  target_link_libraries(isisImageFormat_png ${isis_core_lib} ${LIB_PNG} ${LIB_Z})
 
   set(TARGETS ${TARGETS} isisImageFormat_png)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+endif(ISIS_IOPLUGIN_PNG)
 
 ############################################################
-# GZ proxy plugin
+# COMP proxy plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
-  find_library(LIB_Z "z")
-  find_path(INCPATH_GZIP "zlib.h")
-  include_directories(${INCPATH_GZIP})
-
-  add_library(isisImageFormat_gz_proxy SHARED imageFormat_gz_proxy.cpp)
-  target_link_libraries(isisImageFormat_gz_proxy isis_core ${ISIS_LIB_DEPENDS} ${LIB_Z} )
-
-  set(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
-
-############################################################
-# TAR proxy plugin
-############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+if(ISIS_IOPLUGIN_COMP)
   find_package(Boost REQUIRED COMPONENTS iostreams)
-
-  add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar_proxy.cpp)
+  add_library(isisImageFormat_comp_proxy SHARED imageFormat_compressed.cpp)
 
   find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
-  if(HAVE_FALLOCATE)
-    set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
-  else(HAVE_FALLOCATE)
-    if(HAVE_POSIX_FALLOCATE)
-      set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_POSIX_FALLOCATE)
-    endif(HAVE_POSIX_FALLOCATE)
-  endif(HAVE_FALLOCATE)
-
-  target_link_libraries(isisImageFormat_tar_proxy isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
-  set(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+  set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
+endif(ISIS_IOPLUGIN_COMP)
 
 ############################################################
 # FLIST proxy plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST)
+if(ISIS_IOPLUGIN_FLIST)
 	add_library(isisImageFormat_flist SHARED imageFormat_flist.cpp)
-	target_link_libraries(isisImageFormat_flist isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+	target_link_libraries(isisImageFormat_flist ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_flist)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST)
+endif(ISIS_IOPLUGIN_FLIST)
 
 ############################################################
 # PROCESS proxy plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS)
-	add_library(isisImageFormat_process SHARED isisImageFormat_process.cpp)
-	target_link_libraries(isisImageFormat_process isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+if(ISIS_IOPLUGIN_PROCESS)
+	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
+	target_link_libraries(isisImageFormat_process ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_process)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS)
+endif(ISIS_IOPLUGIN_PROCESS)
 
 ############################################################
 # Dicom
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
+if(ISIS_IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
 	find_library(LIB_DCMIMAGE dcmimage)
 	find_library(LIB_DCMDATA dcmdata)
@@ -264,29 +208,20 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
 	endif(WIN32)
 
-	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} isis_core ${ISIS_LIB_DEPENDS})
+	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
-
-############################################################
-# RAW plugin
-############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
-  add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
-  target_link_libraries(isisImageFormat_raw isis_core ${ISIS_LIB_DEPENDS})
-  set(TARGETS ${TARGETS} isisImageFormat_raw)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+endif(ISIS_IOPLUGIN_DICOM)
 
 #################################################################################################
 # Siemens TCPIP
 #################################################################################################
 
-if (${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
+if (ISIS_IOPLUGIN_SIEMENSTCPIP)
 	add_library(isisImageFormat_SiemensTcpIp SHARED imageFormat_SiemensTcpIp.cpp)
-	message(STATUS ${ISIS_LIB_DEPENDS})
-	target_link_libraries(isisImageFormat_SiemensTcpIp isis_core ${ISIS_LIB_DEPENDS})
+	message(STATUS)
+	target_link_libraries(isisImageFormat_SiemensTcpIp ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_SiemensTcpIp)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
+endif(ISIS_IOPLUGIN_SIEMENSTCPIP)
 
 ###########################################################################
 # prepare all plugins for installation
