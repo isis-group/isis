@@ -9,7 +9,7 @@
 #ifndef FILEPTR_HPP
 #define FILEPTR_HPP
 
-#define BOOST_FILESYSTEM_VERSION 2 //@todo remove as soon as we switch to boost 1.42
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 #include <boost/detail/endian.hpp>
 #include "valuearray.hpp"

@@ -207,7 +207,7 @@ int main( int argc, char *argv[] )
 		boost::filesystem::path sPath2 = ( src2.size() == 1 ) ? src2.front() : getCommonSource( images2 );
 
 
-		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << sPath1.file_string() << "\" and " << images2.size() << " from \"" << sPath2.file_string() << "\"";
+		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << sPath1 << "\" and " << images2.size() << " from \"" << sPath2 << "\"";
 
 		for (
 			std::list< data::Image >::iterator first = images1.begin();
