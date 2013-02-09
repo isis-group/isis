@@ -226,12 +226,12 @@ public:
 						}
 
 						// read the temporary file
-						std::list<data::Chunk>::iterator prev = chunks.end();
-						--prev;
+						std::list<data::Chunk>::iterator ch = chunks.end();
+						--ch;
 						ret += data::IOFactory::load( chunks, tmpfile.string(), dialect.c_str() );
 
-						for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
-							prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
+						for( ; ch != chunks.end(); ++ch ) { // set the source property of the red chunks to something more usefull
+							ch->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
 					}
 				} else {
