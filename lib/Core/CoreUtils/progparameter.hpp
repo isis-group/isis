@@ -76,8 +76,11 @@ public:
 		return get()->castTo<T>();
 	}
 
-
+#ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
 	operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+#else
+	explicit operator bool()const;
+#endif
 
 	/// \returns true, if the parameter was ever successfully parsed
 	bool isSet()const;
