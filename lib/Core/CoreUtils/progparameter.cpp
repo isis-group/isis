@@ -179,6 +179,7 @@ const ProgParameter ParameterMap::operator[] ( const std::string key ) const
 }
 ProgParameter &ParameterMap::operator[] ( const std::string key ) {return std::map<std::string, ProgParameter>::operator[]( key );}
 
+#ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
 ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const
 {
 	boost::scoped_ptr<ValueBase> dummy;
@@ -187,6 +188,12 @@ ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()con
 
 	return  dummy;
 }
+#else
+ProgParameter::operator bool()const
+{
+	return ( ( *this ).castTo<bool>() );
+}
+#endif
 
 }
 }

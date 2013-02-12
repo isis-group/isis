@@ -34,38 +34,27 @@ endif(ISIS_ITK)
 # use QT4 component
 ############################################################
 if(ISIS_QT4)
-  # find qt4
-  find_package(Qt4 REQUIRED)
-  include(${QT_USE_FILE})
+	# find qt4
+	find_package(Qt4 REQUIRED)
+	include(${QT_USE_FILE})
 
-  qt4_wrap_cpp(qdefaultmessageprint_moc qt4/qdefaultmessageprint.hpp)
-  # configure target
+	qt4_wrap_cpp(qdefaultmessageprint_moc qt4/qdefaultmessageprint.hpp)
+	# configure target
 
-  set(ISIS_QT4_LIBRARY_FILES ${qdefaultmessageprint_moc}
-					qt4/qdefaultmessageprint.cpp
-					qt4/qtapplication.cpp
-					qt4/qmatrixconversion.cpp )
+	set(ISIS_QT4_LIBRARY_FILES ${qdefaultmessageprint_moc}
+						qt4/qdefaultmessageprint.cpp
+						qt4/qtapplication.cpp
+						qt4/qmatrixconversion.cpp )
 
-  set(ISIS_QT4_HEADER_FILES qt4/qtapplication.hpp
-							qt4/qdefaultmessageprint.hpp
-							qt4/qmatrixconversion.hpp )
+	set(ISIS_QT4_HEADER_FILES qt4/qtapplication.hpp
+								qt4/qdefaultmessageprint.hpp
+								qt4/qmatrixconversion.hpp )
 
-  add_library(isisAdapter_qt4 SHARED  ${ISIS_QT4_LIBRARY_FILES} )
-  set_target_properties(isisAdapter_qt4  PROPERTIES
-	      ${ISIS_BUILD_PROPERTIES}
-	      SOVERSION ${ISIS_QT_VERSION_SO}
-	      VERSION ${ISIS_QT_VERSION_API}
-	      INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-	      OUTPUT_NAME "isisAdapter_qt4")
-
-  target_link_libraries(isisAdapter_qt4 isis_core ${QT_LIBRARIES} ${CMAKE_C_STANDARD_LIBRARIES})
-
-  # configure install destination
-  install (TARGETS isisAdapter_qt4
-	RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
-	LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
-	ARCHIVE DESTINATION lib COMPONENT Development
-  )
+	add_lib(isisAdapter_qt4
+		"${ISIS_QT4_LIBRARY_FILES}"
+		"${isis_core_lib};${QT_LIBRARIES};${CMAKE_C_STANDARD_LIBRARIES}"
+		${ISIS_QT_VERSION_SO} ${ISIS_QT_VERSION_API}
+	)
 
   # export header files
   set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} ${ISIS_QT4_HEADER_FILES} )

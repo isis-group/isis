@@ -35,7 +35,7 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 ############################################################
 if(ISIS_IOPLUGIN_NIFTI_SA)
   add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
-  target_link_libraries(isisImageFormat_Nifti_sa isis_core )
+  target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
   set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
@@ -108,7 +108,7 @@ if(ISIS_IOPLUGIN_VISTA)
 
     include_directories(${VIA_INCLUDE_DIR} ${VIAIO_INCLUDE_DIR})
     add_library(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
-    target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} isis_core)
+    target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} ${isis_core_lib})
     set(TARGETS ${TARGETS} isisImageFormat_Vista)
   else(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
       AND VIA_LIBRARY AND VIAIO_LIBRARY)
@@ -124,7 +124,7 @@ endif(ISIS_IOPLUGIN_VISTA)
 ############################################################
 if(ISIS_IOPLUGIN_NULL)
   add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
-  target_link_libraries(isisImageFormat_Null isis_core)
+  target_link_libraries(isisImageFormat_Null ${isis_core_lib})
   set(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(ISIS_IOPLUGIN_NULL)
 
@@ -139,7 +139,7 @@ if(ISIS_IOPLUGIN_PNG)
   include_directories(${INCPATH_PNG})
 
   add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-  target_link_libraries(isisImageFormat_png isis_core ${LIB_PNG} ${LIB_Z})
+  target_link_libraries(isisImageFormat_png ${isis_core_lib} ${LIB_PNG} ${LIB_Z})
 
   set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(ISIS_IOPLUGIN_PNG)
@@ -150,11 +150,11 @@ endif(ISIS_IOPLUGIN_PNG)
 if(ISIS_IOPLUGIN_COMP)
   find_package(Boost REQUIRED COMPONENTS iostreams)
   add_library(isisImageFormat_comp_proxy SHARED imageFormat_compressed.cpp)
-  
+
   find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
-  target_link_libraries(isisImageFormat_comp_proxy isis_core ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 
@@ -163,7 +163,7 @@ endif(ISIS_IOPLUGIN_COMP)
 ############################################################
 if(ISIS_IOPLUGIN_FLIST)
 	add_library(isisImageFormat_flist SHARED imageFormat_flist.cpp)
-	target_link_libraries(isisImageFormat_flist isis_core)
+	target_link_libraries(isisImageFormat_flist ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_flist)
 endif(ISIS_IOPLUGIN_FLIST)
 
@@ -172,7 +172,7 @@ endif(ISIS_IOPLUGIN_FLIST)
 ############################################################
 if(ISIS_IOPLUGIN_PROCESS)
 	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
-	target_link_libraries(isisImageFormat_process isis_core)
+	target_link_libraries(isisImageFormat_process ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_process)
 endif(ISIS_IOPLUGIN_PROCESS)
 
@@ -208,7 +208,7 @@ if(ISIS_IOPLUGIN_DICOM)
 	list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
 	endif(WIN32)
 
-	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} isis_core)
+	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 
@@ -219,7 +219,7 @@ endif(ISIS_IOPLUGIN_DICOM)
 if (ISIS_IOPLUGIN_SIEMENSTCPIP)
 	add_library(isisImageFormat_SiemensTcpIp SHARED imageFormat_SiemensTcpIp.cpp)
 	message(STATUS)
-	target_link_libraries(isisImageFormat_SiemensTcpIp isis_core)
+	target_link_libraries(isisImageFormat_SiemensTcpIp ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_SiemensTcpIp)
 endif(ISIS_IOPLUGIN_SIEMENSTCPIP)
 

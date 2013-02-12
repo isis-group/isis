@@ -102,7 +102,7 @@ class FslRgbWriteOp: public WriteOp
 {
 	const data::scaling_pair m_scale;
 	struct VoxelCp: data::VoxelOp<util::color24> {
-		int mode;
+		uint8_t mode;
 		uint8_t *ptr;
 		virtual bool operator()( util::color24 &vox, const isis::util::vector4<size_t>& /*pos*/ ) {
 			switch( mode ) {
@@ -141,7 +141,7 @@ public:
 			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 			data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
 			cp.ptr = &out_data[0];
-			cp.mode = posInImage[data::timeDim];
+			cp.mode = (uint8_t)posInImage[data::timeDim]; //the "timesteps" represent the color thus there are just 3
 			ch.foreachVoxel( cp );
 			assert( cp.ptr == &out_data[0] + out_data.getLength() );
 		}
@@ -839,8 +839,12 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 				// the bvalue is the length of the gradient direction,
 				bvalFile << gradient.len() << " ";
 
-				gradient.norm();// the direction itself must be normalized
-				bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+				if(gradient.len()>0){
+					gradient.norm();// the direction itself must be normalized
+					bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+				} else {
+					bvecList.push_back( util::dvector4(0,0,0) );
+				}
 			}
 
 			// the bvec file is the inverted x-elements of all directions, then all y-elements and so on... dont ask me, ask fsl ...
