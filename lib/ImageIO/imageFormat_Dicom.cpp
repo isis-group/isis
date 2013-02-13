@@ -158,7 +158,10 @@ void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 		const DcmDictEntry *entry = *i;
 		const DcmTagKey key = entry->getKey();
 		const char *name = entry->getTagName();
-		dictionary[key] = name;
+		if(util::istring("Unknown")==name){
+			dictionary[key] = util::istring( unknownTagName ) + key.toString().c_str();
+		} else
+			dictionary[key] = name;
 	}
 }
 
