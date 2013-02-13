@@ -214,7 +214,8 @@ util::istring ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return ".
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
 {
 
-	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims() == img.getRelevantDims() ) { // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
+	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims()!=data::sliceDim || img.getSizeAsVector()[data::sliceDim] <= 1 ) {
+		// chunks are no slices, or there is only one slice - just choose NIFTI_SLICE_SEQ_INC
 		slice_code = NIFTI_SLICE_SEQ_INC;
 	} else {
 		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime" : "acquisitionNumber";
