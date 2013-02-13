@@ -26,7 +26,8 @@ namespace util
  * \code
  * Singletons::get < MyClass, INT_MAX - 1 >
  * \endcode
- * This generates a Singleton of MyClass with highest priority
+ * This generates a Singleton of MyClass with highest priority.
+ * \note This is (currently) not thread save.
  */
 class Singletons
 {

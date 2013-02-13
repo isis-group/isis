@@ -16,7 +16,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Filter)
 
 add_executable( basicFilterTest basicFilterTest.cpp )
 
-target_link_libraries( basicFilterTest ${Boost_LIBRARIES} isis_core isisFilter_Basic)
+target_link_libraries( basicFilterTest ${Boost_LIBRARIES} ${isis_core_lib} isisFilter_Basic)
 
 ############################################################
 # add unit test targets

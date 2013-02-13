@@ -105,11 +105,20 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
 	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
 		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
-		const std::pair<T, T > real = calcMinMax<T, 2>( &ref[0].real(), ref.getLength() * 2 );
-		const std::pair<T, T > imag = calcMinMax<T, 2>( &ref[0].imag(), ref.getLength() * 2 );
+		//use complex as a two element array and find the respective minmax for the two elements
+		const std::pair<T, T > minmax[] = {
+			calcMinMax<T, 2>( reinterpret_cast<const T*>(&ref[0]), ref.getLength() * 2 ),
+			calcMinMax<T, 2>( reinterpret_cast<const T*>(&ref[0])+1, ref.getLength() * 2 )
+		};
 
-		return std::make_pair( std::complex<T>( real.first, imag.first ), std::complex<T>( real.second, imag.second ) );
-	}
+		//also use return as two element array and stuff results from above in there
+		std::pair<std::complex<T> , std::complex<T> > ret;
+		T *min = reinterpret_cast<T*>(&ret.first), *max=reinterpret_cast<T*>(&ret.second);
+		for(int_fast8_t i=0;i<2;i++){
+			min[i]=minmax[i].first;
+			max[i]=minmax[i].second;
+		}
+		return ret;	}
 };
 /// @endcond
 API_EXCLUDE_END
@@ -370,8 +379,8 @@ public:
 			return ValueArrayBase::getScalingTo( typeID, minmax, scaleopt );
 		}
 	}
-    void endianSwap(){
-		data::endianSwapArray(begin(),end(),begin());
+	void endianSwap() {
+		data::endianSwapArray( begin(), end(), begin() );
 	}
 };
 /// @cond _internal

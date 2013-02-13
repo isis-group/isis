@@ -25,7 +25,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END
 
-void FileFormat::write( const std::list< isis::data::Image >& images, const std::string &filename, const isis::util::istring &dialect, boost::shared_ptr< isis::util::ProgressFeedback > progress ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -58,7 +58,7 @@ bool FileFormat::setGender( util::PropertyMap &object, const char *set, const ch
 	return false;
 }
 
-bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::util::PropertyMap &object, isis::LogLevel level )
+bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -93,10 +93,10 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
 	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
-		util::istring check=ifilename.substr(ifilename.length()-suffix.length(),suffix.length());
-		
-		if(filename[filename.length()-suffix.length()-1]=='.' && check == suffix ) {
-			return std::make_pair( filename.substr( 0, filename.length()-suffix.length()-1 ), filename.substr( filename.length()-suffix.length()-1 ) );
+		util::istring check = ifilename.substr( ifilename.length() - suffix.length(), suffix.length() );
+
+		if( filename[filename.length()-suffix.length()-1] == '.' && check == suffix ) {
+			return std::make_pair( filename.substr( 0, filename.length() - suffix.length() - 1 ), filename.substr( filename.length() - suffix.length() - 1 ) );
 		}
 	}
 	return std::make_pair( filename, std::string() );
