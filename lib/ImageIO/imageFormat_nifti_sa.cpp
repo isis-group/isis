@@ -13,13 +13,9 @@ namespace image_io
 
 namespace _internal
 {
-WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel): data::_internal::NDimensional<4>( image ), m_doFlip( false ), m_bpv( bitsPerVoxel ){}
+WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ){}
 
-void WriteOp::setFlip( data::dimensions dim )
-{
-	m_doFlip=true;
-	flip_dim=dim;
-}
+void WriteOp::addFlip( data::dimensions dim ){flip_list.insert(dim);}
 
 size_t WriteOp::getDataSize()
 {
@@ -68,12 +64,25 @@ bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 		return true;
 	}
 }
-void WriteOp::applyFlip ( isis::data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize )
+void WriteOp::applyFlipToBlock ( isis::data::ValueArrayReference dat, util::vector4< size_t > chunkSize )
 {
-	if( m_doFlip ) {
+	if(!flip_list.empty()){
 		// wrap the copied part back into a Chunk to flip it
 		data::Chunk cp( dat, chunkSize[data::rowDim], chunkSize[data::columnDim], chunkSize[data::sliceDim], chunkSize[data::timeDim] ); // this is a cheap copy
-		cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
+		//iterate through all flips within than the block dimensionality
+		for(std::set<data::dimensions>::const_iterator i=flip_list.begin();i!=flip_list.end() && *i < cp.getRelevantDims();i++){
+			cp.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
+		}
+	}
+}
+
+void WriteOp::applyFlipToCoords ( isis::util::vector4< size_t >& coords, isis::data::dimensions blockdims )
+{
+	if(!flip_list.empty()){
+		//iterate through all flips above than the block dimensionality
+		for(std::set<data::dimensions>::const_iterator i=flip_list.lower_bound(blockdims);i!=flip_list.end();i++){
+			coords[*i]=getDimSize(*i)-coords[*i]-1;
+		}
 	}
 }
 
@@ -88,10 +97,12 @@ public:
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 
 	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
+		applyFlipToCoords(posInImage,(data::dimensions)ch.getRelevantDims());
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 		data::ValueArrayReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValueArrayBase().copyTo( *out_data, m_scale );
-		applyFlip( out_data, ch.getSizeAsVector() );
+		
+		applyFlipToBlock( out_data, ch.getSizeAsVector() );
 		return true;
 	}
 
@@ -809,12 +820,12 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		if( dialect == "spm" ) {
-			writer->setFlip(image.mapScannerAxisToImageDimension( data::z ));
+			writer->addFlip(image.mapScannerAxisToImageDimension( data::z ));
 		} else if( dialect == "fsl"){
-			//invert columnVec as the image columns wil be mirrored
+			//invert columnVec as the image columns will be mirrored
 			//don't ask - dcm2nii does it, fsl expects it, so we do it
 			flipGeometry(image,data::columnDim);
-			writer->setFlip(data::columnDim);
+			writer->addFlip(data::columnDim);
 		}
 
 		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to fsl

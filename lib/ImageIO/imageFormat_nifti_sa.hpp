@@ -133,13 +133,13 @@ struct nifti_1_header {
 class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
 {
 protected:
-	bool m_doFlip;
-	data::dimensions flip_dim;
+	std::set<data::dimensions> flip_list;
 	data::FilePtr m_out;
 	size_t m_voxelstart, m_bpv;
 	WriteOp( const isis::data::Image& image, size_t bitsPerVoxel );
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
-	void applyFlip( data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize );
+	void applyFlipToCoords ( util::vector4< size_t > &coords, data::dimensions blockdims);
+	void applyFlipToBlock ( isis::data::ValueArrayReference dat, util::vector4< size_t > chunkSize );
 public:
 	virtual ~WriteOp() {}
 	nifti_1_header *getHeader();
@@ -148,7 +148,7 @@ public:
 	
 	bool operator()( data::Chunk &ch, util::vector4<size_t> posInImage );
 	bool setOutput( const std::string &filename, size_t voxelstart = 352 );
-	void setFlip(data::dimensions dim);
+	void addFlip(data::dimensions dim);
 };
 
 }
