@@ -232,10 +232,15 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image& image, data::dimensions fli
 	const float middle_to_middle=(image.getSizeAsVector()[flipdim]-1)*vsize; // the distance from the middle of the current first voxel to the "going to be first"
 	util::fvector3 &prop=image.propertyValue(names[flipdim]).castTo<util::fvector3>();
 	util::fvector3 &origin=image.propertyValue("indexOrigin").castTo<util::fvector3>();
-	std::cout << origin << "+" << prop << "*" << middle_to_middle << "=";
 	origin+=prop*middle_to_middle; // move the origin along the repective edge to "the other end"
-	std::cout << image.propertyValue("indexOrigin") << std::endl;
+	LOG(Debug,verbose_info) << "moved indexOrigin along " << prop*middle_to_middle << " to " << origin;
 	prop*=-1; // and invert that vector
+}
+
+float ImageFormat_NiftiSa::determinant( const util::Matrix3x3< float >& m )
+{
+	return m.elem(0,0) * m.elem(1,1) * m.elem(2,2) + m.elem(0,1) * m.elem(1,2) * m.elem(2,0) + m.elem(0,2) * m.elem(1,0) * m.elem(2,1)
+	- m.elem(0,0) * m.elem(1,2) * m.elem(2,1) - m.elem(0,1) * m.elem(1,0) * m.elem(2,2) - m.elem(0,2) * m.elem(1,1) * m.elem(2,0);
 }
 
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
@@ -822,13 +827,27 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( dialect == "spm" ) {
 			writer->addFlip(image.mapScannerAxisToImageDimension( data::z ));
 		} else if( dialect == "fsl"){
-			//invert columnVec as the image columns will be mirrored
-			//don't ask - dcm2nii does it, fsl expects it, so we do it
+			//dcm2nii flips the slice ordering of a mosaic if the determinant if the orientation is negative
+			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
+			if( image.hasProperty("DICOM/ImageType") ){
+				const util::slist tp=image.getPropertyAs<util::slist>("DICOM/ImageType");
+				const util::slist::const_iterator was_mosaic=std::find(tp.begin(),tp.end(),"WAS_MOSAIC");
+				const util::Matrix3x3<float> mat(image.getPropertyAs<util::fvector3>("rowVec"),image.getPropertyAs<util::fvector3>("columnVec"),image.getPropertyAs<util::fvector3>("sliceVec"));
+				if(was_mosaic!=tp.end() && determinant(mat)<0){
+					LOG(Runtime,info) << "Flipping slices of a siemens mosaic image for fsl compatibility";
+					flipGeometry(image,data::sliceDim);
+					writer->addFlip(data::sliceDim);
+				}
+			}
+
+			//invert columnVec and flip the order of the images lines
+			//well, you know ... ask dcm2nii ....
+			LOG(Runtime,info) << "Flipping columns of image for fsl compatibility";
 			flipGeometry(image,data::columnDim);
 			writer->addFlip(data::columnDim);
 		}
 
-		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to fsl
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming as dcm2nii does it
 		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
@@ -838,7 +857,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			std::list<util::dvector4> bvecList;
 
 			for( size_t i = 0; i < image.getNrOfTimesteps(); i++ ) { // go through all "volumes"
-				const data::Chunk &chunk = image.getChunk( 0, 0, 0, i );
+				const util::PropertyMap chunk = image.getChunk( 0, 0, 0, i );
 				util::dvector4 gradient = chunk.getPropertyAs<util::dvector4>( "diffusionGradient" );
 				const util::Matrix4x4<double> M(
 					chunk.getPropertyAs<util::dvector4>( "rowVec" ),
@@ -852,15 +871,15 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 
 				if(gradient.len()>0){
 					gradient.norm();// the direction itself must be normalized
-					bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+					bvecList.push_back( M.dot( gradient ) ); // .. transformed into slice space and stored
 				} else {
 					bvecList.push_back( util::dvector4(0,0,0) );
 				}
 			}
 
-			// the bvec file is the inverted x-elements of all directions, then all y-elements and so on... dont ask me, ask fsl ...
+			// the bvec file is the x-elements of all directions, then all y-elements and so on... 
 			bvecFile.precision( 14 );
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << -dir[0] << " ";
+			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[0] << " ";
 			bvecFile << std::endl;
 			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[1] << " ";
 			bvecFile << std::endl;
@@ -1097,11 +1116,7 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 	}
 
 	// compute the determinant to determine if the transformation is proper
-	const float determinant =
-	col[0][0] * col[1][1] * col[2][2] - col[0][0] * col[1][2] * col[2][1] - col[0][1] * col[1][0] * col[2][2] +
-	col[0][1] * col[1][2] * col[2][0] + col[0][2] * col[1][0] * col[2][1] - col[0][2] * col[1][1] * col[2][0];
-
-	if( determinant > 0 ) {
+	if( determinant(util::Matrix3x3<float>(col[0],col[1],col[2])) > 0 ) {
 		head->pixdim[0] = 1;
 	} else { // improper => flip 3rd column
 		col[2][0] = -col[2][0] ;
