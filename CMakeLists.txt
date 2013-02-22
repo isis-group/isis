@@ -52,12 +52,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# general compiler flags
-############################################################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wstrict-aliasing=2" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
-
-############################################################
 # compiler flags on 64Bit cpus
 ############################################################
 

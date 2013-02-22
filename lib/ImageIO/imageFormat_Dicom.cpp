@@ -302,6 +302,8 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	}
 
 	transformOrTell<uint32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
+	if(dicomTree.hasProperty("AcquisitionNumber") && object.propertyValue("acquisitionNumber")==dicomTree.propertyValue("AcquisitionNumber"))
+		dicomTree.remove("AcquisitionNumber");
 
 	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
 		util::Selection isisGender( "male,female,other" );
