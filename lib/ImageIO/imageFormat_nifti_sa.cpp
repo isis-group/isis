@@ -745,10 +745,10 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			if( swap_endian ) {
 				LOG( Runtime, info ) << "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
-				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength()*(1. / 0x100000) << "M)";
 			} else {
 				LOG( Runtime, info ) << "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
-				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength()*(1. / 0x100000) << "M)";
 			}
 
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
@@ -760,6 +760,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		}
 	}
 
+	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data_src, size[0], size[1], size[2], size[3] ) );
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();
