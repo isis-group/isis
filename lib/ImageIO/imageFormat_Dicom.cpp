@@ -348,21 +348,21 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		dicomTree.remove( "SiemensDiffusionBValue" );
 	} else foundDiff = false;
 
-	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
+	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0)
 	if( foundDiff ) {
 		if( dialect == "siemens" ) {
 			LOG( Runtime, warning ) << "Removing acquisitionTime=" << util::MSubject( object.propertyValue( "acquisitionTime" ).toString( false ) ) << " from siemens DWI data as it is probably broken";
 			object.remove( "acquisitionTime" );
 		}
 
-		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() ).castTo<util::fvector4>();
+		util::fvector3 &diff = object.setPropertyAs( "diffusionGradient", util::fvector3() ).castTo<util::fvector3>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
 			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
-				diff = dicomTree.getPropertyAs<util::fvector4>( "DiffusionGradientOrientation" ) * bValue;
+				diff = dicomTree.getPropertyAs<util::fvector3>( "DiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "DiffusionGradientOrientation" );
 			} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
-				diff = dicomTree.getPropertyAs<util::fvector4>( "SiemensDiffusionGradientOrientation" ) * bValue;
+				diff = dicomTree.getPropertyAs<util::fvector3>( "SiemensDiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "SiemensDiffusionGradientOrientation" );
 			} else {
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );

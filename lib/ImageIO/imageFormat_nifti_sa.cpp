@@ -856,16 +856,15 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			std::ofstream bvalFile( ( makeBasename( filename ).first + ".bval" ).c_str() );
 			bvecFile.exceptions( std::ios::failbit | std::ios::badbit );
 			bvalFile.exceptions( std::ios::failbit | std::ios::badbit );
-			std::list<util::dvector4> bvecList;
+			std::list<util::dvector3> bvecList;
 
 			for( size_t i = 0; i < image.getNrOfTimesteps(); i++ ) { // go through all "volumes"
 				const util::PropertyMap chunk = image.getChunk( 0, 0, 0, i );
-				util::dvector4 gradient = chunk.getPropertyAs<util::dvector4>( "diffusionGradient" );
-				const util::Matrix4x4<double> M(
-					chunk.getPropertyAs<util::dvector4>( "rowVec" ),
-					chunk.getPropertyAs<util::dvector4>( "columnVec" ),
-					chunk.getPropertyAs<util::dvector4>( "sliceVec" ),
-					util::dvector4( 0, 0, 0, 1 )
+				util::dvector3 gradient = chunk.getPropertyAs<util::dvector3>( "diffusionGradient" );
+				const util::Matrix3x3<double> M(
+					chunk.getPropertyAs<util::dvector3>( "rowVec" ),
+					chunk.getPropertyAs<util::dvector3>( "columnVec" ),
+					chunk.getPropertyAs<util::dvector3>( "sliceVec" )
 				);
 
 				// the bvalue is the length of the gradient direction,
@@ -875,17 +874,17 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 					gradient.norm();// the direction itself must be normalized
 					bvecList.push_back( M.dot( gradient ) ); // .. transformed into slice space and stored
 				} else {
-					bvecList.push_back( util::dvector4(0,0,0) );
+					bvecList.push_back( util::dvector3(0,0,0) );
 				}
 			}
 
 			// the bvec file is the x-elements of all directions, then all y-elements and so on... 
 			bvecFile.precision( 14 );
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[0] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[0] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[1] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[1] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[2] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[2] << " ";
 			bvecFile << std::endl;
 
 			LOG( Runtime, notice ) << "Stored bvec information for fsl to " << makeBasename( filename ).first + ".bvec";
