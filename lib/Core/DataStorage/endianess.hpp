@@ -4,6 +4,7 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
+#include "common.hpp"
 
 #ifdef HAVE_BYTESWAP
 #include <byteswap.h>
@@ -39,13 +40,22 @@ template<> struct SwapImpl<1> {
 #ifdef HAVE_BYTESWAP
 //specializations for 16 32 and 64 bit
 template<> struct SwapImpl<2> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_16( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {
+		const uint16_t swapped=bswap_16( *reinterpret_cast<const uint16_t*>(&src));
+		return *reinterpret_cast<const TYPE*>(&swapped );
+	}
 };
 template<> struct SwapImpl<4> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_32( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {
+		const uint32_t swapped=bswap_32( *reinterpret_cast<const uint32_t*>(&src));
+		return *reinterpret_cast<const TYPE*>(&swapped );
+	}
 };
 template<> struct SwapImpl<8> {
-	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {return bswap_64( src );}
+	template<typename TYPE> static TYPE doSwap( const TYPE &src ) {
+		const uint64_t swapped=bswap_64( *reinterpret_cast<const uint64_t*>(&src));
+		return *reinterpret_cast<const TYPE*>(&swapped );
+	}
 };
 #endif //HAVE_BYTESWAP
 

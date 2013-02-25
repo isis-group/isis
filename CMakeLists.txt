@@ -12,6 +12,8 @@ FIND_PACKAGE(Git)
 cmake_minimum_required(VERSION 2.6)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
+include(CheckIncludeFiles)
+
 
 project(ISIS)
 
@@ -35,7 +37,14 @@ set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
 
+############################################################
+# check for byteswap intrinsics
+############################################################
+CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP)
 
+if(HAVE_BYTESWAP)
+	add_definitions(-DHAVE_BYTESWAP)
+endif(HAVE_BYTESWAP)
 
 if(NOT WIN32)
 ############################################################
