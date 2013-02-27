@@ -218,7 +218,7 @@ template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale = 10 )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
 
-	const T epsilon = std::numeric_limits<T>::epsilon(); // get the distange between 1 and the next representable value
+	static const T epsilon = std::numeric_limits<T>::epsilon(); // get the distange between 1 and the next representable value
 	T bigger, smaller;
 
 	a = std::abs( a );

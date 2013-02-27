@@ -31,7 +31,7 @@ public:
 	progress_filter( util::ProgressFeedback &feedback ): m_feedback( feedback ), remain( 0 ) {}
 	util::ProgressFeedback &m_feedback;
 	std::streamsize remain;
-	static const std::streamsize blocksize = 0x10000; //64k
+	static const std::streamsize blocksize = 0x40000; //256k
 	typedef char char_type;
 
 	struct category : boost::iostreams::dual_use_filter_tag, boost::iostreams::multichar_tag { };
@@ -165,8 +165,8 @@ public:
 			}
 		}
 
-		// add progress filter
-		if( progress ) {
+		// set up progress bar if its enabled but don't fiddle with it if its set up already
+		if( progress && progress->getMax()==0 ) {
 			progress->show( boost::filesystem::file_size( filename ) / _internal::progress_filter::blocksize, std::string( "decompressing " ) + filename );
 			in.push( _internal::progress_filter( *progress ) );
 		}
