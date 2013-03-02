@@ -7,17 +7,6 @@
 # Date: Wed, 06 Apr 2011 14:01:10 +0200
 # 
 ############################################################
-INCLUDE (CheckIncludeFiles)
-
-
-############################################################
-# check for byteswap intrinsics
-############################################################
-CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP)
-
-if(HAVE_BYTESWAP)
-	add_definitions(-DHAVE_BYTESWAP)
-endif(HAVE_BYTESWAP)
 
 ############################################################
 # check for liboil

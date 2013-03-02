@@ -12,6 +12,8 @@ FIND_PACKAGE(Git)
 cmake_minimum_required(VERSION 2.6)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
+include(CheckIncludeFiles)
+
 
 project(ISIS)
 
@@ -35,7 +37,14 @@ set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
 
+############################################################
+# check for byteswap intrinsics
+############################################################
+CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP)
 
+if(HAVE_BYTESWAP)
+	add_definitions(-DHAVE_BYTESWAP)
+endif(HAVE_BYTESWAP)
 
 if(NOT WIN32)
 ############################################################
@@ -50,12 +59,6 @@ endif(NOT WIN32)
 ############################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
-############################################################
-# general compiler flags
-############################################################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wstrict-aliasing=2" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
 
 ############################################################
 # compiler flags on 64Bit cpus
@@ -83,6 +86,14 @@ endif("${PROCESSOR}" STREQUAL "x86_64" )
 option(ISIS_RUNTIME_LOG "Enable runtime logging" ON)
 option(ISIS_DEBUG_LOG "Enable debug logging" ON)
 
+############################################################
+# optional components
+############################################################
+option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
+option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
+option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
+
+
 # enable RUNTIME_LOG
 if(ISIS_RUNTIME_LOG)
   add_definitions(-D_ENABLE_LOG=1)
@@ -100,8 +111,12 @@ endif(ISIS_DEBUG_LOG)
 
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
-find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
-
+if(ISIS_BUILD_TESTS)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time unit_test_framework)
+else(ISIS_BUILD_TESTS)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
+endif(ISIS_BUILD_TESTS)
+	
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
@@ -149,13 +164,6 @@ if (GIT_REVISION)
 else(GIT_REVISION)
   set(ISIS_CORE_REV_STRING ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH})
 endif(GIT_REVISION)
-
-############################################################
-# optional components
-############################################################
-option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
-option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
 
 ###########################################################
 # CPack config

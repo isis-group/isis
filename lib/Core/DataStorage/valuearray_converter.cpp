@@ -93,14 +93,14 @@ scaling_pair getScalingToComplex( const util::ValueBase &min, const util::ValueB
 
 	if( min.isFloat() || min.isInteger() )scalMin = min.as<double>(); // if min is allready a scalar
 	else { // of not, determine the scalar min from the elements
-		const std::complex<double> minCpl = min.as<std::complex<double> >(); //use the "biggest" known color type
-		scalMin = *std::min_element( &minCpl.real(), &minCpl.imag() ); // take the lowest value
+		const std::complex<double> minCpl = min.as<std::complex<double> >();
+		scalMin = std::min( minCpl.real(), minCpl.imag() );
 	}
 
 	if( max.isFloat() || max.isInteger() )scalMax = max.as<double>(); // if max is allready a scalar
 	else { // of not, determine the scalar min from the elements
-		const std::complex<double> maxCpl = max.as<std::complex<double> >(); //use the "biggest" known color type
-		scalMax = *std::max_element( &maxCpl.real(), &maxCpl.imag() ); // take the lowest value
+		const std::complex<double> maxCpl = max.as<std::complex<double> >();
+		scalMax = std::max( maxCpl.real(), maxCpl.imag() );
 	}
 
 	const std::pair<double, double> scale = getNumericScaling<SRC, DST>( util::Value<double>( scalMin ), util::Value<double>( scalMax ), scaleopt );
