@@ -464,7 +464,7 @@ bool Image::reIndex()
 			const float sliceDist = ( nextV - thisV ).len() - voxeSize[2];
 
 			if ( sliceDist > 0 ) {
-				const float inf = std::numeric_limits<float>::infinity();
+				static const float inf = std::numeric_limits<float>::infinity();
 
 				if ( ! hasProperty( "voxelGap" ) ) { // @todo check this
 					setPropertyAs( "voxelGap", util::fvector3( 0, 0, inf ) );
@@ -473,11 +473,9 @@ bool Image::reIndex()
 				util::fvector3 &voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector3>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
-								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
-								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
-					}
+					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 20 ), Runtime, warning )
+							<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
+							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 				} else {
 					voxelGap[2] = sliceDist;
 					LOG( Debug, info )
