@@ -117,10 +117,10 @@ template<typename SRC, typename DST> boost::numeric::range_check_result num2num(
 {
 	typedef boost::numeric::converter <
 	DST, SRC,
-		 boost::numeric::conversion_traits<DST, SRC>,
-		 NumericOverflowHandler,
-		 boost::numeric::RoundEven<SRC>
-		 > converter;
+	   boost::numeric::conversion_traits<DST, SRC>,
+	   NumericOverflowHandler,
+	   boost::numeric::RoundEven<SRC>
+	   > converter;
 	NumericOverflowHandler::result = boost::numeric::cInRange;
 	dst = converter::convert( src );
 	return NumericOverflowHandler::result;
