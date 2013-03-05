@@ -3,4 +3,4 @@ debian/tmp/usr/include/isis/config.hpp usr/include/isis/
 debian/tmp/usr/include/isis/CoreUtils usr/include/isis/
 debian/tmp/usr/include/isis/DataStorage usr/include/isis/
 debian/tmp/usr/lib/*core.so usr/lib/
-
+debian/tmp/usr/lib/*core.a usr/lib/

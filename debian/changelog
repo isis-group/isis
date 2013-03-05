@@ -1,3 +1,18 @@
+isis (0.7.4-1) UNRELEASED; urgency=low
+
+  * improve fsl dialect in nifti_sa
+    (should conform to "Chris Rorden's dcm2nii :: 12 12 2012" now)
+  * use vector3 for diffusionGradient (in dicom and nifti_sa)
+  * when reading dicom remove AcquisitionNumber if its a duplicate of 
+    InstanceNumber
+  * prevent "Unknown" entries for the dicom dictionary
+  * make the sanity check for the slice distance a bit less strict
+  * make clang happier
+  * fix some byteswap issues
+  * include static lib in dev package
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 05 Mar 2013 14:20:50 +0100
+
 isis (0.7.3-1) UNRELEASED; urgency=low
 
   * make isis::util::FixedVector::sum const
@@ -12,14 +27,14 @@ isis (0.7.3-1) UNRELEASED; urgency=low
 
  -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 04 Feb 2013 23:30:18 +0100
 
-isis (0.7.1-1) natty; urgency=low
+isis (0.7.1-1) UNRELEASED; urgency=low
 
   * fix problem when copying voxelSize from qform/pixdim
   * consider any voxelSize of 0 as invalid in Image::reIndex
 
  -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 18 Jul 2012 13:40:12 +0200
 
-isis (0.7.0-1) natty; urgency=low
+isis (0.7.0-1) UNRELEASED; urgency=low
 
   * API version changed to 3.0.0
   * added vector3<float> and vector3<double> and use it for the image geometry

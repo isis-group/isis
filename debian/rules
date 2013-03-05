@@ -21,7 +21,7 @@ gitver = $(shell [ -x /usr/bin/git ] && git describe --tags --match '*\.*\.*' $$
 # an already installed package -- upstream is working on a fix
 CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DISIS_BUILD_STATIC_AND_SHARED:BOOL=ON \
             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
             -DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined" \
             -DISIS_APPS_CALC:BOOL=ON \

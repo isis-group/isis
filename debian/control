@@ -57,7 +57,7 @@ Description: dicom io plugin for the ISIS framework
 
 Package: libisis-core-dev
 Section: libdevel
-Architecture: all
+Architecture: any
 Depends: libisis-core3 (>= ${source:Version}),
  libisis-core3 (<< ${source:Version}.1~), ${misc:Depends}, cmake, liboil0.3-dev,
  libboost-date-time-dev (>= 1.42.0~ ),
