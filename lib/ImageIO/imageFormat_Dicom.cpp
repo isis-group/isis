@@ -293,8 +293,8 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
 		object.setPropertyAs( "indexOrigin", dicomTree.getPropertyAs<util::fvector3>( "ImagePositionPatient" ) );
-	} else if( object.hasProperty( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
-		util::fvector3 orig( 0, 0, object.getPropertyAs<float>( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
+	} else if( object.hasProperty( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
+		util::fvector3 orig( 0, 0, object.getPropertyAs<float>( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
 		LOG( Runtime, info ) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
 		object.setPropertyAs( "indexOrigin", orig );
 	} else {
