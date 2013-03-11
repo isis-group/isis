@@ -63,14 +63,14 @@ struct dialect_missing {
 		const util::istring dia = ref->dialects( filename );
 		std::list<util::istring> splitted = util::stringToList<util::istring>( dia, ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
-		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
+		LOG_IF( ret, image_io::Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
 		return ret;
 	}
 };
 
 bool invalid_and_tell( Chunk &candidate )
 {
-	LOG_IF( !candidate.isValid(), Runtime, error ) << "Ignoring invalid chunk. Missing properties: " << candidate.getMissing();
+	LOG_IF( !candidate.isValid(), image_io::Runtime, error ) << "Ignoring invalid chunk. Missing properties: " << candidate.getMissing();
 	return !candidate.isValid();
 }
 
@@ -110,7 +110,7 @@ IOFactory::IOFactory()
 
 		if( boost::filesystem::exists( prog_name ) ) {
 			w32_path_ok = true;
-			LOG( Runtime, info ) << "Determined the path of the executable as " << util::MSubject( prog_name.file_string() ) << " will search for plugins there..";
+			LOG( Runtime, info ) << "Determined the path of the executable as " << util::MSubject( prog_name.remove_filename().directory_string() ) << " will search for plugins there..";
 			findPlugins( prog_name.remove_filename().directory_string() );
 		}
 	} else
