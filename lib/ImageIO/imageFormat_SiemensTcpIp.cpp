@@ -41,10 +41,10 @@ public:
 		return "SiemensTcpIp";
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 
 
-		printf( "IMAGE: %d\n", image_counter );
+        LOG( isis::image_io::Runtime, isis::info ) << "IMAGE:  " << image_counter;
 
 		firstHeaderArrived = false;
 		unsigned long data_received = 0L;
@@ -96,8 +96,8 @@ public:
 					memcpy( dataBuffer + data_received, buffer, sizeof( buffer ) );
 					data_received += sizeof( buffer );
 
-					printf( "dataRec: '%ld'\n", data_received );
-					printf( "   imageNR: %d \n", image_counter );
+					//printf( "dataRec: '%ld'\n", data_received );
+					//printf( "   imageNR: %d \n", image_counter );
 				} else {
 					// image complete
 
@@ -130,7 +130,7 @@ public:
 					std::string subject_name = getStringFromHeader( "patient_name", header );
 					size_t subject_gender = atoi( getStringFromHeader( "patient_sex", header ).c_str() );
 					uint16_t seq_number = atol( getStringFromHeader( "meas_uid", header ).c_str() );
-					size_t acq_time = atoi( getStringFromHeader( "acquisition_time", header ).c_str() );
+					//size_t acq_time = atoi( getStringFromHeader( "acquisition_time", header ).c_str() );
 					uint16_t rep_time = atol( getStringFromHeader( "repetition_time", header ).c_str() );
 					util::fvector3 read_vec = getVectorFromString( getStringFromHeader( "read_vector", header ) );
 					util::fvector3 phase_vec = getVectorFromString( getStringFromHeader( "phase_vector", header ) );
@@ -152,10 +152,8 @@ public:
 					size_t fov_read = atoi( getStringFromHeader( "fov_read", header ).c_str() );
 					size_t fov_phase = atoi( getStringFromHeader( "fov_phase", header ).c_str() );
 					float slice_thickness = atof( getStringFromHeader( "slice_thickness", header ).c_str() );
-					size_t dimension_number = atoi( getStringFromHeader( "dimension_number", header ).c_str() );
-					// get voxelGap out of the distance (in percent!) between slices
-					size_t distFactor = atoi( getStringFromHeader( "distance_factor", header ).c_str() );
-					util::fvector3 voxelGap( 0, 0, slice_thickness * ( static_cast<float>( distFactor ) / 100.0 ) );
+					//size_t dimension_number = atoi( getStringFromHeader( "dimension_number", header ).c_str() );
+					
 
 					// ... copy the data ...
 					/******************************/
@@ -190,8 +188,7 @@ public:
 						tSize = sizeof( float );
 					} else {
 						LOG( isis::image_io::Runtime, isis::error ) << "Retrieving data over TCP/IP with an unknown datatype: " << tID;
-						//TODO :REMOVE this
-						printf( "DATATYPE NOT SUPPORTED\n" );
+						
 						free( dataBuffer );
 
 						return 0;
@@ -200,8 +197,8 @@ public:
 					size_t size_to_alloc = iim * width_slice * height_slice;
 					isis::data::ValueArrayReference valPtrBuffer = isis::data::ValueArrayBase::createByID( tID, size_to_alloc );
 
-					for( unsigned int _slice = 0; _slice < iim; _slice++ ) {
-						for( unsigned int _row = 0; _row < height_slice; _row++ ) {
+					for( size_t _slice = 0; _slice < iim; _slice++ ) {
+						for( size_t _row = 0; _row < height_slice; _row++ ) {
 							char *line_start = dataBuffer + ( tSize * ( ( ( _slice / slices_in_row ) * ( slices_in_row * height_slice * width_slice ) ) +
 															  ( _row * width_slice * slices_in_row ) + ( _slice % slices_in_row * width_slice ) ) );
 
@@ -210,10 +207,53 @@ public:
 					}
 
 					/********
-					 * get each slice position from header
+					 * for mosaic images get each slice position from header
+                     * this identifies the indexOrigin (min(z))
+                     * and we need to calculate the voxel gap out of it (assumption: distance is the same for all slices)
 					 */
-					std::string slice_pos = "slice_position_0";
-					util::fvector3 slice_pos_vec = getVectorFromString( getStringFromHeader( slice_pos, header ) ); //(val1, val2, val3);
+                    util::fvector3 voxelGap;
+                    util::fvector3 indexOrigin;
+                    
+                    
+                    if ((true == mosaic) && (1 < iim)){
+                        printf( "get slice positions: \n");
+                        util::fvector3 slice_pos_min;
+                        util::fvector3 slice_pos_max;
+                        
+                        for( size_t _slice = 0; _slice < iim; _slice++ ) {
+                            std::string slice_pos = "slice_position_";
+                            char buf[5];
+                            sprintf(buf, "%li", _slice);
+                            slice_pos.append(buf);
+                            util::fvector3 slice_pos_vec = getVectorFromString( getStringFromHeader( slice_pos, header ) );
+                            LOG( isis::image_io::Runtime, isis::error ) << "SLICE POS" << slice_pos;
+                            switch (_slice) {
+                                case 0:
+                                    slice_pos_min = slice_pos_vec;
+                                    slice_pos_max = slice_pos_vec;
+                                    break;
+                                default:
+                                    if (slice_pos_vec[2] < slice_pos_min[2]){
+                                        slice_pos_min = slice_pos_vec;
+                                    }
+                                    if (slice_pos_vec[2] > slice_pos_max[2]){
+                                        slice_pos_max = slice_pos_vec;
+                                    }
+                                    break;
+                            }
+                            
+
+                        }
+                        voxelGap[2] = (slice_pos_max[2] - slice_pos_min[2]) / (iim - 1) - slice_thickness;
+                        indexOrigin[0] = fov_read/2  - slice_pos_min[0];
+                        indexOrigin[1] = fov_phase/2  - slice_pos_min[1];
+                        indexOrigin[2] = slice_pos_min[2];
+                        LOG( isis::image_io::Runtime, isis::error ) << "indexOrigin " << indexOrigin;
+                        LOG( isis::image_io::Runtime, isis::error ) << "voxelGap " << voxelGap;
+                    }
+                    
+                   
+                    
 					//*********
 
 					// now, create a real chunk in memory and convert it to float data
@@ -222,7 +262,6 @@ public:
 
 					// set all the general properties - i.e. feed the generated chunk with metadata
 
-					myChunk.setPropertyAs( "indexOrigin", slice_pos_vec );
 					myChunk.setPropertyAs<uint32_t>( "acquisitionNumber", ( acq_nr ) );
 					myChunk.setPropertyAs<std::string>( "subjectName", subject_name );
 					isis::util::Selection isisGender( "male,female,other" );
@@ -251,22 +290,23 @@ public:
 
 					seq_descr.append( "_rtMPISiemensExport" );
 					myChunk.setPropertyAs<std::string>( "sequenceDescription", seq_descr );
-
+                    
 					if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
 						myChunk.setPropertyAs<util::fvector3>( "rowVec", phase_vec );
 						myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec );
 						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
-					} else {
+                    } else {
 						myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec );
 						myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec );
 						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
-					}
+                    }
 
 
+                    myChunk.setPropertyAs( "indexOrigin",  indexOrigin);
 					myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
 					myChunk.setPropertyAs<uint16_t>( "repetitionTime", rep_time );
 					myChunk.setPropertyAs<std::string>( "InPlanePhaseEncodingDirection", InPlanePhaseEncodingDirection );
-					myChunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3() );
+                    myChunk.setPropertyAs<util::fvector3>( "voxelGap",voxelGap );
 					std::string sn = boost::posix_time::to_simple_string( boost::posix_time::microsec_clock::local_time() );
 					myChunk.setPropertyAs<std::string>( "source", sn );
 					chunks.push_back( myChunk );
@@ -288,7 +328,7 @@ public:
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		throwGenericError( "Writing TCP/IP is not supportet" );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
@@ -326,6 +366,7 @@ private:
 										header.find( prop_end ) - ( header.find( prop_start ) + prop_start.length() ) );
 		}
 
+        LOG( isis::image_io::Runtime, isis::verbose_info ) << "Get information " << propName << "out of header with result: " << propString;
 		return propString;
 	}
 
@@ -355,14 +396,14 @@ isis::image_io::FileFormat *factory()
 	isis::image_io::ImageFormat_SiemensTcpIp *pluginRtExport = new isis::image_io::ImageFormat_SiemensTcpIp();
 
 	pluginRtExport->sock = socket( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
-	printf( "[receiver2] sock --> %i\n", pluginRtExport->sock );
+	LOG( isis::image_io::Runtime, isis::info ) << "[receiver2] sock --> " << pluginRtExport->sock;
 
 	memset( ( void * )&pluginRtExport->receiver_address, 0, sizeof( pluginRtExport->receiver_address ) );
 	pluginRtExport->receiver_address.sin_family      = PF_INET;
 	pluginRtExport->receiver_address.sin_addr.s_addr = INADDR_ANY;
 	pluginRtExport->receiver_address.sin_port        = htons( 54321 );
 
-	printf( "[bind] --> %i\n", bind( pluginRtExport->sock, ( struct sockaddr * )&pluginRtExport->receiver_address, sizeof( pluginRtExport->receiver_address ) ) );
+	LOG( isis::image_io::Runtime, isis::info ) << "[bind] --> " << bind( pluginRtExport->sock, ( struct sockaddr * )&pluginRtExport->receiver_address, sizeof( pluginRtExport->receiver_address ) );
 	pluginRtExport->receiver_address_length = sizeof( pluginRtExport->receiver_address );
 	pluginRtExport->counter = 0;
 	pluginRtExport->image_counter = 0;
@@ -370,7 +411,7 @@ isis::image_io::FileFormat *factory()
 	//Just a workaround to generate all the converters
 	isis::data::MemChunk<int32_t> test( 2, 3, 4 );
 	test.convertToType( isis::data::ValueArray<float>::staticID );
-	printf( "end of plugin load\n" );
+	//printf( "end of plugin load\n" );
 	return ( isis::image_io::FileFormat * ) pluginRtExport;
 }
 
