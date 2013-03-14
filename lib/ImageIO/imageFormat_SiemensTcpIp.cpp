@@ -208,17 +208,16 @@ public:
 
 					/********
 					 * for mosaic images get each slice position from header
-                     * this identifies the indexOrigin (min(z))
+                     * this identifies the indexOrigin (minimal slice position)
                      * and we need to calculate the voxel gap out of it (assumption: distance is the same for all slices)
 					 */
                     util::fvector3 voxelGap;
-                    util::fvector3 indexOrigin;
-                    
+                    util::fvector3 slice_pos_min;
+                    util::fvector3 slice_pos_max;
                     
                     if ((true == mosaic) && (1 < iim)){
                         printf( "get slice positions: \n");
-                        util::fvector3 slice_pos_min;
-                        util::fvector3 slice_pos_max;
+                        
                         
                         for( size_t _slice = 0; _slice < iim; _slice++ ) {
                             std::string slice_pos = "slice_position_";
@@ -226,7 +225,6 @@ public:
                             sprintf(buf, "%li", _slice);
                             slice_pos.append(buf);
                             util::fvector3 slice_pos_vec = getVectorFromString( getStringFromHeader( slice_pos, header ) );
-                            LOG( isis::image_io::Runtime, isis::error ) << "SLICE POS" << slice_pos;
                             switch (_slice) {
                                 case 0:
                                     slice_pos_min = slice_pos_vec;
@@ -241,15 +239,8 @@ public:
                                     }
                                     break;
                             }
-                            
-
                         }
                         voxelGap[2] = (slice_pos_max[2] - slice_pos_min[2]) / (iim - 1) - slice_thickness;
-                        indexOrigin[0] = fov_read/2  - slice_pos_min[0];
-                        indexOrigin[1] = fov_phase/2  - slice_pos_min[1];
-                        indexOrigin[2] = slice_pos_min[2];
-                        LOG( isis::image_io::Runtime, isis::error ) << "indexOrigin " << indexOrigin;
-                        LOG( isis::image_io::Runtime, isis::error ) << "voxelGap " << voxelGap;
                     }
                     
                    
@@ -292,18 +283,23 @@ public:
 					myChunk.setPropertyAs<std::string>( "sequenceDescription", seq_descr );
                     
 					if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
-						myChunk.setPropertyAs<util::fvector3>( "rowVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec );
+						// Multiplication with (1, -1, 1):
+                        // Scanner measures with read/phase
+                        // but the vector as row/column is only for y in opposite direction
+                        // Only valid for axial!! (TODO: change z for sagittal and ... for coronar)
+                        myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec  * util::fvector3(1, -1, 1));
+						myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec * util::fvector3(1, -1, 1) );
 						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
+						myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - fov_read/2, slice_pos_min[1] - fov_phase/2, slice_pos_min[2] ) );
                     } else {
-						myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec );
+						myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec  * util::fvector3(1, -1, 1) );
+						myChunk.setPropertyAs<util::fvector3>( "rowVec", phase_vec  * util::fvector3(1, -1, 1) );
 						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
+                        myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - fov_phase/2, slice_pos_min[1] - fov_read/2, slice_pos_min[2] ) );
                     }
 
 
-                    myChunk.setPropertyAs( "indexOrigin",  indexOrigin);
-					myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
+                    myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
 					myChunk.setPropertyAs<uint16_t>( "repetitionTime", rep_time );
 					myChunk.setPropertyAs<std::string>( "InPlanePhaseEncodingDirection", InPlanePhaseEncodingDirection );
                     myChunk.setPropertyAs<util::fvector3>( "voxelGap",voxelGap );
