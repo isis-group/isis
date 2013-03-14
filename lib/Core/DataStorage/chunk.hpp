@@ -354,7 +354,7 @@ public:
 		) {}
 	/**
 	 * Create a MemChunkNoDel as copy of a given raw memory block
-	 * This chunk won't be deleted automatically - HAVE TO BE DELETED MANUALLY
+	 * \warning This chunk won't be deleted automatically - IT HAS TO BE DELETED MANUALLY
 	 * This will create a MemChunkNoDel of the given size and fill it with the data at the given address.
 	 * No range check will be done.
 	 * An automatic conversion will be done if necessary.
