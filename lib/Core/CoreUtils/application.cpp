@@ -64,7 +64,7 @@ void Application::addLoggingParameter( std::string name )
 }
 void Application::removeLogging( std::string name )
 {
-	parameters.erase( name );
+	parameters.erase(std::string( "d" ) + name );
 	logs.erase( name );
 }
 
