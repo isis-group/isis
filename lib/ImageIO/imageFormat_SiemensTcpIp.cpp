@@ -211,12 +211,15 @@ namespace isis
                              * this identifies the indexOrigin (minimal slice position)
                              * and we need to calculate the voxel gap out of it (assumption: distance is the same for all slices)
                              */
+                            LOG(isis::image_io::Runtime, isis::error) << "SLICE_NORM_VEC "  << slice_norm_vec;
+                            LOG(isis::image_io::Runtime, isis::error) << "READ_VEC "  << read_vec;
+                            LOG(isis::image_io::Runtime, isis::error) << "PHASE_VEC "  << phase_vec;
                             util::fvector3 voxelGap;
                             util::fvector3 slice_pos_min;
                             util::fvector3 slice_pos_max;
                             
                             if ((true == mosaic) && (1 < iim)){
-                                printf( "get slice positions: \n");
+                                //printf( "get slice positions: \n");
                                 
                                 if ( 0 == slice_orient.compare( 0, slice_orient.length(), "TRANSVERSE" ) ) {
                                     for( size_t _slice = 0; _slice < iim; _slice++ ) {
@@ -225,6 +228,7 @@ namespace isis
                                         sprintf(buf, "%li", _slice);
                                         slice_pos.append(buf);
                                         util::fvector3 slice_pos_vec = getVectorFromString( getStringFromHeader( slice_pos, header ) );
+                                        LOG(isis::image_io::Runtime, isis::error) << "!! " << slice_pos << " : " << slice_pos_vec;
                                         
                                         switch (_slice) {
                                             case 0:
@@ -241,7 +245,10 @@ namespace isis
                                                 break;
                                         }
                                     }
-                                    voxelGap[2] = (slice_pos_max[2] - slice_pos_min[2]) / (iim - 1) - slice_thickness;}
+                                    float distx = slice_pos_max[0]-slice_pos_min[0];
+                                    float disty = slice_pos_max[1]-slice_pos_min[1];
+                                    float distz = slice_pos_max[2]-slice_pos_min[2];
+                                    voxelGap[2] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
                                 if ( 0 == slice_orient.compare( 0, slice_orient.length(), "SAGITTAL" ) ) {
                                     for( size_t _slice = 0; _slice < iim; _slice++ ) {
                                         std::string slice_pos = "slice_position_";
@@ -265,7 +272,11 @@ namespace isis
                                                 break;
                                         }
                                     }
-                                    voxelGap[0] = (slice_pos_max[0] - slice_pos_min[0]) / (iim - 1) - slice_thickness;}
+                                    float distz = slice_pos_max[0]-slice_pos_min[0];
+                                    float distx = slice_pos_max[1]-slice_pos_min[1];
+                                    float disty = slice_pos_max[2]-slice_pos_min[2];
+                                    voxelGap[0] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
+                                    
                                 if ( 0 == slice_orient.compare( 0, slice_orient.length(), "CORONAL" ) ) {
                                     for( size_t _slice = 0; _slice < iim; _slice++ ) {
                                         std::string slice_pos = "slice_position_";
@@ -289,7 +300,11 @@ namespace isis
                                                 break;
                                         }
                                     }
-                                    voxelGap[1] = (slice_pos_max[1] - slice_pos_min[1]) / (iim - 1) - slice_thickness;}
+                                    float distx = slice_pos_max[0]-slice_pos_min[0];
+                                    float distz = slice_pos_max[1]-slice_pos_min[1];
+                                    float disty = slice_pos_max[2]-slice_pos_min[2];
+                                    voxelGap[1] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
+
                             }
                             
                             
@@ -307,9 +322,9 @@ namespace isis
                             isis::util::Selection isisGender( "male,female,other" );
                             
                             if ( 1 == subject_gender ) {
-                                isisGender.set( "male" );
-                            } else if ( 2 == subject_gender ) {
                                 isisGender.set( "female" );
+                            } else if ( 2 == subject_gender ) {
+                                isisGender.set( "male" );
                             } else {
                                 isisGender.set( "other" );
                             }
@@ -336,14 +351,20 @@ namespace isis
                                     // Multiplication with (-1, 1, 1):
                                     // Scanner measures with read/phase
                                     // but the vector as row/column is only for x in opposite direction
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec",  phase_vec  * util::fvector3(-1, 1, 1)); // ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec * util::fvector3(-1, 1, 1) ); // ATTENTION HAS TO BE PHASE
+                                    util::fvector3 rowVec(phase_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE READ
+                                    util::fvector3 columnVec(read_vec  * util::fvector3(-1, 1, 1));// ATTENTION HAS TO BE PHASE
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
                                     myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-fov_read/2, slice_pos_min[1]-fov_phase/2, slice_pos_min[2]));
+                                    
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2] - offsetCorr[2]));
                                 } else {
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec  * util::fvector3(-1, 1, 1)); // ATTENTION HAS TO BE READ
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec  * util::fvector3(-1, 1, -1)); // ATTENTION HAS TO BE READ
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec * util::fvector3(-1, 1, 1) ); // ATTENTION HAS TO BE PHASE
                                     myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
+                                    
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - fov_phase/2, slice_pos_min[1] - fov_read/2, slice_pos_min[2] ) );
                                 }}
                             
@@ -385,7 +406,7 @@ namespace isis
                             std::string sn = boost::posix_time::to_simple_string( boost::posix_time::microsec_clock::local_time() );
                             myChunk.setPropertyAs<std::string>( "source", sn );
                             chunks.push_back( myChunk );
-                            LOG(isis::image_io::Runtime, isis::error) << "RTEXPORT CHUNK PROPS: " << myChunk;
+                            //LOG(isis::image_io::Runtime, isis::error) << "RTEXPORT CHUNK PROPS: " << myChunk;
                             
                             /******************************/
                             free( dataBuffer );
