@@ -141,12 +141,13 @@ namespace isis
                             //Fallunterscheidung
                             // Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> columnVec == col + rowVec == row
                             // Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> columnVec == row + rowVec == col
+                            // ACHTUNG: Wird hier im Bogenmass angegeben! 45 Grad = 0.7854 
                             std::string InPlanePhaseEncodingDirection;
                             
                             if ( 0 == slice_orient.compare( 0, slice_orient.length(), "TRANSVERSE" ) ) {
-                                InPlanePhaseEncodingDirection = ( -45 < inplane_rot && inplane_rot < 45 ) ? "COL" : "ROW";
+                                InPlanePhaseEncodingDirection = ( -0.7854 < inplane_rot && inplane_rot < 0.7854 ) ? "COL" : "ROW";
                             } else {
-                                InPlanePhaseEncodingDirection = ( -45 < inplane_rot && inplane_rot < 45 ) ? "ROW" : "COL";
+                                InPlanePhaseEncodingDirection = ( -0.7854 < inplane_rot && inplane_rot < 0.7854 ) ? "ROW" : "COL";
                             }
                             
                             size_t fov_read = atoi( getStringFromHeader( "fov_read", header ).c_str() );
@@ -211,16 +212,15 @@ namespace isis
                              * this identifies the indexOrigin (minimal slice position)
                              * and we need to calculate the voxel gap out of it (assumption: distance is the same for all slices)
                              */
-                            LOG(isis::image_io::Runtime, isis::error) << "SLICE_NORM_VEC "  << slice_norm_vec;
-                            LOG(isis::image_io::Runtime, isis::error) << "READ_VEC "  << read_vec;
-                            LOG(isis::image_io::Runtime, isis::error) << "PHASE_VEC "  << phase_vec;
+                            //LOG(isis::image_io::Runtime, isis::error) << "SLICE_NORM_VEC "  << slice_norm_vec;
+                            //LOG(isis::image_io::Runtime, isis::error) << "READ_VEC "  << read_vec;
+                            //LOG(isis::image_io::Runtime, isis::error) << "PHASE_VEC "  << phase_vec;
                             util::fvector3 voxelGap;
                             util::fvector3 slice_pos_min;
                             util::fvector3 slice_pos_max;
                             
                             if ((true == mosaic) && (1 < iim)){
-                                //printf( "get slice positions: \n");
-                                
+                                                                
                                 if ( 0 == slice_orient.compare( 0, slice_orient.length(), "TRANSVERSE" ) ) {
                                     for( size_t _slice = 0; _slice < iim; _slice++ ) {
                                         std::string slice_pos = "slice_position_";
@@ -228,8 +228,7 @@ namespace isis
                                         sprintf(buf, "%li", _slice);
                                         slice_pos.append(buf);
                                         util::fvector3 slice_pos_vec = getVectorFromString( getStringFromHeader( slice_pos, header ) );
-                                        LOG(isis::image_io::Runtime, isis::error) << "!! " << slice_pos << " : " << slice_pos_vec;
-                                        
+                                                                                
                                         switch (_slice) {
                                             case 0:
                                                 slice_pos_min = slice_pos_vec;
@@ -275,7 +274,7 @@ namespace isis
                                     float distz = slice_pos_max[0]-slice_pos_min[0];
                                     float distx = slice_pos_max[1]-slice_pos_min[1];
                                     float disty = slice_pos_max[2]-slice_pos_min[2];
-                                    voxelGap[0] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
+                                    voxelGap[2] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
                                     
                                 if ( 0 == slice_orient.compare( 0, slice_orient.length(), "CORONAL" ) ) {
                                     for( size_t _slice = 0; _slice < iim; _slice++ ) {
@@ -303,7 +302,7 @@ namespace isis
                                     float distx = slice_pos_max[0]-slice_pos_min[0];
                                     float distz = slice_pos_max[1]-slice_pos_min[1];
                                     float disty = slice_pos_max[2]-slice_pos_min[2];
-                                    voxelGap[1] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
+                                    voxelGap[2] = sqrt( distx * distx + disty * disty + distz* distz) / (iim - 1) - slice_thickness;}
 
                             }
                             
@@ -345,12 +344,13 @@ namespace isis
                             
                             seq_descr.append( "_rtMPISiemensExport" );
                             myChunk.setPropertyAs<std::string>( "sequenceDescription", seq_descr );
-                            
+                            // I know this part could be written less redundant but than it's even more confusing
+                            // to read who belongs to what 
                             if ( 0 == slice_orient.compare( 0, slice_orient.length(), "TRANSVERSE" ) ) {
                                 if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
                                     // Multiplication with (-1, 1, 1):
                                     // Scanner measures with read/phase
-                                    // but the vector as row/column is only for x in opposite direction
+                                    // but the vector as row/column depends on inplane rotation
                                     util::fvector3 rowVec(phase_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE READ
                                     util::fvector3 columnVec(read_vec  * util::fvector3(-1, 1, 1));// ATTENTION HAS TO BE PHASE
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
@@ -361,43 +361,60 @@ namespace isis
                                     
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2] - offsetCorr[2]));
                                 } else {
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec  * util::fvector3(-1, 1, -1)); // ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec * util::fvector3(-1, 1, 1) ); // ATTENTION HAS TO BE PHASE
+                                   
+                                    util::fvector3 rowVec(read_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE PHASE
+                                    util::fvector3 columnVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec);
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec);
                                     myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
-                                    
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - fov_phase/2, slice_pos_min[1] - fov_read/2, slice_pos_min[2] ) );
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] - offsetCorr[2]) );
+                                   
                                 }}
                             
                             if ( 0 == slice_orient.compare( 0, slice_orient.length(), "SAGITTAL" ) ) {
                                 if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
-                                    
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec",  phase_vec  );// ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec );// ATTENTION HAS TO BE PHASE
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( slice_thickness, fov_read/width_slice, fov_phase/height_slice) );
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0], slice_pos_min[1] - fov_read/2, slice_pos_min[2] -fov_phase/2));
-                                    
-                                                                      
+                                    util::fvector3 rowVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
+                                    util::fvector3 columnVec(read_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE PHASE
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec",  rowVec  );
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read/width_slice, fov_phase/height_slice, slice_thickness) );
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] -offsetCorr[2]));
+                                                                                                          
                                 } else {
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec  );// ATTENTION HAS TO BE PHASE
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec );// ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( slice_thickness, fov_phase/width_slice, fov_read/height_slice));
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0], slice_pos_min[1] - fov_phase/2, slice_pos_min[2] -fov_read/2 ) );
+                                    util::fvector3 rowVec(read_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE PHASE
+                                    util::fvector3 columnVec(phase_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE READ
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec  );
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase/width_slice, fov_read/height_slice, slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] -offsetCorr[2] ) );
+                                  
                                 }}
                             
                             if ( 0 == slice_orient.compare( 0, slice_orient.length(), "CORONAL" ) ) {
                                 if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec",  phase_vec  * util::fvector3(1, 1, -1)); // ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec  * util::fvector3(1, 1, -1)); // ATTENTION HAS TO BE PHASE
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read/width_slice, slice_thickness, fov_phase/height_slice ) );
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-fov_read/2, slice_pos_min[1], slice_pos_min[2]- fov_phase/2));
+                                   
+                                    util::fvector3 rowVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
+                                    util::fvector3 columnVec(read_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE PHASE
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec",  rowVec);
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec); 
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read/width_slice, fov_phase/height_slice, slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2]-offsetCorr[2]));
+                                    
                                  } else {
-                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec  * util::fvector3(1, 1, -1));// ATTENTION HAS TO BE READ
-                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec  * util::fvector3(1, 1, -1)); // ATTENTION HAS TO BE PHASE
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase/width_slice, slice_thickness, fov_read/height_slice ) );
-                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-fov_phase/2, slice_pos_min[1], slice_pos_min[2]- fov_read/2 ));
+                                    
+                                    util::fvector3 rowVec(read_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE PHASE
+                                    util::fvector3 columnVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
+                                    myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec);
+                                    myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec);
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase/width_slice, fov_read/height_slice, slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2]-offsetCorr[2]));
+                                     
                                 }}
-                            
-                            
                             
                             myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
                             myChunk.setPropertyAs<uint16_t>( "repetitionTime", rep_time );
