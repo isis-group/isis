@@ -477,8 +477,10 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 	}
 
 	//store current orientation (may override values set above)
-	if( !saved && !storeQForm( props, head ) ) //try to encode as quaternion
+	if( !saved ) {//try to encode as quaternion
 		storeSForm( props, head ); //fall back to normal matrix
+		storeQForm( props, head );
+        }
 
 	strcpy( head->magic, "n+1" );
 }
