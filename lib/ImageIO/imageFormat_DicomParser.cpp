@@ -44,6 +44,7 @@ template <typename S> void arrayToVecProp( S *array, util::PropertyMap &dest, co
 	else arrayToVecPropImp<S, util::vector4<S> >( array, dest, name, len );
 }
 
+template<typename T> bool noLatin( const T &t ) {return t >= 127;}
 }
 
 
@@ -108,7 +109,7 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
 void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	//@todo if we drop support for old yyyy.mm.dd this would be much easier
-	boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
+	static const boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
 	boost::cmatch results;
 	OFString buff;
 	elem->getOFString( buff, 0 );
@@ -259,12 +260,29 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
 	}
 	break;
+	case EVR_UN: { //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
+		//@todo do a better sanity check
+		Uint8 *buff;
+		elem->getUint8Array( buff ); // get the raw data
+		Uint32 len = elem->getLength();
+		const size_t nonLat = std::count_if( buff, buff + len, _internal::noLatin<Uint8> );
+
+		if( nonLat ) { // if its not "just text" encode it as base256
+			LOG( Runtime, info ) << "Using " << len << " bytes from " << name << "("
+								 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << ") as base256 because there are "
+								 << nonLat << " non latin characters in it";
+			std::stringstream o;
+			std::copy( buff, buff + len, std::ostream_iterator<Uint16>( o << std::hex ) );
+			map.setPropertyAs<std::string>( name, o.str() ); //stuff it into a string
+		} else
+			map.setPropertyAs<std::string>( name, std::string( ( char * )buff, len ) ); //stuff it into a string
+	}
+	break;
 	default: {
 		elem->getOFString( buff, 0 );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
+		LOG( Runtime, notice ) << "Implement me " << name << "("
+							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
+							   << buff;
 	}
 	break;
 	}
@@ -327,10 +345,10 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_PN:
 	default: {
 		elem->getOFStringArray( buff );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
+		LOG( Runtime, notice ) << "Implement me "
+							   << name << "("
+							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
+							   << buff;
 	}
 	break;
 	}
