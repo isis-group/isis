@@ -153,7 +153,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	}
 
 	LOG( Runtime, info )   << "Scanning " << util::MSubject( p ) << " for plugins";
-	boost::regex pluginFilter( std::string( "^" ) + DL_PREFIX + "isisImageFormat_" + "[[:word:]]+" + DL_SUFFIX + "$",boost::regex::perl|boost::regex::icase );
+	boost::regex pluginFilter( std::string( "^" ) + DL_PREFIX + "isisImageFormat_" + "[[:word:]]+" + DL_SUFFIX + "$", boost::regex::perl | boost::regex::icase );
 	unsigned int ret = 0;
 
 	for ( boost::filesystem::directory_iterator itr( p ); itr != boost::filesystem::directory_iterator(); ++itr ) {

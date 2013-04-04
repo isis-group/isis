@@ -424,7 +424,7 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 }
 void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
-	bool saved_sform = false,saved_qform=false;
+	bool saved_sform = false, saved_qform = false;
 
 	// implicit stuff
 	head->intent_code = 0;
@@ -481,9 +481,9 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 
 	// sform is to be used for geometry changes in postprocessing and can diverge from qform
 	// spm apparently doesn't know about that and only looks for the sform, so we "violate" the rule and store it in any case
-	if( !saved_sform ) 
-		storeSForm( props, head ); 
-		
+	if( !saved_sform )
+		storeSForm( props, head );
+
 
 	strcpy( head->magic, "n+1" );
 }

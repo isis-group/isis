@@ -90,7 +90,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 {
 	bool ret = false;
 	util::PropertyMap::DiffMap diff = img1.getDifference( img2 );
-	diff.erase("source"); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
+	diff.erase( "source" ); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
 	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
 	}

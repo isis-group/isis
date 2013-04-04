@@ -148,7 +148,8 @@ ValueArrayBase::Reference ValueArrayBase::createByID( unsigned short ID, size_t 
 ValueArrayBase::Reference ValueArrayBase::convertByID( short unsigned int ID, scaling_pair scaling )
 {
 	scaling = getScaling( scaling, ID );
-	if(scaling.first.isEmpty() || scaling.second.isEmpty()){ // if we don't have a scaling by now conversion wont be possible => abort
+
+	if( scaling.first.isEmpty() || scaling.second.isEmpty() ) { // if we don't have a scaling by now conversion wont be possible => abort
 		return ValueArrayBase::Reference();
 	} else {
 		static const util::Value<uint8_t> one( 1 );
