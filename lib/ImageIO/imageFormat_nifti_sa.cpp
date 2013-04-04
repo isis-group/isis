@@ -424,7 +424,7 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 }
 void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
-	bool saved = false;
+	bool saved_sform = false,saved_qform=false;
 
 	// implicit stuff
 	head->intent_code = 0;
@@ -450,10 +450,8 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			props.getPropertyAs<util::fvector4>( "nifti/srow_x" ).copyTo( head->srow_x );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_y" ).copyTo( head->srow_y );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_z" ).copyTo( head->srow_z );
-		} else
-			storeSForm( props, head );
-
-		saved = true;
+			saved_sform = true;
+		}
 	}
 
 	// store niftis original qform if its there
@@ -471,14 +469,21 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			head->qoffset_x = offset[0];
 			head->qoffset_y = offset[1];
 			head->qoffset_z = offset[2];
-			saved = true;
-		} else
-			saved = storeQForm( props, head );
+			saved_qform = true;
+		}
 	}
 
-	//store current orientation (may override values set above)
-	if( !saved && !storeQForm( props, head ) ) //try to encode as quaternion
-		storeSForm( props, head ); //fall back to normal matrix
+	// store current orientation (into fields which hasn't been set by now)
+
+	// qform is the original scanner coordinates and thus should always be there
+	if( !saved_qform )
+		storeQForm( props, head );
+
+	// sform is to be used for geometry changes in postprocessing and can diverge from qform
+	// spm apparently doesn't know about that and only looks for the sform, so we "violate" the rule and store it in any case
+	if( !saved_sform ) 
+		storeSForm( props, head ); 
+		
 
 	strcpy( head->magic, "n+1" );
 }
