@@ -12,6 +12,8 @@ FIND_PACKAGE(Git)
 cmake_minimum_required(VERSION 2.6)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
+include(CheckIncludeFiles)
+
 
 project(ISIS)
 
@@ -20,7 +22,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "2")
+set(ISIS_VERSION_PATCH "4")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -35,7 +37,14 @@ set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
 
+############################################################
+# check for byteswap intrinsics
+############################################################
+CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP)
 
+if(HAVE_BYTESWAP)
+	add_definitions(-DHAVE_BYTESWAP)
+endif(HAVE_BYTESWAP)
 
 if(NOT WIN32)
 ############################################################
@@ -50,12 +59,6 @@ endif(NOT WIN32)
 ############################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
-############################################################
-# general compiler flags
-############################################################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wstrict-aliasing=2" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
 
 ############################################################
 # compiler flags on 64Bit cpus

@@ -22,7 +22,7 @@ bool swapProperties( data::Image &image, const unsigned short dim )
 	std::vector<data::Chunk> buffer = chunks;
 	std::vector<data::Chunk> swapped_chunks;
 
-	for( util::ivector4::value_type one_above_dim = 0; one_above_dim < size[dim+1]; one_above_dim++ ) {
+	for( util::ivector4::value_type one_above_dim = 0; one_above_dim < size[dim + 1]; one_above_dim++ ) {
 		util::ivector4::value_type reverse_count = size[dim] - 1;
 
 		for( util::ivector4::value_type count = 0; count < size[dim]; count++, reverse_count-- ) {

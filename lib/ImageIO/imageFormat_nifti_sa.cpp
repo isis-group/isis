@@ -13,13 +13,10 @@ namespace image_io
 
 namespace _internal
 {
-WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): data::_internal::NDimensional<4>( image ), m_doFlip( doFlip ), m_bpv( bitsPerVoxel )
-{
-	if( doFlip ) {
-		data::Image dummy( image );
-		flip_dim = dummy.mapScannerAxisToImageDimension( data::z );
-	}
-}
+WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
+
+void WriteOp::addFlip( data::dimensions dim ) {flip_list.insert( dim );}
+
 size_t WriteOp::getDataSize()
 {
 	size_t bitsize = getVolume() * m_bpv;
@@ -67,12 +64,26 @@ bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 		return true;
 	}
 }
-void WriteOp::applyFlip ( isis::data::ValueArrayReference dat, isis::util::vector4< size_t > chunkSize )
+void WriteOp::applyFlipToBlock ( isis::data::ValueArrayReference dat, util::vector4< size_t > chunkSize )
 {
-	if( m_doFlip ) {
+	if( !flip_list.empty() ) {
 		// wrap the copied part back into a Chunk to flip it
 		data::Chunk cp( dat, chunkSize[data::rowDim], chunkSize[data::columnDim], chunkSize[data::sliceDim], chunkSize[data::timeDim] ); // this is a cheap copy
-		cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
+
+		//iterate through all flips within than the block dimensionality
+		for( std::set<data::dimensions>::const_iterator i = flip_list.begin(); i != flip_list.end() && *i < cp.getRelevantDims(); i++ ) {
+			cp.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
+		}
+	}
+}
+
+void WriteOp::applyFlipToCoords ( isis::util::vector4< size_t >& coords, isis::data::dimensions blockdims )
+{
+	if( !flip_list.empty() ) {
+		//iterate through all flips above than the block dimensionality
+		for( std::set<data::dimensions>::const_iterator i = flip_list.lower_bound( blockdims ); i != flip_list.end(); i++ ) {
+			coords[*i] = getDimSize( *i ) - coords[*i] - 1;
+		}
 	}
 }
 
@@ -82,15 +93,17 @@ class CommonWriteOp: public WriteOp
 	const unsigned short m_targetId;
 	const data::scaling_pair m_scale;
 public:
-	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel, bool doFlip = false ):
-		WriteOp( image, bitsPerVoxel, doFlip ),
+	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel ):
+		WriteOp( image, bitsPerVoxel ),
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 
 	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
+		applyFlipToCoords( posInImage, ( data::dimensions )ch.getRelevantDims() );
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 		data::ValueArrayReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValueArrayBase().copyTo( *out_data, m_scale );
-		applyFlip( out_data, ch.getSizeAsVector() );
+
+		applyFlipToBlock( out_data, ch.getSizeAsVector() );
 		return true;
 	}
 
@@ -140,7 +153,7 @@ public:
 			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 			data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
 			cp.ptr = &out_data[0];
-			cp.mode = (uint8_t)posInImage[data::timeDim]; //the "timesteps" represent the color thus there are just 3
+			cp.mode = ( uint8_t )posInImage[data::timeDim]; //the "timesteps" represent the color thus there are just 3
 			ch.foreachVoxel( cp );
 			assert( cp.ptr == &out_data[0] + out_data.getLength() );
 		}
@@ -211,10 +224,31 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 }
 util::istring ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return ".nii";}
 
+void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions flipdim )
+{
+	static const char *names[] = {"rowVec", "columnVec", "sliceVec"};
+	assert( flipdim <= data::sliceDim );
+	const float vsize = image.getPropertyAs<util::fvector3>( "voxelSize" )[flipdim] +
+						( image.hasProperty( "voxelGap" ) ? image.getPropertyAs<util::fvector3>( "voxelGap" )[flipdim] : 0 );
+	const float middle_to_middle = ( image.getSizeAsVector()[flipdim] - 1 ) * vsize; // the distance from the middle of the current first voxel to the "going to be first"
+	util::fvector3 &prop = image.propertyValue( names[flipdim] ).castTo<util::fvector3>();
+	util::fvector3 &origin = image.propertyValue( "indexOrigin" ).castTo<util::fvector3>();
+	origin += prop * middle_to_middle; // move the origin along the repective edge to "the other end"
+	LOG( Debug, verbose_info ) << "moved indexOrigin along " << prop *middle_to_middle << " to " << origin;
+	prop *= -1; // and invert that vector
+}
+
+float ImageFormat_NiftiSa::determinant( const util::Matrix3x3< float >& m )
+{
+	return m.elem( 0, 0 ) * m.elem( 1, 1 ) * m.elem( 2, 2 ) + m.elem( 0, 1 ) * m.elem( 1, 2 ) * m.elem( 2, 0 ) + m.elem( 0, 2 ) * m.elem( 1, 0 ) * m.elem( 2, 1 )
+		   - m.elem( 0, 0 ) * m.elem( 1, 2 ) * m.elem( 2, 1 ) - m.elem( 0, 1 ) * m.elem( 1, 0 ) * m.elem( 2, 2 ) - m.elem( 0, 2 ) * m.elem( 1, 1 ) * m.elem( 2, 0 );
+}
+
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
 {
 
-	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims() == img.getRelevantDims() ) { // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
+	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims() != data::sliceDim || img.getSizeAsVector()[data::sliceDim] <= 1 ) {
+		// chunks are no slices, or there is only one slice - just choose NIFTI_SLICE_SEQ_INC
 		slice_code = NIFTI_SLICE_SEQ_INC;
 	} else {
 		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime" : "acquisitionNumber";
@@ -712,10 +746,10 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			if( swap_endian ) {
 				LOG( Runtime, info ) << "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
-				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ) << "M)";
 			} else {
 				LOG( Runtime, info ) << "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
-				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ) << "M)";
 			}
 
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
@@ -727,6 +761,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		}
 	}
 
+	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data_src, size[0], size[1], size[2], size[3] ) );
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();
@@ -762,7 +797,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 				throwGenericError( "unsupported datatype" );
 			} else {
 				LOG( Runtime, info ) << data::ValueArray<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
-				return std::auto_ptr<_internal::WriteOp>( new _internal::FslRgbWriteOp( src ) );
+				return std::auto_ptr< _internal::WriteOp >( new _internal::FslRgbWriteOp( src ) );
 			}
 
 			break;
@@ -770,12 +805,13 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	}
 
 	// generic case (use generic scalar writer for the target_id)
-	return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, target_id, bpv, ( dialect == "spm" ) ) );
+	return std::auto_ptr< _internal::WriteOp >( new _internal::CommonWriteOp( src, target_id, bpv ) );
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
+	data::Image image = img;
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
@@ -791,44 +827,66 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 				throwGenericError( filename + " could not be opened" );
 		}
 
-		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming to to fsl
+		if( dialect == "spm" ) {
+			writer->addFlip( image.mapScannerAxisToImageDimension( data::z ) );
+		} else if( dialect == "fsl" ) {
+			//dcm2nii flips the slice ordering of a mosaic if the determinant if the orientation is negative
+			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
+			if( image.hasProperty( "DICOM/ImageType" ) ) {
+				const util::slist tp = image.getPropertyAs<util::slist>( "DICOM/ImageType" );
+				const util::slist::const_iterator was_mosaic = std::find( tp.begin(), tp.end(), "WAS_MOSAIC" );
+				const util::Matrix3x3<float> mat( image.getPropertyAs<util::fvector3>( "rowVec" ), image.getPropertyAs<util::fvector3>( "columnVec" ), image.getPropertyAs<util::fvector3>( "sliceVec" ) );
+
+				if( was_mosaic != tp.end() && determinant( mat ) < 0 ) {
+					LOG( Runtime, info ) << "Flipping slices of a siemens mosaic image for fsl compatibility";
+					flipGeometry( image, data::sliceDim );
+					writer->addFlip( data::sliceDim );
+				}
+			}
+
+			//invert columnVec and flip the order of the images lines
+			//well, you know ... ask dcm2nii ....
+			LOG( Runtime, info ) << "Flipping columns of image for fsl compatibility";
+			flipGeometry( image, data::columnDim );
+			writer->addFlip( data::columnDim );
+		}
+
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming as dcm2nii does it
 		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
 			std::ofstream bvalFile( ( makeBasename( filename ).first + ".bval" ).c_str() );
 			bvecFile.exceptions( std::ios::failbit | std::ios::badbit );
 			bvalFile.exceptions( std::ios::failbit | std::ios::badbit );
-			std::list<util::dvector4> bvecList;
+			std::list<util::dvector3> bvecList;
 
 			for( size_t i = 0; i < image.getNrOfTimesteps(); i++ ) { // go through all "volumes"
-				const data::Chunk &chunk = image.getChunk( 0, 0, 0, i );
-				util::dvector4 gradient = chunk.getPropertyAs<util::dvector4>( "diffusionGradient" );
-				const util::Matrix4x4<double> M(
-					chunk.getPropertyAs<util::dvector4>( "rowVec" ),
-					chunk.getPropertyAs<util::dvector4>( "columnVec" ),
-					chunk.getPropertyAs<util::dvector4>( "sliceVec" ),
-					util::dvector4( 0, 0, 0, 1 )
+				const util::PropertyMap chunk = image.getChunk( 0, 0, 0, i );
+				util::dvector3 gradient = chunk.getPropertyAs<util::dvector3>( "diffusionGradient" );
+				const util::Matrix3x3<double> M(
+					chunk.getPropertyAs<util::dvector3>( "rowVec" ),
+					chunk.getPropertyAs<util::dvector3>( "columnVec" ),
+					chunk.getPropertyAs<util::dvector3>( "sliceVec" )
 				);
 
 				// the bvalue is the length of the gradient direction,
 				bvalFile << gradient.len() << " ";
 
-				if(gradient.len()>0){
+				if( gradient.len() > 0 ) {
 					gradient.norm();// the direction itself must be normalized
-					bvecList.push_back( nifti2isis.transpose().dot( M ).dot( gradient ) ); // .. transformed into nifti space and stored
+					bvecList.push_back( M.dot( gradient ) ); // .. transformed into slice space and stored
 				} else {
-					bvecList.push_back( util::dvector4(0,0,0) );
+					bvecList.push_back( util::dvector3( 0, 0, 0 ) );
 				}
 			}
 
 			// the bvec file is the x-elements of all directions, then all y-elements and so on...
-			// dont ask me, ask fsl ...
 			bvecFile.precision( 14 );
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[0] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[0] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[1] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[1] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector4 & dir, bvecList )bvecFile << dir[2] << " ";
+			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[2] << " ";
 			bvecFile << std::endl;
 
 			LOG( Runtime, notice ) << "Stored bvec information for fsl to " << makeBasename( filename ).first + ".bvec";
@@ -851,7 +909,12 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 			header->cal_max = minmax.second;
 		}
 
-		storeHeader( image.getChunk( 0, 0 ), header ); // store properties of the "lowest" chunk merged with the image's properties into the header
+		{
+			//join the properties of the first chunk into the image and store that to the header
+			util::PropertyMap props = image;
+			props.join( image.getChunkAt( 0, false ) );
+			storeHeader( props, header );
+		}
 
 		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );
@@ -1057,11 +1120,7 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 	}
 
 	// compute the determinant to determine if the transformation is proper
-	const float determinant =
-	col[0][0] * col[1][1] * col[2][2] - col[0][0] * col[1][2] * col[2][1] - col[0][1] * col[1][0] * col[2][2] +
-	col[0][1] * col[1][2] * col[2][0] + col[0][2] * col[1][0] * col[2][1] - col[0][2] * col[1][1] * col[2][0];
-
-	if( determinant > 0 ) {
+	if( determinant( util::Matrix3x3<float>( col[0], col[1], col[2] ) ) > 0 ) {
 		head->pixdim[0] = 1;
 	} else { // improper => flip 3rd column
 		col[2][0] = -col[2][0] ;

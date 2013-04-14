@@ -147,7 +147,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	const util::fvector3 indexOrigin( m_ImageISIS->getPropertyAs<util::fvector3>( "indexOrigin" ) );
 	util::fvector3 spacing( m_ImageISIS->getPropertyAs<util::fvector3>( "voxelSize" ) );
 
-  //MH FIXME: changed
+	//MH FIXME: changed
 	//if( spacing[3] == 0 ) { spacing[3] = 1; }
 
 	const util::fvector3 readVec = m_ImageISIS->getPropertyAs<util::fvector3>( "rowVec" );
@@ -232,7 +232,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 
 template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAdapter::internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter )
 {
-    
+
 	typename TImageITK::PointType indexOrigin = src->GetOrigin();
 	typename TImageITK::SizeType imageSize = src->GetBufferedRegion().GetSize();
 	typename TImageITK::SpacingType imageSpacing = src->GetSpacing();
@@ -259,19 +259,19 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	tmpChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
 	tmpChunk.setPropertyAs( "indexOrigin", util::fvector3( static_cast<float>( indexOrigin[0] ),
 							static_cast<float>( indexOrigin[1] ),
-							static_cast<float>( indexOrigin[2] )) );
+							static_cast<float>( indexOrigin[2] ) ) );
 	tmpChunk.setPropertyAs( "rowVec"     , util::fvector3( static_cast<float>( imageDirection[0][0] ),
 							static_cast<float>( imageDirection[1][0] ),
-							static_cast<float>( imageDirection[2][0] )) );
+							static_cast<float>( imageDirection[2][0] ) ) );
 	tmpChunk.setPropertyAs( "columnVec"  , util::fvector3( ( imageDirection[0][1] ),
 							( imageDirection[1][1] ),
-							( imageDirection[2][1] )) );
+							( imageDirection[2][1] ) ) );
 	tmpChunk.setPropertyAs( "sliceVec"   , util::fvector3( static_cast<float>( imageDirection[0][2] ),
 							static_cast<float>( imageDirection[1][2] ),
-							static_cast<float>( imageDirection[2][2] )) );
+							static_cast<float>( imageDirection[2][2] ) ) );
 	tmpChunk.setPropertyAs( "voxelSize"  , util::fvector3( static_cast<float>( imageSpacing[0] ),
 							static_cast<float>( imageSpacing[1] ),
-							static_cast<float>( imageSpacing[2] )) );
+							static_cast<float>( imageSpacing[2] ) ) );
 	tmpChunk.setPropertyAs<u_int32_t>( "acquisitionNumber", 1 );
 	data::TypedImage<ISISRepn> retImage( tmpChunk );
 

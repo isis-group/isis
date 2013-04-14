@@ -43,6 +43,9 @@ public:
 
 private:
 	boost::shared_ptr<util::ProgressFeedback> m_feedback;
+	// use ImageIO's logging here instead of the normal data::Runtime/Debug
+	typedef ImageIoLog Runtime;
+	typedef ImageIoDebug Debug;
 public:
 	/**
 	 * Load data from a set of files or directories with given paths and dialect.

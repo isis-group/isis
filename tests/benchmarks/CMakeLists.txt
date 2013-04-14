@@ -18,6 +18,7 @@ add_executable( valueIteratorStresstest valueIteratorStresstest.cpp)
 add_executable( typedIteratorStresstest typedIteratorStresstest.cpp)
 add_executable( vectorStresstest vectorStresstest.cpp)
 add_executable( chunkVoxelStressTest chunkVoxelStressTest.cpp )
+add_executable( byteswapStressTest byteswapStresstest.cpp )
 
 target_link_libraries( valueIteratorStresstest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( typedIteratorStresstest ${Boost_LIBRARIES} ${isis_core_lib} )
@@ -25,6 +26,7 @@ target_link_libraries( imageStresstest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( valueArrayStresstest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( vectorStresstest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( chunkVoxelStressTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( byteswapStressTest ${Boost_LIBRARIES} ${isis_core_lib} )
 
 ############################################################
 # add unit test targets

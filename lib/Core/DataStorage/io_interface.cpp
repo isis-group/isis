@@ -95,7 +95,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
 		util::istring check = ifilename.substr( ifilename.length() - suffix.length(), suffix.length() );
 
-		if( filename[filename.length()-suffix.length()-1] == '.' && check == suffix ) {
+		if( filename[filename.length() - suffix.length() - 1] == '.' && check == suffix ) {
 			return std::make_pair( filename.substr( 0, filename.length() - suffix.length() - 1 ), filename.substr( filename.length() - suffix.length() - 1 ) );
 		}
 	}

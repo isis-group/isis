@@ -66,18 +66,18 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
 {
-	parameters[std::string( "in" )+suffix] = util::slist();
-	parameters[std::string( "in" )+suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
-	parameters[std::string( "in" )+suffix].needed() = needed;
+	parameters[std::string( "in" ) + suffix] = util::slist();
+	parameters[std::string( "in" ) + suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
+	parameters[std::string( "in" ) + suffix].needed() = needed;
 
-	parameters[std::string( "rf" )+suffix] = std::string();
-	parameters[std::string( "rf" )+suffix].needed() = false;
-	parameters[std::string( "rf" )+suffix].hidden() = true;
+	parameters[std::string( "rf" ) + suffix] = std::string();
+	parameters[std::string( "rf" ) + suffix].needed() = false;
+	parameters[std::string( "rf" ) + suffix].hidden() = true;
 
-	parameters[std::string( "rf" )+suffix].setDescription( std::string( "Override automatic detection of file suffix for reading" + desc + " with given value" ) );
-	parameters[std::string( "rdialect" )+suffix] = std::string();
-	parameters[std::string( "rdialect" )+suffix].needed() = false;
-	parameters[std::string( "rdialect" )+suffix].setDescription(
+	parameters[std::string( "rf" ) + suffix].setDescription( std::string( "Override automatic detection of file suffix for reading" + desc + " with given value" ) );
+	parameters[std::string( "rdialect" ) + suffix] = std::string();
+	parameters[std::string( "rdialect" ) + suffix].needed() = false;
+	parameters[std::string( "rdialect" ) + suffix].setDescription(
 		std::string( "choose dialect for reading" ) + desc + ". The available dialects depend on the capabilities of the used IO plugin" );
 
 	if( parameters.find( "np" ) == parameters.end() ) {
@@ -90,18 +90,18 @@ void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, cons
 
 void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
 {
-	parameters[std::string( "out" )+suffix] = std::string();
-	parameters[std::string( "out" )+suffix].setDescription( "output filename" + desc );
-	parameters[std::string( "out" )+suffix].needed() = needed;
+	parameters[std::string( "out" ) + suffix] = std::string();
+	parameters[std::string( "out" ) + suffix].setDescription( "output filename" + desc );
+	parameters[std::string( "out" ) + suffix].needed() = needed;
 
-	parameters[std::string( "wf" )+suffix] = std::string();
-	parameters[std::string( "wf" )+suffix].needed() = false;
-	parameters[std::string( "wf" )+suffix].setDescription( "Override automatic detection of file suffix for writing" + desc + " with given value" );
-	parameters[std::string( "wf" )+suffix].hidden() = true;
+	parameters[std::string( "wf" ) + suffix] = std::string();
+	parameters[std::string( "wf" ) + suffix].needed() = false;
+	parameters[std::string( "wf" ) + suffix].setDescription( "Override automatic detection of file suffix for writing" + desc + " with given value" );
+	parameters[std::string( "wf" ) + suffix].hidden() = true;
 
-	parameters[std::string( "wdialect" )+suffix] = std::string();
-	parameters[std::string( "wdialect" )+suffix].needed() = false;
-	parameters[std::string( "wdialect" )+suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help-io\" for a list of the plugins and their supported dialects" );
+	parameters[std::string( "wdialect" ) + suffix] = std::string();
+	parameters[std::string( "wdialect" ) + suffix].needed() = false;
+	parameters[std::string( "wdialect" ) + suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help-io\" for a list of the plugins and their supported dialects" );
 	std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 	// remove some types which are useless as representation
 	// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
@@ -117,16 +117,16 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 		i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
 	}
 
-	parameters[std::string( "repn" )+suffix] = util::Selection( types );
-	parameters[std::string( "repn" )+suffix].needed() = false;
-	parameters[std::string( "repn" )+suffix].setDescription(
+	parameters[std::string( "repn" ) + suffix] = util::Selection( types );
+	parameters[std::string( "repn" ) + suffix].needed() = false;
+	parameters[std::string( "repn" ) + suffix].setDescription(
 		"Representation in which the data" + desc + " shall be written" );
 
-	parameters[std::string( "scale_mode" )+suffix] = util::Selection( "noscale,autoscale,noupscale,upscale", "autoscale" );
-	parameters[std::string( "scale_mode" )+suffix].needed() = false;
-	parameters[std::string( "scale_mode" )+suffix].hidden() = true;
+	parameters[std::string( "scale_mode" ) + suffix] = util::Selection( "noscale,autoscale,noupscale,upscale", "autoscale" );
+	parameters[std::string( "scale_mode" ) + suffix].needed() = false;
+	parameters[std::string( "scale_mode" ) + suffix].hidden() = true;
 
-	parameters[std::string( "scale_mode" )+suffix].setDescription(
+	parameters[std::string( "scale_mode" ) + suffix].setDescription(
 		"Scaling strategy to be used when converting into the datatype given in with -repn" + suffix );
 
 	if( parameters.find( "np" ) == parameters.end() ) {
@@ -165,9 +165,9 @@ bool IOApplication::autoload( bool exitOnError )
 }
 bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback )
 {
-	util::slist input = parameters[std::string( "in" )+suffix];
-	std::string rf = parameters[std::string( "rf" )+suffix];
-	std::string dl = parameters[std::string( "rdialect" )+suffix];
+	util::slist input = parameters[std::string( "in" ) + suffix];
+	std::string rf = parameters[std::string( "rf" ) + suffix];
+	std::string dl = parameters[std::string( "rdialect" ) + suffix];
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
 			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
@@ -219,11 +219,11 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_
 }
 bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
 {
-	const util::Selection repn = parameters[std::string( "repn" )+suffix];
-	const util::Selection scale_mode = parameters[std::string( "scale_mode" )+suffix];
-	const std::string output = parameters[std::string( "out" )+suffix];
-	const std::string wf = parameters[std::string( "wf" )+suffix];
-	const std::string dl = parameters[std::string( "wdialect" )+suffix];
+	const util::Selection repn = parameters[std::string( "repn" ) + suffix];
+	const util::Selection scale_mode = parameters[std::string( "scale_mode" ) + suffix];
+	const std::string output = parameters[std::string( "out" ) + suffix];
+	const std::string wf = parameters[std::string( "wf" ) + suffix];
+	const std::string dl = parameters[std::string( "wdialect" ) + suffix];
 	LOG( Runtime, info )
 			<< "Writing " << out_images.size() << " images"
 			<< ( repn ? std::string( " as " ) + ( std::string )repn : "" )
@@ -233,7 +233,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 
-	LOG_IF( parameters[std::string( "scale_mode" )+suffix].isSet() && repn == 0, Runtime, warning )
+	LOG_IF( parameters[std::string( "scale_mode" ) + suffix].isSet() && repn == 0, Runtime, warning )
 			<< "Ignoring -scale_mode" << suffix << " " << util::MSubject( scale_mode )
 			<<  ", because -repn" << suffix << " was not given";
 
