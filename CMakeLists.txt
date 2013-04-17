@@ -137,7 +137,7 @@ macro( build_manpage name desc)
 			COMMENT "(Re)Generating manpage ${name}.1"
             VERBATIM
 		)
-		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI Tools")
+		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI_Tools")
 	endif(MANPAGES)
 endmacro( build_manpage )
 
