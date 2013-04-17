@@ -4,11 +4,11 @@ Priority: extra
 Maintainer: ISIS Group <gr_isis@cbs.mpg.de>
 Uploaders: Enrico Reimer <reimer@cbs.mpg.de>, Michael Hanke <mih@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), cmake, libbz2-dev,
- libmuparser-dev, libvia-dev (>= 2.0.0~),
+ libmuparser-dev,
  liboil0.3-dev | liboil-dev, libqt4-dev,
  libpng12-dev | libpng-dev, libtiff4-dev | libtiff-dev,
  libdcmtk2-dev | libdcmtk1-dev, libboost-iostreams-dev, libboost-filesystem-dev,
- libboost-system-dev, libboost-date-time-dev, help2man
+ libboost-system-dev, libboost-date-time-dev
 Standards-Version: 3.9.2
 Homepage: https://github.com/isis-group
 Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git

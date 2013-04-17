@@ -1,3 +1,10 @@
+isis (0.7.5-2) UNRELEASED; urgency=low
+
+  * hardwire VIAIO_LIBRARY to /usr/lib/libviaio.a to get rid of runtime 
+    dependency on libvia
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 17 Apr 2013 14:34:25 +0200
+
 isis (0.7.5-1) UNRELEASED; urgency=low
 
   * in nifti_sa _always_ store the sform to make SPM happy

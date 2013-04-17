@@ -44,7 +44,8 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
             -DGIT_REVISION="Debian-$(debver)" \
             -DCMAKE_C_FLAGS=-msse2 \
-            -DCMAKE_CXX_FLAGS=-msse2
+            -DCMAKE_CXX_FLAGS=-msse2 \
+            -DVIAIO_LIBRARY=/usr/lib/libviaio.a
 
 override_dh_auto_test:
 	# don't work ATM
