@@ -17,6 +17,6 @@ SET(ISIS_PLUGIN_INFIX @ISIS_PLUGIN_INFIX@)
 SET(CMAKE_PREFIX_PATH @CMAKE_INSTALL_PREFIX@ ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core
 FIND_LIBRARY(ISIS_LIB "isis_core")
 
-MESSAGE(STATUS "isis library: ${ISIS_LIB}")
-MESSAGE(STATUS "isis library dependencies: ${ISIS_LIB_DEPENDS}")
+MESSAGE(STATUS "isis core library: ${ISIS_LIB}")
+MESSAGE(STATUS "isis core library dependencies: ${ISIS_LIB_DEPENDS}")
 MESSAGE(STATUS "isis include dirs: ${ISIS_INCLUDE_DIRS}")
