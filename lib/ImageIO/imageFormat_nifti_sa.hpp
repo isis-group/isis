@@ -172,16 +172,16 @@ class ImageFormat_NiftiSa: public FileFormat
 		return data::ValueArray<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
-	static std::list<data::Chunk> parseSliceOrdering( const _internal::nifti_1_header *head, data::Chunk current );
+	static std::list<data::Chunk> parseSliceOrdering( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk current );
 
 	static bool parseDescripForSPM( util::PropertyMap &props, const char desc[] );
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
-	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
+	static std::list<data::Chunk> parseHeader( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
-	bool checkSwapEndian ( _internal::nifti_1_header *header );
+	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
 public:
 	ImageFormat_NiftiSa();

@@ -291,7 +291,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 
 }
 
-std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const _internal::nifti_1_header *head, data::Chunk current )
+std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk current )
 {
 	double time_fac;
 
@@ -487,7 +487,7 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 
 	strcpy( head->magic, "n+1" );
 }
-std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io::_internal::nifti_1_header *head, isis::data::Chunk props )
+std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk props )
 {
 	unsigned short dims = head->dim[0];
 	double time_fac = 1;
@@ -605,7 +605,7 @@ isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray< u
 	return ret;
 }
 
-bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header *header )
+bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_internal::nifti_1_header > header )
 {
 #define DO_SWAP(VAR) VAR=data::endianSwap(VAR)
 #define DO_SWAPA(VAR,SIZE) data::endianSwapArray(VAR,VAR+SIZE,VAR);
@@ -674,7 +674,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//get the header - we use it directly from the file
-	_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &mfile[0] );
+	boost::shared_ptr< _internal::nifti_1_header > header = boost::static_pointer_cast<_internal::nifti_1_header>(mfile.getRawAddress());
 	const bool swap_endian = checkSwapEndian( header );
 
 	if( header->sizeof_hdr < 348 ) {
