@@ -148,13 +148,18 @@ ValueArrayBase::Reference ValueArrayBase::createByID( unsigned short ID, size_t 
 ValueArrayBase::Reference ValueArrayBase::convertByID( short unsigned int ID, scaling_pair scaling )
 {
 	scaling = getScaling( scaling, ID );
-	static const util::Value<uint8_t> one( 1 );
-	static const util::Value<uint8_t> zero( 0 );
 
-	if( scaling.first->eq( one ) && scaling.second->eq( zero ) && getTypeID() == ID ) { // if type is the same and scaling is 1/0
-		return *this; //cheap copy
+	if( scaling.first.isEmpty() || scaling.second.isEmpty() ) { // if we don't have a scaling by now conversion wont be possible => abort
+		return ValueArrayBase::Reference();
 	} else {
-		return copyByID( ID, scaling ); // convert into new
+		static const util::Value<uint8_t> one( 1 );
+		static const util::Value<uint8_t> zero( 0 );
+
+		if( scaling.first->eq( one ) && scaling.second->eq( zero ) && getTypeID() == ID ) { // if type is the same and scaling is 1/0
+			return *this; //cheap copy
+		} else {
+			return copyByID( ID, scaling ); // convert into new
+		}
 	}
 }
 

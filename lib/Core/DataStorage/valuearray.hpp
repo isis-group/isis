@@ -107,18 +107,21 @@ template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic m
 		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
 		//use complex as a two element array and find the respective minmax for the two elements
 		const std::pair<T, T > minmax[] = {
-			calcMinMax<T, 2>( reinterpret_cast<const T*>(&ref[0]), ref.getLength() * 2 ),
-			calcMinMax<T, 2>( reinterpret_cast<const T*>(&ref[0])+1, ref.getLength() * 2 )
+			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ), ref.getLength() * 2 ),
+			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ) + 1, ref.getLength() * 2 )
 		};
 
 		//also use return as two element array and stuff results from above in there
 		std::pair<std::complex<T> , std::complex<T> > ret;
-		T *min = reinterpret_cast<T*>(&ret.first), *max=reinterpret_cast<T*>(&ret.second);
-		for(int_fast8_t i=0;i<2;i++){
-			min[i]=minmax[i].first;
-			max[i]=minmax[i].second;
+		T *min = reinterpret_cast<T *>( &ret.first ), *max = reinterpret_cast<T *>( &ret.second );
+
+		for( int_fast8_t i = 0; i < 2; i++ ) {
+			min[i] = minmax[i].first;
+			max[i] = minmax[i].second;
 		}
-		return ret;	}
+
+		return ret;
+	}
 };
 /// @endcond
 API_EXCLUDE_END

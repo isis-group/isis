@@ -30,7 +30,7 @@ int main()
 	boost::timer timer;
 
 	data::MemChunk<TYPE> big_chunk( chunk_size, chunk_size, chunk_size, chunk_size );
-	const util::ivector4 size = big_chunk.getSizeAsVector();
+	const util::vector4<size_t> size = big_chunk.getSizeAsVector();
 	std::cout << "Chunk size is: " << size << std::endl;
 	TYPE *ptr = &big_chunk.voxel<TYPE>( 0 );
 	size_t volume = big_chunk.getVolume();
@@ -46,10 +46,10 @@ int main()
 
 	timer.restart();
 
-	for( util::ivector4::value_type t = 0; t < size[data::timeDim]; t++ ) {
-		for( util::ivector4::value_type s = 0; s < size[data::sliceDim]; s++ ) {
-			for( util::ivector4::value_type c = 0; c < size[data::columnDim]; c++ ) {
-				for( util::ivector4::value_type r = 0; r < size[data::rowDim]; r++ ) {
+	for( size_t t = 0; t < size[data::timeDim]; t++ ) {
+		for( size_t s = 0; s < size[data::sliceDim]; s++ ) {
+			for( size_t c = 0; c < size[data::columnDim]; c++ ) {
+				for( size_t r = 0; r < size[data::rowDim]; r++ ) {
 					TYPE &ref = big_chunk.voxel<TYPE>( r, c, s, t );
 					ref = 2;
 				}
@@ -62,10 +62,10 @@ int main()
 
 	timer.restart();
 
-	for( util::ivector4::value_type t = 0; t < size[data::timeDim]; t++ ) {
-		for( util::ivector4::value_type s = 0; s < size[data::sliceDim]; s++ ) {
-			for( util::ivector4::value_type c = 0; c < size[data::columnDim]; c++ ) {
-				for( util::ivector4::value_type r = 0; r < size[data::rowDim]; r++ ) {
+	for( size_t t = 0; t < size[data::timeDim]; t++ ) {
+		for( size_t s = 0; s < size[data::sliceDim]; s++ ) {
+			for( size_t c = 0; c < size[data::columnDim]; c++ ) {
+				for( size_t r = 0; r < size[data::rowDim]; r++ ) {
 					const size_t coords[] = { r, c, s, t };
 					ptr[big_chunk.getLinearIndex( coords )] = 3;
 				}
@@ -79,10 +79,10 @@ int main()
 	timer.restart();
 	size_t counter = 0;
 
-	for( util::ivector4::value_type t = 0; t < size[data::timeDim]; t++ ) {
-		for( util::ivector4::value_type s = 0; s < size[data::sliceDim]; s++ ) {
-			for( util::ivector4::value_type c = 0; c < size[data::columnDim]; c++ ) {
-				for( util::ivector4::value_type r = 0; r < size[data::rowDim]; r++ ) {
+	for( size_t t = 0; t < size[data::timeDim]; t++ ) {
+		for( size_t s = 0; s < size[data::sliceDim]; s++ ) {
+			for( size_t c = 0; c < size[data::columnDim]; c++ ) {
+				for( size_t r = 0; r < size[data::rowDim]; r++ ) {
 					const size_t lin_index = r +
 											 size[data::rowDim] * c +
 											 size[data::columnDim] * size[data::rowDim] * s  +
@@ -94,7 +94,7 @@ int main()
 		}
 	}
 
-	if( counter = big_chunk.getVolume() ) std::cout << "counter == volume!" << std::endl;
+	if( ( counter = big_chunk.getVolume() ) ) std::cout << "counter == volume!" << std::endl;
 
 	std::cout << "Needed " << timer.elapsed() << " seconds to iterator with own \"getLinearIndex\" function." << std::endl;
 	check<TYPE>( big_chunk, 4 );

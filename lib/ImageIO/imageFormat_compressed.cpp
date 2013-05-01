@@ -166,7 +166,7 @@ public:
 		}
 
 		// set up progress bar if its enabled but don't fiddle with it if its set up already
-		if( progress && progress->getMax()==0 ) {
+		if( progress && progress->getMax() == 0 ) {
 			progress->show( boost::filesystem::file_size( filename ) / _internal::progress_filter::blocksize, std::string( "decompressing " ) + filename );
 			in.push( _internal::progress_filter( *progress ) );
 		}

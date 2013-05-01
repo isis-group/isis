@@ -292,6 +292,7 @@ public:
 	 * \param ID the ID of the requeseted type (use ValueArray::staticID)
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns a reference of eigther a cheap copy or a newly created ValueArray
+	 * \returns an empty reference if the conversion failed
 	 */
 	ValueArrayBase::Reference  convertByID( unsigned short ID, scaling_pair scaling = scaling_pair() );
 
