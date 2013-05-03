@@ -34,9 +34,9 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 # NIFTI plugin
 ############################################################
 if(ISIS_IOPLUGIN_NIFTI_SA)
-  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
-  target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
-  set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
+	add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp imageFormat_nifti_parser.cpp )
+	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
+	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
 ############################################################
