@@ -75,7 +75,7 @@ struct flattener { // simply insert subarrays into the array above
 
 template<typename T> struct read {typedef qi::rule<ch_iterator, T(), SKIP_TYPE> rule;};
 
-bool parse_DcmStack( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &DcmStack )
+bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &DcmStack )
 {
 	using qi::lit;
 	using namespace boost::spirit;
