@@ -32,6 +32,18 @@ protected:
 			return ret;
 		}
 	};
+
+	template<typename T, typename DEST> bool extractNumberFromName( std::string name, DEST &property ) {
+		std::string::size_type end = name.find_last_of( "0123456789" );
+
+		if( end != std::string::npos ) {
+			std::string::size_type start = name.find_last_not_of( "0123456789", end );
+			property = boost::lexical_cast<T>( name.substr( start + 1, end - start ) );
+			return true;
+		} else {
+			return false;
+		}
+	}
 	std::map<png_byte, std::map<png_byte, boost::shared_ptr<Reader> > > readers;
 public:
 	ImageFormat_png() {
@@ -44,7 +56,7 @@ public:
 		return "PNG (Portable Network Graphics)";
 	}
 	util::istring dialects( const std::string &/*filename*/ ) const {
-		return "middle";
+		return "middle stacked";
 	}
 	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
 		assert( src.getRelevantDims() == 2 );
@@ -186,17 +198,38 @@ public:
 		data::Chunk ret = ( *reader )( png_ptr, info_ptr );
 
 		fclose( fp );
-		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
-		ret.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-		ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		ret.setPropertyAs( "indexOrigin", util::fvector3( ) );
-		ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		data::Chunk ch = read_png( filename );
+
+		if( dialect == "stacked" ) {
+			float slice;
+
+			if( extractNumberFromName<uint32_t>( filename, slice ) ) {
+				ch.setPropertyAs<uint32_t>( "acquisitionNumber", slice );
+				ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.propertyValue( "acquisitionNumber" )
+									 << " and slice position " <<  ch.propertyValue( "indexOrigin" ) <<  " from filename";
+				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
+			}
+		} else {
+			if( extractNumberFromName<uint32_t>( filename, ch.propertyValue( "acquisitionNumber" ) ) ) {
+				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.propertyValue( "acquisitionNumber" ) << " from filename";
+				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,indexOrigin,rowVec and voxelSize";
+			} else {
+				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
+				ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+			}
+
+			ch.setPropertyAs( "indexOrigin", util::fvector3( ) );
+		}
+
+
 		ch.setPropertyAs( "sequenceNumber", ( uint16_t )1 );
+		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
+		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
+		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 		chunks.push_back( ch );
 		return 0;
 	}
