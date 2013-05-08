@@ -784,7 +784,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 			switch( ext_hdr[1] ) {
 			case 0: { // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
 				util::PropertyMap dcm_map;
-				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), orig.branch( "DcmStack" ) );
+				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), orig.branch( "DcmMeta" ), '.' );
 			}
 			break;
 			case 2:
@@ -876,10 +876,10 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
 			if( image.hasProperty( "DICOM/ImageType" ) ) {
 				const util::slist tp = image.getPropertyAs<util::slist>( "DICOM/ImageType" );
-				const util::slist::const_iterator was_mosaic = std::find( tp.begin(), tp.end(), "WAS_MOSAIC" );
+				const bool was_mosaic = ( std::find( tp.begin(), tp.end(), "WAS_MOSAIC" ) != tp.end() );
 				const util::Matrix3x3<float> mat( image.getPropertyAs<util::fvector3>( "rowVec" ), image.getPropertyAs<util::fvector3>( "columnVec" ), image.getPropertyAs<util::fvector3>( "sliceVec" ) );
 
-				if( was_mosaic != tp.end() && determinant( mat ) < 0 ) {
+				if( was_mosaic  && determinant( mat ) < 0 ) {
 					LOG( Runtime, info ) << "Flipping slices of a siemens mosaic image for fsl compatibility";
 					flipGeometry( image, data::sliceDim );
 					writer->addFlip( data::sliceDim );

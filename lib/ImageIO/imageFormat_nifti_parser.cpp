@@ -45,26 +45,30 @@ typedef data::ValueArray< uint8_t >::iterator ch_iterator;
 typedef qi::rule<ch_iterator, isis::util::PropertyMap(), SKIP_TYPE>::context_type PropertyMapContext;
 typedef boost::variant<util::PropertyValue, util::PropertyMap> value_cont;
 
+struct add_member {
+	char extra_token;
+	add_member( char _extra_token ): extra_token( _extra_token ) {}
+	void operator()( const fusion::vector2<std::string, value_cont> &a, PropertyMapContext &context, bool & )const {
+		const value_cont &container = a.m1;
+		const util::PropertyMap::PropPath label = extra_token ?
+				util::stringToList<util::PropertyMap::KeyType>( a.m0, extra_token ) :
+				util::PropertyMap::PropPath( a.m0.c_str() );
+		util::PropertyMap &target = context.attributes.car;
 
-void add_member( const fusion::vector2<std::string, value_cont> &a, PropertyMapContext &context )
-{
-	const value_cont &container = a.m1;
-	const util::PropertyMap::PropPath label = a.m0.c_str();
-	util::PropertyMap &target = context.attributes.car;
-
-	if( target.hasBranch( label ) || target.hasProperty( label ) ) {
-		LOG( Runtime, error ) << "There is already an entry " << target << " skipping this one" ;
-	} else {
-		switch( container.which() ) {
-		case 1:
-			target.branch( label ) = boost::get<util::PropertyMap>( container );
-			break;
-		case 0:
-			target.propertyValue( label ) = boost::get<util::PropertyValue>( container );
-			break;
+		if( target.hasBranch( label ) || target.hasProperty( label ) ) {
+			LOG( Runtime, error ) << "There is already an entry " << target << " skipping this one" ;
+		} else {
+			switch( container.which() ) {
+			case 1:
+				target.branch( label ) = boost::get<util::PropertyMap>( container );
+				break;
+			case 0:
+				target.propertyValue( label ) = boost::get<util::PropertyValue>( container );
+				break;
+			}
 		}
 	}
-}
+};
 
 struct flattener { // simply insert subarrays into the array above
 	template<typename T, typename CONTEXT> void operator()( const std::list<T> &a, CONTEXT &context, bool & )const {
@@ -75,7 +79,7 @@ struct flattener { // simply insert subarrays into the array above
 
 template<typename T> struct read {typedef qi::rule<ch_iterator, T(), SKIP_TYPE> rule;};
 
-bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &DcmStack )
+bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &json_map, char extra_token )
 {
 	using qi::lit;
 	using namespace boost::spirit;
@@ -86,7 +90,7 @@ bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyM
 	read<value_cont>::rule value;
 	read<std::string>::rule string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" ), label( string >> ':', "label" );
 	read<fusion::vector2<std::string, value_cont> >::rule member( label >> value, "member" );
-	read<isis::util::PropertyMap>::rule object( lit( '{' ) >> member[add_member] % ',' >> '}', "object" );
+	read<isis::util::PropertyMap>::rule object( lit( '{' ) >> member[add_member( extra_token )] % ',' >> '}', "object" );
 	read<util::dlist>::rule dlist( lit( '[' ) >> ( ( double_[phoenix::push_back( _val, _1 )] | dlist[flattener()] ) % ',' ) >> ']', "dlist" );
 	read<util::slist>::rule slist( lit( '[' ) >> ( ( string[phoenix::push_back( _val, _1 )] | slist[flattener()] ) % ',' ) >> ']', "slist" );
 
@@ -99,7 +103,7 @@ bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyM
 	    qi::debug(slist);*/
 
 	data::ValueArray< uint8_t >::iterator begin = stream.begin(), end = stream.end();
-	bool erg = phrase_parse( begin, end, object[phoenix::ref( DcmStack )=_1], skipper );
+	bool erg = phrase_parse( begin, end, object[phoenix::ref( json_map )=_1], skipper );
 	return end == stream.end();
 
 #undef RULE

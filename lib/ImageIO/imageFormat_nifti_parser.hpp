@@ -29,7 +29,7 @@ namespace image_io
 {
 namespace _internal
 {
-bool parse_json( data::ValueArray< uint8_t > stream, isis::util::PropertyMap &DcmStack );
+bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &json_map, char extra_token = 0 );
 
 
 }
