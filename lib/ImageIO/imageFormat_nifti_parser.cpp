@@ -16,9 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#define BOOST_SPIRIT_DEBUG_PRINT_SOME 50
-#define BOOST_SPIRIT_DEBUG_INDENT 5
+// #define BOOST_SPIRIT_DEBUG_PRINT_SOME 50
+// #define BOOST_SPIRIT_DEBUG_INDENT 5
 
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
@@ -37,10 +36,8 @@ namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 namespace phoenix = boost::phoenix;
 namespace fusion = boost::fusion;
+
 typedef BOOST_TYPEOF( ascii::space | '\t' | boost::spirit::eol ) SKIP_TYPE;
-
-
-// typedef fusion::vector2<std::string, std::string> s_entry;
 typedef data::ValueArray< uint8_t >::iterator ch_iterator;
 typedef qi::rule<ch_iterator, isis::util::PropertyMap(), SKIP_TYPE>::context_type PropertyMapContext;
 typedef boost::variant<util::PropertyValue, util::PropertyMap> value_cont;
@@ -85,29 +82,20 @@ bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyM
 	using namespace boost::spirit;
 
 	int version;
-	SKIP_TYPE skipper = ascii::space | '\t' | eol;
-
 	read<value_cont>::rule value;
 	read<std::string>::rule string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" ), label( string >> ':', "label" );
 	read<fusion::vector2<std::string, value_cont> >::rule member( label >> value, "member" );
 	read<isis::util::PropertyMap>::rule object( lit( '{' ) >> member[add_member( extra_token )] % ',' >> '}', "object" );
+	read<int>::rule integer(int_ >> !lit('.'),"integer") ;
 	read<util::dlist>::rule dlist( lit( '[' ) >> ( ( double_[phoenix::push_back( _val, _1 )] | dlist[flattener()] ) % ',' ) >> ']', "dlist" );
-	read<util::slist>::rule slist( lit( '[' ) >> ( ( string[phoenix::push_back( _val, _1 )] | slist[flattener()] ) % ',' ) >> ']', "slist" );
+	read<util::ilist>::rule ilist( lit( '[' ) >> ( ( integer[phoenix::push_back( _val, _1 )] | ilist[flattener()] ) % ',' ) >> ']', "ilist" );
+	read<util::slist>::rule slist( lit( '[' ) >> ( ( string [phoenix::push_back( _val, _1 )] | slist[flattener()] ) % ',' ) >> ']', "slist" );
 
-	value = string | double_ | slist | dlist |  object;
-	value.name( "value" );
-
-	/*  qi::debug(member);
-	    qi::debug(object);
-	    qi::debug(dlist);
-	    qi::debug(slist);*/
+	value = string | integer | double_ | slist | ilist | dlist |  object;
 
 	data::ValueArray< uint8_t >::iterator begin = stream.begin(), end = stream.end();
-	bool erg = phrase_parse( begin, end, object[phoenix::ref( json_map )=_1], skipper );
+	bool erg = phrase_parse( begin, end, object[phoenix::ref( json_map )=_1], ascii::space | '\t' | eol );
 	return end == stream.end();
-
-#undef RULE
-
 }
 
 }

@@ -1230,7 +1230,7 @@ void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal:
 
 // The nifti coord system:
 // The (x,y,z) coordinates refer to the CENTER of a voxel.
-// In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior.
+// In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior (RAS).
 // So, the transform from nifti to isis is:
 const util::Matrix4x4<short> ImageFormat_NiftiSa::nifti2isis(
 	util::vector4<short>( -1, 0, 0, 0 ),
