@@ -69,20 +69,23 @@ bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 		return true;
 	}
 }
-void WriteOp::applyFlipToBlock ( isis::data::ValueArrayReference dat, util::vector4< size_t > chunkSize )
+void WriteOp::applyFlipToData ( data::ValueArrayReference &dat, util::vector4< size_t > chunkSize )
 {
 	if( !flip_list.empty() ) {
 		// wrap the copied part back into a Chunk to flip it
 		data::Chunk cp( dat, chunkSize[data::rowDim], chunkSize[data::columnDim], chunkSize[data::sliceDim], chunkSize[data::timeDim] ); // this is a cheap copy
-
-		//iterate through all flips within than the block dimensionality
-		for( std::set<data::dimensions>::const_iterator i = flip_list.begin(); i != flip_list.end() && *i < cp.getRelevantDims(); i++ ) {
-			cp.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
-		}
+		applyFlipToData(cp); // and apply the flipping
+	}
+}
+void WriteOp::applyFlipToData ( data::Chunk &dat )
+{
+	//iterate through all flips within than the block dimensionality
+	for( std::set<data::dimensions>::const_iterator i = flip_list.begin(); i != flip_list.end() && *i < dat.getRelevantDims(); i++ ) {
+		dat.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
 	}
 }
 
-void WriteOp::applyFlipToCoords ( isis::util::vector4< size_t >& coords, isis::data::dimensions blockdims )
+void WriteOp::applyFlipToCoords ( util::vector4< size_t >& coords, data::dimensions blockdims )
 {
 	if( !flip_list.empty() ) {
 		//iterate through all flips above than the block dimensionality
@@ -108,7 +111,7 @@ public:
 		data::ValueArrayReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValueArrayBase().copyTo( *out_data, m_scale );
 
-		applyFlipToBlock( out_data, ch.getSizeAsVector() );
+		applyFlipToData( out_data, ch.getSizeAsVector() );
 		return true;
 	}
 
@@ -195,6 +198,39 @@ public:
 
 	short unsigned int getTypeId() {return data::ValueArray<bool>::staticID;}
 };
+
+template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name){
+	if( props.size()!=chunks.size()){
+		LOG(Runtime,error) << "The length of the per-slice property " << util::MSubject(name) << " does not fit the number of slices, skipping.";
+		return false;
+	}
+	typename std::list<T>::const_iterator prop=props.begin();
+	BOOST_FOREACH(data::Chunk &ch,chunks){
+		ch.setPropertyAs<T>(name,*prop);
+	}
+	return true;
+}
+
+void demuxDcmMetaSlices(std::list<data::Chunk> chunks, util::PropertyMap &orig ){
+	static const util::PropertyMap::PropPath slicesBranch("DcmMeta/global/slices");
+	if(orig.hasBranch(slicesBranch)){
+		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,orig.branch(slicesBranch).getFlatMap()){
+			bool success;
+			switch(ppair.second.getTypeID()){
+				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,ppair.first);break;
+				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,ppair.first);break;
+				case util::Value<util::slist>::staticID:success=propDemux(ppair.second.castTo<util::slist>(),chunks,ppair.first);break;
+				default:
+					LOG(Runtime,error) << "The the type of " << util::MSubject(ppair.first)
+					<< " (" << ppair.second.getTypeName() <<  ") is not a list, skipping.";
+			}
+			if(success)
+				orig.branch(slicesBranch).remove(ppair.first); //@todo slices won't be removed if empty
+		}
+	} else {
+		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slicesBranch << " branch";
+	}
+}
 
 }
 
@@ -664,7 +700,6 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_
 #undef DO_SWAPA
 }
 
-
 int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
@@ -783,7 +818,6 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			switch( ext_hdr[1] ) {
 			case 0: { // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				util::PropertyMap dcm_map;
 				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), orig.branch( "DcmMeta" ), '.' );
 			}
 			break;
@@ -801,7 +835,6 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 			pos += ext_hdr[0];
 		}
 	}
-
 
 	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, orig );
