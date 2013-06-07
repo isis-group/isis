@@ -19,7 +19,7 @@
 #ifndef TMPFILE_H
 #define TMPFILE_H
 #include <string>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/path.hpp>
 
 namespace isis
@@ -44,6 +44,7 @@ public:
 	 * The file will also be created to prevent any following calls from generating the same filename.
 	 * \param prefix string to be inserted between the path and the actual filename
 	 * \param suffix string to be appended to the filename
+	 * \note This uses boost::filesystem::unique_path and thus may block until sufficient entropy develops. (see http://www.boost.org/doc/libs/1_49_0/libs/filesystem/v3/doc/reference.html#unique_path)
 	 */
 	TmpFile( std::string prefix = "", std::string suffix = "" );
 	///Will delete the temporary file if its still there.
