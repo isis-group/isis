@@ -31,7 +31,7 @@ namespace data
 
 void FilePtr::Closer::operator()( void *p )
 {
-	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename.file_string() ) << " it was mapped at " << p;
+	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename ) << " it was mapped at " << p;
 
 	bool unmapped = false;
 #ifdef WIN32
@@ -40,14 +40,14 @@ void FilePtr::Closer::operator()( void *p )
 	unmapped = !munmap( p, len );
 #endif
 	LOG_IF( !unmapped, Runtime, warning )
-			<< "Unmapping of " << util::MSubject( filename.file_string() )
+			<< "Unmapping of " << util::MSubject( filename )
 			<< " failed, the error was: " << util::MSubject( util::getLastSystemError() );
 
 #ifdef __APPLE__
 
 	if( write && futimes( file, NULL ) != 0 ) {
 		LOG( Runtime, warning )
-				<< "Setting access time of " << util::MSubject( filename.file_string() )
+				<< "Setting access time of " << util::MSubject( filename )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 
@@ -74,7 +74,7 @@ void FilePtr::Closer::operator()( void *p )
 	if( ::close( file ) != 0 ) {
 #endif
 		LOG( Runtime, warning )
-				<< "Closing of " << util::MSubject( filename.file_string() )
+				<< "Closing of " << util::MSubject( filename )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 }
@@ -102,7 +102,7 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 #endif
 
 	if( ptr == NULL ) {
-		LOG( Debug, error ) << "Failed to map " << util::MSubject( filename.file_string() ) << ", error was " << util::getLastSystemError();
+		LOG( Debug, error ) << "Failed to map " << util::MSubject( filename ) << ", error was " << util::getLastSystemError();
 		return false;
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
@@ -138,7 +138,7 @@ size_t FilePtr::checkSize( bool write, FILE_HANDLE file, const boost::filesystem
 
 			if( err ) { // could not resize the file => fail
 				LOG( Runtime, error )
-						<< "Failed to resize " << util::MSubject( filename.file_string() )
+						<< "Failed to resize " << util::MSubject( filename )
 						<< " to the requested size " << size << ", the error was: " << util::MSubject( strerror( err ) );
 				return 0; // fail
 			} else
@@ -158,7 +158,7 @@ size_t FilePtr::checkSize( bool write, FILE_HANDLE file, const boost::filesystem
 		} else if( size <= currSize )
 			return size; // keep the requested size (will fit into the file)
 		else { // size will not fit into the file (and we cannot resize) => fail
-			LOG( Runtime, error ) << "The requested size for readonly mapping of " << util::MSubject( filename.file_string() )
+			LOG( Runtime, error ) << "The requested size for readonly mapping of " << util::MSubject( filename )
 								  << " is greater than the filesize (" << currSize << ").";
 			return 0; // fail
 		}
@@ -183,11 +183,11 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 					  O_CREAT | O_RDWR : //create file if its not there
 					  O_RDONLY; //open file readonly
 	const FILE_HANDLE file =
-		open( filename.file_string().c_str(), oflag, 0666 );
+		open( filename.native().c_str(), oflag, 0666 );
 #endif
 
 	if( file == invalid ) {
-		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename.file_string() )
+		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename )
 							  << ", the error was: " << util::getLastSystemError();
 		return;
 	}
@@ -196,7 +196,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 
 	if( map_size ) {
 		m_good = map( file, map_size, write, filename ); //and do the mapping
-		LOG( Debug, info ) << "Mapped " << map_size << " bytes of " << util::MSubject( filename.file_string() ) << " at " << getRawAddress().get();
+		LOG( Debug, info ) << "Mapped " << map_size << " bytes of " << util::MSubject( filename ) << " at " << getRawAddress().get();
 	}
 
 	// from here on the pointer will be set if mapping succeded

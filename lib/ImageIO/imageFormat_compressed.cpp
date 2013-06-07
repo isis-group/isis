@@ -4,7 +4,7 @@
 #include <CoreUtils/tmpfile.hpp>
 #include <DataStorage/io_factory.hpp>
 
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 
@@ -14,7 +14,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <fstream>
+#include <boost/filesystem/fstream.hpp>
 #include "DataStorage/fileptr.hpp"
 #include <boost/iostreams/categories.hpp>  // tags
 
@@ -188,7 +188,7 @@ public:
 					next_header_in -= tar_readstream( in, namebuff, size, "overlong filename for next entry" );
 					in.ignore( next_header_in ); // skip the remaining input until the next header
 					org_file = boost::filesystem::path( namebuff );
-					LOG( Debug, verbose_info ) << "Got overlong name " << util::MSubject( org_file.file_string() ) << " for next file.";
+					LOG( Debug, verbose_info ) << "Got overlong name " << util::MSubject( org_file ) << " for next file.";
 
 					read_header( in, size, next_header_in ); //continue with the next header
 				} else {
@@ -201,20 +201,20 @@ public:
 
 				if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
 
-					data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
+					data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.string(), dialect ); // and get the reading pluging for that
 
 					if( formats.empty() ) {
 						LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 					} else {
 						LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
-						const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
+						const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.string() );//ask any of the plugins for the suffix
 						util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
 
 						data::FilePtr mfile( tmpfile, size, true );
 
 						if( !mfile.good() ) {
-							throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.file_string() );
+							throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.native() );
 						}
 
 						size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
@@ -222,7 +222,7 @@ public:
 						mfile.release(); //close and unmap the temporary file/mapped memory
 
 						if( red != size ) { // read the data from the stream
-							LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
+							LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.native();
 						}
 
 						// read the temporary file
@@ -231,11 +231,11 @@ public:
 						ret += data::IOFactory::load( chunks, tmpfile.string(), dialect.c_str() );
 
 						for( ; ch != chunks.end(); ++ch ) { // set the source property of the red chunks to something more usefull
-							ch->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
+							ch->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
 					}
 				} else {
-					LOG( Debug, verbose_info ) << "Skipping " << org_file.file_string() << " because its no regular file (type is " << tar_header.typeflag << ")" ;
+					LOG( Debug, verbose_info ) << "Skipping " << org_file << " because its no regular file (type is " << tar_header.typeflag << ")" ;
 				}
 
 				in.ignore( next_header_in ); // skip the remaining input until the next header
@@ -250,12 +250,12 @@ public:
 
 			// set up the input stream
 			util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
-			std::ofstream output( tmpFile.file_string().c_str(), std::ios_base::binary );
+			boost::filesystem::ofstream output( tmpFile, std::ios_base::binary );
 			output.exceptions( std::ios::badbit );
 
 			boost::iostreams::copy( in, output );
 
-			ret = data::IOFactory::load( chunks, tmpFile.file_string().c_str(), dialect );
+			ret = data::IOFactory::load( chunks, tmpFile.native(), dialect );
 
 			if( ret ) { //re-set source of all new chunks
 				prev++;
@@ -281,10 +281,10 @@ public:
 		// create the intermediate file
 		util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
 
-		if( !data::IOFactory::write( image, tmpFile.file_string(), dialect ) ) {throwGenericError( tmpFile.file_string() + " failed to write" );}
+		if( !data::IOFactory::write( image, tmpFile.native(), dialect ) ) {throwGenericError( tmpFile.native() + " failed to write" );}
 
 		// set up the compression stream
-		std::ifstream input( tmpFile.file_string().c_str(), std::ios_base::binary );
+		boost::filesystem::ifstream input( tmpFile, std::ios_base::binary );
 		std::ofstream output( filename.c_str(), std::ios_base::binary );
 		input.exceptions( std::ios::badbit );
 		output.exceptions( std::ios::badbit );
