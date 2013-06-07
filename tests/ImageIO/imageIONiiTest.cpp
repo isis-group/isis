@@ -14,7 +14,7 @@ using namespace isis;
 
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/unit_test.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		null.remove( "performingPhysician" );
 
 		util::TmpFile niifile( "", ".nii" );
-		BOOST_REQUIRE( data::IOFactory::write( null, niifile.file_string() ) );
+		BOOST_REQUIRE( data::IOFactory::write( null, niifile.native() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
 		null.propertyValue( "voxelSize" ).castTo<util::fvector3>() += null.propertyValue( "voxelGap" ).castTo<util::fvector3>();
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		null.setPropertyAs( "nifti/cal_min", minmax.first->as<float>() );
 		null.setPropertyAs( "nifti/cal_max", minmax.second->as<float>() );
 
-		std::list< data::Image > niftilist = data::IOFactory::load( niifile.file_string() );
+		std::list< data::Image > niftilist = data::IOFactory::load( niifile.native() );
 		BOOST_REQUIRE( niftilist.size() == 1 );
 		data::Image &nii = niftilist.front();
 		nii.spliceDownTo( ( data::dimensions )null.getChunk( 0, 0 ).getRelevantDims() ); // make the chunks of the nifti have the same dimensionality as the origin
@@ -133,9 +133,9 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), size );
 
 	util::TmpFile niifile( "", ".nii" );
-	BOOST_REQUIRE( data::IOFactory::write( img, niifile.file_string() ) );
+	BOOST_REQUIRE( data::IOFactory::write( img, niifile.native() ) );
 
-	data::Image img2 = data::IOFactory::load( niifile.file_string() ).front();
+	data::Image img2 = data::IOFactory::load( niifile.native() ).front();
 
 
 	img2.remove( "acquisitionNumber" ); //unique in the source, but since we get the back as one big chunk they are common now

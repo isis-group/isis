@@ -75,7 +75,7 @@ public:
 		ret = makeImage( size, 1, "interleaved Image" );
 		std::list< data::Chunk >::iterator ch = ret.begin();
 
-		for ( uint32_t t = 0; t < timesteps; t++ ) {
+		for ( size_t t = 0; t < timesteps; t++ ) {
 			//even numbers
 			for ( uint32_t a = 0; a < ( size / 2. ); a++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
 				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", a * 2 + t * size );
