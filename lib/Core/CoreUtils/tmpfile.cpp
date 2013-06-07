@@ -25,6 +25,7 @@
 #include <fstream>
 #define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include "tmpfile.hpp"
 #include "message.hpp"
 #include "common.hpp"
@@ -34,13 +35,13 @@ namespace isis
 namespace util
 {
 
-TmpFile::TmpFile( std::string prefix, std::string sufix )
+using namespace boost::filesystem;
+  
+TmpFile::TmpFile( std::string prefix, std::string sufix ): 
+  path(temp_directory_path() / unique_path(prefix+"%%%%-%%%%-%%%%-%%%%"+sufix))
 {
-	// @todo critical block - should be locked
-	boost::filesystem::path dummy( tmpnam( NULL ) );
-	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.filename().string() + sufix ) );
 	LOG( Debug, info ) << "Creating temporary file " << native();
-	std::ofstream( native().c_str() ).exceptions( std::ios::failbit | std::ios::badbit );
+	ofstream( *this ).exceptions( std::ios::failbit | std::ios::badbit );
 }
 
 TmpFile::~TmpFile()
