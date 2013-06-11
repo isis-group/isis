@@ -51,9 +51,11 @@ public:
 class WritingValueAdapter: public ConstValueAdapter
 {
 	Setter setValueFunc;
+	size_t byteSize;
 public:
-	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc );
+	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc, size_t _size );
 	WritingValueAdapter operator=( const util::ValueReference &val );
+	void swapwith( const WritingValueAdapter &b )const; // the WritingValueAdapter is const not what its dereferencing
 };
 
 template<bool IS_CONST> class GenericValueIterator :
@@ -377,4 +379,8 @@ typedef ValueArrayBase::Reference ValueArrayReference;
 }
 }
 
+namespace std
+{
+	void swap(const isis::data::_internal::WritingValueAdapter &a,const isis::data::_internal::WritingValueAdapter &b);
+}
 #endif // TYPEPTRBASE_HPP
