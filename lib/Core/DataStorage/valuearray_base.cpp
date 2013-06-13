@@ -234,21 +234,29 @@ template<> GenericValueIterator<false>::reference GenericValueIterator<false>::o
 	return WritingValueAdapter( p, getValueFunc, setValueFunc, byteSize );
 }
 
-ConstValueAdapter::ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc ): util::ValueReference( _getValueFunc( _p ) ), p( _p ) {}
-bool ConstValueAdapter::operator==( const util::ValueReference &val )const {return ( *this )->eq( *val );}
+ConstValueAdapter::ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc ):getter(_getValueFunc), p( _p ) {}
+bool ConstValueAdapter::operator==( const util::ValueReference &val )const {return getter(p)->eq( *val );}
 bool ConstValueAdapter::operator!=( const util::ValueReference &val )const {return !operator==( val );}
 
-bool ConstValueAdapter::operator<( const util::ValueReference &val )const {return ( *this )->lt( *val );}
-bool ConstValueAdapter::operator>( const util::ValueReference &val )const {return ( *this )->gt( *val );}
+bool ConstValueAdapter::operator<( const util::ValueReference &val )const {return getter(p)->lt( *val );}
+bool ConstValueAdapter::operator>( const util::ValueReference &val )const {return getter(p)->gt( *val );}
+
+const util::ValueReference ConstValueAdapter::operator->() const{ return getter(p);}
+const std::string ConstValueAdapter::toString( bool label ) const{ return getter(p).toString(label);}
+ConstValueAdapter::operator const util::ValueReference()const{return getter(p);}
+
+
 
 WritingValueAdapter::WritingValueAdapter( uint8_t*const _p, ConstValueAdapter::Getter _getValueFunc, ConstValueAdapter::Setter _setValueFunc, size_t _byteSize )
 : ConstValueAdapter( _p, _getValueFunc ), setValueFunc( _setValueFunc ), byteSize(_byteSize) {}
-WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &val )
+WritingValueAdapter WritingValueAdapter::operator=( const util::ValueBase& val )
 {
 	assert( setValueFunc );
-	setValueFunc( const_cast<uint8_t * const>( p ), *val );
+	setValueFunc( const_cast<uint8_t * const>( p ), val );
 	return *this;
 }
+WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &val ){ operator=(*val);}
+
 void WritingValueAdapter::swapwith(const WritingValueAdapter& other )const
 {
 	LOG_IF(setValueFunc != other.setValueFunc,Debug,error) << "Swapping ValueArray iterators with differen set function. This is very likely an error";
