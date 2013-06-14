@@ -427,5 +427,27 @@ BOOST_AUTO_TEST_CASE ( chunk_copySlice_Test )
 	}
 }
 
+BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
+{
+	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
+	uint32_t cnt=0;
+	BOOST_FOREACH( data::Chunk::reference ref, ch )
+		ref = util::Value<int>( cnt++);
+
+	data::MemChunk<uint32_t> swapped(ch);
+	swapped.swapDim(data::columnDim,data::sliceDim);
+
+	for(int t=0;t<20;t++)
+		for(int z=0;z<30;z++)
+			for(int y=0;y<40;y++)
+				for(int x=0;x<50;x++)
+	{
+		size_t idx=ch.getLinearIndex(util::vector4<size_t>(x,y,z,t));
+		BOOST_REQUIRE_EQUAL(ch.voxel<uint32_t>(x,y,z,t),idx);
+		BOOST_CHECK_EQUAL(swapped.voxel<uint32_t>(x,z,y,t),idx);
+	}
+	
+}
+
 }
 }

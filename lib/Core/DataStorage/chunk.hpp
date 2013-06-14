@@ -87,7 +87,7 @@ public:
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
 
-	Chunk( const isis::data::ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false );
+	Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false );
 
 	/**
 	 * Gets a reference to the element at a given index.
@@ -269,9 +269,12 @@ public:
 		return true;
 	}
 	/**
-	  * Swaps the image along a dimension dim in image space.
+	  * Flips the chunk along a dimension dim in image space.
 	  */
 	void swapAlong( const dimensions dim ) const;
+
+	//http://en.wikipedia.org/wiki/In-place_matrix_transposition#Non-square_matrices%3a_Following_the_cycles
+	void swapDim(size_t dim_a,size_t dim_b);
 
 	/**
 	 * Access properties of the next lower dimension (e.g. slice-timings in volumes)
