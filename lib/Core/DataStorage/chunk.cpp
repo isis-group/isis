@@ -320,37 +320,9 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 }
 
-void Chunk::swapDim( size_t dim_a, size_t dim_b )
+void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b )
 {
-	std::vector<bool> visited(getVolume());
-	data::_internal::NDimensional<4> newshape(*this);
-	const data::_internal::NDimensional<4> &oldshape=*this;
-	
-	util::vector4<size_t> newsize=getSizeAsVector();
-	std::swap(newsize[dim_a],newsize[dim_b]);
-	newshape.init(newsize);
-
-	const size_t swap_area=newsize[dim_a]*newsize[dim_b];
-	
-	size_t cycle = 0;
-	iterator at=begin();
-	while(++cycle != getVolume()-1){
-		if(visited[cycle])continue;
-		size_t i=cycle;
-		
-		do{
-			if(i!=getVolume()-1){ // compute new i
-				size_t currIndex[4];
-				oldshape.getCoordsFromLinIndex(i,currIndex);
-				std::swap(currIndex[dim_a],currIndex[dim_b]);
-				i=newshape.getLinearIndex(currIndex);
-			}
-			std::swap(at[i],at[cycle]);
-			visited[i] = true;
-		} while (i != cycle);
-	}
-	//reshape myself
-	init(newsize);
+	NDimensional<4>::swapDim(dim_a,dim_b,begin());
 }
 
 

@@ -391,6 +391,8 @@ public:
 		return data[index.second];
 	}
 
+	void swapDim(unsigned short dim_a,unsigned short dim_b);
+
 	/**
 	 * Get a const reference to the voxel value at the given coordinates.
 	 *

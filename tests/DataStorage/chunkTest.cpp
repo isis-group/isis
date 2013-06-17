@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
 	uint32_t cnt=0;
 	BOOST_FOREACH( data::Chunk::reference ref, ch )
-		ref = util::Value<int>( cnt++);
+		ref = util::Value<uint32_t>( cnt++);
 
 	data::MemChunk<uint32_t> swapped(ch);
 	swapped.swapDim(data::columnDim,data::sliceDim);

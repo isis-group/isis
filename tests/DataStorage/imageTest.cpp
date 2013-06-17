@@ -1226,6 +1226,33 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	}
 }
 
+BOOST_AUTO_TEST_CASE ( image_swapdim_test )
+{
+	std::list<data::MemChunk<uint32_t> > chunks;
+	for(int i=0; i<30;i++){
+		chunks.push_back(genSlice<uint32_t>( 50, 40, i,i ));
+	}
+	
+	data::Image img( chunks );
+	data::_internal::NDimensional<4> oldshape=img;
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_REQUIRE( img.isValid() );
+
+	uint32_t cnt=0;
+	BOOST_FOREACH( data::Image::reference ref, img )
+		ref = util::Value<uint32_t>( cnt++);
+	
+	img.swapDim(data::columnDim,data::sliceDim);
+
+	for(int z=0;z<30;z++)
+		for(int y=0;y<40;y++)
+			for(int x=0;x<50;x++)
+			{
+				size_t idx=oldshape.getLinearIndex(util::vector4<size_t>(x,y,z));
+				BOOST_CHECK_EQUAL(img.voxel<uint32_t>(x,z,y),idx);
+			}
+}
+
 
 } // END namespace test
 } // END namespace isis

@@ -105,6 +105,12 @@ bool Image::isClean()const
 	return clean;
 }
 
+void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
+{
+	NDimensional<4>::swapDim(dim_a,dim_b,begin());
+}
+
+
 void Image::deduplicateProperties()
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";

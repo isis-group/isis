@@ -274,7 +274,7 @@ public:
 	void swapAlong( const dimensions dim ) const;
 
 	//http://en.wikipedia.org/wiki/In-place_matrix_transposition#Non-square_matrices%3a_Following_the_cycles
-	void swapDim(size_t dim_a,size_t dim_b);
+	void swapDim(unsigned short dim_a,unsigned short dim_b);
 
 	/**
 	 * Access properties of the next lower dimension (e.g. slice-timings in volumes)
