@@ -1140,7 +1140,7 @@ std::string Image::identify ( bool withpath )const
 			""
 		  ) + "\""
 		+ ( withpath ?
-			( std::string( " from " ) + getCommonSource( *this ).file_string() ) :
+			( std::string( " from " ) + getCommonSource( *this ).native() ) :
 			"" )
 		+ ( hasProperty( "sequenceStart" ) ?
 			( " taken at " + getPropertyAs<std::string>( "sequenceStart" ) ) :

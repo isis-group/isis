@@ -5,7 +5,7 @@
 
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/unit_test.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 	BOOST_REQUIRE( images.size() >= 1 );
 	BOOST_FOREACH( data::Image & null, images ) {
 		util::TmpFile vfile( "", ".v" );
-		BOOST_REQUIRE( data::IOFactory::write( null, vfile.file_string() ) );
+		BOOST_REQUIRE( data::IOFactory::write( null, vfile.native() ) );
 	}
 }
 BOOST_AUTO_TEST_SUITE_END()
