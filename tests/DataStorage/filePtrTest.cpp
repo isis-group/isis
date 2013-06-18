@@ -3,9 +3,9 @@
 
 #include <CoreUtils/tmpfile.hpp>
 #include <DataStorage/fileptr.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
-#include <fstream>
+#include <boost/filesystem/fstream.hpp>
 
 namespace isis
 {
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 			data::ValueArray<uint8_t> ptr = fptr.at<uint8_t>( 5 );
 			strcpy( ( char * )&ptr[0], "Hello_world!\n" ); // writing to a ValueArray created from a writing fileptr should write into the file
 		}
-		std::ifstream in( testfile.file_string().c_str() );
+		boost::filesystem::ifstream in( testfile );
 		BOOST_REQUIRE( in.good() );
 
 		in.seekg( 5 );
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 			strcpy( ( char * )&ptr[0], "Hello_you!\n" ); // writing to a ValueArray created from a reading fileptr should _NOT_ trigger a copy-on-write
 			BOOST_CHECK_EQUAL( std::string( ( char * )&ptr[0] ), "Hello_you!\n" ); // so next reading should get the new content of the memory
 		}
-		std::ifstream in( testfile.file_string().c_str() );
+		boost::filesystem::ifstream in( testfile );
 		BOOST_REQUIRE( in.good() );
 
 		in.seekg( 5 );
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 			data::ValueArray<uint8_t> ptr = fptr.at<uint8_t>( 5 );
 			strcpy( ( char * )&ptr[0], "Hello_universe!\n" ); // writing to a ValueArray created from a writing fileptr should write into the file
 		}
-		std::ifstream in( testfile.file_string().c_str() );
+		boost::filesystem::ifstream in( testfile );
 		BOOST_REQUIRE( in.good() );
 
 		in.seekg( 5 );
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 BOOST_AUTO_TEST_CASE( FilePtr_at_test )
 {
 	util::TmpFile testfile;
-	std::ofstream out( testfile.file_string().c_str() );
+	boost::filesystem::ofstream out( testfile );
 	util::fvector4 vec1( 1, 2, 3, 4 ), vec2( 5, 6, 7, 8 );
 
 	out.seekp( 5 );

@@ -19,7 +19,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 
 #include "io_interface.h"
