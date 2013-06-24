@@ -63,7 +63,7 @@ protected:
 		if ( ch_idx >= ch_cnt )
 			return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
 		else {
-			const inner_iterator chit_begin = chunks[ch_idx]->begin(); // cast in a const or cast out a non existing one
+			const inner_iterator chit_begin = chunks[ch_idx]->begin(); // cast in a const_ or cast out a non existing one
 			return std::distance ( chit_begin, current_it ); // so we use same iterators here
 		}
 	}
@@ -163,7 +163,8 @@ public:
 			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
 		else
 			current_it = chunks[ch_cnt-1]->end() ; //set current_it to the last chunks end iterator if we are behind it
-
+			//@todo will break if ch_cnt==0
+			
 		return *this;
 	}
 	ThisType &operator-= ( typename inner_iterator::difference_type n ) {
@@ -171,7 +172,19 @@ public:
 	}
 
 	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const {
-		return * ( *this + n );
+		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
+		assert ( ( n / ch_len + static_cast<typename ThisType::difference_type> ( ch_idx ) ) >= 0 );
+		const typename inner_iterator::difference_type my_ch_idx= ch_idx + n / ch_len; //if neccesary jump to next chunk
+		
+		if ( my_ch_idx >= ch_cnt )
+			throw std::out_of_range(
+				std::string("Image voxel index ")+boost::lexical_cast<std::string>(ch_idx*ch_len+currentDist())+"+"
+				+ boost::lexical_cast<std::string>(n-currentDist())
+				+" out of range 0.."+boost::lexical_cast<std::string>(ch_cnt)+"*"
+				+boost::lexical_cast<std::string>(ch_len)+"-1"
+			);
+			
+		return  *(chunks[my_ch_idx]->begin() + n % ch_len); 
 	}
 
 };
