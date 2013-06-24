@@ -22,6 +22,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/type_traits/remove_const.hpp>
+#include <boost/shared_array.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
@@ -51,13 +52,15 @@ protected:
 	typedef CHUNK_TYPE chunk_type;
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
-	std::vector<chunk_type *> chunks;
-	size_t ch_idx;
+	//we have to use the non-const here, otherwise the iterator would not be convertible into const_iterator
+	boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type*> chunks;
+	
+	size_t ch_idx,ch_cnt;
 	inner_iterator current_it;
 	typename inner_iterator::difference_type ch_len;
 
 	typename inner_iterator::difference_type currentDist() const {
-		if ( ch_idx >= chunks.size() )
+		if ( ch_idx >= ch_cnt )
 			return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
 		else {
 			const inner_iterator chit_begin = chunks[ch_idx]->begin(); // cast in a const or cast out a non existing one
@@ -69,20 +72,20 @@ public:
 
 	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
 	ImageIteratorTemplate ( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ) :
-		chunks ( src.chunks.begin(), src.chunks.end() ), ch_idx ( src.ch_idx ),
+		chunks ( src.chunks ), ch_idx ( src.ch_idx ), ch_cnt(src.ch_cnt),
 		current_it ( src.current_it ),
 		ch_len ( src.ch_len )
 	{}
 
 	// empty constructor
-	ImageIteratorTemplate() : ch_idx ( 0 ), ch_len ( 0 ) {}
+	ImageIteratorTemplate() : ch_idx ( 0 ), ch_len ( 0 ), ch_cnt(0) {}
 
 
 	// normal conytructor
-	explicit ImageIteratorTemplate ( const std::vector<chunk_type *>& _chunks ) :
-		chunks ( _chunks ), ch_idx ( 0 ),
+	explicit ImageIteratorTemplate ( boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type*> &_chunks, size_t _ch_cnt ) :
+		chunks ( _chunks ), ch_idx ( 0 ),ch_cnt(_ch_cnt),
 		current_it ( chunks[0]->begin() ),
-		ch_len ( std::distance ( current_it, chunks[0]->end() ) )
+		ch_len ( std::distance ( current_it, const_cast<CHUNK_TYPE*>(chunks[0])->end() ) )
 	{}
 
 	ThisType &operator++() {
@@ -156,10 +159,10 @@ public:
 		assert ( ( n / ch_len + static_cast<typename ThisType::difference_type> ( ch_idx ) ) >= 0 );
 		ch_idx += n / ch_len; //if neccesary jump to next chunk
 
-		if ( ch_idx < chunks.size() )
+		if ( ch_idx < ch_cnt )
 			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
 		else
-			current_it = ( * ( chunks.end() - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
+			current_it = chunks[ch_cnt-1]->end() ; //set current_it to the last chunks end iterator if we are behind it
 
 		return *this;
 	}
@@ -168,7 +171,7 @@ public:
 	}
 
 	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const {
-		return * ( ThisType ( chunks ) += n );
+		return * ( *this + n );
 	}
 
 };
@@ -820,12 +823,12 @@ public:
 	}
 	iterator begin() {
 		if ( checkMakeClean() ) {
-			std::vector<data::ValueArray<T>*> vec ( lookup.size() );
+			boost::shared_array<data::ValueArray<T>*> vec(new data::ValueArray<T>*[lookup.size()]);
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
 				vec[i] = &lookup[i]->template asValueArray<T>();
 
-			return iterator ( vec );
+			return iterator ( vec, lookup.size() );
 		} else {
 			LOG ( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 			return iterator();
@@ -836,12 +839,12 @@ public:
 	};
 	const_iterator begin() const {
 		if ( isClean() ) {
-			std::vector<const data::ValueArray<T>*> vec ( lookup.size() );
-
+			boost::shared_array<data::ValueArray<T>*> vec(new data::ValueArray<T>*[lookup.size()]);
+			
 			for ( size_t i = 0; i < lookup.size(); i++ )
 				vec[i] = &lookup[i]->template asValueArray<T>();
 
-			return const_iterator ( vec );
+			return const_iterator ( vec, lookup.size() );
 		} else {
 			LOG ( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 			return const_iterator();

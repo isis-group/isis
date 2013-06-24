@@ -1087,12 +1087,12 @@ util::fvector3 Image::getFoV() const
 Image::iterator Image::begin()
 {
 	if( checkMakeClean() ) {
-		std::vector<Chunk *> vec( lookup.size() );
+		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
 
-		return iterator( vec );
+		return iterator( vec, lookup.size() );
 	} else {
 		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 		return iterator();
@@ -1102,12 +1102,12 @@ Image::iterator Image::end() {return begin() + getVolume();}
 Image::const_iterator Image::begin()const
 {
 	if( isClean() ) {
-		std::vector<const Chunk *> vec( lookup.size() );
+		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
 
-		return const_iterator( vec );
+		return const_iterator( vec, lookup.size());
 	} else {
 		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 		return const_iterator();
