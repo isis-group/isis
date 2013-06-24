@@ -159,7 +159,6 @@ public:
 
 		//reshape myself
 		std::swap(m_dim[dim_a],m_dim[dim_b]);
-		const size_t size=getVolume()-1;
 		ITER cycle = at,last=cycle+getVolume();
 		size_t currIndex[DIMS];
 

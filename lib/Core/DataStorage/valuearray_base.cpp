@@ -255,7 +255,7 @@ WritingValueAdapter WritingValueAdapter::operator=( const util::ValueBase& val )
 	setValueFunc( const_cast<uint8_t * const>( p ), val );
 	return *this;
 }
-WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &val ){ operator=(*val);}
+WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &val ){ return operator=(*val);}
 
 void WritingValueAdapter::swapwith(const WritingValueAdapter& other )const
 {
