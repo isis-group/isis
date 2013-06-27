@@ -23,8 +23,9 @@
 
 #include <stdio.h>
 #include <fstream>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include "tmpfile.hpp"
 #include "message.hpp"
 #include "common.hpp"
@@ -34,22 +35,22 @@ namespace isis
 namespace util
 {
 
-TmpFile::TmpFile( std::string prefix, std::string sufix )
+using namespace boost::filesystem;
+  
+TmpFile::TmpFile( std::string prefix, std::string sufix ): 
+  path(temp_directory_path() / unique_path(prefix+"%%%%-%%%%-%%%%-%%%%"+sufix))
 {
-	// @todo critical block - should be locked
-	boost::filesystem::path dummy( tmpnam( NULL ) );
-	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
-	LOG( Debug, info ) << "Creating temporary file " << file_string();
-	std::ofstream( file_string().c_str() ).exceptions( std::ios::failbit | std::ios::badbit );
+	LOG( Debug, info ) << "Creating temporary file " << native();
+	ofstream( *this ).exceptions( std::ios::failbit | std::ios::badbit );
 }
 
 TmpFile::~TmpFile()
 {
 	if ( boost::filesystem::exists( *this ) ) {
 		boost::filesystem::remove( *this );
-		LOG( Debug, verbose_info ) << "Removing temporary " << file_string();
+		LOG( Debug, verbose_info ) << "Removing temporary " << native();
 	} else {
-		LOG( Debug, warning ) << "Temporary file " << file_string() << " does not exist, won't delete it";
+		LOG( Debug, warning ) << "Temporary file " << native() << " does not exist, won't delete it";
 	}
 }
 }

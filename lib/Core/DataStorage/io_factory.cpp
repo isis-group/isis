@@ -14,7 +14,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <Winbase.h>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/path.hpp>
 #else
 #include <dlfcn.h>
@@ -84,16 +84,16 @@ IOFactory::IOFactory()
 	const char *env_home = getenv( "HOME" );
 
 	if( env_path ) {
-		findPlugins( boost::filesystem::path( env_path ).directory_string() );
+		findPlugins( boost::filesystem::path( env_path ).native() );
 	}
 
 	if( env_home ) {
 		const boost::filesystem::path home = boost::filesystem::path( env_home ) / "isis" / "plugins";
 
 		if( boost::filesystem::exists( home ) ) {
-			findPlugins( home.directory_string() );
+			findPlugins( home.native() );
 		} else {
-			LOG( Runtime, info ) << home.directory_string() << " does not exist. Won't check for plugins there";
+			LOG( Runtime, info ) << home << " does not exist. Won't check for plugins there";
 		}
 	}
 
@@ -143,12 +143,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	boost::filesystem::path p( path );
 
 	if ( !exists( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " not found";
+		LOG( Runtime, warning ) << util::MSubject( p ) << " not found";
 		return 0;
 	}
 
 	if ( !boost::filesystem::is_directory( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " is no directory";
+		LOG( Runtime, warning ) << util::MSubject( p ) << " is no directory";
 		return 0;
 	}
 
@@ -159,8 +159,8 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	for ( boost::filesystem::directory_iterator itr( p ); itr != boost::filesystem::directory_iterator(); ++itr ) {
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 
-		if ( boost::regex_match( itr->path().leaf(), pluginFilter ) ) {
-			const std::string pluginName = itr->path().file_string();
+		if ( boost::regex_match( itr->path().filename().string(), pluginFilter ) ) {
+			const std::string pluginName = itr->path().native();
 #ifdef WIN32
 			HINSTANCE handle = LoadLibrary( pluginName.c_str() );
 #else
@@ -217,43 +217,47 @@ IOFactory &IOFactory::get()
 size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, util::istring suffix_override, util::istring dialect )
 {
 	FileFormatList formatReader;
-	formatReader = getFileFormatList( filename.file_string(), suffix_override, dialect );
-	const size_t nimgs_old = ret.size();   // save number of chunks
+	formatReader = getFileFormatList( filename.string(), suffix_override, dialect );
 	const util::istring with_dialect = dialect.empty() ?
 									   util::istring( "" ) : util::istring( " with dialect \"" ) + dialect + "\"";
 
 	if ( formatReader.empty() ) {
 		if( !boost::filesystem::exists( filename ) ) {
-			LOG( Runtime, error ) << util::MSubject( filename.file_string() )
+			LOG( Runtime, error ) << util::MSubject( filename )
 								  << " does not exist as file, and no suitable plugin was found to generate data from "
 								  << ( suffix_override.empty() ? util::istring( "that name" ) : util::istring( "the suffix \"" ) + suffix_override + "\"" );
 		} else if( suffix_override.empty() ) {
-			LOG( Runtime, error ) << "No plugin found to read " << filename.file_string() << with_dialect;
+			LOG( Runtime, error ) << "No plugin found to read " << filename << with_dialect;
 		} else {
 			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << with_dialect << " was found";
 		}
 	} else {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 			LOG( ImageIoDebug, info )
-					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename.file_string() ) << ": " << it->getName();
+					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
 
 			try {
-				return it->load( ret, filename.file_string(), dialect, m_feedback );
+				int loaded=it->load( ret, filename.native(), dialect, m_feedback );
+				BOOST_FOREACH( Chunk & ref, ret ) {
+					if ( ! ref.hasProperty( "source" ) )
+						ref.setPropertyAs( "source", filename.native() );
+				}
+				return loaded;
 			} catch ( std::runtime_error &e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
-							<< "Failed to load " <<  filename.file_string() << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
-							<< "The enforced format " << it->getName()  << " failed to read " << filename.file_string() << with_dialect
+							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
 							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
 				}
 			}
 		}
-		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename.file_string() ) << with_dialect;
+		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
 	}
-
-	return ret.size() - nimgs_old;//no plugin of proposed list could load file
+	
+	return 0;//no plugin of proposed list could load file
 }
 
 
@@ -265,7 +269,7 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
-		ext = util::stringToList<std::string>( fname.leaf(), '.' ); // get all suffixes
+		ext = util::stringToList<std::string>( fname.filename().string(), '.' ); // get all suffixes
 
 		if( !ext.empty() )ext.pop_front(); // remove the first "suffix" - actually the basename
 	} else ext = util::stringToList<std::string>( suffix_override, '.' );
@@ -332,10 +336,6 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
 						  get().loadPath( chunks, p, suffix_override, dialect ) :
 						  get().loadFile( chunks, p, suffix_override, dialect );
-	BOOST_FOREACH( Chunk & ref, chunks ) {
-		if ( ! ref.hasProperty( "source" ) )
-			ref.setPropertyAs( "source", p.file_string() );
-	}
 	return loaded;
 }
 
@@ -363,7 +363,7 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 
 	if( m_feedback ) {
 		const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
-		m_feedback->show( length, std::string( "Reading " ) + util::Value<std::string>( length ).toString( false ) + " files from " + path.file_string() );
+		m_feedback->show( length, std::string( "Reading " ) + util::Value<std::string>( length ).toString( false ) + " files from " + path.native() );
 	}
 
 	for ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {

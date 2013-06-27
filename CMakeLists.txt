@@ -22,7 +22,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "5")
+set(ISIS_VERSION_PATCH "6")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -137,7 +137,7 @@ macro( build_manpage name desc)
 			COMMENT "(Re)Generating manpage ${name}.1"
             VERBATIM
 		)
-		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI Tools")
+		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI_Tools")
 	endif(MANPAGES)
 endmacro( build_manpage )
 
