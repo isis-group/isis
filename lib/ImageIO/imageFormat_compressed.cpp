@@ -187,7 +187,7 @@ public:
 					char namebuff[size];
 					next_header_in -= tar_readstream( in, namebuff, size, "overlong filename for next entry" );
 					in.ignore( next_header_in ); // skip the remaining input until the next header
-					org_file = boost::filesystem::path( namebuff );
+					org_file = boost::filesystem::path( std::string(namebuff) );
 					LOG( Debug, verbose_info ) << "Got overlong name " << util::MSubject( org_file ) << " for next file.";
 
 					read_header( in, size, next_header_in ); //continue with the next header

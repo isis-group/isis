@@ -48,6 +48,7 @@ int main()
 		for ( short slice = 0; slice < slices; slice++ ) {
 			chunks.push_back( makeChunk<short>( 256, slice ) );
 			chunks.back().setPropertyAs( "acquisitionNumber", slice );
+			chunks.back().setPropertyAs( "sequenceNumber", 0 );
 		}
 
 		data::Image img( chunks );

@@ -218,7 +218,6 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 {
 	FileFormatList formatReader;
 	formatReader = getFileFormatList( filename.string(), suffix_override, dialect );
-	const size_t nimgs_old = ret.size();   // save number of chunks
 	const util::istring with_dialect = dialect.empty() ?
 									   util::istring( "" ) : util::istring( " with dialect \"" ) + dialect + "\"";
 
@@ -238,7 +237,12 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
 
 			try {
-				return it->load( ret, filename.native(), dialect, m_feedback );
+				int loaded=it->load( ret, filename.native(), dialect, m_feedback );
+				BOOST_FOREACH( Chunk & ref, ret ) {
+					if ( ! ref.hasProperty( "source" ) )
+						ref.setPropertyAs( "source", filename.native() );
+				}
+				return loaded;
 			} catch ( std::runtime_error &e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
@@ -252,8 +256,8 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 		}
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
 	}
-
-	return ret.size() - nimgs_old;//no plugin of proposed list could load file
+	
+	return 0;//no plugin of proposed list could load file
 }
 
 
@@ -332,10 +336,6 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
 						  get().loadPath( chunks, p, suffix_override, dialect ) :
 						  get().loadFile( chunks, p, suffix_override, dialect );
-	BOOST_FOREACH( Chunk & ref, chunks ) {
-		if ( ! ref.hasProperty( "source" ) )
-			ref.setPropertyAs( "source", p.native() );
-	}
 	return loaded;
 }
 
