@@ -1,3 +1,13 @@
+isis (0.7.6-1) UNRELEASED; urgency=low
+
+  * in nifti_sa add rudimentary support for reading json formated extensions
+  * in DICOM add fallback for missing number of slices in mosaic
+  * switch to boost::filesystem v3
+  * add support for lzma in imageFormat_compressed
+  * re-enabled help2man generated man files
+
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Thu, 27 Jun 2013 16:24:21 +0200
+
 isis (0.7.5-2) UNRELEASED; urgency=low
 
   * hardwire VIAIO_LIBRARY to /usr/lib/libviaio.a to get rid of runtime 

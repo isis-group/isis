@@ -30,6 +30,7 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_IOPLUGIN_DICOM:BOOL=ON \
             -DISIS_IOPLUGIN_NIFTI_SA:BOOL=ON \
             -DISIS_IOPLUGIN_COMP:BOOL=ON \
+            -DISIS_IOPLUGIN_COMP_LZMA:BOOL=ON \
             -DISIS_IOPLUGIN_NULL:BOOL=ON \
             -DISIS_IOPLUGIN_PNG:BOOL=ON \
             -DISIS_IOPLUGIN_VISTA:BOOL=ON \
@@ -40,7 +41,7 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_USE_LIBOIL:BOOL=ON \
             -DISIS_RUNTIME_LOG:BOOL=ON \
             -DISIS_DEBUG_LOG:BOOL=OFF \
-            -DMANPAGES:BOOL=OFF \
+            -DMANPAGES:BOOL=ON \
             -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
             -DGIT_REVISION="Debian-$(debver)" \
             -DCMAKE_C_FLAGS=-msse2 \
