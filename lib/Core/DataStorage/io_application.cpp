@@ -146,7 +146,7 @@ void IOApplication::printHelp( bool withHidden ) const
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
+			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
 			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects( "" ).c_str() );
