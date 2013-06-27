@@ -4,7 +4,7 @@
 #include <CoreUtils/tmpfile.hpp>
 #include <DataStorage/io_factory.hpp>
 
-#define BOOST_FILESYSTEM_VERSION 3 
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 
@@ -17,6 +17,10 @@
 #include <boost/filesystem/fstream.hpp>
 #include "DataStorage/fileptr.hpp"
 #include <boost/iostreams/categories.hpp>  // tags
+
+#ifdef HAVE_LZMA
+#include "imageFormat_compressed_lzma.hpp"
+#endif //HAVE_LZMA
 
 namespace isis
 {
@@ -115,10 +119,17 @@ private:
 	}
 protected:
 	util::istring suffixes( io_modes modes = both )const {
-		if( modes == write_only )
-			return "gz bz2 Z";
-		else
-			return "tar tar.gz tgz tar.bz2 tbz tar.Z taz gz bz2 Z";
+#ifdef HAVE_LZMA
+
+		if( modes == write_only )return "gz bz2 Z xz";
+		else return "tar tar.gz tgz tar.bz2 tbz tar.Z tar.xz taz gz bz2 Z xz";
+
+#else
+
+		if( modes == write_only )return "gz bz2 Z";
+		else return "tar tar.gz tgz tar.bz2 tbz tar.Z taz gz bz2 Z";
+
+#endif //HAVE_LZMA
 	}
 public:
 	util::istring dialects( const std::string &/*filename*/ )const {
@@ -160,6 +171,11 @@ public:
 			else if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() );
 			else if( suffix == ".bz2" )in.push( boost::iostreams::bzip2_decompressor() );
 			else if( suffix == ".Z" )in.push( boost::iostreams::zlib_decompressor() );
+
+#ifdef HAVE_LZMA
+			else if( suffix == ".xz" )in.push( boost::iostreams::lzma_decompressor() );
+
+#endif
 			else { // if its tar having no compression is fine
 				throwGenericError( "Cannot determine the compression format of \"" + filename + "\"" );
 			}
@@ -187,7 +203,7 @@ public:
 					char namebuff[size];
 					next_header_in -= tar_readstream( in, namebuff, size, "overlong filename for next entry" );
 					in.ignore( next_header_in ); // skip the remaining input until the next header
-					org_file = boost::filesystem::path( std::string(namebuff) );
+					org_file = boost::filesystem::path( std::string( namebuff ) );
 					LOG( Debug, verbose_info ) << "Got overlong name " << util::MSubject( org_file ) << " for next file.";
 
 					read_header( in, size, next_header_in ); //continue with the next header
@@ -299,6 +315,11 @@ public:
 		if( suffix == ".gz" )out.push( boost::iostreams::gzip_compressor() );
 		else if( suffix == ".bz2" )out.push( boost::iostreams::bzip2_compressor() );
 		else if( suffix == ".Z" )out.push( boost::iostreams::zlib_compressor() );
+
+#ifdef HAVE_LZMA
+		else if( suffix == ".xz" )out.push( boost::iostreams::lzma_compressor() );
+
+#endif
 
 		// write it
 		out.push( output );
