@@ -139,7 +139,8 @@ protected:
 	WriteOp( const isis::data::Image &image, size_t bitsPerVoxel );
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
 	void applyFlipToCoords ( util::vector4< size_t > &coords, data::dimensions blockdims );
-	void applyFlipToBlock ( isis::data::ValueArrayReference dat, util::vector4< size_t > chunkSize );
+	void applyFlipToData ( data::ValueArrayReference &dat, util::vector4< size_t > chunkSize );
+	void applyFlipToData ( data::Chunk& dat );
 public:
 	virtual ~WriteOp() {}
 	nifti_1_header *getHeader();
@@ -159,6 +160,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	static const util::Matrix4x4<short> nifti2isis;
 	static const util::Selection formCode;
 
+	typedef bool(*demuxer_type)(const util::PropertyValue &value,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name);
+
 	/// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
 	static util::Matrix4x4<double> getNiftiMatrix( const util::PropertyMap &props );
 	static void useSForm( util::PropertyMap &props );
@@ -167,21 +170,22 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	std::map<short, unsigned short> nifti_type2isis_type;
 	std::map<unsigned short, short> isis_type2nifti_type;
+	std::map<unsigned short,demuxer_type> prop_demuxer;
 	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
 		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
 		return data::ValueArray<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
-	static std::list<data::Chunk> parseSliceOrdering( const _internal::nifti_1_header *head, data::Chunk current );
+	static std::list<data::Chunk> parseSliceOrdering( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk current );
 
 	static bool parseDescripForSPM( util::PropertyMap &props, const char desc[] );
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
-	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
+	static std::list<data::Chunk> parseHeader( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
-	bool checkSwapEndian ( _internal::nifti_1_header *header );
+	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
 public:
 	ImageFormat_NiftiSa();

@@ -47,7 +47,7 @@ namespace util
 class Application
 {
 	const std::string m_name;
-	std::string m_filename;
+	boost::filesystem::path m_filename;
 	std::list<std::pair<std::string, std::string> > m_examples;
 	void addLoggingParameter( std::string name );
 

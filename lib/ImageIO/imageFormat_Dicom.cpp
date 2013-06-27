@@ -419,12 +419,16 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		NumberOfImagesInMosaicProp = prefix + "SiemensNumberOfImagesInMosaic";
 	} else if ( source.hasProperty( prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic";
-	} else {
-		FileFormat::throwGenericError( "Could not determine the number of images in the mosaic" );
 	}
 
 	// All is fine, lets start
-	uint16_t images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
+	uint16_t images;
+	if(NumberOfImagesInMosaicProp.empty()){
+		images = source.getSizeAsVector()[0]/ source.getPropertyAs<util::ilist>( prefix+"AcquisitionMatrix" ).front();
+		images*=images;
+		LOG(Debug,warning) << "Guessing number of slices in the mosaic as " << images << ". This might be to many";
+	} else
+		images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
 	const util::vector4<size_t> tSize = source.getSizeAsVector();
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
 	const util::vector3<size_t> size( tSize[0] / matrixSize, tSize[1] / matrixSize, images );
