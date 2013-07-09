@@ -100,8 +100,17 @@ public:
 	/// \returns a ordered vector of pointers to the chunks in the list
 	std::vector<boost::shared_ptr<Chunk> > getLookup();
 
-	/// \returns true if the list is rectangular (the amount of secondary sorted entries is equal across all primary entries)
-	bool isRectangular();
+	/**
+	 * \returns 0 if the list is rectangular (the amount of secondary sorted entries is equal across all primary entries)
+	 * \returns lowest amount of secondary sorted entries across all primary entries otherwise
+	 **/	
+	size_t isRectangular();
+
+	/**
+	 * Make image rectangular by dropping secondary sorted entries from all primary entries until their amount is equal.
+	 * \returns amount of dropped entries
+	 **/
+	size_t makeRectangular();
 
 	/// \returns the amount secondary sorted entries
 	size_t getHorizontalSize();

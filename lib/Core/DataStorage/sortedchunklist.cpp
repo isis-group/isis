@@ -221,19 +221,39 @@ void SortedChunkList::clear()
 {
 	chunks.clear();
 }
-bool SortedChunkList::isRectangular()
+size_t SortedChunkList::isRectangular()
 {
 	if( isEmpty() )return true;
 	
+	
 	const size_t images = getHorizontalSize();
+	size_t lowest=images;
 	for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
 		if( c->second.size() != images ){
-			LOG(Runtime,warning) << "Found conflicting non geometric depth of " << c->second.size() << " (the first depth was " << images << ") on a width of " << chunks.size();
-			return false;
+			LOG(Runtime,info) << "Found conflicting non geometric depth of " << c->second.size() << " (the first depth was " << images << ") on a width of " << chunks.size();
+			lowest=std::min(lowest,c->second.size());
 		}
 	}
-	return true;
+	return lowest==images ? 0:lowest;
 }
+
+size_t SortedChunkList::makeRectangular(){
+	size_t resize=isRectangular(),dropped=0;
+	if(resize){
+		for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
+			SecondaryMap &it=c->second;
+			if( it.size() > resize ){
+				dropped+=it.size()-resize;
+				SecondaryMap::iterator firstvalid=it.begin();std::advance(firstvalid,resize);
+				it.erase(firstvalid,it.end());
+			}
+			assert(it.size() == resize);
+		}
+	}
+	LOG_IF(dropped,Runtime,warning) << "Dropped " << dropped << " chunks to make image rectagular";
+	return dropped;
+}
+
 size_t SortedChunkList::getHorizontalSize()
 {
 	if( isEmpty() )return 0;
@@ -242,7 +262,7 @@ size_t SortedChunkList::getHorizontalSize()
 
 std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
-	LOG_IF( !isRectangular(), Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
+	LOG_IF( isRectangular()!=0, Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
 	if( !isEmpty() ) {
 		PrimaryMap::iterator iP = chunks.begin();

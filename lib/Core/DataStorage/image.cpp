@@ -343,8 +343,8 @@ bool Image::reIndex()
 		return false;
 	}
 
-	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "Aborting reindex of incomplete image.";
+	if(set.makeRectangular()>0 && set.isEmpty()){
+		LOG(Runtime,error) << "Nothing left to index, image is empty. Skipping";
 		return false;
 	}
 
