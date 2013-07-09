@@ -905,7 +905,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( dialect == "spm" ) {
 			writer->addFlip( image.mapScannerAxisToImageDimension( data::z ) );
 		} else if( dialect == "fsl" ) {
-			//dcm2nii flips the slice ordering of a mosaic if the determinant if the orientation is negative
+			//dcm2nii flips the slice ordering of a mosaic if the determinant of the orientation is negative
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
 			if( image.hasProperty( "DICOM/ImageType" ) ) {
 				const util::slist tp = image.getPropertyAs<util::slist>( "DICOM/ImageType" );
@@ -920,13 +920,13 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			}
 
 			//invert columnVec and flip the order of the images lines
-			//well, you know ... ask dcm2nii ....
+			//well, you know ... don't ask ....
 			LOG( Runtime, info ) << "Flipping columns of image for fsl compatibility";
 			flipGeometry( image, data::columnDim );
 			writer->addFlip( data::columnDim );
 		}
 
-		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming as dcm2nii does it
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data just as dcm2nii does it
 		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
@@ -985,7 +985,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		{
-			//join the properties of the first chunk into the image and store that to the header
+			//join the properties of the first chunk and the image and store that to the header
 			util::PropertyMap props = image;
 			props.join( image.getChunkAt( 0, false ) );
 			storeHeader( props, header );
