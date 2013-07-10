@@ -991,7 +991,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			storeHeader( props, header );
 		}
 
-		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
+		if( image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );
 
 		if( util::istring( dialect.c_str() ) == "spm" ) { // override "normal" description with the "spm-description"
