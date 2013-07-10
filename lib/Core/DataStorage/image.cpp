@@ -432,13 +432,13 @@ bool Image::reIndex()
 
 	//if we have at least two slides (and have slides (with different positions) at all)
 	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
-		const util::fvector3 thisV = first.getPropertyAs<util::fvector3>( "indexOrigin" );
+		const util::fvector3 firstV = first.getPropertyAs<util::fvector3>( "indexOrigin" );
 		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
 		if ( last.hasProperty( "indexOrigin" ) ) {
 			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
 			//check the slice vector
-			util::fvector3 distVecNorm = lastV - thisV;
+			util::fvector3 distVecNorm = lastV - firstV;
 			LOG_IF( distVecNorm.len() == 0, Runtime, error )
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
@@ -457,11 +457,10 @@ bool Image::reIndex()
 			}
 		}
 
-		const Chunk &next = chunkAt( 1 );
-
-		if ( next.hasProperty( "indexOrigin" ) ) {
-			const util::fvector3 nextV = next.getPropertyAs<util::fvector3>( "indexOrigin" );
-			const float sliceDist = ( nextV - thisV ).len() - voxeSize[2];
+		if ( last.hasProperty( "indexOrigin" ) ) {
+			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
+			const float avDist = ( lastV - firstV ).len() / (structure_size[2]-1); //average dist between the middle of two slices
+			const float sliceDist = avDist - voxeSize[2]; // the gap between two slices
 
 			if ( sliceDist > 0 ) {
 				static const float inf = std::numeric_limits<float>::infinity();
