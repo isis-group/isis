@@ -15,7 +15,10 @@ namespace isis
 {
 namespace image_io
 {
-
+using boost::posix_time::ptime;
+using boost::gregorian::date;
+	
+	
 namespace _internal
 {
 WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
@@ -198,39 +201,6 @@ public:
 
 	short unsigned int getTypeId() {return data::ValueArray<bool>::staticID;}
 };
-
-template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name){
-	if( props.size()!=chunks.size()){
-		LOG(Runtime,error) << "The length of the per-slice property " << util::MSubject(name) << " does not fit the number of slices, skipping.";
-		return false;
-	}
-	typename std::list<T>::const_iterator prop=props.begin();
-	BOOST_FOREACH(data::Chunk &ch,chunks){
-		ch.setPropertyAs<T>(name,*prop);
-	}
-	return true;
-}
-
-void demuxDcmMetaSlices(std::list<data::Chunk> chunks, util::PropertyMap &orig ){
-	static const util::PropertyMap::PropPath slicesBranch("DcmMeta/global/slices");
-	if(orig.hasBranch(slicesBranch)){
-		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,orig.branch(slicesBranch).getFlatMap()){
-			bool success;
-			switch(ppair.second.getTypeID()){
-				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,ppair.first);break;
-				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,ppair.first);break;
-				case util::Value<util::slist>::staticID:success=propDemux(ppair.second.castTo<util::slist>(),chunks,ppair.first);break;
-				default:
-					LOG(Runtime,error) << "The the type of " << util::MSubject(ppair.first)
-					<< " (" << ppair.second.getTypeName() <<  ") is not a list, skipping.";
-			}
-			if(success)
-				orig.branch(slicesBranch).remove(ppair.first); //@todo slices won't be removed if empty
-		}
-	} else {
-		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slicesBranch << " branch";
-	}
-}
 
 }
 
@@ -448,11 +418,11 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
 
-		boost::posix_time::ptime sequenceStart = boost::posix_time::ptime(
+		ptime sequenceStart = ptime(
 			boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
 			boost::posix_time::time_duration( hours, minutes, seconds )
 		);
-		props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
+		props.setPropertyAs<ptime>( "sequenceStart", sequenceStart );
 
 		LOG( Runtime, info ) << "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
 		<< ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
@@ -811,6 +781,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	// check for extenstions and parse them
 	data::ValueArray< uint8_t > extID = mfile.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
+	util::PropertyMap dcmmeta;
 
 	if( extID[0] != 0 ) { // there is an extension http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/extension.html
 		for( size_t pos = header->sizeof_hdr + 4; pos < header->vox_offset; ) {
@@ -818,7 +789,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			switch( ext_hdr[1] ) {
 			case 0: { // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), orig.branch( "DcmMeta" ), '.' );
+				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), dcmmeta.branch(_internal::dcmmeta_root), '.' );
 			}
 			break;
 			case 2:
@@ -838,6 +809,17 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, orig );
+	if(!dcmmeta.isEmpty()){
+		_internal::demuxDcmMetaSlices(newChunks,dcmmeta);
+		if(dcmmeta.hasBranch(_internal::dcmmeta_const_data)){
+			const util::PropertyMap &const_data=dcmmeta.branch(_internal::dcmmeta_const_data);
+			BOOST_FOREACH(data::Chunk &ch,newChunks)
+				ch.branch(_internal::dcmmeta_global).join(const_data);
+		}
+		BOOST_FOREACH(data::Chunk &ch,newChunks)
+			translateFromDcmMeta(ch);
+	}
+	
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();
 }
@@ -1260,6 +1242,122 @@ void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal:
 	sform.getRow( 1 ).copyTo( head->srow_y );
 	sform.getRow( 2 ).copyTo( head->srow_z );
 }
+
+void ImageFormat_NiftiSa::translateFromDcmMeta( util::PropertyMap& object )
+{
+	const util::istring prefix = util::istring(_internal::dcmmeta_global)+"/";
+	util::PropertyMap &demmetaTree=object.branch(prefix); 
+	
+	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
+	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
+		ptime sequenceStart = _internal::parseTM(demmetaTree, "SeriesTime" );
+		demmetaTree.remove( "SeriesTime" );
+		
+		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
+		BOOST_FOREACH( const char * d, dates ) {
+			if( hasOrTell(prefix + d, demmetaTree, warning ) ) {
+				sequenceStart = ptime( demmetaTree.getPropertyAs<date>( d ), sequenceStart.time_of_day() );
+				demmetaTree.remove( d );
+				break;
+			}
+		}
+		
+		// compute acquisitionTime
+		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
+			ptime acTime = _internal::parseTM( demmetaTree, "AcquisitionTime" );
+			demmetaTree.remove( "AcquisitionTime" );
+			
+			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
+			BOOST_FOREACH( const char * d, dates ) {
+				if( hasOrTell(prefix + d, demmetaTree, warning ) ) {
+					acTime = ptime( demmetaTree.getPropertyAs<date>( d ), acTime.time_of_day() );
+					demmetaTree.remove( d );
+					break;
+				}
+			}
+			
+			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
+			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
+			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
+			object.setPropertyAs( "acquisitionTime", fAcDist );
+		}
+		
+		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
+		object.setPropertyAs( "sequenceStart", sequenceStart );
+	}
+	
+	transformOrTell<uint16_t>   ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
+	transformOrTell<uint16_t>   ( prefix + "PatientsAge",      "subjectAge",         object, info );
+	transformOrTell<std::string>( prefix + "SeriesDescription","sequenceDescription",object, warning );
+	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
+	transformOrTell<date>       ( prefix + "PatientsBirthDate","subjectBirth",       object, info );
+	transformOrTell<uint16_t>   ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
+	
+	transformOrTell<std::string>( prefix + "PerformingPhysiciansName","performingPhysician", object, info );
+	transformOrTell<uint16_t>   ( prefix + "NumberOfAverages",        "numberOfAverages",    object, warning );
+	
+	transformOrTell<uint32_t>   ( prefix + "InstanceNumber", "acquisitionNumber", object, error );
+	
+	if( demmetaTree.hasProperty( "AcquisitionNumber" ) && object.propertyValue( "acquisitionNumber" ) == demmetaTree.propertyValue( "AcquisitionNumber" ) )
+		demmetaTree.remove( "AcquisitionNumber" );
+	
+	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
+		util::Selection isisGender( "male,female,other" );
+		bool set = false;
+		
+		switch ( demmetaTree.getPropertyAs<std::string>( "PatientsSex" )[0] ) {
+			case 'M':
+				isisGender.set( "male" );
+				set = true;
+				break;
+			case 'F':
+				isisGender.set( "female" );
+				set = true;
+				break;
+			case 'O':
+				isisGender.set( "other" );
+				set = true;
+				break;
+			default:
+				LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( prefix + "PatientsSex" ) ) <<  " not known";
+		}
+		
+		if( set ) {
+			object.propertyValue( "subjectGender" ) = isisGender;
+			demmetaTree.remove( "PatientsSex" );
+		}
+	}
+	
+	transformOrTell<uint32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
+
+	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
+		const util::fvector3 from_dcmmeta= demmetaTree.getPropertyAs<util::fvector3>( "ImagePositionPatient" );
+		const util::fvector3 from_nifti = object.getPropertyAs<util::fvector3>( "indexOrigin" );
+		if(! from_nifti.fuzzyEqual(from_dcmmeta,100)){
+			LOG(Runtime,warning) << "The slice position given in " << prefix + "ImagePositionPatient" << " does not fit the one computed from the nifti header ("
+			<< from_dcmmeta << "!=" << from_nifti << ")";
+		} else
+			demmetaTree.remove( "ImagePositionPatient" );
+	}
+	
+
+	// @todo figure out how DWI data are stored
+
+	
+	// rename DcmMeta/global to DICOM ... thats essentially what it is ... and others will look there for that data
+	object.rename(_internal::dcmmeta_global,"DICOM");
+	
+	// slices and const should be migrated by now, if not put them back to where they came from
+	if(object.hasBranch("DICOM/const")){
+		LOG(Runtime,warning) << "Unexpected branch " << _internal::dcmmeta_const_data << " found, will not touch it";
+		object.rename("DICOM/const",_internal::dcmmeta_const_data);
+	}
+	if(object.hasBranch("DICOM/slices")){
+		LOG(Runtime,warning) << "Unexpected branch " << _internal::dcmmeta_perslice_data << " found, will not touch it";
+		object.rename("DICOM/slices",_internal::dcmmeta_perslice_data);
+	} // @todo cleanup when PropPath api is improved
+}
+
 
 // The nifti coord system:
 // The (x,y,z) coordinates refer to the CENTER of a voxel.

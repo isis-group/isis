@@ -22,6 +22,7 @@
 
 
 #include "DataStorage/valuearray.hpp"
+#include "DataStorage/chunk.hpp"
 
 namespace isis
 {
@@ -29,8 +30,18 @@ namespace image_io
 {
 namespace _internal
 {
-bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &json_map, char extra_token = 0 );
 
+extern const char dcmmeta_root[];
+extern const char dcmmeta_global[];
+extern const char dcmmeta_perslice_data[];
+extern const char dcmmeta_const_data[];
+
+bool parse_json( data::ValueArray< uint8_t > stream, util::PropertyMap &json_map, char extra_token = 0 );
+
+void demuxDcmMetaSlices( std::list< data::Chunk >& chunks, util::PropertyMap& dcmmeta );
+
+//parse strings formated as dicom TM
+boost::posix_time::ptime parseTM( const util::PropertyMap& map, const util::PropertyMap::PropPath& name );
 
 }
 }
