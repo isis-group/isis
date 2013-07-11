@@ -110,14 +110,14 @@ void Image::deduplicateProperties()
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
 	const boost::shared_ptr<Chunk> &first = lookup[0];
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropertyMap common;
+	util::PropertyMap common=*first;;
 	util::PropertyMap::KeyList uniques;
-	first->toCommonUnique( common, uniques, true );
 
 	for ( size_t i = 1; i < lookup.size(); i++ ) {
 		lookup[i]->toCommonUnique( common, uniques, false );
 	}
 
+	// @todo removing uniques - list might improve performance
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 

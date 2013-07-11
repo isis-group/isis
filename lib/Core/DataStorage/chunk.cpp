@@ -273,7 +273,6 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 		BOOST_FOREACH( const util::PropertyMap::KeyType & key, lists ) { // override list-entries in the splices with their respective entries
 			ret.back().propertyValue( key ) = this->propertyValueAt( key, list_idx );
 		}
-		//      std::cout << static_cast<util::PropertyMap &>( ret.back() ) << std::endl;
 		list_idx++;
 	}
 	return ret;

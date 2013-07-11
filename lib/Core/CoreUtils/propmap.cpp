@@ -132,12 +132,12 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 	if ( path_it != pathEnd ) {
 		propPathIterator next = path_it;
 		next++;
-		iterator found = static_cast<Container &>( root ).find( *path_it );
+		const iterator found = static_cast<Container &>( root ).find( *path_it );
 
 		if ( found != root.end() ) {
 			mapped_type &ref = found->second;
 
-			if ( ! ref.is_leaf() ) {
+			if ( ! ref.is_leaf() && next!=pathEnd) {
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
 				if ( ref.getBranch().isEmpty() )
@@ -147,7 +147,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 				ret = true;
 			}
 		} else {
-			LOG( Runtime, warning ) << "Entry " << MSubject( *path_it ) << " not found, skipping it";
+			LOG( Runtime, warning ) << "Entry " << *path_it << " not found, skipping it";
 		}
 	}
 
@@ -546,29 +546,23 @@ bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 	const mapped_type *new_e = findEntry( newname );
 
 	if ( old_e ) {
-		LOG_IF( new_e && ! new_e->empty(), Runtime, warning )
-				<< "Overwriting " << std::make_pair( newname, *new_e ) << " with " << *old_e;
+		LOG_IF( new_e && ! new_e->empty(), Runtime, warning ) << "Overwriting " << std::make_pair( newname, *new_e ) << " with " << *old_e;
 		fetchEntry( newname ) = *old_e;
 		return remove( oldname );
 	} else {
-		LOG( Runtime, warning )
-				<< "Cannot rename " << oldname << " it does not exist";
+		LOG( Runtime, warning ) << "Cannot rename " << oldname << " it does not exist";
 		return false;
 	}
 }
 
 void PropertyMap::toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const
 {
-	if ( init ) {
-		common = *this;
-		uniques.clear();
-		return;
-	} else {
-		const DiffMap difference = common.getDifference( *this );
-		BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
-			uniques.insert( ref.first );
-
-			if ( ! ref.second.first.isEmpty() )common.remove( ref.first );//if there is something in common, remove it
+	const DiffMap difference = common.getDifference( *this );
+	BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
+		uniques.insert( ref.first );
+		if ( ! ref.second.first.isEmpty() ){
+			LOG(Debug,verbose_info) << "Detected difference in " << ref << " removing from common";
+			common.remove( ref.first );//if there is something in common, remove it
 		}
 	}
 }
