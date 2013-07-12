@@ -127,8 +127,8 @@ template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &c
 
 
 void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmmeta ){
-	static const util::PropertyMap::PropPath slicesBranch(dcmmeta_perslice_data);
-	if(dcmmeta.hasBranch(slicesBranch)){
+	static const util::PropertyMap::PropPath slices(dcmmeta_perslice_data);
+	if(dcmmeta.hasBranch(slices)){
 		size_t stride=1;
 		if(chunks.front().getRelevantDims()==4){ //if we have an 4D-Chunk
 			assert(chunks.size()==1); //there can only be one
@@ -142,9 +142,9 @@ void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmme
 			} else
 				++c;
 		}
-		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,dcmmeta.branch(slicesBranch).getFlatMap()){
-			bool success;
-			util::PropertyMap::PropPath path(util::istring( "DcmMeta/global/"+ppair.first)); // move the prop one branch up (without "slices")
+		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,dcmmeta.branch(slices).getFlatMap()){
+			bool success=false;
+			util::PropertyMap::PropPath path(util::istring(_internal::dcmmeta_perslice_data)+"/"+ppair.first); // move the prop one branch up (without "slices")
 			switch(ppair.second.getTypeID()){
 				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,path);break;
 				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,path);break;
@@ -153,10 +153,12 @@ void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmme
 					LOG(Runtime,error) << "The the type of " << path << " (" << ppair.second.getTypeName() <<  ") is not a list, skipping.";
 			}
 			if(success)
-				dcmmeta.branch(slicesBranch).remove(ppair.first); //@todo slices won't be removed if empty
+				dcmmeta.remove(path);
+			else
+				dcmmeta.rename(path,util::istring( dcmmeta_global )+"/rejected_slices/"+ppair.first);
 		}
 	} else {
-		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slicesBranch << " branch";
+		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slices << " branch";
 	}
 }
 

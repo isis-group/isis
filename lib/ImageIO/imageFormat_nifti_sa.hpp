@@ -187,7 +187,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
-	void translateFromDcmMeta( util::PropertyMap& orig );
+	void translateFromDcmMetaConst( util::PropertyMap& orig );
+	void translateFromDcmMetaSlices( util::PropertyMap& orig );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;

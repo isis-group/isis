@@ -809,15 +809,15 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, orig );
+
+	//if there was a DcmMeta extension 
 	if(!dcmmeta.isEmpty()){
-		_internal::demuxDcmMetaSlices(newChunks,dcmmeta);
-		if(dcmmeta.hasBranch(_internal::dcmmeta_const_data)){
-			const util::PropertyMap &const_data=dcmmeta.branch(_internal::dcmmeta_const_data);
-			BOOST_FOREACH(data::Chunk &ch,newChunks)
-				ch.branch(_internal::dcmmeta_global).join(const_data);
+		_internal::demuxDcmMetaSlices(newChunks,dcmmeta); // propagate the "slices" entry from there into the slices (and make slices if necessary)
+		BOOST_FOREACH(data::Chunk &ch,newChunks){ // join that into the slices
+			ch.join(dcmmeta); // merge the rest (const-data) into the slice 
+			translateFromDcmMetaConst(ch); // .. and translate it to isis (interpret known attributes to isis and move the remains of "global" to "DICOM")
+			translateFromDcmMetaSlices(ch); //  ... and translate slice attributes already in the slices
 		}
-		BOOST_FOREACH(data::Chunk &ch,newChunks)
-			translateFromDcmMeta(ch);
 	}
 	
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
@@ -1243,35 +1243,85 @@ void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal:
 	sform.getRow( 2 ).copyTo( head->srow_z );
 }
 
-void ImageFormat_NiftiSa::translateFromDcmMeta( util::PropertyMap& object )
+void ImageFormat_NiftiSa::translateFromDcmMetaSlices( util::PropertyMap& object )
 {
-	const util::istring prefix = util::istring(_internal::dcmmeta_global)+"/";
-	util::PropertyMap &demmetaTree=object.branch(prefix); 
+	const util::istring slices_prefix = util::istring(_internal::dcmmeta_perslice_data)+"/";
+	util::PropertyMap &slices_tree=object.branch(slices_prefix);
+
+	// compute acquisitionTime
+	if (hasOrTell( slices_prefix + "ContentTime", object, info ) ) {
+		if(object.hasProperty("sequenceStart")){
+			ptime sequenceStart =object.getPropertyAs<ptime>( "sequenceStart");
+
+			ptime acTime = _internal::parseTM( slices_tree, "ContentTime" );
+			slices_tree.remove( "ContentTime" );
+
+			if( hasOrTell(slices_prefix + "ContentDate", slices_tree, warning ) ) {
+				acTime = ptime( slices_tree.getPropertyAs<date>( "ContentDate" ), acTime.time_of_day() );
+				slices_tree.remove( "ContentDate" );
+			}
+
+			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
+			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
+			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
+			object.setPropertyAs( "acquisitionTime", fAcDist );
+		} else {
+			LOG(Runtime,warning) << "Don't have sequenceStart, can't compute acquisitionTime from ContentTime";
+		}
+	}
+
+	if ( hasOrTell( slices_prefix + "ImagePositionPatient", object, info ) ) {
+		const util::fvector3 from_dcmmeta= slices_tree.getPropertyAs<util::fvector3>( "ImagePositionPatient" );
+		const util::fvector3 from_nifti = object.getPropertyAs<util::fvector3>( "indexOrigin" );
+		if(! from_nifti.fuzzyEqual(from_dcmmeta,100)){
+			LOG(Runtime,warning) << "The slice position given in " << slices_prefix + "ImagePositionPatient" << " does not fit the one computed from the nifti header ("
+			<< from_dcmmeta << "!=" << from_nifti << ")";
+		} else
+			slices_tree.remove( "ImagePositionPatient" );
+	}
+	
+	
+	transformOrTell<uint32_t>   ( slices_prefix + "InstanceNumber", "acquisitionNumber", object, error );
+	if( slices_tree.hasProperty( "AcquisitionNumber" ) && object.propertyValue( "acquisitionNumber" ) == slices_tree.propertyValue( "AcquisitionNumber" ) )
+		slices_tree.remove( "AcquisitionNumber" );
+	
+	// rename DcmMeta/global/slices to DICOM ... thats essentially what it is ... and others will look there for that data
+	util::PropertyMap::KeyList rejects=object.branch("DICOM").join(object.branch(_internal::dcmmeta_perslice_data));
+	BOOST_FOREACH(util::PropertyMap::PropPath key,rejects){
+		object.rename(key,util::istring( _internal::dcmmeta_global )+"/rejected_slices/"+key.back()); // and move the rejects to rejected_slices
+	}
+	object.remove(_internal::dcmmeta_perslice_data);
+}
+
+void ImageFormat_NiftiSa::translateFromDcmMetaConst( util::PropertyMap& object )
+{
+	const util::istring const_prefix = util::istring(_internal::dcmmeta_const_data)+"/";
+	util::PropertyMap &const_tree=object.branch(const_prefix);
 	
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
-	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
-		ptime sequenceStart = _internal::parseTM(demmetaTree, "SeriesTime" );
-		demmetaTree.remove( "SeriesTime" );
+	if ( hasOrTell( const_prefix + "SeriesTime", object, warning ) ) {
+		ptime sequenceStart = _internal::parseTM(const_tree, "SeriesTime" );
+		const_tree.remove( "SeriesTime" );
 		
-		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
+		const char *dates[] = {"SeriesDate", "AcquisitionDate"};
 		BOOST_FOREACH( const char * d, dates ) {
-			if( hasOrTell(prefix + d, demmetaTree, warning ) ) {
-				sequenceStart = ptime( demmetaTree.getPropertyAs<date>( d ), sequenceStart.time_of_day() );
-				demmetaTree.remove( d );
+			if( hasOrTell(const_prefix + d, const_tree, warning ) ) {
+				sequenceStart = ptime( const_tree.getPropertyAs<date>( d ), sequenceStart.time_of_day() );
+				const_tree.remove( d );
 				break;
 			}
 		}
 		
-		// compute acquisitionTime
-		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
-			ptime acTime = _internal::parseTM( demmetaTree, "AcquisitionTime" );
-			demmetaTree.remove( "AcquisitionTime" );
+		// compute acquisitionTime from global AcquisitionTime (if its there)
+		if ( hasOrTell( const_prefix + "AcquisitionTime", object, info ) ) {
+			ptime acTime = _internal::parseTM( const_tree, "AcquisitionTime" );
+			const_tree.remove( "AcquisitionTime" );
 			
-			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
+			const char *dates[] = {"AcquisitionDate", "SeriesDate"};
 			BOOST_FOREACH( const char * d, dates ) {
-				if( hasOrTell(prefix + d, demmetaTree, warning ) ) {
-					acTime = ptime( demmetaTree.getPropertyAs<date>( d ), acTime.time_of_day() );
-					demmetaTree.remove( d );
+				if( hasOrTell(const_prefix + d, const_tree, warning ) ) {
+					acTime = ptime( const_tree.getPropertyAs<date>( d ), acTime.time_of_day() );
+					const_tree.remove( d );
 					break;
 				}
 			}
@@ -1286,26 +1336,21 @@ void ImageFormat_NiftiSa::translateFromDcmMeta( util::PropertyMap& object )
 		object.setPropertyAs( "sequenceStart", sequenceStart );
 	}
 	
-	transformOrTell<uint16_t>   ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
-	transformOrTell<uint16_t>   ( prefix + "PatientsAge",      "subjectAge",         object, info );
-	transformOrTell<std::string>( prefix + "SeriesDescription","sequenceDescription",object, warning );
-	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
-	transformOrTell<date>       ( prefix + "PatientsBirthDate","subjectBirth",       object, info );
-	transformOrTell<uint16_t>   ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
+	transformOrTell<uint16_t>   ( const_prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
+	transformOrTell<uint16_t>   ( const_prefix + "PatientsAge",      "subjectAge",         object, info );
+	transformOrTell<std::string>( const_prefix + "SeriesDescription","sequenceDescription",object, warning );
+	transformOrTell<std::string>( const_prefix + "PatientsName",     "subjectName",        object, info );
+	transformOrTell<date>       ( const_prefix + "PatientsBirthDate","subjectBirth",       object, info );
+	transformOrTell<uint16_t>   ( const_prefix + "PatientsWeight",   "subjectWeigth",      object, info );
 	
-	transformOrTell<std::string>( prefix + "PerformingPhysiciansName","performingPhysician", object, info );
-	transformOrTell<uint16_t>   ( prefix + "NumberOfAverages",        "numberOfAverages",    object, warning );
+	transformOrTell<std::string>( const_prefix + "PerformingPhysiciansName","performingPhysician", object, info );
+	transformOrTell<uint16_t>   ( const_prefix + "NumberOfAverages",        "numberOfAverages",    object, warning );
 	
-	transformOrTell<uint32_t>   ( prefix + "InstanceNumber", "acquisitionNumber", object, error );
-	
-	if( demmetaTree.hasProperty( "AcquisitionNumber" ) && object.propertyValue( "acquisitionNumber" ) == demmetaTree.propertyValue( "AcquisitionNumber" ) )
-		demmetaTree.remove( "AcquisitionNumber" );
-	
-	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
+	if ( hasOrTell( const_prefix + "PatientsSex", object, info ) ) {
 		util::Selection isisGender( "male,female,other" );
 		bool set = false;
 		
-		switch ( demmetaTree.getPropertyAs<std::string>( "PatientsSex" )[0] ) {
+		switch ( const_tree.getPropertyAs<std::string>( "PatientsSex" )[0] ) {
 			case 'M':
 				isisGender.set( "male" );
 				set = true;
@@ -1319,43 +1364,22 @@ void ImageFormat_NiftiSa::translateFromDcmMeta( util::PropertyMap& object )
 				set = true;
 				break;
 			default:
-				LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( prefix + "PatientsSex" ) ) <<  " not known";
+				LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( const_prefix + "PatientsSex" ) ) <<  " not known";
 		}
 		
 		if( set ) {
 			object.propertyValue( "subjectGender" ) = isisGender;
-			demmetaTree.remove( "PatientsSex" );
+			const_tree.remove( "PatientsSex" );
 		}
 	}
 	
-	transformOrTell<uint32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-
-	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
-		const util::fvector3 from_dcmmeta= demmetaTree.getPropertyAs<util::fvector3>( "ImagePositionPatient" );
-		const util::fvector3 from_nifti = object.getPropertyAs<util::fvector3>( "indexOrigin" );
-		if(! from_nifti.fuzzyEqual(from_dcmmeta,100)){
-			LOG(Runtime,warning) << "The slice position given in " << prefix + "ImagePositionPatient" << " does not fit the one computed from the nifti header ("
-			<< from_dcmmeta << "!=" << from_nifti << ")";
-		} else
-			demmetaTree.remove( "ImagePositionPatient" );
-	}
-	
+	transformOrTell<uint32_t>( const_prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
 
 	// @todo figure out how DWI data are stored
 
 	
-	// rename DcmMeta/global to DICOM ... thats essentially what it is ... and others will look there for that data
-	object.rename(_internal::dcmmeta_global,"DICOM");
-	
-	// slices and const should be migrated by now, if not put them back to where they came from
-	if(object.hasBranch("DICOM/const")){
-		LOG(Runtime,warning) << "Unexpected branch " << _internal::dcmmeta_const_data << " found, will not touch it";
-		object.rename("DICOM/const",_internal::dcmmeta_const_data);
-	}
-	if(object.hasBranch("DICOM/slices")){
-		LOG(Runtime,warning) << "Unexpected branch " << _internal::dcmmeta_perslice_data << " found, will not touch it";
-		object.rename("DICOM/slices",_internal::dcmmeta_perslice_data);
-	} // @todo cleanup when PropPath api is improved
+	// rename DcmMeta/global/const to DICOM ... thats essentially what it is ... and others will look there for that data
+	object.rename(_internal::dcmmeta_const_data,"DICOM");
 }
 
 
