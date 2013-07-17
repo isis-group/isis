@@ -812,6 +812,11 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	//if there was a DcmMeta extension 
 	if(!dcmmeta.isEmpty()){
+		if(dialect!="withExtProtocols"){ //remove MrPhoenixProtocol if not asked for explicitely
+			const util::istring paths[] = {util::istring(_internal::dcmmeta_const_data)+"/CsaSeries/MrPhoenixProtocol",util::istring(_internal::dcmmeta_perslice_data)+"/CsaSeries/MrPhoenixProtocol"};
+			BOOST_FOREACH(const util::istring &p,paths)
+				if(dcmmeta.hasBranch(p))dcmmeta.remove(p);
+		}
 		_internal::demuxDcmMetaSlices(newChunks,dcmmeta); // propagate the "slices" entry from there into the slices (and make slices if necessary)
 		BOOST_FOREACH(data::Chunk &ch,newChunks){ // join that into the slices
 			ch.join(dcmmeta); // merge the rest (const-data) into the slice 
@@ -1274,10 +1279,11 @@ void ImageFormat_NiftiSa::translateFromDcmMetaSlices( util::PropertyMap& object 
 		const util::fvector3 from_dcmmeta= slices_tree.getPropertyAs<util::fvector3>( "ImagePositionPatient" );
 		const util::fvector3 from_nifti = object.getPropertyAs<util::fvector3>( "indexOrigin" );
 		if(! from_nifti.fuzzyEqual(from_dcmmeta,100)){
-			LOG(Runtime,warning) << "The slice position given in " << slices_prefix + "ImagePositionPatient" << " does not fit the one computed from the nifti header ("
+			LOG(Runtime,warning) << "The slice position given in " << slices_prefix + "ImagePositionPatient" << " did not fit the one computed from the nifti header ("
 			<< from_dcmmeta << "!=" << from_nifti << ")";
-		} else
-			slices_tree.remove( "ImagePositionPatient" );
+		}
+		slices_tree.remove( "ImagePositionPatient" );
+		object.setPropertyAs( "indexOrigin", from_dcmmeta );		
 	}
 	
 	
@@ -1374,7 +1380,7 @@ void ImageFormat_NiftiSa::translateFromDcmMetaConst( util::PropertyMap& object )
 	}
 	
 	transformOrTell<uint32_t>( const_prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-
+ 
 	// @todo figure out how DWI data are stored
 
 	

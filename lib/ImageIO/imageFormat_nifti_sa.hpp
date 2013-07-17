@@ -195,7 +195,7 @@ public:
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
+	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm withExtProtocols";}
 
 protected:
 	util::istring suffixes( io_modes mode = both )const;
