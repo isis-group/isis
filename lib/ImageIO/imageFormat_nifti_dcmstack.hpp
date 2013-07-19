@@ -43,6 +43,14 @@ void demuxDcmMetaSlices( std::list< data::Chunk >& chunks, util::PropertyMap& dc
 //parse strings formated as dicom TM
 boost::posix_time::ptime parseTM( const util::PropertyMap& map, const util::PropertyMap::PropPath& name );
 
+class JsonMap:public util::PropertyMap{
+public:
+	JsonMap(const util::PropertyMap &src);
+	void WriteJson( std::ostream& out );
+private:
+	static void WriteSubtree( const std::map< isis::util::istring, isis::util::_internal::treeNode >& src, std::ostream& out );
+};
+
 }
 }
 }

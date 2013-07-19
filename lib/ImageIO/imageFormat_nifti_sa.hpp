@@ -59,6 +59,7 @@
 
 #include <DataStorage/io_interface.h>
 #include <CoreUtils/matrix.hpp>
+#include <DataStorage/fileptr.hpp>
 #include <sys/stat.h>
 
 namespace isis
@@ -189,6 +190,9 @@ class ImageFormat_NiftiSa: public FileFormat
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
 	void translateFromDcmMetaConst( util::PropertyMap& orig );
 	void translateFromDcmMetaSlices( util::PropertyMap& orig );
+	void translateToDcmMetaConst( util::PropertyMap& orig, std::ofstream &output );
+	void translateToDcmMetaSlices( util::PropertyMap& orig, std::ofstream &output );
+	
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
