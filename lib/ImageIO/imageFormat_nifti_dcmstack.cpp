@@ -16,15 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #define BOOST_SPIRIT_DEBUG_PRINT_SOME 50
-// #define BOOST_SPIRIT_DEBUG_INDENT 5
+#define BOOST_SPIRIT_DEBUG_PRINT_SOME 100
+#define BOOST_SPIRIT_DEBUG_INDENT 5
 
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/spirit/include/qi_repeat.hpp>
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include <isis/CoreUtils/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"
 #include <CoreUtils/value_base.hpp>
@@ -52,8 +54,7 @@ namespace fusion = boost::fusion;
 
 typedef BOOST_TYPEOF( ascii::space | '\t' | boost::spirit::eol ) SKIP_TYPE;
 typedef data::ValueArray< uint8_t >::iterator ch_iterator;
-typedef qi::rule<ch_iterator, isis::util::PropertyMap(), SKIP_TYPE>::context_type PropertyMapContext;
-typedef boost::variant<util::PropertyValue, util::PropertyMap> value_cont;
+typedef qi::rule<ch_iterator, JsonMap(), SKIP_TYPE>::context_type JsonMapContext;
 
 JsonMap::JsonMap( const util::PropertyMap& src ):util::PropertyMap(src){}
 void JsonMap::WriteJson( std::ostream& out )
@@ -98,38 +99,48 @@ void JsonMap::WriteSubtree( const std::map<util::istring, util::_internal::treeN
 struct add_member {
 	char extra_token;
 	add_member( char _extra_token ): extra_token( _extra_token ) {}
-	void operator()( const fusion::vector2<std::string, value_cont> &a, PropertyMapContext &context, bool & )const {
-		const value_cont &container = a.m1;
-		const util::PropertyMap::PropPath label = extra_token ?
-				util::stringToList<util::PropertyMap::KeyType>( a.m0, extra_token ) :
-				util::PropertyMap::PropPath( a.m0.c_str() );
-		util::PropertyMap &target = context.attributes.car;
+	void operator()( const fusion::vector2<std::string, JsonMap::value_cont> &a, JsonMapContext &context, bool & )const {
+		const JsonMap::PropPath label = extra_token ?
+				util::stringToList<JsonMap::KeyType>( a.m0, extra_token ) :
+				JsonMap::PropPath( a.m0.c_str() );
+		JsonMap &target = context.attributes.car;
 
-		if( target.hasBranch( label ) || target.hasProperty( label ) ) {
+		if( target.hasBranch( label ) || target.hasProperty( label ) )
 			LOG( Runtime, error ) << "There is already an entry " << target << " skipping this one" ;
-		} else {
-			switch( container.which() ) {
-			case 1:
-				target.branch( label ) = boost::get<util::PropertyMap>( container );
-				break;
-			case 0:
-				target.propertyValue( label ) = boost::get<util::PropertyValue>( container );
-				break;
-			}
-		}
+		else
+			target.insertObject(label,a.m1);
 	}
 };
 
-struct flattener { // simply insert subarrays into the array above
-	template<typename T, typename CONTEXT> void operator()( const std::list<T> &a, CONTEXT &context, bool & )const {
-		std::list<T> &cont = context.attributes.car;
-		cont.insert( cont.end(), a.begin(), a.end() );
-	}
+struct vec_trans { // insert subarrays as vector-Properties into an array of Properties
+template<typename T, typename CONTEXT> void operator()( const std::vector<T> &a, CONTEXT &context, bool & )const {
+	std::list<util::PropertyValue> &cont = context.attributes.car;
+	util::vector4<T> buff;buff.copyFrom(a.begin(),a.end());
+	cont.push_back(buff);
+}
 };
+
 
 template<typename T> struct read {typedef qi::rule<ch_iterator, T(), SKIP_TYPE> rule;};
 
-bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyMap &json_map, char extra_token )
+void JsonMap::insertObject(const JsonMap::PropPath &label, const JsonMap::value_cont& container )
+{
+	switch( container.which() ) {
+		case 2:{
+			const std::list<util::PropertyValue> &src=boost::get<std::list<util::PropertyValue> >( container );
+			propertyValueVec( label )=std::vector<util::PropertyValue>(src.begin(),src.end());
+			}break;
+		case 1:
+			branch( label ) = boost::get<JsonMap>( container );
+			break;
+		case 0:
+			propertyValue( label ) = boost::get<util::PropertyValue>( container );
+			break;
+	}
+}
+
+
+bool JsonMap::ReadJson( data::ValueArray< uint8_t > stream, char extra_token )
 {
 	using qi::lit;
 	using namespace boost::spirit;
@@ -138,20 +149,31 @@ bool parse_json( isis::data::ValueArray< uint8_t > stream, isis::util::PropertyM
 	read<value_cont>::rule value;
 	read<std::string>::rule string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" ), label( string >> ':', "label" );
 	read<fusion::vector2<std::string, value_cont> >::rule member( label >> value, "member" );
-	read<isis::util::PropertyMap>::rule object( lit( '{' ) >> member[add_member( extra_token )] % ',' >> '}', "object" );
+	read<JsonMap>::rule object( lit( '{' ) >> member[add_member( extra_token )] % ',' >> '}', "object" );
 	read<int>::rule integer(int_ >> !lit('.'),"integer") ;
-	read<util::dlist>::rule dlist( lit( '[' ) >> ( ( double_[phoenix::push_back( _val, _1 )] | dlist[flattener()] ) % ',' ) >> ']', "dlist" );
-	read<util::ilist>::rule ilist( lit( '[' ) >> ( ( integer[phoenix::push_back( _val, _1 )] | ilist[flattener()] ) % ',' ) >> ']', "ilist" );
-	read<util::slist>::rule slist( lit( '[' ) >> ( ( string [phoenix::push_back( _val, _1 )] | slist[flattener()] ) % ',' ) >> ']', "slist" );
+	read<util::dlist>::rule dlist( lit( '[' ) >> double_ % ',' >> ']', "dlist" );
+	read<util::ilist>::rule ilist( lit( '[' ) >> integer % ',' >> ']', "ilist" );
+	read<util::slist>::rule slist( lit( '[' ) >> string  % ',' >> ']', "slist" );
 
-	value = string | integer | double_ | slist | ilist | dlist |  object;
+	read<std::vector<util::dvector4::value_type> >::rule dvec(lit( '[' ) >>  double_ >> repeat(0,3)[ ',' >> double_] >> ']', "dvec");
+	read<std::vector<util::ivector4::value_type> >::rule ivec(lit( '[' ) >>  integer >> repeat(0,3)[ ',' >> integer] >> ']', "ivec");
+	
+	read<std::list<util::PropertyValue> >::rule dveclist( lit( '[' ) >> dvec[vec_trans()] % ',' >> ']', "dveclist");
+	read<std::list<util::PropertyValue> >::rule iveclist( lit( '[' ) >> ivec[vec_trans()] % ',' >> ']', "iveclist");
 
+	value = string | integer | double_ | slist | ilist | dlist | dveclist | iveclist | object;
+
+	qi::debug(dvec);
+	qi::debug(ivec);
+	qi::debug(dveclist);
+	qi::debug(iveclist);
+	
 	data::ValueArray< uint8_t >::iterator begin = stream.begin(), end = stream.end();
-	bool erg = phrase_parse( begin, end, object[phoenix::ref( json_map )=_1], ascii::space | '\t' | eol );
+	bool erg = phrase_parse( begin, end, object[phoenix::ref( *this )=_1], ascii::space | '\t' | eol );
 	return end == stream.end();
 }
 
-template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name){
+template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,JsonMap::PropPath name){
 	if( (props.size()%chunks.size())!=0){
 		LOG(Runtime,error) << "The length of the per-slice property DcmMeta entry " << util::MSubject(name) << " does not fit the number of slices, skipping (" << props.size() << "!=" << chunks.size() << ").";
 		return false;
@@ -172,8 +194,8 @@ template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &c
 }
 
 
-void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmmeta ){
-	static const util::PropertyMap::PropPath slices(dcmmeta_perslice_data);
+void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, JsonMap &dcmmeta ){
+	static const JsonMap::PropPath slices(dcmmeta_perslice_data);
 	if(dcmmeta.hasBranch(slices)){
 		size_t stride=1;
 		if(chunks.front().getRelevantDims()==4){ //if we have an 4D-Chunk
@@ -188,9 +210,9 @@ void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmme
 			} else
 				++c;
 		}
-		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,dcmmeta.branch(slices).getFlatMap()){
+		BOOST_FOREACH(const JsonMap::FlatMap::value_type &ppair,dcmmeta.branch(slices).getFlatMap()){
 			bool success=false;
-			util::PropertyMap::PropPath path(util::istring(_internal::dcmmeta_perslice_data)+"/"+ppair.first); // move the prop one branch up (without "slices")
+			JsonMap::PropPath path(util::istring(_internal::dcmmeta_perslice_data)+"/"+ppair.first); // move the prop one branch up (without "slices")
 			switch(ppair.second.getTypeID()){
 				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,path);break;
 				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,path);break;
@@ -208,7 +230,7 @@ void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, util::PropertyMap &dcmme
 	}
 }
 
-boost::posix_time::ptime parseTM( const isis::util::PropertyMap &map, const util::PropertyMap::PropPath &name )
+boost::posix_time::ptime parseTM( const JsonMap &map, const JsonMap::PropPath &name )
 {
 	short shift = 0;
 	bool ok = true;
@@ -250,7 +272,7 @@ boost::posix_time::ptime parseTM( const isis::util::PropertyMap &map, const util
 void ImageFormat_NiftiSa::translateFromDcmMetaConst( util::PropertyMap& object )
 {
 	const util::istring const_prefix = util::istring(_internal::dcmmeta_const_data)+"/";
-	util::PropertyMap &const_tree=object.branch(const_prefix);
+	_internal::JsonMap const_tree=object.branch(const_prefix);
 	
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
 	if ( hasOrTell( const_prefix + "SeriesTime", object, warning ) ) {
@@ -339,7 +361,7 @@ void ImageFormat_NiftiSa::translateFromDcmMetaConst( util::PropertyMap& object )
 void ImageFormat_NiftiSa::translateFromDcmMetaSlices( util::PropertyMap& object )
 {
 	const util::istring slices_prefix = util::istring(_internal::dcmmeta_perslice_data)+"/";
-	util::PropertyMap &slices_tree=object.branch(slices_prefix);
+	_internal::JsonMap slices_tree=object.branch(slices_prefix);
 	
 	// compute acquisitionTime
 	if (hasOrTell( slices_prefix + "ContentTime", object, info ) ) {

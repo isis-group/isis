@@ -781,7 +781,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	// check for extenstions and parse them
 	data::ValueArray< uint8_t > extID = mfile.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
-	util::PropertyMap dcmmeta;
+	_internal::JsonMap dcmmeta;
 
 	if( extID[0] != 0 ) { // there is an extension http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/extension.html
 		for( size_t pos = header->sizeof_hdr + 4; pos < header->vox_offset; ) {
@@ -789,7 +789,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			switch( ext_hdr[1] ) {
 			case 0: { // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), dcmmeta.branch(_internal::dcmmeta_root), '.' );
+				dcmmeta.ReadJson( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), '.' );
 			}
 			break;
 			case 2:
@@ -817,7 +817,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 			BOOST_FOREACH(const util::istring &p,paths)
 				if(dcmmeta.hasBranch(p))dcmmeta.remove(p);
 		}
-		_internal::demuxDcmMetaSlices(newChunks,dcmmeta); // propagate the "slices" entry from there into the slices (and make slices if necessary)
+// 		_internal::demuxDcmMetaSlices(newChunks,dcmmeta); // propagate the "slices" entry from there into the slices (and make slices if necessary)
 		BOOST_FOREACH(data::Chunk &ch,newChunks){ // join that into the slices
 			ch.join(dcmmeta); // merge the rest (const-data) into the slice 
 			translateFromDcmMetaConst(ch); // .. and translate it to isis (interpret known attributes to isis and move the remains of "global" to "DICOM")
