@@ -59,6 +59,7 @@
 
 #include <DataStorage/io_interface.h>
 #include <CoreUtils/matrix.hpp>
+#include <DataStorage/fileptr.hpp>
 #include <sys/stat.h>
 
 namespace isis
@@ -187,13 +188,18 @@ class ImageFormat_NiftiSa: public FileFormat
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
+	void translateFromDcmMetaConst( util::PropertyMap& orig );
+	void translateFromDcmMetaSlices( util::PropertyMap& orig );
+	void translateToDcmMetaConst( util::PropertyMap& orig, std::ofstream &output );
+	void translateToDcmMetaSlices( util::PropertyMap& orig, std::ofstream &output );
+	
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
+	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm withExtProtocols";}
 
 protected:
 	util::istring suffixes( io_modes mode = both )const;

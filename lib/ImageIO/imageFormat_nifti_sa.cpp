@@ -6,7 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include "imageFormat_nifti_sa.hpp"
-#include "imageFormat_nifti_parser.hpp"
+#include "imageFormat_nifti_dcmstack.hpp"
 #include <errno.h>
 #include <fstream>
 
@@ -15,7 +15,10 @@ namespace isis
 {
 namespace image_io
 {
-
+using boost::posix_time::ptime;
+using boost::gregorian::date;
+	
+	
 namespace _internal
 {
 WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
@@ -198,39 +201,6 @@ public:
 
 	short unsigned int getTypeId() {return data::ValueArray<bool>::staticID;}
 };
-
-template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name){
-	if( props.size()!=chunks.size()){
-		LOG(Runtime,error) << "The length of the per-slice property " << util::MSubject(name) << " does not fit the number of slices, skipping.";
-		return false;
-	}
-	typename std::list<T>::const_iterator prop=props.begin();
-	BOOST_FOREACH(data::Chunk &ch,chunks){
-		ch.setPropertyAs<T>(name,*prop);
-	}
-	return true;
-}
-
-void demuxDcmMetaSlices(std::list<data::Chunk> chunks, util::PropertyMap &orig ){
-	static const util::PropertyMap::PropPath slicesBranch("DcmMeta/global/slices");
-	if(orig.hasBranch(slicesBranch)){
-		BOOST_FOREACH(const util::PropertyMap::FlatMap::value_type &ppair,orig.branch(slicesBranch).getFlatMap()){
-			bool success;
-			switch(ppair.second.getTypeID()){
-				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,ppair.first);break;
-				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,ppair.first);break;
-				case util::Value<util::slist>::staticID:success=propDemux(ppair.second.castTo<util::slist>(),chunks,ppair.first);break;
-				default:
-					LOG(Runtime,error) << "The the type of " << util::MSubject(ppair.first)
-					<< " (" << ppair.second.getTypeName() <<  ") is not a list, skipping.";
-			}
-			if(success)
-				orig.branch(slicesBranch).remove(ppair.first); //@todo slices won't be removed if empty
-		}
-	} else {
-		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slicesBranch << " branch";
-	}
-}
 
 }
 
@@ -448,11 +418,11 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
 
-		boost::posix_time::ptime sequenceStart = boost::posix_time::ptime(
+		ptime sequenceStart = ptime(
 			boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
 			boost::posix_time::time_duration( hours, minutes, seconds )
 		);
-		props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
+		props.setPropertyAs<ptime>( "sequenceStart", sequenceStart );
 
 		LOG( Runtime, info ) << "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
 		<< ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
@@ -811,6 +781,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	// check for extenstions and parse them
 	data::ValueArray< uint8_t > extID = mfile.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
+	util::PropertyMap dcmmeta;
 
 	if( extID[0] != 0 ) { // there is an extension http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/extension.html
 		for( size_t pos = header->sizeof_hdr + 4; pos < header->vox_offset; ) {
@@ -818,7 +789,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			switch( ext_hdr[1] ) {
 			case 0: { // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), orig.branch( "DcmMeta" ), '.' );
+				_internal::parse_json( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), dcmmeta.branch(_internal::dcmmeta_root), '.' );
 			}
 			break;
 			case 2:
@@ -838,6 +809,22 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	//parse the header and add chunks to the result using the mapped data
 	std::list<data::Chunk> newChunks = parseHeader( header, orig );
+
+	//if there was a DcmMeta extension 
+	if(!dcmmeta.isEmpty()){
+		if(dialect!="withExtProtocols"){ //remove MrPhoenixProtocol if not asked for explicitely
+			const util::istring paths[] = {util::istring(_internal::dcmmeta_const_data)+"/CsaSeries/MrPhoenixProtocol",util::istring(_internal::dcmmeta_perslice_data)+"/CsaSeries/MrPhoenixProtocol"};
+			BOOST_FOREACH(const util::istring &p,paths)
+				if(dcmmeta.hasBranch(p))dcmmeta.remove(p);
+		}
+		_internal::demuxDcmMetaSlices(newChunks,dcmmeta); // propagate the "slices" entry from there into the slices (and make slices if necessary)
+		BOOST_FOREACH(data::Chunk &ch,newChunks){ // join that into the slices
+			ch.join(dcmmeta); // merge the rest (const-data) into the slice 
+			translateFromDcmMetaConst(ch); // .. and translate it to isis (interpret known attributes to isis and move the remains of "global" to "DICOM")
+			translateFromDcmMetaSlices(ch); //  ... and translate slice attributes already in the slices
+		}
+	}
+	
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();
 }
@@ -905,7 +892,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( dialect == "spm" ) {
 			writer->addFlip( image.mapScannerAxisToImageDimension( data::z ) );
 		} else if( dialect == "fsl" ) {
-			//dcm2nii flips the slice ordering of a mosaic if the determinant if the orientation is negative
+			//dcm2nii flips the slice ordering of a mosaic if the determinant of the orientation is negative
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
 			if( image.hasProperty( "DICOM/ImageType" ) ) {
 				const util::slist tp = image.getPropertyAs<util::slist>( "DICOM/ImageType" );
@@ -920,13 +907,13 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			}
 
 			//invert columnVec and flip the order of the images lines
-			//well, you know ... ask dcm2nii ....
+			//well, you know ... don't ask ....
 			LOG( Runtime, info ) << "Flipping columns of image for fsl compatibility";
 			flipGeometry( image, data::columnDim );
 			writer->addFlip( data::columnDim );
 		}
 
-		// if the image seems to have diffusion data, and we are writing for fsl we store the data conforming as dcm2nii does it
+		// if the image seems to have diffusion data, and we are writing for fsl we store the data just as dcm2nii does it
 		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
@@ -985,13 +972,13 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		{
-			//join the properties of the first chunk into the image and store that to the header
+			//join the properties of the first chunk and the image and store that to the header
 			util::PropertyMap props = image;
 			props.join( image.getChunkAt( 0, false ) );
 			storeHeader( props, header );
 		}
 
-		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
+		if( image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );
 
 		if( util::istring( dialect.c_str() ) == "spm" ) { // override "normal" description with the "spm-description"
@@ -1260,6 +1247,7 @@ void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal:
 	sform.getRow( 1 ).copyTo( head->srow_y );
 	sform.getRow( 2 ).copyTo( head->srow_z );
 }
+
 
 // The nifti coord system:
 // The (x,y,z) coordinates refer to the CENTER of a voxel.
