@@ -264,16 +264,27 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	const ValueArrayList pointers = this->getValueArrayBase().splice( spliceSize.product() );
 
 	const util::PropertyMap::KeyList lists = this->findLists();
-	size_t list_idx = 0;
+	size_t block_idx = 0;
 
 	//create new Chunks from this ValueArray's
 	BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure this is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); // copy all props into the splices
 		BOOST_FOREACH( const util::PropertyMap::KeyType & key, lists ) { // override list-entries in the splices with their respective entries
-			ret.back().propertyValue( key ) = this->propertyValueAt( key, list_idx );
+			const std::vector<util::PropertyValue> &org=this->propertyValueVec(key);
+			if(org.size()<pointers.size() || org.size()%pointers.size()){
+				LOG(Runtime,warning)
+				<< "Dropping invalid property list " << std::make_pair(key,util::listToString(org.begin(),org.end()))
+				<< " (it doesn't fit the splicing size "<< pointers.size() << ")";
+				ret.back().remove(key);
+			} else {
+				const size_t stride=org.size()/pointers.size();
+				std::vector< util::PropertyValue >::const_iterator start=org.begin(),end=start;
+				std::advance(start,block_idx*stride);std::advance(end,(block_idx+1)*stride);
+				ret.back().propertyValueVec( key ) = std::vector<util::PropertyValue>(start,end);
+			}
 		}
-		list_idx++;
+		block_idx++;
 	}
 	return ret;
 }
