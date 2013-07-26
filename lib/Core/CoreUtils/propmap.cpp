@@ -543,9 +543,9 @@ bool PropertyMap::hasBranch( const PropPath &path ) const
 bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 {
 	const mapped_type *old_e = findEntry( oldname );
-	const mapped_type *new_e = findEntry( newname );
 
 	if ( old_e ) {
+		const mapped_type *new_e = findEntry( newname );
 		LOG_IF( new_e && ! new_e->empty(), Runtime, warning ) << "Overwriting " << std::make_pair( newname, *new_e ) << " with " << *old_e;
 		fetchEntry( newname ) = *old_e;
 		return remove( oldname );
