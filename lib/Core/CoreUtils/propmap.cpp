@@ -454,8 +454,15 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			dst = ( *found ).copyByID( dstID );
-			ret = !dst.isEmpty();
+			ValueReference buff=( *found ).copyByID( dstID );
+			if(buff.isEmpty())
+				ret = false;
+			else{
+				dst = buff;
+				ret = true;
+			}
+
+			delSource&=(from != to); // dont remove the source, if its the destination as well
 		}
 	}
 
