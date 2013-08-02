@@ -242,7 +242,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 			}
 		}
 
-		if(!acqWasList){
+		if(!acqWasList && acquisitionNumberStride){
 			util::PropertyValue acqVal = it->propertyValue( "acquisitionNumber" );//@todo acquisitionTime needs to be fixed as well
 
 			if( acqVal == ret.front().propertyValue( "acquisitionNumber" ) ) {
