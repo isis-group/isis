@@ -369,8 +369,15 @@ public:
 			( ret = val ).needed() = needed;
 		} else if( ret.is<T>() ) {
 			ret.castTo<T>() = val;
-		} else { // don't overwrite already set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+		} else {
+			const util::Value<T> vval(val);
+			const unsigned short dstID=ret.getTypeID();
+			if(vval.fitsInto(dstID)){// allow store if value is convertible into already stored type
+				LOG(Debug,warning) << "Storing " << vval << " as " << ret.getTypeName() << " as old value was already stored in that type";
+				*ret=*(vval.copyByID(dstID));
+			}else {
+				LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+			}
 		}
 
 		return ret;
