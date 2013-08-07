@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define BOOST_SPIRIT_DEBUG_PRINT_SOME 100
-#define BOOST_SPIRIT_DEBUG_INDENT 5
+// #define BOOST_SPIRIT_DEBUG_PRINT_SOME 100
+// #define BOOST_SPIRIT_DEBUG_INDENT 5
 
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
@@ -25,11 +25,13 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi_repeat.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include <isis/CoreUtils/vector.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <CoreUtils/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"
 #include <CoreUtils/value_base.hpp>
+#include <CoreUtils/property.hpp>
+#include <limits.h>
 
 namespace isis
 {
@@ -38,15 +40,15 @@ namespace image_io
 
 using boost::posix_time::ptime;
 using boost::gregorian::date;
-	
+
 namespace _internal
 {
 
-extern const char dcmmeta_root[] = "DcmMeta";
-extern const char dcmmeta_global[] = "DcmMeta/global";
-extern const char dcmmeta_perslice_data[] = "DcmMeta/global/slices";
-extern const char dcmmeta_const_data[] = "DcmMeta/global/const";
+JsonMap::JsonMap( const util::PropertyMap &src ): util::PropertyMap( src ) {}
 
+////////////////////////////////////////////////////////////////////////////////
+// low level json parser
+////////////////////////////////////////////////////////////////////////////////
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 namespace phoenix = boost::phoenix;
@@ -56,364 +58,308 @@ typedef BOOST_TYPEOF( ascii::space | '\t' | boost::spirit::eol ) SKIP_TYPE;
 typedef data::ValueArray< uint8_t >::iterator ch_iterator;
 typedef qi::rule<ch_iterator, JsonMap(), SKIP_TYPE>::context_type JsonMapContext;
 
-JsonMap::JsonMap( const util::PropertyMap& src ):util::PropertyMap(src){}
-void JsonMap::WriteJson( std::ostream& out )
-{
-}
-
-void JsonMap::WriteSubtree( const std::map<util::istring, util::_internal::treeNode>& src, std::ostream &out )
-{
-	for ( const_iterator i = src.begin(); i != src.end(); i++ ) {
-		
-		if ( i->second.is_leaf()  ) {
-			out << i->first << ":"; // write the name
-			util::ValueBase& value=*(i->second.getLeaf()[0]);
-			// json only differs between numbers, strings and lists of that
-			if(value.fitsInto( util::Value<double>::staticID ))// numbers are written as they are
-				out << value;
-			else if(value.fitsInto( util::Value<util::ilist>::staticID )){ // integer lists [ x,y,z ]
-				util::ilist list=value.as<util::ilist>(); //there could an integer that does not fit into double so we can't use integer lists as fp lists
-				util::listToOStream(list.begin(),list.end(),out,",","[","]");
-			} else if(value.fitsInto( util::Value<util::dlist>::staticID )){ // floating point lists [ x.1,y.2,z.3 ]
-				util::dlist list=value.as<util::dlist>();
-				util::listToOStream(list.begin(),list.end(),out,",","[","]");
-			} else if(value.fitsInto( util::Value<util::slist>::staticID )){ // string lists [ "x","y","z" ]
-				util::slist list=value.as<util::slist>();
-				util::listToOStream(list.begin(),list.end(),out,"\",\"","[\"","\"]");
-			} else {
-				out << "\"" << value << "\""; // write everything else as string
-			}
-			out << std::endl; 
-		} else {
-			out << i->first << "{";
-			WriteSubtree(i->second.getBranch(),out);
-			out << "}" << std::endl;
-		}
-	}
-	
-	
-}
-
-
+template<typename T> struct read {typedef qi::rule<ch_iterator, T(), SKIP_TYPE> rule;};
 
 struct add_member {
 	char extra_token;
 	add_member( char _extra_token ): extra_token( _extra_token ) {}
 	void operator()( const fusion::vector2<std::string, JsonMap::value_cont> &a, JsonMapContext &context, bool & )const {
 		const JsonMap::PropPath label = extra_token ?
-				util::stringToList<JsonMap::KeyType>( a.m0, extra_token ) :
-				JsonMap::PropPath( a.m0.c_str() );
+										util::stringToList<JsonMap::KeyType>( a.m0, extra_token ) :
+										JsonMap::PropPath( a.m0.c_str() );
 		JsonMap &target = context.attributes.car;
 
 		if( target.hasBranch( label ) || target.hasProperty( label ) )
 			LOG( Runtime, error ) << "There is already an entry " << target << " skipping this one" ;
 		else
-			target.insertObject(label,a.m1);
+			target.insertObject( label, a.m1 );
 	}
 };
 
-struct vec_trans { // insert subarrays as vector-Properties into an array of Properties
-template<typename T, typename CONTEXT> void operator()( const std::vector<T> &a, CONTEXT &context, bool & )const {
-	std::list<util::PropertyValue> &cont = context.attributes.car;
-	util::vector4<T> buff;buff.copyFrom(a.begin(),a.end());
-	cont.push_back(buff);
-}
-};
-
-
-template<typename T> struct read {typedef qi::rule<ch_iterator, T(), SKIP_TYPE> rule;};
-
-void JsonMap::insertObject(const JsonMap::PropPath &label, const JsonMap::value_cont& container )
+void JsonMap::insertObject( const JsonMap::PropPath &label, const JsonMap::value_cont &container )
 {
 	switch( container.which() ) {
-		case 2:{
-			const std::list<util::PropertyValue> &src=boost::get<std::list<util::PropertyValue> >( container );
-			propertyValueVec( label )=std::vector<util::PropertyValue>(src.begin(),src.end());
-			}break;
-		case 1:
-			branch( label ) = boost::get<JsonMap>( container );
-			break;
-		case 0:
-			propertyValue( label ) = boost::get<util::PropertyValue>( container );
-			break;
+	case 2: {
+		const std::list<util::PropertyValue> &src = boost::get<std::list<util::PropertyValue> >( container );
+		propertyValueVec( label ) = std::vector<util::PropertyValue>( src.begin(), src.end() );
+	}
+	break;
+	case 1:
+		branch( label ) = boost::get<JsonMap>( container );
+		break;
+	case 0:
+		propertyValue( label ) = boost::get<util::PropertyValue>( container );
+		break;
 	}
 }
 
-
-bool JsonMap::ReadJson( data::ValueArray< uint8_t > stream, char extra_token )
+bool JsonMap::readJson( data::ValueArray< uint8_t > stream, char extra_token )
 {
 	using qi::lit;
 	using namespace boost::spirit;
 
 	int version;
-	read<value_cont>::rule value;
+	read<util::PropertyValue>::rule value;
+	read<fusion::vector2<std::string, value_cont> >::rule member;
+
 	read<std::string>::rule string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" ), label( string >> ':', "label" );
-	read<fusion::vector2<std::string, value_cont> >::rule member( label >> value, "member" );
-	read<JsonMap>::rule object( lit( '{' ) >> member[add_member( extra_token )] % ',' >> '}', "object" );
-	read<int>::rule integer(int_ >> !lit('.'),"integer") ;
+	read<int>::rule integer( int_ >> !lit( '.' ), "integer" ) ; // an integer followed by a '.' is not an integer
 	read<util::dlist>::rule dlist( lit( '[' ) >> double_ % ',' >> ']', "dlist" );
 	read<util::ilist>::rule ilist( lit( '[' ) >> integer % ',' >> ']', "ilist" );
 	read<util::slist>::rule slist( lit( '[' ) >> string  % ',' >> ']', "slist" );
+	read<std::list<util::PropertyValue> >::rule vallist( lit( '[' ) >> value % ',' >> ']', "value_list" );
 
-	read<std::vector<util::dvector4::value_type> >::rule dvec(lit( '[' ) >>  double_ >> repeat(0,3)[ ',' >> double_] >> ']', "dvec");
-	read<std::vector<util::ivector4::value_type> >::rule ivec(lit( '[' ) >>  integer >> repeat(0,3)[ ',' >> integer] >> ']', "ivec");
-	
-	read<std::list<util::PropertyValue> >::rule dveclist( lit( '[' ) >> dvec[vec_trans()] % ',' >> ']', "dveclist");
-	read<std::list<util::PropertyValue> >::rule iveclist( lit( '[' ) >> ivec[vec_trans()] % ',' >> ']', "iveclist");
+	read<JsonMap>::rule
+	object( lit( '{' ) >> ( member[add_member( extra_token )] % ',' || eps ) >> '}',                    "object" ),
+			list_object( lit( '{' ) >> ( ( label >> vallist )[add_member( extra_token )] % ',' || eps ) >> '}', "list_object" );
 
-	value = string | integer | double_ | slist | ilist | dlist | dveclist | iveclist | object;
+	member = //samples and slices are expected to consist only of json-arrays
+		lexeme['"' >> ascii::string( "samples" ) >> '"'] >> ':' >> list_object |
+		lexeme['"' >> ascii::string( "slices" ) >> '"'] >> ':' >> list_object |
+		label >> ( value | vallist | object );
+	value = integer | double_ | string | ilist | dlist | slist;
 
-	qi::debug(dvec);
-	qi::debug(ivec);
-	qi::debug(dveclist);
-	qi::debug(iveclist);
-	
 	data::ValueArray< uint8_t >::iterator begin = stream.begin(), end = stream.end();
-	bool erg = phrase_parse( begin, end, object[phoenix::ref( *this )=_1], ascii::space | '\t' | eol );
+	bool erg = phrase_parse( begin, end, object[phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
 	return end == stream.end();
 }
 
-template<typename T> bool propDemux(std::list<T> props,std::list<data::Chunk> &chunks,JsonMap::PropPath name){
-	if( (props.size()%chunks.size())!=0){
-		LOG(Runtime,error) << "The length of the per-slice property DcmMeta entry " << util::MSubject(name) << " does not fit the number of slices, skipping (" << props.size() << "!=" << chunks.size() << ").";
-		return false;
+////////////////////////////////////////////////////////////////////////////////
+// high level translation to ISIS properties
+////////////////////////////////////////////////////////////////////////////////
+
+// some basic functors for later use
+struct Plus {
+	util::PropertyValue operator()( double other, const util::PropertyValue &val )const {return util::Value<float>( other + val.as<float>() );}
+	util::PropertyValue operator()( const util::PropertyValue &val )const {return util::Value<float>( fixedAcq + val.as<float>() );}
+	float fixedAcq;
+};
+
+struct ComputeTimeDist {
+	boost::posix_time::ptime sequenceStart;
+	util::PropertyValue operator()( const util::PropertyValue &val )const {
+		const boost::posix_time::time_duration acDist = val.castTo<boost::posix_time::ptime>() - sequenceStart;
+		return float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
 	}
-	typename std::list<T>::const_iterator prop=props.begin();
-	size_t stride=props.size()/chunks.size();
-	BOOST_FOREACH(data::Chunk &ch,chunks){
-		if(stride==1){
-			ch.setPropertyAs<T>(name,*(prop++));
-		} else if(stride>1) {
-			typename std::list<T>::const_iterator buff=prop;
-			std::advance(prop,stride);
-			std::list<T> &ref=((util::PropertyValue &)ch.setPropertyAs(name, std::list<T>())).castTo<std::list<T> >();// work around gcc bug
-			ref.insert(ref.end(), buff,prop);
+};
+
+struct TmParser {
+	util::PropertyValue operator()( const util::PropertyValue &val )const {
+		short shift = 0;
+		bool ok = true;
+		boost::posix_time::time_duration ret;
+		std::string time_str = val.as<std::string>();
+
+		// Insert the ":" -- make it hh:mm:ss.frac
+		if ( time_str.at( 2 ) != ':' ) {
+			time_str.insert( 2, 1, ':' );
+			shift++;
+		}
+
+		if ( ( time_str.size() > size_t( 4 + shift ) ) && ( time_str.at( 4 + shift ) != ':' ) ) {
+			time_str.insert( 4 + shift, 1, ':' );
+			shift++;
+		}
+
+		//Try standard-parser for hh:mm:ss.frac
+		try {
+			ret = boost::posix_time::duration_from_string( time_str.c_str() );
+			ok = not ret.is_not_a_date_time();
+		} catch ( std::logic_error e ) {
+			ok = false;
+		}
+
+		if ( ok ) {
+			LOG( Debug, verbose_info ) << "Parsed time " <<  time_str << " as " << ret;
+			return ptime( date( 1400, 1, 1 ), ret );
+			//because TM is defined as time of day we dont have a day here, so we fake one
+		} else
+			LOG( Runtime, warning ) << "Cannot parse Time from \"" << val << "\"";
+
+		return val;
+	}
+};
+
+std::list< data::Chunk > JsonMap::translateToISIS( data::Chunk orig )
+{
+	// translate some of the entries and clean up the tree we got from DcmMeta (don't touch anything we got from the normal header though)
+	size_t dosplice = false;
+
+	if( hasBranch( "time" ) ) { //store pervolume data (samples and slices) prior to possible splicing as DICOM
+		util::PropertyMap &time = branch( "time" );
+		//get "samples" and "slices" into DICOM
+		branch( "DICOM" ).join( time.branch( "samples" ) ); //@todo cleanup when we have moving join
+		branch( "DICOM" ).join( time.branch( "slices" ) );
+		remove( "time/samples" );
+		remove( "time/slices" );
+	}
+
+	if( hasBranch( "global/const" ) ) { //store const data prior to possible splicing as DICOM
+		branch( "DICOM" ).join( branch( "global/const" ) );
+	}
+
+	remove( "global/const" );
+
+	if( hasBranch( "global/slices" ) ) { //store slice data prior to possible splicing as DICOM
+		branch( "DICOM" ).join( branch( "global/slices" ) );
+	}
+
+	remove( "global/slices" );
+
+	// if we have a DICOM/AcquisitionNumber-list or DICOM/InstanceNumber rename that to acquisitionNumber and splice the chunk in necessary
+	if( hasProperty( "DICOM/InstanceNumber" ) ) {
+		rename( "DICOM/InstanceNumber", "acquisitionNumber" );
+		dosplice |= propertyValueVec( "acquisitionNumber" ).size() > 1;
+	} else if( hasProperty( "DICOM/AcquisitionNumber" ) ) {
+		rename( "DICOM/AcquisitionNumber", "acquisitionNumber" );
+		dosplice |= propertyValueVec( "acquisitionNumber" ).size() > 1;
+	}
+
+	//translate TM sets we know about to proper Timestamps
+	const char *TMs[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
+	BOOST_FOREACH( const util::PropertyMap::PropPath tm, TMs ) {
+		if( hasProperty( tm ) ) {
+			std::vector< util::PropertyValue > &v = propertyValueVec( tm );
+			std::transform( v.begin(), v.end(), v.begin(), TmParser() );
+			dosplice |= v.size() > 1;
 		}
 	}
-	return true;
+
+
+	// compute acquisitionTime as relative to DICOM/SeriesTime @todo include date
+	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
+	BOOST_FOREACH( const char * time, time_stor ) {
+		const TmParser p;
+		const ComputeTimeDist comp = {p( propertyValue( "DICOM/SeriesTime" ) ).castTo<ptime>()};
+
+		if( hasProperty( time ) && hasProperty( "DICOM/SeriesTime" ) ) {
+			std::vector< util::PropertyValue > &dst = propertyValueVec( "acquisitionTime" );
+			const std::vector< util::PropertyValue > &src = propertyValueVec( time );
+			dst.resize( src.size() );
+			std::transform( src.begin(), src.end(), dst.begin(), comp );
+			remove( time );
+			break;
+		}
+	}
+
+	// deal with mosaic
+	bool is_mosaic = false;
+
+	if( hasProperty( "DICOM/ImageType" ) ) {
+		util::slist &iType = propertyValue( "DICOM/ImageType" ).castTo<util::slist>();
+		is_mosaic = ( std::find( iType.begin(), iType.end(), std::string( "MOSAIC" ) ) != iType.end() );
+	}
+
+	if( is_mosaic ) {
+		decodeMosaic();
+	} else if( hasProperty( "DICOM/ImagePositionPatient" ) ) { //if it wasn't a mosaic, we may actually have a proper ImagePositionPatient-list
+		dosplice |= propertyValueVec( "DICOM/ImagePositionPatient" ).size() > 1;
+	}
+
+	// compute voxelGap (must be done after mosaic because it removes SpacingBetweenSlices)
+	if ( hasProperty( "DICOM/SliceThickness" ) && hasProperty( "DICOM/SpacingBetweenSlices" ) ) {
+		const float gap = getPropertyAs<float>( "DICOM/SpacingBetweenSlices" ) - getPropertyAs<float>( "DICOM/SliceThickness" );
+
+		if( gap )setPropertyAs( "voxelGap", util::fvector3( 0, 0, gap ) );
+
+		remove( "DICOM/SpacingBetweenSlices" );
+	}
+
+	// flatten matrizes
+	const char *matrizes[] = {"dcmmeta_affine", "dcmmeta_reorient_transform"};
+	BOOST_FOREACH( util::istring matrix, matrizes ) {
+		int cnt = 0;
+		BOOST_FOREACH( const util::PropertyValue & val, propertyValueVec( matrix ) ) {
+			setPropertyAs( matrix + "[" + boost::lexical_cast<util::istring>( cnt++ ) + "]", val.as<util::fvector4>() );
+		}
+		remove( matrix );
+	}
+
+	orig.join( *this, true );
+
+	std::list< data::Chunk > ret = ( dosplice ? orig.autoSplice( 1 ) : std::list<data::Chunk>( 1, orig ) ); //splice at (probably) timedim
+
+	return ret;
 }
 
+void JsonMap::decodeMosaic()
+{
+	// prepare variables
+	const util::PropertyMap::KeyType mosaicTimes = find( "MosaicRefAcqTimes" );
+	static const util::PropertyMap::PropPath NumberOfImagesInMosaicProp =  "DICOM/CSAImage/NumberOfImagesInMosaic";
+	static const util::PropertyMap::PropPath MosaicOrigin =  "DICOM/ImagePositionPatient";
 
-void demuxDcmMetaSlices(std::list<data::Chunk> &chunks, JsonMap &dcmmeta ){
-	static const JsonMap::PropPath slices(dcmmeta_perslice_data);
-	if(dcmmeta.hasBranch(slices)){
-		size_t stride=1;
-		if(chunks.front().getRelevantDims()==4){ //if we have an 4D-Chunk
-			assert(chunks.size()==1); //there can only be one
-			chunks=chunks.front().autoSplice(chunks.front().getDimSize(data::sliceDim)); // replace that one by its 3D parts
-		}
-		for(std::list<data::Chunk>::iterator c=chunks.begin();c!=chunks.end();){ // if we have 3D chunks splice each
-			if(c->getRelevantDims()>2){
-				std::list< data::Chunk > insert = c->autoSplice(1);
-				chunks.insert(c,insert.begin(),insert.end()); // insert spliced chunks back into list
-				chunks.erase(c++); // and remove original
-			} else
-				++c;
-		}
-		BOOST_FOREACH(const JsonMap::FlatMap::value_type &ppair,dcmmeta.branch(slices).getFlatMap()){
-			bool success=false;
-			JsonMap::PropPath path(util::istring(_internal::dcmmeta_perslice_data)+"/"+ppair.first); // move the prop one branch up (without "slices")
-			switch(ppair.second.getTypeID()){
-				case util::Value<util::ilist>::staticID:success=propDemux(ppair.second.castTo<util::ilist>(),chunks,path);break;
-				case util::Value<util::dlist>::staticID:success=propDemux(ppair.second.castTo<util::dlist>(),chunks,path);break;
-				case util::Value<util::slist>::staticID:success=propDemux(ppair.second.castTo<util::slist>(),chunks,path);break;
-				default:
-					LOG(Runtime,error) << "The the type of " << path << " (" << ppair.second.getTypeName() <<  ") is not a list, skipping.";
-			}
-			if(success)
-				dcmmeta.remove(path);
-			else
-				dcmmeta.rename(path,util::istring( dcmmeta_global )+"/rejected_slices/"+ppair.first);
-		}
+	// if we have geometric data
+	if(
+		hasProperty( NumberOfImagesInMosaicProp ) && hasProperty( NumberOfImagesInMosaicProp ) &&
+		hasProperty( "DICOM/Columns" ) && hasProperty( "DICOM/Rows" ) &&
+		hasProperty( "DICOM/SliceThickness" ) && hasProperty( "DICOM/PixelSpacing" ) &&
+		propertyValueVec( MosaicOrigin ).size() == 1
+	) {
+		// All is fine, lets start
+		uint16_t slices = getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
+		const uint16_t matrixSize = std::ceil( std::sqrt( slices ) );
+		const util::vector3<size_t> size( getPropertyAs<uint64_t>( "DICOM/Columns" ) / matrixSize, getPropertyAs<uint64_t>( "DICOM/Rows" ) / matrixSize, slices );
+		const util::dlist orientation = getPropertyAs<util::dlist>( "DICOM/ImageOrientationPatient" );
+		util::dlist::const_iterator middle = orientation.begin();
+		std::advance( middle, 3 );
+		util::fvector3 rowVec, columnVec;
+		rowVec.copyFrom( orientation.begin(), middle );
+		columnVec.copyFrom( middle, orientation.end() );
+
+		// fix the properties of the source (we 'll need them later)
+		util::fvector3 voxelSize = getPropertyAs<util::fvector3>( "DICOM/PixelSpacing" );
+		voxelSize[2] = getPropertyAs<float>( "DICOM/SpacingBetweenSlices" );
+		//remove the additional mosaic offset
+		//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
+		const util::fvector3 fovCorr = ( voxelSize ) * size * ( matrixSize - 1 ) / 2;
+		util::fvector3 origin = getPropertyAs<util::fvector3>( MosaicOrigin );
+		origin += ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
+		remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
+
+		// store the proper origin
+		propertyValue( MosaicOrigin ) = util::Value<util::fvector3>( origin );
+
+		// replace "MOSAIC" ImageType by "WAS_MOSAIC"
+		util::slist &iType = propertyValue( "DICOM/ImageType" ).castTo<util::slist>();
+		std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	} else {
-		LOG(Debug,warning) << "demuxDcmMetaSlices called, but there is no " << slices << " branch";
+		LOG( Runtime, error ) << "Failed to decode mosaic geometry data, won't touch " << MosaicOrigin;
 	}
-}
 
-boost::posix_time::ptime parseTM( const JsonMap &map, const JsonMap::PropPath &name )
-{
-	short shift = 0;
-	bool ok = true;
-	boost::posix_time::time_duration ret;
-	std::string time_str=map.getPropertyAs<std::string>(name);
-	
-	// Insert the ":" -- make it hh:mm:ss.frac
-	if ( time_str.at( 2 ) != ':' ) {
-		time_str.insert( 2, 1, ':' );
-		shift++;
-	}
-	
-	if ( ( time_str.size() > size_t( 4 + shift ) ) && ( time_str.at( 4 + shift ) != ':' ) ) {
-		time_str.insert( 4 + shift, 1, ':' );
-		shift++;
-	}
-	
-	//Try standard-parser for hh:mm:ss.frac
-	try {
-		ret = boost::posix_time::duration_from_string( time_str.c_str() );
-		ok = not ret.is_not_a_date_time();
-	} catch ( std::logic_error e ) {
-		ok = false;
-	}
-	
-	if ( ok ) {
-		LOG( Debug, verbose_info )<< "Parsed time for " << name << "(" <<  time_str << ")" << " as " << ret;
-		return boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), ret );
-		//because TM is defined as time of day we dont have a day here, so we fake one
-	} else
-		LOG( Runtime, warning ) << "Cannot parse Time string \"" << time_str << "\" in the field \"" << name << "\"";
-	
-	return boost::posix_time::ptime(boost::posix_time::not_a_date_time);
-}
+	//flatten MosaicRefAcqTimes and add it to acquisitionTime
+	if( mosaicTimes != "" ) { // if there are MosaicRefAcqTimes recompute acquisitionTime
 
+		std::vector< util::PropertyValue > &acq = propertyValueVec( "acquisitionTime" );
+		const std::vector< util::PropertyValue > &mos = propertyValueVec( mosaicTimes );
 
-}
-
-void ImageFormat_NiftiSa::translateFromDcmMetaConst( util::PropertyMap& object )
-{
-	const util::istring const_prefix = util::istring(_internal::dcmmeta_const_data)+"/";
-	_internal::JsonMap const_tree=object.branch(const_prefix);
-	
-	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
-	if ( hasOrTell( const_prefix + "SeriesTime", object, warning ) ) {
-		ptime sequenceStart = _internal::parseTM(const_tree, "SeriesTime" );
-		const_tree.remove( "SeriesTime" );
-		
-		const char *dates[] = {"SeriesDate", "AcquisitionDate"};
-		BOOST_FOREACH( const char * d, dates ) {
-			if( hasOrTell(const_prefix + d, const_tree, warning ) ) {
-				sequenceStart = ptime( const_tree.getPropertyAs<date>( d ), sequenceStart.time_of_day() );
-				const_tree.remove( d );
-				break;
-			}
-		}
-		
-		// compute acquisitionTime from global AcquisitionTime (if its there)
-		if ( hasOrTell( const_prefix + "AcquisitionTime", object, info ) ) {
-			ptime acTime = _internal::parseTM( const_tree, "AcquisitionTime" );
-			const_tree.remove( "AcquisitionTime" );
-			
-			const char *dates[] = {"AcquisitionDate", "SeriesDate"};
-			BOOST_FOREACH( const char * d, dates ) {
-				if( hasOrTell(const_prefix + d, const_tree, warning ) ) {
-					acTime = ptime( const_tree.getPropertyAs<date>( d ), acTime.time_of_day() );
-					const_tree.remove( d );
-					break;
-				}
-			}
-			
-			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
-			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
-			object.setPropertyAs( "acquisitionTime", fAcDist );
-		}
-		
-		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
-		object.setPropertyAs( "sequenceStart", sequenceStart );
-	}
-	
-	transformOrTell<uint16_t>   ( const_prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
-	transformOrTell<uint16_t>   ( const_prefix + "PatientsAge",      "subjectAge",         object, info );
-	transformOrTell<std::string>( const_prefix + "SeriesDescription","sequenceDescription",object, warning );
-	transformOrTell<std::string>( const_prefix + "PatientsName",     "subjectName",        object, info );
-	transformOrTell<date>       ( const_prefix + "PatientsBirthDate","subjectBirth",       object, info );
-	transformOrTell<uint16_t>   ( const_prefix + "PatientsWeight",   "subjectWeigth",      object, info );
-	
-	transformOrTell<std::string>( const_prefix + "PerformingPhysiciansName","performingPhysician", object, info );
-	transformOrTell<uint16_t>   ( const_prefix + "NumberOfAverages",        "numberOfAverages",    object, warning );
-	
-	if ( hasOrTell( const_prefix + "PatientsSex", object, info ) ) {
-		util::Selection isisGender( "male,female,other" );
-		bool set = false;
-		
-		switch ( const_tree.getPropertyAs<std::string>( "PatientsSex" )[0] ) {
-			case 'M':
-				isisGender.set( "male" );
-				set = true;
-				break;
-			case 'F':
-				isisGender.set( "female" );
-				set = true;
-				break;
-			case 'O':
-				isisGender.set( "other" );
-				set = true;
-				break;
-			default:
-				LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( const_prefix + "PatientsSex" ) ) <<  " not known";
-		}
-		
-		if( set ) {
-			object.propertyValue( "subjectGender" ) = isisGender;
-			const_tree.remove( "PatientsSex" );
-		}
-	}
-	
-	transformOrTell<uint32_t>( const_prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-	
-	// @todo figure out how DWI data are stored
-	
-	
-	// rename DcmMeta/global/const to DICOM ... thats essentially what it is ... and others will look there for that data
-	object.rename(_internal::dcmmeta_const_data,"DICOM");
-}
-
-void ImageFormat_NiftiSa::translateFromDcmMetaSlices( util::PropertyMap& object )
-{
-	const util::istring slices_prefix = util::istring(_internal::dcmmeta_perslice_data)+"/";
-	_internal::JsonMap slices_tree=object.branch(slices_prefix);
-	
-	// compute acquisitionTime
-	if (hasOrTell( slices_prefix + "ContentTime", object, info ) ) {
-		if(object.hasProperty("sequenceStart")){
-			ptime sequenceStart =object.getPropertyAs<ptime>( "sequenceStart");
-			
-			ptime acTime = _internal::parseTM( slices_tree, "ContentTime" );
-			slices_tree.remove( "ContentTime" );
-			
-			if( hasOrTell(slices_prefix + "ContentDate", slices_tree, warning ) ) {
-				acTime = ptime( slices_tree.getPropertyAs<date>( "ContentDate" ), acTime.time_of_day() );
-				slices_tree.remove( "ContentDate" );
-			}
-			
-			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
-			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
-			object.setPropertyAs( "acquisitionTime", fAcDist );
+		if( !acq.front().isEmpty() && ( acq.front().is<util::ilist>() || acq.front().is<util::dlist>() || acq.front().is<util::slist>() ) ) {
+			LOG( Runtime, warning ) << "There is already an acquisitionTime for each slice, won't recompute it from " << mosaicTimes;
+		} else if( !acq.front().isEmpty() && mos.size() != acq.size() ) {
+			LOG( Runtime, warning ) << "The list size of " << mosaicTimes << "(" << mos.size() << ") and acquisitionTime (" << acq.size() << ") don't match, won't touch them";
 		} else {
-			LOG(Runtime,warning) << "Don't have sequenceStart, can't compute acquisitionTime from ContentTime";
+			std::vector< util::PropertyValue > old_acq;
+
+			if( acq.size() == mos.size() )
+				old_acq = acq;
+
+			size_t slices = mos.front().as<util::dlist>().size() * mos.size();
+			acq.resize( slices );
+			std::vector< util::PropertyValue >::iterator acq_iter = acq.begin();
+
+			for( size_t i = 0; i < mos.size(); i++ ) {
+				const util::dlist inner_mos = mos[i].as<util::dlist>();
+				const Plus adder = {old_acq.empty() ? 0 : old_acq[i].as<float>()};
+				acq_iter = std::transform( inner_mos.begin(), inner_mos.end(), acq_iter, adder );
+			}
+
+			assert( acq_iter == acq.end() ); // new acq should be filled completely
+
+			remove( mosaicTimes ); // remove the original prop if the distribution was successful
 		}
 	}
-	
-	if ( hasOrTell( slices_prefix + "ImagePositionPatient", object, info ) ) {
-		const util::fvector3 from_dcmmeta= slices_tree.getPropertyAs<util::fvector3>( "ImagePositionPatient" );
-		const util::fvector3 from_nifti = object.getPropertyAs<util::fvector3>( "indexOrigin" );
-		if(! from_nifti.fuzzyEqual(from_dcmmeta,100)){
-			LOG(Runtime,warning) << "The slice position given in " << slices_prefix + "ImagePositionPatient" << " did not fit the one computed from the nifti header ("
-			<< from_dcmmeta << "!=" << from_nifti << ")";
-		}
-		slices_tree.remove( "ImagePositionPatient" );
-		object.setPropertyAs( "indexOrigin", from_dcmmeta );
-	}
-	
-	
-	transformOrTell<uint32_t>   ( slices_prefix + "InstanceNumber", "acquisitionNumber", object, error );
-	if( slices_tree.hasProperty( "AcquisitionNumber" ) && object.propertyValue( "acquisitionNumber" ) == slices_tree.propertyValue( "AcquisitionNumber" ) )
-		slices_tree.remove( "AcquisitionNumber" );
-	
-	// rename DcmMeta/global/slices to DICOM ... thats essentially what it is ... and others will look there for that data
-		util::PropertyMap::KeyList rejects=object.branch("DICOM").join(object.branch(_internal::dcmmeta_perslice_data));
-		BOOST_FOREACH(util::PropertyMap::PropPath key,rejects){
-			object.rename(key,util::istring( _internal::dcmmeta_global )+"/rejected_slices/"+key.back()); // and move the rejects to rejected_slices
-		}
-		object.remove(_internal::dcmmeta_perslice_data);
 }
 
-void ImageFormat_NiftiSa::translateToDcmMetaConst( util::PropertyMap& orig, std::ofstream &output ){
-}
-
-void ImageFormat_NiftiSa::translateToDcmMetaSlices( util::PropertyMap& orig, std::ofstream &output ){
-	
 }
 
 }

@@ -32,31 +32,21 @@ namespace image_io
 namespace _internal
 {
 
-extern const char dcmmeta_root[];
-extern const char dcmmeta_global[];
-extern const char dcmmeta_perslice_data[];
-extern const char dcmmeta_const_data[];
-
-// bool parse_json( data::ValueArray< uint8_t > stream, util::PropertyMap &json_map, char extra_token = 0 );
-
-// void demuxDcmMetaSlices( std::list< data::Chunk >& chunks, util::PropertyMap& dcmmeta );
-
-class JsonMap:public util::PropertyMap{
+class JsonMap: public util::PropertyMap
+{
 public:
 	typedef boost::variant<util::PropertyValue, JsonMap, std::list<util::PropertyValue> > value_cont;
-	
-	JsonMap(){}
-	JsonMap(const util::PropertyMap &src);
-	void insertObject( const PropPath& label, const value_cont& container );
-	void WriteJson( std::ostream& out );
-	bool ReadJson( isis::data::ValueArray< uint8_t > stream, char extra_token = 0 );
+
+	JsonMap() {}
+	JsonMap( const util::PropertyMap &src );
+	void insertObject( const PropPath &label, const value_cont &container );
+	void writeJson( std::ostream &out );
+	bool readJson( isis::data::ValueArray< uint8_t > stream, char extra_token = 0 );
+	std::list<data::Chunk> translateToISIS( data::Chunk orig );
 private:
-	static void WriteSubtree( const std::map< isis::util::istring, isis::util::_internal::treeNode >& src, std::ostream& out );
+	static void writeSubtree( const std::map< isis::util::istring, isis::util::_internal::treeNode >& src, std::ostream &out );
+	void decodeMosaic();
 };
-
-//parse strings formated as dicom TM
-boost::posix_time::ptime parseTM( const JsonMap& map, const JsonMap::PropPath& name );
-
 
 }
 }
