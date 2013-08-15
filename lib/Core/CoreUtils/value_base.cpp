@@ -69,7 +69,7 @@ bool ValueBase::convert( const ValueBase &from, ValueBase &to )
 	return false;
 }
 
-bool ValueBase::fitsInto( short unsigned int ID ) const
+bool ValueBase::fitsInto( short unsigned int ID ) const //@todo find a better way to do this
 {
 	boost::scoped_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );
@@ -77,7 +77,7 @@ bool ValueBase::fitsInto( short unsigned int ID ) const
 	if ( conv ) {
 		return ( conv->generate( *this, to ) ==  boost::numeric::cInRange );
 	} else {
-		LOG( Runtime, warning )
+		LOG( Runtime, info )
 				<< "I dont know any conversion from "
 				<< MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[ID] );
 		return false; // return an empty Reference

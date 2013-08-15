@@ -549,6 +549,9 @@ bool PropertyMap::hasBranch( const PropPath &path ) const
 
 bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 {
+	if(oldname==newname ) // @todo makes pure syntactical rename "voxelSize => VoxelSize" impossible
+		return false;
+	
 	const mapped_type *old_e = findEntry( oldname );
 
 	if ( old_e ) {
