@@ -436,7 +436,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
 	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<uint32_t>( val );
-	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
+	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "UT" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );
