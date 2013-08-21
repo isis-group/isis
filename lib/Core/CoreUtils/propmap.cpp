@@ -51,6 +51,25 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 API_EXCLUDE_END
 
 ///////////////////////////////////////////////////////////////////
+// PropPath impl
+///////////////////////////////////////////////////////////////////
+
+PropertyMap::PropPath::PropPath() {}
+PropertyMap::PropPath::PropPath( const char *key ): std::list<KeyType>( util::stringToList<KeyType>( util::istring( key ), pathSeperator ) ) {}
+PropertyMap::PropPath::PropPath( const KeyType &key ): std::list<KeyType>( util::stringToList<KeyType>( key, pathSeperator ) ) {}
+PropertyMap::PropPath::PropPath( const std::list<KeyType> &path ): std::list<KeyType>( path ) {}
+PropertyMap::PropPath& PropertyMap::PropPath::operator/=(const PropertyMap::PropPath &s){
+    insert(end(), s.begin(), s.end());
+    return *this;
+}
+PropertyMap::PropPath& PropertyMap::PropPath::operator/=(KeyType s){
+    push_back(s);
+    return *this;
+}
+PropertyMap::PropPath PropertyMap::PropPath::operator/(const PropertyMap::PropPath &s)const{return PropPath(*this)/=s;}
+PropertyMap::PropPath PropertyMap::PropPath::operator/(KeyType s)const{return PropPath(*this)/=s;}
+    
+///////////////////////////////////////////////////////////////////
 // Contructors
 ///////////////////////////////////////////////////////////////////
 
