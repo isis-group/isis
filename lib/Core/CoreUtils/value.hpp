@@ -37,9 +37,8 @@ namespace _internal
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
  */
-template<typename T, bool isNumber> class type_compare
+template<typename T, bool isNumber> struct type_compare
 {
-public:
 	type_compare() {} // c++11 says we need a user defined constructor here
 	bool operator()( const util::Value<T> &/*first*/, const ValueBase &/*second*/ )const {
 		LOG( Debug, error ) << "comparison of " << util::Value<T>::staticName() << " is not supportet";
@@ -57,13 +56,11 @@ public:
  * The comparison functions (inRange/posOverflow,negOverflow) here are only stubs and will allways return false.
  * So, these class has to be further specialized for the regarding compare operation.
  */
-template<typename T> class type_compare<T, true>
+template<typename T> struct type_compare<T, true>
 {
-protected:
 	virtual bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
 	virtual bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
 	virtual bool inRange( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
-public:
 	bool operator()( const util::Value<T> &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
 		const ValueBase::Converter conv = second.getConverterTo( util::Value<T>::staticID );
@@ -89,56 +86,38 @@ public:
 
 		return false;
 	}
-	type_compare() {} // c++11 says we need a user defined constructor here
 	virtual ~type_compare() {}
 };
 
-template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber>
+template<typename T, bool isNumber> struct type_less : type_compare<T, isNumber>{};// we are going to specialize this for numeric T below
+template<typename T, bool isNumber> struct type_greater : type_compare<T, isNumber>{};
+template<typename T, bool isNumber> struct type_eq : type_compare<T, isNumber>
 {
-public: // c++11 says we need a user defined constructor here
-	type_less() {}
-};// we are going to specialize this for numeric T below
-template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber>
-{
-public: // c++11 says we need a user defined constructor here
-	type_greater() {}
-};
-template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
-{
-protected:
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) == static_cast<const T &>( second );
 	}
-public: // c++11 says we need a user defined constructor here
-	type_eq() {}
 };
 
 /// less-than comparison for arithmetic types
-template<typename T> class type_less<T, true> : public type_compare<T, true>
+template<typename T> struct type_less<T, true> : type_compare<T, true>
 {
-protected:
 	bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) < static_cast<const T &>( second );
 	}
-public: // c++11 says we need a user defined constructor here
-	type_less() {}
 };
 
 /// greater-than comparison for arithmetic types
-template<typename T> class type_greater<T, true> : public type_compare<T, true>
+template<typename T> struct type_greater<T, true> : type_compare<T, true>
 {
-protected:
 	bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
 	}
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) > static_cast<const T &>( second );
 	}
-public: // c++11 says we need a user defined constructor here
-	type_greater() {}
 };
 
 }
@@ -249,7 +228,7 @@ public:
 
 	/**
 	 * Check if the value of this is greater than ref converted to TYPE.
-	 * The function tries to convert ref to the type of this and compare the result.
+	 * The function tries to convert ref to the type of this and compares the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
 	 * \retval value_of_this>converted_value_of_ref if the conversion was successfull
 	 * \retval true if the conversion failed because the value of ref was to low for TYPE (negative overflow)

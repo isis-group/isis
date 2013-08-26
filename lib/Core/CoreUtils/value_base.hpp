@@ -179,9 +179,12 @@ public:
 
 	virtual ~ValueBase();
 
+	// basic comparison
 	virtual bool gt( const ValueBase &ref )const = 0;
 	virtual bool lt( const ValueBase &ref )const = 0;
 	virtual bool eq( const ValueBase &ref )const = 0;
+
+	
 };
 
 
