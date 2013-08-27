@@ -59,6 +59,7 @@
 
 #include <DataStorage/io_interface.h>
 #include <CoreUtils/matrix.hpp>
+#include <DataStorage/fileptr.hpp>
 #include <sys/stat.h>
 
 namespace isis
@@ -140,7 +141,7 @@ protected:
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
 	void applyFlipToCoords ( util::vector4< size_t > &coords, data::dimensions blockdims );
 	void applyFlipToData ( data::ValueArrayReference &dat, util::vector4< size_t > chunkSize );
-	void applyFlipToData ( data::Chunk& dat );
+	void applyFlipToData ( data::Chunk &dat );
 public:
 	virtual ~WriteOp() {}
 	nifti_1_header *getHeader();
@@ -160,7 +161,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static const util::Matrix4x4<short> nifti2isis;
 	static const util::Selection formCode;
 
-	typedef bool(*demuxer_type)(const util::PropertyValue &value,std::list<data::Chunk> &chunks,util::PropertyMap::PropPath name);
+	typedef bool( *demuxer_type )( const util::PropertyValue &value, std::list<data::Chunk> &chunks, util::PropertyMap::PropPath name );
 
 	/// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
 	static util::Matrix4x4<double> getNiftiMatrix( const util::PropertyMap &props );
@@ -170,7 +171,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	std::map<short, unsigned short> nifti_type2isis_type;
 	std::map<unsigned short, short> isis_type2nifti_type;
-	std::map<unsigned short,demuxer_type> prop_demuxer;
+	std::map<unsigned short, demuxer_type> prop_demuxer;
 	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
 		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
 		return data::ValueArray<NEW_T>::staticID;
@@ -182,21 +183,29 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
-	static std::list<data::Chunk> parseHeader( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk props );
+	void parseHeader( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
+
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm";}
+	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm withExtProtocols";}
 
 protected:
 	util::istring suffixes( io_modes mode = both )const;
+	void sanitise( data::Chunk &ch );
+	template <typename T> void transformIfNotSet( const util::PropertyMap::KeyType &from, const util::PropertyMap::KeyType &to, data::Chunk &object, LogLevel level ) {
+		if( !object.hasProperty( to ) ) {
+			LOG( Debug, info ) << "Using " << std::make_pair( from, object.propertyValue( from ) ) << " for " << to << " because it's not set yet";
+			transformOrTell<T>( from, to, object, level );
+		}
+	}
 };
 
 
