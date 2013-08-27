@@ -32,28 +32,39 @@ namespace data
 /// @cond _internal
 namespace _internal
 {
-class ConstValueAdapter: public util::ValueReference
+class ConstValueAdapter
 {
+	template<bool BB> friend class GenericValueIterator; //allow the iterators (and only them) to create the adapter
 public:
 	typedef const util::ValueReference ( *Getter )( const void * );
 	typedef void ( *Setter )( void *, const util::ValueBase & );
 protected:
 	const uint8_t *const p;
-public:
+	const Getter getter;
 	ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc );
+public:
 	// to make some algorithms work
 	bool operator==( const util::ValueReference &val )const;
 	bool operator!=( const util::ValueReference &val )const;
 
 	bool operator<( const util::ValueReference &val )const;
 	bool operator>( const util::ValueReference &val )const;
+
+	operator const util::ValueReference()const;
+	const util::ValueReference operator->() const;
+	const std::string toString( bool label = false )const;
 };
 class WritingValueAdapter: public ConstValueAdapter
 {
 	Setter setValueFunc;
+	size_t byteSize;
+	template<bool BB> friend class GenericValueIterator; //allow the iterators (and only them) to create the adapter
+protected:
+	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc, size_t _size );
 public:
-	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc );
 	WritingValueAdapter operator=( const util::ValueReference &val );
+	WritingValueAdapter operator=( const util::ValueBase &val );
+	void swapwith( const WritingValueAdapter &b )const; // the WritingValueAdapter is const not what its dereferencing
 };
 
 template<bool IS_CONST> class GenericValueIterator :
@@ -377,4 +388,14 @@ typedef ValueArrayBase::Reference ValueArrayReference;
 }
 }
 
+namespace std
+{
+	void swap(const isis::data::_internal::WritingValueAdapter &a,const isis::data::_internal::WritingValueAdapter &b);
+	/// Streaming output for ConstValueAdapter (use it as a const ValueReference)
+	template<typename charT, typename traits> basic_ostream<charT, traits>&
+	operator<<( basic_ostream<charT, traits> &out, const isis::data::_internal::ConstValueAdapter &v )
+	{
+		return out << (isis::util::ValueReference)v;
+	}
+}
 #endif // TYPEPTRBASE_HPP

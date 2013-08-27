@@ -335,6 +335,12 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 }
 
+void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b )
+{
+	NDimensional<4>::swapDim(dim_a,dim_b,begin());
+}
+
+
 util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &key, size_t at )
 {
 	std::vector< util::PropertyValue > &vec = propertyValueVec( key );

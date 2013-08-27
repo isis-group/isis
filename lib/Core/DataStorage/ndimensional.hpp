@@ -152,6 +152,29 @@ public:
 		const util::FixedVector<float, DIMS> gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;
 	}
+	
+	template<typename ITER> void swapDim(size_t dim_a,size_t dim_b,ITER at){
+		std::vector<bool> visited(getVolume());
+		data::_internal::NDimensional<DIMS> oldshape=*this;
+
+		//reshape myself
+		std::swap(m_dim[dim_a],m_dim[dim_b]);
+		ITER cycle = at,last=cycle+getVolume();
+		size_t currIndex[DIMS];
+
+		while(++cycle != last){
+			size_t i=cycle-at;
+			if(visited[i])continue;
+			
+			do{
+				oldshape.getCoordsFromLinIndex(i,currIndex);
+				std::swap(currIndex[dim_a],currIndex[dim_b]);
+				i=getLinearIndex(currIndex);
+				std::swap(at[i],*cycle);
+				visited[i] = true;
+			} while (at+i != cycle);
+		}
+	}
 };
 
 }

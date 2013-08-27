@@ -105,6 +105,12 @@ bool Image::isClean()const
 	return clean;
 }
 
+void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
+{
+	NDimensional<4>::swapDim(dim_a,dim_b,begin());
+}
+
+
 void Image::deduplicateProperties()
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
@@ -337,8 +343,8 @@ bool Image::reIndex()
 		return false;
 	}
 
-	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "Aborting reindex of incomplete image.";
+	if(set.makeRectangular()>0 && set.isEmpty()){
+		LOG(Runtime,error) << "Nothing left to index, image is empty. Skipping";
 		return false;
 	}
 
@@ -1080,12 +1086,12 @@ util::fvector3 Image::getFoV() const
 Image::iterator Image::begin()
 {
 	if( checkMakeClean() ) {
-		std::vector<Chunk *> vec( lookup.size() );
+		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
 
-		return iterator( vec );
+		return iterator( vec, lookup.size() );
 	} else {
 		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 		return iterator();
@@ -1095,12 +1101,12 @@ Image::iterator Image::end() {return begin() + getVolume();}
 Image::const_iterator Image::begin()const
 {
 	if( isClean() ) {
-		std::vector<const Chunk *> vec( lookup.size() );
+		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
 
-		return const_iterator( vec );
+		return const_iterator( vec, lookup.size());
 	} else {
 		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 		return const_iterator();
