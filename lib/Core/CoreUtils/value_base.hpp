@@ -184,7 +184,8 @@ public:
 	virtual bool lt( const ValueBase &ref )const = 0;
 	virtual bool eq( const ValueBase &ref )const = 0;
 
-	
+	virtual Reference plus( const ValueBase &ref )const = 0;
+	virtual Reference minus( const ValueBase &ref )const = 0;
 };
 
 

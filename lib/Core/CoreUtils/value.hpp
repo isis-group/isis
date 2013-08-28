@@ -98,6 +98,8 @@ template<typename T,typename OPERATOR,bool IS_CONST> struct type_op<T,OPERATOR,I
 };
 
 /// equal comparison
+template<typename T> struct type_plus : type_op<T,std::plus<T>,true,boost::has_plus<T>::value>{};
+template<typename T> struct type_minus : type_op<T,std::plus<T>,true,boost::has_minus<T>::value>{};
 template<typename T> struct type_eq : type_op<T,std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
 
 /// less-than comparison (overrides posOverflow)
@@ -259,6 +261,13 @@ public:
 		return _internal::type_eq<TYPE>()( *this, ref );
 	}
 
+	ValueReference plus( const ValueBase &ref )const {
+		return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );
+	}
+	ValueReference minus( const ValueBase &ref )const {
+		return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );
+	}
+	
 	virtual ~Value() {}
 };
 

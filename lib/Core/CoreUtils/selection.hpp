@@ -139,4 +139,11 @@ basic_ostream<charT, traits> &operator<<( basic_ostream<charT, traits> &out, con
 }
 }
 
+namespace boost{
+	template<class Rhs, class Ret> struct has_minus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_plus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_divides<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_multiplies<isis::util::Selection,Rhs,Ret> : false_type{};
+}
+
 #endif //SELECTION_HPP_INCLUDED
