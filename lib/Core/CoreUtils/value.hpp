@@ -19,6 +19,8 @@
 #include <functional>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/has_operator.hpp>
+#include <boost/type_traits/conditional.hpp>
 
 namespace isis
 {
@@ -33,90 +35,84 @@ namespace _internal
 {
 
 /**
- * Generic value comparison class for Value.
+ * Generic value operation class.
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
  */
-template<typename T, bool isNumber> struct type_compare
+template<typename T,typename OPERATOR,bool IS_CONST, bool enable> struct type_op
 {
-	type_compare() {} // c++11 says we need a user defined constructor here
-	bool operator()( const util::Value<T> &/*first*/, const ValueBase &/*second*/ )const {
-		LOG( Debug, error ) << "comparison of " << util::Value<T>::staticName() << " is not supportet";
-		return false;
+	typedef typename boost::conditional<IS_CONST,const util::Value<T>&,util::Value<T>&>::type lhs;
+	typedef typename OPERATOR::result_type result_type;
+	
+	result_type operator()( lhs first, const ValueBase &second )const {
+		LOG( Debug, error ) << "operator is not supportet on " << util::Value<T>::staticName();
+		return result_type();
 	}
 };
 
 /**
- * Half-generic value comparison class for numeric types.
- * This generic class does compares numeric Value's by converting the second
- * Value-object to the type of the first Value-object. Then:
- * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-comparison is used
- * - if the conversion failed with an positive or negative overflow (the second value is to high/low to fit into the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow comarison us used
- * - if there is no known conversion from second to first an error is sent to the debug-logging and false is returned
- * The comparison functions (inRange/posOverflow,negOverflow) here are only stubs and will allways return false.
- * So, these class has to be further specialized for the regarding compare operation.
+ * Half-generic value operation class.
+ * This generic class does math operations on Values by converting the second Value-object to the type of the first Value-object. Then:
+ * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-operation is used
+ * - if the conversion failed with an positive or negative overflow (the second value is to high/low to fit into the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow operation is used
+ * - if there is no known conversion from second to first an error is sent to the debug-logging and result_type() is returned
+ * \note The functions (posOverflow,negOverflow) here are only stubs and will allways result_type().
+ * \note inRange will return OPERATOR()(first,second)
+ * These class can be further specialized for the regarding operation.
  */
-template<typename T> struct type_compare<T, true>
+template<typename T,typename OPERATOR,bool IS_CONST> struct type_op<T,OPERATOR,IS_CONST,true>
 {
-	virtual bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
-	virtual bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
-	virtual bool inRange( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
-	bool operator()( const util::Value<T> &first, const ValueBase &second )const {
+	typedef typename boost::conditional<IS_CONST,const util::Value<T>&,util::Value<T>&>::type lhs;
+	typedef typename OPERATOR::result_type result_type;
+	
+	virtual result_type posOverflow( lhs/*first*/, const util::Value<T> &/*second*/ )const {return result_type();} //default to T()
+	virtual result_type negOverflow( lhs/*first*/, const util::Value<T> &/*second*/ )const {return result_type();} //default to T()
+	virtual result_type inRange( lhs first, const util::Value<T> &second )const {
+		return OPERATOR()(static_cast<const T &>( first ),static_cast<const T &>( second ));
+	} 
+	result_type operator()( lhs first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
 		const ValueBase::Converter conv = second.getConverterTo( util::Value<T>::staticID );
-
+		
 		if ( conv ) {
 			//try to convert second into T and handle results
 			util::Value<T> buff;
-
+			
 			switch ( conv->convert( second, buff ) ) {
-			case boost::numeric::cPosOverflow:
-				LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
-				return posOverflow( first, buff );
-			case boost::numeric::cNegOverflow:
-				LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
-				return negOverflow( first, buff );
-			case boost::numeric::cInRange:
-				return inRange( first, buff );
+				case boost::numeric::cPosOverflow:
+					LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
+					return posOverflow( first, buff );
+				case boost::numeric::cNegOverflow:
+					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
+					return negOverflow( first, buff );
+				case boost::numeric::cInRange:
+					return inRange( first, buff );
 			}
 		} else {
 			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << util::Value<T>::staticName() << " available";
-			return false;
+			return result_type();
 		}
-
-		return false;
-	}
-	virtual ~type_compare() {}
-};
-
-template<typename T, bool isNumber> struct type_less : type_compare<T, isNumber>{};// we are going to specialize this for numeric T below
-template<typename T, bool isNumber> struct type_greater : type_compare<T, isNumber>{};
-template<typename T, bool isNumber> struct type_eq : type_compare<T, isNumber>
-{
-	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T &>( first ) == static_cast<const T &>( second );
+		
+		return result_type();
 	}
 };
 
-/// less-than comparison for arithmetic types
-template<typename T> struct type_less<T, true> : type_compare<T, true>
+/// equal comparison
+template<typename T> struct type_eq : type_op<T,std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
+
+/// less-than comparison (overrides posOverflow)
+template<typename T> struct type_less : type_op<T,std::less<T>,true,boost::has_less<T>::value>
 {
-	bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
+	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
-	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T &>( first ) < static_cast<const T &>( second );
-	}
 };
 
-/// greater-than comparison for arithmetic types
-template<typename T> struct type_greater<T, true> : type_compare<T, true>
+/// greater-than comparison (overrides negOverflow)
+template<typename T> struct type_greater : type_op<T,std::greater<T>,true,boost::has_greater<T>::value>
 {
-	bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
+	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
-	}
-	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T &>( first ) > static_cast<const T &>( second );
 	}
 };
 
@@ -126,13 +122,11 @@ API_EXCLUDE_END
 
 /**
  * Generic class for type aware variables.
- * Only this generic approach for types makes it possible to handle all the types of Properties for the different
+ * This generic approach makes it possible to handle all the types of Properties for the different
  * data these library can handle. On the other side it's more complex to read and write with these kind of types.
- * Please don't bother about and look carefully at further comments on functionality and examples in use,
- * e.g. with PropertyValue.\n
- * For supported types see types.hpp \n
- * Another advantage is the available type conversion, for further information how to do this and
- * limitations see type_converter.hpp
+ * Look carefully at further comments on functionality and examples in use, e.g. with PropertyValue.
+ * \note For supported types see types.hpp
+ * \note For type conversion see type_converter.cpp
  */
 
 template<typename TYPE> class Value: public ValueBase
@@ -236,8 +230,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool gt( const ValueBase &ref )const {
-		static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
-		return greater.operator()( *this, ref );
+		return _internal::type_greater<TYPE>()( *this, ref );
 	}
 
 	/**
@@ -250,8 +243,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool lt( const ValueBase &ref )const {
-		static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
-		return less( *this, ref );
+		return _internal::type_less<TYPE>()( *this, ref );
 	}
 
 	/**
@@ -264,8 +256,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool eq( const ValueBase &ref )const {
-		static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;
-		return equal( *this, ref );
+		return _internal::type_eq<TYPE>()( *this, ref );
 	}
 
 	virtual ~Value() {}

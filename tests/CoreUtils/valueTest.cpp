@@ -143,6 +143,23 @@ BOOST_AUTO_TEST_CASE( type_comparison_test )
 	BOOST_CHECK( _1000.lt( fucking_much ) );
 	BOOST_CHECK( fucking_much.gt( _1000 ) );
 	BOOST_CHECK( fucking_much.lt( even_more ) );
+
+	Value<util::Selection> a(util::Selection("a,b,c","a")),b=a;
+	Value<util::Selection> other(util::Selection("aa,bb,cc","aa")),unset(util::Selection("x"));
+
+	BOOST_CHECK(  a.eq(b));
+	BOOST_CHECK( !a.lt(b));
+	BOOST_CHECK( !a.gt(b));
+
+	BOOST_CHECK(!a.gt(other));
+	BOOST_CHECK(!a.eq(other));
+	BOOST_CHECK(!a.lt(other));
+	
+	BOOST_CHECK(Value<std::string>("a").eq(a));
+	BOOST_CHECK(Value<std::string>(" ").lt(a));
+	BOOST_CHECK(Value<std::string>("bb").gt(a));
+	// Value<int>(1).eq(a); no conversion Selection=>int available
+	// a.eq(Value<std::string>("a")); no conversion String=>Selection available
 }
 
 BOOST_AUTO_TEST_CASE( type_conversion_test )
