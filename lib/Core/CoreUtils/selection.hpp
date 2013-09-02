@@ -23,6 +23,7 @@
 #include "common.hpp"
 #include "istring.hpp"
 #include <boost/foreach.hpp>
+#include <boost/type_traits/has_operator.hpp>
 
 namespace isis
 {

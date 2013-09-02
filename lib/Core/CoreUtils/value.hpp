@@ -39,13 +39,14 @@ namespace _internal
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
  */
-template<typename T,typename OPERATOR,bool IS_CONST, bool enable> struct type_op
+template<typename OPERATOR,bool IS_CONST, bool enable> struct type_op
 {
-	typedef typename boost::conditional<IS_CONST,const util::Value<T>&,util::Value<T>&>::type lhs;
+	typedef typename boost::conditional<IS_CONST,const util::Value<typename OPERATOR::first_argument_type>&,util::Value<typename OPERATOR::first_argument_type>&>::type lhs;
+	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;
 	
 	result_type operator()( lhs first, const ValueBase &second )const {
-		LOG( Debug, error ) << "operator is not supportet on " << util::Value<T>::staticName();
+		LOG( Debug, error ) << "operator " << typeid(OPERATOR).name() << " is not supportet for " << first.getTypeName()  << " and "<< second.getTypeName();
 		return result_type();
 	}
 };
@@ -60,36 +61,37 @@ template<typename T,typename OPERATOR,bool IS_CONST, bool enable> struct type_op
  * \note inRange will return OPERATOR()(first,second)
  * These class can be further specialized for the regarding operation.
  */
-template<typename T,typename OPERATOR,bool IS_CONST> struct type_op<T,OPERATOR,IS_CONST,true>
+template<typename OPERATOR,bool IS_CONST> struct type_op<OPERATOR,IS_CONST,true>
 {
-	typedef typename boost::conditional<IS_CONST,const util::Value<T>&,util::Value<T>&>::type lhs;
+	typedef typename boost::conditional<IS_CONST,const util::Value<typename OPERATOR::first_argument_type>&,util::Value<typename OPERATOR::first_argument_type>&>::type lhs;
+	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;
 	
-	virtual result_type posOverflow( lhs/*first*/, const util::Value<T> &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type negOverflow( lhs/*first*/, const util::Value<T> &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type inRange( lhs first, const util::Value<T> &second )const {
-		return OPERATOR()(static_cast<const T &>( first ),static_cast<const T &>( second ));
+	virtual result_type posOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
+	virtual result_type negOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
+	virtual result_type inRange( lhs first, const rhs &second )const {
+		return OPERATOR()(first,second);
 	} 
 	result_type operator()( lhs first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const ValueBase::Converter conv = second.getConverterTo( util::Value<T>::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( util::Value<typename OPERATOR::second_argument_type>::staticID );
 		
 		if ( conv ) {
 			//try to convert second into T and handle results
-			util::Value<T> buff;
+			rhs buff;
 			
 			switch ( conv->convert( second, buff ) ) {
 				case boost::numeric::cPosOverflow:
-					LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
+					LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
 					return posOverflow( first, buff );
 				case boost::numeric::cNegOverflow:
-					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
+					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
 					return negOverflow( first, buff );
 				case boost::numeric::cInRange:
 					return inRange( first, buff );
 			}
 		} else {
-			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << util::Value<T>::staticName() << " available";
+			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << rhs::staticName() << " available";
 			return result_type();
 		}
 		
@@ -98,12 +100,12 @@ template<typename T,typename OPERATOR,bool IS_CONST> struct type_op<T,OPERATOR,I
 };
 
 /// equal comparison
-template<typename T> struct type_plus : type_op<T,std::plus<T>,true,boost::has_plus<T>::value>{};
-template<typename T> struct type_minus : type_op<T,std::plus<T>,true,boost::has_minus<T>::value>{};
-template<typename T> struct type_eq : type_op<T,std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
+template<typename T> struct type_plus : type_op<std::plus<T>,true,boost::has_plus<T>::value>{};
+template<typename T> struct type_minus : type_op<std::plus<T>,true,boost::has_minus<T>::value>{};
+template<typename T> struct type_eq : type_op<std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
 
 /// less-than comparison (overrides posOverflow)
-template<typename T> struct type_less : type_op<T,std::less<T>,true,boost::has_less<T>::value>
+template<typename T> struct type_less : type_op<std::less<T>,true,boost::has_less<T>::value>
 {
 	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
@@ -111,7 +113,7 @@ template<typename T> struct type_less : type_op<T,std::less<T>,true,boost::has_l
 };
 
 /// greater-than comparison (overrides negOverflow)
-template<typename T> struct type_greater : type_op<T,std::greater<T>,true,boost::has_greater<T>::value>
+template<typename T> struct type_greater : type_op<std::greater<T>,true,boost::has_greater<T>::value>
 {
 	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
