@@ -104,6 +104,12 @@ template<typename T> struct type_plus : type_op<std::plus<T>,true,boost::has_plu
 template<typename T> struct type_minus : type_op<std::plus<T>,true,boost::has_minus<T>::value>{};
 template<typename T> struct type_eq : type_op<std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
 
+template<> struct type_plus<boost::gregorian::date> : type_op<std::plus<boost::gregorian::date>,true,false>{};
+template<> struct type_minus<boost::gregorian::date> : type_op<std::minus<boost::gregorian::date>,true,false>{};
+
+template<> struct type_plus<boost::posix_time::ptime> : type_op<std::plus<boost::posix_time::ptime>,true,false>{};
+template<> struct type_minus<boost::posix_time::ptime> : type_op<std::minus<boost::posix_time::ptime>,true,false>{};
+
 /// less-than comparison (overrides posOverflow)
 template<typename T> struct type_less : type_op<std::less<T>,true,boost::has_less<T>::value>
 {
