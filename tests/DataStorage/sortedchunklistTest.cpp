@@ -58,14 +58,14 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 
 	// the list should still be rectangular
 	data::enableLog<util::DefaultMsgPrint>( warning );
-	BOOST_REQUIRE( chunks.isRectangular() );
+	BOOST_REQUIRE( chunks.getShape().size()==1 );
 
 	// inserting Chunk with diffent secondary prop should be ok
 	ch1.setPropertyAs( "acquisitionNumber", 1 );
 	BOOST_CHECK( chunks.insert( ch1 ) );
 
 	// and the list it should not be rectangular anymore
-	BOOST_CHECK( ! chunks.isRectangular() );
+	BOOST_CHECK( ! chunks.getShape().size()==1 );
 
 	// add the renmaining acquisitionNumber=1-chunks
 	for ( int j = 1; j < 3; j++ ) { //0 is already there
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	// there should be exactly 3*2 chunks in the list
 	BOOST_CHECK_EQUAL( chunks.getLookup().size(), 6 );
 	// and it should be rectangular by now
-	BOOST_CHECK( chunks.isRectangular() );
+	BOOST_CHECK( chunks.getShape().size()==1 );
 }
 
 }
