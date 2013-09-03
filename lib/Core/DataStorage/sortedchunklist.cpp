@@ -175,6 +175,11 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, verbose_info ) << "Inserting 1st chunk";
 		std::stack<scalarPropCompare> backup = secondarySort;
 
+		if(ch.getDimSize(sliceDim)>1){
+			LOG(Runtime,info)<< "We're dealing with volume chunks, considering indexOrigin as equal across Images";
+			equalProps.push_back("indexOrigin");
+		}
+
 		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
 			const util::PropertyMap::KeyType temp = secondarySort.top().propertyName;
 

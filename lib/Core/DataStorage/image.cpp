@@ -1001,7 +1001,11 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	};
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
-	set.clear(); // clear the image, so we can insert the splices
+
+	// reset the Chunk set, so we can insert new splices
+	set=_internal::SortedChunkList(defaultChunkEqualitySet); 
+	set.addSecondarySort( "acquisitionNumber" );
+
 	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
