@@ -102,6 +102,16 @@ unsigned short Chunk::getTypeID()const
 	return getValueArrayBase().getTypeID();
 }
 
+std::string Chunk::getShapeString(bool upper) const
+{
+	switch(getRelevantDims()){
+		case 2:return upper ? "Slice":"slice";
+		case 3:return upper ? "Volume":"volume";
+		case 4:return upper ? "Volset":"volset";
+	}
+	return upper ? "Chunk":"chunk";
+}
+
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
