@@ -102,13 +102,17 @@ template<typename OPERATOR> struct type_op<OPERATOR,true>
 /// equal comparison
 template<typename T> struct type_plus : type_op<std::plus<T>,boost::has_plus<T>::value>{};
 template<typename T> struct type_minus : type_op<std::minus<T>,boost::has_minus<T>::value>{};
+template<typename T> struct type_mult : type_op<std::multiplies<T>,boost::has_multiplies<T>::value>{};
+template<typename T> struct type_div : type_op<std::divides<T>,boost::has_divides<T>::value>{};
 template<typename T> struct type_eq : type_op<std::equal_to<T>,boost::has_equal_to<T>::value>{};
 
 template<> struct type_plus<boost::gregorian::date> : type_op<std::plus<boost::gregorian::date>,false>{};
 template<> struct type_minus<boost::gregorian::date> : type_op<std::minus<boost::gregorian::date>,false>{};
+template<> struct type_mult<boost::gregorian::date> : type_op<std::multiplies<boost::gregorian::date>,false>{};
 
 template<> struct type_plus<boost::posix_time::ptime> : type_op<std::plus<boost::posix_time::ptime>,false>{};
 template<> struct type_minus<boost::posix_time::ptime> : type_op<std::minus<boost::posix_time::ptime>,false>{};
+template<> struct type_mult<boost::posix_time::ptime> : type_op<std::multiplies<boost::posix_time::ptime>,false>{};
 
 /// less-than comparison (overrides posOverflow)
 template<typename T> struct type_less : type_op<std::less<T>,boost::has_less<T>::value>
@@ -269,17 +273,16 @@ public:
 		return _internal::type_eq<TYPE>()( *this, ref );
 	}
 
-	Reference plus( const ValueBase &ref )const {
-		return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );
-	}
+	Reference plus( const ValueBase &ref )const {return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );}
+	Reference minus( const ValueBase &ref )const {return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );}
+	Reference multiply( const ValueBase &ref )const {return Value<TYPE>( _internal::type_mult<TYPE>()( *this, ref ) );}
+	Reference divide( const ValueBase &ref )const {return Value<TYPE>( _internal::type_div<TYPE>()( *this, ref ) );}
+	
 	Reference add( const ValueBase &ref ) {
 		const TYPE result=_internal::type_plus<TYPE>()( *this, ref );
 		if(_internal::type_plus<TYPE>::enabled::value)
 			*this = result;
 		return *this;
-	}
-	Reference minus( const ValueBase &ref )const {
-		return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );
 	}
 	Reference substract( const ValueBase &ref ) {
 		const TYPE result=_internal::type_minus<TYPE>()( *this, ref );
@@ -287,6 +290,19 @@ public:
 			*this=result;
 		return *this;
 	}
+	Reference multiply_me( const ValueBase &ref ) {
+		const TYPE result=_internal::type_mult<TYPE>()( *this, ref );
+		if(_internal::type_plus<TYPE>::enabled::value)
+			*this = result;
+		return *this;
+	}
+	Reference divide_me( const ValueBase &ref ) {
+		const TYPE result=_internal::type_div<TYPE>()( *this, ref );
+		if(_internal::type_minus<TYPE>::enabled::value)
+			*this=result;
+		return *this;
+	}
+	
 	
 	virtual ~Value() {}
 };

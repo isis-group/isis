@@ -116,11 +116,23 @@ BOOST_AUTO_TEST_CASE( test_type_operators )
 
 	BOOST_CHECK_EQUAL( *tInt1.plus(Value<std::string>("21")), Value<int32_t>( 42 ) );
 	BOOST_CHECK_EQUAL( *tInt1.minus(Value<std::string>("21")), Value<int32_t>( 0 ) );
+	BOOST_CHECK_EQUAL( *tInt1.multiply(Value<std::string>("2")), Value<int32_t>( 42 ) );
+	BOOST_CHECK_EQUAL( *tInt1.divide(Value<std::string>("2")), Value<int32_t>( 10 ) ); // int(21/2)=10
 
-	tInt1.add(Value<std::string>("21"));
-	BOOST_CHECK_EQUAL( tInt1, 42 );
-	tInt1.substract(Value<std::string>("21"));
-	BOOST_CHECK_EQUAL( tInt1, 21 );
+	{
+		Value<int32_t> buff=tInt1;
+		buff.add(Value<std::string>("21"));
+		BOOST_REQUIRE_EQUAL( buff, 42 );
+		buff.substract(Value<std::string>("21"));
+		BOOST_CHECK_EQUAL( buff, 21 );
+	}
+	{
+		Value<int32_t> buff=tInt1;
+		buff.multiply_me(Value<std::string>("2"));
+		BOOST_REQUIRE_EQUAL( buff, 42 );
+		buff.divide_me(Value<std::string>("2"));
+		BOOST_CHECK_EQUAL( buff, 21 );
+	}
 }
 
 BOOST_AUTO_TEST_CASE( type_comparison_test )
