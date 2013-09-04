@@ -20,7 +20,6 @@
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/has_operator.hpp>
-#include <boost/type_traits/conditional.hpp>
 
 namespace isis
 {
@@ -39,11 +38,11 @@ namespace _internal
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
  */
-template<typename OPERATOR,bool IS_CONST, bool enable> struct type_op
+template<typename OPERATOR,bool enable> struct type_op
 {
-	typedef typename boost::conditional<IS_CONST,const util::Value<typename OPERATOR::first_argument_type>&,util::Value<typename OPERATOR::first_argument_type>&>::type lhs;
-	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
+	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
 	typedef typename OPERATOR::result_type result_type;
+	typedef boost::integral_constant<bool,enable> enabled;
 	
 	result_type operator()( lhs first, const ValueBase &second )const {
 		LOG( Debug, error ) << "operator " << typeid(OPERATOR).name() << " is not supportet for " << first.getTypeName()  << " and "<< second.getTypeName();
@@ -61,11 +60,12 @@ template<typename OPERATOR,bool IS_CONST, bool enable> struct type_op
  * \note inRange will return OPERATOR()(first,second)
  * These class can be further specialized for the regarding operation.
  */
-template<typename OPERATOR,bool IS_CONST> struct type_op<OPERATOR,IS_CONST,true>
+template<typename OPERATOR> struct type_op<OPERATOR,true>
 {
-	typedef typename boost::conditional<IS_CONST,const util::Value<typename OPERATOR::first_argument_type>&,util::Value<typename OPERATOR::first_argument_type>&>::type lhs;
+	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
 	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;
+	typedef boost::integral_constant<bool,true> enabled;
 	
 	virtual result_type posOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
 	virtual result_type negOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
@@ -100,18 +100,18 @@ template<typename OPERATOR,bool IS_CONST> struct type_op<OPERATOR,IS_CONST,true>
 };
 
 /// equal comparison
-template<typename T> struct type_plus : type_op<std::plus<T>,true,boost::has_plus<T>::value>{};
-template<typename T> struct type_minus : type_op<std::plus<T>,true,boost::has_minus<T>::value>{};
-template<typename T> struct type_eq : type_op<std::equal_to<T>,true,boost::has_equal_to<T>::value>{};
+template<typename T> struct type_plus : type_op<std::plus<T>,boost::has_plus<T>::value>{};
+template<typename T> struct type_minus : type_op<std::minus<T>,boost::has_minus<T>::value>{};
+template<typename T> struct type_eq : type_op<std::equal_to<T>,boost::has_equal_to<T>::value>{};
 
-template<> struct type_plus<boost::gregorian::date> : type_op<std::plus<boost::gregorian::date>,true,false>{};
-template<> struct type_minus<boost::gregorian::date> : type_op<std::minus<boost::gregorian::date>,true,false>{};
+template<> struct type_plus<boost::gregorian::date> : type_op<std::plus<boost::gregorian::date>,false>{};
+template<> struct type_minus<boost::gregorian::date> : type_op<std::minus<boost::gregorian::date>,false>{};
 
-template<> struct type_plus<boost::posix_time::ptime> : type_op<std::plus<boost::posix_time::ptime>,true,false>{};
-template<> struct type_minus<boost::posix_time::ptime> : type_op<std::minus<boost::posix_time::ptime>,true,false>{};
+template<> struct type_plus<boost::posix_time::ptime> : type_op<std::plus<boost::posix_time::ptime>,false>{};
+template<> struct type_minus<boost::posix_time::ptime> : type_op<std::minus<boost::posix_time::ptime>,false>{};
 
 /// less-than comparison (overrides posOverflow)
-template<typename T> struct type_less : type_op<std::less<T>,true,boost::has_less<T>::value>
+template<typename T> struct type_less : type_op<std::less<T>,boost::has_less<T>::value>
 {
 	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
@@ -119,7 +119,7 @@ template<typename T> struct type_less : type_op<std::less<T>,true,boost::has_les
 };
 
 /// greater-than comparison (overrides negOverflow)
-template<typename T> struct type_greater : type_op<std::greater<T>,true,boost::has_greater<T>::value>
+template<typename T> struct type_greater : type_op<std::greater<T>,boost::has_greater<T>::value>
 {
 	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
@@ -263,16 +263,16 @@ public:
 	 * \retval value_of_this==converted_value_of_ref if the conversion was successfull
 	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
 	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \retval false if there is no know conversion from ref to TYPE
+	 * \retval false if there is no known conversion from ref to TYPE
 	 */
 	bool eq( const ValueBase &ref )const {
 		return _internal::type_eq<TYPE>()( *this, ref );
 	}
 
-	ValueReference plus( const ValueBase &ref )const {
+	Reference plus( const ValueBase &ref )const {
 		return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );
 	}
-	ValueReference minus( const ValueBase &ref )const {
+	Reference minus( const ValueBase &ref )const {
 		return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );
 	}
 	
