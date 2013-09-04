@@ -113,6 +113,14 @@ BOOST_AUTO_TEST_CASE( test_type_operators )
 	BOOST_CHECK_EQUAL( tInt1 + tInt2, Value<int32_t>( 42 ) );
 	BOOST_CHECK_EQUAL( tInt1 * 2, 42 );
 	BOOST_CHECK_EQUAL( 42 - tInt1, tInt2 );
+
+	BOOST_CHECK_EQUAL( *tInt1.plus(Value<std::string>("21")), Value<int32_t>( 42 ) );
+	BOOST_CHECK_EQUAL( *tInt1.minus(Value<std::string>("21")), Value<int32_t>( 0 ) );
+
+	tInt1.add(Value<std::string>("21"));
+	BOOST_CHECK_EQUAL( tInt1, 42 );
+	tInt1.substract(Value<std::string>("21"));
+	BOOST_CHECK_EQUAL( tInt1, 21 );
 }
 
 BOOST_AUTO_TEST_CASE( type_comparison_test )
@@ -247,7 +255,6 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
 }
-
 
 }
 }

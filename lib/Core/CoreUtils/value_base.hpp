@@ -186,6 +186,9 @@ public:
 
 	virtual Reference plus( const ValueBase &ref )const = 0;
 	virtual Reference minus( const ValueBase &ref )const = 0;
+
+	virtual Reference add( const ValueBase &ref ) =0;
+	virtual Reference substract( const ValueBase &ref ) =0;
 };
 
 

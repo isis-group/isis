@@ -272,8 +272,20 @@ public:
 	Reference plus( const ValueBase &ref )const {
 		return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );
 	}
+	Reference add( const ValueBase &ref ) {
+		const TYPE result=_internal::type_plus<TYPE>()( *this, ref );
+		if(_internal::type_plus<TYPE>::enabled::value)
+			*this = result;
+		return *this;
+	}
 	Reference minus( const ValueBase &ref )const {
 		return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );
+	}
+	Reference substract( const ValueBase &ref ) {
+		const TYPE result=_internal::type_minus<TYPE>()( *this, ref );
+		if(_internal::type_minus<TYPE>::enabled::value)
+			*this=result;
+		return *this;
 	}
 	
 	virtual ~Value() {}
