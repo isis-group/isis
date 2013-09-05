@@ -101,10 +101,12 @@ public:
 	std::vector<boost::shared_ptr<Chunk> > getLookup();
 
 	/**
-	 * \returns 0 if the list is rectangular (the amount of secondary sorted entries is equal across all primary entries)
-	 * \returns lowest amount of secondary sorted entries across all primary entries otherwise
+	 * Get the list of primary the different lengths of the primary sorted "columns".
+	 * This list should only hold one value if the amount of secondary sorted entries is equal across all primary entries. Which it is in a consistent dataset.
+	 * \returns a one element set with the amount of secondary sorted entries across all primary entries if image is consistent
+	 * \returns a set with the different amounts of secondary sorted entries across all primary entries otherwise
 	 **/	
-	size_t isRectangular();
+	std::set<size_t> getShape();
 
 	/**
 	 * Make image rectangular by dropping secondary sorted entries from all primary entries until their amount is equal.

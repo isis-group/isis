@@ -65,6 +65,8 @@ template<class T> struct TypeID {
 };
 }
 /// @endcond
+/// resolves to boost::true_type if type is known, boost::false_type if not
+template< typename T > struct knowType :  boost::mpl::contains<_internal::types, T> {};
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
  * Instanciating this with any datatype (eg: checkType\<short\>() ) will cause the
@@ -72,9 +74,7 @@ template<class T> struct TypeID {
  */
 template< typename T > struct checkType {
 	BOOST_MPL_ASSERT_MSG(
-		( boost::mpl::contains<_internal::types, T>::value )
-		, TYPE_IS_NOT_KNOWN
-		, ( T )
+		( knowType<T>::value ), TYPE_IS_NOT_KNOWN, ( T )
 	);
 };
 

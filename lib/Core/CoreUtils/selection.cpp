@@ -69,19 +69,15 @@ bool Selection::set( const char *entry )
 	}
 }
 
-bool Selection::operator==( const Selection &ref )const
-{
-	return m_set == ref.m_set && ent_map == ref.ent_map;
-}
-bool Selection::operator==( const char ref[] ) const
-{
-	return ( ( const util::istring & ) * this ) == ref ;
-}
-bool Selection::operator==( const int ref ) const
-{
-	return ( ( int ) * this ) == ref;
-}
+bool Selection::operator==( const Selection &ref )const{return comp_op(ref,std::equal_to<int>());}
+bool Selection::operator==( const char ref[] )    const{return std::equal_to<util::istring>()(*this, ref);}
+bool Selection::operator==( const int ref )       const{return std::equal_to<int>()(*this, ref);}
 
+bool Selection::operator<( const Selection &ref )const{return comp_op(ref,std::less<int>());}
+bool Selection::operator<( const int ref )       const{return std::greater<int>()(*this, ref);}
+
+bool Selection::operator>( const Selection &ref )const{return comp_op(ref,std::less<int>());}
+bool Selection::operator>( const int ref )       const{return std::greater<int>()(*this, ref);}
 
 std::list<util::istring> Selection::getEntries()const
 {

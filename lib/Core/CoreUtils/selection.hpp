@@ -23,6 +23,7 @@
 #include "common.hpp"
 #include "istring.hpp"
 #include <boost/foreach.hpp>
+#include <boost/type_traits/has_operator.hpp>
 
 namespace isis
 {
@@ -41,6 +42,11 @@ class Selection
 	typedef std::map<util::istring, unsigned short> MapType;
 	MapType ent_map;
 	int m_set;
+	template<typename OPERATION> bool comp_op(const Selection &ref,const OPERATION &op)const{
+		LOG_IF(ent_map != ref.ent_map,Debug,error) << "Comparing different Selection sets, result will be \"false\"";
+		LOG_IF(!(m_set && ref.m_set),Debug,error) << "Comparing unset Selection, result will be \"false\"";
+		return (m_set && ref.m_set) && ent_map == ref.ent_map && op(m_set, ref.m_set);
+	}
 public:
 	/**
 	 * Default constructor.
@@ -87,6 +93,8 @@ public:
 	 * \returns true if both selection have the same options and are currently set to the the option. False otherwise.
 	 */
 	bool operator==( const Selection &ref )const;
+	bool operator>( const Selection &ref )const;
+	bool operator<( const Selection &ref )const;
 	/**
 	 * String comparison.
 	 * \returns true if the currently set option is non-case-sensitive equal to the given string. False otherwise.
@@ -97,6 +105,9 @@ public:
 	 * \returns true if the number corresponding the currently set option is equal to the given number. False otherwise.
 	 */
 	bool operator==( const int ref )const;
+	bool operator>( const int ref )const;
+	bool operator<( const int ref )const;
+
 	/// \returns a list of all options
 	std::list<util::istring> getEntries()const;
 };
@@ -127,6 +138,13 @@ basic_ostream<charT, traits> &operator<<( basic_ostream<charT, traits> &out, con
 {
 	return out << ( std::string )s;
 }
+}
+
+namespace boost{
+	template<class Rhs, class Ret> struct has_minus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_plus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_divides<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_multiplies<isis::util::Selection,Rhs,Ret> : false_type{};
 }
 
 #endif //SELECTION_HPP_INCLUDED

@@ -213,6 +213,17 @@ public:
 	size_t getBytesPerVoxel()const;
 	std::string getTypeName()const;
 	unsigned short getTypeID()const;
+
+	/**
+	 * Get a string describing the shape of the chunk.
+	 * \param upper make the first letter uppercase
+	 * \returns "slice" for 2D chunks
+	 * \returns "volume" for 3D chunks
+	 * \returns "volset" for 4D chunks
+	 * \returns "chunk" otherwise
+	 */
+	std::string getShapeString( bool upper=false )const;
+	
 	template<typename T> bool is()const {return getValueArrayBase().is<T>();}
 
 	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;

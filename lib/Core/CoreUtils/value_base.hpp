@@ -79,6 +79,13 @@ protected:
 	*/
 	virtual ValueBase *clone()const = 0;
 public:
+	/// used for boost::ptr_vector
+	struct heap_clone_allocator
+	{
+		static ValueBase* allocate_clone( const ValueBase& r );
+		static void deallocate_clone( const ValueBase* r );
+	};
+	
 	typedef _internal::GenericReference<ValueBase> Reference;
 	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
@@ -172,9 +179,20 @@ public:
 
 	virtual ~ValueBase();
 
+	// basic comparison
 	virtual bool gt( const ValueBase &ref )const = 0;
 	virtual bool lt( const ValueBase &ref )const = 0;
 	virtual bool eq( const ValueBase &ref )const = 0;
+
+	virtual Reference plus( const ValueBase &ref )const = 0;
+	virtual Reference minus( const ValueBase &ref )const = 0;
+	virtual Reference multiply( const ValueBase &ref )const = 0;
+	virtual Reference divide( const ValueBase &ref )const = 0;
+
+	virtual Reference add( const ValueBase &ref ) =0;
+	virtual Reference substract( const ValueBase &ref ) =0;
+	virtual Reference multiply_me( const ValueBase &ref ) = 0;
+	virtual Reference divide_me( const ValueBase &ref ) = 0;
 };
 
 
