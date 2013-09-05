@@ -113,6 +113,26 @@ BOOST_AUTO_TEST_CASE( test_type_operators )
 	BOOST_CHECK_EQUAL( tInt1 + tInt2, Value<int32_t>( 42 ) );
 	BOOST_CHECK_EQUAL( tInt1 * 2, 42 );
 	BOOST_CHECK_EQUAL( 42 - tInt1, tInt2 );
+
+	BOOST_CHECK_EQUAL( *tInt1.plus(Value<std::string>("21")), Value<int32_t>( 42 ) );
+	BOOST_CHECK_EQUAL( *tInt1.minus(Value<std::string>("21")), Value<int32_t>( 0 ) );
+	BOOST_CHECK_EQUAL( *tInt1.multiply(Value<std::string>("2")), Value<int32_t>( 42 ) );
+	BOOST_CHECK_EQUAL( *tInt1.divide(Value<std::string>("2")), Value<int32_t>( 10 ) ); // int(21/2)=10
+
+	{
+		Value<int32_t> buff=tInt1;
+		buff.add(Value<std::string>("21"));
+		BOOST_REQUIRE_EQUAL( buff, 42 );
+		buff.substract(Value<std::string>("21"));
+		BOOST_CHECK_EQUAL( buff, 21 );
+	}
+	{
+		Value<int32_t> buff=tInt1;
+		buff.multiply_me(Value<std::string>("2"));
+		BOOST_REQUIRE_EQUAL( buff, 42 );
+		buff.divide_me(Value<std::string>("2"));
+		BOOST_CHECK_EQUAL( buff, 21 );
+	}
 }
 
 BOOST_AUTO_TEST_CASE( type_comparison_test )
@@ -143,6 +163,23 @@ BOOST_AUTO_TEST_CASE( type_comparison_test )
 	BOOST_CHECK( _1000.lt( fucking_much ) );
 	BOOST_CHECK( fucking_much.gt( _1000 ) );
 	BOOST_CHECK( fucking_much.lt( even_more ) );
+
+	Value<util::Selection> a(util::Selection("a,b,c","a")),b=a;
+	Value<util::Selection> other(util::Selection("aa,bb,cc","aa")),unset(util::Selection("x"));
+
+	BOOST_CHECK(  a.eq(b));
+	BOOST_CHECK( !a.lt(b));
+	BOOST_CHECK( !a.gt(b));
+
+	BOOST_CHECK(!a.gt(other));
+	BOOST_CHECK(!a.eq(other));
+	BOOST_CHECK(!a.lt(other));
+	
+	BOOST_CHECK(Value<std::string>("a").eq(a));
+	BOOST_CHECK(Value<std::string>(" ").lt(a));
+	BOOST_CHECK(Value<std::string>("bb").gt(a));
+	// Value<int>(1).eq(a); no conversion Selection=>int available
+	// a.eq(Value<std::string>("a")); no conversion String=>Selection available
 }
 
 BOOST_AUTO_TEST_CASE( type_conversion_test )
@@ -230,7 +267,6 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
 }
-
 
 }
 }

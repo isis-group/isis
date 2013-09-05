@@ -23,6 +23,7 @@
 #include "common.hpp"
 #include "istring.hpp"
 #include <boost/foreach.hpp>
+#include <boost/type_traits/has_operator.hpp>
 
 namespace isis
 {
@@ -137,6 +138,13 @@ basic_ostream<charT, traits> &operator<<( basic_ostream<charT, traits> &out, con
 {
 	return out << ( std::string )s;
 }
+}
+
+namespace boost{
+	template<class Rhs, class Ret> struct has_minus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_plus<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_divides<isis::util::Selection,Rhs,Ret> : false_type{};
+	template<class Rhs, class Ret> struct has_multiplies<isis::util::Selection,Rhs,Ret> : false_type{};
 }
 
 #endif //SELECTION_HPP_INCLUDED

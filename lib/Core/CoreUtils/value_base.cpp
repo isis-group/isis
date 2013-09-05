@@ -110,5 +110,15 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 	}
 }
 
+ValueBase* ValueBase::heap_clone_allocator::allocate_clone( const ValueBase& r )
+{
+	return r.clone();
+}
+void ValueBase::heap_clone_allocator::deallocate_clone( const ValueBase* r )
+{
+	delete r;
+}
+
+
 }
 }
