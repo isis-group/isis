@@ -88,6 +88,7 @@ template<typename OPERATOR> struct type_op<OPERATOR,true>
 					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
 					return negOverflow( first, buff );
 				case boost::numeric::cInRange:
+					LOG_IF(second.isFloat()&&buff.isInteger(), Debug,warning) << "Using " << second << " as " << buff << " for operation on " << first << " you might loose precision";
 					return inRange( first, buff );
 			}
 		} else {
@@ -234,49 +235,14 @@ public:
 	 */
 	operator TYPE &() {return m_val;}
 
-	/**
-	 * Check if the value of this is greater than ref converted to TYPE.
-	 * The function tries to convert ref to the type of this and compares the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \retval value_of_this>converted_value_of_ref if the conversion was successfull
-	 * \retval true if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \retval false if there is no know conversion from ref to TYPE
-	 */
-	bool gt( const ValueBase &ref )const {
-		return _internal::type_greater<TYPE>()( *this, ref );
-	}
+	bool gt( const ValueBase &ref )const {return _internal::type_greater<TYPE>()( *this, ref );}
+	bool lt( const ValueBase &ref )const {return _internal::type_less<TYPE>()( *this, ref );}
+	bool eq( const ValueBase &ref )const {return _internal::type_eq<TYPE>()( *this, ref );}
 
-	/**
-	 * Check if the value of this is less than ref converted to TYPE.
-	 * The funkcion tries to convert ref to the type of this and compare the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \retval value_of_this<converted_value_of_ref if the conversion was successfull
-	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \retval true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \retval false if there is no know conversion from ref to TYPE
-	 */
-	bool lt( const ValueBase &ref )const {
-		return _internal::type_less<TYPE>()( *this, ref );
-	}
-
-	/**
-	 * Check if the value of this is equal to ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \retval value_of_this==converted_value_of_ref if the conversion was successfull
-	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \retval false if there is no known conversion from ref to TYPE
-	 */
-	bool eq( const ValueBase &ref )const {
-		return _internal::type_eq<TYPE>()( *this, ref );
-	}
-
-	Reference plus( const ValueBase &ref )const {return Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );}
-	Reference minus( const ValueBase &ref )const {return Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );}
-	Reference multiply( const ValueBase &ref )const {return Value<TYPE>( _internal::type_mult<TYPE>()( *this, ref ) );}
-	Reference divide( const ValueBase &ref )const {return Value<TYPE>( _internal::type_div<TYPE>()( *this, ref ) );}
+	Reference plus( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );}
+	Reference minus( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );}
+	Reference multiply( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_mult<TYPE>()( *this, ref ) );}
+	Reference divide( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_div<TYPE>()( *this, ref ) );}
 	
 	Reference add( const ValueBase &ref ) {
 		const TYPE result=_internal::type_plus<TYPE>()( *this, ref );
