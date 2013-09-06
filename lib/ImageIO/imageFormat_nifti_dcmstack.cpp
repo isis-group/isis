@@ -98,7 +98,6 @@ bool JsonMap::readJson( data::ValueArray< uint8_t > stream, char extra_token )
 	using qi::lit;
 	using namespace boost::spirit;
 
-	int version;
 	read<util::PropertyValue>::rule value;
 	read<fusion::vector2<std::string, value_cont> >::rule member;
 
@@ -144,6 +143,7 @@ struct ComputeTimeDist {
 };
 
 struct TmParser {
+    TmParser(){}
 	util::PropertyValue operator()( const util::PropertyValue &val )const {
 		short shift = 0;
 		bool ok = true;

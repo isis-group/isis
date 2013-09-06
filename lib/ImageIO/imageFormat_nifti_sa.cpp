@@ -820,10 +820,10 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	if( newChunks.size() <= 1 )
 		newChunks = parseSliceOrdering( header, newChunks.front() ); //if dcmmeta didn't splice, check if the header tells us to do so
 
-	if( newChunks.front().hasBranch( "DICOM" ) ) // if we got DICOM data clean up some
+	if( newChunks.front().hasBranch( "DICOM" ) ){ // if we got DICOM data clean up some
 		BOOST_FOREACH( data::Chunk & ch, newChunks )
-		sanitise( ch );
-
+            sanitise( ch );
+    }
 
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();

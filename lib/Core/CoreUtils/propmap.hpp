@@ -63,10 +63,14 @@ public:
 
 	/// "Path" type used to locate entries in the tree
 	struct PropPath: public std::list<KeyType> {
-		PropPath() {}
-		PropPath( const char *key ): std::list<KeyType>( util::stringToList<KeyType>( util::istring( key ), pathSeperator ) ) {}
-		PropPath( const KeyType &key ): std::list<KeyType>( util::stringToList<KeyType>( key, pathSeperator ) ) {}
-		PropPath( const std::list<KeyType> &path ): std::list<KeyType>( path ) {}
+		PropPath();
+		PropPath( const char *key );
+		PropPath( const KeyType &key );
+		PropPath( const std::list<KeyType> &path );
+        PropPath operator/(const PropPath &s)const;
+        PropPath& operator/=(const PropPath &s);
+        PropPath operator/(KeyType s)const;
+        PropPath& operator/=(KeyType s);
 	};
 private:
 	typedef std::map<KeyType, mapped_type, key_compare> Container;

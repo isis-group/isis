@@ -242,7 +242,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	std::list<Chunk>::iterator it = ret.begin();
 	it++;// skip the first one
 
-	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them @todo API cleanup wehn Value has operators
+	for( uint32_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them @todo API cleanup wehn Value has operators
 		if(!originWasList){
 			util::fvector3 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector3>();
 
