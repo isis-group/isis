@@ -112,7 +112,7 @@ struct NumericOverflowHandler {
 };
 boost::numeric::range_check_result NumericOverflowHandler::result = boost::numeric::cInRange;
 
-// basic numeric to numeric conversion (does runding and handles overlow)
+// basic numeric to numeric conversion (does rounding and handles overlow)
 template<typename SRC, typename DST> boost::numeric::range_check_result num2num( const SRC &src, DST &dst )
 {
 	typedef boost::numeric::converter <

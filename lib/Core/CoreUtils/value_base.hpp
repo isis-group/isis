@@ -79,10 +79,17 @@ protected:
 	*/
 	virtual ValueBase *clone()const = 0;
 public:
+	/// used for boost::ptr_vector
+	struct heap_clone_allocator
+	{
+		static ValueBase* allocate_clone( const ValueBase& r );
+		static void deallocate_clone( const ValueBase* r );
+	};
+	
 	typedef _internal::GenericReference<ValueBase> Reference;
 	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
-	/// \return true is the stored type is T
+	/// \return true if the stored type is T
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
@@ -172,9 +179,48 @@ public:
 
 	virtual ~ValueBase();
 
+	/**
+	 * Check if the value of this is greater than ref converted to TYPE.
+	 * The function tries to convert ref to the type of this and compares the result.
+	 * If there is no conversion an error is send to the debug logging, and false is returned.
+	 * \retval value_of_this>converted_value_of_ref if the conversion was successfull
+	 * \retval true if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no know conversion from ref to TYPE
+	 */
 	virtual bool gt( const ValueBase &ref )const = 0;
+	
+	/**
+	 * Check if the value of this is less than ref converted to TYPE.
+	 * The funkcion tries to convert ref to the type of this and compare the result.
+	 * If there is no conversion an error is send to the debug logging, and false is returned.
+	 * \retval value_of_this<converted_value_of_ref if the conversion was successfull
+	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no know conversion from ref to TYPE
+	 */
 	virtual bool lt( const ValueBase &ref )const = 0;
+	
+	/**
+	 * Check if the value of this is equal to ref converted to TYPE.
+	 * The funktion tries to convert ref to the type of this and compare the result.
+	 * If there is no conversion an error is send to the debug logging, and false is returned.
+	 * \retval value_of_this==converted_value_of_ref if the conversion was successfull
+	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no known conversion from ref to TYPE
+	 */
 	virtual bool eq( const ValueBase &ref )const = 0;
+
+	virtual Reference plus( const ValueBase &ref )const = 0;
+	virtual Reference minus( const ValueBase &ref )const = 0;
+	virtual Reference multiply( const ValueBase &ref )const = 0;
+	virtual Reference divide( const ValueBase &ref )const = 0;
+
+	virtual Reference add( const ValueBase &ref ) =0;
+	virtual Reference substract( const ValueBase &ref ) =0;
+	virtual Reference multiply_me( const ValueBase &ref ) = 0;
+	virtual Reference divide_me( const ValueBase &ref ) = 0;
 };
 
 
