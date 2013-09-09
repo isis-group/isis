@@ -350,7 +350,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 	//if the sequence is "normal"
 	current.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	const size_t dims = current.getRelevantDims();
-	assert( dims <= 4 ); // more than 4 dimenstions are ... well, not expected
+	assert( dims <= 4 ); // more than 4 dimensions are ... well, not expected
 
 	if( head->slice_code <= NIFTI_SLICE_SEQ_INC  || head->slice_code > NIFTI_SLICE_ALT_DEC ) {
 		if( head->slice_duration == 0 ) { // and there is no slice duration, there is no use in numbering
@@ -978,6 +978,9 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( image.getMajorTypeID() == data::ValueArray<util::color24>::staticID ) {
 			header->cal_min = 0;
 			header->cal_max = 255;
+		} else if (image.getMajorTypeID() == data::ValueArray<std::complex< double > >::staticID || image.getMajorTypeID() == data::ValueArray<std::complex< float > >::staticID){
+			header->cal_min = 0;
+			header->cal_max = 0;
 		} else {
 			const std::pair< float, float > minmax = image.getMinMaxAs<float>();
 			header->cal_min = minmax.first;
