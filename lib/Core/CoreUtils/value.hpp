@@ -40,12 +40,12 @@ namespace _internal
  */
 template<typename OPERATOR,bool enable> struct type_op
 {
-	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
 	typedef typename OPERATOR::result_type result_type;
 	typedef boost::integral_constant<bool,enable> enabled;
 	
-	result_type operator()( lhs first, const ValueBase &second )const {
+	result_type operator()( const util::Value<typename OPERATOR::first_argument_type> &first, const ValueBase &second )const {
 		LOG( Debug, error ) << "operator " << typeid(OPERATOR).name() << " is not supportet for " << first.getTypeName()  << " and "<< second.getTypeName();
+		throw std::domain_error("operation not available");
 		return result_type();
 	}
 };
@@ -55,26 +55,26 @@ template<typename OPERATOR,bool enable> struct type_op
  * This generic class does math operations on Values by converting the second Value-object to the type of the first Value-object. Then:
  * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-operation is used
  * - if the conversion failed with an positive or negative overflow (the second value is to high/low to fit into the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow operation is used
- * - if there is no known conversion from second to first an error is sent to the debug-logging and result_type() is returned
- * \note The functions (posOverflow,negOverflow) here are only stubs and will allways result_type().
+ * - if there is no known conversion from second to first an error is sent to the debug-logging and std::domain_error is thrown.
+ * \note The functions (posOverflow,negOverflow) here are only stubs and will allways throw std::domain_error.
  * \note inRange will return OPERATOR()(first,second)
  * These class can be further specialized for the regarding operation.
  */
 template<typename OPERATOR> struct type_op<OPERATOR,true>
 {
-	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
+	typedef typename util::Value<typename OPERATOR::first_argument_type>  lhs;
 	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;
 	typedef boost::integral_constant<bool,true> enabled;
 	
-	virtual result_type posOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type negOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type inRange( lhs first, const rhs &second )const {
+	virtual result_type posOverflow( const lhs &first, const rhs &/*second*/ )const {throw std::domain_error("positive overflow"); return result_type();}
+	virtual result_type negOverflow( const lhs &first, const rhs &/*second*/ )const {throw std::domain_error("negative overflow"); return result_type();}
+	virtual result_type inRange( const lhs &first, const rhs &second )const {
 		return OPERATOR()(first,second);
 	} 
-	result_type operator()( lhs first, const ValueBase &second )const {
+	result_type operator()(const lhs &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const ValueBase::Converter conv = second.getConverterTo( util::Value<typename OPERATOR::second_argument_type>::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( rhs::staticID );
 		
 		if ( conv ) {
 			//try to convert second into T and handle results
@@ -88,14 +88,15 @@ template<typename OPERATOR> struct type_op<OPERATOR,true>
 					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
 					return negOverflow( first, buff );
 				case boost::numeric::cInRange:
-					LOG_IF(second.isFloat()&&buff.isInteger(), Debug,warning) << "Using " << second << " as " << buff << " for operation on " << first << " you might loose precision";
+					LOG_IF(second.isFloat() && second.as<float>()!=static_cast<ValueBase&>(buff).as<float>(), Debug,warning) //we can't really use Value<T> yet, so make it ValueBase
+					<< "Using " << second.toString( true ) << " as " << buff.toString( true ) << " for operation on " << first.toString( true )
+					<< " you might loose precision";
 					return inRange( first, buff );
 			}
 		} else {
 			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << rhs::staticName() << " available";
-			return result_type();
+			throw std::domain_error(rhs::staticName()+" not convertible to "+second.getTypeName());
 		}
-		
 		return result_type();
 	}
 };
@@ -118,17 +119,17 @@ template<> struct type_mult<boost::posix_time::ptime> : type_op<std::multiplies<
 /// less-than comparison (overrides posOverflow)
 template<typename T> struct type_less : type_op<std::less<T>,boost::has_less<T>::value>
 {
-	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
-		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
-	}
+	//getting a positive overflow when trying to convert second into T, obviously means first is less and negative means not less
+	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return true;}
+	typename std::less<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;}
 };
 
 /// greater-than comparison (overrides negOverflow)
 template<typename T> struct type_greater : type_op<std::greater<T>,boost::has_greater<T>::value>
 {
-	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
-		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
-	}
+	//getting an negative overflow when trying to convert second into T, obviously means first is greater and a positive overflow means it's not
+	typename std::greater<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;}
+	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return true;}
 };
 
 }
@@ -245,27 +246,27 @@ public:
 	Reference divide( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_div<TYPE>()( *this, ref ) );}
 	
 	Reference add( const ValueBase &ref ) {
-		const TYPE result=_internal::type_plus<TYPE>()( *this, ref );
+		const TYPE result=_internal::type_plus<TYPE>()( *this, ref ); //do operation before to trigger error message if its invalid
 		if(_internal::type_plus<TYPE>::enabled::value)
-			*this = result;
+			static_cast<TYPE&>(*this) = result;
 		return *this;
 	}
 	Reference substract( const ValueBase &ref ) {
-		const TYPE result=_internal::type_minus<TYPE>()( *this, ref );
+		const TYPE result=_internal::type_minus<TYPE>()( *this, ref ); //do operation before to trigger error message if its invalid
 		if(_internal::type_minus<TYPE>::enabled::value)
-			*this=result;
+			static_cast<TYPE&>(*this)=result;
 		return *this;
 	}
 	Reference multiply_me( const ValueBase &ref ) {
-		const TYPE result=_internal::type_mult<TYPE>()( *this, ref );
-		if(_internal::type_plus<TYPE>::enabled::value)
-			*this = result;
+		const TYPE result=_internal::type_mult<TYPE>()( *this, ref ); //do operation before to trigger error message if its invalid
+		if(_internal::type_mult<TYPE>::enabled::value)
+			static_cast<TYPE&>(*this) = result;
 		return *this;
 	}
 	Reference divide_me( const ValueBase &ref ) {
-		const TYPE result=_internal::type_div<TYPE>()( *this, ref );
-		if(_internal::type_minus<TYPE>::enabled::value)
-			*this=result;
+		const TYPE result=_internal::type_div<TYPE>()( *this, ref ); //do operation before to trigger error message if its invalid
+		if(_internal::type_div<TYPE>::enabled::value)
+			static_cast<TYPE&>(*this)=result;
 		return *this;
 	}
 	
