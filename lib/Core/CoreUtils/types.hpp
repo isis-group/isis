@@ -34,7 +34,7 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector27 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector29 < //increase this if a type is added (if >30 consider including vector40 above)
 bool //1
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
 , float, double // 11
@@ -45,6 +45,7 @@ bool //1
 , std::string, isis::util::Selection //23
 , std::complex<float>, std::complex<double> //25
 , boost::posix_time::ptime, boost::gregorian::date //27
+, boost::posix_time::time_duration, boost::gregorian::date_duration //29
 > types;
 
 /**
@@ -82,6 +83,22 @@ std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool w
 
 std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValueArrays = true );
 }
+}
+
+// define +/- operations for ptime and date
+namespace std{
+	template<> struct plus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
+		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x+y;}
+	};
+	template<> struct minus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
+		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x-y;}
+	};
+	template<> struct plus<boost::posix_time::ptime>:binary_function<boost::posix_time::ptime,boost::posix_time::time_duration,boost::posix_time::ptime>{
+		boost::posix_time::ptime operator() (const boost::posix_time::ptime& x, const boost::posix_time::time_duration& y) const {return x+y;}
+	};
+	template<> struct minus<boost::posix_time::ptime>:binary_function<boost::posix_time::ptime,boost::posix_time::time_duration,boost::posix_time::ptime>{
+		boost::posix_time::ptime operator() (const boost::posix_time::ptime& x, const boost::posix_time::time_duration& y) const {return x-y;}
+	};
 }
 
 #endif //TYPES_HPP_INCLUDED
