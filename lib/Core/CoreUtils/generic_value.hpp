@@ -30,6 +30,7 @@ namespace isis
 namespace data {template<typename TYPE> class ValueArray;}
 namespace util
 {
+
 template<typename TYPE> class Value;
 
 namespace _internal
@@ -91,6 +92,16 @@ public:
 	///reexport parts of scoped_ptr's interface
 	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
 	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
+	/**
+	 * Release stored data.
+	 * isEmpty() will be true afterwards.
+	 * \returns auto_ptr pointing to the stored data which will delete them eventualy.
+	 */
+	std::auto_ptr<TYPE_TYPE> release() {
+		std::auto_ptr<TYPE_TYPE> ret(boost::scoped_ptr<TYPE_TYPE>::get());
+		boost::scoped_ptr<TYPE_TYPE>::reset();
+		return ret;
+	}
 	///Default contructor. Creates an empty reference
 	GenericReference() {}
 	/**
