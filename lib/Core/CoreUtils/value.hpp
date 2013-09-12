@@ -38,15 +38,15 @@ namespace _internal
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
  */
-template<typename OPERATOR,bool enable> struct type_op
+template<typename OPERATOR,bool modifying,bool enable> struct type_op
 {
-	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
 	typedef typename OPERATOR::result_type result_type;
 	typedef boost::integral_constant<bool,enable> enabled;
+	typedef typename boost::conditional<modifying,util::Value<typename OPERATOR::first_argument_type>,const util::Value<typename OPERATOR::first_argument_type> >::type lhs;
 	
-	result_type operator()( lhs first, const ValueBase &second )const {
+	result_type operator()( lhs &first, const ValueBase &second )const {
 		LOG( Debug, error ) << "operator " << typeid(OPERATOR).name() << " is not supportet for " << first.getTypeName()  << " and "<< second.getTypeName();
-		return result_type();
+		throw std::domain_error("operation not available");
 	}
 };
 
@@ -55,81 +55,73 @@ template<typename OPERATOR,bool enable> struct type_op
  * This generic class does math operations on Values by converting the second Value-object to the type of the first Value-object. Then:
  * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-operation is used
  * - if the conversion failed with an positive or negative overflow (the second value is to high/low to fit into the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow operation is used
- * - if there is no known conversion from second to first an error is sent to the debug-logging and result_type() is returned
- * \note The functions (posOverflow,negOverflow) here are only stubs and will allways result_type().
+ * - if there is no known conversion from second to first an error is sent to the debug-logging and std::domain_error is thrown.
+ * \note The functions (posOverflow,negOverflow) here are only stubs and will allways throw std::domain_error.
  * \note inRange will return OPERATOR()(first,second)
  * These class can be further specialized for the regarding operation.
  */
-template<typename OPERATOR> struct type_op<OPERATOR,true>
+template<typename OPERATOR,bool modifying> struct type_op<OPERATOR,modifying,true>
 {
-	typedef typename util::Value<typename OPERATOR::first_argument_type> const& lhs;
+	typedef typename boost::conditional<modifying,util::Value<typename OPERATOR::first_argument_type>,const util::Value<typename OPERATOR::first_argument_type> >::type lhs;
 	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;
 	typedef boost::integral_constant<bool,true> enabled;
 	
-	virtual result_type posOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type negOverflow( lhs/*first*/, const rhs &/*second*/ )const {return result_type();} //default to T()
-	virtual result_type inRange( lhs first, const rhs &second )const {
+	virtual result_type posOverflow()const {throw std::domain_error("positive overflow");}
+	virtual result_type negOverflow()const {throw std::domain_error("negative overflow");}
+	virtual result_type inRange( lhs &first, const rhs &second )const {
 		return OPERATOR()(first,second);
 	} 
-	result_type operator()( lhs first, const ValueBase &second )const {
+	result_type operator()(lhs &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const ValueBase::Converter conv = second.getConverterTo( util::Value<typename OPERATOR::second_argument_type>::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( rhs::staticID );
 		
 		if ( conv ) {
 			//try to convert second into T and handle results
 			rhs buff;
 			
 			switch ( conv->convert( second, buff ) ) {
-				case boost::numeric::cPosOverflow:
-					LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
-					return posOverflow( first, buff );
-				case boost::numeric::cNegOverflow:
-					LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << rhs::staticName() << ".";
-					return negOverflow( first, buff );
+				case boost::numeric::cPosOverflow:return posOverflow();
+				case boost::numeric::cNegOverflow:return negOverflow();
 				case boost::numeric::cInRange:
-					LOG_IF(second.isFloat()&&buff.isInteger(), Debug,warning) << "Using " << second << " as " << buff << " for operation on " << first << " you might loose precision";
+					LOG_IF(second.isFloat() && second.as<float>()!=static_cast<ValueBase&>(buff).as<float>(), Debug,warning) //we can't really use Value<T> yet, so make it ValueBase
+					<< "Using " << second.toString( true ) << " as " << buff.toString( true ) << " for operation on " << first.toString( true )
+					<< " you might loose precision";
 					return inRange( first, buff );
 			}
-		} else {
-			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << rhs::staticName() << " available";
-			return result_type();
 		}
-		
-		return result_type();
+		throw std::domain_error(rhs::staticName()+" not convertible to "+second.getTypeName());
 	}
 };
 
-/// equal comparison
-template<typename T> struct type_plus : type_op<std::plus<T>,boost::has_plus<T>::value>{};
-template<typename T> struct type_minus : type_op<std::minus<T>,boost::has_minus<T>::value>{};
-template<typename T> struct type_mult : type_op<std::multiplies<T>,boost::has_multiplies<T>::value>{};
-template<typename T> struct type_div : type_op<std::divides<T>,boost::has_divides<T>::value>{};
-template<typename T> struct type_eq : type_op<std::equal_to<T>,boost::has_equal_to<T>::value>{};
-
-template<> struct type_plus<boost::gregorian::date> : type_op<std::plus<boost::gregorian::date>,false>{};
-template<> struct type_minus<boost::gregorian::date> : type_op<std::minus<boost::gregorian::date>,false>{};
-template<> struct type_mult<boost::gregorian::date> : type_op<std::multiplies<boost::gregorian::date>,false>{};
-
-template<> struct type_plus<boost::posix_time::ptime> : type_op<std::plus<boost::posix_time::ptime>,false>{};
-template<> struct type_minus<boost::posix_time::ptime> : type_op<std::minus<boost::posix_time::ptime>,false>{};
-template<> struct type_mult<boost::posix_time::ptime> : type_op<std::multiplies<boost::posix_time::ptime>,false>{};
-
-/// less-than comparison (overrides posOverflow)
-template<typename T> struct type_less : type_op<std::less<T>,boost::has_less<T>::value>
+// compare operators (overflows are no error here)
+template<typename OPERATOR,bool enable> struct type_comp_base : type_op<OPERATOR,false,enable>{
+	typename OPERATOR::result_type posOverflow()const {return false;}
+	typename OPERATOR::result_type negOverflow()const {return false;}
+};
+template<typename T> struct type_eq   : type_comp_base<std::equal_to<T>,boost::has_equal_to<T>::value>{};
+template<typename T> struct type_less : type_comp_base<std::less<T>,    boost::has_less<T>::value>
 {
-	typename std::less<T>::result_type posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
-		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
-	}
+	//getting a positive overflow when trying to convert second into T, obviously means first is less 
+	typename std::less<T>::result_type posOverflow()const {return true;}
+};
+template<typename T> struct type_greater : type_comp_base<std::greater<T>,boost::has_greater<T>::value>
+{
+	//getting an negative overflow when trying to convert second into T, obviously means first is greater
+	typename std::greater<T>::result_type negOverflow()const {return true;}
 };
 
-/// greater-than comparison (overrides negOverflow)
-template<typename T> struct type_greater : type_op<std::greater<T>,boost::has_greater<T>::value>
-{
-	typename std::greater<T>::result_type negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
-		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
-	}
-};
+// on-self operations .. we return void because the result won't be used anyway
+template<typename OP> struct op_base : std::binary_function <typename OP::first_argument_type,typename OP::second_argument_type,void>{};
+template<typename T> struct plus_op :  op_base<std::plus<T> >      {void operator() (typename std::plus<T>::first_argument_type& x,       typename std::plus<T>::second_argument_type const& y)       const {x+=y;}};
+template<typename T> struct minus_op : op_base<std::minus<T> >     {void operator() (typename std::minus<T>::first_argument_type& x,      typename std::minus<T>::second_argument_type const& y)      const {x-=y;}};
+template<typename T> struct mult_op :  op_base<std::multiplies<T> >{void operator() (typename std::multiplies<T>::first_argument_type& x, typename std::multiplies<T>::second_argument_type const& y) const {x*=y;}};
+template<typename T> struct div_op :   op_base<std::divides<T> >   {void operator() (typename std::divides<T>::first_argument_type& x,    typename std::divides<T>::second_argument_type const& y)    const {x/=y;}};
+
+template<typename T> struct type_plus :  type_op<plus_op<T>,true,boost::has_plus<T>::value>{};
+template<typename T> struct type_minus : type_op<minus_op<T>,true,boost::has_minus<T>::value>{};
+template<typename T> struct type_mult :  type_op<mult_op<T>,true,boost::has_multiplies<T>::value>{};
+template<typename T> struct type_div :   type_op<div_op<T>,true,boost::has_divides<T>::value>{};
 
 }
 /// @endcond _internal
@@ -139,7 +131,6 @@ API_EXCLUDE_END
  * Generic class for type aware variables.
  * This generic approach makes it possible to handle all the types of Properties for the different
  * data these library can handle. On the other side it's more complex to read and write with these kind of types.
- * Look carefully at further comments on functionality and examples in use, e.g. with PropertyValue.
  * \note For supported types see types.hpp
  * \note For type conversion see type_converter.cpp
  */
@@ -148,6 +139,24 @@ template<typename TYPE> class Value: public ValueBase
 {
 	TYPE m_val;
 	static const char m_typeName[];
+	template<typename OP, typename RET> RET operatorWrapper(const OP& op,const ValueBase &rhs,const RET &default_ret)const{
+		try{
+			return op(*this,rhs);
+		} catch(const std::domain_error &e){ // return default value on failure
+			LOG(Runtime,error) << "Operation " << MSubject( typeid(OP).name() ) << " on " << MSubject( getTypeName() ) << " and " << MSubject( rhs.getTypeName() ) << " failed with \"" << e.what()
+			<< "\", will return " << MSubject( Value<RET>(default_ret).toString(true) );
+		return default_ret;
+		}
+	}
+	template<typename OP> ValueBase& operatorWrapper_me(const OP& op,const ValueBase &rhs){
+		try{
+			op(*this,rhs);
+		} catch(const std::domain_error &e){
+			LOG(Runtime,error) << "Operation " << MSubject( typeid(OP).name() ) << " on " << MSubject( getTypeName() ) << " and " << MSubject( rhs.getTypeName() ) << " failed with \"" << e.what()
+			<< "\", wont change value (" << MSubject( this->toString(true) ) << ")";
+		} 
+		return *this;
+	}
 protected:
 	ValueBase *clone() const {
 		return new Value<TYPE>( *this );
@@ -235,40 +244,14 @@ public:
 	 */
 	operator TYPE &() {return m_val;}
 
-	bool gt( const ValueBase &ref )const {return _internal::type_greater<TYPE>()( *this, ref );}
-	bool lt( const ValueBase &ref )const {return _internal::type_less<TYPE>()( *this, ref );}
-	bool eq( const ValueBase &ref )const {return _internal::type_eq<TYPE>()( *this, ref );}
+	bool gt( const ValueBase &ref )const {return operatorWrapper(_internal::type_greater<TYPE>(),ref,false );}
+	bool lt( const ValueBase &ref )const {return operatorWrapper(_internal::type_less<TYPE>(),   ref,false );}
+	bool eq( const ValueBase &ref )const {return operatorWrapper(_internal::type_eq<TYPE>(),     ref, false );}
 
-	Reference plus( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_plus<TYPE>()( *this, ref ) );}
-	Reference minus( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_minus<TYPE>()( *this, ref ) );}
-	Reference multiply( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_mult<TYPE>()( *this, ref ) );}
-	Reference divide( const ValueBase &ref )const {return new Value<TYPE>( _internal::type_div<TYPE>()( *this, ref ) );}
-	
-	Reference add( const ValueBase &ref ) {
-		const TYPE result=_internal::type_plus<TYPE>()( *this, ref );
-		if(_internal::type_plus<TYPE>::enabled::value)
-			*this = result;
-		return *this;
-	}
-	Reference substract( const ValueBase &ref ) {
-		const TYPE result=_internal::type_minus<TYPE>()( *this, ref );
-		if(_internal::type_minus<TYPE>::enabled::value)
-			*this=result;
-		return *this;
-	}
-	Reference multiply_me( const ValueBase &ref ) {
-		const TYPE result=_internal::type_mult<TYPE>()( *this, ref );
-		if(_internal::type_plus<TYPE>::enabled::value)
-			*this = result;
-		return *this;
-	}
-	Reference divide_me( const ValueBase &ref ) {
-		const TYPE result=_internal::type_div<TYPE>()( *this, ref );
-		if(_internal::type_minus<TYPE>::enabled::value)
-			*this=result;
-		return *this;
-	}
-	
+	ValueBase& add( const ValueBase &ref )        {return operatorWrapper_me(_internal::type_plus<TYPE>(), ref );}
+	ValueBase& substract( const ValueBase &ref )  {return operatorWrapper_me(_internal::type_minus<TYPE>(),ref );}
+	ValueBase& multiply_me( const ValueBase &ref ){return operatorWrapper_me(_internal::type_mult<TYPE>(), ref );}
+	ValueBase& divide_me( const ValueBase &ref )  {return operatorWrapper_me(_internal::type_div<TYPE>(),  ref);}
 	
 	virtual ~Value() {}
 };

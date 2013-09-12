@@ -134,6 +134,9 @@ public:
 		else
 			return this->get()->toString( label );
 	}
+
+	bool operator==(const GenericReference &cmp)const{return **this == *cmp;}
+	bool operator==(const TYPE_TYPE &cmp)const{return **this == cmp;}
 };
 
 }

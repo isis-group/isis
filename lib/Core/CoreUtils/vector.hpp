@@ -24,6 +24,7 @@
 #include <cmath>
 
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/mpl/and.hpp>
 
 namespace isis
 {
@@ -43,11 +44,12 @@ protected:
 	iterator end() {return cont + SIZE;}
 	const_iterator end()const {return cont + SIZE;}
 };
+struct VectorClass{};//empty base class to recognize vectors
 }
 /// @endcond _internal
 
 template < typename TYPE, size_t SIZE, typename CONTAINER = _internal::array<TYPE, SIZE> >
-class FixedVector: protected CONTAINER
+class FixedVector:protected CONTAINER,public boost::arithmetic<FixedVector<TYPE, SIZE, CONTAINER>, TYPE>,public _internal::VectorClass
 {
 public:
 	typedef typename CONTAINER::iterator iterator;
@@ -57,25 +59,11 @@ public:
 	typedef TYPE value_type;
 protected:
 	/// Generic operations
-	template<typename OP> this_class binaryOp ( const this_class &src )const {
-		this_class ret;
-		std::transform( CONTAINER::begin(), CONTAINER::end(), src.begin(), ret.begin(), OP() );
-		return ret;
-	}
-	template<typename OP> this_class binaryOp( const TYPE &src )const {
-		this_class ret;
-		iterator dst = ret.begin();
+	template<typename OP> this_class& binaryOp ( const TYPE &src ){
 		const OP op = OP();
-
-		for ( const_iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++, dst++ )
-			*dst = op( *i, src );
-
-		return ret;
-	}
-	template<typename OP> this_class unaryOp()const {
-		this_class ret;
-		std::transform( CONTAINER::begin(), CONTAINER::end(), ret.begin(), OP() );
-		return ret;
+		for ( iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++)
+			*i = op( *i, src );
+		return *this;
 	}
 public:
 	////////////////////////////////////////////////////////////////////////////////////
@@ -157,11 +145,8 @@ public:
 		return false;
 	}
 	///\returns true if this is equal to src
-	bool operator==( const this_class &src )const {return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );}
-	///\returns false if this is equal to src
-	bool operator!=( const this_class &src )const {
-		return !operator==( src );
-	}
+	template<typename TYPE2, typename CONTAINER2> bool operator==( const FixedVector<TYPE2, SIZE, CONTAINER2> &src )const {return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );}
+	template<typename TYPE2, typename CONTAINER2> bool operator!=( const FixedVector<TYPE2, SIZE, CONTAINER2> &src )const {return !this->operator==(src);}
 	/**
 	 * Fuzzy comparison for vectors.
 	 * Does util::fuzzyEqual for the associated elements of the two vectors.
@@ -180,37 +165,19 @@ public:
 		return true;
 	}
 
-
-
 	////////////////////////////////////////////////////////////////////////////////////
-	// Arithmetic operations
+	// Arithmetic operations for scalars (other are defined further down outside of the class)
 	////////////////////////////////////////////////////////////////////////////////////
-	this_class operator-( const this_class &src )const {return binaryOp<std::minus<TYPE>      >( src );}
-	this_class operator+( const this_class &src )const {return binaryOp<std::plus<TYPE>       >( src );}
-	this_class operator*( const this_class &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
-	this_class operator/( const this_class &src )const {return binaryOp<std::divides<TYPE>    >( src );}
-
-	this_class operator-( const TYPE &src )const {return binaryOp<std::minus<TYPE>      >( src );}
-	this_class operator+( const TYPE &src )const {return binaryOp<std::plus<TYPE>       >( src );}
-	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
-	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
-
-	////////////////////////////////////////////////////////////////////////////////////
-	// applying Arithmetic operations
-	////////////////////////////////////////////////////////////////////////////////////
-	this_class operator-=( const this_class &src ) {return *this = *this - src;}
-	this_class operator+=( const this_class &src ) {return *this = *this + src;}
-	this_class operator*=( const this_class &src ) {return *this = *this * src;}
-	this_class operator/=( const this_class &src ) {return *this = *this / src;}
-
-	this_class operator-=( const TYPE &src ) {return *this = *this - src;}
-	this_class operator+=( const TYPE &src ) {return *this = *this + src;}
-	this_class operator*=( const TYPE &src ) {return *this = *this * src;}
-	this_class operator/=( const TYPE &src ) {return *this = *this / src;}
+	this_class& operator-=( const TYPE &src ) {return binaryOp<std::minus<TYPE>      >( src );}
+	this_class& operator+=( const TYPE &src ) {return binaryOp<std::plus<TYPE>       >( src );}
+	this_class& operator*=( const TYPE &src ) {return binaryOp<std::multiplies<TYPE> >( src );}
+	this_class& operator/=( const TYPE &src ) {return binaryOp<std::divides<TYPE>    >( src );}
 
 	///\returns a negated copy
 	const this_class negate()const {
-		return unaryOp<std::negate<float> >();
+		this_class ret=*this;
+		std::transform( ret.begin(), ret.end(), ret.begin(), std::negate<TYPE>() );
+		return ret;
 	}
 
 	/**
@@ -368,6 +335,21 @@ typedef vector4<double> dvector4;
 typedef vector3<float> fvector3;
 typedef vector3<double> dvector3;
 typedef vector4<int32_t> ivector4;
+
+API_EXCLUDE_BEGIN
+/// @cond _internal
+namespace _internal {
+	using boost::mpl::and_;
+	using boost::is_base_of;
+	template<typename VEC1,typename VEC2> struct valid_vecs : and_<is_base_of<VectorClass,VEC1>,is_base_of<VectorClass,VEC2> >{};
+	template<typename OP,typename VEC1,typename VEC2> VEC1& binary_vec_op ( VEC1& rhs,const VEC2 &lhs ){
+		std::transform( rhs.begin(), rhs.end(), lhs.begin(), rhs.begin(), OP() );
+		return rhs;
+	}
+	
+}
+/// @endcond _internal
+API_EXCLUDE_END
 }
 }
 
@@ -376,6 +358,18 @@ template<typename TYPE, size_t SIZE, typename CONTAINER >
 {
 	return s.negate();
 }
+
+
+
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator+=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::plus<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator-=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::minus<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator*=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::multiplies<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator/=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::divides<typename VEC1::value_type> >(rhs,lhs);}
+
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator+( VEC1 rhs,const VEC2 &lhs ) {return rhs+=lhs;}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator-( VEC1 rhs,const VEC2 &lhs ) {return rhs-=lhs;}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator*( VEC1 rhs,const VEC2 &lhs ) {return rhs*=lhs;}
+template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator/( VEC1 rhs,const VEC2 &lhs ) {return rhs/=lhs;}
 
 /// Streaming output for FixedVector
 namespace std

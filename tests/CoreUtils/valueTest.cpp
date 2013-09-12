@@ -106,33 +106,43 @@ BOOST_AUTO_TEST_CASE( test_type_is )
 }
 
 // TestCase operators()
-BOOST_AUTO_TEST_CASE( test_type_operators )
+BOOST_AUTO_TEST_CASE( test_operators )
 {
 	// for operations Value<T> should automatically cast to it's internal type and do the operations on it
 	Value<int32_t> tInt1( 21 ), tInt2( 21 );
+	Value<std::string> _21str("21");
+	
 	BOOST_CHECK_EQUAL( tInt1 + tInt2, Value<int32_t>( 42 ) );
 	BOOST_CHECK_EQUAL( tInt1 * 2, 42 );
 	BOOST_CHECK_EQUAL( 42 - tInt1, tInt2 );
 
-	BOOST_CHECK_EQUAL( *tInt1.plus(Value<std::string>("21")), Value<int32_t>( 42 ) );
-	BOOST_CHECK_EQUAL( *tInt1.minus(Value<std::string>("21")), Value<int32_t>( 0 ) );
-	BOOST_CHECK_EQUAL( *tInt1.multiply(Value<std::string>("2")), Value<int32_t>( 42 ) );
-	BOOST_CHECK_EQUAL( *tInt1.divide(Value<std::string>("2")), Value<int32_t>( 10 ) ); // int(21/2)=10
+}
+BOOST_AUTO_TEST_CASE( test_ext_operators )
+{
+	Value<int32_t> tInt1( 21 ), tInt2( 21 );
+	Value<std::string> _21str("21"),_2str("2"),_2strneg("-2");
+
+	// proper operation
+	BOOST_CHECK_EQUAL( tInt1.plus(_21str), Value<int32_t>( 21+21 ) );
+	BOOST_CHECK_EQUAL( tInt1.minus(_21str), Value<int32_t>( 21-21 ) );
+	BOOST_CHECK_EQUAL( tInt1.multiply(_21str), Value<int32_t>( 21*21 ) );
+	BOOST_CHECK_EQUAL( tInt1.divide(Value<std::string>("2")), Value<int32_t>( 10 ) ); // int(21/2)=10
+
+	BOOST_CHECK_EQUAL( _2str.plus(Value<int32_t>(1)), _21str ); // "2" + "1" = "21"
 
 	{
 		Value<int32_t> buff=tInt1;
-		buff.add(Value<std::string>("21"));
-		BOOST_REQUIRE_EQUAL( buff, 42 );
-		buff.substract(Value<std::string>("21"));
-		BOOST_CHECK_EQUAL( buff, 21 );
+		BOOST_REQUIRE_EQUAL( buff.multiply_me(_2str), Value<int32_t>( 42 ) );
+		BOOST_REQUIRE_EQUAL( buff.divide_me(_2str),   Value<int32_t>( 21 ) );
+		BOOST_REQUIRE_EQUAL( buff.add(_2str),         Value<int32_t>( 23 ) );
+		BOOST_CHECK_EQUAL( buff.substract(_21str),    Value<int32_t>( 2 ) );
 	}
-	{
-		Value<int32_t> buff=tInt1;
-		buff.multiply_me(Value<std::string>("2"));
-		BOOST_REQUIRE_EQUAL( buff, 42 );
-		buff.divide_me(Value<std::string>("2"));
-		BOOST_CHECK_EQUAL( buff, 21 );
-	}
+
+	BOOST_CHECK(!Value<uint16_t>(50).eq(_2strneg));
+
+	// invalid operation
+	Value<uint16_t>(50).plus(_2strneg);
+	BOOST_CHECK_EQUAL(Value<uint16_t>(50).plus(_2strneg),Value<uint16_t>(50));
 }
 
 BOOST_AUTO_TEST_CASE( type_comparison_test )
@@ -149,10 +159,10 @@ BOOST_AUTO_TEST_CASE( type_comparison_test )
 	BOOST_CHECK( _200 > _minus1 );
 	BOOST_CHECK( _200.lt( _1000 ) ) ;
 	BOOST_CHECK( _200.gt( _minus1 ) ) ;
-	//200.4 will be rounded to 200
+	//200.4 will be rounded to 200 - and a message send to CoreDebug
 	BOOST_CHECK( ! _200.lt( _200komma4 ) ) ;
 	BOOST_CHECK( _200.eq( _200komma4 ) ) ;
-	//200.6 will be rounded to 201
+	//200.6 will be rounded to 201 - and a message send to CoreDebug
 	BOOST_CHECK( _200.lt( _200komma6 ) ) ;
 	// compares 200.4 to 200f
 	BOOST_CHECK( ! _200komma4.eq( _200 ) ) ;

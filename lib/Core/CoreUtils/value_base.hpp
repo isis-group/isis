@@ -167,6 +167,8 @@ public:
 
 	/// \returns true if and only if the types of this and second are equal and the values are equal
 	virtual bool operator==( const ValueBase &second )const = 0;
+	/// \returns !operator==
+	bool operator!=( const ValueBase &second )const;
 
 	/// creates a copy of the stored value using a type referenced by its ID
 	Reference copyByID( unsigned short ID ) const;
@@ -212,15 +214,15 @@ public:
 	 */
 	virtual bool eq( const ValueBase &ref )const = 0;
 
-	virtual Reference plus( const ValueBase &ref )const = 0;
-	virtual Reference minus( const ValueBase &ref )const = 0;
-	virtual Reference multiply( const ValueBase &ref )const = 0;
-	virtual Reference divide( const ValueBase &ref )const = 0;
+	Reference plus( const ValueBase &ref )const;
+	Reference minus( const ValueBase &ref )const;
+	Reference multiply( const ValueBase &ref )const;
+	Reference divide( const ValueBase &ref )const;
 
-	virtual Reference add( const ValueBase &ref ) =0;
-	virtual Reference substract( const ValueBase &ref ) =0;
-	virtual Reference multiply_me( const ValueBase &ref ) = 0;
-	virtual Reference divide_me( const ValueBase &ref ) = 0;
+	virtual ValueBase& add( const ValueBase &ref ) =0;
+	virtual ValueBase& substract( const ValueBase &ref ) =0;
+	virtual ValueBase& multiply_me( const ValueBase &ref ) = 0;
+	virtual ValueBase& divide_me( const ValueBase &ref ) = 0;
 };
 
 
