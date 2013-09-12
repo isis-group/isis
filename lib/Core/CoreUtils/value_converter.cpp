@@ -126,21 +126,20 @@ template<typename SRC, typename DST> boost::numeric::range_check_result num2num(
 	return NumericOverflowHandler::result;
 }
 
-template<typename DST> boost::numeric::range_check_result str2scalar( const std::string &src, DST &dst )
+// if a converter from double is available first map to double and then convert that into DST
+template<typename DST> typename boost::enable_if<boost::is_arithmetic<DST>,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
 {
-	try {
-		if( boost::is_arithmetic<DST>::value ) { // if a converter from double is available first map to double and then convert that into DST
-			return num2num<double, DST>( Value<double>( src ), dst );
-		} else { // otherwise try direct mapping (rounding will fail)
-			LOG( Debug, warning ) << "using lexical_cast to convert from string to "
-								  << Value<DST>::staticName() << " no rounding can be done.";
-			dst = boost::lexical_cast<DST>( src );
-		}
-	} catch( const boost::bad_lexical_cast & ) {
+	return num2num<double, DST>( Value<double>( src ), dst );
+}
+// otherwise try direct mapping (rounding will fail)
+template<typename DST> typename boost::disable_if<boost::is_arithmetic<DST>,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
+{
+	LOG( Debug, warning ) << "using lexical_cast to convert from string to " << Value<DST>::staticName() << " no rounding can be done.";
+	try { dst = boost::lexical_cast<DST>( src );}
+	catch( const boost::bad_lexical_cast & ) {
 		dst = DST();
 		LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( src ) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST() );
 	}
-
 	return boost::numeric::cInRange;
 }
 //this is trivial
