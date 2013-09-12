@@ -103,9 +103,7 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 
 		return *to; // return the generated Value-Object - wrapping it into Reference
 	} else {
-		LOG( Runtime, error )
-				<< "I dont know any conversion from "
-				<< MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[ID] );
+		LOG( Runtime, error ) << "I dont know any conversion from " << MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[ID] );
 		return Reference(); // return an empty Reference
 	}
 }
@@ -119,6 +117,11 @@ void ValueBase::heap_clone_allocator::deallocate_clone( const ValueBase* r )
 	delete r;
 }
 
+ValueReference ValueBase::plus( const ValueBase &ref )const{ValueReference ret(*this);return ret->add(ref);}
+ValueReference ValueBase::minus( const ValueBase &ref )const{ValueReference ret(*this);return ret->substract(ref);}
+ValueReference ValueBase::multiply( const ValueBase &ref )const{ValueReference ret(*this);return ret->multiply_me(ref);}
+ValueReference ValueBase::divide( const ValueBase &ref )const{ValueReference ret(*this);return ret->divide_me(ref);}
 
+bool ValueBase::operator!=( const ValueBase &second )const{return !this->operator==(second);}
 }
 }
