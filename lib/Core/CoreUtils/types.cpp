@@ -74,8 +74,11 @@ DEF_TYPE( std::complex<double>, complex<double> );
 
 DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );
+
 DEF_TYPE( boost::posix_time::ptime, timestamp );
 DEF_TYPE( boost::gregorian::date, date );
+DEF_TYPE( boost::posix_time::time_duration, time_duration );
+DEF_TYPE( boost::gregorian::date_duration, date_duration );
 
 API_EXCLUDE_BEGIN
 namespace _internal
