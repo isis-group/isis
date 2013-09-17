@@ -95,7 +95,7 @@ public:
 	 * \note This does not set the logging handler. That is done by reimplementing getLogHandler( std::string module, isis::LogLevel level )const.
 	 * \note If name is an empty string (""), its assumed as the logging for the application.
 	 */
-	template<typename MODULE> void addLogging( std::string name ) {
+	template<typename MODULE> void addLogging( std::string name="" ) {
 		addLoggingParameter( name );
 		logs[name].push_back( &Application::setLog<MODULE> );
 	}
