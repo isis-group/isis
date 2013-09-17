@@ -31,7 +31,7 @@ ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, s
 	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 	init( idx );
 	util::Singletons::get<NeededsList<Chunk>, 0>().applyTo( *this );
-	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
+	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 }
 
@@ -347,7 +347,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 
 void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b )
 {
-	NDimensional<4>::swapDim(dim_a,dim_b,begin());
+	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin());
 }
 
 

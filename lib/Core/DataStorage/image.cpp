@@ -107,7 +107,7 @@ bool Image::isClean()const
 
 void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
 {
-	NDimensional<4>::swapDim(dim_a,dim_b,begin());
+	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin());
 }
 
 
