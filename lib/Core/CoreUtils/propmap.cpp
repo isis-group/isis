@@ -319,8 +319,8 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 				const PropertyMap &refMap = second.getBranch();
 				thisMap.diffTree( refMap, ret, pathname + "/" );
 			} else if ( ! ( first == second )  ) { // if they are not equal
-				const PropertyValue firstVal = first.is_leaf() ? first.getLeaf()[0] : PropertyValue( Value<std::string>( first.toString() ) );
-				const PropertyValue secondVal = second.is_leaf() ? second.getLeaf()[0] : PropertyValue( Value<std::string>( second.toString() ) );
+				const PropertyValue firstVal = first.is_leaf() ? first.getLeaf()[0] : PropertyValue( first.toString() );
+				const PropertyValue secondVal = second.is_leaf() ? second.getLeaf()[0] : PropertyValue( second.toString() );
 				ret.insert( // add (propertyname|(value1|value2))
 					ret.end(),      // we know it has to be at the end
 					std::make_pair(
@@ -462,7 +462,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 	bool ret = false;
 
 	if( ! found.isEmpty() ) {
-		ValueReference &dst = static_cast<ValueReference &>( propertyValue( to ) );
+		PropertyValue &dst = propertyValue( to );
 
 		if ( found.getTypeID() == dstID ) {
 			if( from != to ) {
@@ -473,7 +473,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstI
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			ValueReference buff=( *found ).copyByID( dstID );
+			PropertyValue buff=found.copyByID( dstID );
 			if(buff.isEmpty())
 				ret = false;
 			else{

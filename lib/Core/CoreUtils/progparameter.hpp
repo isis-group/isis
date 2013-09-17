@@ -73,7 +73,7 @@ public:
 	 */
 	template<typename T> operator const T()const {
 		LOG_IF( isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-		return get()->castTo<T>();
+		return front().castTo<T>();
 	}
 
 #ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS

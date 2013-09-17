@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 	//  default constructor
 	util::PropertyValue propZero;
 	//  initializer
-	util::PropertyValue propA = std::string( "Property01" );
+	util::PropertyValue propA(std::string( "Property01" ));
 	BOOST_CHECK_EQUAL( propA.toString(), "Property01" );
 	//  default: not needed
 	BOOST_CHECK( !propA.needed() );
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 BOOST_AUTO_TEST_CASE( property_copy_test )
 {
 	// Test copy operator
-	util::PropertyValue propA = ( int32_t )5;
+	util::PropertyValue propA(( int32_t )5);
 	util::PropertyValue propB = propA;
 	BOOST_CHECK_EQUAL( propB, ( int32_t )5 );
 	//check for deep copy (change of propA shall not change propB)

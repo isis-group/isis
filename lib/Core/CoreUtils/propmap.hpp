@@ -355,8 +355,13 @@ public:
 	/**
 	 * Set the given property to a given value/type.
 	 * The needed flag (if set) will be kept.
-	 * If the property is already set to a value of another type an error is send to Runtime and nothing will be set.
-	 * But a property of the same type will be overwritten.
+	 * The property will be set to the one given value if
+	 * - the property is empty or
+	 * - the property is already set to one value of the same type (value will be overridden)
+	 * - the property is already set to another value and the new value can be converted (value will be overridden but type will be kept)
+	 * The property will not be set and an error will be send to Runtime if
+	 * - the property is already set to one value of another type an and no conversion is available
+	 * - the property is set to more that one value
 	 * \code
 	 * setPropertyAs("MyPropertyName", isis::util::fvector4(1,0,1,0))
 	 * \endcode
@@ -368,21 +373,24 @@ public:
 	template<typename T> PropertyValue &setPropertyAs( const PropPath &path, const T &val ) {
 		PropertyValue &ret = propertyValue( path );
 
-		if( ret.isEmpty() ) {
-			const bool needed = ret.isNeeded();
-			( ret = val ).needed() = needed;
-		} else if( ret.is<T>() ) {
-			ret.castTo<T>() = val;
-		} else {
-			const util::Value<T> vval(val);
-			const unsigned short dstID=ret.getTypeID();
-			if(vval.fitsInto(dstID)){// allow store if value is convertible into already stored type
-				LOG(Debug,warning) << "Storing " << vval << " as " << ret.getTypeName() << " as old value was already stored in that type";
-				*ret=*(vval.copyByID(dstID));
-			}else {
-				LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+		if( ret.isEmpty() ) { // set an empty property
+			ret = val;
+		} else if(size()==1){
+			if( ret.is<T>() ) { // override same type
+				ret.castTo<T>() = val;
+			} else {
+				const util::Value<T> vval(val);
+				const unsigned short dstID=ret.getTypeID();
+				if(vval.fitsInto(dstID)){// allow store if value is convertible into already stored type
+					LOG(Debug,warning) << "Storing " << vval << " as " << ret.getTypeName() << " as old value was already stored in that type";
+					ret=*(vval.copyByID(dstID));
+				}else {
+					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+				}
 			}
-		}
+			
+		} else
+			LOG( Runtime, error ) << "Won't override multivalue property " << MSubject( path ) << " with " << MSubject( Value<T>( val ).toString( true ) );
 
 		return ret;
 	}

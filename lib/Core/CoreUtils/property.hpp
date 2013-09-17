@@ -13,8 +13,7 @@
 #ifndef ISISPROPERTY_HPP
 #define ISISPROPERTY_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <map>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include "value.hpp"
 #include "log.hpp"
 
@@ -30,27 +29,74 @@ namespace util
  * But empty PropertyValues are neigther equal nor unequal to anything (not even to empty ValueValues).
  * @author Enrico Reimer
  */
-class PropertyValue: public ValueReference
+class PropertyValue
 {
 	bool m_needed;
-	//prevent usage of ValueReference's dereferencing (the hooks below should be used) (use "*" if you really have to)
-	ValueBase *operator->();
-	const ValueBase *operator->()const;
+	boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator> container;
 public:
+	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::iterator iterator;
+	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::const_iterator const_iterator;
 	/**
-	 * Default constructor.
-	 * Creates and stores a value from any known type.
+	 * Explicit constructor.
+	 * Creates a property and stores a value from any known type.
 	 * If the type is not known (there is no Value\<type\> available) an compiler error will be raised.
 	 * \param ref the value to be stored
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
-		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
-		checkType<T>();
+	template<typename T> explicit PropertyValue( const T &ref, bool _needed = false ):m_needed( _needed ),container(1) {
+		container.push_back(new Value<T>( ref ));
 	}
-	template<typename T> PropertyValue( const Value<T>& ref, bool _needed = false ):
-		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
-		checkType<T>();
+	/**
+	 * Default constructor.
+	 * Creates a property and stores the given single value object.
+	 */
+	template<typename T> PropertyValue( const Value<T> &ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref );}
+	/// \copydoc PropertyValue::PropertyValue(const Value&,bool)
+	PropertyValue( const ValueBase& ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref);}
+
+	////////////////////////////////////////////////////////////////////////////
+	// List operations
+	////////////////////////////////////////////////////////////////////////////
+	void push_back(const ValueBase& ref);
+
+	void insert(size_t at,const ValueBase& ref);
+	iterator erase( size_t at );
+	
+	template<typename InputIterator> void insert( iterator position, InputIterator first, InputIterator last ){container.insert(position,first,last);}
+	iterator erase( iterator first, iterator last );
+	
+	void transfer(ValueReference& ref);
+	void reserve(size_t size);
+
+	ValueBase&        operator[]( size_t n );
+	const ValueBase&  operator[]( size_t n ) const;
+	ValueBase&        at( size_t n );
+	const ValueBase&  at( size_t n ) const;
+	ValueBase&        front();
+	const ValueBase&  front()const;
+
+	iterator begin();
+	const_iterator begin()const;
+
+	iterator end();
+	const_iterator end()const;
+
+	std::vector<PropertyValue> splice(size_t);
+
+	size_t size()const;
+	
+	/**
+	 * Transfer a list of ValueReference into the PropertyValue.
+	 * \note this is a <b>transfer</b>. The ValueReferences of the input will all be empty afterwards. Use \link copy \endlink if you want to copy instead.
+	 */
+	template<typename ITER> void transfer(ITER first,ITER last){
+		while(first!=last)
+			transfer(*(++first));
+	}
+	/// Copy a list of ValueReference into the PropertyValue.
+	template<typename ITER> void copy(ITER first,ITER last){
+		while(first!=last)
+			push_back(**(++first));
 	}
 	/**
 	 * Empty constructor.
@@ -66,103 +112,230 @@ public:
 	 * Equality to another PropertyValue.
 	 * Properties are ONLY equal if:
 	 * - both properties are not empty
-	 * - both properties contain the same value type T
-	 * - the stored values are equal
-	 * \returns true if both contain the same value of type T, false otherwise.
+	 * - both properties contain the same amount of values
+	 * - \link Value::operator== \endlink is true for all stored values
+	 * - (which also means equal types)
+	 * \note Empty properties are neither equal nor unequal
+	 * \returns true if both contain the same values of the same type, false otherwise.
 	 */
 	bool operator ==( const PropertyValue &second )const;
 	/**
 	 * Unequality to another PropertyValue.
-	 * Properties are ONLY unequal if:
+	 * Properties are unequal if:
 	 * - only one of both properties is empty
-	 * - or both properties contain a different value of same type T
-	 * - or they contain different types
-	 * If both are empty, they are not unequal
-	 * \returns true if they differ in type T or in value of same type, false otherwise.
+	 * - and \link operator!= \endlink is true
+	 * \note Empty properties are neither equal nor unequal
+	 * \returns !operator== if they are not both empty, false otherwise
 	 */
 	bool operator !=( const PropertyValue &second )const;
 	/**
-	 * Equality to another Value-Object (this cannot be empty but PropertyValue can).
-	 * Properties are ONLY equal to Value-Object if:
-	 * - the property and the Value-Object contain the same value type T
-	 * - both stored values are equal
-	 * \returns true if both contain the same value of type T, false otherwise.
+	 * Equality to another Value-Object
+	 * \returns Value::operator== if the property has exactly one value, false otherwise.
 	 */
 	bool operator ==( const ValueBase &second )const;
 	/**
-	 * Equality to a Value of type T (convenience function).
-	 * Properties are ONLY equal to Values if:
-	 * - the property is not empty
-	 * - the property contains the value type T or is convertible into it
-	 * - stored/converted value is equal to the given value
-	 * \warning because of rounding in the conversion the following will be true.
-	 * \code PropertyValue(4.5)==5 \endcode
-	 * If Debug is enabled and its loglevel is at least warning, a message will be send to the logger.
-	 * \returns true if both contain the same value of type T, false otherwise.
+	 * Unequality to another Value-Object 
+	 * \returns Value::operator!= if the property has exactly one value, false otherwise.
 	 */
-	template<typename T> bool operator ==( const T &second )const {
-		checkType<T>();
-
-		if( isEmpty() ) {
-			return false;
-		}
-
-		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
-			const T &cmp = get()->castTo<T>();
-			return second == cmp; //compare our values
-		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
-			LOG( Debug, info )
-					<< *this << " is not " << Value<T>::staticName() << ", trying to convert.";
-			ValueReference dst = ( **this ).copyByID( Value<T>::staticID );
-
-			if ( !dst.isEmpty() )
-				return dst->castTo<T>() == second;
-		}
-
-		return false;
+	bool operator !=( const ValueBase &second )const;
+	
+	/**
+	 * (re)set property to one specific value of a specific type
+	 * \note The needed flag won't be affected by that.
+	 * \note To prevent accidential use this can only be used explicetly. \code util::PropertyValue propA; propA=5; \endcode is valid. But \code util::PropertyValue propA=5; \endcode is not,
+	 */
+	template<typename T> typename boost::enable_if<knowType<T>,PropertyValue&>::type operator=( const T &ref){
+		container.clear();
+		container.push_back(new Value<T>(ref));
+		return *this;
+	}
+	PropertyValue& operator=( const ValueBase &ref){
+		container.clear();
+		push_back(ref);
+		return *this;
 	}
 
 	/**
-	 * \copybrief ValueBase::as
-	 * hook for \link ValueBase::as \endlink
+	 * Explicit cast to ValueReference.
+	 * \returns A ValueReference containing a copy of the first stored Value.
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
-	template<class T> T as()const {
-		LOG_IF( !*this, Debug, error ) << "Doing as<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
-		return ( **this ).as<T>();
-	}
+	ValueReference operator()()const;
+	
+	/**
+	 * creates a copy of the stored values using a type referenced by its ID
+	 * \returns a new PropertyValue containing all values converted to the requested type
+	 */
+	PropertyValue copyByID( unsigned short ID ) const;
+
+	/// \returns the value(s) represented as text.
+	virtual std::string toString( bool labeled = false )const;
+
+	/// \returns true if, and only if no value is stored
+	bool isEmpty()const;
+	
+	
+	////////////////////////////////////////////////////////////////////////////
+	// ValueBase interface
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * \copybrief ValueBase::as
+	 * hook for \link ValueBase::as \endlink called on the first value
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
+	 */
+	template<class T> T as()const {return front().as<T>();}
 
 	/**
 	 * \copybrief ValueBase::is
 	 * hook for \link ValueBase::is \endlink
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
-	template<class T> bool is()const {
-		LOG_IF( !*this, Debug, error ) << "Doing is<" << util::Value<T>::staticName() <<  ">() on empty property, this will crash";
-		return ( **this ).is<T>();
-	}
+	template<class T> bool is()const {return front().is<T>();}
 
 	/**
 	 * \copybrief ValueBase::getTypeName
 	 * hook for \link ValueBase::getTypeName \endlink
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
 	std::string getTypeName()const;
 
 	/**
 	 * \copybrief ValueBase::getTypeID
 	 * hook for \link ValueBase::getTypeID \endlink
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
 	unsigned short getTypeID()const;
 
 	/**
 	 * \copybrief ValueBase::castTo
 	 * hook for \link ValueBase::castTo \endlink
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
-	template<class T> T &castTo()const {
-		LOG_IF( !*this, Debug, error ) << "Casting empty property to " << util::MSubject( util::Value<T>::staticName() ) << ", this will crash";
-		return ( **this ).castTo<T>();
-	}
+	template<typename T> T &castTo(){return front().castTo<T>();}
+	template<typename T> const T &castTo() const{return front().castTo<T>();}
+
+	/**
+	 * \copybrief ValueBase::castToType
+	 * hook for \link ValueBase::castToType \endlink
+	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
+	 * \note An exception is thrown if the PropertyValue is empty.
+	 */
+	template<typename T> Value<T>& castToType(){return front().castToType<T>();}
+	template<typename T> const Value<T>& castToType() const{return front().castToType<T>();}
+	
+	/**
+	 * \returns true if \link ValueBase::fitsInto \endlink is true for all values
+	 * \note Operation is done on all values. For comparing single values access them via the []-operator.
+	 */
+	bool fitsInto( unsigned short ID ) const;
+	
+	/**
+	 * \returns true if \link ValueBase::gt \endlink is true for all values
+	 * \note Operation is done on all values. For working on single values access them via the []-operator.
+	 * \note An exception is thrown if this has less values than the target (the opposite case is ignored).
+	 */
+	bool gt( const PropertyValue &ref )const;
+	/**
+	 * \returns true if \link ValueBase::lt \endlink is true for all values
+	 * \copydetails PropertyValue::gt
+	 */
+	bool lt( const PropertyValue &ref )const;
+	/**
+	 * \returns true if \link ValueBase::eq \endlink is true for all values
+	 * \copydetails PropertyValue::gt
+	 */
+	bool eq( const PropertyValue &ref )const;
+	
+	/**
+	 * \returns a PropertyValue with the results of \link ValueBase::plus \endlink done on all value pairs from this and the target
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue plus( const PropertyValue &ref )const;
+	/**
+	 * \returns a PropertyValue with the results of \link ValueBase::minus \endlink done on all value pairs from this and the target
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue minus( const PropertyValue &ref )const;
+	/**
+	 * \returns a PropertyValue with the results of \link ValueBase::multiply \endlink done on all value pairs from this and the target
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue multiply( const PropertyValue &ref )const;
+	/**
+	 * \returns a PropertyValue with the results of \link ValueBase::divide \endlink done on all value pairs from this and the target
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue divide( const PropertyValue &ref )const;
+	
+	/**
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue& add( const PropertyValue &ref );
+	/**
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue& substract( const PropertyValue &ref );
+	/**
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue& multiply_me( const PropertyValue &ref );
+	/**
+	 * \copydetails PropertyValue::gt
+	 */
+	PropertyValue& divide_me( const PropertyValue &ref );
+
+	////////////////////////////////////////////////////////////////////////////
+	// operators on "normal" values
+	////////////////////////////////////////////////////////////////////////////
+	/**
+	 * Equality to a basic value.
+	 * Properties equal to basic values if:
+	 * - the property contains exactly one value
+	 * - \link Value::eq \endlink is true for that value
+	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
+	 * \returns front().eq(second) if the property contains exactly one value, false otherwise
+	 */
+	template<typename T> bool operator ==( const T &second )const{return size()==1 && front().eq(Value<T>(second));}
+	/**
+	 * Unequality to a basic value.
+	 * Properties are unequal to basic values if:
+	 * - the property contains exactly one value
+	 * - \link Value::eq \endlink is false for that value
+	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
+	 * \returns !front().eq(second) if the property contains exactly one value, false otherwise
+	 */
+	template<typename T> bool operator !=( const T &second )const{return size()==1 && !front().eq(Value<T>(second));}
+	
+	template<typename T> PropertyValue& operator +=( const T &second ){front().add(Value<T>(second));return *this;}
+	template<typename T> PropertyValue& operator -=( const T &second ){front().substract(Value<T>(second));return *this;}
+	template<typename T> PropertyValue& operator *=( const T &second ){front().multiply_me(Value<T>(second));return *this;}
+	template<typename T> PropertyValue& operator /=( const T &second ){front().divide_me(Value<T>(second));return *this;}
+
+	template<typename T> PropertyValue operator+( const T &rhs )const {PropertyValue lhs(*this); return lhs+=rhs;}
+	template<typename T> PropertyValue operator-( const T &rhs )const {PropertyValue lhs(*this); return lhs-=rhs;}
+	template<typename T> PropertyValue operator*( const T &rhs )const {PropertyValue lhs(*this); return lhs*=rhs;}
+	template<typename T> PropertyValue operator/( const T &rhs )const {PropertyValue lhs(*this); return lhs/=rhs;}
+	
 };
 
 }
+}
+
+namespace std
+{
+	/// streaming output for PropertyValue
+	template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyValue &s )
+	{
+		return out<<s.toString(true);
+	}
 }
 #endif
 

@@ -126,7 +126,7 @@ void dropWith( util::slist props, std::list< data::Image > &images )
 {
 	BOOST_FOREACH( util::slist::const_reference propStr, props ) {
 		const std::list< std::string > ppair = util::stringToList<std::string>( propStr, '=' );
-		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), ppair.back() ) );
+		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), util::PropertyValue( ppair.back() ) ) );
 	}
 }
 
@@ -145,8 +145,8 @@ int main( int argc, char *argv[] )
 	app.parameters["selectwith"].needed() = false;
 	app.parameters["selectwith"].setDescription( "List of properties which should be used to select images for comparison" );
 
-	app.addLogging<DiffLog>( "" );
-	app.addLogging<DiffDebug>( "" );
+	app.addLogging<DiffLog>();
+	app.addLogging<DiffDebug>();
 
 	data::IOApplication::addInput( app.parameters, true, "1", " of the first image" );
 	data::IOApplication::addInput( app.parameters, true, "2", " of the second image" );

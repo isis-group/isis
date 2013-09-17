@@ -133,7 +133,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 				size_t overallDigits = 0;
 				unsigned short tID;
 
-				switch ( tID = ( *props.propertyValue( prop ) ).getTypeID() ) {
+				switch ( tID = props.propertyValue( prop ).getTypeID() ) {
 				case util::Value<uint8_t>::staticID:
 					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
 					break;

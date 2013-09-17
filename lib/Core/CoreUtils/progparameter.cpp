@@ -40,7 +40,7 @@ bool &ProgParameter::hidden()
 
 bool ProgParameter::parse( const Value<std::string> &props )
 {
-	ValueBase &me = **this;
+	ValueBase &me = this->front();
 	bool ret = false;
 
 	if ( ( ( std::string )props ).empty() ) {
@@ -60,7 +60,7 @@ bool ProgParameter::parse( const Value<std::string> &props )
 }
 bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
 {
-	ValueBase &me = **this;
+	ValueBase &me = this->front();
 	bool ret = false;
 	const util::slist &theList = props_list.castTo<util::slist>();
 
