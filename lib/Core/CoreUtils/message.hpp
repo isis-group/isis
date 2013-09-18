@@ -72,7 +72,7 @@ public:
 	~Message();
 	std::string merge()const;
 	std::string strTime()const;
-	template<typename T> Message &operator << ( T val ) {
+	template<typename T> Message &operator << (const T& val ) {
 		*( ( std::ostringstream * )this ) << val;
 		return *this;
 	}

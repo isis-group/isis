@@ -145,6 +145,8 @@ protected:
 	/// Create a ValueArray of the same type pointing at the same address.
 	virtual ValueArrayBase *clone()const = 0;
 
+	ValueArrayBase &operator=(const ValueArrayBase &ref){m_len=ref.m_len;}//prevent direct usage
+
 public:
 	typedef _internal::GenericValueIterator<false> value_iterator;
 	typedef _internal::GenericValueIterator<true> const_value_iterator;
