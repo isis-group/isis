@@ -78,6 +78,7 @@ protected:
 	* \returns a ValueBase-pointer to a newly created Value/ValueArray.
 	*/
 	virtual ValueBase *clone()const = 0;
+	ValueBase &operator=(const ValueBase &ref){}//prevent direct usage
 public:
 	/// used for boost::ptr_vector
 	struct heap_clone_allocator

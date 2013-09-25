@@ -383,7 +383,7 @@ public:
 				const unsigned short dstID=ret.getTypeID();
 				if(vval.fitsInto(dstID)){// allow store if value is convertible into already stored type
 					LOG(Debug,warning) << "Storing " << vval << " as " << ret.getTypeName() << " as old value was already stored in that type";
-					ret=*(vval.copyByID(dstID));
+					ValueBase::convert( vval, ret.front() );
 				}else {
 					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 				}

@@ -39,6 +39,7 @@ namespace _internal
 class GenericValue
 {
 protected:
+	GenericValue &operator=(const GenericValue &){}//prevent direct usage
 	template<typename T> T &m_cast_to() {
 		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
 		assert( getTypeID() == T::staticID );
