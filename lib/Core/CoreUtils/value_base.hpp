@@ -220,6 +220,10 @@ public:
 	Reference multiply( const ValueBase &ref )const;
 	Reference divide( const ValueBase &ref )const;
 
+	template<typename T> typename boost::enable_if<knowType<T>,bool>::type apply(const T &val){
+		return convert(Value<T>(val),*this);
+	}
+
 	virtual ValueBase& add( const ValueBase &ref ) =0;
 	virtual ValueBase& substract( const ValueBase &ref ) =0;
 	virtual ValueBase& multiply_me( const ValueBase &ref ) = 0;
