@@ -266,8 +266,8 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( order );
 		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( order );
 
-		if( ( *first ).gt( *second ) ) { // second slice has a lower number than the first => decrementing
-			if( ( *middle ).gt( *second ) ) { // if the middle number is greater than the second its interleaved
+		if( first.gt( second ) ) { // second slice has a lower number than the first => decrementing
+			if( middle.gt( second ) ) { // if the middle number is greater than the second its interleaved
 				LOG( Runtime, info )
 						<< "The \"middle\" " << order << " (" << middle.toString() << ") is greater than the second (" << second.toString()
 						<< ") assuming decrementing interleaved slice order";
@@ -279,7 +279,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 				slice_code = NIFTI_SLICE_SEQ_DEC;
 			}
 		} else { // assume incrementing
-			if( ( *middle ).lt( *second ) ) { // if the middle number is less than the second ist interleaved
+			if( middle.lt( second ) ) { // if the middle number is less than the second ist interleaved
 				LOG( Runtime, info )
 						<< "The \"middle\" " << order << " (" << middle.toString() << ") is less than the second (" << second.toString()
 						<< ") assuming incrementing interleaved slice order";

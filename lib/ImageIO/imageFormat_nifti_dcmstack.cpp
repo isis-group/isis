@@ -128,17 +128,11 @@ bool JsonMap::readJson( data::ValueArray< uint8_t > stream, char extra_token )
 ////////////////////////////////////////////////////////////////////////////////
 
 // some basic functors for later use
-struct Plus {
-	util::PropertyValue operator()( double other, const util::PropertyValue &val )const {return util::Value<float>( other + val.as<float>() );}
-	util::PropertyValue operator()( const util::PropertyValue &val )const {return util::Value<float>( fixedAcq + val.as<float>() );}
-	float fixedAcq;
-};
-
 struct ComputeTimeDist {
 	boost::posix_time::ptime sequenceStart;
 	util::PropertyValue operator()( const util::PropertyValue &val )const {
 		const boost::posix_time::time_duration acDist = val.castTo<boost::posix_time::ptime>() - sequenceStart;
-		return float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
+		return util::PropertyValue(float( acDist.ticks() ) / acDist.ticks_per_second() * 1000);
 	}
 };
 
@@ -171,12 +165,12 @@ struct TmParser {
 
 		if ( ok ) {
 			LOG( Debug, verbose_info ) << "Parsed time " <<  time_str << " as " << ret;
-			return ptime( date( 1400, 1, 1 ), ret );
+			return util::PropertyValue(ptime( date( 1400, 1, 1 ), ret ));
 			//because TM is defined as time of day we dont have a day here, so we fake one
 		} else
 			LOG( Runtime, warning ) << "Cannot parse Time from \"" << val << "\"";
 
-		return val;
+		return util::PropertyValue(val);
 	}
 };
 
@@ -349,8 +343,11 @@ void JsonMap::decodeMosaic()
 
 			for( size_t i = 0; i < mos.size(); i++ ) {
 				const util::dlist inner_mos = mos[i].as<util::dlist>();
-				const Plus adder = {old_acq.empty() ? 0 : old_acq[i].as<float>()};
-				acq_iter = std::transform( inner_mos.begin(), inner_mos.end(), acq_iter, adder );
+				acq_iter = std::transform(
+					inner_mos.begin(), inner_mos.end(),
+					acq_iter,
+					std::bind2nd(std::plus<float>(),old_acq.empty() ? 0 : old_acq[i].as<float>())
+				);
 			}
 
 			assert( acq_iter == acq.end() ); // new acq should be filled completely
