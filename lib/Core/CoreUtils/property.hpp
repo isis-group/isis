@@ -36,6 +36,8 @@ class PropertyValue
 public:
 	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::iterator iterator;
 	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::const_iterator const_iterator;
+	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::reference reference;
+	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::const_reference const_reference;
 	/**
 	 * Explicit constructor.
 	 * Creates a property and stores a value from any known type.
@@ -58,8 +60,14 @@ public:
 	// List operations
 	////////////////////////////////////////////////////////////////////////////
 	void push_back(const ValueBase& ref);
+	template<typename T> typename boost::enable_if<knowType<T> >::type push_back(const T& ref){insert(end(),ref);}
 
-	void insert(size_t at,const ValueBase& ref);
+	iterator insert(iterator at,const ValueBase& ref);
+	template<typename T> typename boost::enable_if<knowType<T>, iterator >::type insert(iterator at,const T& ref){
+		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID,Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
+		return container.insert(at,new Value<T>(ref));
+	}
+
 	iterator erase( size_t at );
 	
 	template<typename InputIterator> void insert( iterator position, InputIterator first, InputIterator last ){container.insert(position,first,last);}
