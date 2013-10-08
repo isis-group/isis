@@ -73,7 +73,6 @@ public:
 	template<typename InputIterator> void insert( iterator position, InputIterator first, InputIterator last ){container.insert(position,first,last);}
 	iterator erase( iterator first, iterator last );
 	
-	void transfer(ValueReference& ref);
 	void reserve(size_t size);
 
 	ValueBase&        operator[]( size_t n );
@@ -89,7 +88,14 @@ public:
 	iterator end();
 	const_iterator end()const;
 
-	std::vector<PropertyValue> splice(size_t);
+	/**
+	 * Splice up the property value.
+	 * Distribute entries into new PropertyValues of given equal length.
+	 * \note the last PropertyValue may have less entries (aka remainder)
+	 * \note this is a transfer function, so *this will be empty afterwards.
+	 * \returns a vector of (mostly) equally sized PropertyValues.
+	 */
+	std::vector<PropertyValue> splice(const size_t len);
 
 	size_t size()const;
 	
@@ -130,10 +136,11 @@ public:
 	/**
 	 * Unequality to another PropertyValue.
 	 * Properties are unequal if:
-	 * - only one of both properties is empty
-	 * - and \link operator!= \endlink is true
+	 * - they have different amounts of values stored
+	 * - or operator!= is true on any stored value
 	 * \note Empty properties are neither equal nor unequal
-	 * \returns !operator== if they are not both empty, false otherwise
+	 * \returns false if operator!= is not true for all stored value and amount of values is equal
+	 * \returns true otherwise
 	 */
 	bool operator !=( const PropertyValue &second )const;
 	/**

@@ -46,8 +46,7 @@ PropertyValue PropertyValue::copyByID( short unsigned int ID ) const
 {
 	PropertyValue ret;ret.container.reserve(size());
 	for(const_iterator i=begin();i!=end();i++){
-		ValueReference buff=i->copyByID(ID);//@todo use std::move
-		ret.transfer(buff);
+		ret.push_back(*(i->copyByID(ID)));
 	}
 	return ret;
 }
@@ -74,9 +73,6 @@ void PropertyValue::push_back( const ValueBase& ref ){
 PropertyValue::iterator PropertyValue::insert( iterator at, const isis::util::ValueBase& ref ){
 	LOG_IF(!isEmpty() && getTypeID()!=ref.getTypeID(),Debug,error) << "Inserting inconsistent type " << MSubject(ref.toString(true)) << " in " << MSubject(*this);
 	return container.insert(at,ValueBase::heap_clone_allocator::allocate_clone( ref ));
-}
-void PropertyValue::transfer( ValueReference& ref ){
-	container.push_back(ref.release());
 }
 
 ValueBase& PropertyValue::at( size_t n ){return container.at(n);}
@@ -108,13 +104,20 @@ const ValueBase& PropertyValue::front() const{
 void PropertyValue::reserve( size_t size ){container.reserve(size);}
 size_t PropertyValue::size() const{return container.size();}
 
-std::vector< PropertyValue > PropertyValue::splice( size_t len)
+std::vector< PropertyValue > PropertyValue::splice( const size_t len )
 {
-	std::vector<PropertyValue> ret(size()/len);
-	for(size_t i=0;i<ret.size();i++){
-		PropertyValue &dst=ret[i];
-		dst.container.transfer(dst.end(),container.begin(),container.begin()+len,container);
+	std::vector<PropertyValue> ret(ceil(double(size())/len));
+	
+	for(std::vector<PropertyValue>::iterator dst=ret.begin();container.size()>=len;dst++){ //as long as there is enough transfer given amount
+		dst->container.transfer(dst->end(),begin(),begin()+len,container);
+		assert(dst->size()==len);
 	}
+	if(!container.empty()){ // store the remainder in last PropertyValue
+		LOG(Debug,notice) << "Last splice will be " << size() << " entries only, as thats all what is left";
+		ret.back().container.transfer(ret.back().end(),container);
+	}
+	assert(isEmpty());
+	return ret;
 }
 
 

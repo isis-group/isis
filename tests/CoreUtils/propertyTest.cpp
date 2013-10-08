@@ -123,5 +123,30 @@ BOOST_AUTO_TEST_CASE( direct_property_operator_test )
 	
 }
 
+BOOST_AUTO_TEST_CASE( property_list_creation )
+{
+	const util::Value<uint32_t> buff[]={0,1,2,3,4,5,6,7,8,9};
+	PropertyValue list;
+	list.insert(list.end(),buff,buff+10);
+	for(int i=0;i<10;i++){
+		BOOST_CHECK_EQUAL(list[i],buff[i]);
+	}
+}
+
+BOOST_AUTO_TEST_CASE( property_list_splice )
+{
+	const util::Value<uint32_t> buff[]={0,1,2,3,4,5,6,7,8,9};
+	PropertyValue list;
+	list.insert(list.end(),buff,buff+10);
+
+	std::vector< PropertyValue > vec=list.splice(4);
+	BOOST_CHECK_EQUAL(vec[0].size(),10*4/10); //10 over (10 over 4) equal 10*4 over 10
+	BOOST_CHECK_EQUAL(vec[1].size(),10*4/10);
+	BOOST_CHECK_EQUAL(vec[2].size(),10%4); // remainder
+	for(int i=0;i<10;i++)
+			BOOST_CHECK_EQUAL(vec[i/4][i%4],buff[i]);
+		
+}
+
 }
 }
