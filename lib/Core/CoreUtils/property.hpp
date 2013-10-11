@@ -74,6 +74,7 @@ public:
 	iterator erase( iterator first, iterator last );
 	
 	void reserve(size_t size);
+	void resize( size_t size, const ValueBase& clone );
 
 	ValueBase&        operator[]( size_t n );
 	const ValueBase&  operator[]( size_t n ) const;
@@ -209,7 +210,7 @@ public:
 	 * \note Applies only on the first value. Other Values are ignored (use the []-operator to access them).
 	 * \note An exception is thrown if the PropertyValue is empty.
 	 */
-	template<class T> bool is()const {return front().is<T>();}
+	template<class T> bool is()const {return container.front().is<T>();}
 
 	/**
 	 * \copybrief ValueBase::getTypeName

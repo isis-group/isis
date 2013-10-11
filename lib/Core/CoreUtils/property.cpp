@@ -103,6 +103,16 @@ const ValueBase& PropertyValue::front() const{
 
 void PropertyValue::reserve( size_t size ){container.reserve(size);}
 size_t PropertyValue::size() const{return container.size();}
+void PropertyValue::resize( size_t size, const ValueBase &clone ){ // the builtin resize wants non-const clone, so we do our own
+	size_t old_size = container.size();
+	if( old_size > size ){
+		erase( begin()+size, end() );
+	} else if( size > old_size ) {
+		for( ; old_size != size; ++old_size )
+			push_back( clone );
+	}
+	assert( container.size() == size );
+}
 
 std::vector< PropertyValue > PropertyValue::splice( const size_t len )
 {
@@ -113,7 +123,7 @@ std::vector< PropertyValue > PropertyValue::splice( const size_t len )
 		assert(dst->size()==len);
 	}
 	if(!container.empty()){ // store the remainder in last PropertyValue
-		LOG(Debug,notice) << "Last splice will be " << size() << " entries only, as thats all what is left";
+		LOG(Runtime,warning) << "Last splice will be " << size() << " entries only, as thats all what is left";
 		ret.back().container.transfer(ret.back().end(),container);
 	}
 	assert(isEmpty());
