@@ -318,7 +318,7 @@ public:
 	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
 	 * \returns front().eq(second) if the property contains exactly one value, false otherwise
 	 */
-	template<typename T> bool operator ==( const T &second )const{return size()==1 && front().eq(Value<T>(second));}
+	template<typename T> typename boost::enable_if<knowType<T>,bool>::type operator ==( const T &second )const{return size()==1 && front().eq(Value<T>(second));}
 	/**
 	 * Unequality to a basic value.
 	 * Properties are unequal to basic values if:
@@ -327,7 +327,7 @@ public:
 	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
 	 * \returns !front().eq(second) if the property contains exactly one value, false otherwise
 	 */
-	template<typename T> bool operator !=( const T &second )const{return size()==1 && !front().eq(Value<T>(second));}
+	template<typename T> typename boost::enable_if<knowType<T>,bool>::type operator !=( const T &second )const{return size()==1 && !front().eq(Value<T>(second));}
 	
 	template<typename T> PropertyValue& operator +=( const T &second ){front().add(Value<T>(second));return *this;}
 	template<typename T> PropertyValue& operator -=( const T &second ){front().substract(Value<T>(second));return *this;}
