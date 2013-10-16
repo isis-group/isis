@@ -7,6 +7,9 @@
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/contains.hpp>
+#include <boost/mpl/and.hpp>
+#include <boost/mpl/not.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -78,6 +81,38 @@ template< typename T > struct checkType {
 		( knowType<T>::value ), TYPE_IS_NOT_KNOWN, ( T )
 	);
 };
+
+template<bool ENABLED> struct ordered{
+	static const bool lt=ENABLED,gt=ENABLED;
+};
+template<bool ENABLED> struct multiplicative{
+	static const bool mult=ENABLED,div=ENABLED;
+};
+template<bool ENABLED> struct additive{
+	static const bool plus=ENABLED,minus=ENABLED,negate=ENABLED;
+};
+
+template<typename T> struct has_op:
+	ordered<boost::mpl::and_<boost::mpl::not_<boost::is_base_of<_internal::VectorClass,T> >, knowType<T> >::value>, //vectors are not ordered
+	additive<knowType<T>::value>,
+	multiplicative<knowType<T>::value>
+	{};
+
+template<> struct has_op<Selection>:ordered<true>,additive<false>,multiplicative<false>{};
+template<> struct has_op<std::string>:ordered<true>,multiplicative<false>{static const bool plus=true,minus=false;};
+
+// cannot multiply time
+template<> struct has_op<boost::gregorian::date>:ordered<true>,additive<true>,multiplicative<false>{};
+template<> struct has_op<boost::gregorian::date_duration>:ordered<true>,additive<true>,multiplicative<false>{};
+template<> struct has_op<boost::posix_time::ptime>:ordered<true>,additive<true>,multiplicative<false>{};
+template<> struct has_op<boost::posix_time::time_duration>:ordered<true>,additive<true>,multiplicative<false>{};
+
+// multidim is not ordered
+template<typename T> struct has_op<std::list<T> >:ordered<true>,additive<false>,multiplicative<false>{};
+template<typename T> struct has_op<color<T> >:ordered<false>,additive<false>,multiplicative<false>{};
+template<typename T> struct has_op<std::complex<T> >:ordered<false>,additive<true>,multiplicative<true>{};
+
+
 
 std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValueArrays = true );
 
