@@ -19,7 +19,6 @@
 #include <functional>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/has_operator.hpp>
 
 namespace isis
 {
@@ -99,13 +98,13 @@ template<typename OPERATOR,bool enable> struct type_comp_base : type_op<OPERATOR
 	typename OPERATOR::result_type posOverflow()const {return false;}
 	typename OPERATOR::result_type negOverflow()const {return false;}
 };
-template<typename T> struct type_eq   : type_comp_base<std::equal_to<T>,boost::has_equal_to<T>::value>{};
-template<typename T> struct type_less : type_comp_base<std::less<T>,    boost::has_less<T>::value>
+template<typename T> struct type_eq   : type_comp_base<std::equal_to<T>,true>{};
+template<typename T> struct type_less : type_comp_base<std::less<T>,    has_op<T>::lt>
 {
 	//getting a positive overflow when trying to convert second into T, obviously means first is less 
 	typename std::less<T>::result_type posOverflow()const {return true;}
 };
-template<typename T> struct type_greater : type_comp_base<std::greater<T>,boost::has_greater<T>::value>
+template<typename T> struct type_greater : type_comp_base<std::greater<T>,has_op<T>::gt>
 {
 	//getting an negative overflow when trying to convert second into T, obviously means first is greater
 	typename std::greater<T>::result_type negOverflow()const {return true;}
@@ -118,10 +117,10 @@ template<typename T> struct minus_op : op_base<std::minus<T> >     {void operato
 template<typename T> struct mult_op :  op_base<std::multiplies<T> >{void operator() (typename std::multiplies<T>::first_argument_type& x, typename std::multiplies<T>::second_argument_type const& y) const {x*=y;}};
 template<typename T> struct div_op :   op_base<std::divides<T> >   {void operator() (typename std::divides<T>::first_argument_type& x,    typename std::divides<T>::second_argument_type const& y)    const {x/=y;}};
 
-template<typename T> struct type_plus :  type_op<plus_op<T>,true,boost::has_plus<T>::value>{};
-template<typename T> struct type_minus : type_op<minus_op<T>,true,boost::has_minus<T>::value>{};
-template<typename T> struct type_mult :  type_op<mult_op<T>,true,boost::has_multiplies<T>::value>{};
-template<typename T> struct type_div :   type_op<div_op<T>,true,boost::has_divides<T>::value>{};
+template<typename T> struct type_plus :  type_op<plus_op<T>,true, has_op<T>::plus>{};
+template<typename T> struct type_minus : type_op<minus_op<T>,true,has_op<T>::minus>{};
+template<typename T> struct type_mult :  type_op<mult_op<T>,true, has_op<T>::mult>{};
+template<typename T> struct type_div :   type_op<div_op<T>,true,  has_op<T>::div>{};
 
 }
 /// @endcond _internal
