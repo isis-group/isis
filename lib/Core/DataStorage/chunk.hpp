@@ -13,6 +13,7 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
+#include "../CoreUtils/vector.hpp"
 #include "valuearray.hpp"
 #include "../CoreUtils/log.hpp"
 #include "../CoreUtils/propmap.hpp"
@@ -20,7 +21,6 @@
 #include <string.h>
 #include <list>
 #include "ndimensional.hpp"
-#include "../CoreUtils/vector.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -286,15 +286,6 @@ public:
 
 	//http://en.wikipedia.org/wiki/In-place_matrix_transposition#Non-square_matrices%3a_Following_the_cycles
 	void swapDim(unsigned short dim_a,unsigned short dim_b);
-
-	/**
-	 * Access properties of the next lower dimension (e.g. slice-timings in volumes)
-	 * This is there for effiency on IO only (you don't have to split up chunks just to store some properties).
-	 * It will be resolved by reindexing anyway. So, in an clean Image Chunks will never have such sub-properties.
-	 */
-	util::PropertyValue &propertyValueAt( const util::PropertyMap::KeyType &key, size_t at );
-	/// \copydoc propertyValueAt
-	const util::PropertyValue &propertyValueAt( const util::PropertyMap::KeyType &key, size_t at )const;
 };
 
 /// Chunk class for memory-based buffers
