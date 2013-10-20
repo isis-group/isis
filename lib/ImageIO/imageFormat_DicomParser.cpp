@@ -255,11 +255,13 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	case EVR_ST: //short text
 	case EVR_UT: //Unlimited Text
 	case EVR_UI: //Unique Identifier [0-9\.]
+	case EVR_AT: // @todo find a better way to interpret the value (see http://northstar-www.dartmouth.edu/doc/idl/html_6.2/Value_Representations.html)
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
 		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
 	}
 	break;
+	case EVR_OB:
 	case EVR_UN: { //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
 		//@todo do a better sanity check
 		Uint8 *buff;
@@ -280,9 +282,8 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	default: {
 		elem->getOFString( buff, 0 );
-		LOG( Runtime, notice ) << "Implement me " << name << "("
-							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							   << buff;
+		LOG( Runtime, notice ) << "Don't know how to handle Value Representation " << util::MSubject(const_cast<DcmTag &>( elem->getTag() ).getVRName()) << 
+		" of " << std::make_pair(name ,buff);
 	}
 	break;
 	}
@@ -324,6 +325,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	break;
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
+	case EVR_LO: //long string
 	case EVR_ST: { //short text
 		map.propertyValue( name ) = _internal::dcmtkListString2list<std::string>( elem );
 	}
@@ -339,7 +341,6 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_UL:
 	case EVR_AE: //Application Entity (string)
 	case EVR_LT: //long text
-	case EVR_LO: //long string
 	case EVR_UT: //Unlimited Text
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN:
@@ -457,6 +458,8 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.propertyValue( name ) = boost::lexical_cast<uint16_t>( val );
 	} else if ( vr == "SS" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int16_t>( val );
+	} else if ( vr == "UT" ) {
+		map.propertyValue( name ) = val ;
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -474,6 +477,8 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = util::listToList<double>( val.begin(), val.end() );
+	} else if ( vr == "CS" ) {
+		map.propertyValue( name ) = val;
 	} else {
 		LOG( Runtime, error ) << "Don't know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
