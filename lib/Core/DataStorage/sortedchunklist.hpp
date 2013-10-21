@@ -41,8 +41,8 @@ class SortedChunkList
 {
 public:
 	struct scalarPropCompare {
-		util::PropertyMap::KeyType propertyName;
-		scalarPropCompare( const util::PropertyMap::KeyType &prop_name );
+		util::PropertyMap::key_type propertyName;
+		scalarPropCompare( const util::PropertyMap::key_type &prop_name );
 		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
@@ -75,13 +75,13 @@ public:
 	/**
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
-	SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props );
+	SortedChunkList( util::PropertyMap::key_type comma_separated_equal_props );
 
 	/**
 	 * Adds a property for secondary sorting.
 	 * At least one secondary sorting is needed.
 	 */
-	void addSecondarySort( const util::PropertyMap::KeyType &cmp );
+	void addSecondarySort( const util::PropertyMap::key_type &cmp );
 
 	// utils
 
@@ -105,7 +105,7 @@ public:
 	 * This list should only hold one value if the amount of secondary sorted entries is equal across all primary entries. Which it is in a consistent dataset.
 	 * \returns a one element set with the amount of secondary sorted entries across all primary entries if image is consistent
 	 * \returns a set with the different amounts of secondary sorted entries across all primary entries otherwise
-	 **/	
+	 **/
 	std::set<size_t> getShape();
 
 	/**

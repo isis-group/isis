@@ -33,7 +33,7 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sorting algorithm implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::KeyType &prop_name ): propertyName( prop_name ) {}
+SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::key_type &prop_name ): propertyName( prop_name ) {}
 
 bool SortedChunkList::posCompare::operator()( const util::fvector3 &posA, const util::fvector3 &posB ) const
 {
@@ -67,9 +67,9 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props )
+SortedChunkList::SortedChunkList( util::PropertyMap::key_type comma_separated_equal_props )
 {
-	const std::list< isis::util::PropertyMap::KeyType > p_list = util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' );
+	const std::list< isis::util::PropertyMap::key_type > p_list = util::stringToList<util::PropertyMap::key_type>( comma_separated_equal_props, ',' );
 	equalProps.insert( equalProps.end(), p_list.begin(), p_list.end() );
 }
 
@@ -89,7 +89,7 @@ SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector
 // low level insert
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
 {
-	util::PropertyMap::KeyType propName = map.key_comp().propertyName;
+	util::PropertyMap::key_type propName = map.key_comp().propertyName;
 
 	if( ch.hasProperty( propName ) ) {
 		//check, if there is already a chunk
@@ -175,13 +175,13 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, verbose_info ) << "Inserting 1st chunk";
 		std::stack<scalarPropCompare> backup = secondarySort;
 
-		if(ch.getDimSize(sliceDim)>1){
-			LOG(Runtime,info)<< "We're dealing with volume chunks, considering indexOrigin as equal across Images";
-			equalProps.push_back("indexOrigin");
+		if( ch.getDimSize( sliceDim ) > 1 ) {
+			LOG( Runtime, info ) << "We're dealing with volume chunks, considering indexOrigin as equal across Images";
+			equalProps.push_back( "indexOrigin" );
 		}
 
 		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
-			const util::PropertyMap::KeyType temp = secondarySort.top().propertyName;
+			const util::PropertyMap::key_type temp = secondarySort.top().propertyName;
 
 			if ( secondarySort.size() > 1 ) {
 				secondarySort.pop();
@@ -196,7 +196,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	const util::PropertyMap::KeyType &prop2 = secondarySort.top().propertyName;
+	const util::PropertyMap::key_type &prop2 = secondarySort.top().propertyName;
 
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
@@ -214,7 +214,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	return inserted.second;
 }
 
-void SortedChunkList::addSecondarySort( const util::PropertyMap::KeyType &cmp )
+void SortedChunkList::addSecondarySort( const util::PropertyMap::key_type &cmp )
 {
 	secondarySort.push( scalarPropCompare( cmp ) );
 }
@@ -229,40 +229,51 @@ void SortedChunkList::clear()
 std::set<size_t> SortedChunkList::getShape()
 {
 	std::set<size_t> images;
-	for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
-		images.insert(c->second.size());
+
+	for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); c++ ) {
+		images.insert( c->second.size() );
 	}
+
 	return images;
 }
 
-size_t SortedChunkList::makeRectangular(){
-	const std::set<size_t> images=getShape();
-	size_t dropped=0;
-	if(images.size()>1){
-		if(chunks.begin()->second.begin()->second->getRelevantDims()>columnDim){
-			size_t resize=*images.rbegin();
-			LOG(Runtime,warning) << "Fourth dimension already used, dropping all but " << resize << " volumes to make image rectagular";
-			for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();) {
-				if(c->second.size()!=resize){
-					dropped+=c->second.size();
-					chunks.erase(c++);
+size_t SortedChunkList::makeRectangular()
+{
+	const std::set<size_t> images = getShape();
+	size_t dropped = 0;
+
+	if( images.size() > 1 ) {
+		if( chunks.begin()->second.begin()->second->getRelevantDims() > columnDim ) {
+			size_t resize = *images.rbegin();
+			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes to make image rectagular";
+
+			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); ) {
+				if( c->second.size() != resize ) {
+					dropped += c->second.size();
+					chunks.erase( c++ );
 				} else
 					c++;
 			}
 		} else {
-			size_t resize=*images.begin();
-			for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
-				SecondaryMap &it=c->second;
-				if( it.size() > resize ){
-					dropped+=it.size()-resize;
-					SecondaryMap::iterator firstvalid=it.begin();std::advance(firstvalid,resize);
-					it.erase(firstvalid,it.end());
+			size_t resize = *images.begin();
+
+			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); c++ ) {
+				SecondaryMap &it = c->second;
+
+				if( it.size() > resize ) {
+					dropped += it.size() - resize;
+					SecondaryMap::iterator firstvalid = it.begin();
+					std::advance( firstvalid, resize );
+					it.erase( firstvalid, it.end() );
 				}
-				assert(it.size() == resize);
+
+				assert( it.size() == resize );
 			}
-			LOG_IF(dropped,Runtime,warning) << "Dropped " << dropped << " chunks to make image rectagular";
+
+			LOG_IF( dropped, Runtime, warning ) << "Dropped " << dropped << " chunks to make image rectagular";
 		}
 	}
+
 	return dropped;
 }
 
@@ -274,7 +285,7 @@ size_t SortedChunkList::getHorizontalSize()
 
 std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
-	LOG_IF( getShape().size()!=1, Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
+	LOG_IF( getShape().size() != 1, Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
 	if( !isEmpty() ) {
 		PrimaryMap::iterator iP = chunks.begin();
@@ -288,7 +299,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				ret[h + v *horizontal] = iS->second;  // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h + v * horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 

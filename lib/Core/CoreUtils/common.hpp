@@ -59,10 +59,8 @@ listToOStream( InputIterator start, InputIterator end,
 {
 	o << prefix;
 
-	if ( start != end ) {
-		o << *start;
-		start++;
-	}
+	if ( start != end )
+		o << *( start++ );
 
 	for ( InputIterator i = start; i != end; i++ )
 		o << delim << *i;

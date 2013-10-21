@@ -30,27 +30,27 @@ namespace image_io
 class FileFormat
 {
 public:
-	enum io_modes{read_only=1,write_only=2,both=3};
+	enum io_modes {read_only = 1, write_only = 2, both = 3};
 protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool setGender( util::PropertyMap &object, const char *set,const char *entries="female,male,other" );
+	static bool setGender( util::PropertyMap &object, const char *set, const char *entries = "female,male,other" );
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level );
+	static bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell( const util::PropertyMap::KeyType &from, const util::PropertyMap::KeyType &to, util::PropertyMap &object, LogLevel level ) {
+	transformOrTell( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.propertyValue( to );
 			return true;
@@ -59,7 +59,7 @@ protected:
 		return false;
 	}
 	/// \return the file-suffixes the plugin supports
-	virtual util::istring suffixes(io_modes modes=both)const = 0;
+	virtual util::istring suffixes( io_modes modes = both )const = 0;
 	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
@@ -69,7 +69,7 @@ public:
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
 
-	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
+	static std::string makeFilename( const util::PropertyMap &img, std::string namePattern );
 	std::list<std::string> makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const;
 
 
@@ -86,7 +86,7 @@ public:
 	 * - both ask for suffixes which can be red \b or written (sould never be empty)
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<util::istring> getSuffixes(io_modes mode = both)const;
+	std::list<util::istring> getSuffixes( io_modes mode = both )const;
 
 
 	/// \return a space separated list of the dialects the plugin supports

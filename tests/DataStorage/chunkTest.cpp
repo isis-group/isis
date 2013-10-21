@@ -317,15 +317,21 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	ch1.setPropertyAs( "voxelGap", util::fvector3( 1, 1, 1 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 
+	const util::Value<int> buff[] = {0, 1, 2};
+	std::copy( buff, buff + 3, std::back_inserter( ch1.propertyValue( "list_test" ) ) );
+
+
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
 
-	const std::list<data::Chunk> splices = ch1.autoSplice( );
-	unsigned short cnt = 1;
+	const std::list<data::Chunk> splices = ch1.autoSplice( 1 );
+	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	BOOST_FOREACH( const data::Chunk & ref, splices ) {
-		BOOST_CHECK_EQUAL( ref.getPropertyAs<util::fvector3>( "indexOrigin" ), util::fvector3( 1, 1, cnt ) );
-		cnt += 2;
+		BOOST_CHECK_EQUAL( ref.propertyValue( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
+		BOOST_CHECK_EQUAL( ref.propertyValue( "list_test" ), cnt );
+		BOOST_CHECK_EQUAL( ref.propertyValue( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
+		cnt++;
 	}
 }
 
@@ -430,23 +436,22 @@ BOOST_AUTO_TEST_CASE ( chunk_copySlice_Test )
 BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 {
 	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
-	uint32_t cnt=0;
+	uint32_t cnt = 0;
 	BOOST_FOREACH( data::Chunk::reference ref, ch )
-		ref = util::Value<uint32_t>( cnt++);
+	ref = util::Value<uint32_t>( cnt++ );
 
-	data::MemChunk<uint32_t> swapped(ch);
-	swapped.swapDim(data::columnDim,data::sliceDim);
+	data::MemChunk<uint32_t> swapped( ch );
+	swapped.swapDim( data::columnDim, data::sliceDim );
 
-	for(int t=0;t<20;t++)
-		for(int z=0;z<30;z++)
-			for(int y=0;y<40;y++)
-				for(int x=0;x<50;x++)
-	{
-		size_t idx=ch.getLinearIndex(util::vector4<size_t>(x,y,z,t));
-		BOOST_REQUIRE_EQUAL(ch.voxel<uint32_t>(x,y,z,t),idx);
-		BOOST_CHECK_EQUAL(swapped.voxel<uint32_t>(x,z,y,t),idx);
-	}
-	
+	for( int t = 0; t < 20; t++ )
+		for( int z = 0; z < 30; z++ )
+			for( int y = 0; y < 40; y++ )
+				for( int x = 0; x < 50; x++ ) {
+					size_t idx = ch.getLinearIndex( util::vector4<size_t>( x, y, z, t ) );
+					BOOST_REQUIRE_EQUAL( ch.voxel<uint32_t>( x, y, z, t ), idx );
+					BOOST_CHECK_EQUAL( swapped.voxel<uint32_t>( x, z, y, t ), idx );
+				}
+
 }
 
 }

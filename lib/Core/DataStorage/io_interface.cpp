@@ -3,7 +3,7 @@
 #endif
 
 #include <boost/foreach.hpp>
-#define BOOST_FILESYSTEM_VERSION 3 
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <iostream>
@@ -58,7 +58,7 @@ bool FileFormat::setGender( util::PropertyMap &object, const char *set, const ch
 	return false;
 }
 
-bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level )
+bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -123,7 +123,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 			isFormatUsed = true;
 		}
 
-		util::PropertyMap::KeyType prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
+		util::PropertyMap::key_type prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
 		const std::string::iterator start = what[0].first, end = what[0].second;
 
 		if( props.hasProperty( prop ) ) {
@@ -173,7 +173,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 			pos = namePattern.begin() + dist + pstring.length();
 
 			LOG( Debug, info )
-					<< "Replacing " << util::PropertyMap::KeyType( "{" ) + prop + "}" << " by "   << props.getPropertyAs<std::string>( prop )
+					<< "Replacing " << util::PropertyMap::key_type( "{" ) + prop + "}" << " by "   << props.getPropertyAs<std::string>( prop )
 					<< " the string is now " << namePattern;
 		} else {
 			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";
