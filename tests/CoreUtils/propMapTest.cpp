@@ -271,5 +271,21 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	}
 }
 
+BOOST_AUTO_TEST_CASE( prop_value_ref_test )
+{
+	PropertyMap map;
+	map.setPropertyAs( "Test1", util::fvector3( 1, 2, 3 ) );
+	BOOST_CHECK_EQUAL( map.propertyValue( "Test1" ), util::fvector3( 1, 2, 3 ) );
+
+	BOOST_CHECK( map.propertyValueAs<util::fvector3>( "Test1" ) ); //should be available as fvector3
+
+	boost::optional< util::fvector4 & > vec4 = map.propertyValueAs<util::fvector4>( "Test1" );
+	BOOST_CHECK( vec4 ); //should be available as fvector4 (conversion available)
+
+	// changes should affect the property
+	vec4.get()[3] = 4;
+	BOOST_CHECK_EQUAL( map.getPropertyAs<util::fvector4>( "Test1" ), util::fvector4( 1, 2, 3, 4 ) );
+}
+
 }
 }

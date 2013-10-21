@@ -201,9 +201,10 @@ protected:
 	 */
 	static boost::optional<const PropertyMap::mapped_type &> findEntry( const container_type &root, const propPathIterator at, const propPathIterator pathEnd )throw( boost::bad_get );
 
-	template<typename T> boost::optional<const T &> tryFindEntry( const PropPath &path)const {
+	template<typename T> boost::optional<const T &> tryFindEntry( const PropPath &path )const {
 		try {
 			const boost::optional<const PropertyMap::mapped_type &> ref = findEntry( path );
+
 			if( ref )
 				return boost::get<T>( *ref );
 		} catch ( const boost::bad_get &e ) {
@@ -352,7 +353,7 @@ public:
 	 * \note the return value is a boost::optional thus the actual PropertyMap can be accessed via the * or -> operators (if there is one of course)
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
-	boost::optional< const PropertyMap& > hasBranch( const PropPath &path )const;
+	boost::optional< const PropertyMap & > hasBranch( const PropPath &path )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -421,7 +422,7 @@ public:
 	 * \param from the path of the property to be transformed
 	 * \param to the path for the new property
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
-	 * \returns true if the transformation was done, false it failed
+	 * \returns true if the transformation was done, false if it failed
 	 */
 	template<typename DST> bool transform( const PropPath &from, const PropPath &to, bool delSource = true ) {
 		checkType<DST>();
@@ -522,22 +523,83 @@ public:
 	 */
 	template<typename T> T getPropertyAs( const PropPath &path )const {
 		boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
-		if(ref && !ref->isEmpty())
+
+		if( ref && !ref->isEmpty() )
 			return ref->as<T>();
 		else {
-			LOG(Runtime,warning) << "Property " << MSubject(path) << " doesn't exist, returning " << MSubject(Value<T>());
+			LOG( Runtime, warning ) << "Property " << MSubject( path ) << " doesn't exist, returning " << MSubject( Value<T>() );
 			return T();
 		}
 	}
 	template<typename T> T getPropertyAs( const PropPath &path, size_t at )const {
 		const boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
-		if( ref && ref->size()>at)
+
+		if( ref && ref->size() > at )
 			return ref->at( at ).as<T>();
 		else {
-			LOG(Runtime,warning) << "Property " << MSubject(path) << " doesn't exist (or isn't long enough), returning " << MSubject(Value<T>());
+			LOG( Runtime, warning ) << "Property " << MSubject( path ) << " doesn't exist (or isn't long enough), returning " << MSubject( Value<T>() );
 			return T();
 		}
 	}
+
+	/**
+	 * Get a valid reference to the stored value in its actual type.
+	 * This tries to access a property's first stored value as reference.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, false is returned.
+	 * If the property does not exist (or is empty) false will be returned as well
+	 * \param path the path to the property
+	 * \returns boost::optional<T&> referencing the requested value or false
+	 */
+	template<typename T> boost::optional<T &> propertyValueAs( const PropPath &path ) {
+		const boost::optional< const PropertyValue & > found = tryFindEntry<PropertyValue>( path );
+
+		if( found ) {
+			if( !found->is<T>() ) { // apparently it already has a value so lets try use that
+				if( !transform<T>( path, path ) ) {
+					LOG( Runtime, warning ) << "Transforming Property " << path << " from " << util::MSubject( found->getTypeName() ) << " to "
+											<< util::MSubject( util::Value<T>::staticName() ) << " failed";
+					return boost::optional<T &>();
+				}
+			}
+
+			assert( found->is<T>() );
+			assert( !found->isEmpty() );
+			return const_cast<PropertyValue &>( *found ).castTo<T>();
+		}
+
+		return boost::optional<T &>();
+	}
+	/**
+	 * Get a valid reference to the stored value in its actual type.
+	 * This tries to access a property's first stored value as reference.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, false is returned.
+	 * If the property does not exist (or is empty) it is created with def as first value.
+	 * \param path the path to the property
+	 * \param def the default value to be used when creating the property
+	 * \returns boost::optional<T&> referencing the requested value or false
+	 */
+	template<typename T> boost::optional<T &> propertyValueAs( const PropPath &path, const T &def ) {
+		boost::optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
+
+		if( !fetched ) return boost::optional<T &>(); // return "false" in case of a failure
+
+		if( fetched->isEmpty() ) { // we just created one, so set its value to def
+			*fetched = def;
+		} else if( !fetched->is<T>() ) { // apparently it already has a value so lets try use that
+			if( !transform<T>( path, path ) ) {
+				LOG( Runtime, warning ) << "Transforming Property " << path << " from " << util::MSubject( fetched->getTypeName() ) << " to "
+										<< util::MSubject( util::Value<T>::staticName() ) << " failed";
+				return boost::optional<T &>();
+			}
+		}
+
+		assert( fetched->is<T>() );
+		assert( !fetched->isEmpty() );
+		return fetched->castTo<T>();
+	}
+
 
 	/**
 	 * Request a property value via the given key in the given type.
@@ -550,17 +612,19 @@ public:
 	 * \param path the path to the property
 	 * \returns the property with given type, if not set yet def is returned.
 	 */
-	template<typename T> T getPropertyAsOr( const PropPath &path, const T& def )const {
+	template<typename T> T getPropertyAsOr( const PropPath &path, const T &def )const {
 		boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
-		if(ref && !ref->isEmpty())
+
+		if( ref && !ref->isEmpty() )
 			return ref->as<T>();
 		else {
 			return def;
 		}
 	}
-	template<typename T> T getPropertyAsOr( const PropPath &path, size_t at, const T& def )const {
+	template<typename T> T getPropertyAsOr( const PropPath &path, size_t at, const T &def )const {
 		const boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
-		if( ref && ref->size()>at)
+
+		if( ref && ref->size() > at )
 			return ref->at( at ).as<T>();
 		else {
 			return def;
