@@ -53,9 +53,9 @@ protected:
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
 	//we have to use the non-const here, otherwise the iterator would not be convertible into const_iterator
-	boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type*> chunks;
-	
-	size_t ch_idx,ch_cnt;
+	boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> chunks;
+
+	size_t ch_idx, ch_cnt;
 	inner_iterator current_it;
 	typename inner_iterator::difference_type ch_len;
 
@@ -72,20 +72,20 @@ public:
 
 	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
 	ImageIteratorTemplate ( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ) :
-		chunks ( src.chunks ), ch_idx ( src.ch_idx ), ch_cnt(src.ch_cnt),
+		chunks ( src.chunks ), ch_idx ( src.ch_idx ), ch_cnt( src.ch_cnt ),
 		current_it ( src.current_it ),
 		ch_len ( src.ch_len )
 	{}
 
 	// empty constructor
-	ImageIteratorTemplate() : ch_idx ( 0 ), ch_len ( 0 ), ch_cnt(0) {}
+	ImageIteratorTemplate() : ch_idx ( 0 ), ch_len ( 0 ), ch_cnt( 0 ) {}
 
 
 	// normal conytructor
-	explicit ImageIteratorTemplate ( boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type*> &_chunks, size_t _ch_cnt ) :
-		chunks ( _chunks ), ch_idx ( 0 ),ch_cnt(_ch_cnt),
+	explicit ImageIteratorTemplate ( boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> &_chunks, size_t _ch_cnt ) :
+		chunks ( _chunks ), ch_idx ( 0 ), ch_cnt( _ch_cnt ),
 		current_it ( chunks[0]->begin() ),
-		ch_len ( std::distance ( current_it, const_cast<CHUNK_TYPE*>(chunks[0])->end() ) )
+		ch_len ( std::distance ( current_it, const_cast<CHUNK_TYPE *>( chunks[0] )->end() ) )
 	{}
 
 	ThisType &operator++() {
@@ -162,29 +162,30 @@ public:
 		if ( ch_idx < ch_cnt )
 			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
 		else
-			current_it = chunks[ch_cnt-1]->end() ; //set current_it to the last chunks end iterator if we are behind it
-			//@todo will break if ch_cnt==0
-			
+			current_it = chunks[ch_cnt - 1]->end() ; //set current_it to the last chunks end iterator if we are behind it
+
+		//@todo will break if ch_cnt==0
+
 		return *this;
 	}
 	ThisType &operator-= ( typename inner_iterator::difference_type n ) {
 		return operator+= ( -n );
 	}
 
-	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const throw(std::out_of_range){
+	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const throw( std::out_of_range ) {
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
 		assert ( ( n / ch_len + static_cast<typename ThisType::difference_type> ( ch_idx ) ) >= 0 );
-		const typename inner_iterator::difference_type my_ch_idx= ch_idx + n / ch_len; //if neccesary jump to next chunk
-		
+		const typename inner_iterator::difference_type my_ch_idx = ch_idx + n / ch_len; //if neccesary jump to next chunk
+
 		if ( my_ch_idx >= ch_cnt )
 			throw std::out_of_range(
-				std::string("Image voxel index ")+boost::lexical_cast<std::string>(ch_idx*ch_len+currentDist())+"+"
-				+ boost::lexical_cast<std::string>(n-currentDist())
-				+" out of range 0.."+boost::lexical_cast<std::string>(ch_cnt)+"*"
-				+boost::lexical_cast<std::string>(ch_len)+"-1"
+				std::string( "Image voxel index " ) + boost::lexical_cast<std::string>( ch_idx * ch_len + currentDist() ) + "+"
+				+ boost::lexical_cast<std::string>( n - currentDist() )
+				+ " out of range 0.." + boost::lexical_cast<std::string>( ch_cnt ) + "*"
+				+ boost::lexical_cast<std::string>( ch_len ) + "-1"
 			);
-			
-		return  *(chunks[my_ch_idx]->begin() + n % ch_len); 
+
+		return  *( chunks[my_ch_idx]->begin() + n % ch_len );
 	}
 
 };
@@ -360,7 +361,7 @@ public:
 				LOG ( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF ( !getMissing().empty(), Debug, warning )
-						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+						<< "The created image is missing some properties: " << util::MSubject( getMissing() ) << ". It will be invalid.";
 			}
 		} else {
 			LOG ( Debug, warning ) << "Image is empty after inserting chunks.";
@@ -407,7 +408,7 @@ public:
 		return data[index.second];
 	}
 
-	void swapDim(unsigned short dim_a,unsigned short dim_b);
+	void swapDim( unsigned short dim_a, unsigned short dim_b );
 
 	/**
 	 * Get a const reference to the voxel value at the given coordinates.
@@ -547,7 +548,7 @@ public:
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::KeyType &key, bool unique = false ) const;
+	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::key_type &key, bool unique = false ) const;
 
 	/**
 	 * Get the size (in bytes) for the voxels in the image
@@ -836,7 +837,7 @@ public:
 	}
 	iterator begin() {
 		if ( checkMakeClean() ) {
-			boost::shared_array<data::ValueArray<T>*> vec(new data::ValueArray<T>*[lookup.size()]);
+			boost::shared_array<data::ValueArray<T>*> vec( new data::ValueArray<T>*[lookup.size()] );
 
 			for ( size_t i = 0; i < lookup.size(); i++ )
 				vec[i] = &lookup[i]->template asValueArray<T>();
@@ -852,8 +853,8 @@ public:
 	};
 	const_iterator begin() const {
 		if ( isClean() ) {
-			boost::shared_array<data::ValueArray<T>*> vec(new data::ValueArray<T>*[lookup.size()]);
-			
+			boost::shared_array<data::ValueArray<T>*> vec( new data::ValueArray<T>*[lookup.size()] );
+
 			for ( size_t i = 0; i < lookup.size(); i++ )
 				vec[i] = &lookup[i]->template asValueArray<T>();
 

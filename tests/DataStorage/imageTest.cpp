@@ -225,8 +225,8 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 
 
 	for( int i = 0; i < 4; i++ ) {
-		ch.propertyValueAt( "acquisitionNumber", 3 - i ) = ( uint32_t )i; //change the acquisitionNumber of that to 1
-		ch.propertyValueAt( "acquisitionTime", 3 - i ) = ( uint32_t )i;
+		ch.propertyValue( "acquisitionNumber")[3 - i].apply(( uint32_t )i); //change the acquisitionNumber of that to 1
+		ch.propertyValue( "acquisitionTime")[3 - i].apply(( uint32_t )i);
 	}
 
 	data::Image img( ch );

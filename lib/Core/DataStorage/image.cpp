@@ -107,7 +107,7 @@ bool Image::isClean()const
 
 void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
 {
-	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin());
+	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin() );
 }
 
 
@@ -116,11 +116,11 @@ void Image::deduplicateProperties()
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
 	const boost::shared_ptr<Chunk> &first = lookup[0];
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropertyMap common=*first;;
-	util::PropertyMap::KeyList uniques;
+	util::PropertyMap common = *first;;
+	util::PropertyMap::PathSet uniques;
 
 	for ( size_t i = 1; i < lookup.size(); i++ ) {
-		lookup[i]->toCommonUnique( common, uniques, false );
+		lookup[i]->toCommonUnique( common, uniques );
 	}
 
 	// @todo removing uniques - list might improve performance
@@ -128,7 +128,7 @@ void Image::deduplicateProperties()
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 
 	// list should not be unified - they belong into their chunk even if they are common
-	common.remove( common.findLists() );
+	common.remove( common.getLists() );
 
 	join( common );
 	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
@@ -343,8 +343,8 @@ bool Image::reIndex()
 		return false;
 	}
 
-	if(set.makeRectangular()>0 && set.isEmpty()){
-		LOG(Runtime,error) << "Nothing left to index, image is empty. Skipping";
+	if( set.makeRectangular() > 0 && set.isEmpty() ) {
+		LOG( Runtime, error ) << "Nothing left to index, image is empty. Skipping";
 		return false;
 	}
 
@@ -404,13 +404,11 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	const util::PropertyMap::KeyType vectors[] = {"rowVec", "columnVec", "sliceVec"};
+	const util::PropertyMap::key_type vectors[] = {"rowVec", "columnVec", "sliceVec"};
 	int oneCnt = 0;
-	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
+	BOOST_FOREACH( const util::PropertyMap::key_type & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
-			util::PropertyValue &prop = propertyValue( ref );
-			LOG_IF( !prop.is<util::fvector3>(), Debug, error ) << "Using " << prop.getTypeName() << " as " << util::Value<util::fvector3>::staticName();
-			util::fvector3 &vec = prop.castTo<util::fvector3>();
+			util::fvector3 &vec = propertyValueAs<util::fvector3>( ref ).get();
 
 			if( vec.sqlen() == 0 ) {
 				util::fvector3  v_one;
@@ -426,7 +424,7 @@ bool Image::reIndex()
 		oneCnt++;
 	}
 
-	util::fvector3 &voxeSize = propertyValue( "voxelSize" ).castTo<util::fvector3>();
+	util::fvector3 &voxeSize = propertyValueAs<util::fvector3>( "voxelSize" ).get();
 
 	for( int i = 0; i < 3; i++ ) {
 		if( voxeSize[i] == 0 || std::isinf( voxeSize[i] ) ) {
@@ -437,21 +435,24 @@ bool Image::reIndex()
 
 
 	//if we have at least two slides (and have slides (with different positions) at all)
-	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
-		const util::fvector3 firstV = first.getPropertyAs<util::fvector3>( "indexOrigin" );
+	const boost::optional< const util::PropertyValue & > firstV = first.hasProperty( "indexOrigin" );
+
+	if ( chunk_dims == 2 && structure_size[2] > 1 && firstV ) {
 		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
-		if ( last.hasProperty( "indexOrigin" ) ) {
-			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
+		const boost::optional< const util::PropertyValue & > lastV = last.hasProperty( "indexOrigin" );
+
+		if ( lastV ) {
 			//check the slice vector
-			util::fvector3 distVecNorm = lastV - firstV;
+			util::fvector3 distVecNorm = lastV->as<util::fvector3>() - firstV->as<util::fvector3>();
 			LOG_IF( distVecNorm.len() == 0, Runtime, error )
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
 
-			if ( hasProperty( "sliceVec" ) ) {
-				const util::fvector3 sliceVec = getPropertyAs<util::fvector3>( "sliceVec" );
-				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, info )
+			const boost::optional< const util::PropertyValue & > sliceVec = hasProperty( "sliceVec" );
+
+			if ( sliceVec ) {
+				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec->as<util::fvector3>() ), Runtime, info )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << structure_size[2] - 1
 						<< " " << distVecNorm;
@@ -461,21 +462,15 @@ bool Image::reIndex()
 						<< " to synthesize the missing sliceVec as " << distVecNorm;
 				propertyValue( "sliceVec" ) = distVecNorm;
 			}
-		}
 
-		if ( last.hasProperty( "indexOrigin" ) ) {
-			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
-			const float avDist = ( lastV - firstV ).len() / (structure_size[2]-1); //average dist between the middle of two slices
+			const float avDist = ( lastV->as<util::fvector3>() - firstV->as<util::fvector3>() ).len() / ( structure_size[2] - 1 ); //average dist between the middle of two slices
+
 			const float sliceDist = avDist - voxeSize[2]; // the gap between two slices
 
 			if ( sliceDist > 0 ) {
 				static const float inf = std::numeric_limits<float>::infinity();
 
-				if ( ! hasProperty( "voxelGap" ) ) { // @todo check this
-					setPropertyAs( "voxelGap", util::fvector3( 0, 0, inf ) );
-				}
-
-				util::fvector3 &voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector3>(); //if there is no voxelGap yet, we create it
+				util::fvector3 &voxelGap = propertyValueAs( "voxelGap", util::fvector3( 0, 0, inf ) ).get(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
 					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 20 ), Runtime, warning )
@@ -492,48 +487,47 @@ bool Image::reIndex()
 	}
 
 	//if we have row- and column- vector
-	if ( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) ) {
-		util::fvector3 &row = propertyValue( "rowVec" ).castTo<util::fvector3>();
-		util::fvector3 &column = propertyValue( "columnVec" ).castTo<util::fvector3>();
-		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
-		const util::fvector3 crossVec = util::fvector3( //we could use their cross-product as sliceVector
-											row[1] * column[2] - row[2] * column[1],
-											row[2] * column[0] - row[0] * column[2],
-											row[0] * column[1] - row[1] * column[0]
-										);
+	const util::fvector3 &row = propertyValueAs<util::fvector3>( "rowVec", util::fvector3( 1, 0 ) ).get();
+	const util::fvector3 &column = propertyValueAs<util::fvector3>( "columnVec", util::fvector3( 0, 1 ) ).get();
+	LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+	const util::fvector3 crossVec = util::fvector3( //we could use their cross-product as sliceVector
+										row[1] * column[2] - row[2] * column[1],
+										row[2] * column[0] - row[0] * column[2],
+										row[0] * column[1] - row[1] * column[0]
+									);
 
-		if ( hasProperty( "sliceVec" ) ) {
-			util::fvector3 &sliceVec = propertyValue( "sliceVec" ).castTo<util::fvector3>(); //get the slice vector
-			LOG_IF( std::acos( crossVec.dot( sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
-					<< "The existing sliceVec " << sliceVec
-					<< " differs from the cross product of the row- and column vector " << crossVec;
-		} else {
-			// We dont know anything about the slice-direction
-			// we just guess its along the positive cross-product between row- and column direction
-			// so at least warn the user if we do that long shot
-			LOG( Runtime, info )
-					<< "used the cross product between rowVec and columnVec as sliceVec:"
-					<< crossVec << ". That might be wrong!";
-			setPropertyAs( "sliceVec", crossVec );
-		}
+
+	boost::optional< const util::PropertyValue & > sliceVec = hasProperty( "sliceVec" );
+
+	if ( sliceVec ) {
+		LOG_IF( std::acos( crossVec.dot( sliceVec->as<util::fvector3>() ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
+				<< "The existing sliceVec " << sliceVec << " differs from the cross product of the row- and column vector " << crossVec;
+	} else {
+		// We dont know anything about the slice-direction
+		// we just guess its along the positive cross-product between row- and column direction
+		// so at least warn the user if we do that long shot
+		LOG( Runtime, info )
+				<< "used the cross product between rowVec and columnVec as sliceVec:"
+				<< crossVec << ". That might be wrong!";
+		setPropertyAs( "sliceVec", crossVec );
 	}
 
-	if ( hasProperty( "fov" ) ) {
-		util::fvector3 &propFoV = propertyValue( "fov" ).castTo<util::fvector3>();
+	boost::optional< util::fvector3 & > storedFoV = propertyValueAs<util::fvector3>( "fov" );
 
-		const util::fvector3 &calcFoV = getFoV();
+	if ( storedFoV ) {
+		const util::fvector3 calcFoV = getFoV();
 
 		bool ok = true;
 
 		for ( size_t i = 0; i < 3; i++ ) {
-			if ( propFoV[i] != -std::numeric_limits<float>::infinity() ) {
-				ok &= util::fuzzyEqual( propFoV[i], calcFoV[i] );
+			if ( ( *storedFoV )[i] != -std::numeric_limits<float>::infinity() ) {
+				ok &= util::fuzzyEqual( ( *storedFoV )[i], calcFoV[i] );
 			} else
-				propFoV[i] = calcFoV[i];
+				( *storedFoV )[i] = calcFoV[i];
 		}
 
 		LOG_IF( ! ok, Runtime, info )
-				<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
+				<< "The calculated field of view differs from the stored " << util::MSubject( *storedFoV ) << "/" << calcFoV;
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
@@ -542,7 +536,7 @@ bool Image::reIndex()
 	bool found = false;
 
 	for ( size_t i = 0; i < lookup.size() && found == false; i++ ) {
-		const KeyList lists_list = lookup[i]->findLists();
+		const PathSet lists_list = lookup[i]->getLists();
 		LOG_IF( !lists_list.empty(), Debug, info ) << "Found property-lists " << util::MSubject( lists_list ) << " in chunk number " << i << " going to splice the image";
 		found = !lists_list.empty();
 	}
@@ -740,7 +734,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return lookup.size() / set.getHorizontalSize();
 }
 
-std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyMap::KeyType &key, bool unique )const
+std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyMap::key_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -974,8 +968,8 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 		image_size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<util::PropertyMap::KeyType> splice_needed = util::stringToList<util::PropertyMap::KeyType>( util::PropertyMap::KeyType( "voxelSize,voxelGap,rowVec,columnVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
-	util::PropertyMap::KeyList needed = MemChunk<short>( 1 ).getMissing();
+	const std::list<util::PropertyMap::key_type> splice_needed = util::stringToList<util::PropertyMap::key_type>( util::PropertyMap::key_type( "voxelSize,voxelGap,rowVec,columnVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
+	util::PropertyMap::PathSet needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {
 		dimensions m_dim;
@@ -1003,14 +997,14 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	lookup.clear();
 
 	// reset the Chunk set, so we can insert new splices
-	set=_internal::SortedChunkList(defaultChunkEqualitySet); 
+	set = _internal::SortedChunkList( defaultChunkEqualitySet );
 	set.addSecondarySort( "acquisitionNumber" );
 
 	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
-		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the
+		BOOST_FOREACH( util::PropertyMap::PathSet::const_reference need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
 				LOG( Debug, info ) << "Copying " << need << "=" << this->propertyValue( need ) << " from the image to the chunk for splicing";
 				ref->propertyValue( need ) = this->propertyValue( need );
@@ -1090,7 +1084,7 @@ util::fvector3 Image::getFoV() const
 Image::iterator Image::begin()
 {
 	if( checkMakeClean() ) {
-		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
+		boost::shared_array<Chunk *> vec( new Chunk*[lookup.size()] );
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
@@ -1105,12 +1099,12 @@ Image::iterator Image::end() {return begin() + getVolume();}
 Image::const_iterator Image::begin()const
 {
 	if( isClean() ) {
-		boost::shared_array<Chunk*> vec(new Chunk*[lookup.size()]);
+		boost::shared_array<Chunk *> vec( new Chunk*[lookup.size()] );
 
 		for( size_t i = 0; i < lookup.size(); i++ )
 			vec[i] = lookup[i].get();
 
-		return const_iterator( vec, lookup.size());
+		return const_iterator( vec, lookup.size() );
 	} else {
 		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 		return const_iterator();
