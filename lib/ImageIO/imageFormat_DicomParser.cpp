@@ -178,10 +178,20 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 		LOG( Debug, verbose_info )
 				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map.propertyValue( name ) = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
-		//although TM is defined as time of day we dont have a day here, so we fake one
+		//although TM is defined as time of day we don't have a day here, so we fake one
 	} else
 		LOG( Runtime, warning )
 				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+}
+
+void ImageFormat_Dicom::parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map ){
+	OFString buff;
+	bool ok = true;
+	elem->getOFString( buff, 0 );
+	buff.insert(8,"T"); // the format is YYYYMMDDHHMMSS.FFFFFF but iso says it should be YYYYMMDDTHHMMSS.FFFFFF
+	const util::ValueReference ref=util::Value<std::string>(buff.c_str()).copyByID(util::Value<boost::posix_time::ptime>::staticID);
+	if(!ref.isEmpty())
+		map.propertyValue( name ) = ref->castTo<boost::posix_time::ptime>();
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -199,6 +209,10 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	case EVR_TM: {
 		parseTM( elem, name, map );
+	}
+	break;
+	case EVR_DT: {
+		parseDT( elem, name, map );
 	}
 	break;
 	case EVR_FL: {
