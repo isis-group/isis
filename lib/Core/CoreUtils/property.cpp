@@ -70,10 +70,29 @@ ValueReference PropertyValue::operator()() const{return front();}
 void PropertyValue::push_back( const ValueBase& ref ){
 	insert(end(),ref);
 }
-PropertyValue::iterator PropertyValue::insert( iterator at, const isis::util::ValueBase& ref ){
+void PropertyValue::insert( iterator at, const PropertyValue& ref ){
+	if(ref.isEmpty()){
+		LOG(Debug,warning) << "Not inserting empty Property";
+	} else {
+		LOG_IF(!isEmpty() && getTypeID()!=ref.getTypeID(),Debug,error) << "Inserting inconsistent type " << MSubject(ref.toString(true)) << " in " << MSubject(*this);
+		container.insert(at,ref.container );
+	}
+}
+PropertyValue::iterator PropertyValue::insert( iterator at, const ValueBase& ref ){
 	LOG_IF(!isEmpty() && getTypeID()!=ref.getTypeID(),Debug,error) << "Inserting inconsistent type " << MSubject(ref.toString(true)) << " in " << MSubject(*this);
 	return container.insert(at,ValueBase::heap_clone_allocator::allocate_clone( ref ));
 }
+
+void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyValue& ref)
+{
+	if(ref.isEmpty()){
+		LOG(Debug,warning) << "Not transfering empty Property";
+	} else {
+		LOG_IF(!isEmpty() && getTypeID()!=ref.getTypeID(),Debug,error) << "Inserting inconsistent type " << MSubject(ref.toString(true)) << " in " << MSubject(*this);
+		container.transfer(at,ref.container );
+	}
+}
+
 
 ValueBase& PropertyValue::at( size_t n ){return container.at(n);}
 const ValueBase& PropertyValue::at( size_t n ) const{return container.at(n);}

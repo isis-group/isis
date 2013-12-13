@@ -38,6 +38,7 @@ public:
 	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::const_iterator const_iterator;
 	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::reference reference;
 	typedef boost::ptr_vector<ValueBase,ValueBase::heap_clone_allocator>::const_reference const_reference;
+	typedef PropertyValue value_type;
 	/**
 	 * Explicit constructor.
 	 * Creates a property and stores a value from any known type.
@@ -63,6 +64,8 @@ public:
 	template<typename T> typename boost::enable_if<knowType<T> >::type push_back(const T& ref){insert(end(),ref);}
 
 	iterator insert(iterator at,const ValueBase& ref);
+	void insert(iterator at,const PropertyValue& ref);
+	
 	template<typename T> typename boost::enable_if<knowType<T>, iterator >::type insert(iterator at,const T& ref){
 		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID,Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
 		return container.insert(at,new Value<T>(ref));
@@ -98,21 +101,16 @@ public:
 	 */
 	std::vector<PropertyValue> splice(const size_t len);
 
+	/// Amount of values in this PropertyValue
 	size_t size()const;
 	
-	/**
-	 * Transfer a list of ValueReference into the PropertyValue.
-	 * \note this is a <b>transfer</b>. The ValueReferences of the input will all be empty afterwards. Use \link copy \endlink if you want to copy instead.
-	 */
-	template<typename ITER> void transfer(ITER first,ITER last){
-		while(first!=last)
-			transfer(*(++first));
-	}
 	/// Copy a list of ValueReference into the PropertyValue.
 	template<typename ITER> void copy(ITER first,ITER last){
 		while(first!=last)
 			push_back(**(++first));
 	}
+	void transfer(iterator at,PropertyValue &ref);
+	void transfer(PropertyValue &ref);
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
