@@ -27,7 +27,7 @@ namespace util
 
 template<class TYPE > class Value;
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -124,7 +124,7 @@ template<typename T> struct type_div :   type_op<div_op<T>,true,  has_op<T>::div
 
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 /**
  * Generic class for type aware variables.

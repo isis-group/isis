@@ -27,7 +27,7 @@ namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -58,7 +58,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 };
 }
 /// @endcond
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).

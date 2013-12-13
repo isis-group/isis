@@ -40,7 +40,7 @@ namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
@@ -792,7 +792,7 @@ ValueConverterMap::ValueConverterMap()
 }
 
 }
-API_EXCLUDE_END
+API_EXCLUDE_END;
 }
 }
 /// @endcond

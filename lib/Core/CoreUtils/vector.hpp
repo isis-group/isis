@@ -336,7 +336,7 @@ typedef vector3<float> fvector3;
 typedef vector3<double> dvector3;
 typedef vector4<int32_t> ivector4;
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal {
 	using boost::mpl::and_;
@@ -349,7 +349,7 @@ namespace _internal {
 	
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 }
 }
 
