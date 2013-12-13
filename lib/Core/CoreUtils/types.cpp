@@ -77,7 +77,7 @@ DEF_TYPE( Selection, selection );
 DEF_TYPE( boost::posix_time::ptime, timestamp );
 DEF_TYPE( boost::gregorian::date, date );
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 namespace _internal
 {
 struct type_lister {
@@ -92,7 +92,7 @@ struct type_lister {
 };
 
 }
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 std::map< unsigned short, std::string > getTypeMap( bool withValues, bool withValueArrays )
 {

@@ -27,7 +27,7 @@ namespace util
 
 template<class TYPE > class Value;
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -143,7 +143,7 @@ public: // c++11 says we need a user defined constructor here
 
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 /**
  * Generic class for type aware variables.

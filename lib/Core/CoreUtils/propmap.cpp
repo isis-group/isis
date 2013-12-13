@@ -17,7 +17,7 @@ namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -48,7 +48,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 }
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 ///////////////////////////////////////////////////////////////////
 // Contructors

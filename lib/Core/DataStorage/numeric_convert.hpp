@@ -14,7 +14,7 @@ namespace isis
 namespace data
 {
 enum autoscaleOption;
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -194,7 +194,7 @@ DECL_SCALED_CONVERT( uint8_t, double );
 
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 /**
  * Computes scaling and offset between two scalar value domains.
  * The rules are:

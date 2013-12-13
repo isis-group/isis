@@ -43,7 +43,7 @@ namespace isis
 {
 namespace data
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
@@ -460,7 +460,7 @@ ValueArrayConverterMap::ValueArrayConverterMap()
 }
 
 }
-API_EXCLUDE_END
+API_EXCLUDE_END;
 }
 }
 /// @endcond
