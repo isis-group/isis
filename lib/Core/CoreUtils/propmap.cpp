@@ -1,3 +1,4 @@
+// kate: indent-width 4; auto-insert-doxygen on
 //
 // C++ Implementation: propmap
 //
@@ -12,12 +13,15 @@
 
 #include "propmap.hpp"
 #include <boost/foreach.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 
 namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -115,15 +119,48 @@ struct TreeInvalidCheck: boost::static_visitor<bool> {
 };
 }
 /// @endcond _internal
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 ///////////////////////////////////////////////////////////////////
 // PropPath impl
 ///////////////////////////////////////////////////////////////////
 
+struct parser {
+	typedef BOOST_TYPEOF( boost::spirit::ascii::space | '\t' | boost::spirit::eol ) skip_type;
+	template<typename T> struct rule{typedef boost::spirit::qi::rule<uint8_t*, T(), skip_type > decl;};
+	typedef boost::variant<PropertyValue, PropertyMap> value_cont;
+
+	struct add_member {
+		const char extra_token;
+		add_member( char _extra_token ): extra_token( _extra_token ) {}
+		void operator()( const boost::fusion::vector2<std::string, value_cont> &a, rule<PropertyMap>::decl::context_type &context, bool & )const {
+			const PropertyMap::PropPath label = extra_token ?
+			stringToList<PropertyMap::key_type>( a.m0, extra_token ) :
+			PropertyMap::PropPath( a.m0.c_str() );
+			PropertyMap &target = context.attributes.car;
+
+			if( target.hasBranch( label ) || target.hasProperty( label ) )
+				LOG( Runtime, error ) << "There is already an entry " << MSubject(target) << " skipping this one" ;
+			else{
+				const value_cont &container= a.m1;
+				switch( container.which() ) {
+				case 1:
+					target.branch( label ) = boost::get<PropertyMap>( container );
+					break;
+				case 0:
+					target.propertyValue( label ) = boost::get<PropertyValue>( container );
+					break;
+				}
+
+			}
+		}
+	};
+
+};
+
 PropertyMap::PropPath::PropPath() {}
-PropertyMap::PropPath::PropPath( const char *key ): std::list<key_type>( util::stringToList<key_type>( util::istring( key ), pathSeperator ) ) {}
-PropertyMap::PropPath::PropPath( const key_type &key ): std::list<key_type>( util::stringToList<key_type>( key, pathSeperator ) ) {}
+PropertyMap::PropPath::PropPath( const char *key ): std::list<key_type>( stringToList<key_type>( istring( key ), pathSeperator ) ) {}
+PropertyMap::PropPath::PropPath( const key_type &key ): std::list<key_type>( stringToList<key_type>( key, pathSeperator ) ) {}
 PropertyMap::PropPath::PropPath( const std::list<key_type> &path ): std::list<key_type>( path ) {}
 PropertyMap::PropPath &PropertyMap::PropPath::operator/=( const PropertyMap::PropPath &s )
 {
@@ -578,6 +615,32 @@ void PropertyMap::toCommonUnique( PropertyMap &common, PathSet &uniques )const
 		}
 	}
 }
+
+bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token )
+{
+	using namespace boost::spirit;
+	using qi::lit;
+
+	parser::rule<boost::fusion::vector2<std::string, parser::value_cont> >::decl member;
+	
+	parser::rule<std::string>::decl string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" );
+	parser::rule<std::string>::decl label( string >> ':', "label" );
+	parser::rule<int>::decl integer( int_ >> !lit( '.' ), "integer" ) ; // an integer followed by a '.' is not an integer
+	parser::rule<dlist>::decl dlist( lit( '[' ) >> double_ % ',' >> ']', "dlist" );
+	parser::rule<ilist>::decl ilist( lit( '[' ) >> integer % ',' >> ']', "ilist" );
+	parser::rule<slist>::decl slist( lit( '[' ) >> string  % ',' >> ']', "slist" );
+	parser::rule<PropertyValue>::decl value = integer | double_ | string | ilist | dlist | slist;
+	parser::rule<PropertyValue>::decl vallist( lit( '[' ) >> value % ',' >> ']', "value_list" );
+
+	parser::rule<PropertyMap>::decl object( lit( '{' ) >> ( member[parser::add_member( extra_token )] % ',' || eps ) >> '}', "object" );
+	
+	member = label >> ( value | vallist | object );
+	
+	uint8_t* end = streamEnd;
+	bool erg = qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
+	return end == streamEnd;
+}
+
 
 std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 {

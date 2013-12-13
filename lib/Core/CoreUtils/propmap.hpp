@@ -640,9 +640,18 @@ public:
 	 * \returns true if renaming/moving was successful
 	 */
 	bool rename( const PropPath &from, const PropPath &to );
+	///////////////////////////////////////////////////////////////////////////
+	// extended tools
+	///////////////////////////////////////////////////////////////////////////
 
 	/// \returns a flat representation of the whole property tree
 	FlatMap getFlatMap( )const;
+
+	/**
+	 * Try reading a JSON map into the PropertyMap.
+	 * \returns true if the whole stream was parsed
+	 */
+	bool readJson( uint8_t *streamBegin, uint8_t *streamEnd, char extra_token = 0 );
 
 	/**
 	 * "Print" the property tree.
