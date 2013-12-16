@@ -149,6 +149,12 @@ protected:
 			std::for_each( sub.container.begin(), sub.container.end(), *this );
 		}
 	};
+	struct IsEmpty : boost::static_visitor<bool>
+	{
+		template <typename T> bool operator()( T & operand ) const{
+			return operand.isEmpty();
+		}
+	};
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal tool-backends
@@ -216,6 +222,8 @@ protected:
 	template<typename T> boost::optional<T &> tryFetchEntry( const PropPath &path ) {
 		try {
 			mapped_type &n = fetchEntry( path );
+			if(n.type()!=typeid(T) && boost::apply_visitor(IsEmpty(),n)) //if target is empty but of wrong type 
+				boost::get<T>( n = T() ); // reset it to empty with right type
 			return boost::get<T>( n );
 		} catch( const boost::bad_get &e ) {
 			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
