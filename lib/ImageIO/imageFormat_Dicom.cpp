@@ -429,6 +429,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		LOG(Debug,warning) << "Guessing number of slices in the mosaic as " << images << ". This might be to many";
 	} else
 		images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
+	
 	const util::vector4<size_t> tSize = source.getSizeAsVector();
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
 	const util::vector3<size_t> size( tSize[0] / matrixSize, tSize[1] / matrixSize, images );
@@ -487,6 +488,9 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	}
 
 	// for every slice
+	util::PropertyValue &ordProp= haveAcqTimeList ? dest.propertyValue( "acquisitionTime"):dest.propertyValue( "acquisitionNumber");
+	ordProp=util::PropertyValue(); //reset the selected ordering property to empty
+	
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
@@ -498,10 +502,10 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		if( haveAcqTimeList ) {
-			dest.propertyValueAt( "acquisitionTime", slice ) = float( acqTime +  * ( acqTimeIt++ ) );
+		if(haveAcqTimeList){
+			ordProp.push_back(float( acqTime +  * ( acqTimeIt++ ) ));
 		} else {
-			dest.propertyValueAt( "acquisitionNumber", slice ) = uint32_t( acqNum * images +  slice );
+			ordProp.push_back(uint32_t( acqNum * images +  slice ));
 		}
 	}
 
