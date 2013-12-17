@@ -616,7 +616,7 @@ void PropertyMap::toCommonUnique( PropertyMap &common, PathSet &uniques )const
 	}
 }
 
-bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token )
+bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees )
 {
 	using namespace boost::spirit;
 	using qi::lit;
@@ -633,9 +633,14 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 	parser::rule<PropertyValue>::decl vallist( lit( '[' ) >> value % ',' >> ']', "value_list" );
 
 	parser::rule<PropertyMap>::decl object( lit( '{' ) >> ( member[parser::add_member( extra_token )] % ',' || eps ) >> '}', "object" );
-	
-	member = label >> ( value | vallist | object );
-	
+	parser::rule<PropertyMap>::decl list_object( lit( '{' ) >> ( ( label >> vallist )[parser::add_member( extra_token )] % ',' || eps ) >> '}', "list_object" );
+
+	BOOST_FOREACH(const std::string &label,util::stringToList<std::string>(list_trees,':')){
+		member= member.copy() | lexeme['"' >> ascii::string( label ) >> '"'] >> ':' >> list_object;
+	}
+
+	member= member.copy() | label >> ( value | vallist | object );
+
 	uint8_t* end = streamEnd;
 	bool erg = qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
 	return end == streamEnd;

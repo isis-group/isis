@@ -657,9 +657,13 @@ public:
 
 	/**
 	 * Try reading a JSON map into the PropertyMap.
+	 * \param streamBegin pointer to the begin of the character stream
+	 * \param streamEnd pointer behind the end of the character stream
+	 * \param extra_token to seperate entry paths in the map ("CsaSeries.MrPhoenixProtocol" from json will become property path "CsaSeries/MrPhoenixProtocol" if '.' is given)
+	 * \param list_trees colon separated labels for json-subtrees where property listing should be tried before using lists from the known types (e.g. "samples:slices")
 	 * \returns true if the whole stream was parsed
 	 */
-	bool readJson( uint8_t *streamBegin, uint8_t *streamEnd, char extra_token = 0 );
+	bool readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
 
 	/**
 	 * "Print" the property tree.
