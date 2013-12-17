@@ -532,22 +532,6 @@ bool Image::reIndex()
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
 
-	// check if there is a list in any chunk
-	bool found = false;
-
-	for ( size_t i = 0; i < lookup.size() && found == false; i++ ) {
-		const PathSet lists_list = lookup[i]->getLists();
-		LOG_IF( !lists_list.empty(), Debug, info ) << "Found property-lists " << util::MSubject( lists_list ) << " in chunk number " << i << " going to splice the image";
-		found = !lists_list.empty();
-	}
-
-	if( found ) { // splice down the image one step if there are some
-		const size_t relDims = lookup[0]->getRelevantDims();
-		assert( relDims > 1 );
-		spliceDownTo( static_cast<data::dimensions>( relDims - 1 ) );
-	}
-
-
 	updateOrientationMatrices();
 	return clean = isValid();
 }
