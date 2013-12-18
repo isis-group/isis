@@ -160,7 +160,7 @@ protected:
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// internal recursion-function for join
-	void joinTree( const PropertyMap &other, bool overwrite, const PropPath &prefix, PathSet &rejects );
+	void joinTree( PropertyMap& other, bool overwrite, bool delsource, const PropPath& prefix, PathSet& rejects );
 	/// internal recursion-function for diff
 	void diffTree( const container_type &other, DiffMap &ret, const PropPath &prefix ) const;
 
@@ -405,12 +405,30 @@ public:
 	DiffMap getDifference( const PropertyMap &second )const;
 
 	/**
-	 * Add Properties from another tree.
+	 * Add Properties from another property map.
 	 * \param other the other tree to join with
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::PathSet join( const PropertyMap &other, bool overwrite = false );
+	PropertyMap::PathSet join( const PropertyMap& other, bool overwrite = false );
+
+	/**
+	 * Transfer Properties from another tree.
+	 * The source should be empty afterwards.
+	 * \param other the other tree to transfer from
+	 * \param overwrite if existing properties shall be replaced
+	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
+	 */
+	PropertyMap::PathSet transfer( PropertyMap& other, int overwrite = 0 ); //use int to prevent implicit conversion from static string (PropPath) to bool
+
+	/**
+	 * Transfer Properties from another tree.
+	 * The source should be empty afterwards.
+	 * \param other the other tree to transfer from
+	 * \param overwrite if existing properties shall be replaced
+	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
+	 */
+	PropertyMap::PathSet transfer( PropertyMap& other, const PropPath &other_path, bool overwrite = false );
 
 	/**
 	 * Transform an existing property into another.

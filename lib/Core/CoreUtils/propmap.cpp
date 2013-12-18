@@ -72,26 +72,30 @@ struct RemoveEqualCheck: boost::static_visitor<bool> {
 	template<typename T1, typename T2> bool operator()( T1 &first, const T2 &second )const {return false;} // any other case
 };
 struct JoinTreeVisitor: boost::static_visitor<bool> {
-	bool overwrite;
+	bool overwrite,delsource;
 	PropertyMap::PathSet &rejects;
 	const PropertyMap::PropPath &prefix, &name;
-	JoinTreeVisitor( bool _overwrite, PropertyMap::PathSet &_rejects, const PropertyMap::PropPath &_prefix, const PropertyMap::PropPath &_name )
-		: overwrite( _overwrite ), rejects( _rejects ), prefix( _prefix ), name( _name ) {}
-	bool operator()( PropertyValue &first, const PropertyValue &second )const { // if both are Values
+	JoinTreeVisitor( bool _overwrite, bool _delsource, PropertyMap::PathSet &_rejects, const PropertyMap::PropPath &_prefix, const PropertyMap::PropPath &_name )
+		: overwrite( _overwrite ), delsource(_delsource), rejects( _rejects ), prefix( _prefix ), name( _name ) {}
+	bool operator()( PropertyValue &first, PropertyValue &second )const { // if both are Values
 		if( first.isEmpty() || overwrite ) { // if ours is empty or overwrite is enabled
-			first = second; //replace ours by the other
+			//replace ours by the other
+			if(delsource)first.transfer(second);
+			else first = second; 
 			return true;
 		} else { // otherwise put the other into rejected if its not equal to our
 			if( first != second )rejects.insert( rejects.end(), prefix / name );
-
 			return false;
 		}
 	}
-	bool operator()( PropertyMap &thisMap, const PropertyMap &otherMap )const { // recurse if both are subtree
-		thisMap.joinTree( otherMap, overwrite, prefix / name, rejects );
-		return false;
+	bool operator()( PropertyMap &thisMap, PropertyMap &otherMap )const { // recurse if both are subtree
+		thisMap.joinTree( otherMap, overwrite, delsource, prefix / name, rejects );
+		return rejects.empty();
 	}
-	template<typename T1, typename T2> bool operator()( T1 &first, const T2 &second )const {return false;} // any other case
+	template<typename T1, typename T2> bool operator()( T1 &first, const T2 &second )const {// any other case
+		rejects.insert( rejects.end(), prefix / name );
+		return false;
+	} 
 };
 struct FlatMapMaker: boost::static_visitor<void> {
 	PropertyMap::FlatMap &out;
@@ -442,46 +446,49 @@ void PropertyMap::removeEqual ( const PropertyMap &other, bool removeNeeded )
 				continue; // keep iterator from incrementing again
 			} else
 				thisIt++;
-
-			//              if(!(thisIt->second != otherIt->second)){ // and they're not unequal (note empty values are neither equal nor unequal)
-			//                  if(removeNeeded || !boost::get<PropertyValue>(thisIt->second).isNeeded()){
-			//                      LOG( Debug, verbose_info ) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
-			//                      container.erase( thisIt++ ); // so delete this if bot are empty _or_ equal
-			//                      continue; // keep iterator from incrementing again
-			//                  } else
-			//                      LOG( Debug, verbose_info ) << "Keeping " << *thisIt << " because it is needed";
-			//              } else {
-			//                  LOG( Debug, verbose_info ) << "Keeping " << *thisIt << " because it is not equal in the other (" << *otherIt << ")";
-			//              }
-			//          } else if(thisIt->second.type()==typeid(PropertyMap) && otherIt->second.type()==typeid(PropertyMap)){ // if both are subtree - recurse
-			//              PropertyMap &thisMap = boost::get<PropertyMap>(thisIt->second);
-			//              thisMap.removeEqual( boost::get<PropertyMap>(otherIt->second) );
-			//          }
-			//          thisIt++;
 		}
 	}
 }
 
 
-PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite )
+PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite)
 {
 	PathSet rejects;
-	joinTree( other, overwrite, PropPath(), rejects );
+	joinTree( const_cast<PropertyMap &>(other), overwrite, false, PropPath(), rejects );
+	return rejects;
+}
+PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
+{
+	PathSet rejects;
+	joinTree( other, overwrite, true, PropPath(), rejects );
+	assert(other.isEmpty());
+	return rejects;
+}
+PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, const PropPath &path, bool overwrite)
+{
+	PathSet rejects=transfer(other.branch(path),overwrite);
+	other.remove(path);
 	return rejects;
 }
 
-void PropertyMap::joinTree( const PropertyMap &other, bool overwrite, const PropPath &prefix, PathSet &rejects )
+
+void PropertyMap::joinTree( PropertyMap &other, bool overwrite, bool delsource, const PropPath &prefix, PathSet &rejects )
 {
 	container_type::iterator thisIt = container.begin();
 
-	for ( container_type::const_iterator otherIt = other.container.begin(); otherIt != other.container.end(); otherIt++ ) { //iterate through the elements of other
+	for ( container_type::iterator otherIt = other.container.begin(); otherIt != other.container.end(); otherIt++ ) { //iterate through the elements of other
 		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
-			if( boost::apply_visitor( _internal::JoinTreeVisitor( overwrite, rejects, prefix, thisIt->first ), thisIt->second, otherIt->second ) );
-
-			LOG( Debug, verbose_info ) << "Replacing property " << MSubject( *thisIt ) << " by " << MSubject( otherIt->second );
+			if(
+				boost::apply_visitor( _internal::JoinTreeVisitor( overwrite, delsource, rejects, prefix, thisIt->first ), thisIt->second, otherIt->second ) &&
+				delsource
+			)// if the join was complete and delsource is true
+				other.container.erase(otherIt); // remove the entry from the source
+				
 		} else { // ok we dont have that - just insert it
+			#warning reimplement me with transfer
 			const std::pair<container_type::const_iterator, bool> inserted = container.insert( *otherIt );
-			LOG_IF( inserted.second, Debug, verbose_info ) << "Inserted property " << MSubject( *inserted.first );
+			if(inserted.second && delsource)other.container.erase(otherIt);
+			LOG_IF( !inserted.second, Debug, warning ) << "Failed to insert property " << MSubject( *inserted.first );
 		}
 	}
 }
@@ -593,7 +600,7 @@ bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 	boost::optional<const PropertyMap::mapped_type &> old_e = findEntry( oldname );
 
 	if ( old_e ) {
-		boost::optional<const PropertyMap::mapped_type &> new_e = findEntry( newname );
+		const boost::optional<const PropertyMap::mapped_type &> new_e = findEntry( newname );
 		LOG_IF( new_e && ! new_e->empty(), Runtime, warning ) << "Overwriting " << std::make_pair( newname, *new_e ) << " with " << *old_e;
 		fetchEntry( newname ) = *old_e;
 		return remove( oldname );
