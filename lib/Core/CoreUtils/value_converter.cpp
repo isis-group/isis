@@ -165,6 +165,15 @@ template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptim
 			return boost::numeric::cInRange;// ok its fine, lets leave here
 	} catch (boost::bad_lexical_cast &e){}
 
+	// try iso formatted time duration
+	try{
+		const boost::posix_time::time_duration dur=boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(src.c_str());
+		if( !dur.is_not_a_date_time() ){
+			dst=boost::posix_time::ptime(boost::gregorian::date( 1400, 1, 1 ), dur);
+			return boost::numeric::cInRange;// ok its fine, lets leave here
+		}
+	} catch (boost::bad_lexical_cast &e){}
+
 	LOG_IF( dst.is_not_a_date_time(), Runtime, error ) // if its still broken at least tell the user
 			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
