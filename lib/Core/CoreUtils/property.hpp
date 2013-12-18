@@ -78,6 +78,11 @@ public:
 	
 	void reserve(size_t size);
 	void resize( size_t size, const ValueBase& clone );
+	template<typename T> typename boost::enable_if<knowType<T>,ValueBase& >::type set(size_t idx,const T& val){
+		if(size()<=idx)
+			resize(idx,Value<T>());
+		return *container.replace(idx,new Value<T>(val));
+	}
 
 	ValueBase&        operator[]( size_t n );
 	const ValueBase&  operator[]( size_t n ) const;
@@ -109,8 +114,39 @@ public:
 		while(first!=last)
 			push_back(**(++first));
 	}
-	void transfer(iterator at,PropertyValue &ref);
+	/**
+	 * Transfer properties from one PropertyValue into another.
+	 * The transfered data will be inserted at idx.
+	 * The properties in the target will not be removed. Thus the PropertyValue will grow.
+	 * The source will be empty afterwards.
+	 */
+	void transfer(iterator idx,PropertyValue &ref);
+	/**
+	 * Transfer properties from one PropertyValue to another.
+	 * The transfered data will replace the properties in the target.
+	 * The source will be empty afterwards.
+	 */
 	void transfer(PropertyValue &ref);
+
+	/// Transform all contained properties into type T
+	template<typename T> void transform(){
+		PropertyValue ret;
+		bool err=false;
+		BOOST_FOREACH(const ValueBase& ref,container){
+			const ValueBase::Reference erg = ref.copyByID( Value<T>::staticID );
+			if(erg.isEmpty()){
+				err=true;
+				break;
+			} else
+				ret.push_back(*erg);
+		}
+
+		if(err){
+			LOG( Debug, error ) << "Interpretation of " << toString( true ) << " as " << Value<T>::staticName() << " failed. Keeping old type.";
+		} else
+			container.swap(ret.container);
+	}
+	
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.

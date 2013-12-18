@@ -59,7 +59,7 @@ std::string PropertyValue::toString( bool labeled )const
 		const PropertyValue buff=copyByID(Value<std::string>::staticID);
 		std::string ret=listToString(buff.begin(),buff.end(),",","[","]");
 		if(labeled && !isEmpty())
-			ret+="("+getTypeName()+")";
+			ret+="("+getTypeName()+"["+boost::lexical_cast<std::string>(size())+"])";
 		return ret;
 	}
 }
@@ -92,6 +92,14 @@ void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyVal
 		container.transfer(at,ref.container );
 	}
 }
+
+void PropertyValue::transfer(PropertyValue& ref)
+{
+	LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
+	container.clear();
+	container.transfer(begin(),ref.container);
+}
+
 
 
 ValueBase& PropertyValue::at( size_t n ){return container.at(n);}
