@@ -86,7 +86,7 @@ PropertyValue::iterator PropertyValue::insert( iterator at, const ValueBase& ref
 void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyValue& ref)
 {
 	if(ref.isEmpty()){
-		LOG(Debug,warning) << "Not transfering empty Property";
+		LOG(Debug,error) << "Not transfering empty Property";
 	} else {
 		LOG_IF(!isEmpty() && getTypeID()!=ref.getTypeID(),Debug,error) << "Inserting inconsistent type " << MSubject(ref.toString(true)) << " in " << MSubject(*this);
 		container.transfer(at,ref.container );
@@ -95,11 +95,32 @@ void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyVal
 
 void PropertyValue::transfer(PropertyValue& ref)
 {
-	LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
-	container.clear();
-	container.transfer(begin(),ref.container);
+	if(ref.isEmpty()){
+		LOG(Debug,error) << "Not transfering empty Property";
+	} else {
+		LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
+		container.clear();
+		container.swap(ref.container);
+	}
 }
 
+void PropertyValue::transform(uint16_t dstID)
+{
+	PropertyValue ret,err;
+	BOOST_FOREACH(const ValueBase& ref,container){
+		const ValueBase::Reference erg = ref.copyByID( dstID );
+		if(erg.isEmpty()){
+			err=ref;
+			break;
+		} else
+			ret.push_back(*erg);
+	}
+
+	if(!err.isEmpty()){
+		LOG( Debug, error ) << "Interpretation of " << err << " as " << util::getTypeMap(true,false)[dstID] << " failed. Keeping old type.";
+	} else
+		container.swap(ret.container);
+}
 
 
 ValueBase& PropertyValue::at( size_t n ){return container.at(n);}

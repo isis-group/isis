@@ -129,23 +129,8 @@ public:
 	void transfer(PropertyValue &ref);
 
 	/// Transform all contained properties into type T
-	template<typename T> void transform(){
-		PropertyValue ret;
-		bool err=false;
-		BOOST_FOREACH(const ValueBase& ref,container){
-			const ValueBase::Reference erg = ref.copyByID( Value<T>::staticID );
-			if(erg.isEmpty()){
-				err=true;
-				break;
-			} else
-				ret.push_back(*erg);
-		}
-
-		if(err){
-			LOG( Debug, error ) << "Interpretation of " << toString( true ) << " as " << Value<T>::staticName() << " failed. Keeping old type.";
-		} else
-			container.swap(ret.container);
-	}
+	void transform( uint16_t dstID );
+	template<typename T> void transform(){transform(Value<T>::staticID);}
 	
 	/**
 	 * Empty constructor.
