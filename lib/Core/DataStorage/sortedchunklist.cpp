@@ -224,11 +224,13 @@ void SortedChunkList::clear()
 bool SortedChunkList::isRectangular()
 {
 	if( isEmpty() )return true;
-
-	size_t images = getHorizontalSize();
-	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
-		if( outer.second.size() != images )
+	
+	const size_t images = getHorizontalSize();
+	for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
+		if( c->second.size() != images ){
+			LOG(Runtime,warning) << "Found conflicting non geometric depth of " << c->second.size() << " (the first depth was " << images << ") on a width of " << chunks.size();
 			return false;
+		}
 	}
 	return true;
 }

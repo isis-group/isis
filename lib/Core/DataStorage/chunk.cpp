@@ -218,31 +218,37 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 		break;
 	case timeDim :
-		LOG_IF( acquisitionNumberStride == 0, Debug, error ) << "Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail";
+		LOG_IF( acquisitionNumberStride == 0, Runtime, error ) << "Splicing at timeDim without acquisitionNumberStride will very likely make the next reIndex() fail";
 	}
 
 	// prepare some attributes
 	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3();
-
+	const bool acqWasList=propertyValueVec("acquisitionNumber").size()==getDimSize(atDim);
+	const bool originWasList=propertyValueVec("indexOrigin").size()==getDimSize(atDim);
+	
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 
 	std::list<Chunk>::iterator it = ret.begin();
 	it++;// skip the first one
 
-	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them
-		util::fvector3 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector3>();
+	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them @todo API cleanup wehn Value has operators
+		if(!originWasList){
+			util::fvector3 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector3>();
 
-		if( orig == ret.front().getPropertyAs<util::fvector3>( "indexOrigin" ) ) { // fix pos if its the same as for the first
-			LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
-			orig = orig + indexOriginOffset * ( float )cnt;
+			if( orig == ret.front().getPropertyAs<util::fvector3>( "indexOrigin" ) ) { // fix pos if its the same as for the first
+				LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
+				orig = orig + indexOriginOffset * ( float )cnt;
+			}
 		}
 
-		uint32_t &acq = it->propertyValue( "acquisitionNumber" ).castTo<uint32_t>();//@todo acquisitionTime needs to be fixed as well
+		if(!acqWasList && acquisitionNumberStride){
+			util::PropertyValue acqVal = it->propertyValue( "acquisitionNumber" );//@todo acquisitionTime needs to be fixed as well
 
-		if( acq == ret.front().getPropertyAs<uint32_t>( "acquisitionNumber" ) ) {
-			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acq << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
-			acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
+			if( acqVal == ret.front().propertyValue( "acquisitionNumber" ) ) {
+				LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
+				it->setPropertyAs( "acquisitionNumber",acqVal.as<uint32_t>() + acquisitionNumberStride * cnt); //@todo this might cause trouble if we try to insert this chunks into an image
+			}
 		}
 	}
 
@@ -264,17 +270,26 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	const ValueArrayList pointers = this->getValueArrayBase().splice( spliceSize.product() );
 
 	const util::PropertyMap::KeyList lists = this->findLists();
-	size_t list_idx = 0;
+	size_t block_idx = 0;
 
 	//create new Chunks from this ValueArray's
 	BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure this is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); // copy all props into the splices
 		BOOST_FOREACH( const util::PropertyMap::KeyType & key, lists ) { // override list-entries in the splices with their respective entries
-			ret.back().propertyValue( key ) = this->propertyValueAt( key, list_idx );
+			const std::vector<util::PropertyValue> &org=this->propertyValueVec(key);
+			if(org.size()<pointers.size() || org.size()%pointers.size()){
+				LOG(Runtime,warning)
+				<< "Dropping invalid property list " << std::make_pair(key,util::listToString(org.begin(),org.end()))
+				<< " (its length " << org.size() << " doesn't fit the splicing size "<< pointers.size() << ")";
+				ret.back().remove(key);
+			} else {
+				const size_t stride=org.size()/pointers.size();
+				const std::vector< util::PropertyValue >::const_iterator start=org.begin()+block_idx*stride,end=start+stride;
+				ret.back().propertyValueVec( key ) = std::vector<util::PropertyValue>(start,end);
+			}
 		}
-		//      std::cout << static_cast<util::PropertyMap &>( ret.back() ) << std::endl;
-		list_idx++;
+		block_idx++;
 	}
 	return ret;
 }
