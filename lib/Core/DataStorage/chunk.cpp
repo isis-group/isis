@@ -232,7 +232,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	std::list<Chunk>::iterator it = ret.begin();
 	it++;// skip the first one
 
-	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them @todo API cleanup wehn Value has operators
+	for( uint32_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them @todo API cleanup wehn Value has operators
 		if(!originWasList){
 			util::fvector3 &orig = it->propertyValue( "indexOrigin" ).castTo<util::fvector3>();
 
@@ -247,7 +247,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 			if( acqVal == ret.front().propertyValue( "acquisitionNumber" ) ) {
 				LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
-				it->setPropertyAs( "acquisitionNumber",acqVal.as<uint32_t>() + acquisitionNumberStride * cnt); //@todo this might cause trouble if we try to insert this chunks into an image
+				it->setPropertyAs<uint32_t>( "acquisitionNumber",acqVal.as<uint32_t>() + acquisitionNumberStride * cnt); //@todo this might cause trouble if we try to insert this chunks into an image
 			}
 		}
 	}
