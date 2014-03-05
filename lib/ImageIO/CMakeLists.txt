@@ -34,9 +34,9 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 # NIFTI plugin
 ############################################################
 if(ISIS_IOPLUGIN_NIFTI_SA)
-  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
-  target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
-  set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
+	add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp imageFormat_nifti_dcmstack.cpp )
+	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
+	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
 ############################################################
@@ -149,12 +149,26 @@ endif(ISIS_IOPLUGIN_PNG)
 ############################################################
 if(ISIS_IOPLUGIN_COMP)
   find_package(Boost REQUIRED COMPONENTS iostreams)
-  add_library(isisImageFormat_comp_proxy SHARED imageFormat_compressed.cpp)
+
+  option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
   find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
-  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+  list(APPEND COMP_LIBS ${LIB_Z} ${LIB_BZ2})
+  list(APPEND COMP_SRC imageFormat_compressed.cpp)
+
+  if(ISIS_IOPLUGIN_COMP_LZMA)
+	find_library(LIB_LZMA "lzma")
+	find_path(INCPATH_LZMA "lzma.h")
+	include_directories(${INCPATH_LZMA})
+	add_definitions("-DHAVE_LZMA")
+	list(APPEND COMP_LIBS ${LIB_LZMA})
+	list(APPEND COMP_SRC imageFormat_compressed_lzma.cpp)
+  endif(ISIS_IOPLUGIN_COMP_LZMA)
+  
+  add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${COMP_LIBS})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 

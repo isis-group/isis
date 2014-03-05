@@ -19,7 +19,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 
 #include "io_interface.h"
@@ -43,6 +43,9 @@ public:
 
 private:
 	boost::shared_ptr<util::ProgressFeedback> m_feedback;
+	// use ImageIO's logging here instead of the normal data::Runtime/Debug
+	typedef ImageIoLog Runtime;
+	typedef ImageIoDebug Debug;
 public:
 	/**
 	 * Load data from a set of files or directories with given paths and dialect.

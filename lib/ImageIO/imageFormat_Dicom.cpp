@@ -293,8 +293,8 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
 		object.setPropertyAs( "indexOrigin", dicomTree.getPropertyAs<util::fvector3>( "ImagePositionPatient" ) );
-	} else if( object.hasProperty( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
-		util::fvector3 orig( 0, 0, object.getPropertyAs<float>( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
+	} else if( object.hasProperty( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
+		util::fvector3 orig( 0, 0, object.getPropertyAs<float>( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
 		LOG( Runtime, info ) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
 		object.setPropertyAs( "indexOrigin", orig );
 	} else {
@@ -419,12 +419,16 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		NumberOfImagesInMosaicProp = prefix + "SiemensNumberOfImagesInMosaic";
 	} else if ( source.hasProperty( prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic";
-	} else {
-		FileFormat::throwGenericError( "Could not determine the number of images in the mosaic" );
 	}
 
 	// All is fine, lets start
-	uint16_t images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
+	uint16_t images;
+	if(NumberOfImagesInMosaicProp.empty()){
+		images = source.getSizeAsVector()[0]/ source.getPropertyAs<util::ilist>( prefix+"AcquisitionMatrix" ).front();
+		images*=images;
+		LOG(Debug,warning) << "Guessing number of slices in the mosaic as " << images << ". This might be to many";
+	} else
+		images = source.getPropertyAs<uint16_t>( NumberOfImagesInMosaicProp );
 	const util::vector4<size_t> tSize = source.getSizeAsVector();
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
 	const util::vector3<size_t> size( tSize[0] / matrixSize, tSize[1] / matrixSize, images );

@@ -127,11 +127,7 @@ protected:
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	/// create a list of keys for every entry for which the given scalar predicate is true.
-	template<class Predicate> const KeyList genKeyList()const {
-		KeyList k;
-		std::for_each( begin(), end(), walkTree<Predicate>( k ) );
-		return k;
-	}
+	template<class Predicate> const KeyList genKeyList()const;
 	/**
 	 * Adds a property with status needed.
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
@@ -472,9 +468,9 @@ public:
 		m_branch = ref.m_branch;
 		m_leaf.resize( ref.m_leaf.size() );
 		std::vector<PropertyValue>::iterator dst = m_leaf.begin();
+		const bool needed = dst->isNeeded();
 		BOOST_FOREACH( std::vector<PropertyValue>::const_reference src, ref.m_leaf ) {
-			const bool needed = dst->isNeeded();
-			( *dst = src ).needed() = needed;;
+			( *(dst++) = src ).needed() = needed;;
 		}
 	}
 	std::string toString()const {
@@ -524,6 +520,13 @@ template<typename T> T PropertyMap::getPropertyAs( const PropPath &path ) const
 
 	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << path << " does not exist";
 	return T();
+}
+
+/// create a list of keys for every entry for which the given scalar predicate is true.
+template<class Predicate> const PropertyMap::KeyList PropertyMap::genKeyList()const {
+    KeyList k;
+    std::for_each( begin(), end(), walkTree<Predicate>( k ) );
+    return k;
 }
 
 }

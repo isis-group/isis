@@ -44,6 +44,7 @@ template <typename S> void arrayToVecProp( S *array, util::PropertyMap &dest, co
 	else arrayToVecPropImp<S, util::vector4<S> >( array, dest, name, len );
 }
 
+template<typename T> bool noLatin( const T &t ) {return t >= 127;}
 }
 
 
@@ -108,7 +109,7 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
 void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	//@todo if we drop support for old yyyy.mm.dd this would be much easier
-	boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
+	static const boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
 	boost::cmatch results;
 	OFString buff;
 	elem->getOFString( buff, 0 );
@@ -154,33 +155,20 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 	boost::posix_time::time_duration time;
 	elem->getOFString( buff, 0 );
 
-	// Insert the ":" -- make it hh:mm:ss.frac
-	if ( buff.at( 2 ) != ':' ) {
-		buff.insert( 2, 1, ':' );
-		shift++;
-	}
-
-	if ( ( buff.size() > size_t( 4 + shift ) ) && ( buff.at( 4 + shift ) != ':' ) ) {
-		buff.insert( 4 + shift, 1, ':' );
-		shift++;
-	}
-
-	//Try standard-parser for hh:mm:ss.frac
+	//Try iso-parser (hhmmss.frac)
 	try {
-		time = boost::posix_time::duration_from_string( buff.c_str() );
+		time = boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(buff.c_str());
 		ok = not time.is_not_a_date_time();
 	} catch ( std::logic_error e ) {
 		ok = false;
 	}
 
 	if ( ok ) {
-		LOG( Debug, verbose_info )
-				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
+		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map.propertyValue( name ) = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
-		LOG( Runtime, warning )
-				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -259,12 +247,29 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
 	}
 	break;
+	case EVR_UN: { //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
+		//@todo do a better sanity check
+		Uint8 *buff;
+		elem->getUint8Array( buff ); // get the raw data
+		Uint32 len = elem->getLength();
+		const size_t nonLat = std::count_if( buff, buff + len, _internal::noLatin<Uint8> );
+
+		if( nonLat ) { // if its not "just text" encode it as base256
+			LOG( Runtime, info ) << "Using " << len << " bytes from " << name << "("
+								 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << ") as base256 because there are "
+								 << nonLat << " non latin characters in it";
+			std::stringstream o;
+			std::copy( buff, buff + len, std::ostream_iterator<Uint16>( o << std::hex ) );
+			map.setPropertyAs<std::string>( name, o.str() ); //stuff it into a string
+		} else
+			map.setPropertyAs<std::string>( name, std::string( ( char * )buff, len ) ); //stuff it into a string
+	}
+	break;
 	default: {
 		elem->getOFString( buff, 0 );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
+		LOG( Runtime, notice ) << "Implement me " << name << "("
+							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
+							   << buff;
 	}
 	break;
 	}
@@ -327,10 +332,10 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_PN:
 	default: {
 		elem->getOFStringArray( buff );
-		LOG( Runtime, info ) << "Implement me "
-							 << name << "("
-							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							 << buff;
+		LOG( Runtime, notice ) << "Implement me "
+							   << name << "("
+							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
+							   << buff;
 	}
 	break;
 	}
@@ -431,7 +436,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
 	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<uint32_t>( val );
-	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
+	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "UT" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );

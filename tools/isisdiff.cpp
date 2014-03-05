@@ -90,6 +90,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 {
 	bool ret = false;
 	util::PropertyMap::DiffMap diff = img1.getDifference( img2 );
+	diff.erase( "source" ); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
 	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
 	}
@@ -207,7 +208,7 @@ int main( int argc, char *argv[] )
 		boost::filesystem::path sPath2 = ( src2.size() == 1 ) ? src2.front() : getCommonSource( images2 );
 
 
-		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << sPath1.file_string() << "\" and " << images2.size() << " from \"" << sPath2.file_string() << "\"";
+		LOG( DiffLog, notice ) << "Comparing " << images1.size() << " images from \"" << sPath1 << "\" and " << images2.size() << " from \"" << sPath2 << "\"";
 
 		for (
 			std::list< data::Image >::iterator first = images1.begin();

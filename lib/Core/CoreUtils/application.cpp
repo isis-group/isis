@@ -64,7 +64,7 @@ void Application::addLoggingParameter( std::string name )
 }
 void Application::removeLogging( std::string name )
 {
-	parameters.erase( name );
+	parameters.erase( std::string( "d" ) + name );
 	logs.erase( name );
 }
 
@@ -77,7 +77,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
 	bool err = false;
-	m_filename = boost::filesystem::path( argv[0] ).leaf();//@todo switch to filename() as soon as we drop support for boost < 1.44
+	m_filename=argv[0];
 
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
@@ -163,7 +163,7 @@ void Application::printHelp( bool withHidden )const
 		std::cout << "Examples:" << std::endl;
 
 		BOOST_FOREACH( example_type ex, m_examples ) {
-			std::cout << '\t' << m_filename + " " + ex.first << '\t' << ex.second << std::endl;
+			std::cout << '\t' << m_filename << " " << ex.first << '\t' << ex.second << std::endl;
 		}
 	}
 }
