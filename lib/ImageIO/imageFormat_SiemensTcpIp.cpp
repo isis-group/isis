@@ -355,9 +355,9 @@ namespace isis
                                     util::fvector3 columnVec(read_vec  * util::fvector3(-1, 1, 1));// ATTENTION HAS TO BE PHASE
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_read) / static_cast<float>(width_slice), static_cast<float>(fov_phase) / static_cast<float>(height_slice), slice_thickness ) );
                                     
-                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2.0)) + (columnVec*(fov_phase/2.0));
                                     
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2] - offsetCorr[2]));
                                 } else {
@@ -366,8 +366,8 @@ namespace isis
                                     util::fvector3 columnVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec);
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec);
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
-                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_phase) / static_cast<float>(width_slice), static_cast<float>(fov_read) / static_cast<float>(height_slice), slice_thickness ) );
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2.0)) + (columnVec*(fov_read/2.0));
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0] - offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] - offsetCorr[2]) );
                                    
                                 }}
@@ -378,8 +378,8 @@ namespace isis
                                     util::fvector3 columnVec(read_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE PHASE
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec",  rowVec  );
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read/width_slice, fov_phase/height_slice, slice_thickness) );
-                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_read)/static_cast<float>(width_slice), static_cast<float>(fov_phase)/static_cast<float>(height_slice), slice_thickness) );
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2.0)) + (columnVec*(fov_phase/2.0));
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] -offsetCorr[2]));
                                                                                                           
                                 } else {
@@ -387,8 +387,8 @@ namespace isis
                                     util::fvector3 columnVec(phase_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE READ
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec  );
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase/width_slice, fov_read/height_slice, slice_thickness));
-                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_phase)/static_cast<float>(width_slice), static_cast<float>(fov_read)/static_cast<float>(height_slice), slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2.0)) + (columnVec*(fov_read/2.0));
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1] - offsetCorr[1], slice_pos_min[2] -offsetCorr[2] ) );
                                   
                                 }}
@@ -400,8 +400,8 @@ namespace isis
                                     util::fvector3 columnVec(read_vec  * util::fvector3(-1, -1, -1));// ATTENTION HAS TO BE PHASE
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec",  rowVec);
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec); 
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read/width_slice, fov_phase/height_slice, slice_thickness));
-                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2)) + (columnVec*(fov_phase/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_read)/static_cast<float>(width_slice), static_cast<float>(fov_phase)/static_cast<float>(height_slice), slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_read/2.0)) + (columnVec*(fov_phase/2.0));
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2]-offsetCorr[2]));
                                     
                                  } else {
@@ -410,8 +410,8 @@ namespace isis
                                     util::fvector3 columnVec(phase_vec  * util::fvector3(1, 1, 1));// ATTENTION HAS TO BE READ
                                     myChunk.setPropertyAs<util::fvector3>( "columnVec", columnVec);
                                     myChunk.setPropertyAs<util::fvector3>( "rowVec", rowVec);
-                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase/width_slice, fov_read/height_slice, slice_thickness));
-                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2)) + (columnVec*(fov_read/2));
+                                    myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( static_cast<float>(fov_phase)/static_cast<float>(width_slice), static_cast<float>(fov_read)/static_cast<float>(height_slice), slice_thickness));
+                                    util::fvector3 offsetCorr = (rowVec*(fov_phase/2.0)) + (columnVec*(fov_read/2.0));
                                     myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( slice_pos_min[0]-offsetCorr[0], slice_pos_min[1]-offsetCorr[1], slice_pos_min[2]-offsetCorr[2]));
                                      
                                 }}
