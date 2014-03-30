@@ -205,8 +205,9 @@ public:
 		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( 0, 0, 1, 0 ),
 		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( 0, 0, 0, 1 )
 	) {
+        typedef typename FixedVector<TYPE2, 4>::container_type container_type;
 		const vector4<TYPE2> src[4] = {row1, row2, row3, row4};
-		FixedMatrix<TYPE, 4, 4>::copyFrom( src );
+		this->template copyFrom<TYPE2,container_type>( src );
 	}
 };
 
@@ -224,8 +225,9 @@ public:
 		const FixedVector<TYPE2, 3> &row2,
 		const FixedVector<TYPE2, 3> &row3 = vector3<TYPE2>( 0, 0, 1 )
 	) {
+        typedef typename FixedVector<TYPE2, 3>::container_type container_type;
 		const vector3<TYPE2> src[3] = {row1, row2, row3};
-		FixedMatrix<TYPE, 3, 3>::copyFrom( src );
+		this->template copyFrom<TYPE2,container_type>( src );
 	}
 };
 
