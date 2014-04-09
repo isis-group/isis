@@ -49,12 +49,9 @@ public:
 	template<typename T> explicit PropertyValue( const T &ref, bool _needed = false ):m_needed( _needed ),container(1) {
 		container.push_back(new Value<T>( ref ));
 	}
-	/**
-	 * Default constructor.
-	 * Creates a property and stores the given single value object.
-	 */
+	/// Create a property and store the given single value object.
 	template<typename T> PropertyValue( const Value<T> &ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref );}
-	/// \copydoc PropertyValue::PropertyValue(const Value&,bool)
+	/// Create a property and store the given single value object.
 	PropertyValue( const ValueBase& ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref);}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -126,7 +123,10 @@ public:
 	 * The transfered data will replace the properties in the target.
 	 * The source will be empty afterwards.
 	 */
-	void transfer(PropertyValue &ref);
+	void transfer(PropertyValue &src);
+
+	/// Swap properties from one PropertyValue with another.
+	void swap(PropertyValue &src);
 
 	/// Transform all contained properties into type T
 	void transform( uint16_t dstID );
@@ -371,6 +371,7 @@ namespace std
 	{
 		return out<<s.toString(true);
 	}
+	template<> void swap<isis::util::PropertyValue>(isis::util::PropertyValue &a,isis::util::PropertyValue &b);
 }
 #endif
 

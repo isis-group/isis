@@ -100,8 +100,12 @@ void PropertyValue::transfer(PropertyValue& ref)
 	} else {
 		LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
 		container.clear();
-		container.swap(ref.container);
+		swap(ref);
 	}
+}
+void PropertyValue::swap(PropertyValue& ref)
+{
+	container.swap(ref.container);
 }
 
 void PropertyValue::transform(uint16_t dstID)
@@ -257,4 +261,8 @@ bool PropertyValue::lt( const PropertyValue& ref ) const{
 
 
 }
+}
+
+namespace std{
+template<> void swap< isis::util::PropertyValue >(isis::util::PropertyValue& a, isis::util::PropertyValue& b){a.swap(b);}
 }
