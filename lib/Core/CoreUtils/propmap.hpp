@@ -300,7 +300,7 @@ protected:
 	void addNeeded( const PropPath &path );
 
 	/**
-	 * Get remove properties from another tree that are in both, but not equal
+	 * Remove properties from another tree that are in both, but not equal
 	 * For every entry of the tree this checks if it is also in the given other tree and removes it there if its not equal.
 	 * This is done by:
 	 * - generating a difference (using diff) between the current common and the tree
