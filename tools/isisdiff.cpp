@@ -33,7 +33,7 @@ std::pair<std::string, int>  parseFilename( std::string name )
 
 bool hasSameProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
 {
-	return ( !img.hasProperty( pname ) && pval.isEmpty() ) || img.propertyValue( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
+	return ( !img.hasProperty( pname ) && pval.isEmpty() ) || img.property( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
 }
 bool hasDifferentProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
 {
@@ -57,7 +57,7 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 {
 	//first time org is empty - images is full
 	const util::PropertyMap::PropPath propPath( propName );
-	util::PropertyValue propval = reference.propertyValue( propPath );
+	util::PropertyValue propval = reference.property( propPath );
 
 	//now move all with different prop back into org
 	for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
@@ -70,7 +70,7 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 
 	LOG( DiffLog, info )
 			<< images.size() << " candidates left for " << reference.identify() << ", "
-			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.propertyValue( propPath );
+			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.property( propPath );
 	return images.size();
 }
 

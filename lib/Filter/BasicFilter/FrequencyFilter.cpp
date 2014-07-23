@@ -35,7 +35,7 @@ bool FrequencyFilter::process ( data::Image &image )
 
 	if( parameters["repetitionTime"].isEmpty() ) {
 		if( image.hasProperty( "repetitionTime" ) ) {
-			repTime = image.getPropertyAs<uint16_t>( "repetitionTime" );
+			repTime = image.getValueAs<uint16_t>( "repetitionTime" );
 		} else {
 			LOG( Runtime, error ) << "Parameter \"repetitionTime\" is not set. Abort.";
 			return false;

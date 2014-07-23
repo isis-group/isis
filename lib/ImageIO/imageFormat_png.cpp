@@ -207,29 +207,29 @@ public:
 			float slice;
 
 			if( extractNumberFromName<uint32_t>( filename, slice ) ) {
-				ch.setPropertyAs<uint32_t>( "acquisitionNumber", slice );
-				ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
-				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.propertyValue( "acquisitionNumber" )
-									 << " and slice position " <<  ch.propertyValue( "indexOrigin" ) <<  " from filename";
+				ch.setValueAs<uint32_t>( "acquisitionNumber", slice );
+				ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" )
+									 << " and slice position " <<  ch.property( "indexOrigin" ) <<  " from filename";
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
 			}
 		} else {
-			if( extractNumberFromName<uint32_t>( filename, ch.propertyValue( "acquisitionNumber" ) ) ) {
-				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.propertyValue( "acquisitionNumber" ) << " from filename";
+			if( extractNumberFromName<uint32_t>( filename, ch.property( "acquisitionNumber" ) ) ) {
+				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" ) << " from filename";
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,indexOrigin,rowVec and voxelSize";
 			} else {
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
-				ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+				ch.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 			}
 
-			ch.setPropertyAs( "indexOrigin", util::fvector3( ) );
+			ch.setValueAs( "indexOrigin", util::fvector3( ) );
 		}
 
 
-		ch.setPropertyAs( "sequenceNumber", ( uint16_t )1 );
-		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		ch.setValueAs( "sequenceNumber", ( uint16_t )1 );
+		ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+		ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 		chunks.push_back( ch );
 		return 0;
 	}

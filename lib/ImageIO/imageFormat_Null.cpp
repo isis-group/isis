@@ -20,14 +20,14 @@ class ImageFormat_Null: public FileFormat
 			for ( uint32_t s = 0; s < size; s++ ) {
 
 				data::MemChunk<uint8_t> ch( size, size );
-				ch.setPropertyAs( "indexOrigin", util::fvector3( 0, -150 / 2, s * 110. / size - 100 / 2 ) ); //don't use s*100./size-100/2 because we want a small gap
-				ch.setPropertyAs<uint16_t>( "sequenceNumber", sequence );
-				ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setPropertyAs( "rowVec",    util::fvector3(  cos( M_PI / 8 ), -sin( M_PI / 8 ) ) ); //rotated by pi/8
-				ch.setPropertyAs( "columnVec", util::fvector3(  sin( M_PI / 8 ),  cos( M_PI / 8 ) ) ); // @todo also rotate the sliceVec
-				ch.setPropertyAs( "voxelSize", util::fvector3( 150. / size, 150. / size, 100. / size ) );
-				ch.setPropertyAs<uint16_t>( "repetitionTime", 1234 );
-				ch.setPropertyAs( "sequenceDescription", desc );
+				ch.setValueAs( "indexOrigin", util::fvector3( 0, -150 / 2, s * 110. / size - 100 / 2 ) ); //don't use s*100./size-100/2 because we want a small gap
+				ch.setValueAs<uint16_t>( "sequenceNumber", sequence );
+				ch.setValueAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
+				ch.setValueAs( "rowVec",    util::fvector3(  cos( M_PI / 8 ), -sin( M_PI / 8 ) ) ); //rotated by pi/8
+				ch.setValueAs( "columnVec", util::fvector3(  sin( M_PI / 8 ),  cos( M_PI / 8 ) ) ); // @todo also rotate the sliceVec
+				ch.setValueAs( "voxelSize", util::fvector3( 150. / size, 150. / size, 100. / size ) );
+				ch.setValueAs<uint16_t>( "repetitionTime", 1234 );
+				ch.setValueAs( "sequenceDescription", desc );
 
 				for ( int x = 10; x < 40; x++ )
 					for ( int y = 10; y < 40; y++ )
@@ -67,7 +67,7 @@ public:
 		std::list<data::Chunk> ret = makeImage( size, 0, "normal sequencial Image" );
 		uint32_t s = 0;
 		BOOST_FOREACH( data::Chunk & ref, ret ) {
-			ref.setPropertyAs<uint32_t>( "acquisitionNumber", s++ );
+			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 		}
 		chunks.insert( chunks.end(), ret.begin(), ret.end() );
 
@@ -78,12 +78,12 @@ public:
 		for ( size_t t = 0; t < timesteps; t++ ) {
 			//even numbers
 			for ( uint32_t a = 0; a < ( size / 2. ); a++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
-				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", a * 2 + t * size );
+				( ch++ )->setValueAs<uint32_t>( "acquisitionNumber", a * 2 + t * size );
 			}
 
 			//uneven numbers
 			for ( uint32_t a = 0; a < ( size / 2 ); a++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
-				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", a * 2 + 1 + t * size );
+				( ch++ )->setValueAs<uint32_t>( "acquisitionNumber", a * 2 + 1 + t * size );
 			}
 		}
 
@@ -107,11 +107,11 @@ public:
 		std::list< data::Chunk >::iterator iCh;
 		uint32_t s = 0;
 
-		switch( image.getPropertyAs<int>( "sequenceNumber" ) ) {
+		switch( image.getValueAs<int>( "sequenceNumber" ) ) {
 		case 0: //image 0 is a "normal" image
 			newChunks = makeImage( size, 0, "normal sequencial Image" );
 			BOOST_FOREACH( data::Chunk & ref, newChunks ) {
-				ref.setPropertyAs<uint32_t>( "acquisitionNumber", s++ );
+				ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 			}
 			break;
 		case 1: //image 1 is a "interleaved" image
@@ -121,12 +121,12 @@ public:
 			for ( uint32_t t = 0; t < timesteps; t++ ) {
 				//even numbers
 				for ( uint32_t s = 0; s < ( size / 2. ); s++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
-					( iCh++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + t * size );
+					( iCh++ )->setValueAs<uint32_t>( "acquisitionNumber", s * 2 + t * size );
 				}
 
 				//uneven numbers
 				for ( uint32_t s = 0; s < ( size / 2 ); s++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
-					( iCh++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + 1 + t * size );
+					( iCh++ )->setValueAs<uint32_t>( "acquisitionNumber", s * 2 + 1 + t * size );
 				}
 			}
 
@@ -144,8 +144,8 @@ public:
 		for( size_t i = 0; i < oldChunks.size(); ++i, ++newCH ) {
 			// check for the orientation seperately
 			if(
-				newCH->getPropertyAs<util::fvector3>( "columnVec" ).fuzzyEqual( oldChunks[i].getPropertyAs<util::fvector3>( "columnVec" ) ) == false ||
-				newCH->getPropertyAs<util::fvector3>( "rowVec" ).fuzzyEqual( oldChunks[i].getPropertyAs<util::fvector3>( "rowVec" ) ) == false
+				newCH->getValueAs<util::fvector3>( "columnVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "columnVec" ) ) == false ||
+				newCH->getValueAs<util::fvector3>( "rowVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "rowVec" ) ) == false
 			) {
 				throwGenericError( "orientation is not equal" );
 			} else {

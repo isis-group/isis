@@ -200,9 +200,9 @@ public:
 protected:
 	util::istring suffixes( io_modes mode = both )const;
 	void sanitise( data::Chunk &ch );
-	template <typename T> void transformIfNotSet( const util::PropertyMap::KeyType &from, const util::PropertyMap::KeyType &to, data::Chunk &object, LogLevel level ) {
+	template <typename T> void transformIfNotSet( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, data::Chunk &object, LogLevel level ) {
 		if( !object.hasProperty( to ) ) {
-			LOG( Debug, info ) << "Using " << std::make_pair( from, object.propertyValue( from ) ) << " for " << to << " because it's not set yet";
+			LOG( Debug, info ) << "Using " << std::make_pair( from, object.property( from ) ) << " for " << to << " because it's not set yet";
 			transformOrTell<T>( from, to, object, level );
 		}
 	}

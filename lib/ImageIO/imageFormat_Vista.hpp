@@ -143,7 +143,7 @@ private:
 					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( x, y, z ) );
+					chunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( x, y, z ) );
 					continue;
 				}
 
@@ -157,49 +157,49 @@ private:
 				if( ( strcmp( name, "orientation" ) == 0 ) && ( ! chunk.hasProperty( "rowVec" ) ) ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					//TODO remove "orientation" in Vista group
-					chunk.setPropertyAs<std::string>( propname, std::string( ( VString )val ) );
+					chunk.setValueAs<std::string>( propname, std::string( ( VString )val ) );
 
 					if( functional ) {
 						// axial is the reference
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( 0, 1, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
 							continue;
 						}
 					} else {
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( -1, 0, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, -1 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( -1, 0, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 0, 0, -1 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( 0, 1, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( 0, 1, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 1, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-							chunk.setPropertyAs( "columnVec", util::fvector3( 0, 0, 1 ) );
-							chunk.setPropertyAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
+							chunk.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+							chunk.setValueAs( "columnVec", util::fvector3( 0, 0, 1 ) );
+							chunk.setValueAs( "sliceVec", util::fvector3( 0, -1, 0 ) );
 							continue;
 						}
 					}
@@ -217,7 +217,7 @@ private:
 					std::stringstream sstr( repTime );
 					uint16_t repTimeInt;
 					sstr >> repTimeInt;
-					chunk.setPropertyAs<uint16_t>( "repetitionTime", repTimeInt );
+					chunk.setValueAs<uint16_t>( "repetitionTime", repTimeInt );
 					continue;
 				}
 
@@ -227,7 +227,7 @@ private:
 					std::stringstream sstr( slice_time );
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
-					chunk.setPropertyAs<float>( "acquisitionTime",  sliceTimeFloat  );
+					chunk.setValueAs<float>( "acquisitionTime",  sliceTimeFloat  );
 					continue;
 				}
 
@@ -247,7 +247,7 @@ private:
 						genderSelection.set( "other" );
 					}
 
-					chunk.setPropertyAs<util::Selection>( "subjectGender", genderSelection );
+					chunk.setValueAs<util::Selection>( "subjectGender", genderSelection );
 					continue;
 				}
 
@@ -255,7 +255,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					std::string subjectName = std::string ( ( VString ) val );
 					subjectName.resize( 4 );
-					chunk.setPropertyAs<std::string>( "subjectName", subjectName );
+					chunk.setValueAs<std::string>( "subjectName", subjectName );
 					continue;
 				}
 
@@ -265,7 +265,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					rowVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector3>( "rowVec", rowVec );
+					chunk.setValueAs<util::fvector3>( "rowVec", rowVec );
 					continue;
 				}
 
@@ -275,7 +275,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					columnVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector3>( "columnVec", columnVec );
+					chunk.setValueAs<util::fvector3>( "columnVec", columnVec );
 					continue;
 				}
 
@@ -285,7 +285,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector3>( "sliceVec", sliceVec );
+					chunk.setValueAs<util::fvector3>( "sliceVec", sliceVec );
 					continue;
 				}
 
@@ -295,7 +295,7 @@ private:
 					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3( x, y, z ) );
+					chunk.setValueAs<util::fvector3>( "indexOrigin", util::fvector3( x, y, z ) );
 					continue;
 				}
 
@@ -317,7 +317,7 @@ private:
 					std::stringstream sstr( echoTimeStr );
 					float echoTime;
 					sstr >> echoTime;
-					chunk.setPropertyAs<float>( "echoTime", echoTime );
+					chunk.setValueAs<float>( "echoTime", echoTime );
 					continue;
 				}
 
@@ -327,13 +327,13 @@ private:
 					std::stringstream sstr( flipAngleStr );
 					uint16_t flipAngle;
 					sstr >> flipAngle;
-					chunk.setPropertyAs<float>( "flipAngle", flipAngle );
+					chunk.setValueAs<float>( "flipAngle", flipAngle );
 					continue;
 				}
 
 				if( strcmp( name, "transmitCoil" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setPropertyAs<std::string>( "transmitCoil", std::string( ( VString )val ) );
+					chunk.setValueAs<std::string>( "transmitCoil", std::string( ( VString )val ) );
 					continue;
 				}
 
@@ -344,7 +344,7 @@ private:
 					// rounding: floor or ceil
 					age = ( ( age * 365.2425 ) - floor( age * 365.2425 ) ) < 0.5 ?
 						  floor( age * 365.2425 ) : ceil( age * 365.2425 );
-					chunk.setPropertyAs<uint16_t>( "subjectAge", age );
+					chunk.setValueAs<uint16_t>( "subjectAge", age );
 					continue;
 				}
 
@@ -373,7 +373,7 @@ private:
 					break;
 				case VStringRepn:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setPropertyAs<std::string>( propname, std::string( ( VString )val ) );
+					chunk.setValueAs<std::string>( propname, std::string( ( VString )val ) );
 					break;
 				default:
 					std::cout << "unknown attribute representation found" << std::endl;
@@ -439,24 +439,24 @@ private:
 					}
 				}
 				boost::posix_time::ptime isisTime( isisDate, isisTimeDuration );
-				chunk.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", isisTime );
+				chunk.setValueAs<boost::posix_time::ptime>( "sequenceStart", isisTime );
 			}
 
 			//if not set yet, set row, column and slice vector.
 			// DEFAULT: axial
 			if( !chunk.hasProperty( "rowVec" ) ) {
-				chunk.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-				chunk.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-				chunk.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+				chunk.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+				chunk.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+				chunk.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 			}
 
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
-			chunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3( 0, 0, 0 ) );
+			chunk.setValueAs<util::fvector3>( "voxelGap", util::fvector3( 0, 0, 0 ) );
 
 			// set acquisitionNumber. This values is always missing
 			if( !chunk.hasProperty( "acquisitionNumber" ) )
-				chunk.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+				chunk.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 
 			LOG( DataLog, verbose_info ) << "finished copying header";
 		}

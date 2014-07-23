@@ -101,7 +101,7 @@ public:
 	std::vector<boost::shared_ptr<Chunk> > getLookup();
 
 	/**
-	 * Get the list of primary the different lengths of the primary sorted "columns".
+	 * Get the list of the different lengths of the primary sorted "columns".
 	 * This list should only hold one value if the amount of secondary sorted entries is equal across all primary entries. Which it is in a consistent dataset.
 	 * \returns a one element set with the amount of secondary sorted entries across all primary entries if image is consistent
 	 * \returns a set with the different amounts of secondary sorted entries across all primary entries otherwise

@@ -93,7 +93,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 
 	if( ch.hasProperty( propName ) ) {
 		//check, if there is already a chunk
-		boost::shared_ptr<Chunk> &pos = map[ch.propertyValue( propName )];
+		boost::shared_ptr<Chunk> &pos = map[ch.property( propName )];
 		bool inserted = false;
 
 		//if not. put oures there
@@ -116,16 +116,16 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector3 &origin = ch.propertyValue( indexOriginProb ).castTo<util::fvector3>();
+	const util::fvector3 &origin = ch.property( indexOriginProb ).castTo<util::fvector3>();
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector3 &rowVec = ch.propertyValue( rowVecProb ).castTo<util::fvector3>();
-	const util::fvector3 &columnVec = ch.propertyValue( columnVecProb ).castTo<util::fvector3>();
+	const util::fvector3 &rowVec = ch.property( rowVecProb ).castTo<util::fvector3>();
+	const util::fvector3 &columnVec = ch.property( columnVecProb ).castTo<util::fvector3>();
 	const util::fvector3 sliceVec = ch.hasProperty( sliceVecProb ) ?
-									ch.propertyValue( sliceVecProb ).castTo<util::fvector3>() :
+									ch.property( sliceVecProb ).castTo<util::fvector3>() :
 									util::fvector3(
 										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
@@ -164,10 +164,10 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 		BOOST_FOREACH( util::PropertyMap::PropPath & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
-			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
+			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.property( ref ) != ch.property( ref ) ) {
 				LOG( Debug, verbose_info )
-						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.propertyValue( ref ) )
-						<< " but chunks already in the list have " << util::MSubject( first.propertyValue( ref ) );
+						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.property( ref ) )
+						<< " but chunks already in the list have " << util::MSubject( first.property( ref ) );
 				return false;
 			}
 		}
@@ -201,15 +201,15 @@ bool SortedChunkList::insert( const Chunk &ch )
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
-			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
-			<< std::make_pair( prop2, ch.propertyValue( prop2 ) );
+			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.property( "indexOrigin" ) << ") with the equal property "
+			<< std::make_pair( prop2, ch.property( prop2 ) );
 
 	LOG_IF(
 		inserted.first && !inserted.second &&
 		ch.hasProperty( "source" ) && inserted.first->hasProperty( "source" ) &&
-		!( ch.propertyValue( "source" ) == inserted.first->propertyValue( "source" ) ),
+		!( ch.property( "source" ) == inserted.first->property( "source" ) ),
 		Debug, verbose_info )
-			<< "The conflicting chunks where " << ch.propertyValue( "source" ).toString( false ) << " and " << inserted.first->propertyValue( "source" ).toString( false );
+			<< "The conflicting chunks where " << ch.property( "source" ).toString( false ) << " and " << inserted.first->property( "source" ).toString( false );
 
 	return inserted.second;
 }
@@ -239,13 +239,13 @@ std::set<size_t> SortedChunkList::getShape()
 
 size_t SortedChunkList::makeRectangular()
 {
-	const std::set<size_t> images = getShape();
+	const std::set<size_t> images = getShape();//get lenghts of all primary sorted "columns" -- as set is sorted the smallest will be at begin
 	size_t dropped = 0;
 
-	if( images.size() > 1 ) {
-		if( chunks.begin()->second.begin()->second->getRelevantDims() > columnDim ) {
+	if( images.size() > 1 ) { //cut down everything else if there is some
+		if( chunks.begin()->second.begin()->second->getRelevantDims() >= 4 ) {
+			#warning test me
 			size_t resize = *images.rbegin();
-			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes to make image rectagular";
 
 			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); ) {
 				if( c->second.size() != resize ) {
@@ -254,17 +254,19 @@ size_t SortedChunkList::makeRectangular()
 				} else
 					c++;
 			}
+			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes (" << dropped << ") to make image rectagular";
+
 		} else {
 			size_t resize = *images.begin();
 
-			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); c++ ) {
+			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); c++ ) { // in every "column"
 				SecondaryMap &it = c->second;
 
-				if( it.size() > resize ) {
+				if( it.size() > resize ) { //remove everything behind the shortest length
 					dropped += it.size() - resize;
-					SecondaryMap::iterator firstvalid = it.begin();
-					std::advance( firstvalid, resize );
-					it.erase( firstvalid, it.end() );
+					SecondaryMap::iterator firstinvalid = it.begin();
+					std::advance( firstinvalid, resize );
+					it.erase( firstinvalid, it.end() );
 				}
 
 				assert( it.size() == resize );

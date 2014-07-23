@@ -222,9 +222,9 @@ public:
 
 					// set all the general properties - i.e. feed the generated chunk with metadata
 
-					myChunk.setPropertyAs( "indexOrigin", slice_pos_vec );
-					myChunk.setPropertyAs<uint32_t>( "acquisitionNumber", ( acq_nr ) );
-					myChunk.setPropertyAs<std::string>( "subjectName", subject_name );
+					myChunk.setValueAs( "indexOrigin", slice_pos_vec );
+					myChunk.setValueAs<uint32_t>( "acquisitionNumber", ( acq_nr ) );
+					myChunk.setValueAs<std::string>( "subjectName", subject_name );
 					isis::util::Selection isisGender( "male,female,other" );
 
 					if ( 1 == subject_gender ) {
@@ -235,40 +235,40 @@ public:
 						isisGender.set( "other" );
 					}
 
-					myChunk.setPropertyAs<isis::util::Selection>( "subjectGender", isisGender );
+					myChunk.setValueAs<isis::util::Selection>( "subjectGender", isisGender );
 
-					//myChunk.setPropertyAs<>("acquisitionTime", acquisition_time);
+					//myChunk.setValueAs<>("acquisitionTime", acquisition_time);
 					if ( ( true == moco ) && ( true == mosaic ) ) {
-						myChunk.setPropertyAs<uint16_t>( "sequenceNumber", seq_number + 10000 ); // This is to make the sequenceNumber unique - so it's a nasty assumption there won't be more than 10000 scans in one session
-						myChunk.setPropertyAs<std::string>( "DICOM/ImageType", "MOCO\\WAS_MOSAIC" );
+						myChunk.setValueAs<uint16_t>( "sequenceNumber", seq_number + 10000 ); // This is to make the sequenceNumber unique - so it's a nasty assumption there won't be more than 10000 scans in one session
+						myChunk.setValueAs<std::string>( "DICOM/ImageType", "MOCO\\WAS_MOSAIC" );
 					} else if ( true == mosaic ) {
-						myChunk.setPropertyAs<uint16_t>( "sequenceNumber", seq_number );
-						myChunk.setPropertyAs<std::string>( "DICOM/ImageType", "WAS_MOSAIC" );
+						myChunk.setValueAs<uint16_t>( "sequenceNumber", seq_number );
+						myChunk.setValueAs<std::string>( "DICOM/ImageType", "WAS_MOSAIC" );
 					} else {
-						myChunk.setPropertyAs<uint16_t>( "sequenceNumber", seq_number );
-						myChunk.setPropertyAs<std::string>( "DICOM/ImageType", "" );
+						myChunk.setValueAs<uint16_t>( "sequenceNumber", seq_number );
+						myChunk.setValueAs<std::string>( "DICOM/ImageType", "" );
 					}
 
 					seq_descr.append( "_rtMPISiemensExport" );
-					myChunk.setPropertyAs<std::string>( "sequenceDescription", seq_descr );
+					myChunk.setValueAs<std::string>( "sequenceDescription", seq_descr );
 
 					if ( 0 == InPlanePhaseEncodingDirection.compare( 0, 3, "COL" ) ) {
-						myChunk.setPropertyAs<util::fvector3>( "rowVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector3>( "columnVec", read_vec );
-						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
+						myChunk.setValueAs<util::fvector3>( "rowVec", phase_vec );
+						myChunk.setValueAs<util::fvector3>( "columnVec", read_vec );
+						myChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( fov_read / width_slice, fov_phase / height_slice, slice_thickness ) );
 					} else {
-						myChunk.setPropertyAs<util::fvector3>( "columnVec", phase_vec );
-						myChunk.setPropertyAs<util::fvector3>( "rowVec", read_vec );
-						myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
+						myChunk.setValueAs<util::fvector3>( "columnVec", phase_vec );
+						myChunk.setValueAs<util::fvector3>( "rowVec", read_vec );
+						myChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( fov_phase / width_slice, fov_read / height_slice, slice_thickness ) );
 					}
 
 
-					myChunk.setPropertyAs<util::fvector3>( "sliceVec", slice_norm_vec );
-					myChunk.setPropertyAs<uint16_t>( "repetitionTime", rep_time );
-					myChunk.setPropertyAs<std::string>( "InPlanePhaseEncodingDirection", InPlanePhaseEncodingDirection );
-					myChunk.setPropertyAs<util::fvector3>( "voxelGap", util::fvector3() );
+					myChunk.setValueAs<util::fvector3>( "sliceVec", slice_norm_vec );
+					myChunk.setValueAs<uint16_t>( "repetitionTime", rep_time );
+					myChunk.setValueAs<std::string>( "InPlanePhaseEncodingDirection", InPlanePhaseEncodingDirection );
+					myChunk.setValueAs<util::fvector3>( "voxelGap", util::fvector3() );
 					std::string sn = boost::posix_time::to_simple_string( boost::posix_time::microsec_clock::local_time() );
-					myChunk.setPropertyAs<std::string>( "source", sn );
+					myChunk.setValueAs<std::string>( "source", sn );
 					chunks.push_back( myChunk );
 
 

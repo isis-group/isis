@@ -19,13 +19,13 @@ BOOST_AUTO_TEST_CASE ( chunklist_insert_test )
 	chunks.addSecondarySort( "acquisitionTime" );
 
 	data::MemChunk<float> ch( 4, 4 );
-	ch.setPropertyAs( "acquisitionNumber", 2 );
-	ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
-	ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	ch.setPropertyAs( "acquisitionNumber", 2 );
-	ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
+	ch.setValueAs( "acquisitionNumber", 2 );
+	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
+	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "acquisitionNumber", 2 );
+	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
 	BOOST_REQUIRE( chunks.insert( ch ) );
 
 	// there should be exactly one chunk in the list
@@ -40,19 +40,19 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 
 	for ( int j = 0; j < 3; j++ ) {
 		data::MemChunk<float> ch( 3, 3 );
-		ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, j ) );
-		ch.setPropertyAs( "acquisitionNumber", 0 );
-		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, j ) );
+		ch.setValueAs( "acquisitionNumber", 0 );
+		ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+		ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 		BOOST_REQUIRE( chunks.insert( ch ) );
 	}
 
 	// inserting duplicate Chunk should fail
 	data::MemChunk<float> ch1( *( chunks.getLookup()[0] ) ); //just make copy of the first chunk
-	ch1.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-	ch1.setPropertyAs( "acquisitionNumber", 0 );
+	ch1.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
+	ch1.setValueAs( "acquisitionNumber", 0 );
 	data::enableLog<util::DefaultMsgPrint>( error );
 	BOOST_CHECK( ! chunks.insert( ch1 ) );
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	BOOST_REQUIRE( chunks.getShape().size()==1 );
 
 	// inserting Chunk with diffent secondary prop should be ok
-	ch1.setPropertyAs( "acquisitionNumber", 1 );
+	ch1.setValueAs( "acquisitionNumber", 1 );
 	BOOST_CHECK( chunks.insert( ch1 ) );
 
 	// and the list it should not be rectangular anymore
@@ -70,11 +70,11 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	// add the renmaining acquisitionNumber=1-chunks
 	for ( int j = 1; j < 3; j++ ) { //0 is already there
 		data::MemChunk<float> ch( 3, 3 );
-		ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, j ) );
-		ch.setPropertyAs( "acquisitionNumber", 1 );
-		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, j ) );
+		ch.setValueAs( "acquisitionNumber", 1 );
+		ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+		ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
 
 		BOOST_REQUIRE( chunks.insert( ch ) );

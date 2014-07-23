@@ -6,10 +6,10 @@ using namespace isis;
 template<typename T> data::MemChunk<T> makeChunk( size_t size, short slice )
 {
 	data::MemChunk<T> ret( size, size );
-	ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-	ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-	ret.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
-	ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ret.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+	ret.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+	ret.setValueAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+	ret.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	return ret;
 }
 
@@ -47,8 +47,8 @@ int main()
 
 		for ( short slice = 0; slice < slices; slice++ ) {
 			chunks.push_back( makeChunk<short>( 256, slice ) );
-			chunks.back().setPropertyAs( "acquisitionNumber", slice );
-			chunks.back().setPropertyAs( "sequenceNumber", 0 );
+			chunks.back().setValueAs( "acquisitionNumber", slice );
+			chunks.back().setValueAs( "sequenceNumber", 0 );
 		}
 
 		data::Image img( chunks );

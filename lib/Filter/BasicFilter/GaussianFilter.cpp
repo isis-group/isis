@@ -33,10 +33,10 @@ bool GaussianFilter::process( data::Image &image )
 	util::fvector4 sigmaVec( sigma, sigma, sigma, sigma );
 
 	if( parameters["physicalSpace"] ) {
-		util::fvector4 voxelSize = image.getPropertyAs<util::fvector4>( "voxelSize" );
+		util::fvector4 voxelSize = image.getValueAs<util::fvector4>( "voxelSize" );
 
 		if( image.hasProperty( "voxelGap" ) ) {
-			voxelSize += image.getPropertyAs<util::fvector4>( "voxelGap" );
+			voxelSize += image.getValueAs<util::fvector4>( "voxelGap" );
 		}
 
 		sigmaVec /= voxelSize;

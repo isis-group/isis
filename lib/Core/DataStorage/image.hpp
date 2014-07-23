@@ -294,14 +294,6 @@ protected:
 	/// Creates an empty Image object.
 	Image();
 
-	util::fvector3 m_RowVec;
-	util::fvector3 m_RowVecInv;
-	util::fvector3 m_ColumnVec;
-	util::fvector3 m_ColumnVecInv;
-	util::fvector3 m_SliceVec;
-	util::fvector3 m_SliceVecInv;
-	util::fvector3 m_Offset;
-
 public:
 	/**
 	 * Copy constructor.
@@ -600,7 +592,7 @@ public:
 	 * with caution!
 	 * \param transform_matrix the transformation matrix can be any type of rigid and affine transformation
 	 * \param transformCenterIsImageCenter if this parameter is true, the center of the image will be translated to the
-	 *  isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its
+	 *  isocenter of the scanner prior applying the transform_matrix. Afterwards, it will be translated to its
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
@@ -620,23 +612,6 @@ public:
 	 */
 
 	dimensions mapScannerAxisToImageDimension ( scannerAxis scannerAxes );
-
-	/** Computes the physical coordinates (in scanner space) of the given voxel index.
-	 *  This function does not perform any test if the voxel index is inside the image.
-	 *  See getIndexFromPhysicalCoords for vice versa purpose.
-	 *  \param index the voxel index from which you want to get the physical coordinates
-	 *  \return physical coordinates associated with the given voxel index
-	 */
-	util::fvector3 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
-
-
-	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
-	 *  This function does not perform any test if the physical coordinates are inside the image.
-	 *  See getPhysicalCoordsFromIndex for vice versa purpose.
-	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
-	 *  \return voxel index associated with the given physicalCoords
-	 */
-	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector3 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -786,7 +761,6 @@ public:
 	size_t getNrOfTimesteps() const;
 
 	util::fvector3 getFoV() const;
-	bool updateOrientationMatrices();
 
 	/**
 	 * Generate a string identifying the image

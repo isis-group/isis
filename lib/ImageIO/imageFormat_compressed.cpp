@@ -247,7 +247,7 @@ public:
 						ret += data::IOFactory::load( chunks, tmpfile.string(), dialect.c_str() );
 
 						for( ; ch != chunks.end(); ++ch ) { // set the source property of the red chunks to something more usefull
-							ch->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
+							ch->setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
 					}
 				} else {
@@ -277,7 +277,7 @@ public:
 				prev++;
 				LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
 
-				for( ; prev != chunks.end(); ++prev )prev->setPropertyAs( "source", filename );
+				for( ; prev != chunks.end(); ++prev )prev->setValueAs( "source", filename );
 			}
 		}
 

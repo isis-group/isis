@@ -69,6 +69,7 @@ template<class T> struct TypeID {
 };
 }
 /// @endcond
+
 /// resolves to boost::true_type if type is known, boost::false_type if not
 template< typename T > struct knowType :  boost::mpl::contains<_internal::types, T> {};
 /**

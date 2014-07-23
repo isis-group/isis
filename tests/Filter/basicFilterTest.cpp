@@ -15,11 +15,11 @@ namespace test
 data::Image createEmptyImage( util::ivector4 size )
 {
 	data::MemChunk<uint8_t> myChunk ( size[0], size[1], size[2], size[3] ) ;
-	myChunk.setPropertyAs<util::fvector3>( "indexOrigin", util::fvector3() );
-	myChunk.setPropertyAs<util::fvector3>( "rowVec", util::fvector3( 1, 0, 0 ) );
-	myChunk.setPropertyAs<util::fvector3>( "columnVec", util::fvector3( 0, 1, 0 ) );
-	myChunk.setPropertyAs<util::fvector3>( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	myChunk.setPropertyAs<uint16_t>( "acquisitionNumber", 0 );
+	myChunk.setValueAs<util::fvector3>( "indexOrigin", util::fvector3() );
+	myChunk.setValueAs<util::fvector3>( "rowVec", util::fvector3( 1, 0, 0 ) );
+	myChunk.setValueAs<util::fvector3>( "columnVec", util::fvector3( 0, 1, 0 ) );
+	myChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	myChunk.setValueAs<uint16_t>( "acquisitionNumber", 0 );
 	return data::Image( myChunk );
 }
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( frequency_filter_test )
 {
 	data::Image myImage = data::IOFactory::load( "/SCR/DATA/gaby/ldopa/raw/ldopa_s01.v" ).front();
 	//  data::Image myImage = createEmptyImage( util::ivector4(100,100,100,100) );
-	//  myImage.setPropertyAs<uint16_t>("repetitionTime", 2000);
+	//  myImage.setValueAs<uint16_t>("repetitionTime", 2000);
 	filter::FrequencyFilter myFrequencyFilter;
 	myFrequencyFilter.setParameter( "dimension", 3 );
 	myFrequencyFilter.run( myImage );

@@ -87,8 +87,8 @@ int main( int argc, char *argv[] )
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
 		data::Chunk ch( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true );
-		ch.setPropertyAs<util::fvector3>( "indexOrigin", app.parameters["origin"] );
-		ch.setPropertyAs<util::fvector3>( "voxelSize", app.parameters["voxel"] );
+		ch.setValueAs<util::fvector3>( "indexOrigin", app.parameters["origin"] );
+		ch.setValueAs<util::fvector3>( "voxelSize", app.parameters["voxel"] );
 
 		app.autowrite( data::Image( ch ), true );
 	} else { // writing raw

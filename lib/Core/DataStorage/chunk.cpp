@@ -47,12 +47,12 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 	assert( ( *this )->getLength() == getVolume() );
 
 	if( fakeValid ) {
-		setPropertyAs( "indexOrigin", util::fvector3() );
-		setPropertyAs( "acquisitionNumber", 0 );
-		setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-		setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		setPropertyAs( "sequenceNumber", ( uint16_t )0 );
+		setValueAs( "indexOrigin", util::fvector3() );
+		setValueAs( "acquisitionNumber", 0 );
+		setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+		setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		setValueAs( "sequenceNumber", ( uint16_t )0 );
 	}
 }
 
@@ -194,7 +194,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	}
 
 	util::fvector3 offset;
-	const util::fvector3 voxelSize = getPropertyAs<util::fvector3>( "voxelSize" );
+	const util::fvector3 voxelSize = getValueAs<util::fvector3>( "voxelSize" );
 	const util::fvector3 voxelGap = getPropertyAsOr( "voxelGap",util::fvector3());
 	
 	const util::fvector3 distance = voxelSize + voxelGap;
@@ -204,18 +204,18 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :
-		offset = getPropertyAs<util::fvector3>( "rowVec" );
+		offset = getValueAs<util::fvector3>( "rowVec" );
 		break;
 	case columnDim:
-		offset = getPropertyAs<util::fvector3>( "columnVec" );
+		offset = getValueAs<util::fvector3>( "columnVec" );
 		break;
 	case sliceDim:{
 		const boost::optional< const util::PropertyValue& > svec=hasProperty( "sliceVec" );
 		if( svec ) {
 			offset = svec->as<util::fvector3>();
 		} else {
-			const util::fvector3 row = getPropertyAs<util::fvector3>( "rowVec" );
-			const util::fvector3 column = getPropertyAs<util::fvector3>( "columnVec" );
+			const util::fvector3 row = getValueAs<util::fvector3>( "rowVec" );
+			const util::fvector3 column = getValueAs<util::fvector3>( "columnVec" );
 			assert( util::fuzzyEqual<float>( row.sqlen(), 1 ) );
 			assert( util::fuzzyEqual<float>( column.sqlen(), 1 ) );
 			offset[0] = row[1] * column[2] - row[2] * column[1];
@@ -229,8 +229,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	// prepare some attributes
 	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3();
-	const bool acqWasList=propertyValue("acquisitionNumber").size()==getDimSize(atDim);
-	const bool originWasList=propertyValue("indexOrigin").size()==getDimSize(atDim);
+	const bool acqWasList=property("acquisitionNumber").size()==getDimSize(atDim);
+	const bool originWasList=property("indexOrigin").size()==getDimSize(atDim);
 	
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
@@ -240,12 +240,12 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	for( uint32_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them 
 		if(!originWasList){
-			LOG( Debug, verbose_info ) << "Origin was " << it->propertyValue( "indexOrigin" ) << " will be moved by " << indexOriginOffset << "*"  << cnt;
-			it->propertyValue( "indexOrigin" )+= util::fvector3(indexOriginOffset * cnt);
+			LOG( Debug, verbose_info ) << "Origin was " << it->property( "indexOrigin" ) << " will be moved by " << indexOriginOffset << "*"  << cnt;
+			it->property( "indexOrigin" )+= util::fvector3(indexOriginOffset * cnt);
 		}
 
 		if(!acqWasList && acquisitionNumberStride){//@todo acquisitionTime needs to be fixed as well
-			util::PropertyValue &acqVal = it->propertyValue( "acquisitionNumber" );
+			util::PropertyValue &acqVal = it->property( "acquisitionNumber" );
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
 			acqVal = acqVal * acquisitionNumberStride + cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		}

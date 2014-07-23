@@ -144,17 +144,17 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	m_ImageISIS->transformCoords( T );
 	//getting the required metadata from the isis image
 	const util::FixedVector<size_t, 4> dimensions( m_ImageISIS->getSizeAsVector() );
-	const util::fvector3 indexOrigin( m_ImageISIS->getPropertyAs<util::fvector3>( "indexOrigin" ) );
-	util::fvector3 spacing( m_ImageISIS->getPropertyAs<util::fvector3>( "voxelSize" ) );
+	const util::fvector3 indexOrigin( m_ImageISIS->getValueAs<util::fvector3>( "indexOrigin" ) );
+	util::fvector3 spacing( m_ImageISIS->getValueAs<util::fvector3>( "voxelSize" ) );
 
 	//MH FIXME: changed
 	//if( spacing[3] == 0 ) { spacing[3] = 1; }
 
-	const util::fvector3 readVec = m_ImageISIS->getPropertyAs<util::fvector3>( "rowVec" );
+	const util::fvector3 readVec = m_ImageISIS->getValueAs<util::fvector3>( "rowVec" );
 
-	const util::fvector3 phaseVec = m_ImageISIS->getPropertyAs<util::fvector3>( "columnVec" );
+	const util::fvector3 phaseVec = m_ImageISIS->getValueAs<util::fvector3>( "columnVec" );
 
-	const util::fvector3 sliceVec = m_ImageISIS->getPropertyAs<util::fvector3>( "sliceVec" );
+	const util::fvector3 sliceVec = m_ImageISIS->getValueAs<util::fvector3>( "sliceVec" );
 
 	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
 	//  std::cout << "readVec: " << readVec << std::endl;
@@ -192,7 +192,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 
 	//if the user requests a 4d image we need to set these parameters
 	if ( OutputImageType::ImageDimension == 4 ) {
-		itkSpacing[3] = m_ImageISIS->getPropertyAs<u_int16_t>( "repetitionTime" );
+		itkSpacing[3] = m_ImageISIS->getValueAs<u_int16_t>( "repetitionTime" );
 		itkSize[3] = m_ImageISIS->getNrOfTimesteps();
 		itkDirection[3][3] = 1; //ensures determinant is unequal 0
 	}
@@ -256,23 +256,23 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
-	tmpChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-	tmpChunk.setPropertyAs( "indexOrigin", util::fvector3( static_cast<float>( indexOrigin[0] ),
+	tmpChunk.setValueAs<uint16_t>( "sequenceNumber", 1 );
+	tmpChunk.setValueAs( "indexOrigin", util::fvector3( static_cast<float>( indexOrigin[0] ),
 							static_cast<float>( indexOrigin[1] ),
 							static_cast<float>( indexOrigin[2] ) ) );
-	tmpChunk.setPropertyAs( "rowVec"     , util::fvector3( static_cast<float>( imageDirection[0][0] ),
+	tmpChunk.setValueAs( "rowVec"     , util::fvector3( static_cast<float>( imageDirection[0][0] ),
 							static_cast<float>( imageDirection[1][0] ),
 							static_cast<float>( imageDirection[2][0] ) ) );
-	tmpChunk.setPropertyAs( "columnVec"  , util::fvector3( ( imageDirection[0][1] ),
+	tmpChunk.setValueAs( "columnVec"  , util::fvector3( ( imageDirection[0][1] ),
 							( imageDirection[1][1] ),
 							( imageDirection[2][1] ) ) );
-	tmpChunk.setPropertyAs( "sliceVec"   , util::fvector3( static_cast<float>( imageDirection[0][2] ),
+	tmpChunk.setValueAs( "sliceVec"   , util::fvector3( static_cast<float>( imageDirection[0][2] ),
 							static_cast<float>( imageDirection[1][2] ),
 							static_cast<float>( imageDirection[2][2] ) ) );
-	tmpChunk.setPropertyAs( "voxelSize"  , util::fvector3( static_cast<float>( imageSpacing[0] ),
+	tmpChunk.setValueAs( "voxelSize"  , util::fvector3( static_cast<float>( imageSpacing[0] ),
 							static_cast<float>( imageSpacing[1] ),
 							static_cast<float>( imageSpacing[2] ) ) );
-	tmpChunk.setPropertyAs<u_int32_t>( "acquisitionNumber", 1 );
+	tmpChunk.setValueAs<u_int32_t>( "acquisitionNumber", 1 );
 	data::TypedImage<ISISRepn> retImage( tmpChunk );
 
 	//this will splice down the image the same way it was handed over to the itkAdapter

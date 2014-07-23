@@ -35,19 +35,19 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	// data::Chunk or a data::Image object. Hence it should contain the
 	// properties rowVec, columnVec, sliceVec and indexOrigin.
 	// get row, column and slice vector from property map
-	isis::util::fvector3 row = properties.getPropertyAs<util::fvector3>( "rowVec" );
-	isis::util::fvector3 column = properties.getPropertyAs<util::fvector3>( "columnVec" );
-	isis::util::fvector3 slice = properties.getPropertyAs<util::fvector3>( "sliceVec" );
+	isis::util::fvector3 row = properties.getValueAs<util::fvector3>( "rowVec" );
+	isis::util::fvector3 column = properties.getValueAs<util::fvector3>( "columnVec" );
+	isis::util::fvector3 slice = properties.getValueAs<util::fvector3>( "sliceVec" );
 	// get index origin from property map
-	isis::util::fvector3 indexorig = properties.getPropertyAs<util::fvector3>( "indexOrigin" );
+	isis::util::fvector3 indexorig = properties.getValueAs<util::fvector3>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
 	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
 	isis::util::fvector3 scaling;
 
 	if( properties.hasProperty( "voxelGap" ) ) {
-		scaling  = properties.getPropertyAs<util::fvector3>( "voxelSize" ) +  properties.getPropertyAs<util::fvector3>( "voxelGap" );
+		scaling  = properties.getValueAs<util::fvector3>( "voxelSize" ) +  properties.getValueAs<util::fvector3>( "voxelGap" );
 	} else {
-		scaling  = properties.getPropertyAs<util::fvector3>( "voxelSize" );
+		scaling  = properties.getValueAs<util::fvector3>( "voxelSize" );
 	}
 
 	// create boost::numeric data structures
@@ -128,10 +128,10 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	}
 
 	// write modified values back into property map
-	properties.setPropertyAs( "indexOrigin", indexorig );
-	properties.setPropertyAs( "rowVec", row );
-	properties.setPropertyAs( "columnVec", column );
-	properties.setPropertyAs( "sliceVec", slice );
+	properties.setValueAs( "indexOrigin", indexorig );
+	properties.setValueAs( "rowVec", row );
+	properties.setValueAs( "columnVec", column );
+	properties.setValueAs( "sliceVec", slice );
 	return true;
 }
 
@@ -157,7 +157,7 @@ boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
 	std::list<boost::filesystem::path> sources;
 	BOOST_FOREACH( const data::Image & img, imgs ) {
 		if( img.hasProperty( "source" ) )
-			sources.push_back( img.getPropertyAs<std::string>( "source" ) );
+			sources.push_back( img.getValueAs<std::string>( "source" ) );
 		else {
 			BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
 				sources.push_back( ref.as<std::string>() );

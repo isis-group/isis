@@ -51,7 +51,7 @@ bool FileFormat::setGender( util::PropertyMap &object, const char *set, const ch
 	util::Selection g( entries );
 
 	if( g.set( set ) ) {
-		object.setPropertyAs( "subjectGender", g );
+		object.setValueAs( "subjectGender", g );
 		return true;
 	}
 
@@ -133,7 +133,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 				size_t overallDigits = 0;
 				unsigned short tID;
 
-				switch ( tID = props.propertyValue( prop ).getTypeID() ) {
+				switch ( tID = props.property( prop ).getTypeID() ) {
 				case util::Value<uint8_t>::staticID:
 					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
 					break;
@@ -156,14 +156,14 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 					break;
 				}
 
-				pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+				pstring =  boost::regex_replace( props.getValueAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
 
 				if ( 0 < overallDigits ) {
 					size_t zerosToFill = overallDigits - pstring.length();
 					pstring.insert( 0, zerosToFill, '0' );
 				}
 			} else {
-				pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+				pstring =  boost::regex_replace( props.getValueAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
 			}
 
 			const size_t dist = start - namePattern.begin();
@@ -173,7 +173,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 			pos = namePattern.begin() + dist + pstring.length();
 
 			LOG( Debug, info )
-					<< "Replacing " << util::PropertyMap::key_type( "{" ) + prop + "}" << " by "   << props.getPropertyAs<std::string>( prop )
+					<< "Replacing " << util::PropertyMap::key_type( "{" ) + prop + "}" << " by "   << props.getValueAs<std::string>( prop )
 					<< " the string is now " << namePattern;
 		} else {
 			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";

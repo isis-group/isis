@@ -41,20 +41,20 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 	BOOST_FOREACH( data::Image & null, images ) {
 
 		// adapt additional/non supported properties
-		null.setPropertyAs( "nifti/qform_code", formCode );
+		null.setValueAs( "nifti/qform_code", formCode );
 		null.remove( "performingPhysician" );
 
 		util::TmpFile niifile( "", ".nii" );
 		BOOST_REQUIRE( data::IOFactory::write( null, niifile.native() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
-		null.propertyValue( "voxelSize" ).castTo<util::fvector3>() += null.propertyValue( "voxelGap" ).castTo<util::fvector3>();
+		null.property( "voxelSize" ).castTo<util::fvector3>() += null.property( "voxelGap" ).castTo<util::fvector3>();
 		null.remove( "voxelGap" );
 
 		// that will be set by the nifti reader
 		const std::pair<util::ValueReference, util::ValueReference> minmax = null.getMinMax();
-		null.setPropertyAs( "nifti/cal_min", minmax.first->as<float>() );
-		null.setPropertyAs( "nifti/cal_max", minmax.second->as<float>() );
+		null.setValueAs( "nifti/cal_min", minmax.first->as<float>() );
+		null.setValueAs( "nifti/cal_max", minmax.second->as<float>() );
 
 		std::list< data::Image > niftilist = data::IOFactory::load( niifile.native() );
 		BOOST_REQUIRE( niftilist.size() == 1 );
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 			// because of the quaternions we get some rounding errors in rowVec and columnVec
 			const char *fuzzies[] = {"rowVec", "columnVec", "voxelSize"};
 			BOOST_FOREACH( const char * fuzz, fuzzies ) {
-				const util::fvector3 niiVec = niiChunks[i].getPropertyAs<util::fvector3>( fuzz );
-				const util::fvector3 nullVec = nullChunks[i].getPropertyAs<util::fvector3>( fuzz );
+				const util::fvector3 niiVec = niiChunks[i].getValueAs<util::fvector3>( fuzz );
+				const util::fvector3 nullVec = nullChunks[i].getValueAs<util::fvector3>( fuzz );
 				BOOST_REQUIRE( niiVec.fuzzyEqual( nullVec ) );
 				niiChunks[i].remove( fuzz );
 				nullChunks[i].remove( fuzz );
@@ -107,27 +107,27 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	aligned.set( "ALIGNED_ANAT" );
 
 	data::MemChunk<short> ch( size[0], size[1] );
-	ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-	ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-	ch.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
+	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
-	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
-	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
-	ch.setPropertyAs( "acquisitionTime", ( float )0 );
+	ch.setValueAs( "acquisitionNumber", ( uint32_t )0 );
+	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
+	ch.setValueAs( "acquisitionTime", ( float )0 );
 
 
 	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
-	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
-	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
-	chunks.back().setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 1 ) );
+	chunks.back().setValueAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
+	chunks.back().setValueAs<float>( "acquisitionTime", 1 );
+	chunks.back().setValueAs( "indexOrigin", util::fvector3( 0, 0, 1 ) );
 
 	data::Image img( chunks );
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
-	img.setPropertyAs( "nifti/sform_code", aligned );
-	img.setPropertyAs<std::string>( "sequenceDescription", "aligned sform" );
+	img.setValueAs( "nifti/sform_code", aligned );
+	img.setValueAs<std::string>( "sequenceDescription", "aligned sform" );
 
 
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), size );

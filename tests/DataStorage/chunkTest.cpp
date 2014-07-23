@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 
 	BOOST_FOREACH( const char * str, needed ) {
-		BOOST_CHECK( ch.propertyValue( str ).needed() );
+		BOOST_CHECK( ch.property( str ).needed() );
 	}
 
 
@@ -147,20 +147,20 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
 	//with a position and an orientation its valid
 	util::fvector3 pos( 1, 1, 1 );
-	ch.setPropertyAs( "indexOrigin", pos );
+	ch.setValueAs( "indexOrigin", pos );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+	ch.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs( "rowVec", pos );
+	ch.setValueAs( "rowVec", pos );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs( "columnVec", pos );
+	ch.setValueAs( "columnVec", pos );
 	BOOST_CHECK( ch.isValid() );
 	//properties shall not be case sensitive
 	BOOST_CHECK( ch.hasProperty( "indexorigin" ) );
 	// and of course the property shall be what it was set to
-	BOOST_CHECK_EQUAL( pos, ch.getPropertyAs<util::fvector3>( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( pos, ch.getValueAs<util::fvector3>( "indexOrigin" ) );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional index
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 		   boost::numeric::RoundEven<double>
 		   > converter;
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
-	ch1.setPropertyAs( "indexOrigin", util::fvector3( 1, 2, 3 ) );
+	ch1.setValueAs( "indexOrigin", util::fvector3( 1, 2, 3 ) );
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
@@ -286,8 +286,8 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 	//it should have the same properties
 	BOOST_REQUIRE( ch2.hasProperty( "indexOrigin" ) );
 	BOOST_REQUIRE( ch3.hasProperty( "indexOrigin" ) );
-	BOOST_CHECK_EQUAL( ch1.propertyValue( "indexOrigin" ), ch2.propertyValue( "indexOrigin" ) );
-	BOOST_CHECK_EQUAL( ch2.propertyValue( "indexOrigin" ), ch3.propertyValue( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( ch1.property( "indexOrigin" ), ch2.property( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( ch2.property( "indexOrigin" ), ch3.property( "indexOrigin" ) );
 	const float scale = float( std::numeric_limits< short >::max() ) / ( ch2.getVolume() - 1 );
 
 	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
@@ -310,15 +310,15 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 3, 3, 3 );
-	ch1.setPropertyAs( "indexOrigin", util::fvector3( 1, 1, 1 ) );
-	ch1.setPropertyAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-	ch1.setPropertyAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-	ch1.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	ch1.setPropertyAs( "voxelGap", util::fvector3( 1, 1, 1 ) );
-	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+	ch1.setValueAs( "indexOrigin", util::fvector3( 1, 1, 1 ) );
+	ch1.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
+	ch1.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+	ch1.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch1.setValueAs( "voxelGap", util::fvector3( 1, 1, 1 ) );
+	ch1.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 
 	const util::Value<int> buff[] = {0, 1, 2};
-	std::copy( buff, buff + 3, std::back_inserter( ch1.propertyValue( "list_test" ) ) );
+	std::copy( buff, buff + 3, std::back_inserter( ch1.property( "list_test" ) ) );
 
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
@@ -328,9 +328,9 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	BOOST_FOREACH( const data::Chunk & ref, splices ) {
-		BOOST_CHECK_EQUAL( ref.propertyValue( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
-		BOOST_CHECK_EQUAL( ref.propertyValue( "list_test" ), cnt );
-		BOOST_CHECK_EQUAL( ref.propertyValue( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
+		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
+		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
+		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
 		cnt++;
 	}
 }

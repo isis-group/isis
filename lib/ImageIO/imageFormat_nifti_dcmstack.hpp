@@ -23,7 +23,6 @@
 
 #include "DataStorage/valuearray.hpp"
 #include "DataStorage/chunk.hpp"
-#include <boost/variant.hpp>
 
 namespace isis
 {
@@ -32,19 +31,16 @@ namespace image_io
 namespace _internal
 {
 
-class JsonMap: public util::PropertyMap
+class DCMStack: public util::PropertyMap
 {
 public:
-	typedef boost::variant<util::PropertyValue, JsonMap, std::list<util::PropertyValue> > value_cont;
-
-	JsonMap() {}
-	JsonMap( const util::PropertyMap &src );
-	void insertObject( const PropPath &label, const value_cont &container );
+	DCMStack() {}
+	DCMStack( const util::PropertyMap &src );
 	void writeJson( std::ostream &out );
 	bool readJson( isis::data::ValueArray< uint8_t > stream, char extra_token = 0 );
 	std::list<data::Chunk> translateToISIS( data::Chunk orig );
 private:
-	static void writeSubtree( const std::map< isis::util::istring, isis::util::_internal::treeNode >& src, std::ostream &out );
+	static void writeSubtree( const PropertyMap& src, std::ostream &out );
 	void decodeMosaic();
 };
 

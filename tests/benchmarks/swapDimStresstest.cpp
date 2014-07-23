@@ -21,14 +21,14 @@ template<typename T> void testImage( )
 	std::list<data::MemChunk<T> > chunks;
 	for(int i=0; i<25;i++){
 		data::MemChunk<T> ch( 200,100,50 );
-		ch.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-		ch.setPropertyAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
+		ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
+		ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+		ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
-		ch.setPropertyAs( "acquisitionNumber", ( uint32_t )i );
-		ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
+		ch.setValueAs( "acquisitionNumber", ( uint32_t )i );
+		ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
 		chunks.push_back(ch);
 	}
 	

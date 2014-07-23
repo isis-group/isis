@@ -238,11 +238,11 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions fli
 {
 	static const char *names[] = {"rowVec", "columnVec", "sliceVec"};
 	assert( flipdim <= data::sliceDim );
-	const float vsize = image.getPropertyAs<util::fvector3>( "voxelSize" )[flipdim] +
-						( image.hasProperty( "voxelGap" ) ? image.getPropertyAs<util::fvector3>( "voxelGap" )[flipdim] : 0 );
+	const float vsize = image.getValueAs<util::fvector3>( "voxelSize" )[flipdim] +
+						( image.hasProperty( "voxelGap" ) ? image.getValueAs<util::fvector3>( "voxelGap" )[flipdim] : 0 );
 	const float middle_to_middle = ( image.getSizeAsVector()[flipdim] - 1 ) * vsize; // the distance from the middle of the current first voxel to the "going to be first"
-	util::fvector3 &prop = image.propertyValue( names[flipdim] ).castTo<util::fvector3>();
-	util::fvector3 &origin = image.propertyValue( "indexOrigin" ).castTo<util::fvector3>();
+	util::fvector3 &prop = image.property( names[flipdim] ).castTo<util::fvector3>();
+	util::fvector3 &origin = image.property( "indexOrigin" ).castTo<util::fvector3>();
 	origin += prop * middle_to_middle; // move the origin along the repective edge to "the other end"
 	LOG( Debug, verbose_info ) << "moved indexOrigin along " << prop *middle_to_middle << " to " << origin;
 	prop *= -1; // and invert that vector
@@ -262,9 +262,9 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 		slice_code = NIFTI_SLICE_SEQ_INC;
 	} else {
 		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime" : "acquisitionNumber";
-		const util::PropertyValue first = img.getChunk( 0, 0, 0, 0, false ).propertyValue( order ); // acquisitionNumber _must_ be chunk-unique - so it is there even without a join
-		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( order );
-		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( order );
+		const util::PropertyValue first = img.getChunk( 0, 0, 0, 0, false ).property( order ); // acquisitionNumber _must_ be chunk-unique - so it is there even without a join
+		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).property( order );
+		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).property( order );
 
 		if( first.gt( second ) ) { // second slice has a lower number than the first => decrementing
 			if( middle.gt( second ) ) { // if the middle number is greater than the second its interleaved
@@ -318,7 +318,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 	}
 
 	//if the sequence is "normal"
-	current.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	current.setValueAs<uint32_t>( "acquisitionNumber", 1 );
 	const size_t dims = current.getRelevantDims();
 	assert( dims <= 4 ); // more than 4 dimenstions are ... well, not expected
 
@@ -338,47 +338,49 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
 
+			util::PropertyValue &acqProp=ch.property( "acquisitionNumber" );
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
 			default:
 				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
 			case 0:
 			case NIFTI_SLICE_SEQ_INC:
 
-				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ )
-					ch.propertyValueAt( "acquisitionNumber", i ) = i + offset;
+				for( short i = 0; i < head->dim[3]; i++ )
+					acqProp.set(i, i + offset );
 
 				break;
 			case NIFTI_SLICE_SEQ_DEC:
 
-				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ )
-					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = i + offset;
+				for( short i = 0; i < head->dim[3]; i++ )
+					acqProp.set(head->dim[3] - i - 1, i + offset );
 
 				break;
 			case NIFTI_SLICE_ALT_INC: {
-				uint32_t i = 0, cnt;
+				short i = 0, cnt;
 
 				for( cnt = 0; i < floor( head->dim[3] / 2 + .5 ); i++, cnt += 2 )
-					ch.propertyValueAt( "acquisitionNumber", i ) = cnt + offset;
+					acqProp.set(i,cnt + offset);
 
-				for( cnt = 1; i < ( uint32_t )head->dim[3]; i++, cnt += 2 )
-					ch.propertyValueAt( "acquisitionNumber", i ) = cnt + offset;
+				for( cnt = 1; i < head->dim[3]; i++, cnt += 2 )
+					acqProp.set(i,cnt + offset);
 			}
 			break;
 			case NIFTI_SLICE_ALT_DEC: {
-				uint32_t i = 0, cnt;
+				short i = 0, cnt;
 
 				for( cnt = 0; i < floor( head->dim[3] / 2 + .5 ); i++, cnt += 2 )
-					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = cnt + offset;
+					acqProp.set(head->dim[3] - i - 1,cnt + offset);
 
 				for( cnt = 1; i < ( uint32_t )head->dim[3]; i++, cnt += 2 )
-					ch.propertyValueAt( "acquisitionNumber", head->dim[3] - i - 1 ) = cnt + offset;
+					acqProp.set(head->dim[3] - i - 1,cnt + offset);
 			}
 			break;
 			}
 
 			if( head->slice_duration ) {
+				util::PropertyValue &acqTimeProp=ch.property( "acquisitionTime");
 				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ ) { // set su-property "acquisitionTime" based of the slice number
-					ch.propertyValueAt( "acquisitionTime",  i ) = ch.propertyValueAt( "acquisitionNumber", i ).as<float>() * head->slice_duration * time_fac;
+					acqTimeProp.set(i,acqProp[i].as<float>() * head->slice_duration * time_fac);
 				}
 			}
 
@@ -396,7 +398,7 @@ void ImageFormat_NiftiSa::storeDescripForSPM( const util::PropertyMap &props, ch
 	const prop_pair  pairs[] = {{"TR", "repetitionTime", "ms"}, {"TE", "echoTime", "ms"}, {"FA", "flipAngle", "deg"}, {"timestamp", "sequenceStart", ""}};
 	BOOST_FOREACH( const prop_pair & p, pairs ) {
 		if( props.hasProperty( p[1] ) ) {
-			ret.push_back( std::string( p[0] ) + "=" + props.getPropertyAs<std::string>( p[1] ) + p[2] );
+			ret.push_back( std::string( p[0] ) + "=" + props.getValueAs<std::string>( p[1] ) + p[2] );
 		}
 	}
 	strncpy( desc, util::listToString( ret.begin(), ret.end(), "/", "", "" ).c_str(), 80 );
@@ -411,9 +413,9 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 	boost::cmatch results;
 
 	if ( boost::regex_match( desc, results,  descriptionRegex ) ) {
-		props.propertyValue( "repetitionTime" ) = util::Value<uint16_t>( results.str( 1 ) );
-		props.propertyValue( "echoTime" ) = util::Value<uint16_t>( results.str( 2 ) );
-		props.propertyValue( "flipAngle" ) = util::Value<uint16_t>( results.str( 3 ) );
+		props.property( "repetitionTime" ) = util::Value<uint16_t>( results.str( 1 ) );
+		props.property( "echoTime" ) = util::Value<uint16_t>( results.str( 2 ) );
+		props.property( "flipAngle" ) = util::Value<uint16_t>( results.str( 3 ) );
 
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
@@ -422,10 +424,10 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 								  boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
 								  boost::posix_time::time_duration( hours, minutes, seconds )
 							  );
-		props.setPropertyAs<ptime>( "sequenceStart", sequenceStart );
+		props.setValueAs<ptime>( "sequenceStart", sequenceStart );
 
-		LOG( Runtime, info ) << "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
-							 << ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
+		LOG( Runtime, info ) << "Using Tr=" << props.property( "repetitionTime" ) << ", Te=" << props.property( "echoTime" )
+							 << ", flipAngle=" << props.property( "flipAngle" ) << " and sequenceStart=" << props.property( "sequenceStart" )
 							 << " from SPM8 description.";
 
 		return true;
@@ -450,32 +452,32 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 
 	//store description if there is one
 	if( props.hasProperty( "sequenceDescription" ) )
-		strncpy( head->descrip, props.getPropertyAs<std::string>( "sequenceDescription" ).c_str(), 80 );
+		strncpy( head->descrip, props.getValueAs<std::string>( "sequenceDescription" ).c_str(), 80 );
 
 	// store niftis original sform if its there
 	if( props.hasProperty( "nifti/sform_code" ) ) {
-		head->sform_code = props.getPropertyAs<util::Selection>( "nifti/sform_code" );
+		head->sform_code = props.getValueAs<util::Selection>( "nifti/sform_code" );
 
 		if( props.hasProperty( "nifti/srow_x" ) && props.hasProperty( "nifti/srow_y" ) && props.hasProperty( "nifti/srow_z" ) ) {
-			props.getPropertyAs<util::fvector4>( "nifti/srow_x" ).copyTo( head->srow_x );
-			props.getPropertyAs<util::fvector4>( "nifti/srow_y" ).copyTo( head->srow_y );
-			props.getPropertyAs<util::fvector4>( "nifti/srow_z" ).copyTo( head->srow_z );
+			props.getValueAs<util::fvector4>( "nifti/srow_x" ).copyTo( head->srow_x );
+			props.getValueAs<util::fvector4>( "nifti/srow_y" ).copyTo( head->srow_y );
+			props.getValueAs<util::fvector4>( "nifti/srow_z" ).copyTo( head->srow_z );
 			saved_sform = true;
 		}
 	}
 
 	// store niftis original qform if its there
 	if( props.hasProperty( "nifti/qform_code" ) ) {
-		head->qform_code = props.getPropertyAs<util::Selection>( "nifti/qform_code" );
+		head->qform_code = props.getValueAs<util::Selection>( "nifti/qform_code" );
 
 		if( props.hasProperty( "nifti/quatern_b" ) && props.hasProperty( "nifti/quatern_c" ) && props.hasProperty( "nifti/quatern_d" ) &&
 			props.hasProperty( "nifti/qoffset" ) && props.hasProperty( "nifti/qfac" )
 		  ) {
-			const util::fvector4 offset = props.getPropertyAs<util::fvector4>( "nifti/qoffset" );
-			head->quatern_b = props.getPropertyAs<float>( "nifti/quatern_b" );
-			head->quatern_c = props.getPropertyAs<float>( "nifti/quatern_c" );
-			head->quatern_d = props.getPropertyAs<float>( "nifti/quatern_d" );
-			head->pixdim[0] = props.getPropertyAs<float>( "nifti/qfac" );
+			const util::fvector4 offset = props.getValueAs<util::fvector4>( "nifti/qoffset" );
+			head->quatern_b = props.getValueAs<float>( "nifti/quatern_b" );
+			head->quatern_c = props.getValueAs<float>( "nifti/quatern_c" );
+			head->quatern_d = props.getValueAs<float>( "nifti/quatern_d" );
+			head->pixdim[0] = props.getValueAs<float>( "nifti/qfac" );
 			head->qoffset_x = offset[0];
 			head->qoffset_y = offset[1];
 			head->qoffset_z = offset[2];
@@ -522,27 +524,27 @@ void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::
 	}
 
 
-	props.setPropertyAs<uint16_t>( "sequenceNumber", 0 );
+	props.setValueAs<uint16_t>( "sequenceNumber", 0 );
 
 	if( head->sform_code ) { // get srow if sform_code>0
-		props.setPropertyAs( "nifti/sform_code", formCode ).castTo<util::Selection>().set( head->sform_code );
-		props.setPropertyAs( "nifti/srow_x", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_x, head->srow_x + 4 );;
-		props.setPropertyAs( "nifti/srow_y", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_y, head->srow_y + 4 );;
-		props.setPropertyAs( "nifti/srow_z", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_z, head->srow_z + 4 );;
+		props.setValueAs( "nifti/sform_code", formCode ).castTo<util::Selection>().set( head->sform_code );
+		props.setValueAs( "nifti/srow_x", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_x, head->srow_x + 4 );;
+		props.setValueAs( "nifti/srow_y", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_y, head->srow_y + 4 );;
+		props.setValueAs( "nifti/srow_z", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_z, head->srow_z + 4 );;
 	}
 
 	if( head->qform_code ) { // get the quaternion if qform_code>0
-		props.setPropertyAs( "nifti/qform_code", formCode ).castTo<util::Selection>().set( head->qform_code );
-		props.setPropertyAs( "nifti/quatern_b", head->quatern_b );
-		props.setPropertyAs( "nifti/quatern_c", head->quatern_c );
-		props.setPropertyAs( "nifti/quatern_d", head->quatern_d );
-		props.setPropertyAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
-		props.setPropertyAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
+		props.setValueAs( "nifti/qform_code", formCode ).castTo<util::Selection>().set( head->qform_code );
+		props.setValueAs( "nifti/quatern_b", head->quatern_b );
+		props.setValueAs( "nifti/quatern_c", head->quatern_c );
+		props.setValueAs( "nifti/quatern_d", head->quatern_d );
+		props.setValueAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
+		props.setValueAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
 		// copy pixdim
 		util::dlist v_size( dims );
 		std::copy( head->pixdim + 1, head->pixdim + dims + 1, v_size.begin() ); //@todo implement size_fac
-		props.setPropertyAs( "nifti/pixdim", v_size );
+		props.setValueAs( "nifti/pixdim", v_size );
 	}
 
 	if( head->sform_code ) { // if sform_code is set, use that regardless of qform
@@ -552,25 +554,25 @@ void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::
 	} else {
 		LOG( Runtime, warning ) << "Neither sform_code nor qform_code are set, using identity matrix for geometry";
 		const util::fvector4 r[3] = {nifti2isis.getRow( 0 ), nifti2isis.getRow( 1 ), nifti2isis.getRow( 2 )};
-		props.setPropertyAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) ); // we use the transformation from nifti to isis as unity
-		props.setPropertyAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) ); // because the image will very likely be in nifti space
-		props.setPropertyAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
-		props.setPropertyAs( "voxelSize",   util::fvector3( head->pixdim[1], head->pixdim[2], head->pixdim[3] ) );
-		props.setPropertyAs( "indexOrigin", util::fvector3( 0, 0 ) );
+		props.setValueAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) ); // we use the transformation from nifti to isis as unity
+		props.setValueAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) ); // because the image will very likely be in nifti space
+		props.setValueAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
+		props.setValueAs( "voxelSize",   util::fvector3( head->pixdim[1], head->pixdim[2], head->pixdim[3] ) );
+		props.setValueAs( "indexOrigin", util::fvector3( 0, 0 ) );
 	}
 
 	// set space unit factors
-	props.propertyValue( "voxelSize" ).castTo<util::fvector3>() *= size_fac;
-	props.propertyValue( "indexOrigin" ).castTo<util::fvector3>() *= size_fac;
+	props.property( "voxelSize" ).castTo<util::fvector3>() *= size_fac;
+	props.property( "indexOrigin" ).castTo<util::fvector3>() *= size_fac;
 
 	// Tr
 	if( head->pixdim[4] != 0 ) // if pixdim is given for the 4th dim, assume its repetitionTime
-		props.setPropertyAs<uint16_t>( "repetitionTime", head->pixdim[4]*time_fac );
+		props.setValueAs<uint16_t>( "repetitionTime", head->pixdim[4]*time_fac );
 
 	// sequenceDescription
 	if( strlen( head->descrip ) ) {
 		if( !parseDescripForSPM( props, head->descrip ) ) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
-			props.setPropertyAs<std::string>( "sequenceDescription", head->descrip );// use it the usual way
+			props.setValueAs<std::string>( "sequenceDescription", head->descrip );// use it the usual way
 	}
 
 	// TODO: at the moment scaling is not supported due to data type changes
@@ -580,14 +582,14 @@ void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::
 	}
 
 	if( head->intent_code  ) {
-		props.setPropertyAs( "nifti/intent_code", head->intent_code ); // use it the usual way
-		LOG( Runtime, warning ) << "Ignoring intent_code " << props.propertyValue( "nifti/intent_code" );
+		props.setValueAs( "nifti/intent_code", head->intent_code ); // use it the usual way
+		LOG( Runtime, warning ) << "Ignoring intent_code " << props.property( "nifti/intent_code" );
 	}
 
 
 	if( head->cal_max != 0 || head->cal_min != 0 ) { // maybe someone needs that, we dont ...
-		props.setPropertyAs( "nifti/cal_max", head->cal_max );
-		props.setPropertyAs( "nifti/cal_min", head->cal_min );
+		props.setValueAs( "nifti/cal_max", head->cal_max );
+		props.setValueAs( "nifti/cal_min", head->cal_min );
 	}
 
 }
@@ -673,7 +675,6 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_
 int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
-	util::DefaultMsgPrint::stopBelow( warning );
 
 	if( !mfile.good() ) {
 		if( errno ) {
@@ -782,7 +783,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	// check for extenstions and parse them
 	data::ValueArray< uint8_t > extID = mfile.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
-	_internal::JsonMap dcmmeta;
+	_internal::DCMStack dcmmeta;
 
 	if( extID[0] != 0 ) { // there is an extension http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/extension.html
 		for( size_t pos = header->sizeof_hdr + 4; pos < header->vox_offset; ) {
@@ -790,7 +791,8 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 			switch( ext_hdr[1] ) {
 			case 0: // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				dcmmeta.readJson( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0], swap_endian ), '.' );
+				dcmmeta.readJson( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0] ), '.' );
+				dcmmeta.print(std::cout,true);
 				break;
 			case 2:
 				LOG( Runtime, warning ) << "sorry nifti extension for DICOM is not yet supported";
@@ -808,7 +810,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	if( dialect != "withExtProtocols" ) { //find and remove MrPhoenixProtocol if not asked for explicitely
-		for( util::PropertyMap::KeyType found = dcmmeta.find( "MrPhoenixProtocol", false, true ); !found.empty(); found = dcmmeta.find( "MrPhoenixProtocol", false, true ) )
+		for( util::PropertyMap::PropPath found = dcmmeta.find( "MrPhoenixProtocol", false, true );!found.empty();found = dcmmeta.find( "MrPhoenixProtocol", false, true ) )
 			dcmmeta.remove( found );
 	}
 
@@ -895,9 +897,9 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			//dcm2nii flips the slice ordering of a mosaic if the determinant of the orientation is negative
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
 			if( image.hasProperty( "DICOM/ImageType" ) ) {
-				const util::slist tp = image.getPropertyAs<util::slist>( "DICOM/ImageType" );
+				const util::slist tp = image.getValueAs<util::slist>( "DICOM/ImageType" );
 				const bool was_mosaic = ( std::find( tp.begin(), tp.end(), "WAS_MOSAIC" ) != tp.end() );
-				const util::Matrix3x3<float> mat( image.getPropertyAs<util::fvector3>( "rowVec" ), image.getPropertyAs<util::fvector3>( "columnVec" ), image.getPropertyAs<util::fvector3>( "sliceVec" ) );
+				const util::Matrix3x3<float> mat( image.getValueAs<util::fvector3>( "rowVec" ), image.getValueAs<util::fvector3>( "columnVec" ), image.getValueAs<util::fvector3>( "sliceVec" ) );
 
 				if( was_mosaic  && determinant( mat ) < 0 ) {
 					LOG( Runtime, info ) << "Flipping slices of a siemens mosaic image for fsl compatibility";
@@ -924,11 +926,11 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 
 			for( size_t i = 0; i < image.getNrOfTimesteps(); i++ ) { // go through all "volumes"
 				const util::PropertyMap chunk = image.getChunk( 0, 0, 0, i );
-				util::dvector3 gradient = chunk.getPropertyAs<util::dvector3>( "diffusionGradient" );
+				util::dvector3 gradient = chunk.getValueAs<util::dvector3>( "diffusionGradient" );
 				const util::Matrix3x3<double> M(
-					chunk.getPropertyAs<util::dvector3>( "rowVec" ),
-					chunk.getPropertyAs<util::dvector3>( "columnVec" ),
-					chunk.getPropertyAs<util::dvector3>( "sliceVec" )
+					chunk.getValueAs<util::dvector3>( "rowVec" ),
+					chunk.getValueAs<util::dvector3>( "columnVec" ),
+					chunk.getValueAs<util::dvector3>( "sliceVec" )
 				);
 
 				// the bvalue is the length of the gradient direction,
@@ -979,7 +981,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		if( image.hasProperty( "repetitionTime" ) )
-			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );
+			header->pixdim[data::timeDim + 1] = image.getValueAs<float>( "repetitionTime" );
 
 		if( util::istring( dialect.c_str() ) == "spm" ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
@@ -998,11 +1000,11 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 /// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
 util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::PropertyMap &props )
 {
-	util::dvector4 scale = props.getPropertyAs<util::dvector4>( "voxelSize" ); //used to put the scaling into the transformation
-	const util::dvector4 offset = props.getPropertyAs<util::dvector4>( "indexOrigin" );
+	util::dvector4 scale = props.getValueAs<util::dvector4>( "voxelSize" ); //used to put the scaling into the transformation
+	const util::dvector4 offset = props.getValueAs<util::dvector4>( "indexOrigin" );
 
 	if( props.hasProperty( "voxelGap" ) ) {
-		const util::dvector4 gap = props.getPropertyAs<util::dvector4>( "voxelGap" );
+		const util::dvector4 gap = props.getValueAs<util::dvector4>( "voxelGap" );
 		scale += gap; //nifti does not know about gaps, just add it to the voxel size
 	}
 
@@ -1011,7 +1013,7 @@ util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::Propert
 	const char *row_names[] = {"rowVec", "columnVec", "sliceVec"};
 
 	for( int i = 0; i < 3; i++ ) {
-		mat_rows[i] = props.getPropertyAs<util::dvector4>( row_names[i] );
+		mat_rows[i] = props.getValueAs<util::dvector4>( row_names[i] );
 		mat_rows[i].norm();
 	}
 
@@ -1033,25 +1035,25 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 	// [x_nii]=[ nifti/srow_y ] * [j]
 	// [x_nii] [ nifti/srow_z ]   [k]
 
-	LOG( Debug, info ) << "Using sform (" << props.propertyValue( "nifti/sform_code" ).toString() << ") " << util::MSubject(
-						   props.propertyValue( "nifti/srow_x" ).toString() + "-" +
-						   props.propertyValue( "nifti/srow_y" ).toString() + "-" +
-						   props.propertyValue( "nifti/srow_z" ).toString()
+	LOG( Debug, info ) << "Using sform (" << props.property( "nifti/sform_code" ).toString() << ") " << util::MSubject(
+						   props.property( "nifti/srow_x" ).toString() + "-" +
+						   props.property( "nifti/srow_y" ).toString() + "-" +
+						   props.property( "nifti/srow_z" ).toString()
 					   ) << " to calc orientation";
 
 
 	// transform from image space to nifti space
 	const util::Matrix4x4<float> image2nifti(
-		props.getPropertyAs<util::fvector4>( "nifti/srow_x" ),
-		props.getPropertyAs<util::fvector4>( "nifti/srow_y" ),
-		props.getPropertyAs<util::fvector4>( "nifti/srow_z" )
+		props.getValueAs<util::fvector4>( "nifti/srow_x" ),
+		props.getValueAs<util::fvector4>( "nifti/srow_y" ),
+		props.getValueAs<util::fvector4>( "nifti/srow_z" )
 	);
 	util::Matrix4x4<float> image2isis = nifti2isis.dot( image2nifti ); // add transform to isis-space
 
 	//get position of image-voxel 0,0,0,0 in isis space
 	const util::fvector4 origin = image2isis.dot( util::fvector4( 0, 0, 0, 1 ) );
-	props.setPropertyAs( "indexOrigin", util::fvector3( origin[0], origin[1], origin[2] ) );
-	LOG( Debug, info ) << "Computed indexOrigin=" << props.propertyValue( "indexOrigin" ) << " from sform";
+	props.setValueAs( "indexOrigin", util::fvector3( origin[0], origin[1], origin[2] ) );
+	LOG( Debug, info ) << "Computed indexOrigin=" << props.property( "indexOrigin" ) << " from sform";
 
 	//remove offset from image2isis
 	image2isis = util::Matrix4x4<float>(
@@ -1066,8 +1068,8 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 		image2isis.dot( util::fvector4( 0, 0, 1 ) ).len()
 	);
 
-	props.setPropertyAs( "voxelSize", voxelSize );
-	LOG( Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from sform";
+	props.setValueAs( "voxelSize", voxelSize );
+	LOG( Debug, info ) << "Computed voxelSize=" << props.property( "voxelSize" ) << " from sform";
 
 
 	//remove scaling from image2isis
@@ -1078,13 +1080,13 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 								 ) );
 
 	const util::fvector4 r[3] = {image2isis.transpose().getRow( 0 ), image2isis.transpose().getRow( 1 ), image2isis.transpose().getRow( 2 )};
-	props.setPropertyAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) );
-	props.setPropertyAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) );
-	props.setPropertyAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
+	props.setValueAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) );
+	props.setValueAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) );
+	props.setValueAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
 
-	LOG( Debug, info ) << "Computed rowVec=" << props.propertyValue( "rowVec" ) << ", "
-					   << "columnVec=" << props.propertyValue( "columnVec" ) << " and "
-					   << "sliceVec=" << props.propertyValue( "sliceVec" ) << " from sform";
+	LOG( Debug, info ) << "Computed rowVec=" << props.property( "rowVec" ) << ", "
+					   << "columnVec=" << props.property( "columnVec" ) << " and "
+					   << "sliceVec=" << props.property( "sliceVec" ) << " from sform";
 
 	props.remove( "nifti/srow_x" );
 	props.remove( "nifti/srow_y" );
@@ -1099,9 +1101,9 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform.html for qfac
 	util::dvector4 quaternion(
 		0,//a
-		props.getPropertyAs<double>( "nifti/quatern_b" ),
-		props.getPropertyAs<double>( "nifti/quatern_c" ),
-		props.getPropertyAs<double>( "nifti/quatern_d" )
+		props.getValueAs<double>( "nifti/quatern_b" ),
+		props.getValueAs<double>( "nifti/quatern_c" ),
+		props.getValueAs<double>( "nifti/quatern_d" )
 	);
 
 	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
@@ -1112,10 +1114,10 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
 	}
 
-	LOG( Debug, info ) << "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
-					   << ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
-					   << ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
-					   << " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
+	LOG( Debug, info ) << "Using qform (" << props.property( "nifti/qform_code" ).toString()
+					   << ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.property( "nifti/qfac" ).toString()
+					   << ", pixdim=" << props.property( "nifti/pixdim" ).toString()
+					   << " and qoffset= " << props.property( "nifti/qoffset" ).toString();
 
 	const double a2 = a * a, b2 = b * b, c2 = c * c, d2 = d * d;
 	const double _2ab = 2 * a * b, _2ac = 2 * a * c, _2ad = 2 * a * d;
@@ -1125,7 +1127,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	const double r_11 = a2 + b2 - c2 - d2, r_12 = _2bc - _2ad,  r_13 = _2bd + _2ac;
 	const double r_21 = _2bc + _2ad,  r_22 = a2 - b2 + c2 - d2, r_23 = _2cd - _2ab;
 	const double r_31 = _2bd - _2ac,  r_32 = _2cd + _2ab,  r_33 = a2 - b2 - c2 + d2;
-	const int qfac = props.getPropertyAs<float>( "nifti/qfac" );
+	const int qfac = props.getValueAs<float>( "nifti/qfac" );
 
 	const util::Matrix4x4<double> image2nifti(
 		util::fvector4( r_11, r_12, r_13 * qfac ),
@@ -1141,13 +1143,13 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	const util::Matrix4x4<double> image2isis = nifti2isis.dot( image2nifti );
 
 	const util::fvector4 r[3] = {image2isis.transpose().getRow( 0 ), image2isis.transpose().getRow( 1 ), image2isis.transpose().getRow( 2 )};
-	props.setPropertyAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) );
-	props.setPropertyAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) );
-	props.setPropertyAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
+	props.setValueAs( "rowVec",      util::fvector3( r[0][0], r[0][1], r[0][2] ) );
+	props.setValueAs( "columnVec",   util::fvector3( r[1][0], r[1][1], r[1][2] ) );
+	props.setValueAs( "sliceVec",    util::fvector3( r[2][0], r[2][1], r[2][2] ) );
 
-	LOG( Debug, info ) << "Computed rowVec=" << props.propertyValue( "rowVec" ) << ", "
-					   << "columnVec=" << props.propertyValue( "columnVec" ) << " and "
-					   << "sliceVec=" << props.propertyValue( "sliceVec" ) << " from qform";
+	LOG( Debug, info ) << "Computed rowVec=" << props.property( "rowVec" ) << ", "
+					   << "columnVec=" << props.property( "columnVec" ) << " and "
+					   << "sliceVec=" << props.property( "sliceVec" ) << " from qform";
 
 	props.remove( "nifti/quatern_b" );
 	props.remove( "nifti/quatern_c" );
@@ -1155,16 +1157,16 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	props.remove( "nifti/qfac" );
 
 	// indexOrigin //////////////////////////////////////////////////////////////////////////////////
-	const util::fvector4 origin = nifti2isis.dot( props.getPropertyAs<util::fvector4>( "nifti/qoffset" ) );
-	props.setPropertyAs( "indexOrigin", util::fvector3( origin[0], origin[1], origin[2] ) );
-	LOG( Debug, info ) << "Computed indexOrigin=" << props.propertyValue( "indexOrigin" ) << " from qform";
+	const util::fvector4 origin = nifti2isis.dot( props.getValueAs<util::fvector4>( "nifti/qoffset" ) );
+	props.setValueAs( "indexOrigin", util::fvector3( origin[0], origin[1], origin[2] ) );
+	LOG( Debug, info ) << "Computed indexOrigin=" << props.property( "indexOrigin" ) << " from qform";
 	props.remove( "nifti/qoffset" );
 
 	// use pixdim[1-3] as voxelSize //////////////////////////////////////////////////////////////////////////////////
-	util::dlist vsize = props.getPropertyAs<util::dlist>( "nifti/pixdim" );
+	util::dlist vsize = props.getValueAs<util::dlist>( "nifti/pixdim" );
 	vsize.resize( 3, 1 );
-	props.setPropertyAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
-	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.propertyValue( "voxelSize" ) << " from pixdim " << props.propertyValue( "nifti/pixdim" );
+	props.setValueAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
+	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.property( "voxelSize" ) << " from pixdim " << props.property( "nifti/pixdim" );
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
@@ -1271,7 +1273,7 @@ void ImageFormat_NiftiSa::sanitise( data::Chunk &object )
 		util::Selection isisGender( "male,female,other" );
 		bool set = false;
 
-		switch ( object.getPropertyAs<std::string>( prefix + "PatientsSex" )[0] ) {
+		switch ( object.getValueAs<std::string>( prefix + "PatientsSex" )[0] ) {
 		case 'M':
 			isisGender.set( "male" );
 			set = true;
@@ -1285,11 +1287,11 @@ void ImageFormat_NiftiSa::sanitise( data::Chunk &object )
 			set = true;
 			break;
 		default:
-			LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( prefix + "PatientsSex" ) ) <<  " not known";
+			LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.property( prefix + "PatientsSex" ) ) <<  " not known";
 		}
 
 		if( set ) {
-			object.propertyValue( "subjectGender" ) = isisGender;
+			object.property( "subjectGender" ) = isisGender;
 			object.remove( prefix + "PatientsSex" );
 		}
 	}

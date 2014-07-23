@@ -240,7 +240,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 				int loaded=it->load( ret, filename.native(), dialect, m_feedback );
 				BOOST_FOREACH( Chunk & ref, ret ) {
 					if ( ! ref.hasProperty( "source" ) )
-						ref.setPropertyAs( "source", filename.native() );
+						ref.setValueAs( "source", filename.native() );
 				}
 				return loaded;
 			} catch ( std::runtime_error &e ) {
