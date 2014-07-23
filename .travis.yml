@@ -9,6 +9,7 @@ before_script:
    - mkdir build
    - cd build
    - cmake .. -DISIS_BUILD_TESTS=ON
+script: make
 branches:
   only:
     - master
