@@ -195,7 +195,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	util::fvector3 offset;
 	const util::fvector3 voxelSize = getValueAs<util::fvector3>( "voxelSize" );
-	const util::fvector3 voxelGap = getPropertyAsOr( "voxelGap",util::fvector3());
+	const util::fvector3 voxelGap = getValueAsOr( "voxelGap",util::fvector3());
 	
 	const util::fvector3 distance = voxelSize + voxelGap;
 	const size_t atDim = getRelevantDims() - 1;

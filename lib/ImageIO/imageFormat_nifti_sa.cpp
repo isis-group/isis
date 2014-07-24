@@ -239,13 +239,13 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions fli
 	static const char *names[] = {"rowVec", "columnVec", "sliceVec"};
 	assert( flipdim <= data::sliceDim );
 	const float vsize = image.getValueAs<util::fvector3>( "voxelSize" )[flipdim] +
-						( image.hasProperty( "voxelGap" ) ? image.getValueAs<util::fvector3>( "voxelGap" )[flipdim] : 0 );
+						image.getValueAsOr<util::fvector3>( "voxelGap", util::fvector3(0,0,0) )[flipdim];
 	const float middle_to_middle = ( image.getSizeAsVector()[flipdim] - 1 ) * vsize; // the distance from the middle of the current first voxel to the "going to be first"
-	util::fvector3 &prop = image.property( names[flipdim] ).castTo<util::fvector3>();
-	util::fvector3 &origin = image.property( "indexOrigin" ).castTo<util::fvector3>();
-	origin += prop * middle_to_middle; // move the origin along the repective edge to "the other end"
-	LOG( Debug, verbose_info ) << "moved indexOrigin along " << prop *middle_to_middle << " to " << origin;
-	prop *= -1; // and invert that vector
+	util::fvector3 &vec = *image.refValueAs<util::fvector3>( names[flipdim] );
+	util::fvector3 &origin = *image.refValueAs<util::fvector3>( "indexOrigin" );
+	origin += vec * middle_to_middle; // move the origin along the repective edge to "the other end"
+	LOG( Debug, verbose_info ) << "moved indexOrigin along " << vec *middle_to_middle << " to " << origin;
+	vec *= -1; // and invert that vector
 }
 
 float ImageFormat_NiftiSa::determinant( const util::Matrix3x3< float >& m )

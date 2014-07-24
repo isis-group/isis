@@ -704,7 +704,7 @@ public:
 	 * \param def the value to be returned if the requested value does not exist
 	 * \returns the property with given type, if not set yet def is returned.
 	 */
-	template<typename T> T getPropertyAsOr( const PropPath &path, const T &def )const {
+	template<typename T> T getValueAsOr( const PropPath &path, const T &def )const {
 		boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
 
 		if( ref && !ref->isEmpty() )
@@ -713,7 +713,7 @@ public:
 			return def;
 		}
 	}
-	template<typename T> T getPropertyAsOr( const PropPath &path, size_t at, const T &def )const {
+	template<typename T> T getValueAsOr( const PropPath &path, size_t at, const T &def )const {
 		const boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
 
 		if( ref && ref->size() > at )
