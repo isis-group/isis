@@ -139,9 +139,10 @@ bool Image::insertChunk ( const Chunk &chunk )
 	if( clean ) {
 		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
 
-		// re-gather all properties of the chunks from the image
+		// re-move all properties from the image back into the chunks 
 		BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-			ref->join( *this );
+		#warning test me
+			ref->transfer( *this );
 		}
 	}
 
@@ -540,6 +541,7 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
+	#warning get rid of me
 	std::vector<isis::data::Chunk> ret;
 	ret.reserve( lookup.size() );
 	std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();

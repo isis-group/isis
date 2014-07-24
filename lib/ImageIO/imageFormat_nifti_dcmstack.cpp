@@ -44,7 +44,6 @@ DCMStack::DCMStack( const util::PropertyMap &src ): util::PropertyMap( src ) {}
 ////////////////////////////////////////////////////////////////////////////////
 // low level json parser
 ////////////////////////////////////////////////////////////////////////////////
-
 bool DCMStack::readJson( data::ValueArray< uint8_t > stream, char extra_token )
 {
 	return PropertyMap::readJson(&stream[0],&stream[stream.getLength()],extra_token,"samples:slices");
