@@ -654,7 +654,7 @@ public:
 	 * \note This is a single value operation. So warning is send to Debug, if accessing a multivalue property.
 	 * If the stored type is not T, a transformation is done in place.
 	 * If that fails, false is returned.
-	 * If the property does not exist (or does not store enough values) false will be returned as well
+	 * If the property does not exist (or is empty) false will be returned as well
 	 * \param path the path to the property
 	 * \returns boost::optional<T&> referencing the requested value or false
 	 */
@@ -671,7 +671,7 @@ public:
 	 * \param def the default value to be used when creating the property
 	 * \returns boost::optional<T&> referencing the requested value or false
 	 */
-	template<typename T> boost::optional<T &> propertyValueAsOr( const PropPath &path, const T &def ) {
+	template<typename T> boost::optional<T &> refValueAsOr( const PropPath &path, const T &def ) {
 		boost::optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
 
 		if( !fetched ) return boost::optional<T &>(); // return "false" in case of a failure
