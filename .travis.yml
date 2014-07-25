@@ -12,4 +12,5 @@ before_script:
 script: make
 branches:
   only:
-    - master
+    - master 
+    - ch_propmap
