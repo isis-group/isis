@@ -200,7 +200,8 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+	{
 		data::Chunk ch = read_png( filename );
 
 		if( dialect == "stacked" ) {
@@ -230,8 +231,7 @@ public:
 		ch.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
 		ch.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
 		ch.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-		chunks.push_back( ch );
-		return 0;
+		return std::list< data::Chunk >(1, ch);
 	}
 
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {

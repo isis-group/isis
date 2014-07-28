@@ -72,7 +72,7 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static size_t load( std::list<data::Chunk> &chunks, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
+	static std::list<data::Chunk> loadChunks(const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 
 	static bool write( const data::Image &image, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 	static bool write( std::list<data::Image> images, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
@@ -98,8 +98,8 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
 protected:
-	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
-	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, util::istring suffix_override = "", util::istring dialect = "" );
+	std::list<Chunk> loadFile( const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
+	std::list<Chunk> loadPath( const boost::filesystem::path &path, util::istring suffix_override = "", util::istring dialect = "" );
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

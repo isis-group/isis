@@ -670,7 +670,7 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_
 #undef DO_SWAPA
 }
 
-int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename, const isis::util::istring& dialect, boost::shared_ptr< isis::util::ProgressFeedback > progress /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
 	util::DefaultMsgPrint::stopBelow( warning );
@@ -825,8 +825,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
             sanitise( ch );
     }
 
-	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
-	return newChunks.size();
+	return newChunks;
 }
 
 std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )

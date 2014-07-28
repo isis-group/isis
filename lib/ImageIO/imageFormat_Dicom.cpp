@@ -509,11 +509,11 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
 {
-
 	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
+	std::list< data::Chunk > ret;
 
 	if ( loaded.good() ) {
 		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
@@ -525,20 +525,17 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
 			if( dialect == "keepmosaic" ) {
 				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"keepmosaic\" was selected";
-				chunks.push_back( chunk );
+				ret.push_back( chunk );
 			} else {
-				chunks.push_back( readMosaic( chunk ) );
+				ret.push_back( readMosaic( chunk ) );
 			}
 		} else {
-			chunks.push_back( chunk );
+			ret.push_back( chunk );
 		}
-
-		return 1;
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
 	}
-
-	return 0;
+	return ret;
 }
 
 void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )

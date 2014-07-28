@@ -59,21 +59,21 @@ public:
 		return "50 500 1000 2000";
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 
 		size_t size = getSize( dialect );
 
 		// normal sequencial image
-		std::list<data::Chunk> ret = makeImage( size, 0, "normal sequencial Image" );
+		std::list<data::Chunk> ret,loaded = makeImage( size, 0, "normal sequencial Image" );
 		uint32_t s = 0;
 		BOOST_FOREACH( data::Chunk & ref, ret ) {
 			ref.setPropertyAs<uint32_t>( "acquisitionNumber", s++ );
 		}
-		chunks.insert( chunks.end(), ret.begin(), ret.end() );
+		ret.splice( ret.end(), loaded );
 
 		// interleaved image
-		ret = makeImage( size, 1, "interleaved Image" );
-		std::list< data::Chunk >::iterator ch = ret.begin();
+		loaded= makeImage( size, 1, "interleaved Image" );
+		std::list< data::Chunk >::iterator ch = loaded.begin();
 
 		for ( size_t t = 0; t < timesteps; t++ ) {
 			//even numbers
@@ -87,8 +87,8 @@ public:
 			}
 		}
 
-		assert( ch == ret.end() );
-		chunks.insert( chunks.end(), ret.begin(), ret.end() );
+		assert( ch == loaded.end() );
+		ret.splice( ret.end(), loaded );
 
 		return timesteps * size;
 	}

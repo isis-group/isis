@@ -23,8 +23,8 @@ public:
 
 		std::list<util::istring> suffixes;
 		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
-			const std::list<util::istring> s = format->getSuffixes();
-			suffixes.insert( suffixes.end(), s.begin(), s.end() );
+			std::list<util::istring> s = format->getSuffixes();
+			suffixes.splice( suffixes.end(), s );
 		}
 		suffixes.sort();
 		suffixes.unique();
@@ -33,10 +33,11 @@ public:
 	}
 	std::string getName()const {return "process proxy (gets filenames from child process given in the filename)";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
-		size_t red = 0;
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
+		
 		LOG( Runtime, info ) << "Running " << util::MSubject( filename );
 		FILE *in = popen( filename.c_str(), "r" );
+		std::list< data::Chunk > ret;
 
 		if( in == NULL ) {
 			std::string err = "Failed to run \"";
@@ -52,7 +53,8 @@ public:
 			if( got == '\n' ) {
 				if( !fname.empty() ) {
 					LOG( Runtime, info ) << "Got " << util::MSubject( fname ) << " from " << util::MSubject( filename );
-					red += data::IOFactory::load( chunks, fname, dialect.c_str(), "" );
+					std::list< data::Chunk > loaded=data::IOFactory::loadChunks( fname, dialect.c_str(), "" );
+					ret.splice(ret.end(),loaded);
 					fname.clear();
 					fcnt++;
 				}
@@ -63,7 +65,7 @@ public:
 
 		pclose( in );
 		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from " << util::MSubject( filename );
-		return red;
+		return ret;
 	}
 
 	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {

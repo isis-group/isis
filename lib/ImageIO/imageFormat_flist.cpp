@@ -32,35 +32,37 @@ public:
 	}
 	std::string getName()const {return "filelist proxy (gets filenames from files or stdin)";}
 
-	size_t doLoad( std::istream &in, std::list<data::Chunk> &chunks, const util::istring &dialect ) {
-		size_t red = 0;
+	std::list<data::Chunk> doLoad( std::istream &in, const util::istring &dialect ) {
 		const boost::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
 		size_t fcnt = 0;
+
+		std::list<data::Chunk> ret;
 
 		while( !in.eof() ) {
 			in >> fnames ;
 			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
 				LOG( Runtime, info ) << "loading " << fname;
-				red += data::IOFactory::load( chunks, fname, "", dialect );
+				std::list<data::Chunk> loaded=data::IOFactory::loadChunks(fname, "", dialect );
 				fcnt++;
+				ret.splice(ret.end(),loaded);
 			}
 		}
 
 		LOG_IF( fcnt == 0, Runtime, warning ) << "didn't get any filename from the input list";
 
-		return red;
+		return ret;
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		if( filename.empty() ) {
 			LOG( Runtime, info ) << "getting filelist from stdin";
-			return doLoad( std::cin, chunks, dialect );
+			return doLoad( std::cin, dialect );
 		} else {
 			LOG( Runtime, info ) << "getting filelist from " << filename;
 			std::ifstream in( filename.c_str() );
 			in.exceptions( std::ios::badbit );
-			return doLoad( in, chunks, dialect );
+			return doLoad( in, dialect );
 		}
 	}
 

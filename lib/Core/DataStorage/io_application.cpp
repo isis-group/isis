@@ -180,9 +180,8 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	const std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str() );
-
-	images.insert( images.end(), tImages.begin(), tImages.end() );
+	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str() );
+	images.splice( images.end(), tImages );
 
 	if ( images.empty() ) {
 		if ( exitOnError ) {

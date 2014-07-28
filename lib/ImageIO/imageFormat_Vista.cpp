@@ -215,10 +215,7 @@ throw( std::runtime_error & )
 }
 
 
-int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &filename,
-							 const util::istring &dialect,
-							 boost::shared_ptr<util::ProgressFeedback> progress
-						   ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
