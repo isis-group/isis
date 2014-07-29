@@ -29,6 +29,12 @@ enum LogLevel {error = 1, warning, notice, info, verbose_info};
 namespace util
 {
 
+/**
+ * Wrapper to mark the "Subject" in a logging message.
+ * Use this to mark the a volatile part of a logging message.
+ * eg. \code LOG(Debug,info) << "Loading File " << MSubject(filename); \endcode
+ * This will then be ignored when looking for repeating log-messages or can be used for text highlighting.
+ */
 class MSubject : public std::string
 {
 public:
@@ -44,6 +50,7 @@ const char *logLevelName( LogLevel level );
 template<class MODULE> class Log;
 class Message;
 
+///Abstract base class for message output handlers
 class MessageHandlerBase
 {
 	static LogLevel m_stop_below;
@@ -53,6 +60,18 @@ protected:
 public:
 	LogLevel m_level;
 	virtual void commit( const Message &msg ) = 0;
+	/**
+	 * Set loglevel below which the system should stop the process.
+	 * Sets the severity at which the OS should send a SIGSTOP to the process to halt it.
+	 * This can be usefull for debugging usage.
+	 * Example: \code
+	 * util::DefaultMsgPrint::stopBelow(warning); //anything more severe than warning will raise SIGSTOP
+	 * ...
+	 * LOG(Runtime,error) << "This is realy bad.. we should stop and debug .."; //here for example
+	 * \endcode
+	 * \note available only on UNIX-Systems
+	 * \note ignored on release builds
+	 */
 	static void stopBelow( LogLevel );
 	bool requestStop( LogLevel _level );
 };

@@ -67,10 +67,22 @@ template<class T> struct TypeID {
 		  > type;
 	static const unsigned short value = type::value;
 };
+
+template<bool ENABLED> struct ordered{
+	static const bool lt=ENABLED,gt=ENABLED;
+};
+template<bool ENABLED> struct multiplicative{
+	static const bool mult=ENABLED,div=ENABLED;
+};
+template<bool ENABLED> struct additive{
+	static const bool plus=ENABLED,minus=ENABLED,negate=ENABLED;
+};
 }
 /// @endcond
 
-/// resolves to boost::true_type if type is known, boost::false_type if not
+/**
+ * resolves to boost::true_type if type is known, boost::false_type if not
+ */
 template< typename T > struct knowType :  boost::mpl::contains<_internal::types, T> {};
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
@@ -83,40 +95,56 @@ template< typename T > struct checkType {
 	);
 };
 
-template<bool ENABLED> struct ordered{
-	static const bool lt=ENABLED,gt=ENABLED;
-};
-template<bool ENABLED> struct multiplicative{
-	static const bool mult=ENABLED,div=ENABLED;
-};
-template<bool ENABLED> struct additive{
-	static const bool plus=ENABLED,minus=ENABLED,negate=ENABLED;
-};
-
+/**
+ * Templated pseudo struct to check if a type supports an operation at compile time.
+ * The compile-time flags are:
+ * - \c \b lt can compare less-than
+ * - \c \b gt can compare greater-than
+ * - \c \b mult multiplication is applicable
+ * - \c \b div division is applicable
+ * - \c \b plus addition is applicable
+ * - \c \b minus substraction is applicable
+ * - \c \b negate negation is applicable
+ */
 template<typename T> struct has_op:
-	ordered<boost::mpl::and_<boost::mpl::not_<boost::is_base_of<_internal::VectorClass,T> >, knowType<T> >::value>, //vectors are not ordered
-	additive<knowType<T>::value>,
-	multiplicative<knowType<T>::value>
+	_internal::ordered<boost::mpl::and_<boost::mpl::not_<boost::is_base_of<_internal::VectorClass,T> >, knowType<T> >::value>, //vectors are not ordered
+	_internal::additive<knowType<T>::value>,
+	_internal::multiplicative<knowType<T>::value>
 	{};
 
-template<> struct has_op<Selection>:ordered<true>,additive<false>,multiplicative<false>{};
-template<> struct has_op<std::string>:ordered<true>,multiplicative<false>{static const bool plus=true,minus=false;};
+/// @cond _internal
+template<> struct has_op<Selection>:_internal::ordered<true>,_internal::additive<false>,_internal::multiplicative<false>{};
+template<> struct has_op<std::string>:_internal::ordered<true>,_internal::multiplicative<false>{static const bool plus=true,minus=false;};
 
 // cannot multiply time
-template<> struct has_op<boost::gregorian::date>:ordered<true>,additive<true>,multiplicative<false>{};
-template<> struct has_op<boost::gregorian::date_duration>:ordered<true>,additive<true>,multiplicative<false>{};
-template<> struct has_op<boost::posix_time::ptime>:ordered<true>,additive<true>,multiplicative<false>{};
-template<> struct has_op<boost::posix_time::time_duration>:ordered<true>,additive<true>,multiplicative<false>{};
+template<> struct has_op<boost::gregorian::date>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
+template<> struct has_op<boost::gregorian::date_duration>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
+template<> struct has_op<boost::posix_time::ptime>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
+template<> struct has_op<boost::posix_time::time_duration>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 
 // multidim is not ordered
-template<typename T> struct has_op<std::list<T> >:ordered<true>,additive<false>,multiplicative<false>{};
-template<typename T> struct has_op<color<T> >:ordered<false>,additive<false>,multiplicative<false>{};
-template<typename T> struct has_op<std::complex<T> >:ordered<false>,additive<true>,multiplicative<true>{};
+template<typename T> struct has_op<std::list<T> >:_internal::ordered<true>,_internal::additive<false>,_internal::multiplicative<false>{};
+template<typename T> struct has_op<color<T> >:_internal::ordered<false>,_internal::additive<false>,_internal::multiplicative<false>{};
+template<typename T> struct has_op<std::complex<T> >:_internal::ordered<false>,_internal::additive<true>,_internal::multiplicative<true>{};
+/// @endcond
 
 
-
+/**
+ * Get a std::map mapping type IDs to type names.
+ * \note the list is generated at runtime, so doing this excessively will be expensive.
+ * \param withValues include util::Value-s in the map
+ * \param withValueArrays include data::ValueArray-s in the map
+ * \returns a map, mapping util::Value::staticID and data::ValueArray::staticID to util::Value::staticName and data::ValueArray::staticName
+ */
 std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValueArrays = true );
 
+/**
+ * Inverse of getTypeMap.
+ * \note the list is generated at runtime, so doing this excessively will be expensive.
+ * \param withValues include util::Value-s in the map
+ * \param withValueArrays include data::ValueArray-s in the map
+ * \returns a map, mapping util::Value::staticName and data::ValueArray::staticName to util::Value::staticID and data::ValueArray::staticID
+ */
 std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValueArrays = true );
 }
 }

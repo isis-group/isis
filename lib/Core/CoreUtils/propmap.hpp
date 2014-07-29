@@ -628,7 +628,6 @@ public:
 	 * getValueAs<fvector4>( "MyPropertyName" );
 	 * \endcode
 	 * \param path the path to the property
-	 * \param at index of the value to return
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getValueAs( const PropPath &path)const {
