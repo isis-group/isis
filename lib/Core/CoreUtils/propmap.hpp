@@ -441,7 +441,7 @@ namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -496,7 +496,7 @@ public:
 };
 }
 /// @endcond
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // and now we can define walkTree (needs treeNode to be defined)

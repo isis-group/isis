@@ -35,7 +35,7 @@ namespace isis
 {
 namespace data
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -76,7 +76,7 @@ bool invalid_and_tell( Chunk &candidate )
 
 }
 /// @endcond _internal
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 
 IOFactory::IOFactory()
 {

@@ -29,7 +29,7 @@ namespace isis
 {
 namespace data
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
@@ -167,7 +167,7 @@ IMPL_SCALED_CONVERT( uint8_t, double, u8, f64 )
 #undef IMPL_CONVERT
 #undef IMPL_SCALED_CONVERT
 }
-#pragma GCC visibility pop
+API_EXCLUDE_END;
 }
 }
 #endif //ISIS_USE_LIBOIL

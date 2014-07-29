@@ -75,7 +75,7 @@ template<> std::pair<int16_t, int16_t> calcMinMax<int16_t, 1>( const int16_t *da
 template<> std::pair<int32_t, int32_t> calcMinMax<int32_t, 1>( const int32_t *data, size_t len );
 #endif //__SSE2__
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
 	std::pair<T, T> operator()( const ValueArray<T> &/*ref*/ ) const {
 		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
@@ -124,7 +124,7 @@ template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic m
 	}
 };
 /// @endcond
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 /**
  * Basic iterator for ValueArray.
