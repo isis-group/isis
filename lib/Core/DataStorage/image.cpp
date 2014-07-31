@@ -313,6 +313,7 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	const util::PropertyMap::key_type vectors[] = {"rowVec", "columnVec", "sliceVec"};
 	int oneCnt = 0;
+
 	BOOST_FOREACH( const util::PropertyMap::key_type & ref, vectors ) {
 		const boost::optional< util::fvector3& > found=refValueAs<util::fvector3>( ref );
 		if ( found ) {
@@ -330,7 +331,15 @@ bool Image::reIndex()
 		}
 		oneCnt++;
 	}
-	property("indexOrigin")=first.property("indexOrigin");
+	if(!hasProperty("indexOrigin")){ // if there is no common indexOrigin
+		boost::optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
+		if(found) // get it from the first chunk - which than by definition should have one
+			property("indexOrigin")=found.get();
+		else{
+			LOG(Runtime,error) << "No indexOrigin found " << " falling back to " << util::fvector3();
+			setValueAs("indexOrigin",util::fvector3());
+		}
+	}
 
 	// check voxelsize
 	util::fvector3 &voxeSize = refValueAs<util::fvector3>( "voxelSize" ).get();
