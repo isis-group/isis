@@ -214,7 +214,7 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, util::istring suffix_override, util::istring dialect )
+std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, util::istring suffix_override, util::istring dialect )
 {
 	FileFormatList formatReader;
 	formatReader = getFileFormatList( filename.string(), suffix_override, dialect );
@@ -237,8 +237,8 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
 
 			try {
-				int loaded=it->load( ret, filename.native(), dialect, m_feedback );
-				BOOST_FOREACH( Chunk & ref, ret ) {
+				std::list<data::Chunk> loaded=it->load( filename.native(), dialect, m_feedback );
+				BOOST_FOREACH( Chunk & ref, loaded ) {
 					ref.refValueAsOr( "source", filename.native() ); // set source to filename or leave it if its already set
 				}
 				return loaded;
@@ -256,7 +256,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
 	}
 	
-	return 0;//no plugin of proposed list could load file
+	return std::list<Chunk>();//no plugin of proposed list could load file
 }
 
 
@@ -329,13 +329,12 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 	return ret;
 }
 
-size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, util::istring suffix_override, util::istring dialect )
+std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect )
 {
 	const boost::filesystem::path p( path );
-	const size_t loaded = boost::filesystem::is_directory( p ) ?
-						  get().loadPath( chunks, p, suffix_override, dialect ) :
-						  get().loadFile( chunks, p, suffix_override, dialect );
-	return loaded;
+	return boost::filesystem::is_directory( p ) ?
+		get().loadPath( p, suffix_override, dialect ) :
+		get().loadFile( p, suffix_override, dialect );
 }
 
 std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect )
@@ -343,7 +342,8 @@ std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suf
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
 	BOOST_FOREACH( const std::string & path, paths ) {
-		loaded += load( chunks, path , suffix_override, dialect );
+		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect );
+		chunks.splice(chunks.end(),loaded);
 	}
 	const std::list<data::Image> images = chunkListToImageList( chunks );
 	LOG( Runtime, info )
@@ -356,9 +356,9 @@ std::list<data::Image> IOFactory::load( const std::string &path, util::istring s
 	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
-size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, util::istring suffix_override, util::istring dialect )
+std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path &path, util::istring suffix_override, util::istring dialect )
 {
-	int loaded = 0;
+	std::list<Chunk> ret;
 
 	if( m_feedback ) {
 		const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
@@ -368,16 +368,18 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 	for ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
 		if ( boost::filesystem::is_directory( *i ) )continue;
 
-		loaded += loadFile( ret, *i, suffix_override, dialect );
+		std::list<Chunk> loaded= loadFile( *i, suffix_override, dialect );
 
 		if( m_feedback )
 			m_feedback->progress();
+		
+		ret.splice(ret.end(),loaded);
 	}
 
 	if( m_feedback )
 		m_feedback->close();
 
-	return loaded;
+	return ret;
 }
 
 bool IOFactory::write( const data::Image &image, const std::string &path, util::istring suffix_override, util::istring dialect )

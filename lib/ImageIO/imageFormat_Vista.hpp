@@ -66,14 +66,8 @@ public:
 	 *
 	 */
 	util::istring dialects( const std::string &/*filename*/ )const {return "functional map anatomical onlyfirst";}
-	int load( std::list<data::Chunk> &chunks, const std::string &filename,
-			  const util::istring &dialect,
-			  boost::shared_ptr<util::ProgressFeedback> progress
-			) throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename,
-				const util::istring &dialect,
-				boost::shared_ptr<util::ProgressFeedback> progress
-			  ) throw( std::runtime_error & );
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
 
 	/**
 	 * Default constructor. Needed to initialize some private member variables.

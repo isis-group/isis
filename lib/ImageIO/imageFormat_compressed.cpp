@@ -146,10 +146,9 @@ public:
 	}
 	std::string getName()const {return "(de)compression proxy for other formats";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
 	throw( std::runtime_error & ) {
-		std::list<data::Chunk>::iterator prev = chunks.end();
-		--prev; //memory current position in the output list
+		std::list<data::Chunk> ret;
 
 		//select filters for input
 		boost::iostreams::filtering_istream in;
@@ -157,7 +156,6 @@ public:
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		util::istring suffix = proxyBase.second.c_str();
 		bool isTar = true;
-		int ret = 0;
 
 		if( suffix == ".tgz" )in.push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
 		else if( suffix == ".tbz" )in.push( boost::iostreams::bzip2_decompressor() );
@@ -242,13 +240,11 @@ public:
 						}
 
 						// read the temporary file
-						std::list<data::Chunk>::iterator ch = chunks.end();
-						--ch;
-						ret += data::IOFactory::load( chunks, tmpfile.string(), dialect.c_str() );
-
-						for( ; ch != chunks.end(); ++ch ) { // set the source property of the red chunks to something more usefull
-							ch->setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
+						std::list< data::Chunk > loaded= data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() );
+						BOOST_FOREACH( data::Chunk &ref, loaded) { // set the source property of the red chunks to something more usefull
+							ref.setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
+						ret.splice(ret.end(),loaded);
 					}
 				} else {
 					LOG( Debug, verbose_info ) << "Skipping " << org_file << " because its no regular file (type is " << tar_header.typeflag << ")" ;
@@ -271,13 +267,11 @@ public:
 
 			boost::iostreams::copy( in, output );
 
-			ret = data::IOFactory::load( chunks, tmpFile.native(), dialect );
+			std::list< data::Chunk > loaded= data::IOFactory::loadChunks( tmpFile.native(), dialect );
 
-			if( ret ) { //re-set source of all new chunks
-				prev++;
-				LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
-
-				for( ; prev != chunks.end(); ++prev )prev->setValueAs( "source", filename );
+			 //re-set source of all new chunks
+			BOOST_FOREACH( data::Chunk &ref, loaded) { // set the source property of the red chunks to something more usefull
+				ref.setValueAs( "source", filename  );
 			}
 		}
 
