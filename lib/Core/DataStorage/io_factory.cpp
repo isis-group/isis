@@ -330,34 +330,43 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 	return ret;
 }
 
-std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect )
+std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect, boost::optional< isis::util::slist& > rejected  )
 {
 	const boost::filesystem::path p( path );
 	return boost::filesystem::is_directory( p ) ?
-		get().loadPath( p, suffix_override, dialect ) :
+		get().loadPath( p, suffix_override, dialect, rejected) :
 		get().loadFile( p, suffix_override, dialect );
 }
 
-std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect )
+std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, boost::optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
 	BOOST_FOREACH( const std::string & path, paths ) {
-		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect );
+		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect, rejected );
 		chunks.splice(chunks.end(),loaded);
 	}
 	const std::list<data::Image> images = chunkListToImageList( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << paths;
+
+	// store paths of red, but rejected chunks
+	std::set<std::string> image_rej;
+	BOOST_FOREACH(const data::Chunk &ch, chunks ){
+		image_rej.insert(ch.getValueAs<std::string>("source"));
+	}
+	if(rejected)
+		rejected->insert(rejected->end(),image_rej.begin(),image_rej.end());
+	
 	return images;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, util::istring suffix_override, util::istring dialect )
+std::list<data::Image> IOFactory::load( const std::string &path, util::istring suffix_override, util::istring dialect, boost::optional< isis::util::slist& > rejected )
 {
 	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
-std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path &path, util::istring suffix_override, util::istring dialect )
+std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, boost::optional< util::slist&> rejected )
 {
 	std::list<Chunk> ret;
 
@@ -370,6 +379,10 @@ std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path &path, util:
 		if ( boost::filesystem::is_directory( *i ) )continue;
 
 		std::list<Chunk> loaded= loadFile( *i, suffix_override, dialect );
+
+		if(rejected && loaded.empty()){
+			rejected->push_back(boost::filesystem::path(*i).native());
+		}
 
 		if( m_feedback )
 			m_feedback->progress();
