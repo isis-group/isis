@@ -19,9 +19,6 @@
 #include <boost/mpl/for_each.hpp>
 #include "../CoreUtils/singletons.hpp"
 
-// we need that, because boost::mpl::for_each will instantiate all types - and this needs the output stream operations
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <utime.h>
 
 namespace isis

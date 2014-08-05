@@ -182,28 +182,6 @@ public:
 		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
 	}
-	/**
-	 * Get the string representation of the Value.
-	 * This tries to use the isis type conversion to create a string from the Value.
-	 * If thats no available, it will fall back to boost::lexical_cast. And it will send a warning to CoreDebug.
-	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
-	 * \param labeled if true the typename will be appended to the resulting string in brackets.
-	 */
-	std::string toString( bool labeled = false )const {
-		std::string ret;
-		Reference ref = copyByID( Value<std::string>::staticID );
-
-		if ( ref.isEmpty() ) {
-			LOG( Debug, warning ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
-			ret = boost::lexical_cast<std::string>( m_val );
-		} else {
-			ret = ref->castTo<std::string>();
-		}
-
-		if ( labeled )ret += "(" + staticName() + ")";
-
-		return ret;
-	}
 
 	std::string getTypeName()const {return staticName();}
 	unsigned short getTypeID()const {return staticID;}

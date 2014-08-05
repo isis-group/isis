@@ -20,7 +20,7 @@
 #include "../DataStorage/valuearray.hpp"
 #include "types.hpp"
 #include <complex>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/foreach.hpp>
 

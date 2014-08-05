@@ -175,6 +175,15 @@ public:
 	virtual bool gt( const ValueBase &ref )const = 0;
 	virtual bool lt( const ValueBase &ref )const = 0;
 	virtual bool eq( const ValueBase &ref )const = 0;
+
+	/**
+	 * Get the string representation of the Value.
+	 * This tries to use the isis type conversion to create a string from the Value.
+	 * If thats no available, it will fall back to boost::lexical_cast. And it will send a warning to CoreDebug.
+	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
+	 * \param labeled if true the typename will be appended to the resulting string in brackets.
+	 */
+    virtual std::string toString(bool labeled = false) const;
 };
 
 
