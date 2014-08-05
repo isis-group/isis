@@ -11,6 +11,7 @@
 //
 
 #include "value_base.hpp"
+#include "value.hpp"
 #include "singletons.hpp"
 
 namespace isis
@@ -106,6 +107,23 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 		LOG( Runtime, error ) << "I dont know any conversion from " << MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[ID] );
 		return Reference(); // return an empty Reference
 	}
+}
+
+
+std::string ValueBase::toString(bool labeled) const
+{
+	std::string ret;
+	Reference ref = copyByID( Value<std::string>::staticID );
+
+	if ( ref.isEmpty() ) {
+		LOG( Debug, error ) << "Automatic conversion of " << getTypeName() << " to string failed. Returning empty string";
+	} else {
+		ret = ref->castTo<std::string>();
+	}
+
+	if ( labeled )ret += "(" + getTypeName() + ")";
+
+	return ret;
 }
 
 ValueBase* ValueBase::heap_clone_allocator::allocate_clone( const ValueBase& r )

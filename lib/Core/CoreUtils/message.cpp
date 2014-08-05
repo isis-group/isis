@@ -14,7 +14,7 @@
 #include "common.hpp"
 #include <sys/types.h>
 
-#include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
+#include <boost/date_time/posix_time/posix_time.hpp> //needed to print the timestamp
 
 #ifndef WIN32
 #include <signal.h>

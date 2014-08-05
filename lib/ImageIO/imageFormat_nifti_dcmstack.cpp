@@ -20,7 +20,6 @@
 // #define BOOST_SPIRIT_DEBUG_INDENT 5
 
 #include <boost/foreach.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <CoreUtils/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"

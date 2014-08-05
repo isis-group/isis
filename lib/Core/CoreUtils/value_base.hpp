@@ -228,6 +228,15 @@ public:
 	virtual ValueBase& substract( const ValueBase &ref ) =0;
 	virtual ValueBase& multiply_me( const ValueBase &ref ) = 0;
 	virtual ValueBase& divide_me( const ValueBase &ref ) = 0;
+
+	/**
+	 * Get the string representation of the Value.
+	 * This tries to use the isis type conversion to create a string from the Value.
+	 * If thats no available, it will fall back to boost::lexical_cast. And it will send a warning to CoreDebug.
+	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
+	 * \param labeled if true the typename will be appended to the resulting string in brackets.
+	 */
+	virtual std::string toString(bool labeled = false) const;
 };
 
 
