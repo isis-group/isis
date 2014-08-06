@@ -116,22 +116,22 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.isValid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector3 &origin = ch.property( indexOriginProb ).castTo<util::fvector3>();
+	const util::fvector3 origin = ch.getValueAs<util::fvector3>( indexOriginProb );
 	// and we have the transformation matrix
 	// [ rowVec ]
 	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector3 &rowVec = ch.property( rowVecProb ).castTo<util::fvector3>();
-	const util::fvector3 &columnVec = ch.property( columnVecProb ).castTo<util::fvector3>();
-	const util::fvector3 sliceVec = ch.hasProperty( sliceVecProb ) ?
-									ch.property( sliceVecProb ).castTo<util::fvector3>() :
-									util::fvector3(
-										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
-										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
-										rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-									);
-
+	const util::fvector3 rowVec = ch.getValueAs<util::fvector3>( rowVecProb );
+	const util::fvector3 columnVec = ch.getValueAs<util::fvector3>( columnVecProb );
+	const util::fvector3 sliceVec = ch.getValueAsOr<util::fvector3>(
+		sliceVecProb,
+		util::fvector3(
+			rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+			rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+			rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
+		)
+	);
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 	const util::fvector3 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ) );
@@ -162,7 +162,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 			return false;
 		}
 
-		BOOST_FOREACH( util::PropertyMap::PropPath & ref, equalProps ) { // check all properties which where given to the constructor of the list
+		BOOST_FOREACH(const util::PropertyMap::PropPath & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.property( ref ) != ch.property( ref ) ) {
 				LOG( Debug, verbose_info )
@@ -196,13 +196,11 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	const util::PropertyMap::key_type &prop2 = secondarySort.top().propertyName;
-
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
 			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.property( "indexOrigin" ) << ") with the equal property "
-			<< std::make_pair( prop2, ch.property( prop2 ) );
+			<< std::make_pair( secondarySort.top().propertyName, ch.property( secondarySort.top().propertyName ) );
 
 	LOG_IF(
 		inserted.first && !inserted.second &&

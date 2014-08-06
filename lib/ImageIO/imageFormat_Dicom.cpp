@@ -357,18 +357,16 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			object.remove( "acquisitionTime" );
 		}
 
-		util::fvector3 &diff = object.setValueAs( "diffusionGradient", util::fvector3() ).castTo<util::fvector3>();
+		if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
+			object.transform<util::fvector3>(prefix+"DiffusionGradientOrientation","diffusionGradient");
+		} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
+			object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
+		} else {
+			LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+		}
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
-			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
-				diff = dicomTree.getValueAs<util::fvector3>( "DiffusionGradientOrientation" ) * bValue;
-				dicomTree.remove( "DiffusionGradientOrientation" );
-			} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
-				diff = dicomTree.getValueAs<util::fvector3>( "SiemensDiffusionGradientOrientation" ) * bValue;
-				dicomTree.remove( "SiemensDiffusionGradientOrientation" );
-			} else {
-				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
-			}
+			object.refValueAsOr<util::fvector3>( "diffusionGradient",util::fvector3()).get()*=bValue;
 		}
 	}
 

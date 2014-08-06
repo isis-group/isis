@@ -65,7 +65,8 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	BOOST_CHECK( chunks.insert( ch1 ) );
 
 	// and the list it should not be rectangular anymore
-	BOOST_CHECK( ! chunks.getShape().size()==1 );
+	static const size_t sizes[]={1,2};
+	BOOST_CHECK_EQUAL( chunks.getShape(), std::set<size_t>(sizes,sizes+2) ); // thus two sizes (1 and 2)
 
 	// add the renmaining acquisitionNumber=1-chunks
 	for ( int j = 1; j < 3; j++ ) { //0 is already there
