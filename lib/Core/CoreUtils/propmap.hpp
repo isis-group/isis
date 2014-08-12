@@ -206,7 +206,7 @@ protected:
 	template<typename T> boost::optional<T &> refValueAsImpl( const PropPath &path, const boost::optional<size_t> &at ) {
 		const boost::optional< const PropertyValue & > found = tryFindEntry<PropertyValue>( path );
 
-		if( found && found->size()>at.get_value_or(0) ) {// apparently it already has a value so lets try use that
+		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
 			if( !found->is<T>() ) {
 				if( !transform<T>( path, path ) ) {// convert to requested type
 					LOG( Runtime, warning ) << "Conversion of Property " << path << " from " << util::MSubject( found->getTypeName() ) << " to "

@@ -357,17 +357,17 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			object.remove( "acquisitionTime" );
 		}
 
+		bool foundGrad=false;
 		if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
-			object.transform<util::fvector3>(prefix+"DiffusionGradientOrientation","diffusionGradient");
+			foundGrad= object.transform<util::fvector3>(prefix+"DiffusionGradientOrientation","diffusionGradient");
 		} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
-			object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
+			foundGrad= object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
 		} else {
 			LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
 		}
 
-		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
-			object.refValueAsOr<util::fvector3>( "diffusionGradient",util::fvector3()).get()*=bValue;
-		}
+		if( bValue && foundGrad ) // if bValue is not zero multiply the diffusionGradient by it
+			object.refValueAs<util::fvector3>("diffusionGradient").get()*=bValue;
 	}
 
 
@@ -434,18 +434,14 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into a " << size << " volume";
 	// fix the properties of the source (we 'll need them later)
-	util::fvector3 voxelGap;
-
-	if ( source.hasProperty( "voxelGap" ) )
-		voxelGap = source.getValueAs<util::fvector3>( "voxelGap" );
-
+	const util::fvector3 voxelGap = source.getValueAsOr("voxelGap",util::fvector3());
 	const util::fvector3 voxelSize = source.getValueAs<util::fvector3>( "voxelSize" );
-	const util::fvector3 &rowVec = source.getValueAs<util::fvector3>( "rowVec" );
-	const util::fvector3 &columnVec = source.getValueAs<util::fvector3>( "columnVec" );
+	const util::fvector3 rowVec = source.getValueAs<util::fvector3>( "rowVec" );
+	const util::fvector3 columnVec = source.getValueAs<util::fvector3>( "columnVec" );
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector3 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector3 &origin = source.property( "indexOrigin" ).castTo<util::fvector3>();
+	util::fvector3 &origin = *source.refValueAs<util::fvector3>( "indexOrigin" );
 	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setValueAs( prefix + "ImageType", iType );
@@ -465,9 +461,9 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		LOG( Debug, info ) << "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
 	}
 
-	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.property( "acquisitionTime" ).castTo<float>();
+	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.getValueAs<float>( "acquisitionTime" );
 	else {
-		acqNum = source.property( "acquisitionNumber" ).castTo<uint32_t>();
+		acqNum = source.getValueAs<uint32_t>( "acquisitionNumber" );
 		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
 		haveAcqTimeList = false;
 	}
@@ -479,7 +475,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
-		util::fvector3 &ref = dest.property( "fov" ).castTo<util::fvector3>();
+		util::fvector3 &ref = *dest.refValueAs<util::fvector3>( "fov" );
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
@@ -521,7 +517,6 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, dialect );
-		chunk.setValueAs( "source", filename );
 		const util::slist iType = chunk.getValueAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic

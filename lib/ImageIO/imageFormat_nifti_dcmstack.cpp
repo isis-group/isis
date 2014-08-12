@@ -96,15 +96,17 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 
 	// compute acquisitionTime as relative to DICOM/SeriesTime @todo include date
 	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
-	BOOST_FOREACH( const char * time, time_stor ) {
-
-		if( hasProperty( time ) && hasProperty( "DICOM/SeriesTime" ) ) {
-			const ComputeTimeDist comp = {property( "DICOM/SeriesTime" ).as<ptime>()};
-			util::PropertyValue &dst = property( "acquisitionTime" );
-			const util::PropertyValue &src = property( time );
-			std::transform( src.begin(), src.end(), std::back_inserter(dst), comp );
-			remove( time );
-			break;
+	boost::optional< const util::PropertyValue& > serTime=hasProperty( "DICOM/SeriesTime" );
+	if(serTime){
+		BOOST_FOREACH( const char * time, time_stor ) {
+			boost::optional< const util::PropertyValue& > src=hasProperty( time );
+			if( src ) {
+				const ComputeTimeDist comp = {serTime->as<ptime>()};
+				util::PropertyValue &dst = property( "acquisitionTime" );
+				std::transform( src->begin(), src->end(), std::back_inserter(dst), comp );
+				remove( time );
+				break;
+			}
 		}
 	}
 

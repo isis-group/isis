@@ -146,8 +146,8 @@ public:
 	}
 	std::string getName()const {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )
-	throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & )
+	{
 		std::list<data::Chunk> ret;
 
 		//select filters for input
@@ -240,11 +240,10 @@ public:
 						}
 
 						// read the temporary file
-						std::list< data::Chunk > loaded= data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() );
-						BOOST_FOREACH( data::Chunk &ref, loaded) { // set the source property of the red chunks to something more usefull
+						ret= data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() );
+						BOOST_FOREACH( data::Chunk &ref, ret) { // set the source property of the red chunks to something more usefull
 							ref.setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
-						ret.splice(ret.end(),loaded);
 					}
 				} else {
 					LOG( Debug, verbose_info ) << "Skipping " << org_file << " because its no regular file (type is " << tar_header.typeflag << ")" ;
@@ -267,10 +266,10 @@ public:
 
 			boost::iostreams::copy( in, output );
 
-			std::list< data::Chunk > loaded= data::IOFactory::loadChunks( tmpFile.native(), dialect );
+			ret= data::IOFactory::loadChunks( tmpFile.native(), dialect );
 
 			 //re-set source of all new chunks
-			BOOST_FOREACH( data::Chunk &ref, loaded) { // set the source property of the red chunks to something more usefull
+			BOOST_FOREACH( data::Chunk &ref, ret) { // set the source property of the red chunks to something more usefull
 				ref.setValueAs( "source", filename  );
 			}
 		}
@@ -312,7 +311,6 @@ public:
 
 #ifdef HAVE_LZMA
 		else if( suffix == ".xz" )out.push( boost::iostreams::lzma_compressor() );
-
 #endif
 
 		// write it

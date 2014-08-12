@@ -194,19 +194,15 @@ endif(ISIS_IOPLUGIN_PROCESS)
 # Dicom
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
-	find_library(LIB_DCMIMGLE dcmimgle)
-	find_library(LIB_DCMIMAGE dcmimage)
-	find_library(LIB_DCMDATA dcmdata)
-	find_library(LIB_OFSTD ofstd)
-
+	find_package(DCMTK REQUIRED)
+	
 	find_library(LIB_Z z)
 	find_library(LIB_TIFF tiff)
 	find_library(LIB_PNG png12)
 
-	set(DCM_LIBS ${LIB_DCMIMGLE} ${LIB_DCMIMAGE}  ${LIB_DCMDATA}) #higher functions
+	set(DCM_LIBS ${DCMTK_dcmimgle_LIBRARY} ${DCMTK_dcmimage_LIBRARY}  ${DCMTK_dcmdata_LIBRARY} ${DCMTK_ofstd_LIBRARY})
 
-	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
-	include_directories(${INCPATH_DCMTK})
+	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
 	
 	find_library(LIB_DCM_LOG "oflog")
 	if(LIB_DCM_LOG)
@@ -214,12 +210,12 @@ if(ISIS_IOPLUGIN_DICOM)
 		list(APPEND DCM_LIBS ${LIB_DCM_LOG} )
 	endif(LIB_DCM_LOG)
 
-	list(APPEND DCM_LIBS ${LIB_OFSTD}  ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}) #low level functions
+	list(APPEND DCM_LIBS ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}) #low level functions
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
 
 	if(WIN32)
-	list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
+		list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
 	endif(WIN32)
 
 	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} ${isis_core_lib})
