@@ -536,11 +536,46 @@ public:
 	bool isEmpty() const;
 
 	/**
-	 * Get a list of the properties of the chunks for the given key
+	 * Get a list of the properties of the chunks for the given key.
+	 * Retrieves the named property from each chunk and returnes them as a list.
+	 * Not existing or empty properties will be inserted as empty properties. Thus the length of the list equals the amount of chunks.
+	 * If unique is true those will be skipped. So the list might be shorter.
+	 * \note Image properties (aka common properties) won't  be added
 	 * \param key the name of the property to search for
-	 * \param unique when true empty or consecutive duplicates wont be added
+	 * \param unique when true empty, non existing or consecutive duplicates won't be added
 	 */
 	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::key_type &key, bool unique = false ) const;
+
+	/**
+	 * Get a list of the properties of the chunks for the given key.
+	 * Retrieves the named property from each chunk and returnes them as a list.
+	 * Not existing or empty properties will be inserted as empty properties. Thus the length of the list equals the amount of chunks.
+	 * If unique is true those will be skipped. So the list might be shorter.
+	 * \note Image properties (aka common properties) won't  be added
+	 * \param key the name of the property to search for
+	 * \param unique when true empty, non existing or consecutive duplicates won't be added
+	 */
+	template<typename T> std::list<T> getChunksValuesAs ( const util::PropertyMap::key_type &key, bool unique = false ) const{
+		std::list<T> ret;
+
+		if( clean ) {
+			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+				const boost::optional< const util::PropertyValue& > prop = ref->hasProperty( key );
+
+				if(unique){ // if unique
+					if( prop && !ret.empty() &&  *prop == ret.back() || // if there is prop, skip if its equal
+						!prop //if there is none skip anyway
+					)
+						continue;
+				}
+				ret.push_back( prop.get_value_or(util::PropertyValue(T())).as<T>() );
+			}
+		} else {
+			LOG( Runtime, error ) << "Cannot get chunk-properties from non clean images. Run reIndex first";
+		}
+
+		return ret;
+	}
 
 	/**
 	 * Get the size (in bytes) for the voxels in the image

@@ -643,15 +643,15 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 	if( clean ) {
 		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-			const util::PropertyValue &prop = ref->property( key );
+			const boost::optional< const util::PropertyValue& > prop = ref->hasProperty( key );
 
-			if ( unique && prop.isEmpty() ) //if unique is requested and the property is empty
-				continue; //skip it
-			else if ( unique && !ret.empty() &&  prop == ret.back() )
-				//if unique is requested and the property is equal to the one added before
-				continue;//skip it
-			else
-				ret.push_back( prop );
+			if(unique){ // if unique
+				if( prop && !ret.empty() &&  prop->eq(ret.back()) || // if there is prop, skip if its equal
+					!prop //if there is none skip anyway
+				) 
+					continue;
+			}
+			ret.push_back( prop.get_value_or(util::PropertyValue()) );
 		}
 	} else {
 		LOG( Runtime, error ) << "Cannot get chunk-properties from non clean images. Run reIndex first";
