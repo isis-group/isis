@@ -217,6 +217,18 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		object.setValueAs( "sequenceStart", sequenceStart );
 	}
 
+	// compute studyStart
+	if ( hasOrTell( prefix + "StudyTime", object, warning ) && hasOrTell( prefix + "StudyDate", object, warning ) ) {
+		const date dt=dicomTree.getValueAs<date>("StudyDate");
+		const ptime tm=dicomTree.getValueAs<ptime>("StudyTime");
+		if(!(dt.is_not_a_date() || tm.is_not_a_date_time())){
+			object.setValueAs("studyStart",genTimeStamp(dt,tm));
+			dicomTree.remove("StudyTime");
+			dicomTree.remove("StudyDate");
+		}
+		
+	}
+	
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
 	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
