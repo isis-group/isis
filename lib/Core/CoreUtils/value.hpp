@@ -19,6 +19,7 @@
 #include <functional>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/conditional.hpp>
 
 namespace isis
 {

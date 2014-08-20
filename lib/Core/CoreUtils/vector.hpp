@@ -23,7 +23,6 @@
 #include <numeric>
 #include <cmath>
 
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/mpl/and.hpp>
 
 namespace isis
@@ -237,16 +236,6 @@ public:
 
 		for ( const_iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
 			ret += *i;
-
-		return ret;
-	}
-
-	boost::numeric::ublas::vector<TYPE> getBoostVector() const {
-		boost::numeric::ublas::vector<TYPE> ret = boost::numeric::ublas::vector<TYPE>( SIZE );
-
-		for( size_t i = 0; i < SIZE; i++ ) {
-			ret( i ) = operator[]( i );
-		}
 
 		return ret;
 	}
