@@ -76,8 +76,8 @@ endif(${APPLE})
 
 if("${PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
+  list(APPEND CMAKE_CXX_FLAGS "-fPIC" )
+  list(APPEND CMAKE_C_FLAGS "-fPIC"  )
 endif("${PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
