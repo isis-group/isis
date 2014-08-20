@@ -104,7 +104,7 @@ public:
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
 protected:
 	std::list<Chunk> loadFile( const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
-	std::list<Chunk> loadPath(const boost::filesystem3::path& path, util::istring suffix_override, util::istring dialect, boost::optional< util::slist& > rejected=boost::optional< util::slist& >());
+	std::list<Chunk> loadPath(const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, boost::optional< util::slist& > rejected=boost::optional< util::slist& >());
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

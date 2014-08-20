@@ -103,7 +103,8 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 			if( src ) {
 				const ComputeTimeDist comp = {serTime->as<ptime>()};
 				util::PropertyValue &dst = property( "acquisitionTime" );
-				std::transform( src->begin(), src->end(), std::back_inserter(dst), comp );
+                for(util::PropertyValue::const_iterator i=src->begin();i!=src->end();i++)//@todo use transform in c++11
+                    dst.push_back(comp(*i) );
 				remove( time );
 				break;
 			}

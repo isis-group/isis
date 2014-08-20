@@ -53,6 +53,7 @@ public:
 	template<typename T> PropertyValue( const Value<T> &ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref );}
 	/// Create a property and store the given single value object.
 	PropertyValue( const ValueBase& ref, bool _needed = false ):m_needed( _needed ),container(1) {push_back(ref);}
+    virtual ~PropertyValue(){}
 
 	////////////////////////////////////////////////////////////////////////////
 	// List operations

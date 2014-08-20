@@ -294,8 +294,8 @@ public:
 		BOOST_STATIC_ASSERT( sizeof( std::complex<SRC> ) == sizeof( SRC ) * 2 );
 		BOOST_STATIC_ASSERT( sizeof( std::complex<DST> ) == sizeof( DST ) * 2 );
 
-		const SRC *sp = &src.castToValueArray<std::complex<SRC> >().begin()->real();
-		DST *dp = &dst.castToValueArray<std::complex<DST> >().begin()->real();
+		const SRC *sp = reinterpret_cast<const SRC*>(&src.castToValueArray<std::complex<SRC> >()[0]);
+		      DST *dp = reinterpret_cast<      DST*>(&dst.castToValueArray<std::complex<DST> >()[0]);
 
 		NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value>::convert( sp, dp, scaling, getConvertSize( src, dst ) * 2 );
 	}
