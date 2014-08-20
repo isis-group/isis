@@ -196,15 +196,15 @@ std::list< data::Chunk > JsonMap::translateToISIS( data::Chunk orig )
 
 	if( hasBranch( "global/const" ) ) { //store const data prior to possible splicing as DICOM
 		branch( "DICOM" ).join( branch( "global/const" ) );
+		remove( "global/const" );
 	}
 
-	remove( "global/const" );
 
 	if( hasBranch( "global/slices" ) ) { //store slice data prior to possible splicing as DICOM
 		branch( "DICOM" ).join( branch( "global/slices" ) );
+		remove( "global/slices" );
 	}
 
-	remove( "global/slices" );
 
 	// if we have a DICOM/AcquisitionNumber-list or DICOM/InstanceNumber rename that to acquisitionNumber and splice the chunk in necessary
 	if( hasProperty( "DICOM/InstanceNumber" ) ) {
@@ -226,21 +226,21 @@ std::list< data::Chunk > JsonMap::translateToISIS( data::Chunk orig )
 	}
 
 
-	// compute acquisitionTime as relative to DICOM/SeriesTime @todo include date
-	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
-	BOOST_FOREACH( const char * time, time_stor ) {
-		const TmParser p;
-		const ComputeTimeDist comp = {p( propertyValue( "DICOM/SeriesTime" ) ).castTo<ptime>()};
-
-		if( hasProperty( time ) && hasProperty( "DICOM/SeriesTime" ) ) {
-			std::vector< util::PropertyValue > &dst = propertyValueVec( "acquisitionTime" );
-			const std::vector< util::PropertyValue > &src = propertyValueVec( time );
-			dst.resize( src.size() );
-			std::transform( src.begin(), src.end(), dst.begin(), comp );
-			remove( time );
-			break;
-		}
-	}
+	// @todo compute acquisitionTime as relative to DICOM/SeriesTime / include date
+// 	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
+// 	BOOST_FOREACH( const char * time, time_stor ) {
+// 		const TmParser p;
+// 		const ComputeTimeDist comp = {p( propertyValue( "DICOM/SeriesTime" ) ).castTo<ptime>()};
+// 
+// 		if( hasProperty( time ) && hasProperty( "DICOM/SeriesTime" ) ) {
+// 			std::vector< util::PropertyValue > &dst = propertyValueVec( "acquisitionTime" );
+// 			const std::vector< util::PropertyValue > &src = propertyValueVec( time );
+// 			dst.resize( src.size() );
+// 			std::transform( src.begin(), src.end(), dst.begin(), comp );
+// 			remove( time );
+// 			break;
+// 		}
+// 	}
 
 	// deal with mosaic
 	bool is_mosaic = false;
@@ -269,10 +269,12 @@ std::list< data::Chunk > JsonMap::translateToISIS( data::Chunk orig )
 	const char *matrizes[] = {"dcmmeta_affine", "dcmmeta_reorient_transform"};
 	BOOST_FOREACH( util::istring matrix, matrizes ) {
 		int cnt = 0;
-		BOOST_FOREACH( const util::PropertyValue & val, propertyValueVec( matrix ) ) {
-			setPropertyAs( matrix + "[" + boost::lexical_cast<util::istring>( cnt++ ) + "]", val.as<util::fvector4>() );
+		if(hasProperty(matrix)){
+			BOOST_FOREACH( const util::PropertyValue & val, propertyValueVec( matrix ) ) {
+				setPropertyAs( matrix + "[" + boost::lexical_cast<util::istring>( cnt++ ) + "]", val.as<util::fvector4>() );
+			}
+			remove( matrix );
 		}
-		remove( matrix );
 	}
 
 	orig.join( *this, true );
