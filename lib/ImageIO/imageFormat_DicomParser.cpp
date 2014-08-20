@@ -260,7 +260,8 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
 	}
 	break;
-	case EVR_UN: { //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
+	case EVR_UN: //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
+	case EVR_OB:{ //bytes .. if it looks like text, use it as text
 		//@todo do a better sanity check
 		Uint8 *buff;
 		elem->getUint8Array( buff ); // get the raw data
@@ -276,6 +277,15 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 			map.setPropertyAs<std::string>( name, o.str() ); //stuff it into a string
 		} else
 			map.setPropertyAs<std::string>( name, std::string( ( char * )buff, len ) ); //stuff it into a string
+	}
+	break;
+	case EVR_OW: { //16bit words - parse as base256 strings
+		Uint16 *buff;
+		elem->getUint16Array( buff ); // get the raw data
+		Uint32 len = elem->getLength();
+		std::stringstream o;
+		std::copy( buff, buff + len, std::ostream_iterator<Uint16>( o << std::hex ) );
+		map.setPropertyAs<std::string>( name, o.str() ); //stuff it into a string
 	}
 	break;
 	default: {
@@ -322,6 +332,11 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 		map.propertyValue( name ) = util::ilist( buff, buff + len );
 	}
 	break;
+	case EVR_SS: {
+		Sint16 *buff;
+		elem->getSint16Array( buff );
+		map.propertyValue( name ) = util::ilist( buff, buff + len );
+	}
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
 	case EVR_ST: { //short text
@@ -335,7 +350,6 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_AS:
 	case EVR_DA:
 	case EVR_TM:
-	case EVR_SS:
 	case EVR_UL:
 	case EVR_AE: //Application Entity (string)
 	case EVR_LT: //long text

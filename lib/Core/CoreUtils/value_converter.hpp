@@ -46,7 +46,7 @@ public:
 	virtual ~ValueConverterBase() {}
 };
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 class ValueConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > >
 {
 public:
@@ -54,7 +54,7 @@ public:
 };
 
 }
-API_EXCLUDE_END
+API_EXCLUDE_END;
 }
 }
 /// @endcond _internal

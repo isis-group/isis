@@ -21,7 +21,7 @@ template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigne
 namespace _internal
 {
 
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 
 ///////////////////////////////////////////////////////////
 // some voodoo to get the vector types into the templates /
@@ -206,7 +206,7 @@ template<typename T> std::pair<T, T> _getMinMax( const T *data, size_t len )
 	}
 }
 
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 ////////////////////////////////////////////////
 // specialize calcMinMax for (u)int(8,16,32)_t /

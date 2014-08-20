@@ -175,6 +175,11 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, verbose_info ) << "Inserting 1st chunk";
 		std::stack<scalarPropCompare> backup = secondarySort;
 
+		if(ch.getDimSize(sliceDim)>1){
+			LOG(Runtime,info)<< "We're dealing with volume chunks, considering indexOrigin as equal across Images";
+			equalProps.push_back("indexOrigin");
+		}
+
 		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
 			const util::PropertyMap::KeyType temp = secondarySort.top().propertyName;
 
@@ -224,11 +229,13 @@ void SortedChunkList::clear()
 bool SortedChunkList::isRectangular()
 {
 	if( isEmpty() )return true;
-
-	size_t images = getHorizontalSize();
-	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
-		if( outer.second.size() != images )
+	
+	const size_t images = getHorizontalSize();
+	for( PrimaryMap::iterator c=chunks.begin();c!=chunks.end();c++ ) {
+		if( c->second.size() != images ){
+			LOG(Runtime,warning) << "Found conflicting non geometric depth of " << c->second.size() << " (the first depth was " << images << ") on a width of " << chunks.size();
 			return false;
+		}
 	}
 	return true;
 }

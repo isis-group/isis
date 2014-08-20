@@ -110,14 +110,14 @@ void Image::deduplicateProperties()
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
 	const boost::shared_ptr<Chunk> &first = lookup[0];
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropertyMap common;
+	util::PropertyMap common=*first;;
 	util::PropertyMap::KeyList uniques;
-	first->toCommonUnique( common, uniques, true );
 
 	for ( size_t i = 1; i < lookup.size(); i++ ) {
 		lookup[i]->toCommonUnique( common, uniques, false );
 	}
 
+	// @todo removing uniques - list might improve performance
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 
@@ -338,7 +338,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (geometric size is " << set.getHorizontalSize() << ")";
+		LOG( Runtime, error ) << "Aborting reindex of incomplete image.";
 		return false;
 	}
 
@@ -432,13 +432,13 @@ bool Image::reIndex()
 
 	//if we have at least two slides (and have slides (with different positions) at all)
 	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
-		const util::fvector3 thisV = first.getPropertyAs<util::fvector3>( "indexOrigin" );
+		const util::fvector3 firstV = first.getPropertyAs<util::fvector3>( "indexOrigin" );
 		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
 		if ( last.hasProperty( "indexOrigin" ) ) {
 			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
 			//check the slice vector
-			util::fvector3 distVecNorm = lastV - thisV;
+			util::fvector3 distVecNorm = lastV - firstV;
 			LOG_IF( distVecNorm.len() == 0, Runtime, error )
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
@@ -457,11 +457,10 @@ bool Image::reIndex()
 			}
 		}
 
-		const Chunk &next = chunkAt( 1 );
-
-		if ( next.hasProperty( "indexOrigin" ) ) {
-			const util::fvector3 nextV = next.getPropertyAs<util::fvector3>( "indexOrigin" );
-			const float sliceDist = ( nextV - thisV ).len() - voxeSize[2];
+		if ( last.hasProperty( "indexOrigin" ) ) {
+			const util::fvector3 lastV = last.getPropertyAs<util::fvector3>( "indexOrigin" );
+			const float avDist = ( lastV - firstV ).len() / (structure_size[2]-1); //average dist between the middle of two slices
+			const float sliceDist = avDist - voxeSize[2]; // the gap between two slices
 
 			if ( sliceDist > 0 ) {
 				static const float inf = std::numeric_limits<float>::infinity();
@@ -473,7 +472,7 @@ bool Image::reIndex()
 				util::fvector3 &voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector3>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 20 ), Runtime, warning )
+					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
 							<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 				} else {
@@ -996,7 +995,11 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	};
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
-	set.clear(); // clear the image, so we can insert the splices
+
+	// reset the Chunk set, so we can insert new splices
+	set=_internal::SortedChunkList(defaultChunkEqualitySet); 
+	set.addSecondarySort( "acquisitionNumber" );
+
 	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
