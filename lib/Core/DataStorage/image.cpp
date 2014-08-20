@@ -472,7 +472,7 @@ bool Image::reIndex()
 				util::fvector3 &voxelGap = propertyValue( "voxelGap" ).castTo<util::fvector3>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 20 ), Runtime, warning )
+					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
 							<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 				} else {
