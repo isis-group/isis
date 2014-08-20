@@ -219,10 +219,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 	// compute studyStart
 	if ( hasOrTell( prefix + "StudyTime", object, warning ) && hasOrTell( prefix + "StudyDate", object, warning ) ) {
-		const date dt=dicomTree.getValueAs<date>("StudyDate");
-		const ptime tm=dicomTree.getValueAs<ptime>("StudyTime");
+		const date dt=dicomTree.getPropertyAs<date>("StudyDate");
+		const ptime tm=dicomTree.getPropertyAs<ptime>("StudyTime");
 		if(!(dt.is_not_a_date() || tm.is_not_a_date_time())){
-			object.setValueAs("studyStart",genTimeStamp(dt,tm));
+			object.setPropertyAs("studyStart",genTimeStamp(dt,tm));
 			dicomTree.remove("StudyTime");
 			dicomTree.remove("StudyDate");
 		}
