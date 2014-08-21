@@ -183,7 +183,6 @@ BOOST_AUTO_TEST_CASE ( copy_image_test )
 	chunks.back().setValueAs<float>( "acquisitionTime", 1 );
 
 	data::Image img( chunks );
-	const size_t size[] = {4, 4, 1, 2};
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 

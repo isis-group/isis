@@ -29,9 +29,9 @@ namespace _internal
 /**
  * Continously searches in a sorted list using the given less-than comparison.
  * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
+ * Then it returns.
  * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
+ * This value is changed directly, so after the function returns, it references the first entry of the list
  * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
  * \param end the end of the list
  * \param compare the compare-value
@@ -59,7 +59,7 @@ struct MapStrAdapter: boost::static_visitor<PropertyValue> {
 };
 struct RemoveEqualCheck: boost::static_visitor<bool> {
 	bool removeNeeded;
-	RemoveEqualCheck( bool _removeNeeded ): removeNeeded( removeNeeded ) {}
+	RemoveEqualCheck( bool _removeNeeded ): removeNeeded( _removeNeeded ) {}
 	bool operator()( PropertyValue &first, const PropertyValue &second )const { // if both are Values
 		if( first != second ) {
 			return false;
