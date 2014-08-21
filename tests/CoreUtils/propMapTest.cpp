@@ -319,5 +319,44 @@ BOOST_AUTO_TEST_CASE( prop_value_ref_test )
 	BOOST_CHECK_EQUAL( map.getValueAs<util::fvector4>( "Test1" ), util::fvector4( 1, 2, 3, 4 ) );
 }
 
+BOOST_AUTO_TEST_CASE( propMap_transfer_test )
+{
+	PropertyMap map1,map2;
+	map1.property( "Test1" ) = M_2_PI;
+	map1.property( "Test2" ) = ( int32_t )5;
+	map1.property( "Test3" ) = util::fvector4( 1, 1, 1, 1 );
+	map1.property( "Test4" ) = std::string( "Hallo" );
+	map1.property( "sub/Test1" ) = ( int32_t )1;
+	map1.property( "sub/Test2" ) = ( int32_t )2;
+
+	BOOST_CHECK(map2.transfer(map1).empty());
+	BOOST_CHECK(map1.isEmpty()); //source should be empty after transfer
+
+	// stuff should be in map2 now
+	BOOST_CHECK_EQUAL(map2.property( "Test1" ), M_2_PI);
+	BOOST_CHECK_EQUAL(map2.property( "Test2" ), ( int32_t )5);
+	BOOST_CHECK_EQUAL(map2.property( "Test3" ), util::fvector4( 1, 1, 1, 1 ));
+	BOOST_CHECK_EQUAL(map2.property( "Test4" ), std::string( "Hallo" ));
+	BOOST_CHECK_EQUAL(map2.property( "sub/Test1" ), ( int32_t )1);
+	BOOST_CHECK_EQUAL(map2.property( "sub/Test2" ), ( int32_t )2);
+
+	map1.property("test1") = M_PI;
+	PropertyMap::PathSet rejected=map1.transfer(map2);
+	BOOST_REQUIRE_EQUAL(rejected.size(),1); // there should be one rejected
+	BOOST_CHECK_EQUAL(*rejected.begin(),"Test1"); //it should be Test1
+	BOOST_CHECK_EQUAL(map1.property("test1"), M_PI); // this should not be overwritten
+	BOOST_CHECK_EQUAL(map2.property("test1"), M_2_PI); // and this should still be there
+
+	BOOST_CHECK(map1.transfer(map2,true).empty()); // with overwrite it should be now
+	BOOST_CHECK_EQUAL(map1.property("Test1"), M_2_PI); 
+
+	BOOST_CHECK(map2.transfer(map1,"sub").empty()); //subtree
+	BOOST_CHECK(!map1.hasBranch("sub")); //subtree no more
+
+	BOOST_CHECK_EQUAL(map2.property( "Test1" ), ( int32_t )1); // its here now
+	BOOST_CHECK_EQUAL(map2.property( "Test2" ), ( int32_t )2);
+}
+
+
 }
 }
