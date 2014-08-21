@@ -108,7 +108,7 @@ void PropertyValue::swap(PropertyValue& ref)
 	container.swap(ref.container);
 }
 
-void PropertyValue::transform(uint16_t dstID)
+bool PropertyValue::transform(uint16_t dstID)
 {
 	PropertyValue ret,err;
 	BOOST_FOREACH(const ValueBase& ref,container){
@@ -122,8 +122,11 @@ void PropertyValue::transform(uint16_t dstID)
 
 	if(!err.isEmpty()){
 		LOG( Debug, error ) << "Interpretation of " << err << " as " << util::getTypeMap(true,false)[dstID] << " failed. Keeping old type.";
-	} else
+		return false;
+	} else {
 		container.swap(ret.container);
+		return true;
+	}
 }
 
 

@@ -130,8 +130,8 @@ public:
 	void swap(PropertyValue &src);
 
 	/// Transform all contained properties into type T
-	void transform( uint16_t dstID );
-	template<typename T> void transform(){transform(Value<T>::staticID);}
+	bool transform( uint16_t dstID );
+	template<typename T> bool transform(){return transform(Value<T>::staticID);}
 	
 	/**
 	 * Empty constructor.
