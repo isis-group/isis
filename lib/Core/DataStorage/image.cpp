@@ -563,7 +563,6 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
-	#warning get rid of me
 	std::vector<isis::data::Chunk> ret;
 	ret.reserve( lookup.size() );
 	std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
@@ -643,10 +642,10 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 	if( clean ) {
 		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-			const boost::optional< const util::PropertyValue& > prop = ref->hasProperty( key );
+			const boost::optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 			if(unique){ // if unique
-				if( prop && !ret.empty() &&  prop->eq(ret.back()) || // if there is prop, skip if its equal
+				if( (prop && !ret.empty() &&  prop->eq(ret.back())) || // if there is prop, skip if its equal
 					!prop //if there is none skip anyway
 				) 
 					continue;

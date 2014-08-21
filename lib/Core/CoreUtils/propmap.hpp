@@ -205,11 +205,11 @@ protected:
 		}
 	};
 	template<typename T> boost::optional<T &> refValueAsImpl( const PropPath &path, const boost::optional<size_t> &at ) {
-		const boost::optional< const PropertyValue & > found = tryFindEntry<PropertyValue>( path );
+		const boost::optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
 
 		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
 			if( !found->is<T>() ) {
-				if( !transform<T>( path, path ) ) {// convert to requested type
+				if( !found->transform<T>() ) {// convert to requested type
 					LOG( Runtime, warning ) << "Conversion of Property " << path << " from " << util::MSubject( found->getTypeName() ) << " to "
 											<< util::MSubject( util::Value<T>::staticName() ) << " failed";
 					return boost::optional<T &>();
@@ -217,8 +217,8 @@ protected:
 			}
 			assert( found->is<T>() );
 			return at ?
-				const_cast<PropertyValue &>( *found ).at(*at).castTo<T>():
-				const_cast<PropertyValue &>( *found ).castTo<T>(); // use single value ops, if at was not given
+				found->at(*at).castTo<T>():
+				found->castTo<T>(); // use single value ops, if at was not given
 		}
 
 		return boost::optional<T &>();
@@ -273,6 +273,17 @@ protected:
 		}
 
 		return  boost::optional<const T &>();
+	}
+	template<typename T> boost::optional<T &> tryFindEntry( const PropPath &path ){
+		try {
+			boost::optional<PropertyMap::mapped_type &> ref = findEntry( path );
+
+			if( ref )
+				return boost::get<T>( *ref );
+		} catch ( const boost::bad_get &e ) {
+			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
+		}
+		return  boost::optional<T &>();
 	}
 	template<typename T> boost::optional<T &> tryFetchEntry( const PropPath &path ) {
 		try {
@@ -395,6 +406,7 @@ public:
 	 * \returns true if the given property does exist and is not empty, false otherwise
 	 */
 	boost::optional< const PropertyValue & > hasProperty( const PropPath &path )const;
+	boost::optional< PropertyValue & > hasProperty( const PropPath &path );
 
 	/**
 	 * Search for a property/branch in the whole Tree.
@@ -412,6 +424,7 @@ public:
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
 	boost::optional< const PropertyMap & > hasBranch( const PropPath &path )const;
+	boost::optional< PropertyMap & > hasBranch( const PropPath &path );
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools

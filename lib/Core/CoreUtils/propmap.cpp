@@ -85,7 +85,8 @@ struct JoinTreeVisitor: boost::static_visitor<bool> {
 			else first = second; 
 			return true;
 		} else { // otherwise put the other into rejected if its unequal to ours
-			if( first != second )rejects.insert( rejects.end(), prefix / name );
+			if( first != second )
+				rejects.insert( rejects.end(), prefix / name );
 			return false;
 		}
 	}
@@ -456,8 +457,14 @@ PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, const PropPath &path, bool overwrite)
 {
-	PathSet rejects=transfer(other.branch(path),overwrite);
-	other.remove(path);
+	boost::optional< PropertyMap& > b=other.hasBranch(path);
+	PathSet rejects;
+	if(b){
+		rejects=transfer(*b,overwrite);
+		if(rejects.empty())
+			other.remove(path);
+	} else
+		LOG(Runtime,error) << "Branch " << path << " does not exist, won't do anything";
 	return rejects;
 }
 
@@ -466,21 +473,25 @@ void PropertyMap::joinTree( PropertyMap &other, bool overwrite, bool delsource, 
 {
 	container_type::iterator thisIt = container.begin();
 
-	for ( container_type::iterator otherIt = other.container.begin(); otherIt != other.container.end(); otherIt++ ) { //iterate through the elements of other
+	for ( container_type::iterator otherIt = other.container.begin(); otherIt != other.container.end(); ) { //iterate through the elements of other
 		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
 			if(
 				boost::apply_visitor( _internal::JoinTreeVisitor( overwrite, delsource, rejects, prefix, thisIt->first ), thisIt->second, otherIt->second ) &&
 				delsource
-			)// if the join was complete and delsource is true
-				other.container.erase(otherIt); // remove the entry from the source
+			){// if the join was complete and delsource is true
+				other.container.erase(otherIt++); // remove the entry from the source
+			} else {
+				otherIt++;
+			}
 				
 		} else { // ok we dont have that - just insert it
 			if(delsource){ // if we don't need the source anymore
 				otherIt->second.swap(container[otherIt->first]); //swap it with the empty (because newly created) entry in the destination
-				other.container.erase(otherIt);//remove now empty entry
+				other.container.erase(otherIt++);//remove now empty entry
 			} else { // insert a copy
 				const std::pair<container_type::const_iterator, bool> inserted = container.insert( *otherIt );
 				LOG_IF( !inserted.second, Debug, warning ) << "Failed to insert property " << MSubject( *inserted.first );
+				otherIt++;
 			}
 		}
 	}
@@ -500,8 +511,6 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t
 	if(src.isEmpty())
 		return false;
 	
-	bool ret = false;
-
 	if ( src.getTypeID() == dstID ) { //same type - just rename it
 		if( from != to ) // if its not at the same place anyway
 			return rename(from,to);
@@ -539,6 +548,15 @@ boost::optional<const PropertyValue &> PropertyMap::hasProperty( const PropPath 
 	} else
 		return boost::optional<const PropertyValue &>();
 }
+boost::optional<PropertyValue &> PropertyMap::hasProperty( const PropPath &path )
+{
+	boost::optional< PropertyValue& > ref = tryFindEntry<PropertyValue>( path );
+
+	if( ref && ! ref->isEmpty() ) {
+		return ref;
+	} else
+		return boost::optional<PropertyValue &>();
+}
 
 PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty, bool allowBranch ) const
 {
@@ -572,6 +590,10 @@ PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty
 }
 
 boost::optional< const PropertyMap& > PropertyMap::hasBranch( const PropPath &path ) const
+{
+	return tryFindEntry<PropertyMap>( path );
+}
+boost::optional< PropertyMap& > PropertyMap::hasBranch( const PropPath &path )
 {
 	return tryFindEntry<PropertyMap>( path );
 }
@@ -641,7 +663,7 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 	member= member.copy() | label >> ( value | vallist | object );
 
 	uint8_t* end = streamEnd;
-	bool erg = qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
+	qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
 	return end == streamEnd;
 }
 
