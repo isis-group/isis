@@ -98,11 +98,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 
 	configure_file(${DOXYFILE_IN} Doxyfile ESCAPE_QUOTES IMMEDIATE @ONLY)
 
-	get_target_property(DOC_TARGET doc TYPE)
-	if(NOT DOC_TARGET)
-		add_custom_target(doc)
-	endif()
-		
+	add_custom_target(doc)		
 	add_dependencies(doc doxygen)
 endif()
 

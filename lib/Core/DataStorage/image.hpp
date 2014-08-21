@@ -78,7 +78,7 @@ public:
 	{}
 
 	// empty constructor
-	ImageIteratorTemplate() : ch_idx ( 0 ), ch_len ( 0 ), ch_cnt( 0 ) {}
+	ImageIteratorTemplate() : ch_idx ( 0 ), ch_cnt( 0 ), ch_len ( 0 ) {}
 
 
 	// normal conytructor
@@ -174,8 +174,8 @@ public:
 
 	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const throw( std::out_of_range ) {
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
-		assert ( ( n / ch_len + static_cast<typename ThisType::difference_type> ( ch_idx ) ) >= 0 );
-		const typename inner_iterator::difference_type my_ch_idx = ch_idx + n / ch_len; //if neccesary jump to next chunk
+		assert ( (ch_idx + n / ch_len ) >= 0 );
+		const size_t my_ch_idx = static_cast<size_t>(ch_idx + n / ch_len); //if neccesary jump to next chunk
 
 		if ( my_ch_idx >= ch_cnt )
 			throw std::out_of_range(
@@ -563,7 +563,7 @@ public:
 				const boost::optional< const util::PropertyValue& > prop = ref->hasProperty( key );
 
 				if(unique){ // if unique
-					if( prop && !ret.empty() &&  *prop == ret.back() || // if there is prop, skip if its equal
+					if( ( prop && !ret.empty() &&  *prop == ret.back() ) || // if there is prop, skip if its equal
 						!prop //if there is none skip anyway
 					)
 						continue;

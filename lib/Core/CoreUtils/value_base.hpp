@@ -78,7 +78,7 @@ protected:
 	* \returns a ValueBase-pointer to a newly created Value/ValueArray.
 	*/
 	virtual ValueBase *clone()const = 0;
-	ValueBase &operator=(const ValueBase &ref){}//prevent direct usage
+	ValueBase &operator=(const ValueBase &ref);//prevent direct usage
 public:
 	/// used for boost::ptr_vector
 	struct heap_clone_allocator
@@ -86,7 +86,7 @@ public:
 		static ValueBase* allocate_clone( const ValueBase& r );
 		static void deallocate_clone( const ValueBase* r );
 	};
-	
+
 	typedef _internal::GenericReference<ValueBase> Reference;
 	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
@@ -192,7 +192,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	virtual bool gt( const ValueBase &ref )const = 0;
-	
+
 	/**
 	 * Check if the value of this is less than ref converted to TYPE.
 	 * The funkcion tries to convert ref to the type of this and compare the result.
@@ -203,7 +203,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	virtual bool lt( const ValueBase &ref )const = 0;
-	
+
 	/**
 	 * Check if the value of this is equal to ref converted to TYPE.
 	 * The funktion tries to convert ref to the type of this and compare the result.

@@ -143,7 +143,6 @@ bool Image::insertChunk ( const Chunk &chunk )
 
 		// re-move all properties from the image back into the chunks 
 		BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		#warning test me
 			ref->transfer( *this );
 		}
 	}

@@ -39,8 +39,8 @@ public:
 	typedef const util::ValueReference ( *Getter )( const void * );
 	typedef void ( *Setter )( void *, const util::ValueBase & );
 protected:
-	const uint8_t *const p;
 	const Getter getter;
+	const uint8_t *const p;
 	ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc );
 public:
 	// to make some algorithms work
@@ -145,7 +145,7 @@ protected:
 	/// Create a ValueArray of the same type pointing at the same address.
 	virtual ValueArrayBase *clone()const = 0;
 
-	ValueArrayBase &operator=(const ValueArrayBase &ref){m_len=ref.m_len;}//prevent direct usage
+	void operator=(const ValueArrayBase &ref){m_len=ref.m_len;}//prevent direct usage
 
 public:
 	typedef _internal::GenericValueIterator<false> value_iterator;
