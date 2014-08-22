@@ -131,10 +131,12 @@ public:
 
 class DcmtkLogger : public log4cplus::Appender{
 	log4cplus::SharedAppenderPtrList others;
+	std::set<log4cplus::tstring> ignores;
 public:
     DcmtkLogger():others(log4cplus::Logger::getRoot().getAllAppenders()){
 		// there shall be no logging besides me
 		log4cplus::Logger::getRoot().removeAllAppenders();
+		ignores.insert("no pixel data found in DICOM dataset");
 	}
     ~DcmtkLogger(){
 		log4cplus::Logger logger = log4cplus::Logger::getRoot();
@@ -146,7 +148,9 @@ public:
     virtual void close(){}
 protected:
     virtual void append(const log4cplus::spi::InternalLoggingEvent& event){
-		LOG(Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
+		const log4cplus::tstring &msg=event.getMessage();
+		if(ignores.find(msg)==ignores.end())
+			LOG(Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
 }
