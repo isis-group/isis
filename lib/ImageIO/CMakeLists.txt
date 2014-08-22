@@ -196,29 +196,13 @@ endif(ISIS_IOPLUGIN_PROCESS)
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
 	
-	find_library(LIB_Z z)
 	find_library(LIB_TIFF tiff)
 	find_library(LIB_PNG png12)
 
-	set(DCM_LIBS ${DCMTK_dcmimgle_LIBRARY} ${DCMTK_dcmimage_LIBRARY}  ${DCMTK_dcmdata_LIBRARY} ${DCMTK_ofstd_LIBRARY})
-
-	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
-	
-	find_library(LIB_DCM_LOG "oflog")
-	if(LIB_DCM_LOG)
-		message(STATUS "dcmtk 3.6 found - linking against ${LIB_DCM_LOG}")
-		list(APPEND DCM_LIBS ${LIB_DCM_LOG} )
-	endif(LIB_DCM_LOG)
-
-	list(APPEND DCM_LIBS ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}) #low level functions
+	include_directories(${DCMTK_INCLUDE_DIRS})
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-
-	if(WIN32)
-		list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
-	endif(WIN32)
-
-	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} ${isis_core_lib})
+	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${LIB_PNG} ${LIB_TIFF} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 

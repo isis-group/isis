@@ -5,6 +5,7 @@
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <dcmtk/dcmdata/dcdicent.h>
+#include <dcmtk/oflog/config.h>
 
 namespace isis
 {
@@ -125,6 +126,27 @@ public:
 		}
 
 		return *ret;
+	}
+};
+
+class DcmtkLogger : public log4cplus::Appender{
+	log4cplus::SharedAppenderPtrList others;
+public:
+    DcmtkLogger():others(log4cplus::Logger::getRoot().getAllAppenders()){
+		// there shall be no logging besides me
+		log4cplus::Logger::getRoot().removeAllAppenders();
+	}
+    ~DcmtkLogger(){
+		log4cplus::Logger logger = log4cplus::Logger::getRoot();
+		while(!others.empty()){// put the others back
+			logger.addAppender(others.front());// although apparently removeAllAppenders seems to delete them ...
+			others.pop_front(); // so we're probably adding nothing
+		}
+	}
+    virtual void close(){}
+protected:
+    virtual void append(const log4cplus::spi::InternalLoggingEvent& event){
+		LOG(Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
 }
@@ -554,7 +576,7 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 
 bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 
-ImageFormat_Dicom::ImageFormat_Dicom()
+ImageFormat_Dicom::ImageFormat_Dicom():log_forward(new _internal::DcmtkLogger)
 {
 	//first read external dictionary if available
 	if ( dcmDataDict.isDictionaryLoaded() ) {
@@ -585,8 +607,15 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 		dictionary[DcmTag( 0x0029, i )] = ( std::string( "Private Code for " ) + DcmTag( 0x0029, i << 8 ).toString().c_str() + "-" + DcmTag( 0x0029, ( i << 8 ) + 0xFF ).toString().c_str() ).c_str();
 	}
 
-
+	//hack to steal logging from dcmtk and redirect it to our own
+	log4cplus::Logger logger = log4cplus::Logger::getRoot();
+	logger.addAppender(log_forward);
 }
+ImageFormat_Dicom::~ImageFormat_Dicom()
+{
+	log4cplus::Logger::getRoot().removeAppender(log_forward);
+}
+
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const
 {
 	std::map< DcmTagKey, util::PropertyMap::PropPath >::const_iterator entry = dictionary.find( tag );
@@ -599,6 +628,5 @@ util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )c
 
 isis::image_io::FileFormat *factory()
 {
-	isis::image_io::ImageFormat_Dicom *ret = new isis::image_io::ImageFormat_Dicom;
-	return ret;
+	return new isis::image_io::ImageFormat_Dicom;
 }
