@@ -198,11 +198,12 @@ if(ISIS_IOPLUGIN_DICOM)
 	
 	find_library(LIB_TIFF tiff)
 	find_library(LIB_PNG png12)
+	find_library(LIB_DCM_LOG "oflog")
 
 	include_directories(${DCMTK_INCLUDE_DIRS})
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${LIB_PNG} ${LIB_TIFF} ${isis_core_lib})
+	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${LIB_PNG} ${LIB_TIFF} ${LIB_DCM_LOG} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 
