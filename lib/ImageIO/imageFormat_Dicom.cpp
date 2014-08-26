@@ -40,9 +40,8 @@ class DicomChunk : public data::Chunk
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
-		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
-		data::ValueArray<util::color<TYPE> > &dest = ret->asValueArray<util::color<TYPE> >();
-		const size_t pixels = dest.getLength();
+		const size_t pixels = width*height;
+		data::ValueArray<util::color<TYPE> > dest(pixels);
 
 		for ( size_t i = 0; i < pixels; i++ ) {
 			util::color<TYPE> &dvoxel = dest[i];
@@ -50,8 +49,7 @@ class DicomChunk : public data::Chunk
 			dvoxel.g = source[1][i];
 			dvoxel.b = source[2][i];
 		}
-
-		return ret;
+		return new data::Chunk(dest,width,height);
 	}
 public:
 	//this uses auto_ptr by intention
@@ -149,8 +147,7 @@ public:
 protected:
     virtual void append(const log4cplus::spi::InternalLoggingEvent& event){
 		const log4cplus::tstring &msg=event.getMessage();
-		if(ignores.find(msg)==ignores.end())
-			LOG(Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
+		LOG_IF(ignores.find(msg)==ignores.end(),Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
 }
