@@ -128,20 +128,10 @@ public:
 };
 
 class DcmtkLogger : public log4cplus::Appender{
-	log4cplus::SharedAppenderPtrList others;
 	std::set<log4cplus::tstring> ignores;
 public:
-    DcmtkLogger():others(log4cplus::Logger::getRoot().getAllAppenders()){
-		// there shall be no logging besides me
-		log4cplus::Logger::getRoot().removeAllAppenders();
+    DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
-	}
-    ~DcmtkLogger(){
-		log4cplus::Logger logger = log4cplus::Logger::getRoot();
-		while(!others.empty()){// put the others back
-			logger.addAppender(others.front());// although apparently removeAllAppenders seems to delete them ...
-			others.pop_front(); // so we're probably adding nothing
-		}
 	}
     virtual void close(){}
 protected:
@@ -577,13 +567,13 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 
 bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 
-ImageFormat_Dicom::ImageFormat_Dicom():log_forward(new _internal::DcmtkLogger)
+ImageFormat_Dicom::ImageFormat_Dicom()
 {
 	//first read external dictionary if available
 	if ( dcmDataDict.isDictionaryLoaded() ) {
 		DcmDataDictionary &dict = dcmDataDict.wrlock();
 		addDicomDict( dict );
-		dcmDataDict.unlock();
+		dcmDataDict.unlock(); 
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
@@ -610,11 +600,9 @@ ImageFormat_Dicom::ImageFormat_Dicom():log_forward(new _internal::DcmtkLogger)
 
 	//hack to steal logging from dcmtk and redirect it to our own
 	log4cplus::Logger logger = log4cplus::Logger::getRoot();
-	logger.addAppender(log_forward);
-}
-ImageFormat_Dicom::~ImageFormat_Dicom()
-{
-	log4cplus::Logger::getRoot().removeAppender(log_forward);
+	// there shall be no logging besides me
+	logger.removeAllAppenders();
+	logger.addAppender(log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const
