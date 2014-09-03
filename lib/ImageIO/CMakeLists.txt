@@ -192,15 +192,15 @@ endif(ISIS_IOPLUGIN_PROCESS)
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
-	
+	find_package(PNG REQUIRED)
+
 	find_library(LIB_TIFF tiff)
-	find_library(LIB_PNG png)
-	find_library(LIB_DCM_LOG "oflog")
+	find_library(DCMTK_oflog_LIBRARY "oflog")
 
 	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${LIB_PNG} ${LIB_TIFF}  ${LIB_DCM_LOG} ${ZLIB_LIBRARIES} ${isis_core_lib})
+	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${PNG_LIBRARIES} ${LIB_TIFF} ${DCMTK_oflog_LIBRARY} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 

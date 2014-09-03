@@ -574,7 +574,7 @@ void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::
 	}
 
 	// TODO: at the moment scaling is not supported due to data type changes
-	if ( !head->scl_slope == 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
+	if ( head->scl_slope != 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
 		//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 	}

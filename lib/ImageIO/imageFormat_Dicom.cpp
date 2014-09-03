@@ -15,28 +15,10 @@ namespace _internal
 {
 class DicomChunk : public data::Chunk
 {
-	struct Deleter {
-		DcmFileFormat *m_dcfile;
-		DicomImage *m_img;
-		std::string m_filename;
-		Deleter( DcmFileFormat *dcfile, DicomImage *img, std::string filename ): m_dcfile( dcfile ), m_img( img ), m_filename( filename ) {}
-		void operator ()( void *at ) {
-			LOG_IF( not m_dcfile, Runtime, error )
-					<< "Trying to close non existing dicom file";
-			LOG_IF( not m_img, Runtime, error )
-					<< "Trying to close non existing dicom image";
-			LOG( Debug, verbose_info ) << "Closing mapped dicom-file " << util::MSubject( m_filename ) << " (pixeldata was at " << at << ")";
-			delete m_img;
-			delete m_dcfile;
-		}
-	};
-	template<typename TYPE> DicomChunk(
-		TYPE *dat, Deleter del,
-		size_t width, size_t height ):
-		data::Chunk( dat, del, width, height, 1, 1 ) {
+	template<typename TYPE> DicomChunk(TYPE *dat,size_t width, size_t height ):data::Chunk( data::MemChunk<TYPE>(width, height) ) {
 		LOG( Debug, verbose_info )
-				<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-				<< dat << " (" << data::ValueArray<TYPE>::staticName() << ")" ;
+				<< "Copying greyscale pixeldata of into " << dat << " (" << data::ValueArray<TYPE>::staticName() << ")" ;
+		asValueArrayBase().copyFromMem<TYPE>(dat,width*height);
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
@@ -54,47 +36,42 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const util::istring &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, DcmFileFormat &dcfile, const util::istring &dialect ) {
 		std::auto_ptr<data::Chunk> ret;
-		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
+		DicomImage img( &dcfile, EXS_Unknown );
 
-		if ( img->getStatus() == EIS_Normal ) {
-			const DiPixel *const  pix = img->getInterData();
-			const unsigned long width = img->getWidth(), height = img->getHeight();
+		if ( img.getStatus() == EIS_Normal ) {
+			const DiPixel *const  pix = img.getInterData();
+			const unsigned long width = img.getWidth(), height = img.getHeight();
 			const void *const data = pix->getData();
-			DcmDataset *dcdata = dcfile->getDataset();
+			DcmDataset *dcdata = dcfile.getDataset();
 
 			if ( pix ) {
-				if ( img->isMonochrome() ) { //try to load image directly from the raw monochrome dicom-data
-					Deleter del( dcfile.get(), img.get(), filename );
-
+				if ( img.isMonochrome() ) { //try to load image directly from the raw monochrome dicom-data
 					switch ( pix->getRepresentation() ) {
 					case EPR_Uint8:
-						ret.reset( new DicomChunk( ( uint8_t * ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint8_t * ) data, width, height ) );
 						break;
 					case EPR_Sint8:
-						ret.reset( new DicomChunk( ( int8_t * )  data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int8_t * )  data, width, height ) );
 						break;
 					case EPR_Uint16:
-						ret.reset( new DicomChunk( ( uint16_t * )data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint16_t * )data, width, height ) );
 						break;
 					case EPR_Sint16:
-						ret.reset( new DicomChunk( ( int16_t * ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int16_t * ) data, width, height ) );
 						break;
 					case EPR_Uint32:
-						ret.reset( new DicomChunk( ( uint32_t * )data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint32_t * )data, width, height ) );
 						break;
 					case EPR_Sint32:
-						ret.reset( new DicomChunk( ( int32_t * ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int32_t * ) data, width, height ) );
 						break;
 					default:
 						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
 					}
 
 					if ( ret.get() ) {
-						//OK, the source image and file pointer are managed by the chunk, we must release them
-						img.release();
-						dcfile.release();
 						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
@@ -120,7 +97,7 @@ public:
 				FileFormat::throwGenericError( "Didn't get any pixel data" );
 			}
 		} else {
-			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img->getStatus() )  + ")" );
+			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() )  + ")" );
 		}
 
 		return *ret;
@@ -128,20 +105,10 @@ public:
 };
 
 class DcmtkLogger : public log4cplus::Appender{
-	log4cplus::SharedAppenderPtrList others;
 	std::set<log4cplus::tstring> ignores;
 public:
-    DcmtkLogger():others(log4cplus::Logger::getRoot().getAllAppenders()){
-		// there shall be no logging besides me
-		log4cplus::Logger::getRoot().removeAllAppenders();
+    DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
-	}
-    ~DcmtkLogger(){
-		log4cplus::Logger logger = log4cplus::Logger::getRoot();
-		while(!others.empty()){// put the others back
-			logger.addAppender(others.front());// although apparently removeAllAppenders seems to delete them ...
-			others.pop_front(); // so we're probably adding nothing
-		}
 	}
     virtual void close(){}
 protected:
@@ -544,8 +511,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
 {
-	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
-	OFCondition loaded = dcfile->loadFile( filename.c_str() );
+	DcmFileFormat dcfile;
+	OFCondition loaded = dcfile.loadFile( filename.c_str() );
 	std::list< data::Chunk > ret;
 
 	if ( loaded.good() ) {
@@ -577,13 +544,13 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 
 bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 
-ImageFormat_Dicom::ImageFormat_Dicom():log_forward(new _internal::DcmtkLogger)
+ImageFormat_Dicom::ImageFormat_Dicom()
 {
 	//first read external dictionary if available
 	if ( dcmDataDict.isDictionaryLoaded() ) {
 		DcmDataDictionary &dict = dcmDataDict.wrlock();
 		addDicomDict( dict );
-		dcmDataDict.unlock();
+		dcmDataDict.unlock(); 
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
@@ -610,11 +577,9 @@ ImageFormat_Dicom::ImageFormat_Dicom():log_forward(new _internal::DcmtkLogger)
 
 	//hack to steal logging from dcmtk and redirect it to our own
 	log4cplus::Logger logger = log4cplus::Logger::getRoot();
-	logger.addAppender(log_forward);
-}
-ImageFormat_Dicom::~ImageFormat_Dicom()
-{
-	log4cplus::Logger::getRoot().removeAppender(log_forward);
+	// there shall be no logging besides me
+	logger.removeAllAppenders();
+	logger.addAppender(log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const

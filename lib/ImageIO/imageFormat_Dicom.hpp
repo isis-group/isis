@@ -59,13 +59,11 @@ class ImageFormat_Dicom: public FileFormat
 	static bool parseCSAValueList( const isis::util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey, util::PropertyMap::PropPath> dictionary;
-	log4cplus::SharedAppenderPtr log_forward;
 protected:
 	util::istring suffixes( io_modes modes = both )const;
 	util::PropertyMap::PropPath tag2Name( const DcmTagKey &tag ) const;
 public:
 	ImageFormat_Dicom();
-    virtual ~ImageFormat_Dicom();
 	void addDicomDict( DcmDataDictionary &dict );
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
