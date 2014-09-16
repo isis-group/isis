@@ -59,7 +59,7 @@ struct MapStrAdapter: boost::static_visitor<PropertyValue> {
 };
 struct RemoveEqualCheck: boost::static_visitor<bool> {
 	bool removeNeeded;
-	RemoveEqualCheck( bool _removeNeeded ): removeNeeded( removeNeeded ) {}
+	RemoveEqualCheck( bool _removeNeeded ): removeNeeded( _removeNeeded ) {}
 	bool operator()( PropertyValue &first, const PropertyValue &second )const { // if both are Values
 		if( first != second ) {
 			return false;
@@ -376,14 +376,13 @@ void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &r
 				const PropertyMap &thisMap = boost::get<PropertyMap>( thisIt->second ), &refMap = boost::get<PropertyMap>( otherIt->second );
 				thisMap.diffTree( refMap.container, ret, prefix / thisIt->first );
 			} else if( thisIt->second.type() == typeid( PropertyValue ) && otherIt->second.type() == typeid( PropertyValue ) ) { // both are PropertyValue
-				const PropertyValue &thisVal = boost::get<PropertyValue>( thisIt->second ), &refVal = boost::get<PropertyValue>( otherIt->second );
-
-				if( thisVal != refVal ) // if they are different
+				const PropertyValue &thisVal = boost::get<PropertyValue>( thisIt->second ), &otherVal = boost::get<PropertyValue>( otherIt->second );
+				if( thisVal != otherVal ) // if they are different
 					ret.insert( // add (propertyname|(value1|value2))
 						ret.end(),      // we know it has to be at the end
 						std::make_pair(
 							prefix / thisIt->first,   //the key
-							std::make_pair( thisVal, refVal ) //pair of both values
+							std::make_pair( thisVal, otherVal ) //pair of both values
 						)
 					);
 			} else { // obviously different just stuff it in
