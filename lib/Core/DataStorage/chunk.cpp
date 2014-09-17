@@ -18,6 +18,8 @@
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
 
+using boost::optional;
+
 namespace isis
 {
 namespace data
@@ -210,7 +212,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		offset = getValueAs<util::fvector3>( "columnVec" );
 		break;
 	case sliceDim:{
-		const boost::optional< const util::PropertyValue& > svec=hasProperty( "sliceVec" );
+		const optional< const util::PropertyValue& > svec=hasProperty( "sliceVec" );
 		if( svec ) {
 			offset = svec->as<util::fvector3>();
 		} else {

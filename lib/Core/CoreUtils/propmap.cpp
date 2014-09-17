@@ -226,11 +226,11 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry( container_type &root, const p
 	}
 }
 
-boost::optional<const PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )const throw( boost::bad_get )
+optional<const PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )const throw( boost::bad_get )
 {
 	return findEntryImpl<const mapped_type,const container_type>( container, path.begin(), path.end() );
 }
-boost::optional<PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )throw( boost::bad_get )
+optional<PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )throw( boost::bad_get )
 {
 	return findEntryImpl<mapped_type,container_type>( container, path.begin(), path.end() );
 }
@@ -272,7 +272,13 @@ bool PropertyMap::recursiveRemove( container_type &root, const propPathIterator 
 
 const PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )const
 {
-	return *tryFindEntry<PropertyValue>( path );
+	boost::optional< const PropertyValue& > found=tryFindEntry<PropertyValue>( path );
+	if(found)
+		return *found;
+	else {
+		static const PropertyValue dummy;
+		return dummy;
+	}
 }
 
 PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )
@@ -456,7 +462,7 @@ PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, const PropPath &path, bool overwrite)
 {
-	boost::optional< PropertyMap& > b=other.hasBranch(path);
+	optional< PropertyMap& > b=other.hasBranch(path);
 	PathSet rejects;
 	if(b){
 		rejects=transfer(*b,overwrite);
@@ -538,23 +544,23 @@ void PropertyMap::addNeeded( const PropPath &path )
 }
 
 
-boost::optional<const PropertyValue &> PropertyMap::hasProperty( const PropPath &path ) const
+optional<const PropertyValue &> PropertyMap::hasProperty( const PropPath &path ) const
 {
-	boost::optional< const PropertyValue& > ref = tryFindEntry<PropertyValue>( path );
+	optional< const PropertyValue& > ref = tryFindEntry<PropertyValue>( path );
 
 	if( ref && ! ref->isEmpty() ) {
 		return ref;
 	} else
-		return boost::optional<const PropertyValue &>();
+		return optional<const PropertyValue &>();
 }
-boost::optional<PropertyValue &> PropertyMap::hasProperty( const PropPath &path )
+optional<PropertyValue &> PropertyMap::hasProperty( const PropPath &path )
 {
-	boost::optional< PropertyValue& > ref = tryFindEntry<PropertyValue>( path );
+	optional< PropertyValue& > ref = tryFindEntry<PropertyValue>( path );
 
 	if( ref && ! ref->isEmpty() ) {
 		return ref;
 	} else
-		return boost::optional<PropertyValue &>();
+		return optional<PropertyValue &>();
 }
 
 PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty, bool allowBranch ) const
@@ -588,18 +594,18 @@ PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty
 	return PropPath(); // nothing found
 }
 
-boost::optional< const PropertyMap& > PropertyMap::hasBranch( const PropPath &path ) const
+optional< const PropertyMap& > PropertyMap::hasBranch( const PropPath &path ) const
 {
 	return tryFindEntry<PropertyMap>( path );
 }
-boost::optional< PropertyMap& > PropertyMap::hasBranch( const PropPath &path )
+optional< PropertyMap& > PropertyMap::hasBranch( const PropPath &path )
 {
 	return tryFindEntry<PropertyMap>( path );
 }
 
 bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname, bool overwrite )
 {
-	boost::optional<mapped_type &> old_e = findEntry( oldname );
+	optional<mapped_type &> old_e = findEntry( oldname );
 
 	if ( !old_e ) {//abort if oldname is not there
 		LOG( Runtime, error ) << "Cannot rename " << oldname << " it does not exist";

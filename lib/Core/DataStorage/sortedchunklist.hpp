@@ -24,6 +24,8 @@
 #include <stack>
 #include <boost/shared_ptr.hpp>
 
+using boost::optional;
+
 /// @cond _internal
 namespace isis
 {
@@ -57,7 +59,6 @@ private:
 	typedef std::map<util::fvector3, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
-	posCompare primarySort;
 	PrimaryMap chunks;
 
 	// low level finding
@@ -112,7 +113,7 @@ public:
 	 * Make image rectangular by dropping secondary sorted entries from all primary entries until their amount is equal.
 	 * \returns amount of dropped entries
 	 **/
-	size_t makeRectangular();
+	size_t makeRectangular(optional< util::slist& > rejected=optional< util::slist& >());
 
 	/// \returns the amount secondary sorted entries
 	size_t getHorizontalSize();

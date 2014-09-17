@@ -28,6 +28,8 @@
 #include <boost/optional.hpp>
 #include <boost/typeof/typeof.hpp>
 
+using boost::optional;
+
 namespace isis
 {
 namespace util
@@ -171,7 +173,7 @@ API_EXCLUDE_END;
 	/// internal recursion-function for remove
 	static bool recursiveRemove( container_type &root, const propPathIterator pathIt, const propPathIterator pathEnd )throw( boost::bad_get );
 
-	template <typename MAPPED,typename CONTAINER> static boost::optional<MAPPED &> findEntryImpl( CONTAINER &root, const propPathIterator at, const propPathIterator pathEnd )throw( boost::bad_get )
+	template <typename MAPPED,typename CONTAINER> static optional<MAPPED &> findEntryImpl( CONTAINER &root, const propPathIterator at, const propPathIterator pathEnd )throw( boost::bad_get )
 	{
 		propPathIterator next = at;
 		next++;
@@ -185,7 +187,7 @@ API_EXCLUDE_END;
 			return found->second; // return that entry
 		}
 
-		return boost::optional<MAPPED &>();
+		return optional<MAPPED &>();
 	}
 
 
@@ -204,15 +206,15 @@ protected:
 			}
 		}
 	};
-	template<typename T> boost::optional<T &> refValueAsImpl( const PropPath &path, const boost::optional<size_t> &at ) {
-		const boost::optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
+	template<typename T> optional<T &> refValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
+		const optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
 
 		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
 			if( !found->is<T>() ) {
 				if( !found->transform<T>() ) {// convert to requested type
 					LOG( Runtime, warning ) << "Conversion of Property " << path << " from " << util::MSubject( found->getTypeName() ) << " to "
 											<< util::MSubject( util::Value<T>::staticName() ) << " failed";
-					return boost::optional<T &>();
+					return optional<T &>();
 				}
 			}
 			assert( found->is<T>() );
@@ -221,10 +223,10 @@ protected:
 				found->castTo<T>(); // use single value ops, if at was not given
 		}
 
-		return boost::optional<T &>();
+		return optional<T &>();
 	}
-	template<typename T> T getValueAsImpl( const PropPath &path, const boost::optional<size_t> &at )const {
-		const boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
+	template<typename T> T getValueAsImpl( const PropPath &path, const optional<size_t> &at )const {
+		const optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
 
 		if( !ref ){
 			LOG( Runtime, warning ) << "Property " << MSubject( path ) << " doesn't exist returning " << MSubject( Value<T>() );
@@ -259,12 +261,12 @@ protected:
 	 * If the "path" or the property does not exist NULL is returned.
 	 * \note this is the const version of \link fetchEntry( const PropPath &path ) \endlink, so it won't modify the map.
 	 */
-	boost::optional<const PropertyMap::mapped_type &> findEntry( const PropPath &path )const throw( boost::bad_get );
-	boost::optional<PropertyMap::mapped_type &> findEntry( const PropPath &path  )throw( boost::bad_get );
+	optional<const PropertyMap::mapped_type &> findEntry( const PropPath &path )const throw( boost::bad_get );
+	optional<PropertyMap::mapped_type &> findEntry( const PropPath &path  )throw( boost::bad_get );
 
-	template<typename T> boost::optional<const T &> tryFindEntry( const PropPath &path )const {
+	template<typename T> optional<const T &> tryFindEntry( const PropPath &path )const {
 		try {
-			const boost::optional<const PropertyMap::mapped_type &> ref = findEntry( path );
+			const optional<const PropertyMap::mapped_type &> ref = findEntry( path );
 
 			if( ref )
 				return boost::get<T>( *ref );
@@ -272,20 +274,20 @@ protected:
 			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
 		}
 
-		return  boost::optional<const T &>();
+		return  optional<const T &>();
 	}
-	template<typename T> boost::optional<T &> tryFindEntry( const PropPath &path ){
+	template<typename T> optional<T &> tryFindEntry( const PropPath &path ){
 		try {
-			boost::optional<PropertyMap::mapped_type &> ref = findEntry( path );
+			optional<PropertyMap::mapped_type &> ref = findEntry( path );
 
 			if( ref )
 				return boost::get<T>( *ref );
 		} catch ( const boost::bad_get &e ) {
 			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
 		}
-		return  boost::optional<T &>();
+		return  optional<T &>();
 	}
-	template<typename T> boost::optional<T &> tryFetchEntry( const PropPath &path ) {
+	template<typename T> optional<T &> tryFetchEntry( const PropPath &path ) {
 		try {
 			mapped_type &n = fetchEntry( path );
 			if(n.type()!=typeid(T) && boost::apply_visitor(IsEmpty(),n)) //if target is empty but of wrong type 
@@ -295,7 +297,7 @@ protected:
 			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
 		}
 
-		return  boost::optional<T &>();
+		return  optional<T &>();
 	}
 
 
@@ -334,7 +336,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Access the property referenced by the path.
-	 * If the property does not exist, a failed assertion will be raised.
+	 * If the property does not exist an empty dummy is referenced.
 	 * As well as for accessing errors like the given path is a branch instead of a property.
 	 * \param path the path to the property
 	 * \returns a reference to the property
@@ -402,11 +404,11 @@ public:
 	/**
 	 * check if a property is available
 	 * \param path the path to the property
-	 * \note the return value is a boost::optional thus the actual PropertyValue can be accessed via the * or -> operators (if there is one of course)
+	 * \note the return value is a optional thus the actual PropertyValue can be accessed via the * or -> operators (if there is one of course)
 	 * \returns true if the given property does exist and is not empty, false otherwise
 	 */
-	boost::optional< const PropertyValue & > hasProperty( const PropPath &path )const;
-	boost::optional< PropertyValue & > hasProperty( const PropPath &path );
+	optional< const PropertyValue & > hasProperty( const PropPath &path )const;
+	optional< PropertyValue & > hasProperty( const PropPath &path );
 
 	/**
 	 * Search for a property/branch in the whole Tree.
@@ -420,11 +422,11 @@ public:
 	/**
 	 * check if branch of the tree is available
 	 * \param path the path to the branch
-	 * \note the return value is a boost::optional thus the actual PropertyMap can be accessed via the * or -> operators (if there is one of course)
+	 * \note the return value is a optional thus the actual PropertyMap can be accessed via the * or -> operators (if there is one of course)
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
-	boost::optional< const PropertyMap & > hasBranch( const PropPath &path )const;
-	boost::optional< PropertyMap & > hasBranch( const PropPath &path );
+	optional< const PropertyMap & > hasBranch( const PropPath &path )const;
+	optional< PropertyMap & > hasBranch( const PropPath &path );
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -630,7 +632,7 @@ public:
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getValueAs( const PropPath &path, size_t at )const {
-		return getValueAsImpl<T>(path,boost::optional<size_t>(at));// uses single value ops, if at was not given
+		return getValueAsImpl<T>(path,optional<size_t>(at));// uses single value ops, if at was not given
 	}
 	/**
 	 * Request a property value via the given key in the given type.
@@ -645,7 +647,7 @@ public:
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getValueAs( const PropPath &path)const {
-		return getValueAsImpl<T>(path,boost::optional<size_t>());
+		return getValueAsImpl<T>(path,optional<size_t>());
 	}
 
 	/**
@@ -656,10 +658,10 @@ public:
 	 * If the property does not exist (or does not store enough values) false will be returned as well
 	 * \param path the path to the property
 	 * \param at the index of the value to reference
-	 * \returns boost::optional<T&> referencing the requested value or false
+	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> boost::optional<T &> refValueAs( const PropPath &path, size_t at ) {
-		return refValueAsImpl<T>(path, boost::optional<size_t>(at) );
+	template<typename T> optional<T &> refValueAs( const PropPath &path, size_t at ) {
+		return refValueAsImpl<T>(path, optional<size_t>(at) );
 	}
 	/**
 	 * Get a valid reference to the stored single value in a given type.
@@ -669,10 +671,10 @@ public:
 	 * If that fails, false is returned.
 	 * If the property does not exist (or is empty) false will be returned as well
 	 * \param path the path to the property
-	 * \returns boost::optional<T&> referencing the requested value or false
+	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> boost::optional<T &> refValueAs( const PropPath &path) {
-		return refValueAsImpl<T>(path, boost::optional<size_t>() );
+	template<typename T> optional<T &> refValueAs( const PropPath &path) {
+		return refValueAsImpl<T>(path, optional<size_t>() );
 	}
 	/**
 	 * Get a valid reference to the stored value in a given type.
@@ -682,12 +684,12 @@ public:
 	 * If the property does not exist (or is empty) it is created with def as first value.
 	 * \param path the path to the property
 	 * \param def the default value to be used when creating the property
-	 * \returns boost::optional<T&> referencing the requested value or false
+	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> boost::optional<T &> refValueAsOr( const PropPath &path, const T &def ) {
-		boost::optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
+	template<typename T> optional<T &> refValueAsOr( const PropPath &path, const T &def ) {
+		optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
 
-		if( !fetched ) return boost::optional<T &>(); // return "false" in case of a failure
+		if( !fetched ) return optional<T &>(); // return "false" in case of a failure
 
 		if( fetched->isEmpty() ) { // we just created one, so set its value to def
 			*fetched = def;
@@ -695,7 +697,7 @@ public:
 			if( !transform<T>( path, path ) ) {
 				LOG( Runtime, warning ) << "Transforming Property " << path << " from " << util::MSubject( fetched->getTypeName() ) << " to "
 										<< util::MSubject( util::Value<T>::staticName() ) << " failed";
-				return boost::optional<T &>();
+				return optional<T &>();
 			}
 		}
 
@@ -718,7 +720,7 @@ public:
 	 * \returns the property with given type, if not set yet def is returned.
 	 */
 	template<typename T> T getValueAsOr( const PropPath &path, const T &def )const {
-		boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
+		optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
 
 		if( ref && !ref->isEmpty() )
 			return ref->as<T>();
@@ -727,7 +729,7 @@ public:
 		}
 	}
 	template<typename T> T getValueAsOr( const PropPath &path, size_t at, const T &def )const {
-		const boost::optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
+		const optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
 
 		if( ref && ref->size() > at )
 			return ref->at( at ).as<T>();
