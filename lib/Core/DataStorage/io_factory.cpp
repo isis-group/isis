@@ -68,12 +68,6 @@ struct dialect_missing {
 	}
 };
 
-bool invalid_and_tell( Chunk &candidate )
-{
-	LOG_IF( !candidate.isValid(), image_io::Runtime, error ) << "Ignoring invalid chunk. Missing properties: " << candidate.getMissing();
-	return !candidate.isValid();
-}
-
 }
 /// @endcond _internal
 API_EXCLUDE_BEGIN;
@@ -297,12 +291,20 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 	return ret;
 }
 
-std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
+std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, boost::optional< util::slist& > rejected )
 {
 	// throw away invalid chunks
-	size_t errcnt = src.size();
-	src.remove_if( _internal::invalid_and_tell );
-	errcnt -= src.size();
+	std::size_t errcnt=0;
+	for(std::list<Chunk>::iterator i=src.begin();i!=src.end();){
+		if(!i->isValid()){
+			LOG(image_io::Runtime, error ) << "Rejecting invalid chunk. Missing properties: " << i->getMissing();
+			errcnt++;
+			if(rejected)
+				rejected->push_back(i->getValueAs<std::string>("source")); 
+			src.erase(i++);//we must increment i before the removal, otherwise it will be invalid
+		} else
+			i++;
+	}
 
 	std::list< Image > ret;
 
@@ -310,7 +312,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
 		size_t before = src.size();
 
-		Image buff( src );
+		Image buff( src, rejected );
 
 		if ( buff.isClean() ) {
 			if( buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
@@ -345,7 +347,7 @@ std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suf
 		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect, rejected );
 		chunks.splice(chunks.end(),loaded);
 	}
-	const std::list<data::Image> images = chunkListToImageList( chunks );
+	const std::list<data::Image> images = chunkListToImageList( chunks, rejected );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << paths;
 

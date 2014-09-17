@@ -101,7 +101,7 @@ public:
 	 *  \param chunks list of chunks to be used for the new images.
 	 *  \returns a list of newly created images consisting off chunks out of the given chunk list.
 	 */
-	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
+	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks, boost::optional< isis::util::slist& > rejected );
 protected:
 	std::list<Chunk> loadFile( const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
 	std::list<Chunk> loadPath(const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, boost::optional< util::slist& > rejected=boost::optional< util::slist& >());

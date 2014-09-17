@@ -305,19 +305,19 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
+	template<typename T> Image ( std::list<T> &chunks, boost::optional< util::slist& > rejected=boost::optional< util::slist& >(), dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		insertChunksFromList ( chunks );
+		insertChunksFromList ( chunks, rejected );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
+	template<typename T> Image ( std::vector<T> &chunks, boost::optional< util::slist& > rejected=boost::optional< util::slist& >(), dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
@@ -333,7 +333,7 @@ public:
 	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
 	 * \returns amount of successfully inserted chunks
 	 */
-	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks ) {
+	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks, boost::optional< util::slist& > rejected=boost::optional< util::slist& >() ) {
 		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, T> ) );
 		size_t cnt = 0;
 
@@ -349,7 +349,7 @@ public:
 		if ( ! isEmpty() ) {
 			LOG ( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
-			if ( !reIndex() ) {
+			if ( !reIndex(rejected) ) {
 				LOG ( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF ( !getMissing().empty(), Debug, warning )
@@ -530,7 +530,7 @@ public:
 	 * The image will be "clean" on success.
 	 * \returns true if the image was successfully reindexed and is valid, false otherwise.
 	 */
-	bool reIndex();
+	bool reIndex(boost::optional< util::slist& > rejected=boost::optional< util::slist& >());
 
 	/// \returns true if there is no chunk in the image
 	bool isEmpty() const;

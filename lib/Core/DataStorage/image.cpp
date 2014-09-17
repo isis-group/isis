@@ -234,14 +234,14 @@ dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 }
 
 
-bool Image::reIndex()
+bool Image::reIndex(boost::optional< util::slist& > rejected)
 {
 	if ( set.isEmpty() ) {
 		LOG( Debug, warning ) << "Reindexing an empty image is useless.";
 		return false;
 	}
 
-	if( set.makeRectangular() > 0 && set.isEmpty() ) {
+	if( set.makeRectangular(rejected) > 0 && set.isEmpty() ) {
 		LOG( Runtime, error ) << "No retangular image data left. Skipping";
 		return false;
 	}
