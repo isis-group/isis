@@ -294,7 +294,7 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optional< util::slist& > rejected )
 {
 	// throw away invalid chunks
-	std::size_t errcnt=0;
+	size_t errcnt=0;
 	for(std::list<Chunk>::iterator i=src.begin();i!=src.end();){
 		if(!i->isValid()){
 			LOG(image_io::Runtime, error ) << "Rejecting invalid chunk. Missing properties: " << i->getMissing();
