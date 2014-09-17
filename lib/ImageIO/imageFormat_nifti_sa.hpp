@@ -61,6 +61,7 @@
 #include <CoreUtils/matrix.hpp>
 #include <DataStorage/fileptr.hpp>
 #include <sys/stat.h>
+#include <memory>
 
 namespace isis
 {
@@ -184,7 +185,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
 	void parseHeader( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
-	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
+	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );

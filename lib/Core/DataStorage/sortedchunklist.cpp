@@ -248,7 +248,7 @@ size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); ) {
 				if( c->second.size() != resize ) {
 					if(rejected)
-						BOOST_FOREACH(const SecondaryMap::value_type &ch,c->second)
+						for(const SecondaryMap::value_type &ch:c->second)
 							rejected->push_back(ch.second->getValueAs<std::string>("source"));
 					dropped += c->second.size();
 					chunks.erase( c++ );

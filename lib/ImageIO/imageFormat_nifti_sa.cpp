@@ -828,7 +828,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 	return newChunks;
 }
 
-std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )
+std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )
 {
 	const size_t bpv = src.getMaxBytesPerVoxel() * 8;
 	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
@@ -838,7 +838,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 		if( dialect == "fsl" || dialect == "spm" ) {
 			target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );// fall back to uint8_t and use normal writer for that
 		} else {
-			return std::auto_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) ); // use special writer for bit
+			return std::unique_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) ); // use special writer for bit
 		}
 	}
 
@@ -858,7 +858,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 				throwGenericError( "unsupported datatype" );
 			} else {
 				LOG( Runtime, info ) << data::ValueArray<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
-				return std::auto_ptr< _internal::WriteOp >( new _internal::FslRgbWriteOp( src ) );
+				return std::unique_ptr<_internal::WriteOp >( new _internal::FslRgbWriteOp( src ) );
 			}
 
 			break;
@@ -866,7 +866,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	}
 
 	// generic case (use generic scalar writer for the target_id)
-	return std::auto_ptr< _internal::WriteOp >( new _internal::CommonWriteOp( src, target_id, bpv ) );
+	return std::unique_ptr<_internal::WriteOp >( new _internal::CommonWriteOp( src, target_id, bpv ) );
 }
 
 
@@ -874,7 +874,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
-	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
+	std::unique_ptr<_internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
 
 	if( nifti_id ) { // there is a corresponding nifti datatype

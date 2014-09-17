@@ -34,10 +34,8 @@ class DicomChunk : public data::Chunk
 		return new data::Chunk(dest,width,height);
 	}
 public:
-	//this uses auto_ptr by intention
-	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
 	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, DcmFileFormat &dcfile, const util::istring &dialect ) {
-		std::auto_ptr<data::Chunk> ret;
+		std::unique_ptr<data::Chunk> ret;
 		DicomImage img( &dcfile, EXS_Unknown );
 
 		if ( img.getStatus() == EIS_Normal ) {
@@ -71,7 +69,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret.get() ) {
+					if ( ret ) {
 						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
@@ -87,7 +85,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret.get() ) {
+					if ( ret ) {
 						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
