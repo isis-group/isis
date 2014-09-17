@@ -272,7 +272,13 @@ bool PropertyMap::recursiveRemove( container_type &root, const propPathIterator 
 
 const PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )const
 {
-	return *tryFindEntry<PropertyValue>( path );
+	boost::optional< const PropertyValue& > found=tryFindEntry<PropertyValue>( path );
+	if(found)
+		return *found;
+	else {
+		static const PropertyValue dummy;
+		return dummy;
+	}
 }
 
 PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )

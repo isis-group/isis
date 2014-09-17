@@ -336,7 +336,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Access the property referenced by the path.
-	 * If the property does not exist, a failed assertion will be raised.
+	 * If the property does not exist an empty dummy is referenced.
 	 * As well as for accessing errors like the given path is a branch instead of a property.
 	 * \param path the path to the property
 	 * \returns a reference to the property

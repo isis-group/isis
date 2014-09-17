@@ -59,7 +59,6 @@ private:
 	typedef std::map<util::fvector3, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
-	posCompare primarySort;
 	PrimaryMap chunks;
 
 	// low level finding
