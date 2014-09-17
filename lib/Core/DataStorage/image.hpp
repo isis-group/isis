@@ -431,7 +431,7 @@ public:
 	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
 	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
 	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
-	 * \returns a number which is equal to the ValueArray::staticID of the selected type.
+	 * \returns a number which is equal to the ValueArray::staticID() of the selected type.
 	 */
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
@@ -492,7 +492,7 @@ public:
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
-		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID() ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -508,7 +508,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
 		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType ( ValueArray<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType ( ValueArray<TYPE>::staticID(), scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -658,7 +658,7 @@ public:
 	template<typename T> void copyToMem ( T *dst, size_t len,  scaling_pair scaling = scaling_pair() ) const {
 		if ( clean ) {
 			if ( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
-				scaling = getScalingTo ( ValueArray<T>::staticID );
+				scaling = getScalingTo ( ValueArray<T>::staticID() );
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
@@ -783,7 +783,7 @@ public:
 			}
 		};
 		_proxy prx ( op );
-		return convertToType ( data::ValueArray<TYPE>::staticID ) && foreachChunk ( prx, false );
+		return convertToType ( data::ValueArray<TYPE>::staticID() ) && foreachChunk ( prx, false );
 	}
 
 	/// \returns the number of rows of the image
@@ -825,7 +825,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage ( const Image &src ) : Image ( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		convertToType ( ValueArray<T>::staticID );
+		convertToType ( ValueArray<T>::staticID() );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator= ( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -835,7 +835,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator= ( ref );
-		convertToType ( ValueArray<T>::staticID );
+		convertToType ( ValueArray<T>::staticID() );
 		return *this;
 	}
 	void copyToMem ( void *dst ) {
@@ -910,7 +910,7 @@ public:
 				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID );
+		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID() );
 		LOG ( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform ( conv_op );

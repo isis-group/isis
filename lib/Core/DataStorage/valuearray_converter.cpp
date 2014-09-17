@@ -290,9 +290,9 @@ public:
 		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
-		//we do an evil hack here assuming std::complex is POD - at least check if the size of std::complex is reasonable
-		BOOST_STATIC_ASSERT( sizeof( std::complex<SRC> ) == sizeof( SRC ) * 2 );
-		BOOST_STATIC_ASSERT( sizeof( std::complex<DST> ) == sizeof( DST ) * 2 );
+		//@todo we do an evil hack here assuming std::complex is POD - at least check if the size of std::complex is reasonable
+		static_assert( sizeof( std::complex<SRC> ) == sizeof( SRC ) * 2, "complex type apparently not POD" );
+		static_assert( sizeof( std::complex<DST> ) == sizeof( DST ) * 2, "complex type apparently not POD" );
 
 		const SRC *sp = reinterpret_cast<const SRC*>(&src.castToValueArray<std::complex<SRC> >()[0]);
 		      DST *dp = reinterpret_cast<      DST*>(&dst.castToValueArray<std::complex<DST> >()[0]);
@@ -433,7 +433,7 @@ template<typename SRC> struct inner_ValueArrayConverter {
 		boost::shared_ptr<const ValueArrayConverterBase> conv =
 			ValueArrayConverter<boost::is_arithmetic<SRC>::value, boost::is_arithmetic<DST>::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
-		m_subMap.insert( m_subMap.end(), std::make_pair( ValueArray<DST>::staticID, conv ) );
+		m_subMap.insert( m_subMap.end(), std::make_pair( ValueArray<DST>::staticID(), conv ) );
 	}
 };
 
@@ -443,7 +443,7 @@ struct outer_ValueArrayConverter {
 	outer_ValueArrayConverter( std::map< int , std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in ValueArrayConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_ValueArrayConverter<SRC>( m_map[ValueArray<SRC>::staticID] )
+			inner_ValueArrayConverter<SRC>( m_map[ValueArray<SRC>::staticID()] )
 		);
 	}
 };

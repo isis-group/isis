@@ -54,7 +54,7 @@ class FilePtr: public ValueArray<uint8_t>
 			std::map<unsigned short, generator_type> *m_map;
 			proc( std::map<unsigned short, generator_type> *map ): m_map( map ) {}
 			template<class T> void operator()( const T & ) {
-				m_map->insert( std::make_pair( ValueArray<T>::staticID, &generator<T> ) );
+				m_map->insert( std::make_pair( ValueArray<T>::staticID(), &generator<T> ) );
 			}
 		};
 	};

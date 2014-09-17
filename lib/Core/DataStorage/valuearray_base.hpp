@@ -290,7 +290,7 @@ public:
 	 * \returns a the newly created ValueArray
 	 */
 	template<typename T> ValueArray<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		Reference erg = copyByID( ValueArray<T>::staticID, scaling );
+		Reference erg = copyByID( ValueArray<T>::staticID(), scaling );
 		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 
@@ -302,7 +302,7 @@ public:
 	 * - scaling.first (the scaling offset) is not 0
 	 *
 	 * Otherwise a cheap copy is done.
-	 * \param ID the ID of the requeseted type (use ValueArray::staticID)
+	 * \param ID the ID of the requeseted type (use ValueArray::staticID())
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns a reference of eigther a cheap copy or a newly created ValueArray
 	 * \returns an empty reference if the conversion failed
@@ -322,7 +322,7 @@ public:
 	 * \returns eigther a cheap copy or a newly created ValueArray
 	 */
 	template<typename T> ValueArray<T> as( scaling_pair scaling = scaling_pair() ) {
-		Reference erg = convertByID( ValueArray<T>::staticID, scaling );
+		Reference erg = convertByID( ValueArray<T>::staticID(), scaling );
 		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 

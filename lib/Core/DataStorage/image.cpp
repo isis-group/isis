@@ -797,10 +797,10 @@ Image::orientation Image::getMainOrientation()const
 unsigned short Image::getMajorTypeID() const
 {
 	switch( getChunk( 0 ).getTypeID() ) { // dont do smart typeID detection for types who cant do minmax
-	case data::ValueArray<util::color24>::staticID:
-	case data::ValueArray<util::color48>::staticID:
-	case data::ValueArray<std::complex< float >  >::staticID:
-	case data::ValueArray<std::complex< double > >::staticID:
+	case data::ValueArray<util::color24>::staticID():
+	case data::ValueArray<util::color48>::staticID():
+	case data::ValueArray<std::complex< float >  >::staticID():
+	case data::ValueArray<std::complex< double > >::staticID():
 		LOG( Debug, info ) << "Using flat typeID for " << getChunk( 0 ).getTypeName() << " because I cannot compute min/max";
 		return getChunk( 0 ).getTypeID();
 		break;

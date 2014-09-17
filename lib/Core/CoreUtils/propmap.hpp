@@ -514,7 +514,7 @@ public:
 	 */
 	template<typename DST> bool transform( const PropPath &from, const PropPath &to) {
 		checkType<DST>();
-		return transform( from, to, Value<DST>::staticID);
+		return transform( from, to, Value<DST>::staticID());
 	}
 
 	/**

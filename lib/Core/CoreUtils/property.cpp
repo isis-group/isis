@@ -58,7 +58,7 @@ std::string PropertyValue::toString( bool labeled )const
 	} else if(size()==1)
 		return front().toString(labeled);
 	else{
-		const PropertyValue buff=copyByID(Value<std::string>::staticID);
+		const PropertyValue buff=copyByID(Value<std::string>::staticID());
 		std::string ret=listToString(buff.begin(),buff.end(),",","[","]");
 		if(labeled && !isEmpty())
 			ret+="("+getTypeName()+"["+boost::lexical_cast<std::string>(size())+"])";

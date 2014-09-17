@@ -65,7 +65,7 @@ public:
 	void insert(iterator at,const PropertyValue& ref);
 	
 	template<typename T> typename boost::enable_if<knowType<T>, iterator >::type insert(iterator at,const T& ref){
-		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID,Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
+		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID(),Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
 		return container.insert(at,new Value<T>(ref));
 	}
 
@@ -131,7 +131,7 @@ public:
 
 	/// Transform all contained properties into type T
 	bool transform( uint16_t dstID );
-	template<typename T> bool transform(){return transform(Value<T>::staticID);}
+	template<typename T> bool transform(){return transform(Value<T>::staticID());}
 	
 	/**
 	 * Empty constructor.

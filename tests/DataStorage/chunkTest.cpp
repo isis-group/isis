@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 
 	std::pair<util::ValueReference, util::ValueReference> minmax = ch.getMinMax();
 
-	data::scaling_pair scale = ch.getScalingTo( data::ValueArray<uint8_t>::staticID, minmax );
+	data::scaling_pair scale = ch.getScalingTo( data::ValueArray<uint8_t>::staticID(), minmax );
 	const util::ValueBase &scale_s = *( scale.first );
 	const util::ValueBase &scale_o = *( scale.second );
 
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 
 	data::Chunk ch2 = ch1;//This shall clone the underlying ValueArray-Object
 	data::Chunk copyF = ch2.copyByID(); // this shall copy as the same as ch2 (float)
-	data::Chunk copyI = ch2.copyByID( data::ValueArray<uint32_t>::staticID, no_scale ); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
+	data::Chunk copyI = ch2.copyByID( data::ValueArray<uint32_t>::staticID(), no_scale ); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
 
 	//but it should of course be of the same type and contain the same data
 	BOOST_CHECK( ch1.getValueArrayBase().is<float>() );

@@ -20,6 +20,9 @@
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/conditional.hpp>
+#include <boost/mpl/distance.hpp>
+#include <boost/mpl/find.hpp>
+#include <boost/mpl/begin_end.hpp>
 
 namespace isis
 {
@@ -74,7 +77,7 @@ template<typename OPERATOR,bool modifying> struct type_op<OPERATOR,modifying,tru
 	} 
 	result_type operator()(lhs &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const ValueBase::Converter conv = second.getConverterTo( rhs::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( rhs::staticID() );
 		
 		if ( conv ) {
 			//try to convert second into T and handle results
@@ -162,10 +165,15 @@ protected:
 		return new Value<TYPE>( *this );
 	}
 public:
-	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
+	constexpr static unsigned short staticID(){
+		return boost::mpl::distance <
+			boost::mpl::begin<_internal::types>::type,
+			typename boost::mpl::find<_internal::types, TYPE>::type
+		>::type::value+1;
+	}
 	Value(): m_val() {
-		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
+		static_assert( staticID() < 0xFF, "This is not a value type" );
 	}
 	/**
 	 * Create a Value from any type.
@@ -176,12 +184,12 @@ public:
 	 */
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
-		BOOST_STATIC_ASSERT( staticID < 0xFF );
 		checkType<TYPE>();
+		static_assert( staticID() < 0xFF, "This is not a value type" );
 	}
 
 	std::string getTypeName()const {return staticName();}
-	unsigned short getTypeID()const {return staticID;}
+	unsigned short getTypeID()const {return staticID();}
 	bool isFloat() const {return boost::is_float< TYPE >::value;}
 	bool isInteger() const {return boost::is_integral< TYPE >::value;}
 
@@ -258,7 +266,7 @@ template<typename T> T &ValueBase::castTo()
 template<typename T> bool ValueBase::is()const
 {
 	checkType<T>();
-	return getTypeID() == util::Value<T>::staticID;
+	return getTypeID() == util::Value<T>::staticID();
 }
 
 }

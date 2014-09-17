@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	data::scaling_pair scale = img.getScalingTo( data::ValueArray<uint8_t>::staticID );
+	data::scaling_pair scale = img.getScalingTo( data::ValueArray<uint8_t>::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
 }

@@ -779,7 +779,7 @@ template<typename SRC> struct inner_TypeConverter {
 		boost::shared_ptr<const ValueConverterBase> conv =
 			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
-		m_subMap.insert( m_subMap.end(), std::make_pair( Value<DST>::staticID, conv ) );
+		m_subMap.insert( m_subMap.end(), std::make_pair( Value<DST>::staticID(), conv ) );
 	}
 };
 

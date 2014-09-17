@@ -174,7 +174,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::map<unsigned short, demuxer_type> prop_demuxer;
 	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
 		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
-		return data::ValueArray<NEW_T>::staticID;
+		return data::ValueArray<NEW_T>::staticID();
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
 	static std::list<data::Chunk> parseSliceOrdering( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk current );

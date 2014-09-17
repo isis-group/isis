@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE( FilePtr_at_test )
 	BOOST_CHECK_EQUAL( ptr1[0], util::fvector4( 1, 2, 3, 4 ) );
 	BOOST_CHECK_EQUAL( ptr1[1], util::fvector4( 5, 6, 7, 8 ) );
 
-	data::ValueArrayReference ref = fptr.atByID( data::ValueArray<util::fvector4>::staticID, 5 );
+	data::ValueArrayReference ref = fptr.atByID( data::ValueArray<util::fvector4>::staticID(), 5 );
 	BOOST_REQUIRE( ref->is<util::fvector4>() );
 	data::ValueArray<util::fvector4> ptr2 = ref->castToValueArray<util::fvector4>();
 	BOOST_CHECK_EQUAL( ptr2[0], util::fvector4( 1, 2, 3, 4 ) );

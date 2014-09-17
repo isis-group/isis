@@ -38,28 +38,28 @@ itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkRe
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
-	case data::ValueArray<int8_t>::staticID:
+	case data::ValueArray<int8_t>::staticID():
 		return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int8_t>::staticID:
+	case data::ValueArray<u_int8_t>::staticID():
 		return this->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<int16_t>::staticID:
+	case data::ValueArray<int16_t>::staticID():
 		return this->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int16_t>::staticID:
+	case data::ValueArray<u_int16_t>::staticID():
 		return this->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<int32_t>::staticID:
+	case data::ValueArray<int32_t>::staticID():
 		return this->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int32_t>::staticID:
+	case data::ValueArray<u_int32_t>::staticID():
 		return this->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<float>::staticID:
+	case data::ValueArray<float>::staticID():
 		return this->internCreateItk<float, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<double>::staticID:
+	case data::ValueArray<double>::staticID():
 		return this->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 		break;
 	default:
@@ -72,28 +72,28 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 {
 	if( m_TypeID ) {
 		switch ( m_TypeID ) {
-		case data::ValueArray<int8_t>::staticID:
+		case data::ValueArray<int8_t>::staticID():
 			return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int8_t>::staticID:
+		case data::ValueArray<u_int8_t>::staticID():
 			return this->internCreateISIS<TImage, u_int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<int16_t>::staticID:
+		case data::ValueArray<int16_t>::staticID():
 			return this->internCreateISIS<TImage, int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID():
 			return this->internCreateISIS<TImage, u_int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<int32_t>::staticID:
+		case data::ValueArray<int32_t>::staticID():
 			return this->internCreateISIS<TImage, int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int32_t>::staticID:
+		case data::ValueArray<u_int32_t>::staticID():
 			return this->internCreateISIS<TImage, u_int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<float>::staticID:
+		case data::ValueArray<float>::staticID():
 			return this->internCreateISIS<TImage, float>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<double>::staticID:
+		case data::ValueArray<double>::staticID():
 			return this->internCreateISIS<TImage, double>( src, behaveAsItkWriter );
 			break;
 		default:
@@ -253,7 +253,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 
 	data::Chunk
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2] ) ) ;
-	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID );
+	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID() );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	tmpChunk.setValueAs<uint16_t>( "sequenceNumber", 1 );

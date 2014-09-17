@@ -20,8 +20,6 @@
 #ifndef TYPEPTR_HPP
 #define TYPEPTR_HPP
 
-#include <boost/static_assert.hpp>
-
 #include "valuearray_base.hpp"
 #include "valuearray_converter.hpp"
 #include "../CoreUtils/value.hpp"
@@ -39,7 +37,7 @@ namespace _internal
 /// @cond _internal
 template<typename T, uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_STATIC_ASSERT( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate ); //well we're pretty f**ed in this case
+	static_assert( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate, "denormisation not known" ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
 		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
@@ -104,7 +102,7 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 };
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
 	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
-		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
+		static_assert( sizeof( std::complex<T> ) == sizeof( T ) * 2, "complex type seems not POD" ); // we need this for the calcMinMax-hack below
 		//use complex as a two element array and find the respective minmax for the two elements
 		const std::pair<T, T > minmax[] = {
 			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ), ref.getLength() * 2 ),
@@ -200,7 +198,9 @@ public:
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 
-	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
+	constexpr static unsigned short staticID(){
+		return util::Value<TYPE>::staticID()<<8 ;
+	}
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
@@ -303,7 +303,7 @@ public:
 	}
 
 	std::string getTypeName()const {return staticName();}
-	unsigned short getTypeID()const {return staticID;}
+	unsigned short getTypeID()const {return staticID();}
 	bool isFloat() const {return boost::is_float< TYPE >::value;}
 	bool isInteger() const {return boost::is_integral< TYPE >::value;}
 
@@ -372,7 +372,7 @@ public:
 	}
 	//
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		if( typeID == staticID && scaleopt == autoscale ) { // if id is the same and autoscale is requested
+		if( typeID == staticID() && scaleopt == autoscale ) { // if id is the same and autoscale is requested
 			static const util::Value<uint8_t> one( 1 );
 			static const util::Value<uint8_t> zero( 0 );
 			return std::pair<util::ValueReference, util::ValueReference>( one, zero ); // the result is always 1/0
@@ -394,7 +394,7 @@ template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigne
 template<typename T> bool ValueArrayBase::is()const
 {
 	util::checkType<T>();
-	return getTypeID() == ValueArray<T>::staticID;
+	return getTypeID() == ValueArray<T>::staticID();
 }
 
 

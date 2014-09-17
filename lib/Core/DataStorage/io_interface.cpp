@@ -134,22 +134,22 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 				unsigned short tID;
 
 				switch ( tID = props.property( prop ).getTypeID() ) {
-				case util::Value<uint8_t>::staticID:
+				case util::Value<uint8_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
 					break;
-				case util::Value<int8_t>::staticID:
+				case util::Value<int8_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int8_t>::max() ) );
 					break;
-				case util::Value<uint16_t>::staticID:
+				case util::Value<uint16_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint16_t>::max() ) );
 					break;
-				case util::Value<int16_t>::staticID:
+				case util::Value<int16_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int16_t>::max() ) );
 					break;
-				case util::Value<uint32_t>::staticID:
+				case util::Value<uint32_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint32_t>::max() ) );
 					break;
-				case util::Value<int32_t>::staticID:
+				case util::Value<int32_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int32_t>::max() ) );
 					break;
 				default:

@@ -168,17 +168,17 @@ BOOST_AUTO_TEST_CASE( ValueArray_conv_scaling_test )
 
 	//scaling to itself should allways be 1/0
 	floatArray.copyFromMem( init, 12 );
-	data::scaling_pair scale = floatArray.getScalingTo( data::ValueArray<float>::staticID );
+	data::scaling_pair scale = floatArray.getScalingTo( data::ValueArray<float>::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<float>(), 1 );
 	BOOST_CHECK_EQUAL( scale.second->as<float>(), 0 );
 
 	//float=> integer should upscale
-	scale = floatArray.getScalingTo( data::ValueArray<int32_t>::staticID );
+	scale = floatArray.getScalingTo( data::ValueArray<int32_t>::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<int32_t>::max() / 2. );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
 
 	//float=> unsigned integer should upscale and shift
-	scale = floatArray.getScalingTo( data::ValueArray<uint8_t>::staticID );
+	scale = floatArray.getScalingTo( data::ValueArray<uint8_t>::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<uint8_t>::max() / 4. );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 2 * scale.first->as<double>() );
 }
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE( ValueArray_numeric_to_color_conversion_test )
 	i16Array.copyFromMem( init, sizeof( init ) / sizeof( uint16_t ) );
 
 	//scaling should be 0.5/0
-	data::scaling_pair scale = i16Array.getScalingTo( data::ValueArray<util::color24 >::staticID );
+	data::scaling_pair scale = i16Array.getScalingTo( data::ValueArray<util::color24 >::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 0.5 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
 

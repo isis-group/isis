@@ -123,7 +123,7 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyByID( Value<T>::staticID );
+		Reference ret = copyByID( Value<T>::staticID() );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )

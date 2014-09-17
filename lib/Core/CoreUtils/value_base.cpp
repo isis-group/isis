@@ -113,7 +113,7 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 std::string ValueBase::toString(bool labeled) const
 {
 	std::string ret;
-	Reference ref = copyByID( Value<std::string>::staticID );
+	Reference ref = copyByID( Value<std::string>::staticID() );
 
 	if ( ref.isEmpty() ) {
 		LOG( Debug, error ) << "Automatic conversion of " << getTypeName() << " to string failed. Returning empty string";
