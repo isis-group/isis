@@ -291,7 +291,7 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 	return ret;
 }
 
-std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, boost::optional< util::slist& > rejected )
+std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optional< util::slist& > rejected )
 {
 	// throw away invalid chunks
 	std::size_t errcnt=0;
@@ -331,7 +331,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, boost
 	return ret;
 }
 
-std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect, boost::optional< isis::util::slist& > rejected  )
+std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect, optional< isis::util::slist& > rejected  )
 {
 	const boost::filesystem::path p( path );
 	return boost::filesystem::is_directory( p ) ?
@@ -339,7 +339,7 @@ std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::i
 		get().loadFile( p, suffix_override, dialect );
 }
 
-std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, boost::optional< isis::util::slist& > rejected )
+std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
@@ -362,12 +362,12 @@ std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suf
 	return images;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, util::istring suffix_override, util::istring dialect, boost::optional< isis::util::slist& > rejected )
+std::list<data::Image> IOFactory::load( const std::string &path, util::istring suffix_override, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	return load( util::slist( 1, path ), suffix_override, dialect );
 }
 
-std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, boost::optional< util::slist&> rejected )
+std::list<Chunk> IOFactory::loadPath( const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, optional< util::slist&> rejected )
 {
 	std::list<Chunk> ret;
 

@@ -235,7 +235,7 @@ std::set<size_t> SortedChunkList::getShape()
 	return images;
 }
 
-size_t SortedChunkList::makeRectangular(boost::optional< util::slist& > rejected)
+size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 {
 	const std::set<size_t> images = getShape();//get lenghts of all primary sorted "columns" -- as set is sorted the smallest will be at begin
 	size_t dropped = 0;

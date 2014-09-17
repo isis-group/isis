@@ -234,7 +234,7 @@ dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 }
 
 
-bool Image::reIndex(boost::optional< util::slist& > rejected)
+bool Image::reIndex(optional< util::slist& > rejected)
 {
 	if ( set.isEmpty() ) {
 		LOG( Debug, warning ) << "Reindexing an empty image is useless.";
@@ -314,7 +314,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 	int oneCnt = 0;
 
 	BOOST_FOREACH( const util::PropertyMap::key_type & ref, vectors ) {
-		const boost::optional< util::fvector3& > found=refValueAs<util::fvector3>( ref );
+		const optional< util::fvector3& > found=refValueAs<util::fvector3>( ref );
 		if ( found ) {
 			util::fvector3 &vec = found.get();
 
@@ -331,7 +331,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 		oneCnt++;
 	}
 	if(!hasProperty("indexOrigin")){ // if there is no common indexOrigin
-		boost::optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
+		optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
 		if(found) // get it from the first chunk - which than by definition should have one
 			property("indexOrigin")=found.get();
 		else{
@@ -351,12 +351,12 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 
 
 	//if we have at least two slides (and have slides (with different positions) at all)
-	const boost::optional< const util::PropertyValue& > firstV = first.hasProperty( "indexOrigin" );
+	const optional< const util::PropertyValue& > firstV = first.hasProperty( "indexOrigin" );
 
 	if ( chunk_dims == 2 && structure_size[2] > 1 && firstV ) {
 		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
-		boost::optional< const util::PropertyValue& > lastV = last.hasProperty( "indexOrigin" );
+		optional< const util::PropertyValue& > lastV = last.hasProperty( "indexOrigin" );
 
 		if ( lastV ) {
 			//check the slice vector
@@ -365,7 +365,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
 
-			const boost::optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
+			const optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
 
 			if ( sliceVec ) {
 				LOG_IF( ! distVecNorm.fuzzyEqual( *sliceVec ), Runtime, info )
@@ -403,7 +403,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 	}
 
 	//if we have row- and column- vector
-	const boost::optional< util::fvector3& > rrow = refValueAs<util::fvector3>( "rowVec" ),rcolumn = refValueAs<util::fvector3>( "columnVec" );
+	const optional< util::fvector3& > rrow = refValueAs<util::fvector3>( "rowVec" ),rcolumn = refValueAs<util::fvector3>( "columnVec" );
 	if(rrow && rcolumn){
 		const util::fvector3 &row=*rrow,&column=*rcolumn;
 		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
@@ -412,7 +412,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 											row[2] * column[0] - row[0] * column[2],
 											row[0] * column[1] - row[1] * column[0]
 										);
-		boost::optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
+		optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
 
 		if ( sliceVec ) {
 			LOG_IF( std::acos( crossVec.dot( *sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
@@ -431,7 +431,7 @@ bool Image::reIndex(boost::optional< util::slist& > rejected)
 	}
 
 
-	boost::optional< util::fvector3 & > storedFoV = refValueAs<util::fvector3>( "fov" );
+	optional< util::fvector3 & > storedFoV = refValueAs<util::fvector3>( "fov" );
 
 	if ( storedFoV ) {
 		const util::fvector3 calcFoV = getFoV();
@@ -641,7 +641,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 	if( clean ) {
 		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-			const boost::optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+			const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 			if(unique){ // if unique
 				if( (prop && !ret.empty() &&  prop->eq(ret.back())) || // if there is prop, skip if its equal

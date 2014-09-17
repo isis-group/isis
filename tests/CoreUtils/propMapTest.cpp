@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE( prop_value_ref_test )
 
 	BOOST_CHECK( map.refValueAs<util::fvector3>( "Test1" ) ); //should be available as fvector3
 
-	boost::optional< util::fvector4 & > vec4 = map.refValueAs<util::fvector4>( "Test1" );
+	optional< util::fvector4 & > vec4 = map.refValueAs<util::fvector4>( "Test1" );
 	BOOST_CHECK( vec4 ); //should be available as fvector4 (conversion available)
 
 	// changes should affect the property
