@@ -26,7 +26,6 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/optional.hpp>
-#include <boost/typeof/typeof.hpp>
 
 using boost::optional;
 
@@ -177,7 +176,7 @@ API_EXCLUDE_END;
 	{
 		propPathIterator next = at;
 		next++;
-		BOOST_AUTO(found, root.find( *at ));
+		auto found =root.find( *at );
 
 		if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 			if ( found != root.end() ) {//and we found the entry

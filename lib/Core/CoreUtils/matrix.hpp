@@ -24,7 +24,6 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
-#include <boost/typeof/typeof.hpp>
 #include <iomanip>
 
 
