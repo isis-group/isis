@@ -22,10 +22,12 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/shared_array.hpp>
 #include <stack>
+#include <boost/none.hpp>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
 
 using boost::optional;
+using boost::none;
 
 namespace isis
 {

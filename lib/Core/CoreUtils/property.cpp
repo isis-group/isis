@@ -69,9 +69,9 @@ bool PropertyValue::isEmpty() const{return container.empty();}
 
 ValueReference PropertyValue::operator()() const{return front();}
 
-void PropertyValue::push_back( const ValueBase& ref ){
-	insert(end(),ref);
-}
+void PropertyValue::push_back( const PropertyValue& ref ){insert(end(),ref);}
+void PropertyValue::push_back( const ValueBase& ref ){insert(end(),ref);}
+
 void PropertyValue::insert( iterator at, const PropertyValue& ref ){
 	if(ref.isEmpty()){
 		LOG(Debug,warning) << "Not inserting empty Property";
