@@ -2,14 +2,7 @@
 #define TYPES_HPP_INCLUDED
 
 #include <boost/mpl/vector/vector30.hpp>
-#include <boost/mpl/distance.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/find.hpp>
 #include <boost/mpl/contains.hpp>
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -90,7 +83,7 @@ template< typename T > struct checkType {
  * - \c \b negate negation is applicable
  */
 template<typename T> struct has_op:
-	_internal::ordered<boost::mpl::and_<boost::mpl::not_<boost::is_base_of<_internal::VectorClass,T> >, knowType<T> >::value>, //vectors are not ordered
+	_internal::ordered<!std::is_base_of<_internal::VectorClass,T>::value && knowType<T>::value>, //vectors are not ordered
 	_internal::additive<knowType<T>::value>,
 	_internal::multiplicative<knowType<T>::value>
 	{};

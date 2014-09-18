@@ -13,6 +13,7 @@
 #ifndef ISISTYPE_BASE_HPP
 #define ISISTYPE_BASE_HPP
 
+#include <type_traits>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -220,7 +221,7 @@ public:
 	Reference multiply( const ValueBase &ref )const;
 	Reference divide( const ValueBase &ref )const;
 
-	template<typename T> typename boost::enable_if<knowType<T>,bool>::type apply(const T &val){
+	template<typename T> typename std::enable_if<knowType<T>::value,bool>::type apply(const T &val){
 		return convert(Value<T>(val),*this);
 	}
 

@@ -20,7 +20,6 @@
 #include <vector>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/type_traits/remove_const.hpp>
 #include <boost/shared_array.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
@@ -54,7 +53,7 @@ protected:
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
 	//we have to use the non-const here, otherwise the iterator would not be convertible into const_iterator
-	boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> chunks;
+	boost::shared_array<typename std::remove_const<CHUNK_TYPE>::type *> chunks;
 
 	size_t ch_idx, ch_cnt;
 	inner_iterator current_it;
@@ -72,7 +71,7 @@ protected:
 public:
 
 	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
-	ImageIteratorTemplate ( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ) :
+	ImageIteratorTemplate ( const ImageIteratorTemplate<typename std::remove_const<CHUNK_TYPE>::type > &src ) :
 		chunks ( src.chunks ), ch_idx ( src.ch_idx ), ch_cnt( src.ch_cnt ),
 		current_it ( src.current_it ),
 		ch_len ( src.ch_len )
@@ -83,7 +82,7 @@ public:
 
 
 	// normal conytructor
-	explicit ImageIteratorTemplate ( boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> &_chunks, size_t _ch_cnt ) :
+	explicit ImageIteratorTemplate ( boost::shared_array<typename std::remove_const<CHUNK_TYPE>::type *> &_chunks, size_t _ch_cnt ) :
 		chunks ( _chunks ), ch_idx ( 0 ), ch_cnt( _ch_cnt ),
 		current_it ( chunks[0]->begin() ),
 		ch_len ( std::distance ( current_it, const_cast<CHUNK_TYPE *>( chunks[0] )->end() ) )

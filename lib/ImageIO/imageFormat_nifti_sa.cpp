@@ -1,8 +1,6 @@
 // #define BOOST_SPIRIT_DEBUG  ///$$$ DEFINE THIS BEFORE ANYTHING ELSE $$$///
 
 #include <DataStorage/fileptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <errno.h>

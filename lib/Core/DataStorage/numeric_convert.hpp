@@ -3,8 +3,6 @@
 
 #include <limits>
 #include <assert.h>
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
 #include "common.hpp"
 #include "valuearray.hpp"
 

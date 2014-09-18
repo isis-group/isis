@@ -24,7 +24,6 @@
 #include "valuearray_converter.hpp"
 #include "../CoreUtils/value.hpp"
 #include "common.hpp"
-#include <boost/type_traits/remove_const.hpp>
 #include "endianess.hpp"
 
 namespace isis
@@ -137,7 +136,7 @@ template<typename TYPE> class ValueArrayIterator: public std::iterator<std::rand
 public:
 	ValueArrayIterator(): p( NULL ) {}
 	ValueArrayIterator( TYPE *_p ): p( _p ) {}
-	ValueArrayIterator( const ValueArrayIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
+	ValueArrayIterator( const ValueArrayIterator<typename std::remove_const<TYPE>::type > &src ): p( src.p ) {}
 
 	ValueArrayIterator<TYPE>& operator++() {++p; return *this;}
 	ValueArrayIterator<TYPE>& operator--() {--p; return *this;}
@@ -340,7 +339,7 @@ public:
 			return std::pair<util::ValueReference, util::ValueReference>();
 		} else {
 
-			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, std::is_arithmetic<TYPE>::value>()( *this );
 
 			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 		}

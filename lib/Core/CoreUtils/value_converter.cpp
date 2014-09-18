@@ -25,8 +25,7 @@
 #include "value_base.hpp"
 #include "value.hpp"
 #include <boost/mpl/for_each.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/mpl/and.hpp>
+#include <type_traits>
 
 // @todo we need to know this for lexical_cast (toString)
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -44,6 +43,10 @@ API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
+template<typename SRC,typename DST> constexpr bool is_num(){return std::is_arithmetic<SRC>::value && std::is_arithmetic<DST>::value;};
+template<typename SRC,typename DST> constexpr bool is_same(){return std::is_same<SRC, DST>::value;}
+	
+	
 //Define generator - this can be global because its using convert internally
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
 {
@@ -127,12 +130,12 @@ template<typename SRC, typename DST> boost::numeric::range_check_result num2num(
 }
 
 // if a converter from double is available first map to double and then convert that into DST
-template<typename DST> typename boost::enable_if<boost::is_arithmetic<DST>,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
+template<typename DST> typename std::enable_if<std::is_arithmetic<DST>::value,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
 {
 	return num2num<double, DST>( Value<double>( src ), dst );
 }
 // otherwise try direct mapping (rounding will fail)
-template<typename DST> typename boost::disable_if<boost::is_arithmetic<DST>,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
+template<typename DST> typename std::enable_if<!std::is_arithmetic<DST>::value,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
 {
 	LOG( Debug, warning ) << "using lexical_cast to convert from string to " << Value<DST>::staticName() << " no rounding can be done.";
 	try { dst = boost::lexical_cast<DST>( src );}
@@ -276,7 +279,7 @@ template<typename DST> struct StrTransformer {
 //helper to convert strings to FixedVectors
 template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, FixedVector<DST, NUM> &dstList )
 {
-	const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+	const std::list<std::string> srcList = Tokenizer<std::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
 	std::list< std::string >::const_iterator end = srcList.begin();
 	std::advance( end, std::min<size_t>( srcList.size(), NUM ) ); // use a max of NUM tokens
 	StrTransformer<DST> transformer; // create a transformer from string to DST
@@ -318,9 +321,7 @@ template<typename SRC, typename DST> struct IterableSubValueConv: SubValueConv<S
 };
 template<typename CLASS, typename SRC, typename DST> static boost::shared_ptr<const ValueConverterBase> getFor()
 {
-	typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-	typedef boost::is_same<SRC, DST> is_same;
-	boost::shared_ptr<const ValueConverterBase> sub_conv = ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
+	boost::shared_ptr<const ValueConverterBase> sub_conv = ValueConverter<is_num<SRC,DST>(), is_same<SRC,DST>(), SRC, DST>::get();
 
 	if ( sub_conv ) {
 		boost::shared_ptr<CLASS > ret( new CLASS );
@@ -701,7 +702,7 @@ public:
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		std::list<DST> &dstList = dst.castTo<std::list<DST> >();
-		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the strin based on the target type
+		const std::list<std::string> srcList = Tokenizer<std::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the strin based on the target type
 		dstList.resize( srcList.size() ); // resize target to the ammount of found tokens
 		StrTransformer<DST> transformer; // create a transformer from string to DST
 		std::transform( srcList.begin(), srcList.end(), dstList.begin(), transformer ); // transform the found strings to the destination
@@ -754,7 +755,7 @@ public:
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		color<T> &dstVal = dst.castTo<color<T> >();
-		const std::list<std::string> srcList = Tokenizer<boost::is_arithmetic<T>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
+		const std::list<std::string> srcList = Tokenizer<std::is_arithmetic<T>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
 		std::list< std::string >::const_iterator end = srcList.begin();
 		std::advance( end, std::min<size_t>( srcList.size(), 3 ) ); // use a max of 3 tokens
 		StrTransformer<T> transformer; // create a transformer from string to DST
@@ -774,10 +775,8 @@ template<typename SRC> struct inner_TypeConverter {
 	inner_TypeConverter( std::map<int, boost::shared_ptr<const ValueConverterBase> > &subMap ): m_subMap( subMap ) {}
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_TypeConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
-		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
-		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const ValueConverterBase> conv =
-			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
+			ValueConverter<is_num<SRC,DST>(), is_same<SRC,DST>(), SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( Value<DST>::staticID(), conv ) );
 	}

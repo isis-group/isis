@@ -22,8 +22,6 @@
 #include "../CoreUtils/value_base.hpp"
 #include "valuearray_converter.hpp"
 #include "common.hpp"
-#include <boost/mpl/if.hpp>
-#include <boost/utility/enable_if.hpp>
 
 namespace isis
 {

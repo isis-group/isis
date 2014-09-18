@@ -27,8 +27,6 @@
 #include "numeric_convert.hpp"
 #include "../CoreUtils/types.hpp"
 #include <boost/mpl/for_each.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/mpl/and.hpp>
 
 #ifdef ISIS_USE_LIBOIL
 #include <liboil/liboil.h>
@@ -431,7 +429,7 @@ template<typename SRC> struct inner_ValueArrayConverter {
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValueArrayConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
 		boost::shared_ptr<const ValueArrayConverterBase> conv =
-			ValueArrayConverter<boost::is_arithmetic<SRC>::value, boost::is_arithmetic<DST>::value, SRC, DST>::get();
+			ValueArrayConverter<std::is_arithmetic<SRC>::value, std::is_arithmetic<DST>::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( ValueArray<DST>::staticID(), conv ) );
 	}
