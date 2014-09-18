@@ -85,7 +85,7 @@ class VistaSaParser
 public:
 
 	VistaSaParser ( data::FilePtr fPtr );
-	typedef boost::shared_ptr< VistaHeader > HeaderType;
+	typedef std::shared_ptr< VistaHeader > HeaderType;
 	typedef std::list< HeaderType > HeaderListType;
 	typedef std::list< std::pair< HeaderType, VistaObject > > HeaderObjectListType;
 

@@ -101,7 +101,7 @@ public:
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
 	template<typename T> ValueArray<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
-		boost::shared_ptr<T> ptr = boost::static_pointer_cast<T>( getRawAddress( offset ) );
+		std::shared_ptr<T> ptr = std::static_pointer_cast<T>( getRawAddress( offset ) );
 
 		if( len == 0 ) {
 			len = ( getLength() - offset ) / sizeof( T );

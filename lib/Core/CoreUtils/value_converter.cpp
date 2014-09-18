@@ -51,12 +51,12 @@ template<typename SRC,typename DST> constexpr bool is_same(){return std::is_same
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
 {
 public:
-	void create( boost::scoped_ptr<ValueBase>& dst )const {
+	void create( std::unique_ptr<ValueBase>& dst )const {
 		LOG_IF( dst.get(), Debug, error ) << "Generating into existing value " << dst->toString( true ) << " (dropping this).";
 		Value<DST> *ref = new Value<DST>;
 		dst.reset( ref );
 	}
-	boost::numeric::range_check_result generate( const ValueBase &src, boost::scoped_ptr<ValueBase>& dst )const {
+	boost::numeric::range_check_result generate( const ValueBase &src, std::unique_ptr<ValueBase>& dst )const {
 		create( dst );
 		assert( dst );
 		const boost::numeric::range_check_result result = convert( src.castToType<SRC>(), *dst );
@@ -71,11 +71,11 @@ template<bool NUMERIC, bool SAME, typename SRC, typename DST> class ValueConvert
 {
 public:
 	//uncomment this to see which conversions are not generated - be carefull, thats f***king much
-	/*  static boost::shared_ptr<const ValueConverterBase> get() {
+	/*  static std::shared_ptr<const ValueConverterBase> get() {
 	        std::cout <<
 	            "There will be no " << (SAME?"copy":NUMERIC?"numeric":"non-numeric") <<  " conversion for " <<
 	            util::Value<SRC>::staticName() << " to " << util::Value<DST>::staticName() << std::endl;
-	        return boost::shared_ptr<const ValueConverterBase>();
+	        return std::shared_ptr<const ValueConverterBase>();
 	    }*/
 	virtual ~ValueConverter() {}
 };
@@ -89,9 +89,9 @@ template<bool NUMERIC, typename SRC, typename DST> class ValueConverter<NUMERIC,
 				<< "Creating trivial copy converter for " << Value<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<NUMERIC, true, SRC, DST> *ret = new ValueConverter<NUMERIC, true, SRC, DST>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		SRC &dstVal = dst.castTo<SRC>();
@@ -289,7 +289,7 @@ template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Ve
 
 // additional base for converters which use another converter
 template<typename SRC, typename DST> struct SubValueConv {
-	boost::shared_ptr<const ValueConverterBase> sub_conv;
+	std::shared_ptr<const ValueConverterBase> sub_conv;
 };
 template<typename SRC, typename DST> struct IterableSubValueConv: SubValueConv<SRC, DST> {
 	template<typename SRC_LST, typename DST_LST> boost::numeric::range_check_result
@@ -319,16 +319,16 @@ template<typename SRC, typename DST> struct IterableSubValueConv: SubValueConv<S
 	}
 
 };
-template<typename CLASS, typename SRC, typename DST> static boost::shared_ptr<const ValueConverterBase> getFor()
+template<typename CLASS, typename SRC, typename DST> static std::shared_ptr<const ValueConverterBase> getFor()
 {
-	boost::shared_ptr<const ValueConverterBase> sub_conv = ValueConverter<is_num<SRC,DST>(), is_same<SRC,DST>(), SRC, DST>::get();
+	std::shared_ptr<const ValueConverterBase> sub_conv = ValueConverter<is_num<SRC,DST>(), is_same<SRC,DST>(), SRC, DST>::get();
 
 	if ( sub_conv ) {
-		boost::shared_ptr<CLASS > ret( new CLASS );
+		std::shared_ptr<CLASS > ret( new CLASS );
 		ret->sub_conv = sub_conv;
 		return ret;
 	} else {
-		return boost::shared_ptr<const ValueConverterBase>();
+		return std::shared_ptr<const ValueConverterBase>();
 	}
 }
 
@@ -354,9 +354,9 @@ template<typename SRC, typename DST> class ValueConverter<true, false, SRC, DST>
 				<< Value<SRC>::staticName() << " to " << Value<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<true, false, SRC, DST> *ret = new ValueConverter<true, false, SRC, DST>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		return num2num( src.castTo<SRC>(), dst.castTo<DST>() );
@@ -373,9 +373,9 @@ template<typename SRC, typename DST> class ValueConverter<false, false, std::com
 		LOG( Debug, verbose_info ) << "Creating complex-complex converter from " << Value<std::complex<SRC> >::staticName() << " to " << Value<std::complex<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > *ret = new ValueConverter<false, false, std::complex<SRC>, std::complex<DST> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		return num2num( src.castTo<std::complex<SRC> >(), dst.castTo<std::complex<DST> >() );
@@ -392,9 +392,9 @@ template<typename SRC, typename DST> class ValueConverter<false, false, color<SR
 		LOG( Debug, verbose_info ) << "Creating color converter from " << Value<color<SRC> >::staticName() << " to " << Value<color<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, color<SRC>, color<DST>  > *ret = new ValueConverter<false, false, color<SRC>, color<DST>  >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		boost::numeric::range_check_result res = boost::numeric::cInRange;
@@ -423,9 +423,9 @@ template<typename SRC, typename DST> class ValueConverter<false, false, SRC, std
 				<< "Creating number-complex converter from "
 				<< Value<SRC>::staticName() << " to " << Value<std::complex<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, SRC, std::complex<DST> >, SRC, DST >();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, SRC, std::complex<DST> >, SRC, DST >();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, SRC, std::complex<DST> >, SRC, DST >();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -452,9 +452,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, vector4
 	ValueConverter( ) {
 		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector4<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -469,9 +469,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, vector3
 	ValueConverter( ) {
 		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, vector3<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -486,9 +486,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, vector4
 	ValueConverter( ) {
 		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector4<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, vector4<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -503,9 +503,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, vector3
 	ValueConverter( ) {
 		LOG( Debug, verbose_info ) << "Creating vector converter from " << Value<vector3<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, vector3<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -523,9 +523,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, std::li
 	ValueConverter() {
 		LOG( Debug, verbose_info ) << "Creating list converter from " << Value<std::list<SRC> >::staticName() << " to " << Value<std::list<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, std::list<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, std::list<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, std::list<SRC>, std::list<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -549,9 +549,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, util::v
 	ValueConverter() {
 		LOG( Debug, verbose_info ) << "Creating list converter from " << Value<util::vector3<SRC> >::staticName() << " to " << Value<std::list<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, util::vector3<SRC>, std::list<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, util::vector3<SRC>, std::list<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, util::vector3<SRC>, std::list<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -569,9 +569,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, util::v
 	ValueConverter() {
 		LOG( Debug, verbose_info ) << "Creating list converter from " << Value<util::vector4<SRC> >::staticName() << " to " << Value<std::list<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, util::vector4<SRC>, std::list<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, util::vector4<SRC>, std::list<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, util::vector4<SRC>, std::list<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -591,9 +591,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, std::li
 	ValueConverter() {
 		LOG( Debug, verbose_info ) << "Creating list converter from " << Value<std::list<SRC> >::staticName() << " to " << Value<vector3<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, std::list<SRC>, vector3<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -607,9 +607,9 @@ template<typename SRC, typename DST > class ValueConverter<false, false, std::li
 	ValueConverter() {
 		LOG( Debug, verbose_info ) << "Creating list converter from " << Value<std::list<SRC> >::staticName() << " to " << Value<vector4<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, std::list<SRC>, vector4<DST> >, SRC, DST>();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -628,9 +628,9 @@ template<typename DST> class ValueConverter<false, false, std::string, DST> : pu
 		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::string, DST> *ret = new ValueConverter<false, false, std::string, DST>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		return str2scalar( src.castTo<std::string>(), dst.castTo<DST>() );
@@ -645,9 +645,9 @@ template<typename DST> class ValueConverter<false, false, std::string, std::comp
 		LOG( Debug, verbose_info )
 				<< "Creating from-string converter for " << Value<std::complex<DST> >::staticName();
 	};
-	friend boost::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::string, std::complex<DST> >, std::complex<double>, std::complex<DST> >();
+	friend std::shared_ptr<const ValueConverterBase> getFor<ValueConverter<false, false, std::string, std::complex<DST> >, std::complex<double>, std::complex<DST> >();
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		return getFor<ValueConverter<false, false, std::string, std::complex<DST> >, std::complex<double>, std::complex<DST> >();
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
@@ -674,9 +674,9 @@ template<typename SRC> class ValueConverter<false, false, SRC, std::string> : pu
 				<< "Creating to-string converter for " << Value<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, SRC, std::string> *ret = new ValueConverter<false, false, SRC, std::string>;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>() );
@@ -696,9 +696,9 @@ template<typename DST> class ValueConverter<false, false, std::string, std::list
 				<< "Creating from-string converter for " << Value<std::list<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::string, std::list<DST> > *ret = new ValueConverter<false, false, std::string, std::list<DST> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		std::list<DST> &dstList = dst.castTo<std::list<DST> >();
@@ -716,9 +716,9 @@ template<typename DST> class ValueConverter<false, false, std::string, vector4<D
 		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector4<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::string, vector4<DST> > *ret = new ValueConverter<false, false, std::string, vector4<DST> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		return _internal::convertStr2Vector<DST, 4>( src, dst.castTo<vector4<DST> >() );
@@ -732,9 +732,9 @@ template<typename DST> class ValueConverter<false, false, std::string, vector3<D
 		LOG( Debug, verbose_info ) << "Creating from-string converter for " << Value<vector3<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::string, vector3<DST> > *ret = new ValueConverter<false, false, std::string, vector3<DST> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		return _internal::convertStr2Vector<DST, 3>( src, dst.castTo<vector3<DST> >() );
@@ -749,9 +749,9 @@ template<typename T> class ValueConverter<false, false, std::string, color<T> >:
 				<< "Creating from-string converter for " << Value<color<T> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueConverterBase> get() {
+	static std::shared_ptr<const ValueConverterBase> get() {
 		ValueConverter<false, false, std::string, color<T> > *ret = new ValueConverter<false, false, std::string, color<T> >;
-		return boost::shared_ptr<const ValueConverterBase>( ret );
+		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		color<T> &dstVal = dst.castTo<color<T> >();
@@ -771,11 +771,11 @@ public:
 
 ///generate a ValueConverter for conversions from SRC to any type from the "types" list
 template<typename SRC> struct inner_TypeConverter {
-	std::map<int, boost::shared_ptr<const ValueConverterBase> > &m_subMap;
-	inner_TypeConverter( std::map<int, boost::shared_ptr<const ValueConverterBase> > &subMap ): m_subMap( subMap ) {}
+	std::map<int, std::shared_ptr<const ValueConverterBase> > &m_subMap;
+	inner_TypeConverter( std::map<int, std::shared_ptr<const ValueConverterBase> > &subMap ): m_subMap( subMap ) {}
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_TypeConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
-		boost::shared_ptr<const ValueConverterBase> conv =
+		std::shared_ptr<const ValueConverterBase> conv =
 			ValueConverter<is_num<SRC,DST>(), is_same<SRC,DST>(), SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( Value<DST>::staticID(), conv ) );
@@ -784,8 +784,8 @@ template<typename SRC> struct inner_TypeConverter {
 
 ///generate a ValueConverter for conversions from any SRC from the "types" list
 struct outer_TypeConverter {
-	std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > > &m_map;
-	outer_TypeConverter( std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > > &map ): m_map( map ) {}
+	std::map< int , std::map<int, std::shared_ptr<const ValueConverterBase> > > &m_map;
+	outer_TypeConverter( std::map< int , std::map<int, std::shared_ptr<const ValueConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in ValueConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
 			inner_TypeConverter<SRC>( m_map[Value<SRC>().getTypeID()] )

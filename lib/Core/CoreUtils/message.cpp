@@ -79,7 +79,7 @@ std::string Message::strTime()const
 	return boost::posix_time::to_simple_string( m_timeStamp );
 }
 
-Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo )
+Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo )
 	: commitTo( _commitTo ),
 	  m_object( object ),
 	  m_module( module ),
@@ -134,7 +134,7 @@ bool Message::shouldCommit()const
 	if( str().empty() )
 		return false;
 
-	const boost::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
+	const std::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
 
 	if ( buff )
 		return ( buff->m_level >= m_level );

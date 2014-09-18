@@ -29,7 +29,6 @@
 #include <CoreUtils/application.hpp>
 #include <CoreUtils/matrix.hpp>
 #include <DataStorage/io_application.hpp>
-#include <boost/scoped_ptr.hpp>
 #include "qdefaultmessageprint.hpp"
 
 namespace isis
@@ -39,7 +38,7 @@ namespace qt4
 
 class QtApplication : public util::Application
 {
-	boost::scoped_ptr<QApplication> m_qapp;
+	std::unique_ptr<QApplication> m_qapp;
 public:
 	QApplication &getQApplication();
 	QtApplication( const char name[] );
@@ -51,14 +50,14 @@ class IOQtApplication : public data::IOApplication
 {
 	int m_argc; //same as above
 	char **m_argv;
-	boost::scoped_ptr<QApplication> m_qapp;
+	std::unique_ptr<QApplication> m_qapp;
 public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 protected:
-	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 

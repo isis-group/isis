@@ -179,9 +179,9 @@ const ProgParameter ParameterMap::operator[] ( const std::string key ) const
 ProgParameter &ParameterMap::operator[] ( const std::string key ) {return std::map<std::string, ProgParameter>::operator[]( key );}
 
 #ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
-ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const
+ProgParameter::operator std::unique_ptr<ValueBase>::unspecified_bool_type()const
 {
-	boost::scoped_ptr<ValueBase> dummy;
+	std::unique_ptr<ValueBase> dummy;
 
 	if( ( *this ).castTo<bool>() )dummy.reset( new Value<int16_t> );
 

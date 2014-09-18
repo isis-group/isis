@@ -198,12 +198,12 @@ scaling_pair ValueArrayConverterBase::getScaling( const isis::util::ValueBase &m
 template<typename SRC, typename DST> class ValueArrayGenerator: public ValueArrayConverterBase
 {
 public:
-	void create( boost::scoped_ptr<ValueArrayBase>& dst, const size_t len )const {
+	void create( std::unique_ptr<ValueArrayBase>& dst, const size_t len )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Creating into existing value " << dst->toString( true );
 		ValueArray<DST> *newDat = new ValueArray<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
 		dst.reset( newDat );
 	}
-	void generate( const ValueArrayBase &src, boost::scoped_ptr<ValueArrayBase>& dst, const scaling_pair &scaling )const {
+	void generate( const ValueArrayBase &src, std::unique_ptr<ValueArrayBase>& dst, const scaling_pair &scaling )const {
 		//Create new "stuff" in memory
 		create( dst, src.getLength() );
 		assert( dst );
@@ -234,9 +234,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<false, false, SRC
 		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValueArray<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<false, false, SRC, DST> *ret = new ValueArrayConverter<false, false, SRC, DST>;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 		SRC *dstPtr = &dst.castToValueArray<SRC>()[0];
@@ -257,9 +257,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<true, true, SRC, 
 		LOG( Debug, verbose_info ) << "Creating numeric converter from " << ValueArray<SRC>::staticName() << " to " << ValueArray<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<true, true, SRC, DST> *ret = new ValueArrayConverter<true, true, SRC, DST>;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 		const SRC *srcPtr = &src.castToValueArray<SRC>()[0];
@@ -283,9 +283,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<false, false, std
 				<< ValueArray<std::complex<SRC> >::staticName() << " to " << ValueArray<std::complex<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<false, false, std::complex<SRC>, std::complex<DST> > *ret = new ValueArrayConverter<false, false, std::complex<SRC>, std::complex<DST> >;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 		//@todo we do an evil hack here assuming std::complex is POD - at least check if the size of std::complex is reasonable
@@ -320,9 +320,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<true, false, SRC,
 		}
 	};
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<true, false, SRC, std::complex<DST> > *ret = new ValueArrayConverter<true, false, SRC, std::complex<DST> >;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 
@@ -357,9 +357,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<false, false, uti
 				<< ValueArray<util::color<SRC> >::staticName() << " to " << ValueArray<util::color<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<false, false, util::color<SRC>, util::color<DST> > *ret = new ValueArrayConverter<false, false, util::color<SRC>, util::color<DST> >;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 		const SRC *sp = &src.castToValueArray<util::color<SRC> >().begin()->r;
@@ -392,9 +392,9 @@ template<typename SRC, typename DST> class ValueArrayConverter<true, false, SRC,
 	};
 
 public:
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {
+	static std::shared_ptr<const ValueArrayConverterBase> get() {
 		ValueArrayConverter<true, false, SRC, util::color<DST> > *ret = new ValueArrayConverter<true, false, SRC, util::color<DST> >;
-		return boost::shared_ptr<const ValueArrayConverterBase>( ret );
+		return std::shared_ptr<const ValueArrayConverterBase>( ret );
 	}
 	void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const {
 		size_t size = getConvertSize( src, dst );
@@ -424,11 +424,11 @@ public:
 
 ///generate a ValueArrayConverter for conversions from SRC to any type from the "types" list
 template<typename SRC> struct inner_ValueArrayConverter {
-	std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > &m_subMap;
-	inner_ValueArrayConverter( std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > &subMap ): m_subMap( subMap ) {}
+	std::map<int, std::shared_ptr<const ValueArrayConverterBase> > &m_subMap;
+	inner_ValueArrayConverter( std::map<int, std::shared_ptr<const ValueArrayConverterBase> > &subMap ): m_subMap( subMap ) {}
 	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValueArrayConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
-		boost::shared_ptr<const ValueArrayConverterBase> conv =
+		std::shared_ptr<const ValueArrayConverterBase> conv =
 			ValueArrayConverter<std::is_arithmetic<SRC>::value, std::is_arithmetic<DST>::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( ValueArray<DST>::staticID(), conv ) );
@@ -437,8 +437,8 @@ template<typename SRC> struct inner_ValueArrayConverter {
 
 ///generate a ValueArrayConverter for conversions from any SRC from the "types" list
 struct outer_ValueArrayConverter {
-	std::map< int , std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > > &m_map;
-	outer_ValueArrayConverter( std::map< int , std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > > &map ): m_map( map ) {}
+	std::map< int , std::map<int, std::shared_ptr<const ValueArrayConverterBase> > > &m_map;
+	outer_ValueArrayConverter( std::map< int , std::map<int, std::shared_ptr<const ValueArrayConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in ValueArrayConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
 			inner_ValueArrayConverter<SRC>( m_map[ValueArray<SRC>::staticID()] )

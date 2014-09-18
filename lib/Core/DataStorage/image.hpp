@@ -16,7 +16,7 @@
 #include "chunk.hpp"
 
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -225,7 +225,7 @@ public:
 	static const char *neededProperties;
 protected:
 	_internal::SortedChunkList set;
-	std::vector<boost::shared_ptr<Chunk> > lookup;
+	std::vector<std::shared_ptr<Chunk> > lookup;
 private:
 	size_t chunkVolume;
 
@@ -236,7 +236,7 @@ private:
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
-	const boost::shared_ptr<Chunk> &chunkPtrAt ( size_t at ) const;
+	const std::shared_ptr<Chunk> &chunkPtrAt ( size_t at ) const;
 
 	/**
 	 * Computes chunk- and voxel- indices.
@@ -559,8 +559,8 @@ public:
 		std::list<T> ret;
 
 		if( clean ) {
-			for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
-				const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
+				const optional< const util::PropertyValue& > prop = std::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 				if(unique){ // if unique
 					if( ( prop && !ret.empty() &&  *prop == ret.back() ) || // if there is prop, skip if its equal
@@ -662,7 +662,7 @@ public:
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
-			for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
+			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
@@ -906,8 +906,8 @@ public:
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			std::pair<util::ValueReference, util::ValueReference> scale;
-			boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
+			std::shared_ptr<Chunk> operator() ( const std::shared_ptr< Chunk >& ptr ) {
+				return std::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
 		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID() );

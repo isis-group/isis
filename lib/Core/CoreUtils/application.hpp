@@ -54,7 +54,7 @@ class Application
 protected:
 	typedef void ( Application::*setLogFunction )( LogLevel level )const;
 	std::map<std::string, std::list<setLogFunction> > logs;
-	virtual boost::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual std::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 public:
 

@@ -81,17 +81,17 @@ public:
  * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
-template<typename TYPE_TYPE> class GenericReference: protected boost::scoped_ptr<TYPE_TYPE>
+template<typename TYPE_TYPE> class GenericReference: protected std::unique_ptr<TYPE_TYPE>
 {
 	template<typename TT> friend class data::ValueArray; //allow Value and ValueArray to use the protected contructor below
 	template<typename TT> friend class Value;
 protected:
 	//dont use this directly
-	GenericReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
+	GenericReference( TYPE_TYPE *t ): std::unique_ptr<TYPE_TYPE>( t ) {}
 public:
 	///reexport parts of scoped_ptr's interface
-	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
-	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
+	TYPE_TYPE *operator->() const {return std::unique_ptr<TYPE_TYPE>::operator->();}
+	TYPE_TYPE &operator*() const {return std::unique_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
 	GenericReference() {}
 	/**
@@ -99,10 +99,10 @@ public:
 	 * This operator creates a copy of the referenced Value-Object.
 	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
 	 */
-	GenericReference( const GenericReference &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
+	GenericReference( const GenericReference &src ){
 		operator=( src );
 	}
-	GenericReference( const TYPE_TYPE &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
+	GenericReference( const TYPE_TYPE &src ){
 		operator=( src );
 	}
 	/**
@@ -113,7 +113,7 @@ public:
 	 * \returns reference to the (just changed) target
 	 */
 	GenericReference<TYPE_TYPE>& operator=( const GenericReference<TYPE_TYPE> &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
+		std::unique_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
 		return *this;
 	}
 	/**
@@ -122,12 +122,12 @@ public:
 	 * \returns reference to the (just changed) target
 	 */
 	GenericReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
+		std::unique_ptr<TYPE_TYPE>::reset( src.clone() );
 		return *this;
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool isEmpty()const {
-		return boost::scoped_ptr<TYPE_TYPE>::get() == NULL;
+		return std::unique_ptr<TYPE_TYPE>::get() == NULL;
 	}
 	const std::string toString( bool label = false )const {
 		if ( isEmpty() )

@@ -297,7 +297,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 
 }
 
-std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk current )
+std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk current )
 {
 	double time_fac;
 
@@ -495,7 +495,7 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 
 	strcpy( head->magic, "n+1" );
 }
-void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, data::Chunk &props )
+void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, data::Chunk &props )
 {
 	unsigned short dims = head->dim[0];
 	double time_fac = 1;
@@ -613,7 +613,7 @@ isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray< u
 	return ret;
 }
 
-bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_internal::nifti_1_header > header )
+bool ImageFormat_NiftiSa::checkSwapEndian ( std::shared_ptr< isis::image_io::_internal::nifti_1_header > header )
 {
 #define DO_SWAP(VAR) VAR=data::endianSwap(VAR)
 #define DO_SWAPA(VAR,SIZE) data::endianSwapArray(VAR,VAR+SIZE,VAR);
@@ -668,7 +668,7 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( boost::shared_ptr< isis::image_io::_
 #undef DO_SWAPA
 }
 
-std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename, const isis::util::istring& dialect, boost::shared_ptr< isis::util::ProgressFeedback > progress /*progress*/ )  throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename, const isis::util::istring& dialect, std::shared_ptr< isis::util::ProgressFeedback > progress /*progress*/ )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
 
@@ -681,7 +681,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 	}
 
 	//get the header - we use it directly from the file
-	boost::shared_ptr< _internal::nifti_1_header > header = boost::static_pointer_cast<_internal::nifti_1_header>( mfile.getRawAddress() );
+	std::shared_ptr< _internal::nifti_1_header > header = std::static_pointer_cast<_internal::nifti_1_header>( mfile.getRawAddress() );
 	const bool swap_endian = checkSwapEndian( header );
 
 	if( header->sizeof_hdr < 348 ) {
@@ -868,7 +868,7 @@ std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)

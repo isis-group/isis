@@ -59,21 +59,21 @@ BOOST_AUTO_TEST_CASE( ValueArray_init_test )
 		data::enableLog<util::DefaultMsgPrint>( warning );
 		// must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
-		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
-		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).use_count(), 0 );
+		BOOST_CHECK( ! ( std::shared_ptr<int32_t> )outer );
+		BOOST_CHECK_EQUAL( ( ( std::shared_ptr<int32_t> )outer ).use_count(), 0 );
 		{
 			data::ValueArray<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
+			std::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( outer.getLength(), inner.getLength() );
-			BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).get(), ( ( boost::shared_ptr<int32_t> )inner ).get() );
+			BOOST_CHECK_EQUAL( ( ( std::shared_ptr<int32_t> )outer ).get(), ( ( std::shared_ptr<int32_t> )inner ).get() );
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer;
+		std::shared_ptr<int32_t> &dummy = outer;
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
@@ -88,19 +88,19 @@ BOOST_AUTO_TEST_CASE( ValueArray_clone_test )
 		{
 			data::ValueArray<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one ValueArray referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
+			std::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( outer->getLength(), inner.getLength() );
 			BOOST_CHECK_EQUAL(
-				( ( boost::shared_ptr<int32_t> )outer->castToValueArray<int32_t>() ).get(),
-				( ( boost::shared_ptr<int32_t> )inner ).get()
+				( ( std::shared_ptr<int32_t> )outer->castToValueArray<int32_t>() ).get(),
+				( ( std::shared_ptr<int32_t> )inner ).get()
 			);
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToValueArray<int32_t>();
+		std::shared_ptr<int32_t> &dummy = outer->castToValueArray<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
@@ -118,17 +118,17 @@ BOOST_AUTO_TEST_CASE( ValueArray_Reference_test )
 			ReferenceTest inner;
 			BOOST_CHECK( ! inner.isEmpty() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy1 = inner->castToValueArray<int32_t>();//get the smart_pointer inside the referenced ValueArray
+			std::shared_ptr<int32_t> &dummy1 = inner->castToValueArray<int32_t>();//get the smart_pointer inside the referenced ValueArray
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 1 ); //We only have one ValueArray (inside inner)
 			outer = inner;//now we have two
-			boost::shared_ptr<int32_t> &dummy2 = outer->castToValueArray<int32_t>();
+			std::shared_ptr<int32_t> &dummy2 = outer->castToValueArray<int32_t>();
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 2 );
 			BOOST_CHECK_EQUAL( dummy2.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( dummy1.get(), dummy2.get() );
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToValueArray<int32_t>();
+		std::shared_ptr<int32_t> &dummy = outer->castToValueArray<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE( ValueArray_splice_test )
 		{
 			data::ValueArray<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
+			std::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValueArray does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			//splicing up makes a references for every splice
 			outer = inner.splice( 2 );

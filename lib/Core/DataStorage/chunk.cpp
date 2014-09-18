@@ -16,8 +16,6 @@
 
 #include "chunk.hpp"
 
-#include <boost/scoped_ptr.hpp>
-
 using boost::optional;
 
 namespace isis
@@ -288,7 +286,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 	const size_t elSize = getBytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();
 
-	boost::shared_ptr<uint8_t> swap_ptr = boost::static_pointer_cast<uint8_t>( get()->getRawAddress() );
+	std::shared_ptr<uint8_t> swap_ptr = std::static_pointer_cast<uint8_t>( get()->getRawAddress() );
 	uint8_t *swap_start = swap_ptr.get();
 	const uint8_t *const swap_end = swap_start + whole_size.product() * elSize;
 

@@ -41,7 +41,7 @@ public:
 		return "SiemensTcpIp";
 	}
 
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
 
 
 		printf( "IMAGE: %d\n", image_counter );
@@ -288,7 +288,7 @@ public:
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
 		throwGenericError( "Writing TCP/IP is not supportet" );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

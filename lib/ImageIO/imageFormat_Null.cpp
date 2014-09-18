@@ -59,7 +59,7 @@ public:
 		return "50 500 1000 2000";
 	}
 
-	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 
 		size_t size = getSize( dialect );
 
@@ -93,7 +93,7 @@ public:
 		return timesteps * size;
 	}
 
-	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		data::Image image = img;
 
 		// set by the core, thus the newChunks cannot have one

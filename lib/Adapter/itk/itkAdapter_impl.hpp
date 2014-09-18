@@ -34,7 +34,7 @@ template<typename TImage> typename TImage::Pointer
 itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkReader )
 {
 	typedef TImage OutputImageType;
-	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image( src ) );
+	m_ImageISIS = std::shared_ptr< data::Image >( new data::Image( src ) );
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
@@ -214,7 +214,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 		data::Chunk &chRef = ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
 		chRef.getValueArray<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
-		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
+		std::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropertyMapVector.push_back( tmpMap );
 	}
 	importer->SetImportPointer( refTarget, itkSize[0], false );

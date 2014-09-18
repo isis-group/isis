@@ -179,7 +179,7 @@ public:
  */
 template<typename TYPE> class ValueArray: public ValueArrayBase
 {
-	boost::shared_ptr<TYPE> m_val;
+	std::shared_ptr<TYPE> m_val;
 	static const util::ValueReference getValueFrom( const void *p ) {
 		return util::Value<TYPE>( *reinterpret_cast<const TYPE *>( p ) );
 	}
@@ -231,13 +231,13 @@ public:
 	}
 
 	/**
-	 * Creates ValueArray from a boost::shared_ptr of the same type.
+	 * Creates ValueArray from a std::shared_ptr of the same type.
 	 * It will inherit the deleter of the shared_ptr.
 	 * \param ptr the shared_ptr to share the data with
 	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValueArray( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
+	ValueArray( const std::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValueArray from a pointer of type TYPE.
@@ -262,16 +262,16 @@ public:
 
 	virtual ~ValueArray() {}
 
-	boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
+	std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
 		if( offset ) {
 			DelProxy proxy( *this );
 			const uint8_t *const b_ptr = reinterpret_cast<const uint8_t *>( m_val.get() ) + offset;
-			return boost::shared_ptr<const void>( b_ptr, proxy );
+			return std::shared_ptr<const void>( b_ptr, proxy );
 		} else
-			return boost::static_pointer_cast<const void>( m_val );
+			return std::static_pointer_cast<const void>( m_val );
 	}
-	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
-		return boost::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
+	std::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
+		return std::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
 	}
 	virtual value_iterator beginGeneric() {
 		return value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
@@ -323,13 +323,13 @@ public:
 		return begin()[idx];
 	}
 	/**
-	 * Implicit conversion to boost::shared_ptr\<TYPE\>
+	 * Implicit conversion to std::shared_ptr\<TYPE\>
 	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data
 	 * (using the given deleter) if required.
-	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
+	 * \return std::shared_ptr\<TYPE\> handling same data as the object.
 	 */
-	operator boost::shared_ptr<TYPE>&() {return m_val;}
-	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
+	operator std::shared_ptr<TYPE>&() {return m_val;}
+	operator const std::shared_ptr<TYPE>&()const {return m_val;}
 
 	size_t bytesPerElem()const {return sizeof( TYPE );}
 

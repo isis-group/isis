@@ -441,7 +441,7 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 
 	return false;
 }
-void IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback )
+void IOFactory::setProgressFeedback( std::shared_ptr<util::ProgressFeedback> feedback )
 {
 	IOFactory &This = get();
 

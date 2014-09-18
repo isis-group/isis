@@ -899,7 +899,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const size_t D[] = {0, 0, 0, 0};
 
 	cpSource.copyRange( S1, S2, chSlice, D );
-	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
+	float *pValues = ( ( std::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
 	float *pRun = pValues;
 
 	for ( unsigned int iy = 0; iy < nrY; iy++ ) {

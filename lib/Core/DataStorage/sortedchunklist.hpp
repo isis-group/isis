@@ -22,7 +22,7 @@
 #include "chunk.hpp"
 #include "../CoreUtils/vector.hpp"
 #include <stack>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 using boost::optional;
 
@@ -51,23 +51,23 @@ public:
 		bool operator()( const util::fvector3 &a, const util::fvector3 &b ) const;
 	};
 	struct chunkPtrOperator {
-		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr ) = 0;
+		virtual std::shared_ptr<Chunk> operator()( const std::shared_ptr<Chunk> &ptr ) = 0;
 		virtual ~chunkPtrOperator();
 	};
 private:
-	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
+	typedef std::map<util::PropertyValue, std::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
 	typedef std::map<util::fvector3, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
 	PrimaryMap chunks;
 
 	// low level finding
-	boost::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
+	std::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
 	SecondaryMap *primaryFind( const util::fvector3 &key );
 
 	// low level inserting
-	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
-	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
+	std::pair<std::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
+	std::pair<std::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
 	std::list<util::PropertyMap::PropPath> equalProps;
 public:
@@ -99,7 +99,7 @@ public:
 	void clear();
 
 	/// \returns a ordered vector of pointers to the chunks in the list
-	std::vector<boost::shared_ptr<Chunk> > getLookup();
+	std::vector<std::shared_ptr<Chunk> > getLookup();
 
 	/**
 	 * Get the list of the different lengths of the primary sorted "columns".

@@ -44,7 +44,7 @@ protected:
 			return false;
 		}
 	}
-	std::map<png_byte, std::map<png_byte, boost::shared_ptr<Reader> > > readers;
+	std::map<png_byte, std::map<png_byte, std::shared_ptr<Reader> > > readers;
 public:
 	ImageFormat_png() {
 		readers[PNG_COLOR_TYPE_GRAY][8].reset( new GenericReader<uint8_t> );
@@ -188,7 +188,7 @@ public:
 		png_read_update_info( png_ptr, info_ptr );
 		const png_byte color_type = png_get_color_type ( png_ptr, info_ptr );
 		const png_byte bit_depth = png_get_bit_depth( png_ptr, info_ptr );
-		boost::shared_ptr< Reader > reader = readers[color_type][bit_depth];
+		std::shared_ptr< Reader > reader = readers[color_type][bit_depth];
 
 		if( !reader ) {
 			LOG( Runtime, error ) << "Sorry, the color type " << ( int )color_type << " with " << ( int )bit_depth << " bits is not supportet.";
@@ -200,7 +200,7 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 	{
 		data::Chunk ch = read_png( filename );
 
@@ -234,7 +234,7 @@ public:
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;

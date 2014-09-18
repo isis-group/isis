@@ -77,7 +77,7 @@ public:
 	}
 
 #ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
-	operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+	operator std::unique_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 #else
 	explicit operator bool()const;
 #endif

@@ -42,7 +42,7 @@ public:
 protected:
 	util::istring suffixes( io_modes mode = both )const;
 
-	boost::shared_ptr< _internal::VistaHeader> m_vheader;
+	std::shared_ptr< _internal::VistaHeader> m_vheader;
 
 };
 

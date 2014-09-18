@@ -35,13 +35,13 @@ class IOApplication: public util::Application
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
 		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
-	boost::shared_ptr<util::ConsoleFeedback> feedback;
+	std::shared_ptr<util::ConsoleFeedback> feedback;
 
 public:
 	std::list<data::Image> images;
 	/**
 	 * Add input parameters to the given ParameterMap.
-	 * This adds the usual parameter for image input (used by autoload( const util::ParameterMap &, std::list< Image >&, bool, const std::string &, boost::shared_ptr< util::ConsoleFeedback > ) ) to the given ParameterMap. The parameters are:
+	 * This adds the usual parameter for image input (used by autoload( const util::ParameterMap &, std::list< Image >&, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback > ) ) to the given ParameterMap. The parameters are:
 	 * - \c -in the filename or path to load from
 	 * - \c -rf to override the file suffix used to select the plugin used for reading
 	 * - \c -rdialect selects a special dialect used for reading
@@ -94,7 +94,7 @@ public:
 	}
 
 	/** Load data into the input list of the Application using the internal ParameterMap.
-	 * This is the default loading function, it is calling autoload( const util::ParameterMap &, std::list< Image >&, bool, const std::string &, boost::shared_ptr< util::ConsoleFeedback > )
+	 * This is the default loading function, it is calling autoload( const util::ParameterMap &, std::list< Image >&, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback > )
 	 * with the ParameterMap of the application and stores the loaded image in its input list (see fetchImage and fetchImageAs).
 	 * \note usually there is no nedd to explicitely call that function. It is called automatically by init() if the Application is set up for input (see IOApplication()).
 	 */
@@ -109,10 +109,10 @@ public:
 	 * \param suffix the same suffix used for addInput()
 	 * \param feedback if given, the util::ConsoleFeedback object will be used to display reading progress if possible
 	 */
-	static bool autoload( const util::ParameterMap &parameters, std::list< Image >& images, bool exitOnError = false, const std::string &suffix = "", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
+	static bool autoload( const util::ParameterMap &parameters, std::list< Image >& images, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
 
 	/** Write data using the internal ParameterMap.
-	 * Uses autowrite(const util::ParameterMap &, Image, bool, const std::string &, boost::shared_ptr< util::ConsoleFeedback >) with the ParameterMap of the application to write the given image.
+	 * Uses autowrite(const util::ParameterMap &, Image, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback >) with the ParameterMap of the application to write the given image.
 	 * \param out_image the image to be written
 	 * \param exitOnError terminate the application if there was an error writing the data
 	 */
@@ -129,12 +129,12 @@ public:
 	 * \param suffix the same suffix used for addOutput()
 	 * \param feedback if given, the util::ConsoleFeedback object will be used to display reading progress if possible
 	 */
-	static bool autowrite( const util::ParameterMap &parameters, Image out_image, bool exitOnError = false, const std::string &suffix = "", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
-	/// \overload autowrite( const util::ParameterMap &, Image, bool, const std::string &, boost::shared_ptr< util::ConsoleFeedback > feedback)
-	static bool autowrite( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError = false, const std::string &suffix = "", boost::shared_ptr< util::ConsoleFeedback > feedback = boost::shared_ptr< util::ConsoleFeedback >() );
+	static bool autowrite( const util::ParameterMap &parameters, Image out_image, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
+	/// \overload autowrite( const util::ParameterMap &, Image, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback > feedback)
+	static bool autowrite( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
 
 protected:
-	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };
 
 }

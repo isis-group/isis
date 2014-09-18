@@ -20,7 +20,6 @@
 #include <iostream>
 #define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/path.hpp>
-#include <boost/weak_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace isis
@@ -78,7 +77,7 @@ public:
 
 class Message: public std::ostringstream
 {
-	boost::weak_ptr<MessageHandlerBase> commitTo;
+	std::weak_ptr<MessageHandlerBase> commitTo;
 public:
 	std::string m_object, m_module;
 	boost::filesystem::path m_file;
@@ -86,7 +85,7 @@ public:
 	boost::posix_time::ptime m_timeStamp;
 	int m_line;
 	LogLevel m_level;
-	Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo );
+	Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo );
 	Message( const Message &src );
 	~Message();
 	std::string merge()const;

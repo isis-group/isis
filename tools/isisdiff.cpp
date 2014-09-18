@@ -174,7 +174,7 @@ int main( int argc, char *argv[] )
 	std::list<data::Image> images1, images2;
 	util::slist ignore = app.parameters["ignore"];
 	ignore.push_back( "source" );
-	boost::shared_ptr<util::ConsoleFeedback> feedback( new util::ConsoleFeedback );
+	std::shared_ptr<util::ConsoleFeedback> feedback( new util::ConsoleFeedback );
 
 	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
 		app.parameters["in1"] = util::slist( 1, in1.first );

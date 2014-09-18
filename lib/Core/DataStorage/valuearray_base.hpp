@@ -151,7 +151,7 @@ public:
 	typedef value_iterator value_reference;
 	typedef const_value_iterator const_value_reference;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
-	class DelProxy : public boost::shared_ptr<const void>
+	class DelProxy : public std::shared_ptr<const void>
 	{
 	public:
 		/**
@@ -171,10 +171,10 @@ public:
 	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer
 	 * \returns a shared_ptr with the memory address of the data handled by this ValueArray.
 	 */
-	virtual boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
+	virtual std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
 
 	/// \copydoc getRawAddress
-	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
+	virtual std::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
 
 	virtual value_iterator beginGeneric() = 0;
 	value_iterator endGeneric();

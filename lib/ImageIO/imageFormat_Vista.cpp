@@ -49,7 +49,7 @@ boost::is_unsigned<VBit>::type,
 void
 ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const util::istring &/*dialect*/,
-						  boost::shared_ptr<util::ProgressFeedback> progress )
+						  std::shared_ptr<util::ProgressFeedback> progress )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -215,7 +215,7 @@ throw( std::runtime_error & )
 }
 
 
-std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;

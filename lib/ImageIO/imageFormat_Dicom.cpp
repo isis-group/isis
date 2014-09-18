@@ -507,7 +507,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, std::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
 {
 	DcmFileFormat dcfile;
 	OFCondition loaded = dcfile.loadFile( filename.c_str() );
@@ -535,7 +535,7 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 	return ret;
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }

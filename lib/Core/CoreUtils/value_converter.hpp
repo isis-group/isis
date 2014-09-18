@@ -20,8 +20,7 @@
 #ifndef CONVERTER_HPP
 #define CONVERTER_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <boost/numeric/conversion/converter.hpp>
 #include "log.hpp"
 #include "../config.hpp"
@@ -39,15 +38,15 @@ class ValueConverterBase
 {
 public:
 	virtual boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const = 0;
-	virtual void create( boost::scoped_ptr<ValueBase>& dst )const = 0;
-	virtual boost::numeric::range_check_result generate( const ValueBase &src, boost::scoped_ptr<ValueBase>& dst )const = 0;
-	static boost::shared_ptr<const ValueConverterBase> get() {return boost::shared_ptr<const ValueConverterBase>();}
+	virtual void create( std::unique_ptr<ValueBase>& dst )const = 0;
+	virtual boost::numeric::range_check_result generate( const ValueBase &src, std::unique_ptr<ValueBase>& dst )const = 0;
+	static std::shared_ptr<const ValueConverterBase> get() {return std::shared_ptr<const ValueConverterBase>();}
 public:
 	virtual ~ValueConverterBase() {}
 };
 
 API_EXCLUDE_BEGIN;
-class ValueConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > >
+class ValueConverterMap : public std::map< int , std::map<int, std::shared_ptr<const ValueConverterBase> > >
 {
 public:
 	ValueConverterMap();

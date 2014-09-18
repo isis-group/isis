@@ -24,7 +24,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END;
 
-void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, std::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();

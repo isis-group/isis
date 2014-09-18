@@ -187,13 +187,13 @@ bool FilePtr::good() {return m_good;}
 
 void FilePtr::release()
 {
-	static_cast<boost::shared_ptr<uint8_t>&>( *this ).reset();
+	static_cast<std::shared_ptr<uint8_t>&>( *this ).reset();
 	m_good = false;
 }
 
 ValueArrayReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len, bool swap_endianess )
 {
-	LOG_IF( static_cast<boost::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
+	LOG_IF( static_cast<std::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
 			<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
 	GeneratorMap &map = util::Singletons::get<GeneratorMap, 0>();
 	assert( !map.empty() );

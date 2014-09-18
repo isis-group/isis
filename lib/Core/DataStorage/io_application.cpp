@@ -47,7 +47,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 IOApplication::~IOApplication()
 {
-	data::IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback>() );
+	data::IOFactory::setProgressFeedback( std::shared_ptr<util::ProgressFeedback>() );
 }
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
@@ -163,7 +163,7 @@ bool IOApplication::autoload( bool exitOnError )
 	return autoload( parameters, images, exitOnError, "", feedback );
 
 }
-bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	std::string rf = parameters[std::string( "rf" ) + suffix];
@@ -209,14 +209,14 @@ bool IOApplication::autowrite( Image out_image, bool exitOnError ) {return autow
 bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 {
 	const bool no_progress = parameters["np"];
-	return autowrite( parameters, out_images, exitOnError, "", no_progress ? boost::shared_ptr<util::ConsoleFeedback>() : feedback );
+	return autowrite( parameters, out_images, exitOnError, "", no_progress ? std::shared_ptr<util::ConsoleFeedback>() : feedback );
 }
 
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	return autowrite( parameters, std::list<Image>( 1, out_image ), exitOnError, suffix, feedback );
 }
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	const util::Selection repn = parameters[std::string( "repn" ) + suffix];
 	const util::Selection scale_mode = parameters[std::string( "scale_mode" ) + suffix];
@@ -264,7 +264,7 @@ Image IOApplication::fetchImage()
 	return ret;
 }
 
-boost::shared_ptr< util::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
+std::shared_ptr< util::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
 {
 	return isis::util::Application::getLogHandler( module, level );
 }

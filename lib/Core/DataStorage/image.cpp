@@ -70,8 +70,8 @@ Image &Image::operator=( const data::Image &ref )
 	minIndexingDim = ref.minIndexingDim;
 	//replace all chunks (in set) by cheap copies of them
 	struct : public _internal::SortedChunkList::chunkPtrOperator {
-		boost::shared_ptr< Chunk > operator()( const boost::shared_ptr< Chunk >& ptr ) {
-			return boost::shared_ptr< Chunk > ( new Chunk( *ptr ) );
+		std::shared_ptr< Chunk > operator()( const std::shared_ptr< Chunk >& ptr ) {
+			return std::shared_ptr< Chunk > ( new Chunk( *ptr ) );
 		}
 	} replace;
 	set.transform( replace );
@@ -141,7 +141,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
 
 		// re-move all properties from the image back into the chunks 
-		for( boost::shared_ptr<Chunk> &ref :  lookup ) {
+		for( std::shared_ptr<Chunk> &ref :  lookup ) {
 			ref->transfer( *this );
 		}
 	}
@@ -183,7 +183,7 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 
 		if( hasProperty ( pPath ) ) {
 			const util::fvector3 p = getValueAs<util::fvector3> ( pPath );
-			for( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
+			for( std::vector<std::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
 				if ( !chRef->hasProperty ( pPath ) ) {
 					chRef->setValueAs<util::fvector3> ( pPath, p );
 					propPathList.insert( pPath );
@@ -195,7 +195,7 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 		}
 	}
 
-	for( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
+	for( std::vector<std::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
 		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
 			return false;
 		}
@@ -458,11 +458,11 @@ bool Image::isEmpty()const
 	return set.isEmpty();
 }
 
-const boost::shared_ptr< Chunk >& Image::chunkPtrAt( size_t pos )const
+const std::shared_ptr< Chunk >& Image::chunkPtrAt( size_t pos )const
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( pos >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << pos << ">=" << lookup.size() << ").";
-	const boost::shared_ptr<Chunk> &ptr = lookup[pos];
+	const std::shared_ptr<Chunk> &ptr = lookup[pos];
 	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << pos << ". This usually happens in incomplete images.";
 	return ptr;
 }
@@ -514,7 +514,7 @@ void Image::copyToValueArray( ValueArrayBase &dst, scaling_pair scaling ) const
 		}
 
 		std::vector< ValueArrayReference >::iterator target = targets.begin();
-		for( const boost::shared_ptr<Chunk> &ref :  lookup ) { // copy chunks into the parts
+		for( const std::shared_ptr<Chunk> &ref :  lookup ) { // copy chunks into the parts
 			if ( !ref->getValueArrayBase().copyTo ( **target, scaling ) ) {
 				LOG ( Runtime, error )
 						<< "Failed to copy raw data of type " << ref->getTypeName() << " from " << getSizeAsString() << "-image into ValueArray of type "
@@ -536,8 +536,8 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 	struct : _internal::SortedChunkList::chunkPtrOperator {
 		std::pair<util::ValueReference, util::ValueReference> scale;
 		unsigned short ID;
-		boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr ) {
-			return boost::shared_ptr<Chunk> ( new Chunk ( ptr->copyByID( ID, scale ) ) );
+		std::shared_ptr<Chunk> operator() ( const std::shared_ptr< Chunk >& ptr ) {
+			return std::shared_ptr<Chunk> ( new Chunk ( ptr->copyByID( ID, scale ) ) );
 		}
 	} conv_op;
 
@@ -563,8 +563,8 @@ std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
 	std::vector<isis::data::Chunk> ret;
 	ret.reserve( lookup.size() );
-	std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
-	const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
+	std::vector<std::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
+	const std::vector<std::shared_ptr<Chunk> >::const_iterator end = lookup.end();
 
 	while ( at != end ) {
 		ret.push_back( **( at++ ) );
@@ -639,8 +639,8 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 	std::list<util::PropertyValue > ret;
 
 	if( clean ) {
-		for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
-			const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+		for( const std::shared_ptr<Chunk> &ref :  lookup ) {
+			const optional< const util::PropertyValue& > prop = std::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 			if(unique){ // if unique
 				if( (prop && !ret.empty() &&  prop->eq(ret.back())) || // if there is prop, skip if its equal
@@ -660,7 +660,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 size_t Image::getMaxBytesPerVoxel() const
 {
 	size_t bytes = chunkPtrAt( 0 )->getBytesPerVoxel();
-	for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
+	for( const std::shared_ptr<Chunk> &ref :  lookup ) {
 		LOG_IF( bytes != ref->getBytesPerVoxel(), Debug, warning )
 				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->getBytesPerVoxel() << "). Using the biggest.";
 
@@ -676,7 +676,7 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 	std::pair<util::ValueReference, util::ValueReference> ret;
 
 	if( !lookup.empty() ) {
-		std::vector<boost::shared_ptr<Chunk> >::const_iterator i = lookup.begin();
+		std::vector<std::shared_ptr<Chunk> >::const_iterator i = lookup.begin();
 		ret = ( *i )->getMinMax();
 
 		for( ++i; i != lookup.end(); ++i ) {
@@ -699,7 +699,7 @@ std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( sho
 	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
-	for( const boost::shared_ptr<const Chunk> &ref :  lookup ) { //find a chunk which would be converted
+	for( const std::shared_ptr<const Chunk> &ref :  lookup ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
 			const scaling_pair scale = ref->getScalingTo( targetID, minmax, scaleopt );
 			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error ) << "Returning an invalid scaling. This is bad!";
@@ -833,7 +833,7 @@ std::string Image::getMajorTypeName() const
 bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 {
 	bool retVal = true;
-	for( boost::shared_ptr<Chunk> &ref :  lookup ) {
+	for( std::shared_ptr<Chunk> &ref :  lookup ) {
 		retVal &= ( ref->getTypeID() == ID );
 	}
 
@@ -846,7 +846,7 @@ bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	retVal = true;
 	//we want all chunks to be of type ID - so tell them
-	for( boost::shared_ptr<Chunk> &ref :  lookup ) {
+	for( std::shared_ptr<Chunk> &ref :  lookup ) {
 		retVal &= ref->convertToType( ID, scale );
 	}
 	return retVal;
@@ -893,7 +893,7 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 			}
 		}
 	};
-	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
+	std::vector<std::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
 
 	// reset the Chunk set, so we can insert new splices
@@ -903,7 +903,7 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
-	for( boost::shared_ptr<Chunk> &ref :  buffer ) {
+	for( std::shared_ptr<Chunk> &ref :  buffer ) {
 		for( util::PropertyMap::PathSet::const_reference need :  needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
 				LOG( Debug, info ) << "Copying " << need << "=" << this->property( need ) << " from the image to the chunk for splicing";

@@ -75,10 +75,10 @@ SortedChunkList::SortedChunkList( util::PropertyMap::key_type comma_separated_eq
 
 
 // low level finding
-boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyValue &key, SortedChunkList::SecondaryMap &map )
+std::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyValue &key, SortedChunkList::SecondaryMap &map )
 {
 	const SecondaryMap::iterator found = map.find( key );
-	return found != map.end() ? found->second : boost::shared_ptr<Chunk>();
+	return found != map.end() ? found->second : std::shared_ptr<Chunk>();
 }
 SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector3 &key )
 {
@@ -87,13 +87,13 @@ SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector
 }
 
 // low level insert
-std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
+std::pair<std::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
 {
 	util::PropertyMap::key_type propName = map.key_comp().propertyName;
 
 	if( ch.hasProperty( propName ) ) {
 		//check, if there is already a chunk
-		boost::shared_ptr<Chunk> &pos = map[ch.property( propName )];
+		std::shared_ptr<Chunk> &pos = map[ch.property( propName )];
 		bool inserted = false;
 
 		//if not. put oures there
@@ -106,10 +106,10 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 		return std::make_pair( pos, inserted );
 	} else {
 		LOG( Runtime, warning ) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";
-		return std::pair<boost::shared_ptr<Chunk>, bool>( boost::shared_ptr<Chunk>(), false );
+		return std::pair<std::shared_ptr<Chunk>, bool>( std::shared_ptr<Chunk>(), false );
 	}
 }
-std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
+std::pair<std::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
 	static const util::PropertyMap::PropPath rowVecProb( "rowVec" ), columnVecProb( "columnVec" ), sliceVecProb( "sliceVec" ), indexOriginProb( "indexOrigin" );
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
@@ -196,7 +196,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
+	std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
 			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.property( "indexOrigin" ) << ") with the equal property "
@@ -289,7 +289,7 @@ size_t SortedChunkList::getHorizontalSize()
 	else return chunks.begin()->second.size();
 }
 
-std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
+std::vector< std::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
 	LOG_IF( getShape().size() != 1, Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
@@ -297,7 +297,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 		PrimaryMap::iterator iP = chunks.begin();
 		const size_t horizontal = chunks.size();
 		const size_t vertical = iP->second.size();
-		std::vector< boost::shared_ptr< Chunk > > ret( horizontal * vertical );
+		std::vector< std::shared_ptr< Chunk > > ret( horizontal * vertical );
 
 		for( size_t h = 0; h < horizontal; h++, iP++ ) { // outer loop iterates horizontaly (through the primary sorting)
 			assert( iP != chunks.end() );
@@ -311,7 +311,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 		return ret;
 	} else
-		return std::vector< boost::shared_ptr< Chunk > >();
+		return std::vector< std::shared_ptr< Chunk > >();
 }
 
 void SortedChunkList::transform( chunkPtrOperator &op )

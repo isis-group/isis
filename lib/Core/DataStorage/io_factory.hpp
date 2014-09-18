@@ -17,7 +17,7 @@
 
 #include <map>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/regex.hpp>
 #define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
@@ -39,12 +39,12 @@ namespace data
 class IOFactory
 {
 public:
-	typedef boost::shared_ptr< image_io::FileFormat> FileFormatPtr;
+	typedef std::shared_ptr< image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 	friend class util::Singletons;
 
 private:
-	boost::shared_ptr<util::ProgressFeedback> m_feedback;
+	std::shared_ptr<util::ProgressFeedback> m_feedback;
 	// use ImageIO's logging here instead of the normal data::Runtime/Debug
 	typedef ImageIoLog Runtime;
 	typedef ImageIoDebug Debug;
@@ -87,7 +87,7 @@ public:
 	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
 
-	static void setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback );
+	static void setProgressFeedback( std::shared_ptr<util::ProgressFeedback> feedback );
 
 	/**
 	 * Get all formats which should be able to read/write the given file.
