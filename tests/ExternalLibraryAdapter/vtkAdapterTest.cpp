@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE VTKAdapterTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <boost/foreach.hpp>
 
 #include "CoreUtils/log.hpp"
 #include "DataStorage/image.hpp"

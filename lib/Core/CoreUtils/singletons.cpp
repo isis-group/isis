@@ -1,5 +1,4 @@
 #include "singletons.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {

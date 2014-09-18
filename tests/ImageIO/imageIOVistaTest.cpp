@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
 	BOOST_REQUIRE( images.size() >= 1 );
-	BOOST_FOREACH( data::Image & null, images ) {
+	for( data::Image & null :  images ) {
 		util::TmpFile vfile( "", ".v" );
 		BOOST_REQUIRE( data::IOFactory::write( null, vfile.native() ) );
 	}

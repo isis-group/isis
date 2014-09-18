@@ -12,7 +12,6 @@
 //
 
 #include "propmap.hpp"
-#include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -186,7 +185,7 @@ size_t PropertyMap::PropPath::length()const
 	if( empty() )return 0;
 
 	size_t ret = 0;
-	BOOST_FOREACH( const_reference ref, *this )
+	for( const_reference ref :  *this )
 	ret += ref.length();
 	return ret + size() - 1;
 }
@@ -308,7 +307,7 @@ bool PropertyMap::remove( const PropPath &path )
 bool PropertyMap::remove( const PathSet &removeList, bool keep_needed )
 {
 	bool ret = true;
-	BOOST_FOREACH( PathSet::const_reference key, removeList ) {
+	for( PathSet::const_reference key :  removeList ) {
 		if( hasProperty( key ) ) { // remove everything which is there
 			if( !( property( key ).isNeeded() && keep_needed ) ) { // if its not needed or keep_need is not true
 				ret &= remove( key );
@@ -581,7 +580,7 @@ PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty
 	  ) {
 		return found->first;
 	} else { // otherwise search in the branches
-		BOOST_FOREACH( container_type::const_reference ref, container ) {
+		for( container_type::const_reference ref :  container ) {
 			if( ref.second.type() == typeid( PropertyMap ) ) {
 				const PropPath found = boost::get<PropertyMap>( ref.second ).find( name.back(), allowProperty, allowBranch );
 
@@ -633,7 +632,7 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 {
 #warning getDifference is waste of time here
 	const DiffMap difference = common.getDifference( *this ); 
-	BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
+	for( const DiffMap::value_type & ref :  difference ) {
 		if ( ! ref.second.first.isEmpty() ) {
 			LOG( Debug, verbose_info ) << "Detected difference in " << ref << " removing from common";
 			common.remove( ref.first );//if there is something in common, remove it
@@ -661,7 +660,7 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 	parser::rule<PropertyMap>::decl object( lit( '{' ) >> ( member[parser::add_member( extra_token )] % ',' || eps ) >> '}', "object" );
 	parser::rule<PropertyMap>::decl list_object( lit( '{' ) >> ( ( label >> vallist )[parser::add_member( extra_token )] % ',' || eps ) >> '}', "list_object" );
 
-	BOOST_FOREACH(const std::string &label,util::stringToList<std::string>(list_trees,':')){
+	for(const std::string &label : util::stringToList<std::string>(list_trees,':')){
 		member= member.copy() | lexeme['"' >> ascii::string( label ) >> '"'] >> ':' >> list_object;
 	}
 

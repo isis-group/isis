@@ -113,7 +113,7 @@ void PropertyValue::swap(PropertyValue& ref)
 bool PropertyValue::transform(uint16_t dstID)
 {
 	PropertyValue ret,err;
-	BOOST_FOREACH(const ValueBase& ref,container){
+	for(const ValueBase& ref : container){
 		const ValueBase::Reference erg = ref.copyByID( dstID );
 		if(erg.isEmpty()){
 			err=ref;

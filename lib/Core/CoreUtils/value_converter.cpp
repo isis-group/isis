@@ -193,7 +193,7 @@ template<> boost::numeric::range_check_result str2scalar<boost::gregorian::date>
 	typedef boost::gregorian::date( *date_parser )( const std::string );
 	const date_parser parsers[] = {boost::gregorian::from_simple_string, boost::gregorian::from_uk_string, boost::gregorian::from_us_string};
 
-	BOOST_FOREACH( date_parser parser, parsers ) {
+	for( date_parser parser :  parsers ) {
 		try {dst = parser( str );}
 		catch( std::out_of_range &e ) {
 			LOG( Debug, verbose_info ) << "Failed to parse " << util::MSubject( str ) << " as date: " << e.what();

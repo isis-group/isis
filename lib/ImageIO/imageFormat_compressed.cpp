@@ -135,7 +135,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
-		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
 			const std::list<util::istring> s = format->getSuffixes();
 			suffixes.insert( suffixes.end(), s.begin(), s.end() );
 		}
@@ -241,7 +241,7 @@ public:
 
 						// read the temporary file
 						ret= data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() );
-						BOOST_FOREACH( data::Chunk &ref, ret) { // set the source property of the red chunks to something more usefull
+						for( data::Chunk &ref :  ret) { // set the source property of the red chunks to something more usefull
 							ref.setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
 						}
 					}
@@ -269,7 +269,7 @@ public:
 			ret= data::IOFactory::loadChunks( tmpFile.native(), dialect );
 
 			 //re-set source of all new chunks
-			BOOST_FOREACH( data::Chunk &ref, ret) { // set the source property of the red chunks to something more usefull
+			for( data::Chunk &ref :  ret) { // set the source property of the red chunks to something more usefull
 				ref.setValueAs( "source", filename  );
 			}
 		}

@@ -15,7 +15,7 @@
 #endif
 
 #include "chunk.hpp"
-#include <boost/foreach.hpp>
+
 #include <boost/scoped_ptr.hpp>
 
 using boost::optional;
@@ -271,7 +271,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	const ValueArrayList pointers = this->getValueArrayBase().splice( spliceSize.product() );
 
 	//create new Chunks from this ValueArray's
-	BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
+	for( ValueArrayList::const_reference ref :  pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); 
 	}
 	PropertyMap::splice(ret.begin(),ret.end());//copy/splice properties into spliced chunks

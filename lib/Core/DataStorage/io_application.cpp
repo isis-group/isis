@@ -145,7 +145,7 @@ void IOApplication::printHelp( bool withHidden ) const
 	} else if( parameters["help-io"].as<bool>() ) { // if help-io was set to true
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
-		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
+		for( data::IOFactory::FileFormatList::const_reference pi :  plugins ) {
 			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
@@ -237,7 +237,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<<  ", because -repn" << suffix << " was not given";
 
 	if( repn != 0 ) {
-		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
+		for( std::list<Image>::reference ref :  out_images ) {
 			ref.convertToType( repn, static_cast<autoscaleOption>( scale_mode - 1 ) ); //noscale is 0 but 1 in the selection
 		}
 	}

@@ -174,7 +174,7 @@ throw( std::runtime_error & )
 	// count number of history entries
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
-	BOOST_FOREACH( util::PropertyMap::KeyList::key_type key, keyset ) {
+	for( util::PropertyMap::KeyList::key_type key :  keyset ) {
 		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
@@ -383,7 +383,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		//remove the images with size 1x1 from the imageVector
 		VAttrList refList = VImageAttrList( vImageVector.front() );
-		BOOST_FOREACH( std::vector< VImage >::const_reference oneVoxelImage, emptySlices ) {
+		for( std::vector< VImage >::const_reference oneVoxelImage :  emptySlices ) {
 			std::vector< VImage >::iterator iter = std::find( vImageVector.begin(), vImageVector.end(), oneVoxelImage );
 			vImageVector.erase( iter );
 			VImage image = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
@@ -458,7 +458,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		std::set<util::fvector3, data::_internal::SortedChunkList::posCompare> originCheckSet;
 		//first we have to create a vista chunkList so we can get the number of slices
-		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
+		for( std::vector<VImage>::reference sliceRef :  vImageVector ) {
 			VistaChunk<VShort> vchunk( sliceRef, true );
 			vistaChunkList.push_back( vchunk );
 
@@ -478,7 +478,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		if( progress ) progress->show( vistaChunkList.size() );
 
-		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
+		for( std::vector<VistaChunk<VShort> >::reference sliceRef :  vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
 			uint16_t repetitionTime = 0;
@@ -611,7 +611,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 			std::list<data::Chunk> splices = sliceRef.splice( data::sliceDim );
 			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
-			BOOST_FOREACH( data::Chunk & spliceRef, splices ) {
+			for( data::Chunk & spliceRef :  splices ) {
 				uint32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
 				spliceRef.setValueAs<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
@@ -636,7 +636,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		//handle the residual images
 		uint16_t sequenceNumber = 0;
-		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
+		for( std::vector<VImage>::reference vImageRef :  residualVImages ) {
 			if( switchHandle( vImageRef, chunks ) ) {
 				chunks.back().setValueAs<uint16_t>( "sequenceNumber", ++sequenceNumber );
 				// add history information

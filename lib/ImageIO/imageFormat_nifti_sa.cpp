@@ -225,7 +225,7 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 	nifti_type2isis_type[NIFTI_TYPE_BINARY] = data::ValueArray<bool>::staticID();
 
 	typedef std::map<short, unsigned short>::const_reference ref_type;
-	BOOST_FOREACH( ref_type ref, nifti_type2isis_type ) {
+	for( ref_type ref :  nifti_type2isis_type ) {
 		isis_type2nifti_type[ref.second] = ref.first;
 	}
 
@@ -334,7 +334,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 
 		uint32_t offset = 0;
 
-		BOOST_FOREACH( data::Chunk & ch, newChList ) {
+		for( data::Chunk & ch :  newChList ) {
 
 			util::PropertyValue &acqProp=ch.property( "acquisitionNumber" );
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
@@ -394,7 +394,7 @@ void ImageFormat_NiftiSa::storeDescripForSPM( const util::PropertyMap &props, ch
 	std::list<std::string> ret;
 	typedef const char *prop_pair[3];
 	const prop_pair  pairs[] = {{"TR", "repetitionTime", "ms"}, {"TE", "echoTime", "ms"}, {"FA", "flipAngle", "deg"}, {"timestamp", "sequenceStart", ""}};
-	BOOST_FOREACH( const prop_pair & p, pairs ) {
+	for( const prop_pair & p :  pairs ) {
 		if( props.hasProperty( p[1] ) ) {
 			ret.push_back( std::string( p[0] ) + "=" + props.getValueAs<std::string>( p[1] ) + p[2] );
 		}
@@ -821,7 +821,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 		newChunks = parseSliceOrdering( header, newChunks.front() ); //if dcmmeta didn't splice, check if the header tells us to do so
 
 	if( newChunks.front().hasBranch( "DICOM" ) ){ // if we got DICOM data clean up some
-		BOOST_FOREACH( data::Chunk & ch, newChunks )
+		for( data::Chunk & ch :  newChunks )
             sanitise( ch );
     }
 
@@ -943,11 +943,11 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 
 			// the bvec file is the x-elements of all directions, then all y-elements and so on...
 			bvecFile.precision( 14 );
-			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[0] << " ";
+			for( const util::dvector3 & dir :  bvecList )bvecFile << dir[0] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[1] << " ";
+			for( const util::dvector3 & dir :  bvecList )bvecFile << dir[1] << " ";
 			bvecFile << std::endl;
-			BOOST_FOREACH( const util::dvector3 & dir, bvecList )bvecFile << dir[2] << " ";
+			for( const util::dvector3 & dir :  bvecList )bvecFile << dir[2] << " ";
 			bvecFile << std::endl;
 
 			LOG( Runtime, notice ) << "Stored bvec information for fsl to " << makeBasename( filename ).first + ".bvec";

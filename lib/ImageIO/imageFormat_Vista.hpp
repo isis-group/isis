@@ -30,7 +30,6 @@
 #include <boost/regex.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <list>
-#include <boost/foreach.hpp>
 
 // local includes
 #include <DataStorage/io_interface.h>
@@ -396,7 +395,7 @@ private:
 				m_timeDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ ?([[:digit:]]{1,2})\\ ?([[:word:]{3})\\ ?([[:digit:]]{4}).*" ), "not_needed", 1, 2, 3 ) );
 				std::string day, month, year;
 				boost::gregorian::date isisDate;
-				BOOST_FOREACH( std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList ) {
+				for( std::list<DateDecoding>::const_reference dateRef :  m_dateDecodingList ) {
 					boost::regex dateRegex( dateRef.dateRegex );
 					boost::cmatch dateResults;
 
@@ -421,7 +420,7 @@ private:
 
 				size_t hours, minutes, seconds;
 				boost::posix_time::time_duration isisTimeDuration;
-				BOOST_FOREACH( std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList ) {
+				for( std::list<DateDecoding>::const_reference timeRef :  m_timeDecodingList ) {
 					boost::regex timeRegex( timeRef.dateRegex );
 					boost::cmatch timeResults;
 

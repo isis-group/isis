@@ -33,7 +33,6 @@
 //external includes
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/foreach.hpp>
 
 //itk includes
 #include <itkImage.h>

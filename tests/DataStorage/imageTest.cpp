@@ -10,7 +10,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/foreach.hpp>
 #include <DataStorage/image.hpp>
 #include <DataStorage/io_factory.hpp>
 
@@ -77,7 +76,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		//List of the properties shall be as if every chunk of the image was asked for the property
 		std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
 		unsigned int i = 0;
-		BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
+		for( const util::PropertyValue & ref :  origins ) {
 			BOOST_CHECK( ref == util::fvector3( 0, 0, i++ ) );
 		}
 	}
@@ -851,7 +850,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	}
 
 	data::Image img( chunks );
-	BOOST_FOREACH( const char * str, needed ) {
+	for( const char * str :  needed ) {
 		BOOST_CHECK( img.property( str ).needed() );
 	}
 
@@ -1211,7 +1210,7 @@ BOOST_AUTO_TEST_CASE ( image_swapdim_test )
 	BOOST_REQUIRE( img.isValid() );
 
 	uint32_t cnt=0;
-	BOOST_FOREACH( data::Image::reference ref, img )
+	for( data::Image::reference ref :  img )
 		ref = util::Value<uint32_t>( cnt++);
 	
 	img.swapDim(data::columnDim,data::sliceDim);

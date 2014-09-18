@@ -7,7 +7,6 @@
 
 #define BOOST_TEST_MODULE ImageLoadTest
 #include <boost/test/unit_test.hpp>
-#include <boost/foreach.hpp>
 
 #include <DataStorage/image.hpp>
 #include <DataStorage/io_factory.hpp>

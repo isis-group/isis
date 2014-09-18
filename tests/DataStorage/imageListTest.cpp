@@ -7,7 +7,6 @@
 
 #define BOOST_TEST_MODULE ImageListTest
 #include <boost/test/unit_test.hpp>
-#include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 
@@ -40,7 +39,7 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	std::list<data::Image> list = data::IOFactory::chunkListToImageList( chunks );
 	BOOST_CHECK_EQUAL( list.size(), images );
 	short cnt = 0;
-	BOOST_FOREACH( data::Image & ref, list ) {
+	for( data::Image & ref :  list ) {
 		BOOST_CHECK( ref.getSizeAsVector() == util::fvector4( 3, 3, 3, timesteps ) );
 
 		for ( size_t i = 0; i < timesteps; i++ )

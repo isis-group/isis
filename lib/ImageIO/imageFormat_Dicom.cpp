@@ -173,7 +173,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		dicomTree.remove( "SeriesTime" );
 
 		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
-		BOOST_FOREACH( const char * d, dates ) {
+		for( const char * d :  dates ) {
 			if( dicomTree.hasProperty( d ) ) {
 				sequenceStart = genTimeStamp( dicomTree.getValueAs<date>( d ), sequenceStart );
 				dicomTree.remove( d );
@@ -187,7 +187,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			dicomTree.remove( "AcquisitionTime" );
 
 			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
-			BOOST_FOREACH( const char * d, dates ) {
+			for( const char * d :  dates ) {
 				if( dicomTree.hasProperty( d ) ) {
 					acTime = genTimeStamp( dicomTree.getValueAs<date>( d ), acTime );
 					dicomTree.remove( d );

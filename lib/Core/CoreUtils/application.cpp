@@ -21,8 +21,6 @@
  *****************************************************************/
 
 #include "application.hpp"
-#include <boost/foreach.hpp>
-
 #define STR(s) _xstr_(s)
 #define _xstr_(s) std::string(#s)
 
@@ -89,11 +87,11 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	BOOST_FOREACH( logger_ref ref, logs ) {
+	for( logger_ref ref: logs ) {
 		const std::string dname = std::string( "d" ) + ref.first;
 		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
 		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
-		BOOST_FOREACH( setLogFunction setter, ref.second ) {
+		for( setLogFunction setter: ref.second ) {
 			( this->*setter )( level );
 		}
 	}
@@ -162,7 +160,7 @@ void Application::printHelp( bool withHidden )const
 	if( !m_examples.empty() ) {
 		std::cout << "Examples:" << std::endl;
 
-		BOOST_FOREACH( example_type ex, m_examples ) {
+		for( example_type ex :  m_examples ) {
 			std::cout << '\t' << m_filename << " " << ex.first << '\t' << ex.second << std::endl;
 		}
 	}

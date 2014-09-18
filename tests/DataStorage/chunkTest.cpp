@@ -8,7 +8,6 @@
 #define BOOST_TEST_MODULE ChunkTest
 #include <boost/test/unit_test.hpp>
 #include "DataStorage/chunk.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -25,7 +24,7 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 
-	BOOST_FOREACH( const char * str, needed ) {
+	for( const char * str :  needed ) {
 		BOOST_CHECK( ch.property( str ).needed() );
 	}
 
@@ -327,7 +326,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	const std::list<data::Chunk> splices = ch1.autoSplice( 1 );
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
-	BOOST_FOREACH( const data::Chunk & ref, splices ) {
+	for( const data::Chunk & ref :  splices ) {
 		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
 		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
 		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
@@ -437,7 +436,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 {
 	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
 	uint32_t cnt = 0;
-	BOOST_FOREACH( data::Chunk::reference ref, ch )
+	for( data::Chunk::reference ref :  ch )
 	ref = util::Value<uint32_t>( cnt++ );
 
 	data::MemChunk<uint32_t> swapped( ch );

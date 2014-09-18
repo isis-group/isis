@@ -210,7 +210,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
 	std::vector< data::Chunk> chList = m_ImageISIS->copyChunksToVector();
 	size_t chunkIndex = 0;
-	BOOST_FOREACH(  std::vector<data::Chunk >::reference ref, chList ) {
+	for(  std::vector<data::Chunk >::reference ref: chList ) {
 		data::Chunk &chRef = ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
 		chRef.getValueArray<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
@@ -289,7 +289,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	LOG_IF( chList.size() != m_ChunkPropertyMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
 	//iterate through the spliced chunks of the image and set all the chunk specific parameters
 	size_t chunkCounter = 0;
-	BOOST_FOREACH( std::vector< data::Chunk >::reference chRef, chList ) {
+	for( std::vector< data::Chunk >::reference chRef: chList ) {
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropertyMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
@@ -321,7 +321,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	T( 2, 1 ) = 0;
 	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
-	BOOST_FOREACH( std::list<data::Image>::reference ref, retList ) {
+	for( std::list<data::Image>::reference ref: retList ) {
 		ref.transformCoords( T );
 	}
 	return retList;

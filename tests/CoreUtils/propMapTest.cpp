@@ -268,12 +268,12 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	map.setValueAs<std::string>( "Test4", "Welt" );
 
 	std::vector<PropertyMap> dst( 6 );
-	BOOST_FOREACH( const PropertyMap & ref, dst )
+	for( const PropertyMap & ref :  dst )
 	BOOST_REQUIRE( ref.isEmpty() );
 	map.splice( dst.begin(), dst.end() );
 
 	int i = 0;
-	BOOST_FOREACH( const PropertyMap & ref, dst ) {
+	for( const PropertyMap & ref :  dst ) {
 		// all must be scalar now
 		BOOST_CHECK_EQUAL( ref.property( "test1" ).size(), 1 );
 		BOOST_CHECK_EQUAL( ref.property( "test2" ).size(), 1 );
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	dst = std::vector<PropertyMap>( 3 );
 	map.splice( dst.begin(), dst.end() );
 	i = 0;
-	BOOST_FOREACH( const PropertyMap & ref, dst ) {
+	for( const PropertyMap & ref :  dst ) {
 		// all must be scalar now
 		BOOST_CHECK_EQUAL( ref.property( "test1" ).size(), 2 );
 		BOOST_CHECK_EQUAL( ref.property( "test2" ).size(), 2 );

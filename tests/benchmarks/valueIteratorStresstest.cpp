@@ -24,7 +24,7 @@ int main()
 		data::MemChunk<short> ch( 256, 256, 256 );
 		timer.restart();
 
-		BOOST_FOREACH( data::Chunk::reference ref, ch ) {
+		for( data::Chunk::reference ref :  ch ) {
 			ref = util::Value<int>( 42 );
 		}
 
@@ -32,7 +32,7 @@ int main()
 
 		timer.restart();
 
-		BOOST_FOREACH( data::Chunk::const_reference ref, ch ) {
+		for( data::Chunk::const_reference ref :  ch ) {
 			if( ref->as<int>() != 42 )
 				std::cout << "Whoops, something is very wrong ..." << std::endl;
 		}
@@ -61,14 +61,14 @@ int main()
 
 		timer.restart();
 
-		BOOST_FOREACH( data::Image::reference ref, img ) {
+		for( data::Image::reference ref :  img ) {
 			ref = util::Value<int>( 42 );
 		}
 
 		std::cout << img.getVolume() << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
 		timer.restart();
 
-		BOOST_FOREACH( data::Image::const_reference ref, img ) {
+		for( data::Image::const_reference ref :  img ) {
 			if( ref->as<int>() != 42 )
 				std::cout << "Whoops, something is very wrong ..." << std::endl;
 		}

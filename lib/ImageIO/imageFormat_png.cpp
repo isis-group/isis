@@ -287,7 +287,7 @@ public:
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
-			BOOST_FOREACH( const data::Chunk & ref, chunks ) {
+			for( const data::Chunk & ref :  chunks ) {
 				const std::string num = boost::lexical_cast<std::string>( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 

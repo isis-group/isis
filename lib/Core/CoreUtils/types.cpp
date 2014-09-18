@@ -22,7 +22,7 @@
 #include <complex>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/mpl/for_each.hpp>
-#include <boost/foreach.hpp>
+
 
 namespace isis
 {
@@ -109,7 +109,7 @@ std::map< std::string, unsigned short > getTransposedTypeMap( bool withValues, b
 	typedef std::map< std::string, unsigned short> transposedMapType;
 	typedef std::map< unsigned short, std::string > mapType;
 	transposedMapType ret;
-	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withValues, withValueArrays ) ) {
+	for( mapType::const_reference ref : util::getTypeMap( withValues, withValueArrays ) ) {
 		ret[ref.second] = ref.first;
 	}
 	return ret;

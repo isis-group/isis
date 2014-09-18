@@ -21,7 +21,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
-		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
 			const std::list<util::istring> s = format->getSuffixes();
 			suffixes.insert( suffixes.end(), s.begin(), s.end() );
 		}
@@ -41,7 +41,7 @@ public:
 
 		while( !in.eof() ) {
 			in >> fnames ;
-			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
+			for( const std::string fname : util::stringToList<std::string>( fnames, linebreak ) ) {
 				LOG( Runtime, info ) << "loading " << fname;
 				std::list<data::Chunk> loaded=data::IOFactory::loadChunks(fname, "", dialect );
 				fcnt++;

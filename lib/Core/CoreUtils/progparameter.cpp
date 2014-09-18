@@ -17,7 +17,6 @@
 */
 
 #include "progparameter.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -118,7 +117,7 @@ bool ParameterMap::parse( int argc, char **argv )
 			}
 
 			std::list<std::string> matchingStrings;
-			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
+			for( ParameterMap::const_reference parameterRef :  *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
 					if( parameterRef.first.length() == pName.length() ) { //if its an exact match
 						matchingStrings = std::list<std::string>( 1, pName ); //use that
@@ -130,7 +129,7 @@ bool ParameterMap::parse( int argc, char **argv )
 
 			if( matchingStrings.size() > 1 ) {
 				std::stringstream matchingStringStream;
-				BOOST_FOREACH( std::list<std::string>::const_reference stringRef, matchingStrings ) {
+				for( std::list<std::string>::const_reference stringRef :  matchingStrings ) {
 					matchingStringStream << stringRef << " ";
 				}
 				LOG( Runtime, warning )

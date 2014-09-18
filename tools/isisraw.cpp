@@ -98,7 +98,7 @@ int main( int argc, char *argv[] )
 		std::list< std::string >::const_iterator iOut = fnames.begin();
 		const util::Selection wrepn = app.parameters["repn"];
 
-		BOOST_FOREACH( const data::Image & img, app.images ) {
+		for( const data::Image & img :  app.images ) {
 			const unsigned short sRepn = ( int )wrepn ? : img.getMajorTypeID(); // get repn eigther from the parameter, or from the image
 			size_t repnsize = data::ValueArrayBase::createByID( sRepn, 1 )->bytesPerElem(); //create a dummy ValueArray to determine the elementsize of the requested repn
 			const size_t imgsize = img.getVolume() * repnsize;

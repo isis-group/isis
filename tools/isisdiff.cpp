@@ -1,6 +1,5 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/io_application.hpp"
-#include <boost/foreach.hpp>
 #include "CoreUtils/application.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
@@ -79,7 +78,7 @@ std::list<data::Image> findFitting( const data::Image reference, std::list<data:
 	std::list< data::Image > images;
 	images.splice( images.begin(), org_images ); //first move all into images
 
-	BOOST_FOREACH( const std::string & prop, props ) {
+	for( const std::string & prop :  props ) {
 		if( doFit( reference, org_images, images, prop.c_str() ) < 1 ) //now move all with different prop back into org
 			return images; // abort if no image is left
 	}
@@ -91,7 +90,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	bool ret = false;
 	util::PropertyMap::DiffMap diff = img1.getDifference( img2 );
 	diff.erase( "source" ); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
-	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
+	for( util::slist::const_reference ref :  ignore ) {
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
 	}
 	const std::string name1 = img1.identify();
@@ -124,7 +123,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 
 void dropWith( util::slist props, std::list< data::Image > &images )
 {
-	BOOST_FOREACH( util::slist::const_reference propStr, props ) {
+	for( util::slist::const_reference propStr :  props ) {
 		const std::list< std::string > ppair = util::stringToList<std::string>( propStr, '=' );
 		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), util::PropertyValue( ppair.back() ) ) );
 	}
@@ -219,7 +218,7 @@ int main( int argc, char *argv[] )
 					<< "Could not find a unique image fitting " << first->identify()
 					<< ". " << candidates.size() << " where found";
 
-			BOOST_FOREACH( const data::Image & second, candidates ) {
+			for( const data::Image & second :  candidates ) {
 				if( diff( *first, second, ignore ) )
 					ret++;
 			}

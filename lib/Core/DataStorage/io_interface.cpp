@@ -2,7 +2,6 @@
 #pragma warning(disable:4996)
 #endif
 
-#include <boost/foreach.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -29,7 +28,7 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		std::string uniquePath = *( inames++ );
 
 		try {
@@ -81,7 +80,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const
 {
 	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ).c_str() );
-	BOOST_FOREACH( util::istring & ref, ret ) {
+	for( util::istring & ref :  ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
 	ret.sort( _internal::moreCmp ); //start with the longest suffix
@@ -92,7 +91,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 {
 	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
-	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
+	for( const util::istring & suffix :  supported_suffixes ) {
 		util::istring check = ifilename.substr( ifilename.length() - suffix.length(), suffix.length() );
 
 		if( filename[filename.length() - suffix.length() - 1] == '.' && check == suffix ) {
@@ -188,11 +187,11 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Im
 {
 	std::list<std::string> ret;
 	std::map<std::string, unsigned short> names, used_names;
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		names[makeFilename( ref, namePattern )]++;
 	}
 
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		std::string name = makeFilename( ref, namePattern );
 
 		if( names[name] > 1 ) {

@@ -162,7 +162,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 			return false;
 		}
 
-		BOOST_FOREACH(const util::PropertyMap::PropPath & ref, equalProps ) { // check all properties which where given to the constructor of the list
+		for(const util::PropertyMap::PropPath & ref :  equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.property( ref ) != ch.property( ref ) ) {
 				LOG( Debug, verbose_info )
@@ -316,8 +316,8 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 void SortedChunkList::transform( chunkPtrOperator &op )
 {
-	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
-		BOOST_FOREACH( SecondaryMap::reference inner, outer.second ) {
+	for( PrimaryMap::reference outer :  chunks ) {
+		for( SecondaryMap::reference inner :  outer.second ) {
 			inner.second = op( inner.second );
 		}
 	}

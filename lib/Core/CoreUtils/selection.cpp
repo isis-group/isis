@@ -8,7 +8,6 @@
  */
 
 #include "selection.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -18,7 +17,7 @@ namespace util
 Selection::Selection( const char *entries, const char *init_val ): m_set( 0 )
 {
 	int ID = 1;
-	BOOST_FOREACH( const util::istring & ref, stringToList<util::istring>( util::istring( entries ), ',' ) ) {
+	for( const util::istring & ref :  stringToList<util::istring>( util::istring( entries ), ',' ) ) {
 		const MapType::value_type pair( ref, ID++ );
 
 		if( ! ent_map.insert( pair ).second ) {
@@ -34,7 +33,7 @@ Selection::Selection(): m_set( 0 ) {}
 Selection::operator int()const {return m_set;}
 Selection::operator util::istring()const
 {
-	BOOST_FOREACH( MapType::const_reference ref, ent_map ) {
+	for( MapType::const_reference ref :  ent_map ) {
 		if ( ref.second == m_set )
 			return ref.first;
 	}
@@ -82,7 +81,7 @@ bool Selection::operator>( const int ref )       const{return std::greater<int>(
 std::list<util::istring> Selection::getEntries()const
 {
 	std::list<util::istring> ret;
-	BOOST_FOREACH( MapType::const_reference ref, ent_map ) {
+	for( MapType::const_reference ref :  ent_map ) {
 		ret.push_back( ref.first );
 	}
 	return ret;

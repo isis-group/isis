@@ -22,7 +22,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
-		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
 			std::list<util::istring> s = format->getSuffixes();
 			suffixes.splice( suffixes.end(), s );
 		}

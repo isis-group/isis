@@ -143,7 +143,7 @@ API_EXCLUDE_BEGIN;
 					i->property( name ) = val;
 			} else {
 				ITER i = first;
-				BOOST_FOREACH( const PropertyValue & splint, val.splice( val.size() / blocks ) ) {
+				for( const PropertyValue & splint :  val.splice( val.size() / blocks ) ) {
 					assert( i != last );
 					( i++ )->property( name ) = splint;
 				}
@@ -201,7 +201,7 @@ protected:
 			assign( buff.begin(), buff.end() );
 		}
 		void applyTo( PropertyMap &props ) {
-			BOOST_FOREACH( const PropPath & ref, *this ) {
+			for( const PropPath & ref :  *this ) {
 				props.addNeeded( ref );
 			}
 		}

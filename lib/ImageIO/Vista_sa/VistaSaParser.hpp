@@ -27,7 +27,6 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant/recursive_variant.hpp>
-#include <boost/foreach.hpp>
 
 #include "DataStorage/fileptr.hpp"
 

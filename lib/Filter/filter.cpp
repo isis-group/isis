@@ -20,7 +20,7 @@ void FilterBase::setInput ( const std::string &label, const data::Chunk &chunk )
 
 void FilterBase::setParameters ( const util::ParameterMap &map )
 {
-	BOOST_FOREACH( util::ParameterMap::const_reference mapElem, map ) {
+	for( util::ParameterMap::const_reference mapElem :  map ) {
 		parameters[mapElem.first] = mapElem.second;
 	}
 }

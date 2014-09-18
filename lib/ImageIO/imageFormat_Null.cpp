@@ -66,7 +66,7 @@ public:
 		// normal sequencial image
 		std::list<data::Chunk> ret,loaded = makeImage( size, 0, "normal sequencial Image" );
 		uint32_t s = 0;
-		BOOST_FOREACH( data::Chunk & ref, ret ) {
+		for( data::Chunk & ref :  ret ) {
 			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 		}
 		ret.splice( ret.end(), loaded );
@@ -110,7 +110,7 @@ public:
 		switch( image.getValueAs<int>( "sequenceNumber" ) ) {
 		case 0: //image 0 is a "normal" image
 			newChunks = makeImage( size, 0, "normal sequencial Image" );
-			BOOST_FOREACH( data::Chunk & ref, newChunks ) {
+			for( data::Chunk & ref :  newChunks ) {
 				ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 			}
 			break;

@@ -19,7 +19,6 @@
 // #define BOOST_SPIRIT_DEBUG_PRINT_SOME 100
 // #define BOOST_SPIRIT_DEBUG_INDENT 5
 
-#include <boost/foreach.hpp>
 #include <CoreUtils/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"
@@ -88,7 +87,7 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 
 	//translate TM sets we know about to proper Timestamps
 	const char *TMs[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
-	BOOST_FOREACH( const util::PropertyMap::PropPath tm, TMs ) {
+	for( const util::PropertyMap::PropPath tm :  TMs ) {
 		if( hasProperty( tm ) )
 			property( tm ).transform<ptime>();
 	}
@@ -98,7 +97,7 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 	optional< util::PropertyValue& > serTime=hasProperty( "DICOM/SeriesTime" );
 	if(serTime){
-		BOOST_FOREACH( const char * time, time_stor ) {
+		for( const char * time :  time_stor ) {
 			optional< util::PropertyValue& > src=hasProperty( time );
 			if( src ) {
 				const ComputeTimeDist comp = {serTime->as<ptime>()};
@@ -130,9 +129,9 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 
 	// flatten matrizes
 // 	const char *matrizes[] = {"dcmmeta_affine", "dcmmeta_reorient_transform"};
-// 	BOOST_FOREACH( util::istring matrix, matrizes ) {
+// 	for( util::istring matrix :  matrizes ) {
 // 		int cnt = 0;
-// 		BOOST_FOREACH( const util::PropertyValue & val, propertyValue( matrix ) ) {
+// 		for( const util::PropertyValue & val :  propertyValue( matrix ) ) {
 // 			setValueAs( matrix + "[" + boost::lexical_cast<util::istring>( cnt++ ) + "]", val.as<util::fvector4>() );
 // 		}
 // 		remove( matrix );
@@ -211,7 +210,7 @@ void DCMStack::decodeMosaic()
 			for( size_t i = 0; i < mos.size(); i++ ) {
 				const util::dlist inner_mos = mos[i].as<util::dlist>();
 				const float offset= old_acq.isEmpty() ? 0:old_acq[i].as<float>();
-				BOOST_FOREACH(const float m,inner_mos){
+				for(const float m : inner_mos){
 					acq.push_back(m+offset);
 				}
 			}

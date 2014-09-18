@@ -147,7 +147,7 @@ boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sour
 	} else if( sources.size() == 1 )
 		return sources.front();
 	else {
-		BOOST_FOREACH( boost::filesystem::path & ref, sources )
+		for( boost::filesystem::path & ref :  sources )
 		ref.remove_leaf();//@todo switch to ref.remove_filename() as soon as we drop support for boost < 1.44
 		return getCommonSource( sources );
 	}
@@ -155,11 +155,11 @@ boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sour
 boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
 {
 	std::list<boost::filesystem::path> sources;
-	BOOST_FOREACH( const data::Image & img, imgs ) {
+	for( const data::Image & img :  imgs ) {
 		if( img.hasProperty( "source" ) )
 			sources.push_back( img.getValueAs<std::string>( "source" ) );
 		else {
-			BOOST_FOREACH( const util::PropertyValue & ref, img.getChunksProperties( "source", true ) ) {
+			for( const util::PropertyValue & ref : img.getChunksProperties( "source", true ) ) {
 				sources.push_back( ref.as<std::string>() );
 			}
 		}

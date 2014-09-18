@@ -18,7 +18,6 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/type_traits/remove_const.hpp>
@@ -561,7 +560,7 @@ public:
 		std::list<T> ret;
 
 		if( clean ) {
-			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+			for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
 				const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 				if(unique){ // if unique
@@ -664,7 +663,7 @@ public:
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
-			BOOST_FOREACH ( const boost::shared_ptr<Chunk> &ref, lookup ) {
+			for( const boost::shared_ptr<Chunk> &ref :  lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
