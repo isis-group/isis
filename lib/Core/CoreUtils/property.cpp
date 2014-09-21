@@ -53,7 +53,9 @@ PropertyValue PropertyValue::copyByID( short unsigned int ID ) const
 
 std::string PropertyValue::toString( bool labeled )const
 {
-	if(size()==1)
+	if(container.empty()){
+		return std::string("\u2205");//utf8 for empty set
+	} else if(size()==1)
 		return front().toString(labeled);
 	else{
 		const PropertyValue buff=copyByID(Value<std::string>::staticID);
@@ -67,9 +69,9 @@ bool PropertyValue::isEmpty() const{return container.empty();}
 
 ValueReference PropertyValue::operator()() const{return front();}
 
-void PropertyValue::push_back( const ValueBase& ref ){
-	insert(end(),ref);
-}
+void PropertyValue::push_back( const PropertyValue& ref ){insert(end(),ref);}
+void PropertyValue::push_back( const ValueBase& ref ){insert(end(),ref);}
+
 void PropertyValue::insert( iterator at, const PropertyValue& ref ){
 	if(ref.isEmpty()){
 		LOG(Debug,warning) << "Not inserting empty Property";

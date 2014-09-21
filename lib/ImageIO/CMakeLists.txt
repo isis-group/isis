@@ -12,6 +12,7 @@
 # include the ISIS core header files
 ############################################################
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+find_package(ZLIB)
 
 ############################################################
 # add global options
@@ -132,16 +133,13 @@ endif(ISIS_IOPLUGIN_NULL)
 # PNG plugin
 ############################################################
 if(ISIS_IOPLUGIN_PNG)
-  find_library(LIB_Z z)
-  find_library(LIB_PNG png12)
+	find_package(PNG REQUIRED)
+	include_directories(${PNG_INCLUDE_DIRS})
 
-  find_path(INCPATH_PNG "png.h")
-  include_directories(${INCPATH_PNG})
+	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
+	target_link_libraries(isisImageFormat_png ${isis_core_lib} ${PNG_LIBRARIES})
 
-  add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-  target_link_libraries(isisImageFormat_png ${isis_core_lib} ${LIB_PNG} ${LIB_Z})
-
-  set(TARGETS ${TARGETS} isisImageFormat_png)
+	set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(ISIS_IOPLUGIN_PNG)
 
 ############################################################
@@ -152,10 +150,9 @@ if(ISIS_IOPLUGIN_COMP)
 
   option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
-  find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
-  list(APPEND COMP_LIBS ${LIB_Z} ${LIB_BZ2})
+  list(APPEND COMP_LIBS ${ZLIB_LIBRARIES} ${LIB_BZ2})
   list(APPEND COMP_SRC imageFormat_compressed.cpp)
 
   if(ISIS_IOPLUGIN_COMP_LZMA)
@@ -195,30 +192,15 @@ endif(ISIS_IOPLUGIN_PROCESS)
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
-	
-	find_library(LIB_Z z)
-	find_library(LIB_TIFF tiff)
-	find_library(LIB_PNG png12)
+	find_package(PNG REQUIRED)
 
-	set(DCM_LIBS ${DCMTK_dcmimgle_LIBRARY} ${DCMTK_dcmimage_LIBRARY}  ${DCMTK_dcmdata_LIBRARY} ${DCMTK_ofstd_LIBRARY})
+	find_library(LIB_TIFF tiff)
+	find_library(DCMTK_oflog_LIBRARY "oflog")
 
 	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
-	
-	find_library(LIB_DCM_LOG "oflog")
-	if(LIB_DCM_LOG)
-		message(STATUS "dcmtk 3.6 found - linking against ${LIB_DCM_LOG}")
-		list(APPEND DCM_LIBS ${LIB_DCM_LOG} )
-	endif(LIB_DCM_LOG)
-
-	list(APPEND DCM_LIBS ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}) #low level functions
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-
-	if(WIN32)
-		list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
-	endif(WIN32)
-
-	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} ${isis_core_lib})
+	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${PNG_LIBRARIES} ${LIB_TIFF} ${DCMTK_oflog_LIBRARY} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 

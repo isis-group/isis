@@ -14,9 +14,6 @@ int main( int argc, char **argv )
 		"from the dicom files." );
 	app.init( argc, argv ); // will exit if there is a problem
 
-	while(!app.images.empty()){
-		app.autowrite( app.images.front() );
-		app.images.pop_front();
-	}
+	app.autowrite( app.images );
 	return EXIT_SUCCESS;
 }

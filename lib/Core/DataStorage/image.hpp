@@ -24,8 +24,12 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/shared_array.hpp>
 #include <stack>
+#include <boost/none.hpp>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
+
+using boost::optional;
+using boost::none;
 
 namespace isis
 {
@@ -305,19 +309,19 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
+	template<typename T> Image ( std::list<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
 		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 		set.addSecondarySort ( "acquisitionNumber" );
-		insertChunksFromList ( chunks );
+		insertChunksFromList ( chunks, rejected );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
+	template<typename T> Image ( std::vector<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
 		set ( defaultChunkEqualitySet ),
 		clean ( false ) {
@@ -333,7 +337,7 @@ public:
 	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
 	 * \returns amount of successfully inserted chunks
 	 */
-	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks ) {
+	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >() ) {
 		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, T> ) );
 		size_t cnt = 0;
 
@@ -349,7 +353,7 @@ public:
 		if ( ! isEmpty() ) {
 			LOG ( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
-			if ( !reIndex() ) {
+			if ( !reIndex(rejected) ) {
 				LOG ( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF ( !getMissing().empty(), Debug, warning )
@@ -530,7 +534,7 @@ public:
 	 * The image will be "clean" on success.
 	 * \returns true if the image was successfully reindexed and is valid, false otherwise.
 	 */
-	bool reIndex();
+	bool reIndex(optional< util::slist& > rejected=optional< util::slist& >());
 
 	/// \returns true if there is no chunk in the image
 	bool isEmpty() const;
@@ -560,7 +564,7 @@ public:
 
 		if( clean ) {
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				const boost::optional< const util::PropertyValue& > prop = ref->hasProperty( key );
+				const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 				if(unique){ // if unique
 					if( ( prop && !ret.empty() &&  *prop == ret.back() ) || // if there is prop, skip if its equal

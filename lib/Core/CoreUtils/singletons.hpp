@@ -66,6 +66,15 @@ public:
 
 		return *Singleton<T>::_instance;
 	}
+	template<typename T, typename P1, int PRIO> static T &get(P1 p1) {
+		if ( !Singleton<T>::_instance ) {
+			Singleton<T>::_instance = new T(p1);
+			prioMap &map = getMaster().map;
+			map.insert( map.find( PRIO ), std::make_pair( PRIO, Singleton<T>::destruct ) );
+		}
+
+		return *Singleton<T>::_instance;
+	}
 };
 template <typename C> C *Singletons::Singleton<C>::_instance = 0;
 

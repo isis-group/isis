@@ -67,21 +67,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 # compiler flags 
 ############################################################
 
-if(${APPLE})
-  if(${CMAKE_OSX_ARCHITECTURES})
-    set(PROCESSOR ${CMAKE_OSX_ARCHITECTURES})
-  else(${CMAKE_OSX_ARCHITECTURES})
-    set(PROCESSOR "x86_64")
-  endif(${CMAKE_OSX_ARCHITECTURES})
-else(${APPLE})
-  set(PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
-endif(${APPLE})
-
-if("${PROCESSOR}" STREQUAL "x86_64")
+if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
-endif("${PROCESSOR}" STREQUAL "x86_64" )
+endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall" )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall"  )

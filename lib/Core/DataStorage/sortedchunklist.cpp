@@ -235,7 +235,7 @@ std::set<size_t> SortedChunkList::getShape()
 	return images;
 }
 
-size_t SortedChunkList::makeRectangular()
+size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 {
 	const std::set<size_t> images = getShape();//get lenghts of all primary sorted "columns" -- as set is sorted the smallest will be at begin
 	size_t dropped = 0;
@@ -247,6 +247,9 @@ size_t SortedChunkList::makeRectangular()
 
 			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); ) {
 				if( c->second.size() != resize ) {
+					if(rejected)
+						BOOST_FOREACH(const SecondaryMap::value_type &ch,c->second)
+							rejected->push_back(ch.second->getValueAs<std::string>("source"));
 					dropped += c->second.size();
 					chunks.erase( c++ );
 				} else
@@ -264,6 +267,9 @@ size_t SortedChunkList::makeRectangular()
 					dropped += it.size() - resize;
 					SecondaryMap::iterator firstinvalid = it.begin();
 					std::advance( firstinvalid, resize );
+					if(rejected)
+						for(SecondaryMap::iterator i=firstinvalid;i!=it.end();i++)
+							rejected->push_back(i->second->getValueAs<std::string>("source"));
 					it.erase( firstinvalid, it.end() );
 				}
 

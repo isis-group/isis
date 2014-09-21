@@ -31,7 +31,7 @@ namespace data
 
 class IOApplication: public util::Application
 {
-	bool m_input, m_output;
+	bool m_input;
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
 		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}

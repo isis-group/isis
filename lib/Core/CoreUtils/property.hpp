@@ -58,6 +58,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////
 	// List operations
 	////////////////////////////////////////////////////////////////////////////
+	void push_back(const PropertyValue& ref);
 	void push_back(const ValueBase& ref);
 	template<typename T> typename boost::enable_if<knowType<T> >::type push_back(const T& ref){insert(end(),ref);}
 
