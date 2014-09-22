@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		// inserting insufficient Chunk should fail
 		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 );
 		BOOST_CHECK( ! img.insertChunk( data::MemChunk<float>( 4, 4 ) ) );
-		data::enableLog<util::DefaultMsgPrint>( error );
+		data::enableLog<util::DefaultMsgPrint>( notice );
 
 		//inserting the same chunk twice should fail
 		BOOST_CHECK( ! img.insertChunk( ch ) );
@@ -183,7 +183,6 @@ BOOST_AUTO_TEST_CASE ( copy_image_test )
 	chunks.back().setValueAs<float>( "acquisitionTime", 1 );
 
 	data::Image img( chunks );
-	const size_t size[] = {4, 4, 1, 2};
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 
@@ -212,8 +211,10 @@ BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 	BOOST_CHECK_EQUAL( img.voxel<float>( 0 ), ( float )M_PI ); //so image will _not_ be changed
 }
 
-BOOST_AUTO_TEST_CASE ( proplist_image_test )
+BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 {
+	const util::PropertyValue *dummy=&util::PropertyMap().property("nothing");//hack to get the address of the dummy return for failed property access
+	
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
 
 	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
@@ -222,19 +223,36 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
+	ch.property( "nothing")=util::PropertyValue();
 
-
+	// make c a proplist
 	for( int i = 0; i < 4; i++ ) {
-		ch.property( "acquisitionNumber")[3 - i].apply(( uint32_t )i); //change the acquisitionNumber of that to 1
-		ch.property( "acquisitionTime")[3 - i].apply(( uint32_t )i);
+		ch.property( "acquisitionNumber").push_back(3-i); 
+		ch.property( "acquisitionTime").push_back(3-i); 
 	}
 
-	data::Image img( ch );
-	BOOST_REQUIRE_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // the dim should be 2 now
+	data::Image img( ch );  
+	BOOST_CHECK_EQUAL( img.getRelevantDims(), 3 ); // still a 4x4x4 volume
+	BOOST_CHECK_EQUAL( img.property( "acquisitionTime").size(),4); // also still a proplist
+	BOOST_CHECK_EQUAL( img.property( "acquisitionNumber").size(),4); // also still a proplist
+
+	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should be there (aka not the dummy)
+	BOOST_CHECK(img.property("nothing").isEmpty()); // but empty
+	
+	img.spliceDownTo(data::sliceDim);
+
+	BOOST_CHECK_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // now its sliced
+	BOOST_CHECK( !img.hasProperty( "acquisitionTime")); // its in the chunks now
+	BOOST_CHECK( !img.hasProperty( "acquisitionNumber")); // its in the chunks now
+
+	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should still be there
+	BOOST_CHECK(img.property("nothing").isEmpty()); // but still empty
 
 	for( uint32_t i = 0; i < 4; i++ ) {
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).property( "acquisitionTime" ), i );
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).property( "acquisitionNumber" ), i );
+		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionTime" ));
+		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionNumber" ));
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionTime" ), i );
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionNumber" ), i );
 	}
 }
 
@@ -925,7 +943,6 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
 
-	util::DefaultMsgPrint::stopBelow( warning );
 	img.spliceDownTo( data::sliceDim );
 	std::vector<data::Chunk > chunks = img.copyChunksToVector( false );
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );

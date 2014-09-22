@@ -188,7 +188,7 @@ Chunk &Chunk::operator=( const Chunk &ref )
 	return *this;
 }
 
-std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
+std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 {
 	if ( !isValid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
@@ -212,7 +212,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		offset = getValueAs<util::fvector3>( "columnVec" );
 		break;
 	case sliceDim:{
-		const optional< const util::PropertyValue& > svec=hasProperty( "sliceVec" );
+		const optional< util::PropertyValue& > svec=hasProperty( "sliceVec" );
 		if( svec ) {
 			offset = svec->as<util::fvector3>();
 		} else {
@@ -249,14 +249,14 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		if(!acqWasList && acquisitionNumberStride){//@todo acquisitionTime needs to be fixed as well
 			util::PropertyValue &acqVal = it->property( "acquisitionNumber" );
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
-			acqVal = acqVal * acquisitionNumberStride + cnt; //@todo this might cause trouble if we try to insert this chunks into an image
+			acqVal = acqVal + acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		}
 	}
 
 	return ret;
 }
 
-std::list<Chunk> Chunk::splice ( dimensions atDim )const
+std::list<Chunk> Chunk::splice ( dimensions atDim )
 {
 	std::list<Chunk> ret;
 
@@ -274,7 +274,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	BOOST_FOREACH( ValueArrayList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); 
 	}
-	PropertyMap::splice(ret.begin(),ret.end());//copy/splice properties into spliced chunks
+	PropertyMap::splice(ret.begin(),ret.end(),false);//copy/splice properties into spliced chunks
 	return ret;
 }
 

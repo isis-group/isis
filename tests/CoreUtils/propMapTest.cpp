@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	std::vector<PropertyMap> dst( 6 );
 	BOOST_FOREACH( const PropertyMap & ref, dst )
 	BOOST_REQUIRE( ref.isEmpty() );
-	map.splice( dst.begin(), dst.end() );
+	map.splice( dst.begin(), dst.end(), true );
 
 	int i = 0;
 	BOOST_FOREACH( const PropertyMap & ref, dst ) {
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	}
 
 	dst = std::vector<PropertyMap>( 3 );
-	map.splice( dst.begin(), dst.end() );
+	map.splice( dst.begin(), dst.end(), true );
 	i = 0;
 	BOOST_FOREACH( const PropertyMap & ref, dst ) {
 		// all must be scalar now

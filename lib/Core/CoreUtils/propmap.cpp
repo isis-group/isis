@@ -85,7 +85,7 @@ struct JoinTreeVisitor: boost::static_visitor<bool> {
 			else first = second; 
 			return true;
 		} else { // otherwise put the other into rejected if its unequal to ours
-			if( first != second )
+			if( first != second && !second.isEmpty())
 				rejects.insert( rejects.end(), prefix / name );
 			return false;
 		}
@@ -309,8 +309,10 @@ bool PropertyMap::remove( const PathSet &removeList, bool keep_needed )
 {
 	bool ret = true;
 	BOOST_FOREACH( PathSet::const_reference key, removeList ) {
-		if( hasProperty( key ) ) { // remove everything which is there
-			if( !( property( key ).isNeeded() && keep_needed ) ) { // if its not needed or keep_need is not true
+		optional< PropertyValue& > found = tryFindEntry<PropertyValue>( key );
+
+		if( found ) { // remove everything which is there
+			if( !(found->isNeeded() && keep_needed) ) { // if its not needed or keep_need is not true
 				ret &= remove( key );
 			}
 		} else {
@@ -370,7 +372,7 @@ PropertyMap::DiffMap PropertyMap::getDifference( const PropertyMap &other ) cons
 	return ret;
 }
 
-void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &ret, const PropPath &prefix ) const
+void PropertyMap::diffTree( const container_type& other, DiffMap& ret, const PropPath& prefix ) const
 {
 	container_type::const_iterator otherIt = other.begin();
 
@@ -397,7 +399,7 @@ void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &r
 						boost::apply_visitor( _internal::MapStrAdapter(), otherIt->second )
 													   ) ) );
 			}
-		} else { // if ref is not in the other map
+		} else { // if ref is not in the other map 
 			const PropertyValue firstVal = boost::apply_visitor( _internal::MapStrAdapter(), thisIt->second );
 			ret.insert( // add (propertyname|(value1|[empty]))
 				ret.end(),      // we know it has to be at the end
@@ -450,14 +452,15 @@ PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite
 {
 	PathSet rejects;
 	joinTree( const_cast<PropertyMap &>(other), overwrite, false, PropPath(), rejects );
-	LOG_IF(!rejects.empty(),Debug,notice) << "The properties " << MSubject(rejects) << " where rejected during the join";
+	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the join";
 	return rejects;
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 {
+#warning test non removal of rejected
 	PathSet rejects;
 	joinTree( other, overwrite, true, PropPath(), rejects );
-	LOG_IF(!rejects.empty(),Debug,notice) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
+	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
 	return rejects;
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, const PropPath &path, bool overwrite)
@@ -691,6 +694,8 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 /// @cond _internal
 bool PropertyMap::TrueP::operator()( const PropertyValue &/*ref*/ ) const {return true;}
 bool PropertyMap::InvalidP::operator()( const PropertyValue &ref ) const {return ref.isNeeded() && ref.isEmpty();}
+bool PropertyMap::EmptyP::operator()(const PropertyValue& ref) const {return ref.isEmpty();};
+
 /// @endcond _internal
 
 }

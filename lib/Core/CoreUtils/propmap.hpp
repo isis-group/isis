@@ -42,6 +42,10 @@ struct JoinTreeVisitor;
 struct SwapVisitor;
 struct FlatMapMaker;
 struct TreeInvalidCheck;
+
+template<typename T> T &un_shared_ptr(T &p){return p;}
+template<typename T> T &un_shared_ptr(boost::shared_ptr<T> &p){return *p;}
+
 }
 /// @endcond 
 /**
@@ -107,7 +111,8 @@ API_EXCLUDE_BEGIN;
 	struct TrueP { bool operator()( const PropertyValue &ref )const;};
 	/// true when the Property is needed and empty
 	struct InvalidP { bool operator()( const PropertyValue &ref )const;};
-
+	struct EmptyP { bool operator()( const PropertyValue &ref )const;};
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -127,29 +132,39 @@ API_EXCLUDE_BEGIN;
 	template<typename ITER> struct Splicer: public boost::static_visitor<void> {
 		const ITER &first, &last;
 		const PropPath &name;
-		Splicer( const ITER &_first, const ITER &_last, const PropPath &_name ): first( _first ), last( _last ), name( _name ) {}
-		void operator()( const container_type::value_type &pair )const {
-			boost::apply_visitor( Splicer<ITER>( first, last, name / pair.first ), pair.second );
-		}
-		void operator()( PropertyValue val )const {
-			const size_t blocks = std::distance( first, last );
+		const bool lists_only;
+		const size_t blocks;
+		Splicer( const ITER &_first, const ITER &_last, const PropPath &_name, bool _lists_only ): 
+			first( _first ), last( _last ), name( _name ),lists_only(_lists_only), blocks(std::distance( first, last )) 
+		{
 			assert( blocks );
-
+		}
+		void operator()( container_type::value_type &pair )const {
+			boost::apply_visitor( Splicer<ITER>( first, last, name / pair.first, lists_only ), pair.second );
+		}
+		void operator()( PropertyValue &val )const {
+			if(val.isEmpty())return; // abort if there is nothing to splice
+			else if(lists_only && val.size() <= 1)return;  //abort if we dont want do move scalars
+			
 			if( val.size() % blocks ) { // just copy all which cannot be properly spliced to the destination
 				LOG_IF( val.size() > 1, Runtime, warning ) << "Not splicing non scalar property " << MSubject( name ) << " because its length "
-						<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
-
+				<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
+			
 				for( ITER i = first; i != last; i++ )
-					i->property( name ) = val;
+					_internal::un_shared_ptr(*i).property( name ) = val;
+				val=PropertyValue();//and clear the source
 			} else {
+				LOG_IF( val.size() > 1, Debug, info ) << "Splicing non scalar property " << MSubject( name ) << " into " << blocks << " chunks";
 				ITER i = first;
 				BOOST_FOREACH( const PropertyValue & splint, val.splice( val.size() / blocks ) ) {
 					assert( i != last );
-					( i++ )->property( name ) = splint;
+					_internal::un_shared_ptr(*i).property( name ) = splint;
+					i++;
 				}
 			}
+			assert(val.isEmpty());
 		}
-		void operator()( const PropertyMap &sub )const { //call my own recursion for each element
+		void operator()( PropertyMap &sub )const { //call my own recursion for each element
 			std::for_each( sub.container.begin(), sub.container.end(), *this );
 		}
 	};
@@ -222,7 +237,6 @@ protected:
 				found->at(*at).castTo<T>():
 				found->castTo<T>(); // use single value ops, if at was not given
 		}
-
 		return optional<T &>();
 	}
 	template<typename T> T getValueAsImpl( const PropPath &path, const optional<size_t> &at )const {
@@ -467,7 +481,7 @@ public:
 	 * \param second the other tree to compare with
 	 * \returns a map of property paths and pairs of the corresponding different values
 	 */
-	DiffMap getDifference( const PropertyMap &second )const;
+	DiffMap getDifference( const PropertyMap &other )const;
 
 	/**
 	 * Add Properties from another property map.
@@ -520,15 +534,18 @@ public:
 	}
 
 	/**
-	 * Copy-Splice this map into a list of other PropertyMaps.
+	 * Splice this map into a list of other PropertyMaps.
 	 * This will copy all scalar Properties equally into a list of destination maps represented by iterators.
 	 * Multi-Value Properties will be split up, if their length fits.
 	 * \param first start of the destination list
 	 * \param last end of the destination list
+	 * \param lists_only if only list should be spliced
 	 * \note dereferencing ITER must result in PropertyMap&
+	 * \note all empty properties will be removed afterwards (including needed properties)
 	 */
-	template<typename ITER> void splice( ITER first, ITER last )const {
-		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath() ) );
+	template<typename ITER> void splice( ITER first, ITER last, bool lists_only ){
+		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath(), lists_only) );
+		remove(genKeyList<EmptyP>());//some cleanup
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
