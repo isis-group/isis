@@ -43,7 +43,7 @@ Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
 	set.addSecondarySort( "acquisitionNumber" );
-
+	
 	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
 		LOG( Runtime, error ) << "Failed to create image from single chunk.";
 	} else if( !isValid() ) {
@@ -106,19 +106,20 @@ void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
 void Image::deduplicateProperties()
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
-	util::PropertyMap &common=*this; // the image stores the common stuff (or should after we're done here)
-	const PathSet rej=common.join(*lookup.front());//copy all props from the first chunk into the image (aka common) -- except those who are already there
+	if(lookup.empty())
+		return;
 
-	LOG_IF(!rej.empty(),Debug,warning) << "Some props where rejected when joining first chunk into the image (" << rej << ")";
+	util::PropertyMap common=*lookup.front();  //copy all props from the first chunk
 
-	// the image (common) now has all props (from image and the first chunk)
-	for ( size_t i = 0; i < lookup.size(); i++ ) { //remove everything from the image which is not equal
-		lookup[i]->removeUncommon( common );
-	}
-
-	//remove common props from the chunks
-	for ( size_t i = 0; i != lookup.size(); i++ )
-		lookup[i]->remove( common, false ); //this _won't_ keep needed properties - so from here on the chunks of the image are invalid
+	// common now has all props (from the first chunk)
+	for(size_t i=1;i<lookup.size();i++)
+		lookup[i]->removeUncommon( common );//remove everything which isn't common from common
+	//then remove remaining common props from the chunks
+	for ( const std::shared_ptr<Chunk> &p: lookup ) 
+		p->remove( common, false ); //this _won't_ keep needed properties - so from here on the chunks of the image are invalid
+		
+	const PathSet rej = this->join(common);
+	LOG_IF(!rej.empty(),Debug,error) << "Some props where rejected when joining the chunk's commons into the image (" << rej << ")";
 
 	LOG( Debug, verbose_info ) << "common properties now in the image: " << common;
 }
@@ -154,6 +155,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 	} else {
 		// if the insertion failed, but the image was clean - de-duplicate properties again
 		// the image is still clean - no need to reindex
+		#warning test me (why deduplicate)
 		if( clean )
 			deduplicateProperties();
 
@@ -257,7 +259,12 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	const unsigned short chunk_dims = std::max<unsigned short>( first.getRelevantDims(), minIndexingDim );
 	chunkVolume = first.getVolume();
 
-	//clean generated props from the image
+	//move all props from the image and move them (back) into the chunks to redo common check
+	for(int i=0;i<lookup.size()-1;i++) // copy the first n-1
+		lookup[i]->join(*this); 
+	lookup.back()->transfer(*this); //transfer into the last
+	
+	//clean generated props if they're still here (which would mean the chunks has their own -- which is a good thing)
 	if(hasProperty("indexOrigin"))remove( "indexOrigin" );
 	if(hasProperty("rowVec"))remove( "rowVec" );
 	if(hasProperty("columnVec"))remove( "columnVec" );
@@ -329,6 +336,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 		}
 		oneCnt++;
 	}
+
 	if(!hasProperty("indexOrigin")){ // if there is no common indexOrigin
 		optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
 		if(found) // get it from the first chunk - which than by definition should have one
@@ -876,14 +884,15 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 		Image &m_image;
 		size_t m_amount;
 		splicer( dimensions dimemsion, size_t amount, Image &image ): m_dim( dimemsion ), m_image( image ), m_amount( amount ) {}
-		void operator()( const Chunk &ch ) {
+		void operator()( std::shared_ptr<Chunk> &ptr ) {operator()(*ptr);}
+		void operator()( Chunk &ch ) {
 			const size_t topDim = ch.getRelevantDims() - 1;
 
 			if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				for( const Chunk & ref :  ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
+				for( Chunk & ref :  ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
@@ -893,25 +902,34 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 			}
 		}
 	};
-	std::vector<std::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
-	lookup.clear();
 
 	// reset the Chunk set, so we can insert new splices
 	set = _internal::SortedChunkList( defaultChunkEqualitySet );
 	set.addSecondarySort( "acquisitionNumber" );
 
 	clean = false; // mark the image for reIndexing
-	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
-	splicer splice( dim, image_size.product(), *this );
-	for( std::shared_ptr<Chunk> &ref :  buffer ) {
-		for( util::PropertyMap::PathSet::const_reference need :  needed ) { //get back properties needed for the
-			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
-				LOG( Debug, info ) << "Copying " << need << "=" << this->property( need ) << " from the image to the chunk for splicing";
-				ref->property( need ) = this->property( need );
+
+	//splice existing lists into the current chunks -- they will be spliced further if neccessary
+	PropertyMap::splice(lookup.begin(),lookup.end(),true);
+	
+	//transfer properties needed for the chunk back into the chunk (if they're there)
+	for( util::PropertyMap::PathSet::const_reference need : needed ) { 
+		const boost::optional< util::PropertyValue& > foundNeed=this->hasProperty( need );
+		if(foundNeed){
+			for( std::shared_ptr<Chunk> &ref : lookup ) {
+				if( !ref->hasProperty( need ) ) {
+					LOG( Debug, verbose_info ) << "Copying " << std::make_pair(need, *foundNeed) << " from the image to the chunk for splicing";
+					ref->property( need ) = *foundNeed;
+				} else 
+					LOG(Debug,error) << need << " was found in the chunk although it is in the image as well. It will be deleted in the image";
 			}
+			this->remove(need);
 		}
-		splice( *ref );
 	}
+	// do the splicing
+	std::vector<std::shared_ptr<Chunk> > buffer;
+	buffer.swap(lookup); // move the old lookup table into a buffer, so its empty when the splicer starts inserting the new chunks
+	std::for_each(buffer.begin(),buffer.end(),splicer( dim, image_size.product(), *this ));
 	reIndex();
 	return lookup.size();
 }

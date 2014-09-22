@@ -904,7 +904,7 @@ public:
 	MemImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 
 		Image::operator= ( ref ); // ok we just copied the whole image
-
+		
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			std::pair<util::ValueReference, util::ValueReference> scale;
