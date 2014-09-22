@@ -41,6 +41,8 @@ bool PropertyValue::operator!=( const ValueBase& second ) const
 
 
 PropertyValue::PropertyValue ( ) : m_needed( false ) {}
+PropertyValue &PropertyValue::operator=(const PropertyValue& other){container=other.container;return *this;}
+
 
 PropertyValue PropertyValue::copyByID( short unsigned int ID ) const
 {
@@ -173,6 +175,7 @@ void PropertyValue::resize( size_t size, const ValueBase &clone ){ // the builti
 
 std::vector< PropertyValue > PropertyValue::splice( const size_t len )
 {
+	assert(len);
 	std::vector<PropertyValue> ret(ceil(double(size())/len));
 	
 	for(std::vector<PropertyValue>::iterator dst=ret.begin();container.size()>=len;dst++){ //as long as there is enough transfer given amount

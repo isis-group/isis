@@ -139,6 +139,14 @@ public:
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
 	 */
 	PropertyValue();
+	/**
+	 * Copy operator.
+	 * Copies the content of another Property.
+	 * \param other the source to copy from
+	 * \note the needed state wont change, regardless of what it is in other
+	 */
+	PropertyValue &operator=(const PropertyValue &other);
+	
 	/// accessor to mark as (not) needed
 	bool &needed();
 	/// returns true if PropertyValue is marked as needed, false otherwise
