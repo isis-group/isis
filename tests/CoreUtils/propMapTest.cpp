@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE( prop_list_test )
 BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 {
 
-	PropertyMap map;
+	PropertyMap map,backup;
 	const util::Value<int> buff[] = {1, 2, 3, 4, 5, 6};
 	std::copy( buff, buff + 6, std::back_inserter( map.property( "test1" ) ) );
 	std::copy( buff, buff + 6, std::back_inserter( map.property( "test2" ) ) );
@@ -267,10 +267,18 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	map.setValueAs<std::string>( "Test3", "Hallo" );
 	map.setValueAs<std::string>( "Test4", "Welt" );
 
+	BOOST_CHECK_EQUAL( map.property( "test1" ).size(), 6 );
+	BOOST_CHECK_EQUAL( map.property( "test2" ).size(), 6 );
+	BOOST_CHECK_EQUAL( map.property( "test3" ).size(), 1 );
+	BOOST_CHECK_EQUAL( map.property( "test4" ).size(), 1 );
+	
 	std::vector<PropertyMap> dst( 6 );
 	BOOST_FOREACH( const PropertyMap & ref, dst )
 	BOOST_REQUIRE( ref.isEmpty() );
-	map.splice( dst.begin(), dst.end(), true );
+	
+	backup=map; //make backup of map
+	util::enableLog<util::DefaultMsgPrint>(info);
+	map.splice( dst.begin(), dst.end(), false );
 
 	int i = 0;
 	BOOST_FOREACH( const PropertyMap & ref, dst ) {
@@ -286,7 +294,7 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 	}
 
 	dst = std::vector<PropertyMap>( 3 );
-	map.splice( dst.begin(), dst.end(), true );
+	(map=backup).splice( dst.begin(), dst.end(), false );
 	i = 0;
 	BOOST_FOREACH( const PropertyMap & ref, dst ) {
 		// all must be scalar now
