@@ -113,7 +113,11 @@ class DefaultMsgPrint : public MessageHandlerBase
 {
 protected:
 	static std::ostream *o;
+#ifdef NDEBUG
 	static const int max_age = 500;
+#else
+	static const int max_age = 0;
+#endif
 	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
 
 public:
