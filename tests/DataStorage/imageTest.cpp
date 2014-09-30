@@ -48,17 +48,18 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 
 		// inserting insufficient Chunk should fail
-		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 );
+		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 ); //don't raise error about inserting valid chunk
 		BOOST_CHECK( ! img.insertChunk( data::MemChunk<float>( 4, 4 ) ) );
-		data::enableLog<util::DefaultMsgPrint>( notice );
+		data::enableLog<util::DefaultMsgPrint>( error ); // still block warning about inserting into existing image
 
 		//inserting the same chunk twice should fail
 		BOOST_CHECK( ! img.insertChunk( ch ) );
-
+		
 		// but inserting another Chunk should work
 		ch = genSlice<float>( 4, 4, 0, 2 );
 		img.insertChunk( ch );
-
+		data::enableLog<util::DefaultMsgPrint>( notice );//back to normal
+		
 		// Chunks should be inserted based on their position (lowest first)
 		ch = genSlice<float>( 4, 4, 1, 1 );
 		BOOST_REQUIRE( img.insertChunk( ch ) );
@@ -223,12 +224,12 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
-	ch.property( "nothing")=util::PropertyValue();
+	ch.touchProperty( "nothing")=util::PropertyValue();
 
 	// make c a proplist
 	for( int i = 0; i < 4; i++ ) {
-		ch.property( "acquisitionNumber").push_back(3-i); 
-		ch.property( "acquisitionTime").push_back(3-i); 
+		ch.touchProperty( "acquisitionNumber").push_back(3-i); 
+		ch.touchProperty( "acquisitionTime").push_back(3-i); 
 	}
 
 	data::Image img( ch );  
@@ -754,7 +755,9 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
+		data::enableLog<util::DefaultMsgPrint>(error); // don't warn about downscaling
 		data::MemImage<uint8_t> img2( img );
+		data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -819,7 +822,9 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
+		data::enableLog<util::DefaultMsgPrint>(error); // don't warn about downscaling
 		data::TypedImage<uint8_t> img2( img );
+		data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -870,7 +875,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 
 	data::Image img( chunks );
 	BOOST_FOREACH( const char * str, needed ) {
-		BOOST_CHECK( img.property( str ).needed() );
+		BOOST_CHECK( img.property( str ).isNeeded() );
 	}
 
 	BOOST_REQUIRE( img.isClean() );
@@ -1094,8 +1099,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	std::list<data::Chunk> empty;
 
+	data::enableLog<util::DefaultMsgPrint>(error); // don't warn about empty insert
 	data::Image img6( empty );
-
+	data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
+	
 	const size_t dummy6[] = {nrX, nrY, nrS, nrT};
 
 	const util::vector4<size_t> sizeVec6( dummy6 );

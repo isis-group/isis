@@ -89,8 +89,8 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 	//translate TM sets we know about to proper Timestamps
 	const char *TMs[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 	BOOST_FOREACH( const util::PropertyMap::PropPath tm, TMs ) {
-		if( hasProperty( tm ) )
-			property( tm ).transform<ptime>();
+		const boost::optional< util::PropertyValue& > found=hasProperty( tm );
+		found && found->transform<ptime>();
 	}
 
 
@@ -102,7 +102,7 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 			optional< util::PropertyValue& > src=hasProperty( time );
 			if( src ) {
 				const ComputeTimeDist comp = {serTime->as<ptime>()};
-				util::PropertyValue &dst = property( "acquisitionTime" );
+				util::PropertyValue &dst = touchProperty( "acquisitionTime" );
                 for(util::PropertyValue::const_iterator i=src->begin();i!=src->end();i++)//@todo use transform in c++11
                     dst.push_back(comp(*i) );
 				remove( time );
@@ -112,11 +112,9 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 	}
 
 	// deal with mosaic
-	if( hasProperty( "DICOM/ImageType" ) ) {
-		util::slist &iType = property( "DICOM/ImageType" ).castTo<util::slist>();
-		if( std::find( iType.begin(), iType.end(), std::string( "MOSAIC" ) ) != iType.end() )
+	boost::optional< util::slist& > iType=refValueAs<util::slist>("DICOM/ImageType");
+	if( iType && std::find( iType->begin(), iType->end(), std::string( "MOSAIC" ) ) != iType->end() )
 			decodeMosaic();
-	}
 
 	// compute voxelGap (must be done after mosaic because it removes SpacingBetweenSlices)
 	if ( hasProperty( "DICOM/SliceThickness" ) && hasProperty( "DICOM/SpacingBetweenSlices" ) ) {
@@ -176,15 +174,16 @@ void DCMStack::decodeMosaic()
 		//remove the additional mosaic offset
 		//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 		const util::fvector3 fovCorr = ( voxelSize ) * size * ( matrixSize - 1 ) / 2;
-		util::fvector3 origin = getValueAs<util::fvector3>( MosaicOrigin );
-		origin += ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
-		remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 
-		// store the proper origin
-		property( MosaicOrigin ) = util::Value<util::fvector3>( origin );
+		// correct the origin
+		util::fvector3 &origin = *refValueAs<util::fvector3>( MosaicOrigin );
+		origin += ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
+
+		// we dont need that anymore
+		remove( NumberOfImagesInMosaicProp ); 
 
 		// replace "MOSAIC" ImageType by "WAS_MOSAIC"
-		util::slist &iType = property( "DICOM/ImageType" ).castTo<util::slist>();
+		util::slist &iType = *refValueAs<util::slist>( "DICOM/ImageType" );
 		std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	} else {
 		LOG( Runtime, error ) << "Failed to decode mosaic geometry data, won't touch " << MosaicOrigin;
@@ -193,7 +192,7 @@ void DCMStack::decodeMosaic()
 	//flatten MosaicRefAcqTimes and add it to acquisitionTime
 	if( ! mosaicTimes.empty() ) { // if there are MosaicRefAcqTimes recompute acquisitionTime
 
-		util::PropertyValue &acq = property( "acquisitionTime" );
+		util::PropertyValue &acq = touchProperty( "acquisitionTime" );
 		const util::PropertyValue &mos = property( mosaicTimes );
 
 		if( !acq.isEmpty() && ( acq.is<util::ilist>() || acq.is<util::dlist>() || acq.is<util::slist>() ) ) {

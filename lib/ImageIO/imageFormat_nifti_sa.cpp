@@ -336,7 +336,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 
 		BOOST_FOREACH( data::Chunk & ch, newChList ) {
 
-			util::PropertyValue &acqProp=ch.property( "acquisitionNumber" );
+			util::PropertyValue &acqProp=ch.touchProperty( "acquisitionNumber" );
 			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
 			default:
 				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
@@ -376,7 +376,7 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const boost::sha
 			}
 
 			if( head->slice_duration ) {
-				util::PropertyValue &acqTimeProp=ch.property( "acquisitionTime");
+				util::PropertyValue &acqTimeProp=ch.touchProperty( "acquisitionTime");
 				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ ) { // set su-property "acquisitionTime" based of the slice number
 					acqTimeProp.set(i,acqProp[i].as<float>() * head->slice_duration * time_fac);
 				}
@@ -411,9 +411,9 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 	boost::cmatch results;
 
 	if ( boost::regex_match( desc, results,  descriptionRegex ) ) {
-		props.property( "repetitionTime" ) = util::Value<uint16_t>( results.str( 1 ) );
-		props.property( "echoTime" ) = util::Value<uint16_t>( results.str( 2 ) );
-		props.property( "flipAngle" ) = util::Value<uint16_t>( results.str( 3 ) );
+		props.setValueAs( "repetitionTime", boost::lexical_cast<uint16_t>( results.str( 1 ) ) );
+		props.setValueAs( "echoTime", boost::lexical_cast<uint16_t>( results.str( 2 ) ) );
+		props.setValueAs( "flipAngle", boost::lexical_cast<uint16_t>( results.str( 3 ) ) );
 
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
@@ -560,8 +560,8 @@ void ImageFormat_NiftiSa::parseHeader( const boost::shared_ptr< isis::image_io::
 	}
 
 	// set space unit factors
-	props.property( "voxelSize" ).castTo<util::fvector3>() *= size_fac;
-	props.property( "indexOrigin" ).castTo<util::fvector3>() *= size_fac;
+	props.touchProperty( "voxelSize" ) *= size_fac;
+	props.touchProperty( "indexOrigin" ) *= size_fac;
 
 	// Tr
 	if( head->pixdim[4] != 0 ) // if pixdim is given for the 4th dim, assume its repetitionTime
@@ -1288,7 +1288,7 @@ void ImageFormat_NiftiSa::sanitise( data::Chunk &object )
 		}
 
 		if( set ) {
-			object.property( "subjectGender" ) = isisGender;
+			object.setValueAs( "subjectGender", isisGender );
 			object.remove( prefix + "PatientsSex" );
 		}
 	}

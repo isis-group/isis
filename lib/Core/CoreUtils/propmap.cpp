@@ -26,31 +26,6 @@ API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
-/**
- * Continously searches in a sorted list using the given less-than comparison.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \param compOp the comparison functor. It must provide "bool operator()(T,T)".
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, const CMP &compOp )
-{
-	//find the first iterator which does not compare less
-	current = std::lower_bound( current, end, compare, compOp );
-
-	if ( current == end //if we're at the end
-		 || compOp( compare, *current ) //or compare less than that iterator
-	   )
-		return false;//we didn't find a match
-	else
-		return true;//not(current <> compare) makes compare == current
-}
 struct MapStrAdapter: boost::static_visitor<PropertyValue> {
 	PropertyValue operator()( const PropertyValue &val )const {return val;}
 	PropertyValue operator()( const PropertyMap &map )const {
@@ -81,7 +56,7 @@ struct JoinTreeVisitor: boost::static_visitor<bool> {
 	bool operator()( PropertyValue &first, PropertyValue &second )const { // if both are Values
 		if( first.isEmpty() || overwrite ) { // if ours is empty or overwrite is enabled
 			//replace ours by the other
-			if(delsource)first.transfer(second);
+			if(delsource)first.transfer(second,true);
 			else first = second; 
 			return true;
 		} else { // otherwise put the other into rejected if its unequal to ours
@@ -147,7 +122,7 @@ struct parser {
 					target.branch( label ) = boost::get<PropertyMap>( container );
 					break;
 				case 0:
-					target.property( label ) = boost::get<PropertyValue>( container );
+					target.touchProperty( label ) = boost::get<PropertyValue>( container );
 					break;
 				}
 
@@ -281,7 +256,7 @@ const PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )c
 	}
 }
 
-PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )
+PropertyValue &PropertyMap::touchProperty( const PropertyMap::PropPath &path )
 {
 	return *tryFetchEntry<PropertyValue>( path );
 }
@@ -331,7 +306,7 @@ bool PropertyMap::remove( const PropertyMap &removeMap, bool keep_needed )
 	//remove everything that is also in second
 	for ( container_type::const_iterator otherIt = removeMap.container.begin(); otherIt != removeMap.container.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
 			if ( thisIt->second.type() == typeid( PropertyMap ) && otherIt->second.type() == typeid( PropertyMap ) ) { //both are a branch => recurse
 				PropertyMap &mySub = boost::get<PropertyMap>( thisIt->second );
 				const PropertyMap &otherSub = boost::get<PropertyMap>( otherIt->second );
@@ -379,7 +354,7 @@ void PropertyMap::diffTree( const container_type& other, DiffMap& ret, const Pro
 	//insert everything that is in this, but not in second or is on both but differs
 	for ( container_type::const_iterator thisIt = container.begin(); thisIt != container.end(); thisIt++ ) {
 		//find the closest match for thisIt->first in other (use the value-comparison-functor of the container)
-		if ( _internal::continousFind( otherIt, other.end(), *thisIt, container.value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
+		if ( continousFind( otherIt, other.end(), *thisIt, container.value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
 			if( thisIt->second.type() == typeid( PropertyMap ) && otherIt->second.type() == typeid( PropertyMap ) ) { // both are branches -- recursion step
 				const PropertyMap &thisMap = boost::get<PropertyMap>( thisIt->second ), &refMap = boost::get<PropertyMap>( otherIt->second );
 				thisMap.diffTree( refMap.container, ret, prefix / thisIt->first );
@@ -415,7 +390,7 @@ void PropertyMap::diffTree( const container_type& other, DiffMap& ret, const Pro
 	container_type::const_iterator thisIt = container.begin();
 
 	for ( otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
-		if ( ! _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //there is nothing in this which has the same key as ref
+		if ( ! continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //there is nothing in this which has the same key as ref
 
 			const PropertyValue secondVal = boost::apply_visitor( _internal::MapStrAdapter(), otherIt->second );
 			ret.insert(
@@ -435,7 +410,7 @@ void PropertyMap::removeEqual ( const PropertyMap &other, bool removeNeeded )
 	//remove everything that is also in second and equal (or also empty)
 	for ( container_type::const_iterator otherIt = other.container.begin(); otherIt != other.container.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
 
 			//          if(thisIt->second.type()==typeid(PropertyValue) && otherIt->second.type()==typeid(PropertyValue)){ // if both are Values
 			if( boost::apply_visitor( _internal::RemoveEqualCheck( removeNeeded ), thisIt->second, otherIt->second ) ) {
@@ -482,7 +457,7 @@ void PropertyMap::joinTree( PropertyMap &other, bool overwrite, bool delsource, 
 	container_type::iterator thisIt = container.begin();
 
 	for ( container_type::iterator otherIt = other.container.begin(); otherIt != other.container.end(); ) { //iterate through the elements of other
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
 			if(
 				boost::apply_visitor( _internal::JoinTreeVisitor( overwrite, delsource, rejects, prefix, thisIt->first ), thisIt->second, otherIt->second ) &&
 				delsource
@@ -515,7 +490,7 @@ PropertyMap::FlatMap PropertyMap::getFlatMap() const
 
 bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t dstID)
 {
-	PropertyValue &src = property( from );
+	const PropertyValue src = property( from );
 	if(src.isEmpty())
 		return false;
 	
@@ -529,7 +504,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t
 		PropertyValue buff= src.copyByID( dstID );
 
 		if( !buff.isEmpty() ){
-			property( to ).swap(buff);
+			touchProperty( to ).swap(buff);
 			if(from!=to)remove( from );
 			return true;
 		}
@@ -543,7 +518,7 @@ PropertyMap::PathSet PropertyMap::getMissing()const {return genKeyList<InvalidP>
 
 void PropertyMap::addNeeded( const PropPath &path )
 {
-	property( path ).needed() = true;
+	touchProperty( path ).needed() = true;
 }
 
 

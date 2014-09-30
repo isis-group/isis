@@ -87,11 +87,9 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
 			LOG( Runtime, warning )
 					<< "Missing age-type-letter, assuming days";
 		}
-
-		map.property( name ) = duration;
+		map.setValueAs( name, duration );
 		LOG( Debug, verbose_info )
-				<< "Parsed age for " << name << "(" <<  buff << ")"
-				<< " as " << duration << " days";
+				<< "Parsed age for " << name << "(" <<  buff << ")" << " as " << duration << " days";
 	} else
 		LOG( Runtime, warning )
 				<< "Cannot parse age string \"" << buff << "\" in the field \"" << name << "\"";
@@ -122,7 +120,7 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::Prop
 		);
 		LOG( Debug, verbose_info )
 				<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
-		map.property( name ) = date;
+		map.setValueAs( name, date );
 	} else
 		LOG( Runtime, warning )
 				<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
@@ -177,7 +175,7 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 	if ( ok ) {
 		LOG( Debug, verbose_info )
 				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
-		map.property( name ) = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
+		map.setValueAs( name, boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time ) );
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
 		LOG( Runtime, warning )
@@ -307,44 +305,44 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_FL: {
 		Float32 *buff;
 		elem->getFloat32Array( buff );
-		map.property( name ) = util::dlist( buff, buff + len );
+		map.setValueAs( name, util::dlist( buff, buff + len ) );
 	}
 	break;
 	case EVR_FD: {
 		Float64 *buff;
 		elem->getFloat64Array( buff );
-		map.property( name ) = util::dlist( buff, buff + len );
+		map.setValueAs( name, util::dlist( buff, buff + len ) );
 	}
 	break;
 	case EVR_IS: {
-		map.property( name ) = _internal::dcmtkListString2list<int>( elem );
+		map.setValueAs( name, _internal::dcmtkListString2list<int>( elem ));
 	}
 	break;
 	case EVR_SL: {
 		Sint32 *buff;
 		elem->getSint32Array( buff );
-		map.property( name ) = util::ilist( buff, buff + len );
+		map.setValueAs( name, util::ilist( buff, buff + len ));
 	}
 	break;
 	case EVR_US: {
 		Uint16 *buff;
 		elem->getUint16Array( buff );
-		map.property( name ) = util::ilist( buff, buff + len );
+		map.setValueAs( name, util::ilist( buff, buff + len ));
 	}
 	break;
 	case EVR_SS: {
 		Sint16 *buff;
 		elem->getSint16Array( buff );
-		map.property( name ) = util::ilist( buff, buff + len );
+		map.setValueAs( name, util::ilist( buff, buff + len ));
 	}
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
 	case EVR_ST: { //short text
-		map.property( name ) = _internal::dcmtkListString2list<std::string>( elem );
+		map.setValueAs( name, _internal::dcmtkListString2list<std::string>( elem ));
 	}
 	break;
 	case EVR_DS: {
-		map.property( name ) = _internal::dcmtkListString2list<double>( elem );
+		map.setValueAs( name, _internal::dcmtkListString2list<double>( elem ));
 	}
 	break;
 	case EVR_AS:
@@ -460,17 +458,17 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" ) {
-		map.property( name ) = boost::lexical_cast<int32_t>( val );
+		map.setValueAs( name, boost::lexical_cast<int32_t>( val ));
 	} else if ( vr == "UL" ) {
-		map.property( name ) = boost::lexical_cast<uint32_t>( val );
+		map.setValueAs( name, boost::lexical_cast<uint32_t>( val ));
 	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
-		map.property( name ) = val;
+		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
-		map.property( name ) = boost::lexical_cast<double>( val );
+		map.setValueAs( name, boost::lexical_cast<double>( val ));
 	} else if ( vr == "US" ) {
-		map.property( name ) = boost::lexical_cast<uint16_t>( val );
+		map.setValueAs( name, boost::lexical_cast<uint16_t>( val ));
 	} else if ( vr == "SS" ) {
-		map.property( name ) = boost::lexical_cast<int16_t>( val );
+		map.setValueAs( name, boost::lexical_cast<int16_t>( val ));
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -481,13 +479,13 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" or vr == "US" or vr == "SS" ) {
-		map.property( name ) = util::listToList<int32_t>( val.begin(), val.end() );
+		map.setValueAs( name, util::listToList<int32_t>( val.begin(), val.end() ) );
 	} else if ( vr == "UL" ) {
-		map.property( name ) = val; // @todo we dont have an unsigned int list
+		map.setValueAs( name, val); // @todo we dont have an unsigned int list
 	} else if ( vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "SL" ) {
-		map.property( name ) = val;
+		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
-		map.property( name ) = util::listToList<double>( val.begin(), val.end() );
+		map.setValueAs( name, util::listToList<double>( val.begin(), val.end() ) );
 	} else {
 		LOG( Runtime, error ) << "Don't know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;

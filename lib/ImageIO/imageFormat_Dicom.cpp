@@ -331,7 +331,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 
 		if( set ) {
-			object.property( "subjectGender" ) = isisGender;
+			object.setValueAs( "subjectGender", isisGender);
 			dicomTree.remove( "PatientsSex" );
 		}
 	}
@@ -484,7 +484,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	}
 
 	// for every slice
-	util::PropertyValue &ordProp= haveAcqTimeList ? dest.property( "acquisitionTime"):dest.property( "acquisitionNumber");
+	util::PropertyValue &ordProp= haveAcqTimeList ? dest.touchProperty( "acquisitionTime"):dest.touchProperty( "acquisitionNumber");
 	ordProp=util::PropertyValue(); //reset the selected ordering property to empty
 	
 	for ( size_t slice = 0; slice < images; slice++ ) {

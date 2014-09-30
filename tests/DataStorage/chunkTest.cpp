@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 
 	BOOST_FOREACH( const char * str, needed ) {
-		BOOST_CHECK( ch.property( str ).needed() );
+		BOOST_CHECK( ch.property( str ).isNeeded() );
 	}
 
 
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	ch1.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 
 	const util::Value<int> buff[] = {0, 1, 2};
-	std::copy( buff, buff + 3, std::back_inserter( ch1.property( "list_test" ) ) );
+	std::copy( buff, buff + 3, std::back_inserter( ch1.touchProperty( "list_test" ) ) );
 
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )

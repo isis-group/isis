@@ -151,14 +151,14 @@ API_EXCLUDE_BEGIN;
 				<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
 			
 				for( ITER i = first; i != last; i++ )
-					_internal::un_shared_ptr(*i).property( name ) = val;
+					_internal::un_shared_ptr(*i).touchProperty( name ) = val;
 				val=PropertyValue();//and clear the source
 			} else {
 				LOG_IF( val.size() > 1, Debug, info ) << "Splicing non scalar property " << MSubject( name ) << " into " << blocks << " chunks";
 				ITER i = first;
 				BOOST_FOREACH( const PropertyValue & splint, val.splice( val.size() / blocks ) ) {
 					assert( i != last );
-					_internal::un_shared_ptr(*i).property( name ) = splint;
+					_internal::un_shared_ptr(*i).touchProperty( name ) = splint;
 					i++;
 				}
 			}
@@ -363,7 +363,7 @@ public:
 	 * \param path the path to the property
 	 * \returns a reference to the property
 	 */
-	PropertyValue &property( const PropPath &path );
+	PropertyValue &touchProperty( const PropPath &path );
 
 	/**
 	 * Access the branch referenced by the path, create it if its not there.
@@ -544,8 +544,16 @@ public:
 	 * \note all empty properties will be removed afterwards (including needed properties)
 	 */
 	template<typename ITER> void splice( ITER first, ITER last, bool lists_only ){
+		const PathSet empty_before=genKeyList<EmptyP>();
 		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath(), lists_only) );
-		remove(genKeyList<EmptyP>());//some cleanup
+		//some cleanup 
+		//delete all thats empty now, but wasn't back then (we shouldn't delete this that where empty before)
+		const PathSet empty_after=genKeyList<EmptyP>();
+		std::list<PropPath> deletes;
+		std::set_difference(empty_after.begin(),empty_after.end(),empty_before.begin(),empty_before.end(),std::back_inserter(deletes));
+		LOG_IF(!deletes.empty(),Debug,info) << "Properties " << MSubject(deletes) << " became empty while splicing, deleting them";
+		BOOST_FOREACH(const PropPath &del,deletes)
+			remove(del);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -577,7 +585,7 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val ) {
-		PropertyValue &ret = property( path );
+		PropertyValue &ret = touchProperty( path );
 
 		if( ret.isEmpty() ) { // set an empty property
 			ret = val;
@@ -616,7 +624,7 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val, size_t at ) {
-		PropertyValue &ret = property( path );
+		PropertyValue &ret = touchProperty( path );
 
 		if( ret.size() <= at ) {
 			LOG_IF(at, Debug, info ) << "Extending " << MSubject( std::make_pair( path, ret ) ) << " to fit length " << MSubject( at ); //dont tell about extending empty property
