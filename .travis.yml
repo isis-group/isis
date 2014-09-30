@@ -9,8 +9,8 @@ before_script:
    - mkdir build
    - cd build
    - cmake .. -DISIS_BUILD_TESTS=ON
-script: make
+script: make && make test
 branches:
   only:
     - master 
-    - ch_propmap
+    - api_change
