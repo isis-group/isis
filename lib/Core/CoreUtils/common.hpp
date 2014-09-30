@@ -40,6 +40,32 @@ namespace isis
 namespace util
 {
 
+/**
+* Continously searches in a sorted list using the given less-than comparison.
+* It starts at current and increments it until the referenced value is not less than the compare-value anymore.
+* Than it returns.
+* \param current the current-position-iterator for the sorted list.
+* This value is changed directly, so after the function returns is references the first entry of the list
+* which does not compare less than compare or, if such a value does not exist in the list, it will be equal to end.
+* \param end the end of the list
+* \param compare the compare-value
+* \param compOp the comparison functor. It must provide "bool operator()(T,T)".
+* \returns true if the value current currently refers to is equal to compare
+*/
+template<typename ForwardIterator, typename T, typename CMP> bool
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, const CMP &compOp )
+{
+	//find the first iterator which does not compare less
+	current = std::lower_bound( current, end, compare, compOp );
+	
+	if ( current == end //if we're at the end
+		|| compOp( compare, *current ) //or compare less than that iterator (eg. iterator greater than compare)
+	)
+		return false;//we didn't find a match
+	else
+		return true;//not(current <> compare) makes compare == current
+}
+	
 std::string getLastSystemError();
 
 /**

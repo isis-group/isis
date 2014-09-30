@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		BOOST_REQUIRE( data::IOFactory::write( null, niifile.native() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
-		null.property( "voxelSize" ).castTo<util::fvector3>() += null.property( "voxelGap" ).castTo<util::fvector3>();
+		null.touchProperty( "voxelSize" ) += null.getValueAs<util::fvector3>( "voxelGap" );
 		null.remove( "voxelGap" );
 
 		// that will be set by the nifti reader

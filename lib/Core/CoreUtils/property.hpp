@@ -125,7 +125,7 @@ public:
 	 * The transfered data will replace the properties in the target.
 	 * The source will be empty afterwards.
 	 */
-	void transfer(PropertyValue &src);
+	void transfer(PropertyValue &src, bool overwrite=false);
 
 	/// Swap properties from one PropertyValue with another.
 	void swap(PropertyValue &src);

@@ -241,13 +241,12 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 	for( uint32_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them 
 		if(!originWasList){
 			LOG( Debug, verbose_info ) << "Origin was " << it->property( "indexOrigin" ) << " will be moved by " << indexOriginOffset << "*"  << cnt;
-			it->property( "indexOrigin" )+= util::fvector3(indexOriginOffset * cnt);
+			it->touchProperty( "indexOrigin" )+= util::fvector3(indexOriginOffset * cnt);
 		}
 
 		if(!acqWasList && acquisitionNumberStride){//@todo acquisitionTime needs to be fixed as well
-			util::PropertyValue &acqVal = it->property( "acquisitionNumber" );
-			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
-			acqVal = acqVal + acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
+			LOG( Debug, verbose_info ) << "acquisitionNumber was " << it->property( "acquisitionNumber" ) << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
+			it->touchProperty( "acquisitionNumber" ) += acquisitionNumberStride * cnt; 
 		}
 	}
 

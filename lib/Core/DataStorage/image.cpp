@@ -340,7 +340,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	if(!hasProperty("indexOrigin")){ // if there is no common indexOrigin
 		optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
 		if(found) // get it from the first chunk - which than by definition should have one
-			property("indexOrigin")=found.get();
+			touchProperty("indexOrigin")=found.get();
 		else{
 			LOG(Runtime,error) << "No indexOrigin found " << " falling back to " << util::fvector3();
 			setValueAs("indexOrigin",util::fvector3());
@@ -383,7 +383,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 				LOG( Debug, info )
 						<< "used the distance between chunk 0 and " << structure_size[2] - 1
 						<< " to synthesize the missing sliceVec as " << distVecNorm;
-				property( "sliceVec" ) = distVecNorm;
+				setValueAs( "sliceVec", distVecNorm); // this should message if there really is a conflict
 			}
 
 			const float avDist = ( lastV->as<util::fvector3>() - firstV->as<util::fvector3>() ).len() / ( structure_size[2] - 1 ); //average dist between the middle of two slices
@@ -912,14 +912,14 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	//splice existing lists into the current chunks -- they will be spliced further if neccessary
 	PropertyMap::splice(lookup.begin(),lookup.end(),true);
 	
-	//transfer properties needed for the chunk back into the chunk (if they're there)
+	//transfer properties needed for the chunk back into the chunk (if they're there but not lists)
 	for( util::PropertyMap::PathSet::const_reference need : needed ) { 
 		const boost::optional< util::PropertyValue& > foundNeed=this->hasProperty( need );
 		if(foundNeed){
 			for( std::shared_ptr<Chunk> &ref : lookup ) {
 				if( !ref->hasProperty( need ) ) {
 					LOG( Debug, verbose_info ) << "Copying " << std::make_pair(need, *foundNeed) << " from the image to the chunk for splicing";
-					ref->property( need ) = *foundNeed;
+					ref->touchProperty( need ) = *foundNeed;
 				} else 
 					LOG(Debug,error) << need << " was found in the chunk although it is in the image as well. It will be deleted in the image";
 			}

@@ -215,7 +215,7 @@ public:
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
 			}
 		} else {
-			if( extractNumberFromName<uint32_t>( filename, ch.property( "acquisitionNumber" ) ) ) {
+			if( extractNumberFromName<uint32_t>( filename, ch.touchProperty( "acquisitionNumber" ) ) ) {
 				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" ) << " from filename";
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,indexOrigin,rowVec and voxelSize";
 			} else {

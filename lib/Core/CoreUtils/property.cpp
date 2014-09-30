@@ -97,14 +97,16 @@ void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyVal
 	}
 }
 
-void PropertyValue::transfer(PropertyValue& ref)
+void PropertyValue::transfer(PropertyValue& ref, bool overwrite)
 {
 	if(ref.isEmpty()){
 		LOG(Debug,error) << "Not transfering empty Property";
 	} else {
-		LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
-		container.clear();
-		swap(ref);
+		if(isEmpty() || overwrite){
+			container.clear();
+			swap(ref);
+		} else 
+			LOG(Debug,warning) << "Not Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
 	}
 }
 void PropertyValue::swap(PropertyValue& ref)
