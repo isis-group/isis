@@ -74,6 +74,14 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 	return images.size();
 }
 
+boost::filesystem::path getCommonSource(const std::list<data::Image> &images){
+	std::list<boost::filesystem::path> sources;
+	for(const data::Image &img:images){
+		sources.push_back(img.getCommonSource());
+	}
+	return util::getRootPath(sources);
+}
+
 std::list<data::Image> findFitting( const data::Image reference, std::list<data::Image> &org_images, const util::slist &props )
 {
 	std::list< data::Image > images;

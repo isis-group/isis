@@ -67,6 +67,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 }
 	
 std::string getLastSystemError();
+boost::filesystem::path getRootPath(std::list< boost::filesystem::path > sources,bool sorted=false);
 
 /**
 Write a list of elements to a std::basic_ostream
