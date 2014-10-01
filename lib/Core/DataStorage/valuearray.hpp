@@ -298,7 +298,7 @@ public:
 			ret += util::Value<TYPE>( *( end() - 1 ) ).toString( labeled );
 		}
 
-		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
+		return std::to_string( m_len ) + "#" + ret;
 	}
 
 	std::string getTypeName()const {return staticName();}

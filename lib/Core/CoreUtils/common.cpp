@@ -1,8 +1,5 @@
 #include "common.hpp"
-
-#ifdef WIN32
-#include <boost/lexical_cast.hpp>
-#endif
+#include <string>
 
 namespace isis
 {
@@ -23,7 +20,7 @@ std::string getLastSystemError()
 						 ( LPTSTR )&s,
 						 0,
 						 NULL ) == 0 ) { /* failed */
-		ret = std::string( "Unknown error " ) + boost::lexical_cast<std::string>( err );
+		ret = std::string( "Unknown error " ) + std::to_string( err );
 	} else { /* success */
 		ret = s;
 		ret.resize( ret.rfind( '\r' ) ); //FormatMessage appends a newline

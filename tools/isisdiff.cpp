@@ -23,7 +23,7 @@ std::pair<std::string, int>  parseFilename( std::string name )
 
 	if ( boost::regex_match( name.c_str(), results, reg ) ) {
 		ret.first = results.str( results.size() - 2 );
-		ret.second = boost::lexical_cast<int>( results.str( results.size() - 1 ) );
+		ret.second = std::stoi( results.str( results.size() - 1 ) );
 	} else
 		ret.first = name;
 
@@ -46,7 +46,7 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 
 	if( at == list.end() ) {
 		LOG( DiffLog, error ) << "Sorry, there is no image " << pos;
-		throw( std::logic_error( std::string( "no " ) + boost::lexical_cast<std::string>( pos ) + "th image" ) );
+		throw( std::logic_error( std::string( "no " ) + std::to_string( pos ) + "th image" ) );
 	}
 
 	return *at;

@@ -28,7 +28,7 @@ namespace _internal
 struct MapStrAdapter: boost::static_visitor<PropertyValue> {
 	PropertyValue operator()( const PropertyValue &val )const {return val;}
 	PropertyValue operator()( const PropertyMap &map )const {
-		return PropertyValue( std::string( "[[PropertyMap with " ) + boost::lexical_cast<std::string>( map.container.size() ) + " entries]]" );
+		return PropertyValue( std::string( "[[PropertyMap with " ) + std::to_string( map.container.size() ) + " entries]]" );
 	}
 };
 struct RemoveEqualCheck: boost::static_visitor<bool> {

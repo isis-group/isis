@@ -114,9 +114,9 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::Prop
 
 	if ( boost::regex_match( buff.c_str(), results, reg ) ) {
 		const boost::gregorian::date date(
-			boost::lexical_cast<int16_t>( results.str( 1 ) ), //year
-			boost::lexical_cast<int16_t>( results.str( 2 ) ), //month
-			boost::lexical_cast<int16_t>( results.str( 3 ) ) //day of month
+			std::stoi( results.str( 1 ) ), //year
+			std::stoi( results.str( 2 ) ), //month
+			std::stoi( results.str( 3 ) ) //day of month
 		);
 		LOG( Debug, verbose_info )
 				<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
@@ -213,7 +213,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
 		elem->getOFString( buff, 0 );
-		map.setValueAs<double>( name, boost::lexical_cast<double>( buff ) );
+		map.setValueAs<double>( name, std::stod( buff.c_str() ) );
 	}
 	break;
 	case EVR_SL: { //signed long
@@ -242,7 +242,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map.setValueAs<int32_t>( name, boost::lexical_cast<int32_t>( buff ) );
+		map.setValueAs<int32_t>( name, std::stoi( buff.c_str() ) );
 	}
 	break;
 	case EVR_AE: //Application Entity (string)
@@ -255,7 +255,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
-		map.setValueAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
+		map.setValueAs<std::string>( name, buff.c_str() );
 	}
 	break;
 	case EVR_UN: //Unknown, see http://www.dabsoft.ch/dicom/5/6.2.2/
@@ -444,7 +444,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 					LOG( Debug, verbose_info ) << "Found list entry " << path << ":" << map.property( path ) << " in CSA header";
 				}
 			}
-		} catch ( boost::bad_lexical_cast e ) {
+		} catch ( std::exception &e ) {
 			LOG( Runtime, warning ) << "Failed to parse CSA entry " << std::make_pair( name, ret ) << " as " << vr << " (" << e.what() << ")";
 		}
 	} else {
@@ -458,13 +458,13 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" ) {
-		map.setValueAs( name, boost::lexical_cast<int32_t>( val ));
+		map.setValueAs( name, std::stoi( val ));
 	} else if ( vr == "UL" ) {
 		map.setValueAs( name, boost::lexical_cast<uint32_t>( val ));
 	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
 		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
-		map.setValueAs( name, boost::lexical_cast<double>( val ));
+		map.setValueAs( name, std::stod( val ));
 	} else if ( vr == "US" ) {
 		map.setValueAs( name, boost::lexical_cast<uint16_t>( val ));
 	} else if ( vr == "SS" ) {

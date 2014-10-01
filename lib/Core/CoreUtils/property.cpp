@@ -63,7 +63,7 @@ std::string PropertyValue::toString( bool labeled )const
 		const PropertyValue buff=copyByID(Value<std::string>::staticID());
 		std::string ret=listToString(buff.begin(),buff.end(),",","[","]");
 		if(labeled && !isEmpty())
-			ret+="("+getTypeName()+"["+boost::lexical_cast<std::string>(size())+"])";
+			ret+="("+getTypeName()+"["+std::to_string(size())+"])";
 		return ret;
 	}
 }

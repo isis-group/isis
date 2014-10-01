@@ -197,7 +197,7 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Im
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];
 			const unsigned short length = ( uint16_t )log10( ( float )names[name] ) - ( uint16_t )log10( ( float )number );
-			const std::string snumber = std::string( length, '0' ) + boost::lexical_cast<std::string>( number );
+			const std::string snumber = std::string( length, '0' ) + std::to_string( number );
 			const std::pair<std::string, std::string> splitted = makeBasename( name );
 			name = splitted.first + "_" + snumber + splitted.second;
 		}

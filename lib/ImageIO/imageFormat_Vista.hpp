@@ -400,14 +400,14 @@ private:
 					boost::cmatch dateResults;
 
 					if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
-						day = boost::lexical_cast<std::string>( dateResults.str( dateRef.first ) );
+						day = std::to_string( dateResults.str( dateRef.first ) );
 
 						if( day.size() == 1 ) {
 							day.insert( 0, std::string( "0" ) );
 						}
 
-						month = boost::lexical_cast<std::string>( dateResults.str( dateRef.second ) );
-						year = boost::lexical_cast<std::string>( dateResults.str( dateRef.third ) );
+						month = std::to_string( dateResults.str( dateRef.second ) );
+						year = std::to_string( dateResults.str( dateRef.third ) );
 						std::string strDate = year + dateRef.delimiter + month + dateRef.delimiter + day;
 						isisDate = boost::gregorian::from_simple_string( strDate );
 					}

@@ -181,10 +181,10 @@ public:
 
 		if ( my_ch_idx >= ch_cnt )
 			throw std::out_of_range(
-				std::string( "Image voxel index " ) + boost::lexical_cast<std::string>( ch_idx * ch_len + currentDist() ) + "+"
-				+ boost::lexical_cast<std::string>( n - currentDist() )
-				+ " out of range 0.." + boost::lexical_cast<std::string>( ch_cnt ) + "*"
-				+ boost::lexical_cast<std::string>( ch_len ) + "-1"
+				std::string( "Image voxel index " ) + std::to_string( ch_idx * ch_len + currentDist() ) + "+"
+				+ std::to_string( n - currentDist() )
+				+ " out of range 0.." + std::to_string( ch_cnt ) + "*"
+				+ std::to_string( ch_len ) + "-1"
 			);
 
 		return  *( chunks[my_ch_idx]->begin() + n % ch_len );

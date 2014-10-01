@@ -598,7 +598,7 @@ isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray< u
 
 	if( src.getLength() * 8 < size ) {
 		std::string err( "unexpected end of file (missing " );
-		err += boost::lexical_cast<std::string>( size - src.getLength() * 8 ) + " bytes)";
+		err += std::to_string( size - src.getLength() * 8 ) + " bytes)";
 		throwGenericError( err );
 	}
 
