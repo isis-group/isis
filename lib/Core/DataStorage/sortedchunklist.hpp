@@ -88,6 +88,15 @@ public:
 
 	///runs op on all entries of the list (the order is not defined) and replaces the entries by the return value
 	void transform( chunkPtrOperator &op );
+	template<typename T> void forall( T &func)const
+	{
+		BOOST_FOREACH( PrimaryMap::const_reference outer, chunks ) {
+			BOOST_FOREACH( const SecondaryMap::const_reference inner, outer.second ) {
+				func( inner.second );
+			}
+		}
+	}
+	
 
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );
