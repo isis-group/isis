@@ -1048,34 +1048,18 @@ void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns,
 
 boost::filesystem::path Image::getCommonSource()const
 {
-	std::list<boost::filesystem::path> sources;
 	boost::optional< const util::PropertyValue& > found=hasProperty( "source" );
 	if( found )
-		sources.push_back( found->as<std::string>() );
-	else {
-		BOOST_FOREACH( const util::PropertyValue & ref, getChunksProperties( "source" ) ) {
-			sources.push_back( ref.as<std::string>() );
-		}
-	}
-	return util::getRootPath( sources );
+		return found->as<std::string>();
+	else
+		return set.getCommonSource();
 }
 
 std::string Image::identify ( bool withpath )const
 {
-	return
-		"\"S"
-		+ getValueAs<std::string>( "sequenceNumber" )
-		+ ( hasProperty( "sequenceDescription" ) ?
-			( "_" + getValueAs<std::string>( "sequenceDescription" ) ) :
-			""
-		  ) + "\""
-		+ ( withpath ?
-			( std::string( " from " ) + getCommonSource().native() ) :
-			"" )
-		+ ( hasProperty( "sequenceStart" ) ?
-			( " taken at " + getValueAs<std::string>( "sequenceStart" ) ) :
-			""
-		  );
+	_internal::SortedChunkList::getproplist seqNum("sequenceNumber"),seqDesc("sequenceDescription"),seqStart("sequenceStart");
+	seqNum(*this);seqDesc(*this);seqStart(*this);
+	return set.identify(withpath,seqNum,seqDesc,seqStart);
 }
 
 
