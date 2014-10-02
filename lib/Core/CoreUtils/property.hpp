@@ -101,6 +101,7 @@ public:
 	 * Distribute entries into new PropertyValues of given equal length.
 	 * \note the last PropertyValue may have less entries (aka remainder)
 	 * \note this is a transfer function, so *this will be empty afterwards.
+	 * \param len the requested size of the "splinters"
 	 * \returns a vector of (mostly) equally sized PropertyValues.
 	 */
 	std::vector<PropertyValue> splice(const size_t len);
@@ -382,6 +383,9 @@ namespace std
 		return out<<s.toString(true);
 	}
 	template<> void swap<isis::util::PropertyValue>(isis::util::PropertyValue &a,isis::util::PropertyValue &b);
+	template<> struct less<isis::util::PropertyValue> : binary_function <isis::util::PropertyValue,isis::util::PropertyValue,bool> {
+		bool operator() (const isis::util::PropertyValue& x, const isis::util::PropertyValue& y) const;
+	};
 }
 #endif
 

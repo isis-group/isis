@@ -604,6 +604,7 @@ public:
 
 		return ret;
 	}
+	PropertyValue &setValueAs( const PropPath &path, const char *val );
 	/**
 	 * Set the given property to a given value/type at a specified index.
 	 * The needed flag (if set) will be kept.
@@ -643,6 +644,7 @@ public:
 
 		return ret;
 	}
+	PropertyValue &setValueAs( const PropPath &path, const char *val, size_t at );
 
 	/**
 	 * Request a property value via the given key in the given type.

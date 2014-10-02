@@ -665,6 +665,13 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 
 	return out;
 }
+PropertyValue& PropertyMap::setValueAs(const PropertyMap::PropPath& path, const char* val, size_t at){
+	return setValueAs<std::string>(path,val,at);
+}
+PropertyValue& PropertyMap::setValueAs(const PropertyMap::PropPath& path, const char* val){
+	return setValueAs<std::string>(path,val);
+}
+
 
 /// @cond _internal
 bool PropertyMap::TrueP::operator()( const PropertyValue &/*ref*/ ) const {return true;}
