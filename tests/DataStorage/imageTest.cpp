@@ -189,6 +189,22 @@ BOOST_AUTO_TEST_CASE ( copy_image_test )
 	data::Image copy = img.copyByID();
 	BOOST_CHECK( img.compare( copy ) == 0 );
 }
+BOOST_AUTO_TEST_CASE ( ident_image_test )
+{
+	data::Chunk ch = genSlice<float>( 4, 4 ); 
+	std::vector<data::MemChunk<float> > chunks( 10, ch ); 
+	boost::posix_time::ptime now=boost::posix_time::second_clock::local_time();
+	for(int i=0;i<10;i++){
+		chunks[i].setValueAs<uint32_t>( "acquisitionNumber", i ); 
+		chunks[i].setValueAs<float>( "acquisitionTime", i );
+		chunks[i].setValueAs( "source", std::string("root/")+boost::lexical_cast<std::string>(i) );
+		chunks[i].setValueAs( "sequenceStart",now);
+		chunks[i].setValueAs( "sequenceDescription","test");
+	}
+	
+	data::Image img( chunks );
+	BOOST_CHECK_EQUAL(img.identify(),std::string("S0_test from root taken at ")+util::PropertyValue(now).toString());
+}
 
 BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 {

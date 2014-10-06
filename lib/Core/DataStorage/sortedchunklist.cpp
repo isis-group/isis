@@ -322,6 +322,35 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 		}
 	}
 }
+std::string SortedChunkList::identify(bool withpath, getproplist seqNum, getproplist seqDesc, getproplist seqStart) const
+{
+	forall(seqNum);
+	forall(seqDesc);
+	forall(seqStart);
+	
+	std::string ret;
+	if(seqNum.size()==1)
+		ret+=std::string("S")+seqNum.begin()->toString();
+	if(seqDesc.size()==1)
+		ret+= (ret.empty() ? std::string():std::string("_"))+seqDesc.begin()->toString();
+	if(withpath){
+		ret+=(ret.empty() ? std::string():std::string(" "))+( std::string( "from " ) + getCommonSource().native() );
+	}
+	if(seqStart.size()==1)
+		ret+=(ret.empty() ? std::string():std::string(" "))+std::string("taken at ") + seqStart.begin()->toString();
+	return ret;
+}
+boost::filesystem::path SortedChunkList::getCommonSource() const
+{
+	std::list<boost::filesystem::path> sources;
+	getproplist paths("source");
+	forall(paths);
+		
+	for( const util::PropertyValue & ref : paths ) {
+		sources.push_back( ref.as<std::string>() );
+	}
+	return util::getRootPath( sources );
+}
 
 
 }

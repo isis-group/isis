@@ -134,43 +134,6 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	properties.setValueAs( "sliceVec", slice );
 	return true;
 }
-
 }
-
-boost::filesystem::path getCommonSource( std::list<boost::filesystem::path> sources )
-{
-	sources.erase( std::unique( sources.begin(), sources.end() ), sources.end() );
-
-	if( sources.empty() ) {
-		LOG( Runtime, error ) << "Failed to get common source";
-		return boost::filesystem::path();
-	} else if( sources.size() == 1 )
-		return sources.front();
-	else {
-		for( boost::filesystem::path & ref :  sources )
-		ref.remove_leaf();//@todo switch to ref.remove_filename() as soon as we drop support for boost < 1.44
-		return getCommonSource( sources );
-	}
-}
-boost::filesystem::path getCommonSource( const std::list<data::Image> &imgs )
-{
-	std::list<boost::filesystem::path> sources;
-	for( const data::Image & img :  imgs ) {
-		if( img.hasProperty( "source" ) )
-			sources.push_back( img.getValueAs<std::string>( "source" ) );
-		else {
-			for( const util::PropertyValue & ref : img.getChunksProperties( "source", true ) ) {
-				sources.push_back( ref.as<std::string>() );
-			}
-		}
-	}
-	sources.sort();
-	return getCommonSource( sources );
-}
-boost::filesystem::path getCommonSource( const data::Image &img )
-{
-	return getCommonSource( std::list<data::Image>( 1, img ) );
-}
-
 }
 }

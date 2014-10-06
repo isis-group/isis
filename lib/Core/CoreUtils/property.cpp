@@ -275,4 +275,6 @@ bool PropertyValue::lt( const PropertyValue& ref ) const{
 
 namespace std{
 template<> void swap< isis::util::PropertyValue >(isis::util::PropertyValue& a, isis::util::PropertyValue& b){a.swap(b);}
+bool less< isis::util::PropertyValue >::operator()(const isis::util::PropertyValue& x, const isis::util::PropertyValue& y) const{return x.lt(y);}
+
 }
