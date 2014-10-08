@@ -594,7 +594,7 @@ public:
 				ret.castTo<T>() = val;
 			} else {
 				if( ret[0].apply( val ) ) {
-					LOG( Debug, warning ) << "Storing " << MSubject( Value<T>( val ).toString( true ) ) << " as " << MSubject( ret.toString( true ) ) << " as old value was already stored in that type";
+					LOG( Debug, warning ) << "Storing " << MSubject( std::make_pair(path, Value<T>( val ).toString( true ) ) ) << " as " << MSubject( ret.toString( true ) ) << " as old value was already stored in that type";
 				} else {
 					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 				}
@@ -610,7 +610,7 @@ public:
 	 * The needed flag (if set) will be kept.
 	 * The property will be set to the given value at the given index if
 	 * - the property is empty or
-	 * - the index is beyond property the amount of stored values (the list will be filled up to the index)
+	 * - the index is beyond the amount of stored values (the list will be filled up to the index)
 	 * - the property already stores a value of the same type at the given index (value will be overwritten)
 	 * - the property already stores a value at the given index and the new value can be converted to that type (value will be overwritten but type will be kept)
 	 * The property will not be set and an error will be send to Runtime if

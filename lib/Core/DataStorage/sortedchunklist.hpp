@@ -153,7 +153,7 @@ public:
 	 * - sequenceStart if available
 	 * \param withpath add the common path of all sources to the identifying string
 	 */
-	std::string identify( bool withpath = true, 
+	std::string identify( bool withpath = true, bool withdate=true, 
 						  getproplist seqNum=getproplist("sequenceNumber"),
 						  getproplist seqDesc=getproplist("sequenceDescription"),
 						  getproplist seqStart=getproplist("sequenceStart") )const;

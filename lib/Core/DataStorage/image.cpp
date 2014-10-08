@@ -30,6 +30,31 @@ namespace isis
 {
 namespace data
 {
+namespace _internal {
+struct splicer {
+	dimensions m_dim;
+	Image &m_image;
+	size_t m_amount;
+	splicer( dimensions dimemsion, size_t amount, Image &image ): m_dim( dimemsion ), m_image( image ), m_amount( amount ) {}
+	void operator()( boost::shared_ptr<Chunk> &ptr ) {operator()(*ptr);}
+	void operator()( Chunk &ch ) {
+		const size_t topDim = ch.getRelevantDims() - 1;
+
+		if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
+			const size_t subSize = m_image.getSizeAsVector()[topDim];
+			assert( !( m_amount % subSize ) ); // there must not be any "remaining"
+			splicer sub( m_dim, m_amount / subSize, m_image );
+			BOOST_FOREACH( Chunk ref, ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
+				sub( ref );
+			}
+		} else { // seems like we're done - insert it into the image
+			assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+			LOG( Debug, verbose_info ) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.property( "indexOrigin" );
+			m_image.insertChunk( ch );
+		}
+	}
+};
+}
 
 ChunkOp::~ChunkOp() {}
 
@@ -880,30 +905,6 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	const std::list<util::PropertyMap::key_type> splice_needed = util::stringToList<util::PropertyMap::key_type>( util::PropertyMap::key_type( "voxelSize,voxelGap,rowVec,columnVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
 	util::PropertyMap::PathSet needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
-	struct splicer {
-		dimensions m_dim;
-		Image &m_image;
-		size_t m_amount;
-		splicer( dimensions dimemsion, size_t amount, Image &image ): m_dim( dimemsion ), m_image( image ), m_amount( amount ) {}
-		void operator()( boost::shared_ptr<Chunk> &ptr ) {operator()(*ptr);}
-		void operator()( Chunk &ch ) {
-			const size_t topDim = ch.getRelevantDims() - 1;
-
-			if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
-				const size_t subSize = m_image.getSizeAsVector()[topDim];
-				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
-				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( Chunk ref, ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
-					sub( ref );
-				}
-			} else { // seems like we're done - insert it into the image
-				assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
-				LOG( Debug, verbose_info ) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.property( "indexOrigin" );
-				m_image.insertChunk( ch );
-			}
-		}
-	};
-
 	// reset the Chunk set, so we can insert new splices
 	set = _internal::SortedChunkList( defaultChunkEqualitySet );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -930,7 +931,7 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	// do the splicing
 	std::vector<boost::shared_ptr<Chunk> > buffer;
 	buffer.swap(lookup); // move the old lookup table into a buffer, so its empty when the splicer starts inserting the new chunks
-	std::for_each(buffer.begin(),buffer.end(),splicer( dim, image_size.product(), *this ));
+	std::for_each(buffer.begin(),buffer.end(),_internal::splicer( dim, image_size.product(), *this ));
 	reIndex();
 	return lookup.size();
 }
@@ -1055,11 +1056,11 @@ boost::filesystem::path Image::getCommonSource()const
 		return set.getCommonSource();
 }
 
-std::string Image::identify ( bool withpath )const
+std::string Image::identify ( bool withpath, bool withdate )const
 {
 	_internal::SortedChunkList::getproplist seqNum("sequenceNumber"),seqDesc("sequenceDescription"),seqStart("sequenceStart");
 	seqNum(*this);seqDesc(*this);seqStart(*this);
-	return set.identify(withpath,seqNum,seqDesc,seqStart);
+	return set.identify(withpath,withdate,seqNum,seqDesc,seqStart);
 }
 
 
