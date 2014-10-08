@@ -255,7 +255,7 @@ size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 				} else
 					c++;
 			}
-			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes (" << dropped << ") to make image rectagular";
+			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes (" << dropped << ") to make " << identify(true,false) << " rectagular";
 
 		} else {
 			size_t resize = *images.begin();
@@ -276,7 +276,7 @@ size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 				assert( it.size() == resize );
 			}
 
-			LOG_IF( dropped, Runtime, warning ) << "Dropped " << dropped << " chunks to make image rectagular";
+			LOG_IF( dropped, Runtime, warning ) << "Dropped " << dropped << " chunks to make " << identify(true,false) << " rectagular";
 		}
 	}
 
@@ -322,7 +322,7 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 		}
 	}
 }
-std::string SortedChunkList::identify(bool withpath, getproplist seqNum, getproplist seqDesc, getproplist seqStart) const
+std::string SortedChunkList::identify(bool withpath, bool withdate, getproplist seqNum, getproplist seqDesc, getproplist seqStart) const
 {
 	forall(seqNum);
 	forall(seqDesc);
@@ -336,7 +336,7 @@ std::string SortedChunkList::identify(bool withpath, getproplist seqNum, getprop
 	if(withpath){
 		ret+=(ret.empty() ? std::string():std::string(" "))+( std::string( "from " ) + getCommonSource().native() );
 	}
-	if(seqStart.size()==1)
+	if(withdate && seqStart.size()==1)
 		ret+=(ret.empty() ? std::string():std::string(" "))+std::string("taken at ") + seqStart.begin()->toString();
 	return ret;
 }

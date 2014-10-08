@@ -808,7 +808,7 @@ public:
 	 * - sequenceStart if available
 	 * \param withpath add the common path of all sources to the identifying string
 	 */
-	std::string identify( bool withpath = true )const;
+	std::string identify( bool withpath = true, bool withdate=true )const;
 	/**
 	 * Generate a string identifying the image
 	 * The identifier is made of
