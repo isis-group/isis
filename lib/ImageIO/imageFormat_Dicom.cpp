@@ -228,20 +228,24 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	// compute voxelSize and gap
 	{
 		util::fvector3 voxelSize( invalid_float, invalid_float, invalid_float );
-
-		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
-			voxelSize = dicomTree.getValueAs<util::fvector3>( "PixelSpacing" );
-			dicomTree.remove( "PixelSpacing" );
-			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
-		} else {
-			voxelSize[2] = 1 / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
+		const util::istring pixelsize_params[]={"PixelSpacing","ImagePlanePixelSpacing","ImagerPixelSpacing"};
+		BOOST_FOREACH(const util::istring &name,pixelsize_params){
+			if ( hasOrTell( prefix + name, object, warning ) ) {
+				voxelSize = dicomTree.getValueAs<util::fvector3>( name );
+				dicomTree.remove( name );
+				std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
+				break;
+			}
+			
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
 			voxelSize[2] = dicomTree.getValueAs<float>( "SliceThickness" );
 			dicomTree.remove( "SliceThickness" );
+		} else {
+			voxelSize[2] = 1 / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
 		}
-
+		
 		object.setValueAs( "voxelSize", voxelSize );
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
@@ -574,6 +578,13 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	for( unsigned short i = 0x0010; i <= 0x00FF; i++ ) {
 		dictionary[DcmTag( 0x0029, i )] = ( std::string( "Private Code for " ) + DcmTag( 0x0029, i << 8 ).toString().c_str() + "-" + DcmTag( 0x0029, ( i << 8 ) + 0xFF ).toString().c_str() ).c_str();
 	}
+	
+	//http://www.healthcare.siemens.com/siemens_hwem-hwem_ssxa_websites-context-root/wcm/idc/groups/public/@global/@services/documents/download/mdaw/mtiy/~edisp/2008b_ct_dicomconformancestatement-00073795.pdf
+	for( unsigned short i = 0x0; i <= 0x02FF; i++ ) {
+		dictionary[DcmTag( 0x6000, i )] = util::PropertyMap::PropPath("DICOM overlay info") / boost::lexical_cast<util::istring>(i);//TODO should be hex
+	}
+	dictionary[DcmTag( 0x6000, 0x3000 )] = util::PropertyMap::PropPath("DICOM overlay data");
+	
 
 	//hack to steal logging from dcmtk and redirect it to our own
 	log4cplus::Logger logger = log4cplus::Logger::getRoot();

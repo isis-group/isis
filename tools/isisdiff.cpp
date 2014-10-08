@@ -76,7 +76,7 @@ size_t doFit( const data::Image reference, std::list<data::Image> &org_images, s
 
 boost::filesystem::path getCommonSource(const std::list<data::Image> &images){
 	std::list<boost::filesystem::path> sources;
-	for(const data::Image &img:images){
+	BOOST_FOREACH(const data::Image &img,images){
 		sources.push_back(img.getCommonSource());
 	}
 	return util::getRootPath(sources);
@@ -99,9 +99,9 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	bool ret = false;
 	util::PropertyMap::DiffMap diff = img1.getDifference( img2 );
 	diff.erase( "source" ); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
-	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
+	BOOST_FOREACH( util::slist::const_reference ref, ignore )
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
-	}
+
 	const std::string name1 = img1.identify();
 	const std::string name2 = img2.identify();
 	LOG( DiffLog, info ) << "Comparing " << name1 << " and " << name2;
