@@ -61,7 +61,7 @@ struct ComputeTimeDist {
 	}
 };
 
-std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
+void DCMStack::translateToISIS( data::Chunk &orig )
 {
 	// translate some of the entries and clean up the tree we got from DcmMeta (don't touch anything we got from the normal header though)
 
@@ -94,10 +94,10 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 	}
 
 
-	// compute acquisitionTime as relative to DICOM/SeriesTime @todo include date
-	const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
+	// compute acquisitionTime as relative to DICOM/SeriesTime TODO include date
 	optional< util::PropertyValue& > serTime=hasProperty( "DICOM/SeriesTime" );
 	if(serTime){
+		const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 		BOOST_FOREACH( const char * time, time_stor ) {
 			optional< util::PropertyValue& > src=hasProperty( time );
 			if( src ) {
@@ -126,21 +126,7 @@ std::list< data::Chunk > DCMStack::translateToISIS( data::Chunk orig )
 		remove( "DICOM/SliceThickness" );
 	}
 
-	// flatten matrizes
-// 	const char *matrizes[] = {"dcmmeta_affine", "dcmmeta_reorient_transform"};
-// 	BOOST_FOREACH( util::istring matrix, matrizes ) {
-// 		int cnt = 0;
-// 		BOOST_FOREACH( const util::PropertyValue & val, propertyValue( matrix ) ) {
-// 			setValueAs( matrix + "[" + boost::lexical_cast<util::istring>( cnt++ ) + "]", val.as<util::fvector4>() );
-// 		}
-// 		remove( matrix );
-// 	}
-
 	orig.join( *this, true );
-
-// 	std::list< data::Chunk > ret = ( dosplice ? orig.autoSplice( 1 ) : std::list<data::Chunk>( 1, orig ) ); //splice at (probably) timedim
-
-// 	return ret;
 }
 
 void DCMStack::decodeMosaic()
