@@ -100,7 +100,7 @@ struct TreeInvalidCheck: boost::static_visitor<bool> {
 
 struct parser {
 	typedef BOOST_TYPEOF( boost::spirit::ascii::space | '\t' | boost::spirit::eol ) skip_type;
-	template<typename T> struct rule{typedef boost::spirit::qi::rule<uint8_t*, T(), skip_type > decl;};
+	template<typename T> struct rule{typedef boost::spirit::qi::rule<const uint8_t*, T(), skip_type > decl;};
 	typedef boost::variant<PropertyValue, PropertyMap> value_cont;
 
 	struct add_member {
@@ -618,7 +618,7 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 	}
 }
 
-bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees )
+bool PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees )
 {
 	using namespace boost::spirit;
 	using qi::lit;
@@ -644,7 +644,7 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 
 	member= member.copy() | label >> ( value | vallist | object );
 
-	uint8_t* end = streamEnd;
+	const uint8_t* end = streamEnd;
 	qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
 	return end == streamEnd;
 }

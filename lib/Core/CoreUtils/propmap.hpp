@@ -789,7 +789,7 @@ public:
 	 * \param list_trees colon separated labels for json-subtrees where property listing should be tried before using lists from the known types (e.g. "samples:slices")
 	 * \returns true if the whole stream was parsed
 	 */
-	bool readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
+	bool readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
 
 	/**
 	 * "Print" the property tree.

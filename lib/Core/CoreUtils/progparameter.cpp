@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If !, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -37,36 +37,35 @@ bool &ProgParameter::hidden()
 	return m_hidden;
 }
 
-bool ProgParameter::parse( const Value<std::string> &props )
+bool ProgParameter::parse( const std::string &prop )
 {
 	ValueBase &me = this->front();
 	bool ret = false;
 
-	if ( ( ( std::string )props ).empty() ) {
+	if ( prop.empty() ) {
 		if ( me.is<bool>() ) {
 			me.castTo<bool>() = true;
 			ret = true;
 		}
 	} else {
-		ret = ValueBase::convert( props, me );
+		ret = ValueBase::convert( Value<std::string>(prop), me );
 	}
 
-	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
+	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( prop ) << " as " << me.toString( true );
 
 	if( ret )m_set = true;
 
 	return ret;
 }
-bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
+bool ProgParameter::parse_list( const slist& theList )
 {
 	ValueBase &me = this->front();
 	bool ret = false;
-	const util::slist &theList = props_list.castTo<util::slist>();
 
 	if ( theList.empty() ) {
 		//there is nothing like a bool-list (yet)
 	} else {
-		ret = ValueBase::convert( props_list, me );
+		ret = ValueBase::convert( Value<slist>(theList), me );
 	}
 
 	LOG_IF( ret, Debug, info )

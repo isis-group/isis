@@ -297,8 +297,18 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 
 }
 
-std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk current )
+void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, data::Chunk &current )
 {
+	
+// 	The following table indicates the slice timing pattern, relative to	time=0 for the first slice acquired, for some sample cases.  
+// 	
+// 	slice  SEQ_INC SEQ_DEC ALT_INC ALT_DEC ALT_INC2 ALT_DEC2
+// 	1  :   0.0     0.4     0.0     0.2     0.2      0.4    
+// 	2  :   0.1     0.3     0.3     0.4     0.0      0.1    
+// 	3  :   0.2     0.2     0.1     0.1     0.3      0.3    
+// 	4  :   0.3     0.1     0.4     0.3     0.1      0.0    
+// 	5  :   0.4     0.0     0.2     0.0     0.4      0.2    
+	
 	double time_fac;
 
 	switch( head->xyzt_units & 0x38 ) {
@@ -320,69 +330,61 @@ std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering( const std::share
 
 	if( head->slice_code <= NIFTI_SLICE_SEQ_INC  || head->slice_code > NIFTI_SLICE_ALT_DEC ) {
 		if( head->slice_duration == 0 ) { // and there is no slice duration, there is no use in numbering
-			return std::list<data::Chunk>( 1, current );
+			return;
 		}
 	}
 
 	if( dims < 3 ) { // if there is only one slice, there is no use in numbering
-		return std::list<data::Chunk>( 1, current );
+		return;
 	} else {// if there are timesteps we have to get a bit dirty
-		// make sure we have a list of 3D-Chunks (acquisitionNumberStride doesn't matter, we will reset it anyway)
-		std::list< data::Chunk > newChList = ( dims == 4 ? current.autoSplice( 1 ) : std::list<data::Chunk>( 1, current ) );
-
-		uint32_t offset = 0;
-
-		for( data::Chunk & ch :  newChList ) {
-
-			util::PropertyValue &acqProp=ch.touchProperty( "acquisitionNumber" );
-			switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
-			default:
-				LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
-			case 0:
-			case NIFTI_SLICE_SEQ_INC:
-
+		util::PropertyValue &acqProp=current.touchProperty( "acquisitionNumber" );
+		
+		switch( head->slice_code ) { //set sub-property "acquisitionNumber" based on the slice_code and the offset
+		default:
+			LOG( Runtime, error ) << "Unknown slice code " << util::MSubject( ( int )head->slice_code ) << " falling back to NIFTI_SLICE_SEQ_INC";
+		case 0:
+		case NIFTI_SLICE_SEQ_INC: //system assumes this anyway when the chunk is spliced up -- no explicit values needed
+		break;
+		case NIFTI_SLICE_SEQ_DEC:{
+			acqProp.reserve(head->dim[3]*head->dim[4]);
+			for(short v=0;v<head->dim[4];v++)
 				for( short i = 0; i < head->dim[3]; i++ )
-					acqProp.set(i, i + offset );
-
-				break;
-			case NIFTI_SLICE_SEQ_DEC:
-
-				for( short i = 0; i < head->dim[3]; i++ )
-					acqProp.set(head->dim[3] - i - 1, i + offset );
-
-				break;
-			case NIFTI_SLICE_ALT_INC: {
-				short i = 0, cnt;
-
-				for( cnt = 0; i < floor( head->dim[3] / 2 + .5 ); i++, cnt += 2 )
-					acqProp.set(i,cnt + offset);
-
-				for( cnt = 1; i < head->dim[3]; i++, cnt += 2 )
-					acqProp.set(i,cnt + offset);
-			}
-			break;
-			case NIFTI_SLICE_ALT_DEC: {
-				short i = 0, cnt;
-
-				for( cnt = 0; i < floor( head->dim[3] / 2 + .5 ); i++, cnt += 2 )
-					acqProp.set(head->dim[3] - i - 1,cnt + offset);
-
-				for( cnt = 1; i < ( uint32_t )head->dim[3]; i++, cnt += 2 )
-					acqProp.set(head->dim[3] - i - 1,cnt + offset);
-			}
-			break;
-			}
-
-			if( head->slice_duration ) {
-				util::PropertyValue &acqTimeProp=ch.touchProperty( "acquisitionTime");
-				for( uint32_t i = 0; i < ( uint32_t )head->dim[3]; i++ ) { // set su-property "acquisitionTime" based of the slice number
-					acqTimeProp.set(i,acqProp[i].as<float>() * head->slice_duration * time_fac);
-				}
-			}
-
-			offset += head->dim[3]; // increase offset by the number of slices per volume
+					acqProp.push_back(v*head->dim[3]+head->dim[3]-i );
 		}
-		return newChList;
+		break;
+		case NIFTI_SLICE_ALT_INC: { //interlaced increment
+			acqProp.reserve(head->dim[3]*head->dim[4]);
+			for(short v=0;v<head->dim[4];v++){
+				short cnt=1;
+				for( short i = 0; i < head->dim[3]; i+=2)
+					acqProp.set(v*head->dim[3]+i,cnt++);
+				for( short i = 1; i < head->dim[3]; i+=2)
+					acqProp.set(v*head->dim[3]+i,cnt++);
+				assert(cnt==head->dim[3]);
+			}
+		}
+		break;
+		case NIFTI_SLICE_ALT_DEC: {
+			acqProp.reserve(head->dim[3]*head->dim[4]);
+			for(short v=0;v<head->dim[4];v++){
+				short cnt=1;
+				for( short i = head->dim[3]-1; i>=0; i-=2)
+					acqProp.set(v*head->dim[3]+i,cnt++);
+				for( short i = head->dim[3]-2; i>=0; i-=2)
+					acqProp.set(v*head->dim[3]+i,cnt++);
+				assert(cnt==head->dim[3]);
+			}
+		}
+		break;
+		}
+
+		if( head->slice_duration ) {
+			util::PropertyValue &acqTimeProp=current.touchProperty( "acquisitionTime");
+			acqTimeProp.reserve(head->dim[3]*head->dim[4]);
+			for(util::PropertyValue::const_iterator i=acqProp.begin();i!=acqProp.end();i++){
+				acqTimeProp.push_back(i->as<float>() * head->slice_duration * time_fac);
+			}
+		}
 	}
 }
 
@@ -558,8 +560,8 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 	}
 
 	// set space unit factors
-	props.touchProperty( "voxelSize" ) *= size_fac;
-	props.touchProperty( "indexOrigin" ) *= size_fac;
+	*props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
+	*props.refValueAs<util::fvector3>( "indexOrigin" ) *= size_fac;
 
 	// Tr
 	if( head->pixdim[4] != 0 ) // if pixdim is given for the 4th dim, assume its repetitionTime
@@ -573,8 +575,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 
 	// TODO: at the moment scaling is not supported due to data type changes
 	if ( head->scl_slope != 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
-		//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
-		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
+		LOG( Runtime, error ) << "Ignoring scaling "<< std::make_pair(head->scl_slope,head->scl_inter) << " it is not supported at the moment.";
 	}
 
 	if( head->intent_code  ) {
@@ -722,7 +723,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
 		data_src = bitRead( mfile.at<uint8_t>( header->vox_offset ), size.product() );
-	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
+	} else if( dialect == "fsl" && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = size.product() / 3;
 		data::ValueArray<util::color24> buff( volume );
@@ -737,7 +738,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 
 		data_src = buff;
 		size[data::timeDim] = 1;
-	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
+	} else if( dialect == "fsl" && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
 		const size_t volume = size.product() / 3;
 		data::ValueArray<util::fvector3> buff( volume );
@@ -811,19 +812,17 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 	}
 
 
-	//parse the header and add chunks to the result using the mapped data
+	//parse the header and add respective properties to the chunk
 	parseHeader( header, orig );
-	std::list<data::Chunk> newChunks =  dcmmeta.translateToISIS( orig );
+	dcmmeta.translateToISIS( orig );
 
-	if( newChunks.size() <= 1 )
-		newChunks = parseSliceOrdering( header, newChunks.front() ); //if dcmmeta didn't splice, check if the header tells us to do so
+	if(orig.property( "acquisitionNumber").size()<=1)//if dcmmeta didn't set slice ordering
+		parseSliceOrdering( header, orig ); //get it from the header
 
-	if( newChunks.front().hasBranch( "DICOM" ) ){ // if we got DICOM data clean up some
-		for( data::Chunk & ch :  newChunks )
-            sanitise( ch );
-    }
+	if( orig.hasBranch( "DICOM" ) ) // if we got DICOM data clean up some
+		sanitise( orig );
 
-	return newChunks;
+	return std::list<data::Chunk>(1,orig);
 }
 
 std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )

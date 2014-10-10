@@ -60,8 +60,9 @@ public:
 	 * \param props the value as string written on commandline to be put into this parameter
 	 * \return true if parsing was succesful, false otherwise
 	 */
-	bool parse( const isis::util::Value< std::string >& props );
-	bool parse_list( const isis::util::Value< util::slist >& props_list );
+	bool parse( const std::string &prop );
+	bool parse_list( const util::slist &props_list );
+	
 	/// \return the description string
 	const std::string &description()const;
 	/* set the description string

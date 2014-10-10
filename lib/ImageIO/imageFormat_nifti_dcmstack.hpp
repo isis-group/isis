@@ -37,8 +37,8 @@ public:
 	DCMStack() {}
 	DCMStack( const util::PropertyMap &src );
 	void writeJson( std::ostream &out );
-	bool readJson( isis::data::ValueArray< uint8_t > stream, char extra_token = 0 );
-	std::list<data::Chunk> translateToISIS( data::Chunk orig );
+	bool readJson( data::ValueArray< uint8_t > stream, char extra_token = 0 );
+	void translateToISIS( data::Chunk& orig );
 private:
 	static void writeSubtree( const PropertyMap& src, std::ostream &out );
 	void decodeMosaic();

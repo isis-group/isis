@@ -178,7 +178,7 @@ class ImageFormat_NiftiSa: public FileFormat
 		return data::ValueArray<NEW_T>::staticID();
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
-	static std::list<data::Chunk> parseSliceOrdering( const std::shared_ptr< _internal::nifti_1_header > &head, data::Chunk current );
+	   void parseSliceOrdering( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk& current );
 
 	static bool parseDescripForSPM( util::PropertyMap &props, const char desc[] );
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
