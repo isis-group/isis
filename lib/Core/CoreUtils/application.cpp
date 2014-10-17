@@ -21,6 +21,7 @@
  *****************************************************************/
 
 #include "application.hpp"
+#include "../DataStorage/fileptr.hpp"
 #include <boost/foreach.hpp>
 
 #define STR(s) _xstr_(s)
@@ -67,6 +68,34 @@ void Application::removeLogging( std::string name )
 	parameters.erase( std::string( "d" ) + name );
 	logs.erase( name );
 }
+
+bool Application::addConfigFile(const std::string& filename)
+{
+	data::FilePtr f(filename);
+	if(f.good()){
+		const data::ValueArray< uint8_t > buffer=f.at<uint8_t>(0);
+		bool ret=configuration.readJson(&buffer[0],&buffer[buffer.getLength()],'/');
+		boost::optional< PropertyMap& > param=configuration.hasBranch("parameters");
+		if(param){
+			for(PropertyMap::PropPath p:param->getLocalProps()){
+				assert(p.size()==1);
+				PropertyValue &dst=static_cast<PropertyValue&>( parameters[p.front().c_str()]);
+				PropertyValue &src=param->touchProperty(p);
+				if(dst.isEmpty())
+					dst.swap(src);
+				else if(!dst.front().apply(src.front())){
+					LOG(Runtime,warning) << "Failed to apply parameter " << std::make_pair(p,src) << " from configuration, skipping ..";
+					continue;
+				}
+				param->remove(p);
+			}
+		}
+		return ret;
+	} else 
+		return false;
+}
+const PropertyMap& Application::config() const{return configuration;}
+
 
 void Application::addExample ( std::string params, std::string desc )
 {

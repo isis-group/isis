@@ -25,6 +25,7 @@
 #define APPLICATION_HPP
 
 #include "progparameter.hpp"
+#include "propmap.hpp"
 
 namespace isis
 {
@@ -48,6 +49,7 @@ class Application
 {
 	const std::string m_name;
 	boost::filesystem::path m_filename;
+	PropertyMap configuration;
 	std::list<std::pair<std::string, std::string> > m_examples;
 	void addLoggingParameter( std::string name );
 
@@ -105,6 +107,9 @@ public:
 	 * \note the logging module cannot be removed at runtime - its usage is controled by the _ENABLE_LOG / _ENABLE_DEBUG defines at compile time.
 	 */
 	void removeLogging( std::string name );
+
+	bool addConfigFile(const std::string &filename);
+	const PropertyMap &config()const;
 
 	/**
 	 * Add an example for the programs usage.
