@@ -338,6 +338,8 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	break;
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
+	case EVR_LT: //long text
+	case EVR_LO: //long string
 	case EVR_ST: { //short text
 		map.setValueAs( name, _internal::dcmtkListString2list<std::string>( elem ));
 	}
@@ -351,8 +353,6 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	case EVR_TM:
 	case EVR_UL:
 	case EVR_AE: //Application Entity (string)
-	case EVR_LT: //long text
-	case EVR_LO: //long string
 	case EVR_UT: //Unlimited Text
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN:

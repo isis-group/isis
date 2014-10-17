@@ -35,10 +35,10 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	m_input( have_input ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input )
-		addInput( parameters );
+		addInput();
 
 	if ( have_output )
-		addOutput( parameters );
+		addOutput();
 
 	parameters["help-io"] = false;
 	parameters["help-io"].needed() = false;
@@ -64,7 +64,7 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 	return true;
 }
 
-void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
+void IOApplication::addInput ( util::ParameterMap &parameters, const std::string &desc, const std::string &suffix, bool needed)
 {
 	parameters[std::string( "in" ) + suffix] = util::slist();
 	parameters[std::string( "in" ) + suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
@@ -87,8 +87,13 @@ void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, cons
 		parameters["np"].hidden() = true;
 	}
 }
+void IOApplication::addInput(const std::string& desc, const std::string& suffix, bool needed)
+{
+	addInput(parameters,desc,suffix,needed);
+}
 
-void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
+
+void IOApplication::addOutput( util::ParameterMap &parameters, const std::string &desc, const std::string &suffix, bool needed)
 {
 	parameters[std::string( "out" ) + suffix] = std::string();
 	parameters[std::string( "out" ) + suffix].setDescription( "output filename" + desc );
@@ -136,6 +141,10 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 		parameters["np"].hidden() = true;
 	}
 }
+void IOApplication::addOutput(const std::string& desc, const std::string& suffix, bool needed)
+{
+	addOutput(parameters,desc,suffix,needed);
+}
 
 
 void IOApplication::printHelp( bool withHidden ) const
@@ -158,12 +167,12 @@ void IOApplication::printHelp( bool withHidden ) const
 	}
 }
 
-bool IOApplication::autoload( bool exitOnError )
+bool IOApplication::autoload( bool exitOnError,optional< util::slist& > rejected)
 {
-	return autoload( parameters, images, exitOnError, "", feedback );
+	return autoload( parameters, images, exitOnError, "", feedback,rejected );
 
 }
-bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ConsoleFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	std::string rf = parameters[std::string( "rf" ) + suffix];
@@ -180,7 +189,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str() );
+	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str(),rejected );
 	images.splice( images.end(), tImages );
 
 	if ( images.empty() ) {

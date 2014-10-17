@@ -109,6 +109,10 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 	}
 }
 
+bool ValueBase::apply(const ValueBase& val)
+{
+	return convert(val,*this);
+}
 
 std::string ValueBase::toString(bool labeled) const
 {
