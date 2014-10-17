@@ -166,7 +166,12 @@ size_t PropertyMap::PropPath::length()const
 	return ret + size() - 1;
 }
 
-
+std::string PropertyMap::PropPath::toString()const
+{
+	std::stringstream out;
+	out << *this;
+	return out.str();
+}
 ///////////////////////////////////////////////////////////////////
 // Contructors
 ///////////////////////////////////////////////////////////////////
@@ -515,6 +520,16 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t
 
 PropertyMap::PathSet PropertyMap::getKeys()const   {return genKeyList<TrueP>();}
 PropertyMap::PathSet PropertyMap::getMissing()const {return genKeyList<InvalidP>();}
+
+PropertyMap::PathSet PropertyMap::getLocalBranches() const
+{
+	return getLocal<PropertyMap>();
+}
+PropertyMap::PathSet PropertyMap::getLocalProps() const
+{
+	return getLocal<PropertyValue>();
+}
+
 
 void PropertyMap::addNeeded( const PropPath &path )
 {

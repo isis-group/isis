@@ -88,6 +88,7 @@ public:
 		bool operator==( const key_type &s )const {return *this == PropPath( s );}
 		bool operator!=( const key_type &s )const {return *this != PropPath( s );}
 		size_t length()const;
+		std::string toString()const;
 	};
 
 	///a list to store keys only (without the corresponding values)
@@ -174,6 +175,14 @@ API_EXCLUDE_BEGIN;
 			return operand.isEmpty();
 		}
 	};
+	template<typename T> PathSet getLocal()const{
+		PathSet ret;
+		BOOST_FOREACH(const container_type::value_type &v,container){
+			if(v.second.type()==typeid(T))
+				ret.insert(v.first);
+		}
+		return ret;
+	}
 API_EXCLUDE_END;
 /// @endcond _internal
 
@@ -459,13 +468,16 @@ public:
 	 * \returns a flat list of the paths to all properties in the PropertyMap
 	 */
 	PathSet getKeys()const;
-
+	
+	PathSet getLocalProps()const;
+	PathSet getLocalBranches()const;
+	
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of the paths for all properties which are marked as needed and but are empty.
 	 */
 	PathSet getMissing()const;
-
+	
 	/**
 	 * Get a difference map of this tree and another.
 	 * Out of the names of differing properties a mapping from paths to std::pair\<PropertyValue,PropertyValue\> is created with following rules:
@@ -489,7 +501,7 @@ public:
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::PathSet join( const PropertyMap& other, bool overwrite = false );
+	PathSet join( const PropertyMap& other, bool overwrite = false );
 
 	/**
 	 * Transfer all Properties from another PropertyMap.
@@ -498,7 +510,7 @@ public:
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::PathSet transfer( PropertyMap& other, int overwrite = 0 ); //use int to prevent implicit conversion from static string (PropPath) to bool
+	PathSet transfer( PropertyMap& other, int overwrite = 0 ); //use int to prevent implicit conversion from static string (PropPath) to bool
 
 	/**
 	 * Transfer a single entry / branch from another PropertyMap.
