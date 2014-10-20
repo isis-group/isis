@@ -9,7 +9,6 @@
 ############################################################
 
 INCLUDE(CTest)
-ENABLE_TESTING()
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 

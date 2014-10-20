@@ -1,7 +1,7 @@
 #ifndef CORE_CONFIG_HPP
 #define CORE_CONFIG_HPP
 
-#ifdef WIN32
+#if defined(__GNUC__) && __GNUC__ >= 4 && !defined(__MINGW32__)
 #define API_EXCLUDE_BEGIN
 #define API_EXCLUDE_END
 #else
@@ -21,7 +21,7 @@ typedef boost::uint64_t uint64_t;
 
 namespace isis
 {
-// dear microsoft, if I 'ld mean "boost::mpl::size_t", I 'ld write "boost::mpl::size_t" *argl*
+// dear microsoft, if I'd mean "boost::mpl::size_t", I'd write "boost::mpl::size_t" *argl*
 typedef ::size_t size_t;
 }
 #else

@@ -115,47 +115,31 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 size_t FilePtr::checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size )
 {
 	const boost::uintmax_t currSize = boost::filesystem::file_size( filename );
+	if ( std::numeric_limits<size_t>::max() < currSize ) {
+		LOG( Runtime, error )
+			<< "Sorry cannot map files larger than " << std::numeric_limits<size_t>::max()
+			<< " bytes on this platform";
+		return 0;
+	}
 
 	if( write ) { // if we're writing
 		assert( size > 0 );
 
 		if( size > currSize ) { // and the file is shorter than requested, resize it
-#ifdef WIN32
-			DWORD dwPtr = SetFilePointer( file, size, NULL, FILE_BEGIN );
-
-			if ( dwPtr != INVALID_SET_FILE_POINTER ) {
-				if( SetEndOfFile( file ) /*&& SetFileValidData(file, size)*/ ) {
-					return GetFileSize( file, NULL );
-				}
+			boost::system::error_code ec;
+			boost::filesystem::resize_file(filename,size,ec);
+			if(ec){
+				 LOG( Runtime, error )
+					<< "Failed to resize " << util::MSubject( filename )
+					<< " to the requested size " << size << ", the error was: " << util::MSubject( ec.message() );
+					return 0; // fail
 			}
-
-			LOG( Runtime, error )
-					<< "Failed to resize " << util::MSubject( filename.file_string() )
-					<< " to the requested size " << size << ", the error was: " << util::MSubject( util::getLastSystemError() );
-			return 0; // fail
-#else
-			const int err = ftruncate( file, size ) ? errno : 0;
-
-			if( err ) { // could not resize the file => fail
-				LOG( Runtime, error )
-						<< "Failed to resize " << util::MSubject( filename )
-						<< " to the requested size " << size << ", the error was: " << util::MSubject( strerror( err ) );
-				return 0; // fail
-			} else
-				return size; // ok now the file has the right size
-
-#endif
-		} else
-			return size; // no resizing needed
+		}
+		return boost::filesystem::file_size(filename);
 	} else { // if we're reading
-		if( size == 0 ) {
-			if ( std::numeric_limits<size_t>::max() < currSize ) {
-				LOG( Runtime, error ) << "Sorry cannot map files larger than " << std::numeric_limits<size_t>::max()
-									  << " bytes on this platform";
-				return 0;
-			} else
-				return currSize; // automatically select size of the file
-		} else if( size <= currSize )
+		if( size == 0 )
+			return currSize; // automatically select size of the file
+		else if( size <= currSize )
 			return size; // keep the requested size (will fit into the file)
 		else { // size will not fit into the file (and we cannot resize) => fail
 			LOG( Runtime, error ) << "The requested size for readonly mapping of " << util::MSubject( filename )

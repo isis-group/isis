@@ -369,8 +369,15 @@ public:
 			( ret = val ).needed() = needed;
 		} else if( ret.is<T>() ) {
 			ret.castTo<T>() = val;
-		} else { // don't overwrite already set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+		} else {
+			const util::Value<T> vval(val);
+			const unsigned short dstID=ret.getTypeID();
+			if(vval.fitsInto(dstID)){// allow store if value is convertible into already stored type
+				LOG(Debug,warning) << "Storing " << vval << " as " << ret.getTypeName() << " as old value was already stored in that type";
+				*ret=*(vval.copyByID(dstID));
+			}else {
+				LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+			}
 		}
 
 		return ret;
@@ -430,7 +437,7 @@ namespace isis
 {
 namespace util
 {
-API_EXCLUDE_BEGIN
+API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal
 {
@@ -472,9 +479,9 @@ public:
 		m_branch = ref.m_branch;
 		m_leaf.resize( ref.m_leaf.size() );
 		std::vector<PropertyValue>::iterator dst = m_leaf.begin();
+		const bool needed = dst->isNeeded();
 		BOOST_FOREACH( std::vector<PropertyValue>::const_reference src, ref.m_leaf ) {
-			const bool needed = dst->isNeeded();
-			( *dst = src ).needed() = needed;;
+			( *(dst++) = src ).needed() = needed;;
 		}
 	}
 	std::string toString()const {
@@ -485,7 +492,7 @@ public:
 };
 }
 /// @endcond
-API_EXCLUDE_END
+API_EXCLUDE_END;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // and now we can define walkTree (needs treeNode to be defined)
