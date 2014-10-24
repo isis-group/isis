@@ -180,17 +180,6 @@ SET(CPACK_NSIS_MODIFY_PATH ON)
 SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
-# status messages
-# message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
-# message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
-# message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
-# if(WIN32)
-# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
-# else(WIN32)
-# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
-# endif(WIN32)
-#
-
 # build the ISIS libraries
 add_subdirectory(lib)
 
@@ -204,8 +193,6 @@ add_subdirectory(design)
 if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
-
-
 
 
 # build the ISIS tests.

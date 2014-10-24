@@ -1,4 +1,4 @@
-// This mostly a copy of the iostreams-lzma filter from fusecompress
+// This is mostly a copy of the iostreams-lzma filter from fusecompress
 // (http://fusecompress.sourcearchive.com/downloads/2.6-4/)
 
 // (C) Copyright Milan Svoboda 2008.
@@ -168,7 +168,6 @@ public:
 private:
 	void do_init( const lzma_params &p, bool compress, lzma::alloc_func, lzma::free_func, void *derived );
 	void         *stream_;         // Actual type: lzmadec_stream*.
-	bool          calculate_crc_;
 	unsigned long crc_;
 	int           total_in_;
 	int           total_out_;

@@ -74,7 +74,7 @@ void lzma_error::check( int error )
 namespace detail
 {
 
-lzma_base::lzma_base(): stream_( new lzma_stream ), calculate_crc_( false ), crc_( 0 ) { }
+lzma_base::lzma_base(): stream_( new lzma_stream ), crc_( 0 ) { }
 
 lzma_base::~lzma_base() { delete static_cast<lzma_stream *>( stream_ ); }
 
