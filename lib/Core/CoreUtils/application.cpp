@@ -75,7 +75,7 @@ bool Application::addConfigFile(const std::string& filename)
 		bool ret=configuration.readJson(&buffer[0],&buffer[buffer.getLength()],'/');
 		boost::optional< PropertyMap& > param=configuration.hasBranch("parameters");
 		if(param){
-			BOOST_FOREACH(PropertyMap::PropPath p,param->getLocalProps()){
+			for(PropertyMap::PropPath p:param->getLocalProps()){
 				assert(p.size()==1);
 				PropertyValue &dst=static_cast<PropertyValue&>( parameters[p.front().c_str()]);
 				PropertyValue &src=param->touchProperty(p);
