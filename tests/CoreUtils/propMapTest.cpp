@@ -34,7 +34,6 @@ PropertyMap getFilledMap(){
 BOOST_AUTO_TEST_CASE( propPath_test )
 {
 
-	util::DefaultMsgPrint::stopBelow(notice);
 	const PropertyMap::PropPath a( "a" ), bc( "b/c" ), abc( "a/b/c" );
 	//creation
 	BOOST_CHECK_EQUAL( PropertyMap::PropPath( "a/a/a" ), std::list<PropertyMap::key_type>( 3, PropertyMap::key_type( "a" ) ) );
