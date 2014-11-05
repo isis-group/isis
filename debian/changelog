@@ -1,3 +1,22 @@
+isis (0.7.7-2) UNRELEASED; urgency=low
+
+  * use boost 1.48 to work around packaging issues in ubuntu
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Tue, 04 Nov 2014 21:23:35 +0000
+
+isis (0.7.7-1) UNRELEASED; urgency=low
+
+  * add some value representations in DICOM
+  * consider volume chunks with different indexOrigin to be part of 
+    different images
+  * extend dcmstack support in nifti
+  * catch bad_lexical_cast when trying to parse string as ptime in the 
+    automatic value conversion
+  * in nifti_sa always store repetitionTime, if there is one
+  * improve message about incomplete images
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Mon, 18 Aug 2014 20:14:18 +0000
+
 isis (0.7.6-1) UNRELEASED; urgency=low
 
   * in nifti_sa add rudimentary support for reading json formated extensions
