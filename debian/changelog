@@ -1,8 +1,15 @@
+isis (0.7.8-1) UNRELEASED; urgency=low
+
+  * fix crash with empty dcmstack
+  * in DICOM generate studyStart from StudyTime and StudyDate
+
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Mon, 20 Oct 2014 15:02:14 +0200
+
 isis (0.7.7-2) UNRELEASED; urgency=low
 
   * use boost 1.48 to work around packaging issues in ubuntu
 
- -- Enrico Reimer <reimer@cbs.mpg.de>  Tue, 04 Nov 2014 21:23:35 +0000
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Wed, 20 Aug 2014 19:22:52 +0000
 
 isis (0.7.7-1) UNRELEASED; urgency=low
 
@@ -15,7 +22,7 @@ isis (0.7.7-1) UNRELEASED; urgency=low
   * in nifti_sa always store repetitionTime, if there is one
   * improve message about incomplete images
 
- -- Enrico Reimer <reimer@cbs.mpg.de>  Mon, 18 Aug 2014 20:14:18 +0000
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Mon, 18 Aug 2014 20:14:18 +0000
 
 isis (0.7.6-1) UNRELEASED; urgency=low
 
