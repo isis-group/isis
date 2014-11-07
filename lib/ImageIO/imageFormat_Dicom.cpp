@@ -143,7 +143,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic forcemosaic";}
 
 
 
@@ -540,9 +540,11 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 			} else {
 				chunks.push_back( readMosaic( chunk ) );
 			}
-		} else {
-			chunks.push_back( chunk );
-		}
+		} else if( dialect == "forcemosaic" ) 
+			ret.push_back( readMosaic( chunk ) );
+		else 
+			ret.push_back( chunk );
+
 
 		return 1;
 	} else {
