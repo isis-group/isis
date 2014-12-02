@@ -37,13 +37,13 @@ template<class MODULE> class Log
 	Log(): m_handle( new DefaultMsgPrint( notice ) ) {}
 public:
 	template<class HANDLE_CLASS> static void enable( LogLevel enable ) {
-		setHandler( std::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );
+		Log<MODULE>::setHandler( std::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );
 	}
 	static void setHandler( std::shared_ptr<MessageHandlerBase> handler ) {
-		getHandle() = handler;
+		Log<MODULE>::getHandle() = handler;
 	}
 	static Message send( const char file[], const char object[], int line, LogLevel level ) {
-		std::shared_ptr<util::MessageHandlerBase> &handle = getHandle();
+		std::shared_ptr<util::MessageHandlerBase> &handle = Log<MODULE>::getHandle();
 		return Message( object, MODULE::name(), file, line, level, handle );
 	}
 };
