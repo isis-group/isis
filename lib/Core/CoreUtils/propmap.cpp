@@ -641,7 +641,12 @@ bool PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd
 
 	parser::rule<boost::fusion::vector2<std::string, parser::value_cont> >::decl member;
 	
-	parser::rule<std::string>::decl string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" );
+	qi::symbols<char const, char const> esc_char;
+	esc_char.add("\\a", '\a')("\\b", '\b')("\\f", '\f')("\\n", '\n')
+	("\\r", '\r')("\\t", '\t')("\\v", '\v')("\\\\", '\\')
+	("\\\'", '\'')("\\\"", '\"');
+	
+	parser::rule<std::string>::decl string( lexeme['"' >> *(esc_char | "\\x" >> qi::hex | ascii::print - '"')>> '"'], "string" );
 	parser::rule<std::string>::decl label( string >> ':', "label" );
 	parser::rule<int>::decl integer( int_ >> !lit( '.' ), "integer" ) ; // an integer followed by a '.' is not an integer
 	parser::rule<dlist>::decl dlist( lit( '[' ) >> double_ % ',' >> ']', "dlist" );
