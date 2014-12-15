@@ -69,8 +69,9 @@ public:
 	 * No programm parameter is parsed here. To do that use init()
 	 *
 	 * \param name name of the application.
+	 * \param cfg the default path of the config file. If empty, no config file will be loaded
 	 */
-	Application( const char name[] );
+	Application( const char name[], const char cfg[]="" );
 	virtual ~Application();
 
 	/**

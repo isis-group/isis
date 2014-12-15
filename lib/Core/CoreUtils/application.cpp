@@ -30,7 +30,7 @@ namespace isis
 namespace util
 {
 
-Application::Application( const char name[] ): m_name( name )
+Application::Application( const char name[], const char cfg[]): m_name( name )
 {
 	addLogging<CoreLog>( "Core" );
 	addLogging<CoreDebug>( "Core" );
@@ -42,6 +42,12 @@ Application::Application( const char name[] ): m_name( name )
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	parameters["help"].needed() = false;
+	
+	if(strlen(cfg)){
+		parameters["cfg"]=std::string(cfg);
+		parameters["cfg"].setDescription("File to read configuration from");
+		parameters["cfg"].needed()=false;
+	}
 }
 Application::~Application() {}
 
@@ -74,14 +80,15 @@ bool Application::addConfigFile(const std::string& filename)
 		const data::ValueArray< uint8_t > buffer=f.at<uint8_t>(0);
 		if(configuration.readJson(&buffer[0],&buffer[buffer.getLength()],'/')){
 			boost::optional< PropertyMap& > param=configuration.hasBranch("parameters");
+			// if there is a "parameters" section in the file, use that as default parameters for the app
 			if(param){
-			for(PropertyMap::PropPath p:param->getLocalProps()){
+				for(PropertyMap::PropPath p:param->getLocalProps()){
 					assert(p.size()==1);
 					PropertyValue &dst=static_cast<PropertyValue&>( parameters[p.front().c_str()]);
 					PropertyValue &src=param->touchProperty(p);
 					if(dst.isEmpty())
 						dst.swap(src);
-					else if(!dst.front().apply(src.front())){
+					else if(!dst.front().apply(src.front())){ //replace builtin default with value from config if there is one already
 						LOG(Runtime,warning) << "Failed to apply parameter " << std::make_pair(p,src) << " from configuration, skipping ..";
 						continue;
 					}
@@ -117,6 +124,10 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	} else {
 		LOG( Runtime, error ) << "Failed to parse the command line";
 		err = true;
+	}
+	std::map< std::string, ProgParameter >::iterator cfg=parameters.find("cfg");
+	if(cfg!=parameters.end()){
+		addConfigFile(cfg->second.as<std::string>());
 	}
 
 	for( logger_ref ref: logs ) {

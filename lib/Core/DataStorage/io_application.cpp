@@ -30,8 +30,8 @@ namespace isis
 {
 namespace data
 {
-IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
-	Application( name ),
+	IOApplication::IOApplication( const char name[], bool have_input, bool have_output, const char cfg[] ):
+	Application( name, cfg ),
 	m_input( have_input ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input )

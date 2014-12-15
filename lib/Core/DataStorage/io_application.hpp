@@ -69,7 +69,7 @@ public:
 	static void addOutput( util::ParameterMap &parameters, const std::string &desc = "", const std::string &suffix = "", bool needed = true );
 	void addOutput( const std::string &desc = "", const std::string &suffix = "", bool needed = true );
 	
-	IOApplication( const char name[], bool have_input = true, bool have_output = true );
+	IOApplication( const char name[], bool have_input = true, bool have_output = true, const char cfg[]="" );
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 	virtual void printHelp( bool withHidden = false ) const;
