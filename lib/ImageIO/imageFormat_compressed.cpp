@@ -240,9 +240,9 @@ public:
 						}
 
 						// read the temporary file
-						ret= data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() );
-						for( data::Chunk &ref :  ret) { // set the source property of the red chunks to something more usefull
+						for( data::Chunk ref :  data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() )) { // set the source property of the red chunks to something more usefull
 							ref.setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
+							ret.push_back(ref);
 						}
 					}
 				} else {

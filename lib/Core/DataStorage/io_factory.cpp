@@ -333,9 +333,14 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optio
 std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect, optional< isis::util::slist& > rejected  )
 {
 	const boost::filesystem::path p( path );
-	return boost::filesystem::is_directory( p ) ?
-		get().loadPath( p, suffix_override, dialect, rejected) :
-		get().loadFile( p, suffix_override, dialect );
+	if(boost::filesystem::is_directory( p ))
+		return get().loadPath( p, suffix_override, dialect, rejected);
+	else{
+		const std::list< Chunk > loaded=get().loadFile( p, suffix_override, dialect );
+		if(rejected && loaded.empty())
+			rejected->push_back(path);
+		return loaded;
+	}
 }
 
 std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, optional< isis::util::slist& > rejected )
