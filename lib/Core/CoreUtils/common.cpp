@@ -39,15 +39,25 @@ boost::filesystem::path getRootPath(std::list< boost::filesystem::path > sources
 	sources.erase( std::unique( sources.begin(), sources.end() ), sources.end() );
 	
 	if( sources.empty() ) {
-		LOG( Runtime, error ) << "Failed to get common source";
-		return boost::filesystem::path();
-	} else if( sources.size() == 1 )
+		LOG( Runtime, error ) << "Failed to get root path (list is empty)";
+	} else if( sources.size() == 1 ) // ok, we got one unique path, return that
 		return *sources.begin();
-	else {
-		for( boost::filesystem::path & ref : sources )
-			ref.remove_filename();
-		return getRootPath( sources,true );
+	else { // no unique path yet, try to shorten
+		bool abort=true;
+		for( boost::filesystem::path & ref : sources ){
+			if(ref.has_branch_path()){
+				ref.remove_filename();
+				abort=false; //if at least one path can be shortened
+			}
+		}
+		
+		if(!abort){//if shortening was possible, check again for unique
+			return getRootPath( sources,true );
+		} else { // no more shortening possible, abort
+			LOG( Runtime, error ) << "Failed to get root path for " << MSubject(sources);
+		}
 	}
+	return boost::filesystem::path();
 }
 
 

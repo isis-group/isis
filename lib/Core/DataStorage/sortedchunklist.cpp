@@ -322,11 +322,10 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 		}
 	}
 }
-std::string SortedChunkList::identify(bool withpath, bool withdate, getproplist seqNum, getproplist seqDesc, getproplist seqStart) const
+std::string SortedChunkList::identify(bool withpath, bool withdate, getproplist source, getproplist seqNum, getproplist seqDesc, getproplist seqStart) const
 {
 	forall(seqNum);
 	forall(seqDesc);
-	forall(seqStart);
 	
 	std::string ret;
 	if(seqNum.size()==1)
@@ -334,22 +333,19 @@ std::string SortedChunkList::identify(bool withpath, bool withdate, getproplist 
 	if(seqDesc.size()==1)
 		ret+= (ret.empty() ? std::string():std::string("_"))+seqDesc.begin()->toString();
 	if(withpath){
-		ret+=(ret.empty() ? std::string():std::string(" "))+( std::string( "from " ) + getCommonSource().native() );
+		forall(source);
+		std::list<boost::filesystem::path> sources;
+		std::transform(source.begin(),source.end(),std::back_inserter(sources),[](const util::PropertyValue &v){return v.as<std::string>();});
+		ret+=
+			(ret.empty() ? std::string():std::string(" "))+( std::string( "from " ) + 
+			util::getRootPath(sources,true).native() );
 	}
-	if(withdate && seqStart.size()==1)
-		ret+=(ret.empty() ? std::string():std::string(" "))+std::string("taken at ") + seqStart.begin()->toString();
+	if(withdate){
+		forall(seqStart);
+		if(seqStart.size()==1)
+			ret+=(ret.empty() ? std::string():std::string(" "))+std::string("taken at ") + seqStart.begin()->toString();
+	}
 	return ret;
-}
-boost::filesystem::path SortedChunkList::getCommonSource() const
-{
-	std::list<boost::filesystem::path> sources;
-	getproplist paths("source");
-	forall(paths);
-		
-	for( const util::PropertyValue & ref : paths ) {
-		sources.push_back( ref.as<std::string>() );
-	}
-	return util::getRootPath( sources );
 }
 
 

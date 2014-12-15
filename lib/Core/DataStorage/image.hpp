@@ -809,16 +809,6 @@ public:
 	 * \param withpath add the common path of all sources to the identifying string
 	 */
 	std::string identify( bool withpath = true, bool withdate=true )const;
-	/**
-	 * Generate a string identifying the image
-	 * The identifier is made of
-	 * - sequenceNumber
-	 * - sequenceDescription if available
-	 * - the common path of all chunk-sources (or the source file, if there is only one) if withpath is true
-	 * - sequenceStart if available
-	 * \param withpath add the common path of all sources to the identifying string
-	 */
-	boost::filesystem::path getCommonSource()const;	
 };
 
 /**

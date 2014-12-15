@@ -81,7 +81,7 @@ public:
 	 *
 	 * The MODULE must be a struct like
 	 * \code struct MyLogModule {static const char *name() {return "MyModuleLog";}; enum {use = _ENABLE_LOG};}; \endcode
-	 * than \code addLogging<MyLogModule>("MyLog"); \endcode will install a parameter "-dMyLog" which will control all calls to
+	 * then \code addLogging<MyLogModule>("MyLog"); \endcode will install a parameter "-dMyLog" which will control all calls to
 	 * \code LOG(MyLogModule,...) << ... \endcode if _ENABLE_LOG was set for the compilation. Otherwise this commands will not have an effect.
 	 *
 	 * Multiple MODLUES can have the same parameter name, so

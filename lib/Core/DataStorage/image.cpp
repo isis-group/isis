@@ -1046,20 +1046,11 @@ void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns,
 	begin()[getLinearIndex( idx )] = val;
 }
 
-boost::filesystem::path Image::getCommonSource()const
-{
-	boost::optional< const util::PropertyValue& > found=hasProperty( "source" );
-	if( found )
-		return found->as<std::string>();
-	else
-		return set.getCommonSource();
-}
-
 std::string Image::identify ( bool withpath, bool withdate )const
 {
-	_internal::SortedChunkList::getproplist seqNum("sequenceNumber"),seqDesc("sequenceDescription"),seqStart("sequenceStart");
-	seqNum(*this);seqDesc(*this);seqStart(*this);
-	return set.identify(withpath,withdate,seqNum,seqDesc,seqStart);
+	_internal::SortedChunkList::getproplist source("source"),seqNum("sequenceNumber"),seqDesc("sequenceDescription"),seqStart("sequenceStart");
+	seqNum(*this);seqDesc(*this);seqStart(*this),source(*this);
+	return set.identify(withpath,withdate,source, seqNum,seqDesc,seqStart);
 }
 
 
