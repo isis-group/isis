@@ -470,6 +470,8 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.setValueAs( name, boost::lexical_cast<uint16_t>( val ));
 	} else if ( vr == "SS" ) {
 		map.setValueAs( name, boost::lexical_cast<int16_t>( val ));
+	} else if ( vr == "LT" ) {
+		map.setValueAs( name, val );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -487,6 +489,8 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.setValueAs( name, util::listToList<double>( val.begin(), val.end() ) );
+	} else if ( vr == "LT" ) {
+		map.setValueAs( name, val );
 	} else {
 		LOG( Runtime, error ) << "Don't know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
