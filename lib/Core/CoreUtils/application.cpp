@@ -84,13 +84,15 @@ bool Application::addConfigFile(const std::string& filename)
 			if(param){
 				for(PropertyMap::PropPath p:param->getLocalProps()){
 					assert(p.size()==1);
-					PropertyValue &dst=static_cast<PropertyValue&>( parameters[p.front().c_str()]);
+					ProgParameter &dst=parameters[p.front().c_str()];
 					PropertyValue &src=param->touchProperty(p);
-					if(dst.isEmpty())
-						dst.swap(src);
-					else if(!dst.front().apply(src.front())){ //replace builtin default with value from config if there is one already
-						LOG(Runtime,warning) << "Failed to apply parameter " << std::make_pair(p,src) << " from configuration, skipping ..";
-						continue;
+					if(!dst.isSet()){ // don't touch it, if its not just the default
+						if(dst.isEmpty())
+							dst.swap(src);
+						else if(!dst.front().apply(src.front())){ //replace builtin default with value from config if there is one already
+							LOG(Runtime,warning) << "Failed to apply parameter " << std::make_pair(p,src) << " from configuration, skipping ..";
+							continue;
+						}
 					}
 					param->remove(p);
 				}
@@ -126,7 +128,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 	std::map< std::string, ProgParameter >::iterator cfg=parameters.find("cfg");
-	if(cfg!=parameters.end()){
+	if(cfg!=parameters.end()){ // TODO this will override given parameters
 		addConfigFile(cfg->second.as<std::string>());
 	}
 

@@ -42,6 +42,11 @@ public:
 		text << cont;
 		assign( text.str() );
 	}
+	MSubject( const boost::filesystem::path &cont ) {
+		std::ostringstream text;
+		text << cont.native();
+		assign( text.str() );
+	}
 };
 
 const char *logLevelName( LogLevel level );
