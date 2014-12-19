@@ -30,6 +30,7 @@
 #include <boost/algorithm/string.hpp>
 #include "../CoreUtils/singletons.hpp"
 
+
 namespace isis
 {
 namespace data
@@ -235,14 +236,14 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 					ref.refValueAsOr( "source", filename.native() ); // set source to filename or leave it if its already set
 				}
 				return loaded;
-			} catch ( std::runtime_error &e ) {
+			} catch ( const std::exception& e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
 							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
 							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
-							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
+							<< " with " << util::MSubject( e.what() ) << ", maybe it just wasn't the right format";
 				}
 			}
 		}
@@ -434,7 +435,7 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 							  util::istring( " and dialect: " ) + dialect
 							);
 				return true;
-			} catch ( std::runtime_error &e ) {
+			} catch ( const std::exception &e ) {
 				LOG( Runtime, warning )
 						<< "Failed to write " <<  images.size()
 						<< " images to " << path << " using " <<  it->getName() << " (" << e.what() << ")";

@@ -146,8 +146,7 @@ public:
 	}
 	std::string getName()const {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & )
-	{
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )	{
 		std::list<data::Chunk> ret;
 
 		//select filters for input
@@ -277,7 +276,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
 
