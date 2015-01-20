@@ -7,6 +7,10 @@
 #include <dcmtk/dcmdata/dcdicent.h>
 #include <dcmtk/oflog/config.h>
 
+#include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
+#include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
+
+
 namespace isis
 {
 namespace image_io
@@ -95,7 +99,7 @@ public:
 				FileFormat::throwGenericError( "Didn't get any pixel data" );
 			}
 		} else {
-			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() )  + ")" );
+			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() ));
 		}
 
 		return *ret;
@@ -131,7 +135,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens nocsa withExtProtocols keepmosaic";}
 
 
 
@@ -553,6 +557,7 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 		DcmDataDictionary &dict = dcmDataDict.wrlock();
 		addDicomDict( dict );
 		dcmDataDict.unlock(); 
+		DJDecoderRegistration::registerCodecs();
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk

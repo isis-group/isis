@@ -384,7 +384,8 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
 	pos += 0x40;
-	assert( name[0] );
+	if(name[0]==0)
+		throw std::logic_error("empty CSA entry name");
 	/*Sint32 &vm=*((Sint32*)array+pos);*/
 	pos += sizeof( Sint32 );
 	const char *const vr = ( char * )at + pos;
@@ -510,10 +511,15 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			boost::optional< util::PropertyValue& > known = map.hasProperty( "Private Code for (0029,1000)-(0029,10ff)" );
 
 			if( known && known->as<std::string>() == "SIEMENS CSA HEADER" ) {
-				const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
-				LOG( Debug, info ) << "Using " << tag.toString() << " as " << name;
-				DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-				parseCSA( elem, map.branch( name ), dialect );
+				if(dialect!="nocsa"){
+					const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
+					DcmElement *elem = dynamic_cast<DcmElement *>( obj );
+					try{
+						parseCSA( elem, map.branch( name ), dialect );
+					} catch(std::exception &e){
+						LOG( Runtime, error ) << "Error parsing CSA data ("<< util::MSubject(e.what()) <<"). Deleting " << util::MSubject(name);
+					}
+				}
 			} else {
 				LOG( Runtime, warning ) << "Ignoring entry " << tag.toString() << ", binary format " << *known << " is not known";
 			}
