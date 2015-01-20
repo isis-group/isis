@@ -132,7 +132,17 @@ template<typename SRC, typename DST> boost::numeric::range_check_result num2num(
 // if a converter from double is available first map to double and then convert that into DST
 template<typename DST> typename std::enable_if<std::is_arithmetic<DST>::value,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
 {
-	return num2num<double, DST>( Value<double>( src ), dst );
+	double d;
+	try { 
+		d=std::stod( src );
+	} catch( std::out_of_range &) {
+		return boost::numeric::cPosOverflow; //-isch
+	} catch( const std::logic_error &e ) {
+		dst = DST();
+		LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( src ) << " as " << Value<DST>::staticName() << "(" << MSubject(e.what())<< ") returning " << MSubject( DST() );
+		return boost::numeric::cInRange;
+	} 
+	return num2num<double, DST>( d, dst );
 }
 // otherwise try direct mapping (rounding will fail)
 template<typename DST> typename std::enable_if<!std::is_arithmetic<DST>::value,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
