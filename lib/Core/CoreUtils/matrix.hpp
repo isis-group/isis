@@ -205,7 +205,7 @@ public:
 		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( 0, 0, 1, 0 ),
 		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( 0, 0, 0, 1 )
 	) {
-		const vector4<TYPE2> src[4] = {row1, row2, row3, row4};
+		const FixedVector<TYPE2, 4> src[4] = {row1, row2, row3, row4};
 		FixedMatrix<TYPE, 4, 4>::copyFrom( src );
 	}
 };

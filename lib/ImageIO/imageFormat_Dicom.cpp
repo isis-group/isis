@@ -541,10 +541,9 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 				chunks.push_back( readMosaic( chunk ) );
 			}
 		} else if( dialect == "forcemosaic" ) 
-			ret.push_back( readMosaic( chunk ) );
+			chunks.push_back( readMosaic( chunk ) );
 		else 
-			ret.push_back( chunk );
-
+			chunks.push_back( chunk );
 
 		return 1;
 	} else {
