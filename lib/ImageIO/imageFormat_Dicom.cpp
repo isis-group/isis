@@ -379,7 +379,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 				diff = dicomTree.getPropertyAs<util::fvector3>( "SiemensDiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "SiemensDiffusionGradientOrientation" );
 			} else {
+			if(bValue)
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+			else
+				LOG(Runtime, notice ) << "Ignoring DiffusionBValue 0 as there is no diffusionGradient";
 			}
 		}
 	}
