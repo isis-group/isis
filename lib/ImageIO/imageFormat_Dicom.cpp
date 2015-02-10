@@ -135,7 +135,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens nocsa withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
 
@@ -371,7 +371,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
 			foundGrad= object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
 		} else {
+			if(bValue)
 			LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+			else
+				LOG(Runtime, notice ) << "Ignoring DiffusionBValue 0 as there is no diffusionGradient";
 		}
 
 		if( bValue && foundGrad ) // if bValue is not zero multiply the diffusionGradient by it
@@ -519,9 +522,9 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 {
 	DcmFileFormat dcfile;
 	OFCondition loaded = dcfile.loadFile( filename.c_str() );
-	std::list< data::Chunk > ret;
 
 	if ( loaded.good() ) {
+		std::list< data::Chunk > ret;
 		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, dialect );
@@ -534,13 +537,17 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 			} else {
 				ret.push_back( readMosaic( chunk ) );
 			}
-		} else {
+		} else if( dialect == "forcemosaic" ) 
+			ret.push_back( readMosaic( chunk ) );
+		else 
 			ret.push_back( chunk );
-		}
+
+		return ret;
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
+		return std::list< data::Chunk >();
 	}
-	return ret;
+
 }
 
 void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )

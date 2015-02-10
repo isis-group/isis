@@ -62,14 +62,14 @@ bool ProgParameter::parse_list( const slist& theList )
 	ValueBase &me = this->front();
 	bool ret = false;
 
-	if ( theList.empty() ) {
-		//there is nothing like a bool-list (yet)
-	} else {
-		ret = ValueBase::convert( Value<slist>(theList), me );
-	}
-
-	LOG_IF( ret, Debug, info )
+	ret = ValueBase::convert( Value<slist>(theList), me );
+	if(theList.empty()){
+		LOG_IF( ret, Debug, info )
+		<< "Parsed empty parameter list as " << me.toString( true );
+	}else{
+		LOG_IF( ret, Debug, info )
 			<< "Parsed parameter list " << MSubject( util::listToString( theList.begin(), theList.end(), " ", "", "" ) ) << " as " << me.toString( true );
+	}
 
 	if( ret )m_set = true;
 

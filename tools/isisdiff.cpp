@@ -55,21 +55,25 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 size_t doFit( const data::Image reference, std::list<data::Image> &org_images, std::list<data::Image> &images, const char *propName )
 {
 	//first time org is empty - images is full
-	const util::PropertyMap::PropPath propPath( propName );
-	util::PropertyValue propval = reference.property( propPath );
+	if(propName[0]==0){
+		LOG(DiffLog,warning) << "Empty property names are invalid! Use \'-selectwith\' instead of \'-selectwith \"\"\'.";
+	} else {
+		const util::PropertyMap::PropPath propPath( propName );
+		util::PropertyValue propval = reference.property( propPath );
 
-	//now move all with different prop back into org
-	for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
-		if( hasDifferentProp( *i, propPath, propval ) ) {
-			org_images.push_back( *i );
-			images.erase( i++ );
-		} else
-			i++;
-	}
+		//now move all with different prop back into org
+		for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
+			if( hasDifferentProp( *i, propPath, propval ) ) {
+				org_images.push_back( *i );
+				images.erase( i++ );
+			} else
+				i++;
+		}
 
-	LOG( DiffLog, info )
+		LOG( DiffLog, info )
 			<< images.size() << " candidates left for " << reference.identify() << ", "
 			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.property( propPath );
+	}
 	return images.size();
 }
 
