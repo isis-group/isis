@@ -36,7 +36,7 @@ public:
 		if ( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
 			hit++;
 		else
-			std::cout << "Unexpected error " << mesg.merge();
+			std::cout << "Unexpected error " << mesg.merge("");
 	}
 };
 int TestHandler::hit = 0;

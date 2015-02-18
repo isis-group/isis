@@ -168,7 +168,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 #endif
 
 	if( file == invalid ) {
-		LOG( Runtime, error ) << "Failed to open " << filename << ", the error was: " << util::getLastSystemError();
+		LOG( Runtime, error ) << "Failed to open " << util::MSubject(filename) << ", the error was: " << util::getLastSystemError();
 		return;
 	}
 

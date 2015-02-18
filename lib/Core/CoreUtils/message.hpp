@@ -17,8 +17,8 @@
 #include <string>
 #include <ctime>
 #include <list>
-#include <iostream>
-#define BOOST_FILESYSTEM_VERSION 3 
+#include <stdio.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -93,7 +93,7 @@ public:
 	Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo );
 	Message( const Message &src );
 	~Message();
-	std::string merge()const;
+	std::string merge(const std::string color_code)const;
 	std::string strTime()const;
 	template<typename T> Message &operator << (const T& val ) {
 		*( ( std::ostringstream * )this ) << val;
@@ -115,8 +115,8 @@ public:
  */
 class DefaultMsgPrint : public MessageHandlerBase
 {
+	bool istty;
 protected:
-	static std::ostream *o;
 #ifdef NDEBUG
 	static const int max_age = 500;
 #else
@@ -125,10 +125,11 @@ protected:
 	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
 
 public:
-	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ) {}
+	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ), istty(isatty(fileno(stderr))) {}
 	virtual ~DefaultMsgPrint() {}
 	void commit( const Message &mesg );
-	static void setStream( std::ostream &_o );
+	void commit_tty(const Message &mesg);
+	void commit_pipe(const Message &mesg);
 };
 
 }

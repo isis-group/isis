@@ -17,6 +17,7 @@
 
 */
 
+//TODO maybe use standard traits is_trivially_default_constructible and is_trivially_copy_constructible
 #ifdef _MSC_VER
 #pragma warning(disable:4800 4996)
 #endif
