@@ -423,12 +423,12 @@ bool Image::reIndex(optional< util::slist& > rejected)
 				if ( voxelGap[2] != inf ) {
 					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 200 ), Runtime, warning )
 							<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
-							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
+							<< " differs from the distance between chunk 0 and 1, which is " << util::MSubject( sliceDist );
 				} else {
 					voxelGap[2] = sliceDist;
 					LOG( Debug, info )
 							<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
-							<< sliceDist;
+							<< util::MSubject( sliceDist );
 				}
 			}
 		}
@@ -448,7 +448,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 
 		if ( sliceVec ) {
 			LOG_IF( std::acos( crossVec.dot( *sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
-					<< "The existing sliceVec " << sliceVec << " differs from the cross product of the row- and column vector " << crossVec;
+					<< "The existing sliceVec " << util::MSubject( sliceVec ) << " differs from the cross product of the row- and column vector " << util::MSubject( crossVec );
 		} else {
 			// We dont know anything about the slice-direction
 			// we just guess its along the positive cross-product between row- and column direction

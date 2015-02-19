@@ -125,7 +125,7 @@ protected:
 	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
 
 public:
-	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ), istty(isatty(fileno(stderr))) {}
+	DefaultMsgPrint( LogLevel level );
 	virtual ~DefaultMsgPrint() {}
 	void commit( const Message &mesg );
 	void commit_tty(const Message &mesg);

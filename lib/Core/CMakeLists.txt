@@ -9,6 +9,18 @@
 ############################################################
 
 ############################################################
+# check for ncurses
+############################################################
+find_package(Curses)
+if(CURSES_FOUND)
+	include_directories(${CURSES_INCLUDE_DIR})
+	add_definitions(-DHAVE_CURSES)
+else(CURSES_FOUND)
+	set(CURSES_LIBRARIES "")
+endif(CURSES_FOUND)
+
+
+############################################################
 # check for liboil
 ############################################################
 set(ISIS_USE_LIBOIL OFF CACHE BOOL "use liboil" )
@@ -24,7 +36,7 @@ endif(ISIS_USE_LIBOIL)
 ############################################################
 # export library dependencies of isis_core
 ############################################################
-foreach(FILE ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
+foreach(FILE ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} ${CURSES_LIBRARIES})
 		string(REGEX MATCH "${CMAKE_SHARED_LIBRARY_SUFFIX}$" IS_SHARED ${FILE})
 		if(IS_SHARED)
 				LIST(APPEND ISIS_LIB_DEPENDS ${FILE})
@@ -49,7 +61,7 @@ file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${CMAKE_DL_LIBS};${LibOil_LIBRARY};${Boost_LIBRARIES}"
+	"${CMAKE_DL_LIBS};${LibOil_LIBRARY};${Boost_LIBRARIES};${CURSES_LIBRARIES}"
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 

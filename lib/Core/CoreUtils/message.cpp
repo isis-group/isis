@@ -21,6 +21,11 @@
 #include <signal.h>
 #endif
 
+#ifdef HAVE_CURSES
+#include <curses.h>
+#include <term.h>
+#endif // HAVE_CURSES
+
 namespace isis
 {
 namespace util
@@ -148,6 +153,7 @@ bool Message::shouldCommit()const
 
 LogLevel MessageHandlerBase::m_stop_below = error;
 
+DefaultMsgPrint::DefaultMsgPrint(LogLevel level): MessageHandlerBase( level ), istty(isatty(fileno(stderr))) {}
 
 void DefaultMsgPrint::commit( const Message &mesg )
 {
@@ -163,23 +169,27 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 	//first remove everything which is to old anyway
 	std::list< std::pair<boost::posix_time::ptime, std::string> >::iterator begin = last.begin();
 	static const boost::posix_time::millisec dist( max_age );
+
+	const char *color_code="";
+	
+#ifdef HAVE_CURSES
+	static int err_dummy;
+	static int is_no_term=setupterm(0,fileno(stderr),&err_dummy);
 	
 	// terminal color codes
-	const char reset_code[]= "\033[0m";
 	const char red_code[]="\x1B[31m";
 	const char yellow_code[]="\x1B[33m";
 	const char green_code[]="\x1B[32m";
 	const char norm_code[]="\x1B[0m";
 	
-	const char *color_code;
-	
-	switch(mesg.m_level){
-		case error:color_code=red_code;
-		case warning:color_code=yellow_code;break;
-		case notice:color_code=green_code;break;
-		default:color_code=norm_code;break;
-	}
-	
+	if(!is_no_term && cur_term && max_colors>=8)
+		switch(mesg.m_level){
+			case error:color_code=red_code;
+			case warning:color_code=yellow_code;break;
+			case notice:color_code=green_code;break;
+			default:color_code=norm_code;break;
+		}
+#endif //HAVE_CURSES
 
 	while( begin != last.end() && begin->first + dist < mesg.m_timeStamp ) {
 		begin++;
