@@ -161,14 +161,14 @@ void DCMStack::decodeMosaic()
 		const util::fvector3 fovCorr = ( voxelSize ) * size * ( matrixSize - 1 ) / 2;
 
 		// correct the origin
-		util::fvector3 &origin = *refValueAs<util::fvector3>( MosaicOrigin );
+		util::fvector3 &origin = refValueAs<util::fvector3>( MosaicOrigin );
 		origin += ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 
 		// we dont need that anymore
 		remove( NumberOfImagesInMosaicProp ); 
 
 		// replace "MOSAIC" ImageType by "WAS_MOSAIC"
-		util::slist &iType = *refValueAs<util::slist>( "DICOM/ImageType" );
+		util::slist &iType = refValueAs<util::slist>( "DICOM/ImageType" );
 		std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	} else {
 		LOG( Runtime, error ) << "Failed to decode mosaic geometry data, won't touch " << MosaicOrigin;

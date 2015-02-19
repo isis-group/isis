@@ -378,7 +378,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 
 		if( bValue && foundGrad ) // if bValue is not zero multiply the diffusionGradient by it
-			object.refValueAs<util::fvector3>("diffusionGradient").get()*=bValue;
+			object.refValueAs<util::fvector3>("diffusionGradient")*=bValue;
 	}
 
 
@@ -452,7 +452,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector3 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector3 &origin = *source.refValueAs<util::fvector3>( "indexOrigin" );
+	util::fvector3 &origin = source.refValueAs<util::fvector3>( "indexOrigin" );
 	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setValueAs( prefix + "ImageType", iType );
@@ -486,7 +486,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
-		util::fvector3 &ref = *dest.refValueAs<util::fvector3>( "fov" );
+		util::fvector3 &ref = dest.refValueAs<util::fvector3>( "fov" );
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
@@ -591,7 +591,9 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	
 	//http://www.healthcare.siemens.com/siemens_hwem-hwem_ssxa_websites-context-root/wcm/idc/groups/public/@global/@services/documents/download/mdaw/mtiy/~edisp/2008b_ct_dicomconformancestatement-00073795.pdf
 	for( unsigned short i = 0x0; i <= 0x02FF; i++ ) {
-		dictionary[DcmTag( 0x6000, i )] = util::PropertyMap::PropPath("DICOM overlay info") / boost::lexical_cast<util::istring>(i);//TODO should be hex
+		char buff[7];
+		std::snprintf(buff,7,"0x%.4X",i);
+		dictionary[DcmTag( 0x6000, i )] = util::PropertyMap::PropPath("DICOM overlay info") / util::PropertyMap::PropPath(buff);
 	}
 	dictionary[DcmTag( 0x6000, 0x3000 )] = util::PropertyMap::PropPath("DICOM overlay data");
 	

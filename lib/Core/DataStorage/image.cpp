@@ -345,7 +345,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	int oneCnt = 0;
 
 	for( const util::PropertyMap::key_type & ref :  vectors ) {
-		const optional< util::fvector3& > found=refValueAs<util::fvector3>( ref );
+		const optional< util::fvector3& > found=queryValueAs<util::fvector3>( ref );
 		if ( found ) {
 			util::fvector3 &vec = found.get();
 
@@ -373,7 +373,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	}
 
 	// check voxelsize
-	util::fvector3 &voxeSize = refValueAs<util::fvector3>( "voxelSize" ).get();
+	util::fvector3 &voxeSize = refValueAs<util::fvector3>( "voxelSize" );
 	for( int i = 0; i < 3; i++ ) {
 		if( voxeSize[i] == 0 || std::isinf( voxeSize[i] ) ) {
 			LOG( Runtime, warning ) << "voxelSize[" << i << "]=="  << voxeSize[i] << " is invalid, using 1";
@@ -397,7 +397,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
 
-			const optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
+			const optional< util::fvector3& > sliceVec = queryValueAs<util::fvector3>( "sliceVec" );
 
 			if ( sliceVec ) {
 				LOG_IF( ! distVecNorm.fuzzyEqual( *sliceVec ), Runtime, info )
@@ -418,7 +418,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 			if ( sliceDist > 0 ) {
 				static const float inf = -std::numeric_limits<float>::infinity();
 
-				util::fvector3 &voxelGap = refValueAsOr( "voxelGap", util::fvector3( 0, 0, inf ) ).get(); //if there is no voxelGap yet, we create it as (0,0,inf)
+				util::fvector3 &voxelGap = refValueAsOr( "voxelGap", util::fvector3( 0, 0, inf ) ); //if there is no voxelGap yet, we create it as (0,0,inf)
 
 				if ( voxelGap[2] != inf ) {
 					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 200 ), Runtime, warning )
@@ -435,7 +435,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	}
 
 	//if we have row- and column- vector
-	const optional< util::fvector3& > rrow = refValueAs<util::fvector3>( "rowVec" ),rcolumn = refValueAs<util::fvector3>( "columnVec" );
+	const optional< util::fvector3& > rrow = queryValueAs<util::fvector3>( "rowVec" ),rcolumn = queryValueAs<util::fvector3>( "columnVec" );
 	if(rrow && rcolumn){
 		const util::fvector3 &row=*rrow,&column=*rcolumn;
 		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
@@ -444,7 +444,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 											row[2] * column[0] - row[0] * column[2],
 											row[0] * column[1] - row[1] * column[0]
 										);
-		optional< util::fvector3& > sliceVec = refValueAs<util::fvector3>( "sliceVec" );
+		optional< util::fvector3& > sliceVec = queryValueAs<util::fvector3>( "sliceVec" );
 
 		if ( sliceVec ) {
 			LOG_IF( std::acos( crossVec.dot( *sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
@@ -463,7 +463,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	}
 
 
-	optional< util::fvector3 & > storedFoV = refValueAs<util::fvector3>( "fov" );
+	optional< util::fvector3 & > storedFoV = queryValueAs<util::fvector3>( "fov" );
 
 	if ( storedFoV ) {
 		const util::fvector3 calcFoV = getFoV();

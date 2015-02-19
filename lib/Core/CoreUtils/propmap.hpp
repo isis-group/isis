@@ -229,7 +229,7 @@ protected:
 			}
 		}
 	};
-	template<typename T> optional<T &> refValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
+	template<typename T> optional<T &> queryValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
 		const optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
 
 		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
@@ -698,8 +698,23 @@ public:
 	 * \param at the index of the value to reference
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAs( const PropPath &path, size_t at ) {
-		return refValueAsImpl<T>(path, optional<size_t>(at) );
+	template<typename T> optional<T &> queryValueAs( const PropPath &path, size_t at ) {
+		return queryValueAsImpl<T>(path, optional<size_t>(at) );
+	}
+	/**
+	 * Get a valid reference to the stored value in a given type at a given index.
+	 * This tries to access a property's stored value as reference.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * If the property does not exist (or is empty) an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * \param path the path to the property
+	 * \param at the index of the value to reference
+	 * \returns T& referencing the requested value
+	 */
+	template<typename T> T& refValueAs( const PropPath &path, size_t at ) {
+		const optional<T &> query=queryValueAs<T>(path,at);
+		LOG_IF(!query,Runtime,error) << "Referencing unavailable value " << MSubject( path ) << " this will probably crash";
+		return query.get();
 	}
 	/**
 	 * Get a valid reference to the stored single value in a given type.
@@ -711,9 +726,25 @@ public:
 	 * \param path the path to the property
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAs( const PropPath &path) {
-		return refValueAsImpl<T>(path, optional<size_t>() );
+	template<typename T> optional<T &> queryValueAs( const PropPath &path) {
+		return queryValueAsImpl<T>(path, optional<size_t>() );
 	}
+	/**
+	 * Get a valid reference to the stored single value in a given type.
+	 * This tries to access a property's stored value as reference.
+	 * \note This is a single value operation. So warning is send to Debug, if accessing a multivalue property.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * If the property does not exist (or is empty) an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * \param path the path to the property
+	 * \returns T& referencing the requested value
+	 */
+	template<typename T> T& refValueAs( const PropPath &path) {
+		const optional<T &> query=queryValueAs<T>(path);
+		LOG_IF(!query,Runtime,error) << "Referencing unavailable value " << MSubject( path ) << " this will probably crash";
+		return query.get();
+	}
+	
 	/**
 	 * Get a valid reference to the stored value in a given type.
 	 * This tries to access a property's first stored value as reference.
@@ -724,18 +755,16 @@ public:
 	 * \param def the default value to be used when creating the property
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAsOr( const PropPath &path, const T &def ) {
-		optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
-
-		if( !fetched ) return optional<T &>(); // return "false" in case of a failure
+	template<typename T> T& refValueAsOr( const PropPath &path, const T &def )  {
+		const optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
+		if(!fetched)
+			throw std::invalid_argument(path.toString()+" is not available");
 
 		if( fetched->isEmpty() ) { // we just created one, so set its value to def
 			*fetched = def;
 		} else if( !fetched->is<T>() ) { // apparently it already has a value so lets try use that
 			if( !transform<T>( path, path ) ) {
-				LOG( Runtime, warning ) << "Transforming Property " << path << " from " << util::MSubject( fetched->getTypeName() ) << " to "
-										<< util::MSubject( util::Value<T>::staticName() ) << " failed";
-				return optional<T &>();
+				throw std::logic_error(fetched->toString(true)+" cannot be transformed to "+util::Value<T>::staticName() );
 			}
 		}
 

@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE( prop_value_ref_test )
 	map.setValueAs( "Test1", util::fvector3( 1, 2, 3 ) );
 	BOOST_CHECK_EQUAL( map.property( "Test1" ), util::fvector3( 1, 2, 3 ) );
 
-	BOOST_CHECK( map.refValueAs<util::fvector3>( "Test1" ) ); //should be available as fvector3
+	BOOST_CHECK( map.queryValueAs<util::fvector3>( "Test1" ) ); //should be available as fvector3
 
 	optional< util::fvector4 & > vec4 = map.refValueAs<util::fvector4>( "Test1" );
 	BOOST_CHECK( vec4 ); //should be available as fvector4 (conversion available)

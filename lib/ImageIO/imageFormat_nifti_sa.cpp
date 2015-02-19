@@ -237,8 +237,8 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions fli
 	const float vsize = image.getValueAs<util::fvector3>( "voxelSize" )[flipdim] +
 						image.getValueAsOr<util::fvector3>( "voxelGap", util::fvector3(0,0,0) )[flipdim];
 	const float middle_to_middle = ( image.getSizeAsVector()[flipdim] - 1 ) * vsize; // the distance from the middle of the current first voxel to the "going to be first"
-	util::fvector3 &vec = *image.refValueAs<util::fvector3>( names[flipdim] );
-	util::fvector3 &origin = *image.refValueAs<util::fvector3>( "indexOrigin" );
+	util::fvector3 &vec = image.refValueAs<util::fvector3>( names[flipdim] );
+	util::fvector3 &origin = image.refValueAs<util::fvector3>( "indexOrigin" );
 	origin += vec * middle_to_middle; // move the origin along the repective edge to "the other end"
 	LOG( Debug, verbose_info ) << "moved indexOrigin along " << vec *middle_to_middle << " to " << origin;
 	vec *= -1; // and invert that vector
@@ -560,8 +560,8 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 	}
 
 	// set space unit factors
-	*props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
-	*props.refValueAs<util::fvector3>( "indexOrigin" ) *= size_fac;
+	props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
+	props.refValueAs<util::fvector3>( "indexOrigin" ) *= size_fac;
 
 	// Tr
 	if( head->pixdim[4] != 0 ) // if pixdim is given for the 4th dim, assume its repetitionTime
