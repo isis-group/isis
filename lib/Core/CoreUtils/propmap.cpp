@@ -262,16 +262,16 @@ const PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )c
 
 PropertyValue &PropertyMap::touchProperty( const PropertyMap::PropPath &path )
 {
-	return *tryFetchEntry<PropertyValue>( path );
+	return tryFetchEntry<PropertyValue>( path ).get();
 }
 
 const PropertyMap &PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
-	return *tryFindEntry<PropertyMap>( path );
+	return tryFindEntry<PropertyMap>( path ).get();
 }
 PropertyMap &PropertyMap::branch( const PropPath &path )
 {
-	return *tryFetchEntry<PropertyMap>( path );
+	return tryFetchEntry<PropertyMap>( path ).get();
 }
 
 bool PropertyMap::remove( const PropPath &path )
