@@ -20,6 +20,7 @@
 #include "../CoreUtils/vector.hpp"
 #include "../CoreUtils/property.hpp"
 #include <boost/token_iterator.hpp>
+#include <boost/optional/optional_io.hpp>
 
 #define _USE_MATH_DEFINES 1
 #include <math.h>

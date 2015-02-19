@@ -63,6 +63,7 @@ template<typename OPERATOR,bool modifying,bool enable> struct type_op
  */
 template<typename OPERATOR,bool modifying> struct type_op<OPERATOR,modifying,true>
 {
+    virtual ~type_op(){}
 	typedef typename std::conditional<modifying,util::Value<typename OPERATOR::first_argument_type>,const util::Value<typename OPERATOR::first_argument_type> >::type lhs;
 	typedef typename util::Value<typename OPERATOR::second_argument_type> rhs;
 	typedef typename OPERATOR::result_type result_type;

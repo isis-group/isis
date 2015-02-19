@@ -165,7 +165,6 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 	static const boost::posix_time::millisec dist( max_age );
 	
 	// terminal color codes
-	const char reset_code[]= "\033[0m";
 	const char red_code[]="\x1B[31m";
 	const char yellow_code[]="\x1B[33m";
 	const char green_code[]="\x1B[32m";
@@ -197,7 +196,7 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 		);
 #else
 		fprintf(stderr,"%s:%s[%s]%s\n",
-				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_object,mesg.merge().c_str()
+				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_object.c_str(),mesg.merge(color_code).c_str()
 		);
 #endif //NDEBUG
 	} else {
