@@ -33,6 +33,7 @@ namespace util
  * Use this to mark the a volatile part of a logging message.
  * eg. \code LOG(Debug,info) << "Loading File " << MSubject(filename); \endcode
  * This will then be ignored when looking for repeating log-messages or can be used for text highlighting.
+ * \note anything which is no string literal will aumatically used wrapped as Subject. Use NoSubject to prevent this.
  */
 class MSubject : public std::string
 {
@@ -43,6 +44,24 @@ public:
 		assign( text.str() );
 	}
 	MSubject( const boost::filesystem::path &cont ) {
+		std::ostringstream text;
+		text << cont.native();
+		assign( text.str() );
+	}
+};
+/**
+ * Wrapper to explicitely mark something as non-"Subject" in a logging message.
+ * See MSubject for the opposite.
+ */
+class NoSubject : public std::string
+{
+public:
+	template<typename T> NoSubject( const T &cont ) {
+		std::ostringstream text;
+		text << cont;
+		assign( text.str() );
+	}
+	NoSubject( const boost::filesystem::path &cont ) {
 		std::ostringstream text;
 		text << cont.native();
 		assign( text.str() );
@@ -95,13 +114,17 @@ public:
 	~Message();
 	std::string merge(const std::string color_code)const;
 	std::string strTime()const;
-	template<typename T> Message &operator << (const T& val ) {
-		*( ( std::ostringstream * )this ) << val;
+	template<size_t SIZE> Message &operator << ( const char (&str)[SIZE] ) { //send string literals as text
+		*( ( std::ostringstream * )this ) << str;
 		return *this;
 	}
-	Message &operator << ( const MSubject &subj ) {
-		m_subjects.push_back( subj );
+	template<typename T> Message &operator << (const T& val ) { // for everything else default to MSubject
+		m_subjects.push_back( MSubject( val ) );
 		*( ( std::ostringstream * )this ) << "{s}";
+		return *this;
+	}
+	Message &operator << (const NoSubject& subj ) { // explicitly not a subject
+		*( ( std::ostringstream * )this ) << subj;
 		return *this;
 	}
 	bool shouldCommit()const;

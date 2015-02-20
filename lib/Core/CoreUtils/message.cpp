@@ -121,8 +121,8 @@ Message::~Message()
 std::string Message::merge(const std::string color_code)const
 {
 	const std::string reset_code(color_code.empty()? "":"\033[0m");
-	const std::string s_prefix(color_code.empty()? std::string("\""):reset_code);
-	const std::string s_suffix(color_code.empty()? std::string("\""):color_code);
+	const std::string s_prefix(color_code.empty()? "\"":"\x1B[1m");
+	const std::string s_suffix(color_code.empty()? std::string("\""):reset_code+color_code);
 	
 	std::string ret( str() );
 	size_t found = std::string::npos;
@@ -180,6 +180,7 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 	const char red_code[]="\x1B[31m";
 	const char yellow_code[]="\x1B[33m";
 	const char green_code[]="\x1B[32m";
+	const char white_code[]="\x1B[37m";
 	const char norm_code[]="\x1B[0m";
 	
 	if(!is_no_term && cur_term && max_colors>=8)
@@ -187,6 +188,7 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 			case error:color_code=red_code;
 			case warning:color_code=yellow_code;break;
 			case notice:color_code=green_code;break;
+			case info:color_code=white_code;break;
 			default:color_code=norm_code;break;
 		}
 #endif //HAVE_CURSES
