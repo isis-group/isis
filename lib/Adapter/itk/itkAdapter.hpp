@@ -31,9 +31,8 @@
 #include "DataStorage/numeric_convert.hpp"
 
 //external includes
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/foreach.hpp>
 
 //itk includes
 #include <itkImage.h>
@@ -86,15 +85,15 @@ public:
 
 protected:
 	//should not be loaded directly
-	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
+	itkAdapter( const std::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
 	itkAdapter( const itkAdapter & ) {};
 
 private:
 
-	boost::shared_ptr<data::Image> m_ImageISIS;
+	std::shared_ptr<data::Image> m_ImageISIS;
 	//  data::Image m_ImageISIS;
 	unsigned short m_TypeID;
-	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropertyMapVector;
+	std::vector< std::shared_ptr<util::PropertyMap> > m_ChunkPropertyMapVector;
 	util::PropertyMap m_ImagePropertyMap;
 	size_t m_RelevantDim;
 

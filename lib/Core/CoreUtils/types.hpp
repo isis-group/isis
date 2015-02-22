@@ -2,14 +2,7 @@
 #define TYPES_HPP_INCLUDED
 
 #include <boost/mpl/vector/vector30.hpp>
-#include <boost/mpl/distance.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/find.hpp>
 #include <boost/mpl/contains.hpp>
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -51,23 +44,6 @@ bool //1
 , boost::posix_time::time_duration, boost::gregorian::date_duration //29
 > types;
 
-/**
- * Templated pseudo struct to generate the ID of a supported type.
- * The ID is stored in TypeID\<T\>::value.
- * The ID is the position of the type in the mpl::vector types, starting with 1 (so there is no ID==0)
- * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
- */
-template<class T> struct TypeID {
-	typedef boost::mpl::plus <
-	boost::mpl::int_<1>,
-		  typename boost::mpl::distance <
-		  boost::mpl::begin<types>::type,
-		  typename boost::mpl::find<types, T>::type
-		  >::type
-		  > type;
-	static const unsigned short value = type::value;
-};
-
 template<bool ENABLED> struct ordered{
 	static const bool lt=ENABLED,gt=ENABLED;
 };
@@ -107,7 +83,7 @@ template< typename T > struct checkType {
  * - \c \b negate negation is applicable
  */
 template<typename T> struct has_op:
-	_internal::ordered<boost::mpl::and_<boost::mpl::not_<boost::is_base_of<_internal::VectorClass,T> >, knowType<T> >::value>, //vectors are not ordered
+	_internal::ordered<!std::is_base_of<_internal::VectorClass,T>::value && knowType<T>::value>, //vectors are not ordered
 	_internal::additive<knowType<T>::value>,
 	_internal::multiplicative<knowType<T>::value>
 	{};
@@ -134,7 +110,7 @@ template<typename T> struct has_op<std::complex<T> >:_internal::ordered<false>,_
  * \note the list is generated at runtime, so doing this excessively will be expensive.
  * \param withValues include util::Value-s in the map
  * \param withValueArrays include data::ValueArray-s in the map
- * \returns a map, mapping util::Value::staticID and data::ValueArray::staticID to util::Value::staticName and data::ValueArray::staticName
+ * \returns a map, mapping util::Value::staticID() and data::ValueArray::staticID() to util::Value::staticName and data::ValueArray::staticName
  */
 std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValueArrays = true );
 
@@ -143,7 +119,7 @@ std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool w
  * \note the list is generated at runtime, so doing this excessively will be expensive.
  * \param withValues include util::Value-s in the map
  * \param withValueArrays include data::ValueArray-s in the map
- * \returns a map, mapping util::Value::staticName and data::ValueArray::staticName to util::Value::staticID and data::ValueArray::staticID
+ * \returns a map, mapping util::Value::staticName and data::ValueArray::staticName to util::Value::staticID() and data::ValueArray::staticID()
  */
 std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValueArrays = true );
 }

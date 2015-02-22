@@ -23,7 +23,7 @@
 #include <numeric>
 #include <cmath>
 
-#include <boost/mpl/and.hpp>
+#include <type_traits>
 
 namespace isis
 {
@@ -328,9 +328,10 @@ typedef vector4<int32_t> ivector4;
 API_EXCLUDE_BEGIN;
 /// @cond _internal
 namespace _internal {
-	using boost::mpl::and_;
-	using boost::is_base_of;
-	template<typename VEC1,typename VEC2> struct valid_vecs : and_<is_base_of<VectorClass,VEC1>,is_base_of<VectorClass,VEC2> >{};
+	template<typename VEC1,typename VEC2> struct valid_vecs : std::integral_constant<bool,
+		std::is_base_of<VectorClass,VEC1>::value && 
+		std::is_base_of<VectorClass,VEC2>::value 
+	>{};
 	template<typename OP,typename VEC1,typename VEC2> VEC1& binary_vec_op ( VEC1& rhs,const VEC2 &lhs ){
 		std::transform( rhs.begin(), rhs.end(), lhs.begin(), rhs.begin(), OP() );
 		return rhs;
@@ -350,15 +351,15 @@ template<typename TYPE, size_t SIZE, typename CONTAINER >
 
 
 
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator+=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::plus<typename VEC1::value_type> >(rhs,lhs);}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator-=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::minus<typename VEC1::value_type> >(rhs,lhs);}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator*=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::multiplies<typename VEC1::value_type> >(rhs,lhs);}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type &operator/=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::divides<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type &operator+=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::plus<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type &operator-=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::minus<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type &operator*=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::multiplies<typename VEC1::value_type> >(rhs,lhs);}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type &operator/=( VEC1& rhs,const VEC2 &lhs ) {return isis::util::_internal::binary_vec_op<std::divides<typename VEC1::value_type> >(rhs,lhs);}
 
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator+( VEC1 rhs,const VEC2 &lhs ) {return rhs+=lhs;}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator-( VEC1 rhs,const VEC2 &lhs ) {return rhs-=lhs;}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator*( VEC1 rhs,const VEC2 &lhs ) {return rhs*=lhs;}
-template<typename VEC1, typename VEC2> typename boost::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>, VEC1>::type operator/( VEC1 rhs,const VEC2 &lhs ) {return rhs/=lhs;}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type operator+( VEC1 rhs,const VEC2 &lhs ) {return rhs+=lhs;}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type operator-( VEC1 rhs,const VEC2 &lhs ) {return rhs-=lhs;}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type operator*( VEC1 rhs,const VEC2 &lhs ) {return rhs*=lhs;}
+template<typename VEC1, typename VEC2> typename std::enable_if<isis::util::_internal::valid_vecs<VEC1,VEC2>::value, VEC1>::type operator/( VEC1 rhs,const VEC2 &lhs ) {return rhs/=lhs;}
 
 /// Streaming output for FixedVector
 namespace std

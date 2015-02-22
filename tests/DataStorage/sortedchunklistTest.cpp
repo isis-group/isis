@@ -3,7 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/foreach.hpp>
+
 #include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 

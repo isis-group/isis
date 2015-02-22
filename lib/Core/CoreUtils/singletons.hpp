@@ -66,7 +66,7 @@ public:
 
 		return *Singleton<T>::_instance;
 	}
-	template<typename T, typename P1, int PRIO> static T &get(P1 p1) {
+	template<typename T, int PRIO, typename P1> static T &get(P1 p1) {
 		if ( !Singleton<T>::_instance ) {
 			Singleton<T>::_instance = new T(p1);
 			prioMap &map = getMaster().map;

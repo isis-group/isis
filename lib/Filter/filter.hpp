@@ -40,8 +40,8 @@ namespace _internal
 class FilterBase
 {
 public:
-	void setProgressFeedback( boost::shared_ptr< util::ProgressFeedback > pfb ) { m_progressfeedback = pfb; }
-	boost::shared_ptr< util::ProgressFeedback > getProgressFeedback() const  { return m_progressfeedback; }
+	void setProgressFeedback( std::shared_ptr< util::ProgressFeedback > pfb ) { m_progressfeedback = pfb; }
+	std::shared_ptr< util::ProgressFeedback > getProgressFeedback() const  { return m_progressfeedback; }
 
 	//pure virtual
 	virtual bool isValid() const = 0;
@@ -70,10 +70,10 @@ protected:
 	util::ParameterMap parameters;
 	util::ParameterMap results;
 
-	boost::shared_ptr< util::ProgressFeedback > m_progressfeedback;
+	std::shared_ptr< util::ProgressFeedback > m_progressfeedback;
 
-	std::map< std::string, boost::shared_ptr<data::Image> > m_additionalImages;
-	std::map< std::string, boost::shared_ptr<data::Chunk> > m_additionalChunks;
+	std::map< std::string, std::shared_ptr<data::Image> > m_additionalImages;
+	std::map< std::string, std::shared_ptr<data::Chunk> > m_additionalChunks;
 
 };
 
@@ -125,7 +125,7 @@ public:
 	TYPE getOutput() const { return *output; }
 protected:
 	OutputFilterBase() {};
-	boost::shared_ptr<TYPE> output;
+	std::shared_ptr<TYPE> output;
 
 };
 

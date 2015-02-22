@@ -16,12 +16,10 @@
 #include "chunk.hpp"
 
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
-#include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/type_traits/remove_const.hpp>
 #include <boost/shared_array.hpp>
 #include <stack>
 #include <boost/none.hpp>
@@ -57,7 +55,7 @@ protected:
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
 	//we have to use the non-const here, otherwise the iterator would not be convertible into const_iterator
-	boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> chunks;
+	boost::shared_array<typename std::remove_const<CHUNK_TYPE>::type *> chunks;
 
 	size_t ch_idx, ch_cnt;
 	inner_iterator current_it;
@@ -75,7 +73,7 @@ protected:
 public:
 
 	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
-	ImageIteratorTemplate ( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ) :
+	ImageIteratorTemplate ( const ImageIteratorTemplate<typename std::remove_const<CHUNK_TYPE>::type > &src ) :
 		chunks ( src.chunks ), ch_idx ( src.ch_idx ), ch_cnt( src.ch_cnt ),
 		current_it ( src.current_it ),
 		ch_len ( src.ch_len )
@@ -86,7 +84,7 @@ public:
 
 
 	// normal conytructor
-	explicit ImageIteratorTemplate ( boost::shared_array<typename boost::remove_const<CHUNK_TYPE>::type *> &_chunks, size_t _ch_cnt ) :
+	explicit ImageIteratorTemplate ( boost::shared_array<typename std::remove_const<CHUNK_TYPE>::type *> &_chunks, size_t _ch_cnt ) :
 		chunks ( _chunks ), ch_idx ( 0 ), ch_cnt( _ch_cnt ),
 		current_it ( chunks[0]->begin() ),
 		ch_len ( std::distance ( current_it, const_cast<CHUNK_TYPE *>( chunks[0] )->end() ) )
@@ -183,10 +181,10 @@ public:
 
 		if ( my_ch_idx >= ch_cnt )
 			throw std::out_of_range(
-				std::string( "Image voxel index " ) + boost::lexical_cast<std::string>( ch_idx * ch_len + currentDist() ) + "+"
-				+ boost::lexical_cast<std::string>( n - currentDist() )
-				+ " out of range 0.." + boost::lexical_cast<std::string>( ch_cnt ) + "*"
-				+ boost::lexical_cast<std::string>( ch_len ) + "-1"
+				std::string( "Image voxel index " ) + std::to_string( ch_idx * ch_len + currentDist() ) + "+"
+				+ std::to_string( n - currentDist() )
+				+ " out of range 0.." + std::to_string( ch_cnt ) + "*"
+				+ std::to_string( ch_len ) + "-1"
 			);
 
 		return  *( chunks[my_ch_idx]->begin() + n % ch_len );
@@ -229,7 +227,7 @@ public:
 	static const char *neededProperties;
 protected:
 	_internal::SortedChunkList set;
-	std::vector<boost::shared_ptr<Chunk> > lookup;
+	std::vector<std::shared_ptr<Chunk> > lookup;
 private:
 	size_t chunkVolume;
 
@@ -240,7 +238,7 @@ private:
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
-	const boost::shared_ptr<Chunk> &chunkPtrAt ( size_t at ) const;
+	const std::shared_ptr<Chunk> &chunkPtrAt ( size_t at ) const;
 
 	/**
 	 * Computes chunk- and voxel- indices.
@@ -435,7 +433,7 @@ public:
 	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
 	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
 	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
-	 * \returns a number which is equal to the ValueArray::staticID of the selected type.
+	 * \returns a number which is equal to the ValueArray::staticID() of the selected type.
 	 */
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
@@ -496,7 +494,7 @@ public:
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
-		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID() ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -512,7 +510,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
 		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType ( ValueArray<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType ( ValueArray<TYPE>::staticID(), scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -563,8 +561,8 @@ public:
 		std::list<T> ret;
 
 		if( clean ) {
-			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				const optional< const util::PropertyValue& > prop = boost::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
+				const optional< const util::PropertyValue& > prop = std::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
 
 				if(unique){ // if unique
 					if( ( prop && !ret.empty() &&  *prop == ret.back() ) || // if there is prop, skip if its equal
@@ -662,11 +660,11 @@ public:
 	template<typename T> void copyToMem ( T *dst, size_t len,  scaling_pair scaling = scaling_pair() ) const {
 		if ( clean ) {
 			if ( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
-				scaling = getScalingTo ( ValueArray<T>::staticID );
+				scaling = getScalingTo ( ValueArray<T>::staticID() );
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
-			BOOST_FOREACH ( const boost::shared_ptr<Chunk> &ref, lookup ) {
+			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
@@ -787,7 +785,7 @@ public:
 			}
 		};
 		_proxy prx ( op );
-		return convertToType ( data::ValueArray<TYPE>::staticID ) && foreachChunk ( prx, false );
+		return convertToType ( data::ValueArray<TYPE>::staticID() ) && foreachChunk ( prx, false );
 	}
 
 	/// \returns the number of rows of the image
@@ -810,7 +808,7 @@ public:
 	 * - sequenceStart if available
 	 * \param withpath add the common path of all sources to the identifying string
 	 */
-	std::string identify( bool withpath = true )const;
+	std::string identify( bool withpath = true, bool withdate=true )const;
 };
 
 /**
@@ -829,7 +827,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage ( const Image &src ) : Image ( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		convertToType ( ValueArray<T>::staticID );
+		convertToType ( ValueArray<T>::staticID() );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator= ( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -839,7 +837,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator= ( ref );
-		convertToType ( ValueArray<T>::staticID );
+		convertToType ( ValueArray<T>::staticID() );
 		return *this;
 	}
 	void copyToMem ( void *dst ) {
@@ -906,15 +904,15 @@ public:
 	MemImage &operator= ( const Image &ref ) { // copy the image, and make sure its of the given type
 
 		Image::operator= ( ref ); // ok we just copied the whole image
-
+		
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			std::pair<util::ValueReference, util::ValueReference> scale;
-			boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
+			std::shared_ptr<Chunk> operator() ( const std::shared_ptr< Chunk >& ptr ) {
+				return std::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID );
+		conv_op.scale = ref.getScalingTo ( ValueArray<T>::staticID() );
 		LOG ( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform ( conv_op );

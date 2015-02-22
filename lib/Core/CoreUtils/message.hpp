@@ -17,10 +17,9 @@
 #include <string>
 #include <ctime>
 #include <list>
-#include <iostream>
-#define BOOST_FILESYSTEM_VERSION 3 
+#include <stdio.h>
+
 #include <boost/filesystem/path.hpp>
-#include <boost/weak_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace isis
@@ -34,6 +33,7 @@ namespace util
  * Use this to mark the a volatile part of a logging message.
  * eg. \code LOG(Debug,info) << "Loading File " << MSubject(filename); \endcode
  * This will then be ignored when looking for repeating log-messages or can be used for text highlighting.
+ * \note anything which is no string literal will aumatically used wrapped as Subject. Use NoSubject to prevent this.
  */
 class MSubject : public std::string
 {
@@ -41,6 +41,29 @@ public:
 	template<typename T> MSubject( const T &cont ) {
 		std::ostringstream text;
 		text << cont;
+		assign( text.str() );
+	}
+	MSubject( const boost::filesystem::path &cont ) {
+		std::ostringstream text;
+		text << cont.native();
+		assign( text.str() );
+	}
+};
+/**
+ * Wrapper to explicitely mark something as non-"Subject" in a logging message.
+ * See MSubject for the opposite.
+ */
+class NoSubject : public std::string
+{
+public:
+	template<typename T> NoSubject( const T &cont ) {
+		std::ostringstream text;
+		text << cont;
+		assign( text.str() );
+	}
+	NoSubject( const boost::filesystem::path &cont ) {
+		std::ostringstream text;
+		text << cont.native();
 		assign( text.str() );
 	}
 };
@@ -78,7 +101,7 @@ public:
 
 class Message: public std::ostringstream
 {
-	boost::weak_ptr<MessageHandlerBase> commitTo;
+	std::weak_ptr<MessageHandlerBase> commitTo;
 public:
 	std::string m_object, m_module;
 	boost::filesystem::path m_file;
@@ -86,18 +109,22 @@ public:
 	boost::posix_time::ptime m_timeStamp;
 	int m_line;
 	LogLevel m_level;
-	Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo );
+	Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo );
 	Message( const Message &src );
 	~Message();
-	std::string merge()const;
+	std::string merge(const std::string color_code)const;
 	std::string strTime()const;
-	template<typename T> Message &operator << (const T& val ) {
-		*( ( std::ostringstream * )this ) << val;
+	template<size_t SIZE> Message &operator << ( const char (&str)[SIZE] ) { //send string literals as text
+		*( ( std::ostringstream * )this ) << str;
 		return *this;
 	}
-	Message &operator << ( const MSubject &subj ) {
-		m_subjects.push_back( subj );
+	template<typename T> Message &operator << (const T& val ) { // for everything else default to MSubject
+		m_subjects.push_back( MSubject( val ) );
 		*( ( std::ostringstream * )this ) << "{s}";
+		return *this;
+	}
+	Message &operator << (const NoSubject& subj ) { // explicitly not a subject
+		*( ( std::ostringstream * )this ) << subj;
 		return *this;
 	}
 	bool shouldCommit()const;
@@ -111,16 +138,21 @@ public:
  */
 class DefaultMsgPrint : public MessageHandlerBase
 {
+	bool istty;
 protected:
-	static std::ostream *o;
+#ifdef NDEBUG
 	static const int max_age = 500;
+#else
+	static const int max_age = 0;
+#endif
 	std::list<std::pair<boost::posix_time::ptime, std::string> > last;
 
 public:
-	DefaultMsgPrint( LogLevel level ): MessageHandlerBase( level ) {}
+	DefaultMsgPrint( LogLevel level );
 	virtual ~DefaultMsgPrint() {}
 	void commit( const Message &mesg );
-	static void setStream( std::ostream &_o );
+	void commit_tty(const Message &mesg);
+	void commit_pipe(const Message &mesg);
 };
 
 }

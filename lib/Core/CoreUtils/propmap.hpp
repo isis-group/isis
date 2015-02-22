@@ -26,7 +26,7 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/optional.hpp>
-#include <boost/typeof/typeof.hpp>
+#include <boost/optional/optional_io.hpp>
 
 using boost::optional;
 
@@ -42,6 +42,10 @@ struct JoinTreeVisitor;
 struct SwapVisitor;
 struct FlatMapMaker;
 struct TreeInvalidCheck;
+
+template<typename T> T &un_shared_ptr(T &p){return p;}
+template<typename T> T &un_shared_ptr(std::shared_ptr<T> &p){return *p;}
+
 }
 /// @endcond 
 /**
@@ -84,6 +88,7 @@ public:
 		bool operator==( const key_type &s )const {return *this == PropPath( s );}
 		bool operator!=( const key_type &s )const {return *this != PropPath( s );}
 		size_t length()const;
+		std::string toString()const;
 	};
 
 	///a list to store keys only (without the corresponding values)
@@ -107,7 +112,8 @@ API_EXCLUDE_BEGIN;
 	struct TrueP { bool operator()( const PropertyValue &ref )const;};
 	/// true when the Property is needed and empty
 	struct InvalidP { bool operator()( const PropertyValue &ref )const;};
-
+	struct EmptyP { bool operator()( const PropertyValue &ref )const;};
+	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -127,29 +133,39 @@ API_EXCLUDE_BEGIN;
 	template<typename ITER> struct Splicer: public boost::static_visitor<void> {
 		const ITER &first, &last;
 		const PropPath &name;
-		Splicer( const ITER &_first, const ITER &_last, const PropPath &_name ): first( _first ), last( _last ), name( _name ) {}
-		void operator()( const container_type::value_type &pair )const {
-			boost::apply_visitor( Splicer<ITER>( first, last, name / pair.first ), pair.second );
-		}
-		void operator()( PropertyValue val )const {
-			const size_t blocks = std::distance( first, last );
+		const bool lists_only;
+		const size_t blocks;
+		Splicer( const ITER &_first, const ITER &_last, const PropPath &_name, bool _lists_only ): 
+			first( _first ), last( _last ), name( _name ),lists_only(_lists_only), blocks(std::distance( first, last )) 
+		{
 			assert( blocks );
-
+		}
+		void operator()( container_type::value_type &pair )const {
+			boost::apply_visitor( Splicer<ITER>( first, last, name / pair.first, lists_only ), pair.second );
+		}
+		void operator()( PropertyValue &val )const {
+			if(val.isEmpty())return; // abort if there is nothing to splice
+			else if(lists_only && val.size() <= 1)return;  //abort if we dont want do move scalars
+			
 			if( val.size() % blocks ) { // just copy all which cannot be properly spliced to the destination
 				LOG_IF( val.size() > 1, Runtime, warning ) << "Not splicing non scalar property " << MSubject( name ) << " because its length "
-						<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
-
+				<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
+			
 				for( ITER i = first; i != last; i++ )
-					i->property( name ) = val;
+					_internal::un_shared_ptr(*i).touchProperty( name ) = val;
+				val=PropertyValue();//and clear the source
 			} else {
+				LOG_IF( val.size() > 1, Debug, info ) << "Splicing non scalar property " << MSubject( name ) << " into " << blocks << " chunks";
 				ITER i = first;
-				BOOST_FOREACH( const PropertyValue & splint, val.splice( val.size() / blocks ) ) {
+				for( const PropertyValue & splint :  val.splice( val.size() / blocks ) ) {
 					assert( i != last );
-					( i++ )->property( name ) = splint;
+					_internal::un_shared_ptr(*i).touchProperty( name ) = splint;
+					i++;
 				}
 			}
+			assert(val.isEmpty());
 		}
-		void operator()( const PropertyMap &sub )const { //call my own recursion for each element
+		void operator()( PropertyMap &sub )const { //call my own recursion for each element
 			std::for_each( sub.container.begin(), sub.container.end(), *this );
 		}
 	};
@@ -159,6 +175,14 @@ API_EXCLUDE_BEGIN;
 			return operand.isEmpty();
 		}
 	};
+	template<typename T> PathSet getLocal()const{
+		PathSet ret;
+		for(const container_type::value_type &v:container){
+			if(v.second.type()==typeid(T))
+				ret.insert(v.first);
+		}
+		return ret;
+	}
 API_EXCLUDE_END;
 /// @endcond _internal
 
@@ -177,7 +201,7 @@ API_EXCLUDE_END;
 	{
 		propPathIterator next = at;
 		next++;
-		BOOST_AUTO(found, root.find( *at ));
+		auto found =root.find( *at );
 
 		if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 			if ( found != root.end() ) {//and we found the entry
@@ -201,12 +225,12 @@ protected:
 			assign( buff.begin(), buff.end() );
 		}
 		void applyTo( PropertyMap &props ) {
-			BOOST_FOREACH( const PropPath & ref, *this ) {
+			for( const PropPath & ref :  *this ) {
 				props.addNeeded( ref );
 			}
 		}
 	};
-	template<typename T> optional<T &> refValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
+	template<typename T> optional<T &> queryValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
 		const optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
 
 		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
@@ -222,7 +246,6 @@ protected:
 				found->at(*at).castTo<T>():
 				found->castTo<T>(); // use single value ops, if at was not given
 		}
-
 		return optional<T &>();
 	}
 	template<typename T> T getValueAsImpl( const PropPath &path, const optional<size_t> &at )const {
@@ -349,7 +372,7 @@ public:
 	 * \param path the path to the property
 	 * \returns a reference to the property
 	 */
-	PropertyValue &property( const PropPath &path );
+	PropertyValue &touchProperty( const PropPath &path );
 
 	/**
 	 * Access the branch referenced by the path, create it if its not there.
@@ -445,13 +468,16 @@ public:
 	 * \returns a flat list of the paths to all properties in the PropertyMap
 	 */
 	PathSet getKeys()const;
-
+	
+	PathSet getLocalProps()const;
+	PathSet getLocalBranches()const;
+	
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of the paths for all properties which are marked as needed and but are empty.
 	 */
 	PathSet getMissing()const;
-
+	
 	/**
 	 * Get a difference map of this tree and another.
 	 * Out of the names of differing properties a mapping from paths to std::pair\<PropertyValue,PropertyValue\> is created with following rules:
@@ -467,7 +493,7 @@ public:
 	 * \param second the other tree to compare with
 	 * \returns a map of property paths and pairs of the corresponding different values
 	 */
-	DiffMap getDifference( const PropertyMap &second )const;
+	DiffMap getDifference( const PropertyMap &other )const;
 
 	/**
 	 * Add Properties from another property map.
@@ -475,7 +501,7 @@ public:
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::PathSet join( const PropertyMap& other, bool overwrite = false );
+	PathSet join( const PropertyMap& other, bool overwrite = false );
 
 	/**
 	 * Transfer all Properties from another PropertyMap.
@@ -484,7 +510,7 @@ public:
 	 * \param overwrite if existing properties shall be replaced
 	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
 	 */
-	PropertyMap::PathSet transfer( PropertyMap& other, int overwrite = 0 ); //use int to prevent implicit conversion from static string (PropPath) to bool
+	PathSet transfer( PropertyMap& other, int overwrite = 0 ); //use int to prevent implicit conversion from static string (PropPath) to bool
 
 	/**
 	 * Transfer a single entry / branch from another PropertyMap.
@@ -516,19 +542,30 @@ public:
 	 */
 	template<typename DST> bool transform( const PropPath &from, const PropPath &to) {
 		checkType<DST>();
-		return transform( from, to, Value<DST>::staticID);
+		return transform( from, to, Value<DST>::staticID());
 	}
 
 	/**
-	 * Copy-Splice this map into a list of other PropertyMaps.
+	 * Splice this map into a list of other PropertyMaps.
 	 * This will copy all scalar Properties equally into a list of destination maps represented by iterators.
 	 * Multi-Value Properties will be split up, if their length fits.
 	 * \param first start of the destination list
 	 * \param last end of the destination list
+	 * \param lists_only if only list should be spliced
 	 * \note dereferencing ITER must result in PropertyMap&
+	 * \note all empty properties will be removed afterwards (including needed properties)
 	 */
-	template<typename ITER> void splice( ITER first, ITER last )const {
-		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath() ) );
+	template<typename ITER> void splice( ITER first, ITER last, bool lists_only ){
+		const PathSet empty_before=genKeyList<EmptyP>();
+		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath(), lists_only) );
+		//some cleanup 
+		//delete all thats empty now, but wasn't back then (we shouldn't delete this that where empty before)
+		const PathSet empty_after=genKeyList<EmptyP>();
+		std::list<PropPath> deletes;
+		std::set_difference(empty_after.begin(),empty_after.end(),empty_before.begin(),empty_before.end(),std::back_inserter(deletes));
+		LOG_IF(!deletes.empty(),Debug,info) << "Properties " << MSubject(deletes) << " became empty while splicing, deleting them";
+		for(const PropPath &del:deletes)
+			remove(del);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -560,7 +597,7 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val ) {
-		PropertyValue &ret = property( path );
+		PropertyValue &ret = touchProperty( path );
 
 		if( ret.isEmpty() ) { // set an empty property
 			ret = val;
@@ -569,7 +606,7 @@ public:
 				ret.castTo<T>() = val;
 			} else {
 				if( ret[0].apply( val ) ) {
-					LOG( Debug, warning ) << "Storing " << MSubject( Value<T>( val ).toString( true ) ) << " as " << MSubject( ret.toString( true ) ) << " as old value was already stored in that type";
+					LOG( Debug, warning ) << "Storing " << MSubject( std::make_pair(path, Value<T>( val ).toString( true ) ) ) << " as " << MSubject( ret.toString( true ) ) << " as old value was already stored in that type";
 				} else {
 					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 				}
@@ -579,12 +616,13 @@ public:
 
 		return ret;
 	}
+	PropertyValue &setValueAs( const PropPath &path, const char *val );
 	/**
 	 * Set the given property to a given value/type at a specified index.
 	 * The needed flag (if set) will be kept.
 	 * The property will be set to the given value at the given index if
 	 * - the property is empty or
-	 * - the index is beyond property the amount of stored values (the list will be filled up to the index)
+	 * - the index is beyond the amount of stored values (the list will be filled up to the index)
 	 * - the property already stores a value of the same type at the given index (value will be overwritten)
 	 * - the property already stores a value at the given index and the new value can be converted to that type (value will be overwritten but type will be kept)
 	 * The property will not be set and an error will be send to Runtime if
@@ -599,7 +637,7 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val, size_t at ) {
-		PropertyValue &ret = property( path );
+		PropertyValue &ret = touchProperty( path );
 
 		if( ret.size() <= at ) {
 			LOG_IF(at, Debug, info ) << "Extending " << MSubject( std::make_pair( path, ret ) ) << " to fit length " << MSubject( at ); //dont tell about extending empty property
@@ -618,6 +656,7 @@ public:
 
 		return ret;
 	}
+	PropertyValue &setValueAs( const PropPath &path, const char *val, size_t at );
 
 	/**
 	 * Request a property value via the given key in the given type.
@@ -660,8 +699,23 @@ public:
 	 * \param at the index of the value to reference
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAs( const PropPath &path, size_t at ) {
-		return refValueAsImpl<T>(path, optional<size_t>(at) );
+	template<typename T> optional<T &> queryValueAs( const PropPath &path, size_t at ) {
+		return queryValueAsImpl<T>(path, optional<size_t>(at) );
+	}
+	/**
+	 * Get a valid reference to the stored value in a given type at a given index.
+	 * This tries to access a property's stored value as reference.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * If the property does not exist (or is empty) an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * \param path the path to the property
+	 * \param at the index of the value to reference
+	 * \returns T& referencing the requested value
+	 */
+	template<typename T> T& refValueAs( const PropPath &path, size_t at ) {
+		const optional<T &> query=queryValueAs<T>(path,at);
+		LOG_IF(!query,Runtime,error) << "Referencing unavailable value " << MSubject( path ) << " this will probably crash";
+		return query.get();
 	}
 	/**
 	 * Get a valid reference to the stored single value in a given type.
@@ -673,9 +727,25 @@ public:
 	 * \param path the path to the property
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAs( const PropPath &path) {
-		return refValueAsImpl<T>(path, optional<size_t>() );
+	template<typename T> optional<T &> queryValueAs( const PropPath &path) {
+		return queryValueAsImpl<T>(path, optional<size_t>() );
 	}
+	/**
+	 * Get a valid reference to the stored single value in a given type.
+	 * This tries to access a property's stored value as reference.
+	 * \note This is a single value operation. So warning is send to Debug, if accessing a multivalue property.
+	 * If the stored type is not T, a transformation is done in place.
+	 * If that fails, an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * If the property does not exist (or is empty) an error will be sent to runtime and the following behaviour is UNDEFINED.
+	 * \param path the path to the property
+	 * \returns T& referencing the requested value
+	 */
+	template<typename T> T& refValueAs( const PropPath &path) {
+		const optional<T &> query=queryValueAs<T>(path);
+		LOG_IF(!query,Runtime,error) << "Referencing unavailable value " << MSubject( path ) << " this will probably crash";
+		return query.get();
+	}
+	
 	/**
 	 * Get a valid reference to the stored value in a given type.
 	 * This tries to access a property's first stored value as reference.
@@ -686,18 +756,16 @@ public:
 	 * \param def the default value to be used when creating the property
 	 * \returns optional<T&> referencing the requested value or false
 	 */
-	template<typename T> optional<T &> refValueAsOr( const PropPath &path, const T &def ) {
-		optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
-
-		if( !fetched ) return optional<T &>(); // return "false" in case of a failure
+	template<typename T> T& refValueAsOr( const PropPath &path, const T &def )  {
+		const optional< PropertyValue & > fetched = tryFetchEntry<PropertyValue>( path );
+		if(!fetched)
+			throw std::invalid_argument(path.toString()+" is not available");
 
 		if( fetched->isEmpty() ) { // we just created one, so set its value to def
 			*fetched = def;
 		} else if( !fetched->is<T>() ) { // apparently it already has a value so lets try use that
 			if( !transform<T>( path, path ) ) {
-				LOG( Runtime, warning ) << "Transforming Property " << path << " from " << util::MSubject( fetched->getTypeName() ) << " to "
-										<< util::MSubject( util::Value<T>::staticName() ) << " failed";
-				return optional<T &>();
+				throw std::logic_error(fetched->toString(true)+" cannot be transformed to "+util::Value<T>::staticName() );
 			}
 		}
 
@@ -763,7 +831,7 @@ public:
 	 * \param list_trees colon separated labels for json-subtrees where property listing should be tried before using lists from the known types (e.g. "samples:slices")
 	 * \returns true if the whole stream was parsed
 	 */
-	bool readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
+	bool readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
 
 	/**
 	 * "Print" the property tree.

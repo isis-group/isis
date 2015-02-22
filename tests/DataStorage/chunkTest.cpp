@@ -8,7 +8,6 @@
 #define BOOST_TEST_MODULE ChunkTest
 #include <boost/test/unit_test.hpp>
 #include "DataStorage/chunk.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -25,8 +24,8 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 
-	BOOST_FOREACH( const char * str, needed ) {
-		BOOST_CHECK( ch.property( str ).needed() );
+	for( const char * str :  needed ) {
+		BOOST_CHECK( ch.property( str ).isNeeded() );
 	}
 
 
@@ -191,7 +190,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 
 	std::pair<util::ValueReference, util::ValueReference> minmax = ch.getMinMax();
 
-	data::scaling_pair scale = ch.getScalingTo( data::ValueArray<uint8_t>::staticID, minmax );
+	data::scaling_pair scale = ch.getScalingTo( data::ValueArray<uint8_t>::staticID(), minmax );
 	const util::ValueBase &scale_s = *( scale.first );
 	const util::ValueBase &scale_o = *( scale.second );
 
@@ -234,7 +233,7 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 
 	data::Chunk ch2 = ch1;//This shall clone the underlying ValueArray-Object
 	data::Chunk copyF = ch2.copyByID(); // this shall copy as the same as ch2 (float)
-	data::Chunk copyI = ch2.copyByID( data::ValueArray<uint32_t>::staticID, no_scale ); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
+	data::Chunk copyI = ch2.copyByID( data::ValueArray<uint32_t>::staticID(), no_scale ); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
 
 	//but it should of course be of the same type and contain the same data
 	BOOST_CHECK( ch1.getValueArrayBase().is<float>() );
@@ -318,7 +317,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	ch1.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 
 	const util::Value<int> buff[] = {0, 1, 2};
-	std::copy( buff, buff + 3, std::back_inserter( ch1.property( "list_test" ) ) );
+	std::copy( buff, buff + 3, std::back_inserter( ch1.touchProperty( "list_test" ) ) );
 
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
@@ -327,7 +326,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	const std::list<data::Chunk> splices = ch1.autoSplice( 1 );
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
-	BOOST_FOREACH( const data::Chunk & ref, splices ) {
+	for( const data::Chunk & ref :  splices ) {
 		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
 		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
 		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
@@ -437,7 +436,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 {
 	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
 	uint32_t cnt = 0;
-	BOOST_FOREACH( data::Chunk::reference ref, ch )
+	for( data::Chunk::reference ref :  ch )
 	ref = util::Value<uint32_t>( cnt++ );
 
 	data::MemChunk<uint32_t> swapped( ch );

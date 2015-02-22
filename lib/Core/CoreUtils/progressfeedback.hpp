@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <string>
 #include <boost/progress.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 namespace isis
 {
@@ -62,7 +62,7 @@ public:
  */
 class ConsoleFeedback: public ProgressFeedback
 {
-	boost::scoped_ptr<boost::progress_display> disp;
+	std::unique_ptr<boost::progress_display> disp;
 public:
 	void close();
 	size_t getMax();

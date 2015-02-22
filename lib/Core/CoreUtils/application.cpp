@@ -21,8 +21,7 @@
  *****************************************************************/
 
 #include "application.hpp"
-#include <boost/foreach.hpp>
-
+#include "../DataStorage/fileptr.hpp"
 #define STR(s) _xstr_(s)
 #define _xstr_(s) std::string(#s)
 
@@ -31,7 +30,7 @@ namespace isis
 namespace util
 {
 
-Application::Application( const char name[] ): m_name( name )
+Application::Application( const char name[], const char cfg[]): m_name( name )
 {
 	addLogging<CoreLog>( "Core" );
 	addLogging<CoreDebug>( "Core" );
@@ -43,6 +42,12 @@ Application::Application( const char name[] ): m_name( name )
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	parameters["help"].needed() = false;
+	
+	if(strlen(cfg)){
+		parameters["cfg"]=std::string(cfg);
+		parameters["cfg"].setDescription("File to read configuration from");
+		parameters["cfg"].needed()=false;
+	}
 }
 Application::~Application() {}
 
@@ -68,6 +73,40 @@ void Application::removeLogging( std::string name )
 	logs.erase( name );
 }
 
+bool Application::addConfigFile(const std::string& filename)
+{
+	data::FilePtr f(filename);
+	if(f.good()){
+		const data::ValueArray< uint8_t > buffer=f.at<uint8_t>(0);
+		if(configuration.readJson(&buffer[0],&buffer[buffer.getLength()],'/')){
+			boost::optional< PropertyMap& > param=configuration.hasBranch("parameters");
+			// if there is a "parameters" section in the file, use that as default parameters for the app
+			if(param){
+				for(PropertyMap::PropPath p:param->getLocalProps()){
+					assert(p.size()==1);
+					ProgParameter &dst=parameters[p.front().c_str()];
+					PropertyValue &src=param->touchProperty(p);
+					if(!dst.isSet()){ // don't touch it, if its not just the default
+						if(dst.isEmpty())
+							dst.swap(src);
+						else if(!dst.front().apply(src.front())){ //replace builtin default with value from config if there is one already
+							LOG(Runtime,warning) << "Failed to apply parameter " << std::make_pair(p,src) << " from configuration, skipping ..";
+							continue;
+						}
+					}
+					param->remove(p);
+				}
+			}
+			return true;
+		} else {
+			LOG(Runtime,warning) << "Failed to parse configuration file " << util::MSubject(filename);
+		}
+	} 
+	return false;
+}
+const PropertyMap& Application::config() const{return configuration;}
+
+
 void Application::addExample ( std::string params, std::string desc )
 {
 	m_examples.push_back( std::make_pair( params, desc ) );
@@ -88,12 +127,16 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		LOG( Runtime, error ) << "Failed to parse the command line";
 		err = true;
 	}
+	std::map< std::string, ProgParameter >::iterator cfg=parameters.find("cfg");
+	if(cfg!=parameters.end()){ // TODO this will override given parameters
+		addConfigFile(cfg->second.as<std::string>());
+	}
 
-	BOOST_FOREACH( logger_ref ref, logs ) {
+	for( logger_ref ref: logs ) {
 		const std::string dname = std::string( "d" ) + ref.first;
 		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
 		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
-		BOOST_FOREACH( setLogFunction setter, ref.second ) {
+		for( setLogFunction setter: ref.second ) {
 			( this->*setter )( level );
 		}
 	}
@@ -162,22 +205,22 @@ void Application::printHelp( bool withHidden )const
 	if( !m_examples.empty() ) {
 		std::cout << "Examples:" << std::endl;
 
-		BOOST_FOREACH( example_type ex, m_examples ) {
+		for( example_type ex :  m_examples ) {
 			std::cout << '\t' << m_filename << " " << ex.first << '\t' << ex.second << std::endl;
 		}
 	}
 }
 
-boost::shared_ptr< MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+std::shared_ptr< MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
 {
-	return boost::shared_ptr< MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
+	return std::shared_ptr< MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
 const std::string Application::getCoreVersion( void )
 {
 #ifdef ISIS_RCS_REVISION
-	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + STR( ISIS_RCS_REVISION ) + "]";
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + STR( ISIS_RCS_REVISION ) + " " + __DATE__ + "]";
 #else
-	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH );
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + __DATE__ + "]";;
 #endif
 }
 

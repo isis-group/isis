@@ -72,7 +72,7 @@ bool ValueBase::convert( const ValueBase &from, ValueBase &to )
 
 bool ValueBase::fitsInto( short unsigned int ID ) const //@todo find a better way to do this
 {
-	boost::scoped_ptr<ValueBase> to;
+	std::unique_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );
 
 	if ( conv ) {
@@ -87,7 +87,7 @@ bool ValueBase::fitsInto( short unsigned int ID ) const //@todo find a better wa
 
 ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 {
-	boost::scoped_ptr<ValueBase> to;
+	std::unique_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );
 
 	if ( conv ) {
@@ -109,11 +109,15 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 	}
 }
 
+bool ValueBase::apply(const ValueBase& val)
+{
+	return convert(val,*this);
+}
 
 std::string ValueBase::toString(bool labeled) const
 {
 	std::string ret;
-	Reference ref = copyByID( Value<std::string>::staticID );
+	Reference ref = copyByID( Value<std::string>::staticID() );
 
 	if ( ref.isEmpty() ) {
 		LOG( Debug, error ) << "Automatic conversion of " << getTypeName() << " to string failed. Returning empty string";

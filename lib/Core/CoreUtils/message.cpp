@@ -15,10 +15,16 @@
 #include <sys/types.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp> //needed to print the timestamp
+#include <sstream>
 
 #ifndef WIN32
 #include <signal.h>
 #endif
+
+#ifdef HAVE_CURSES
+#include <curses.h>
+#include <term.h>
+#endif // HAVE_CURSES
 
 namespace isis
 {
@@ -79,7 +85,7 @@ std::string Message::strTime()const
 	return boost::posix_time::to_simple_string( m_timeStamp );
 }
 
-Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo )
+Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo )
 	: commitTo( _commitTo ),
 	  m_object( object ),
 	  m_module( module ),
@@ -112,8 +118,12 @@ Message::~Message()
 }
 
 
-std::string Message::merge()const
+std::string Message::merge(const std::string color_code)const
 {
+	const std::string reset_code(color_code.empty()? "":"\033[0m");
+	const std::string s_prefix(color_code.empty()? "\"":"\x1B[1m");
+	const std::string s_suffix(color_code.empty()? std::string("\""):reset_code+color_code);
+	
 	std::string ret( str() );
 	size_t found = std::string::npos;
 	std::list<std::string>::const_iterator subj = m_subjects.begin();
@@ -124,9 +134,9 @@ std::string Message::merge()const
 	found = 0;
 
 	while ( ( found = ret.find( "{s}", found ) ) != std::string::npos )
-		ret.replace( found, 3, std::string( "\"" ) + * ( subj++ ) + "\"" );
+		ret.replace( found, 3, s_prefix + * ( subj++ ) + s_suffix );
 
-	return ret;
+	return  color_code+ret+reset_code;
 }
 
 bool Message::shouldCommit()const
@@ -134,7 +144,7 @@ bool Message::shouldCommit()const
 	if( str().empty() )
 		return false;
 
-	const boost::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
+	const std::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
 
 	if ( buff )
 		return ( buff->m_level >= m_level );
@@ -143,13 +153,45 @@ bool Message::shouldCommit()const
 
 LogLevel MessageHandlerBase::m_stop_below = error;
 
+DefaultMsgPrint::DefaultMsgPrint(LogLevel level): MessageHandlerBase( level ), istty(isatty(fileno(stderr))) {}
 
-std::ostream *DefaultMsgPrint::o = &::std::cerr;
 void DefaultMsgPrint::commit( const Message &mesg )
+{
+	if(istty)
+		commit_tty(mesg);
+	else
+		commit_pipe(mesg);
+}
+
+
+void DefaultMsgPrint::commit_tty(const Message& mesg)
 {
 	//first remove everything which is to old anyway
 	std::list< std::pair<boost::posix_time::ptime, std::string> >::iterator begin = last.begin();
 	static const boost::posix_time::millisec dist( max_age );
+
+	const char *color_code="";
+	
+#ifdef HAVE_CURSES
+	static int err_dummy;
+	static int is_no_term=setupterm(0,fileno(stderr),&err_dummy);
+	
+	// terminal color codes
+	const char red_code[]="\x1B[31m";
+	const char yellow_code[]="\x1B[33m";
+	const char green_code[]="\x1B[32m";
+	const char white_code[]="\x1B[37m";
+	const char norm_code[]="\x1B[0m";
+	
+	if(!is_no_term && cur_term && max_colors>=8)
+		switch(mesg.m_level){
+			case error:color_code=red_code;
+			case warning:color_code=yellow_code;break;
+			case notice:color_code=green_code;break;
+			case info:color_code=white_code;break;
+			default:color_code=norm_code;break;
+		}
+#endif //HAVE_CURSES
 
 	while( begin != last.end() && begin->first + dist < mesg.m_timeStamp ) {
 		begin++;
@@ -161,14 +203,15 @@ void DefaultMsgPrint::commit( const Message &mesg )
 	begin = std::find_if( last.begin(), last.end(), isEqual );
 
 	if( begin == last.end() ) { // its not in the list of the last xxx milliseconds - so print it
-		*o << mesg.m_module << ":" << logLevelName( mesg.m_level );
 #ifndef NDEBUG //if with debug-info
-		*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
+		fprintf(stderr,"%s:%s[%s:%d]%s\n",
+				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_file.leaf().c_str(),mesg.m_line,mesg.merge(color_code).c_str()
+		);
 #else
-		*o << "[" << mesg.m_object << "] "; //print the object/method
+		fprintf(stderr,"%s:%s[%s]%s\n",
+				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_object.c_str(),mesg.merge(color_code).c_str()
+		);
 #endif //NDEBUG
-		*o << mesg.merge(); //print the message itself
-		*o << std::endl;
 	} else {
 		last.erase( begin ); // it was in the list - remove it
 	}
@@ -176,10 +219,10 @@ void DefaultMsgPrint::commit( const Message &mesg )
 	last.push_back( std::make_pair( mesg.m_timeStamp, mesg.str() ) ); // put new message on the top
 }
 
-void DefaultMsgPrint::setStream( ::std::ostream &_o )
+void DefaultMsgPrint::commit_pipe(const Message& mesg)
 {
-	o->flush();
-	o = &_o;
+	fprintf(stderr,"%s:%s %s [%s -- %s:%d]\n",
+			mesg.m_module.c_str(),util::logLevelName( mesg.m_level ),mesg.merge("").c_str(), mesg.strTime().c_str(),mesg.m_file.leaf().c_str(),mesg.m_line);
 }
 
 }

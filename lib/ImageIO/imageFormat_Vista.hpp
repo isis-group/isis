@@ -30,7 +30,6 @@
 #include <boost/regex.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <list>
-#include <boost/foreach.hpp>
 
 // local includes
 #include <DataStorage/io_interface.h>
@@ -66,8 +65,8 @@ public:
 	 *
 	 */
 	util::istring dialects( const std::string &/*filename*/ )const {return "functional map anatomical onlyfirst";}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
 
 	/**
 	 * Default constructor. Needed to initialize some private member variables.
@@ -396,19 +395,19 @@ private:
 				m_timeDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ ?([[:digit:]]{1,2})\\ ?([[:word:]{3})\\ ?([[:digit:]]{4}).*" ), "not_needed", 1, 2, 3 ) );
 				std::string day, month, year;
 				boost::gregorian::date isisDate;
-				BOOST_FOREACH( std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList ) {
+				for( std::list<DateDecoding>::const_reference dateRef :  m_dateDecodingList ) {
 					boost::regex dateRegex( dateRef.dateRegex );
 					boost::cmatch dateResults;
 
 					if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
-						day = boost::lexical_cast<std::string>( dateResults.str( dateRef.first ) );
+						day = std::to_string( dateResults.str( dateRef.first ) );
 
 						if( day.size() == 1 ) {
 							day.insert( 0, std::string( "0" ) );
 						}
 
-						month = boost::lexical_cast<std::string>( dateResults.str( dateRef.second ) );
-						year = boost::lexical_cast<std::string>( dateResults.str( dateRef.third ) );
+						month = std::to_string( dateResults.str( dateRef.second ) );
+						year = std::to_string( dateResults.str( dateRef.third ) );
 						std::string strDate = year + dateRef.delimiter + month + dateRef.delimiter + day;
 						isisDate = boost::gregorian::from_simple_string( strDate );
 					}
@@ -421,7 +420,7 @@ private:
 
 				size_t hours, minutes, seconds;
 				boost::posix_time::time_duration isisTimeDuration;
-				BOOST_FOREACH( std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList ) {
+				for( std::list<DateDecoding>::const_reference timeRef :  m_timeDecodingList ) {
 					boost::regex timeRegex( timeRef.dateRegex );
 					boost::cmatch timeResults;
 

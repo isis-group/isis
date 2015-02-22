@@ -25,6 +25,7 @@
 #define APPLICATION_HPP
 
 #include "progparameter.hpp"
+#include "propmap.hpp"
 
 namespace isis
 {
@@ -48,13 +49,14 @@ class Application
 {
 	const std::string m_name;
 	boost::filesystem::path m_filename;
+	PropertyMap configuration;
 	std::list<std::pair<std::string, std::string> > m_examples;
 	void addLoggingParameter( std::string name );
 
 protected:
 	typedef void ( Application::*setLogFunction )( LogLevel level )const;
 	std::map<std::string, std::list<setLogFunction> > logs;
-	virtual boost::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual std::shared_ptr<MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 public:
 
@@ -67,8 +69,9 @@ public:
 	 * No programm parameter is parsed here. To do that use init()
 	 *
 	 * \param name name of the application.
+	 * \param cfg the default path of the config file. If empty, no config file will be loaded
 	 */
-	Application( const char name[] );
+	Application( const char name[], const char cfg[]="" );
 	virtual ~Application();
 
 	/**
@@ -78,7 +81,7 @@ public:
 	 *
 	 * The MODULE must be a struct like
 	 * \code struct MyLogModule {static const char *name() {return "MyModuleLog";}; enum {use = _ENABLE_LOG};}; \endcode
-	 * than \code addLogging<MyLogModule>("MyLog"); \endcode will install a parameter "-dMyLog" which will control all calls to
+	 * then \code addLogging<MyLogModule>("MyLog"); \endcode will install a parameter "-dMyLog" which will control all calls to
 	 * \code LOG(MyLogModule,...) << ... \endcode if _ENABLE_LOG was set for the compilation. Otherwise this commands will not have an effect.
 	 *
 	 * Multiple MODLUES can have the same parameter name, so
@@ -105,6 +108,9 @@ public:
 	 * \note the logging module cannot be removed at runtime - its usage is controled by the _ENABLE_LOG / _ENABLE_DEBUG defines at compile time.
 	 */
 	void removeLogging( std::string name );
+
+	bool addConfigFile(const std::string &filename);
+	const PropertyMap &config()const;
 
 	/**
 	 * Add an example for the programs usage.

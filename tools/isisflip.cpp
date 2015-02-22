@@ -3,7 +3,6 @@
 
 #include <map>
 #include <boost/assign.hpp>
-#include <boost/foreach.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 using namespace isis;
@@ -69,7 +68,7 @@ int main( int argc, char **argv )
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
-	BOOST_FOREACH( data::Image & refImage, app.images ) {
+	for( data::Image & refImage :  app.images ) {
 		std::vector< data::Chunk > delme = refImage.copyChunksToVector( true );
 		isis::data::Image dummy( delme );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );

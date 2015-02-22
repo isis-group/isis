@@ -1,6 +1,5 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/io_application.hpp"
-#include <boost/foreach.hpp>
 #include "CoreUtils/application.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
@@ -24,7 +23,7 @@ std::pair<std::string, int>  parseFilename( std::string name )
 
 	if ( boost::regex_match( name.c_str(), results, reg ) ) {
 		ret.first = results.str( results.size() - 2 );
-		ret.second = boost::lexical_cast<int>( results.str( results.size() - 1 ) );
+		ret.second = std::stoi( results.str( results.size() - 1 ) );
 	} else
 		ret.first = name;
 
@@ -47,7 +46,7 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 
 	if( at == list.end() ) {
 		LOG( DiffLog, error ) << "Sorry, there is no image " << pos;
-		throw( std::logic_error( std::string( "no " ) + boost::lexical_cast<std::string>( pos ) + "th image" ) );
+		throw( std::logic_error( std::string( "no " ) + std::to_string( pos ) + "th image" ) );
 	}
 
 	return *at;
@@ -56,22 +55,38 @@ data::Image pickImg( int pos, std::list<data::Image> list )
 size_t doFit( const data::Image reference, std::list<data::Image> &org_images, std::list<data::Image> &images, const char *propName )
 {
 	//first time org is empty - images is full
-	const util::PropertyMap::PropPath propPath( propName );
-	util::PropertyValue propval = reference.property( propPath );
+	if(propName[0]==0){
+		LOG(DiffLog,warning) << "Empty property names are invalid! Use \'-selectwith\' instead of \'-selectwith \"\"\'.";
+	} else {
+		const util::PropertyMap::PropPath propPath( propName );
+		util::PropertyValue propval = reference.property( propPath );
 
-	//now move all with different prop back into org
-	for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
-		if( hasDifferentProp( *i, propPath, propval ) ) {
-			org_images.push_back( *i );
-			images.erase( i++ );
-		} else
-			i++;
-	}
+		//now move all with different prop back into org
+		for( std::list<data::Image>::iterator i = images.begin(); i != images.end(); ) {
+			if( hasDifferentProp( *i, propPath, propval ) ) {
+				org_images.push_back( *i );
+				images.erase( i++ );
+			} else
+				i++;
+		}
 
-	LOG( DiffLog, info )
+		LOG( DiffLog, info )
 			<< images.size() << " candidates left for " << reference.identify() << ", "
 			<< org_images.size() << " not considered after checking for " << propName << "=" << reference.property( propPath );
+	}
 	return images.size();
+}
+
+boost::filesystem::path getCommonSource(const std::list<data::Image> &images){
+	
+	std::list<std::string> sources;
+	for(const data::Image &img:images){
+		if(img.hasProperty("source"))
+			sources.push_back(img.getValueAs<std::string>("source"));
+		std::list<std::string> s=img.getChunksValuesAs<std::string>("source",true);
+		sources.splice(sources.end(),s);
+	}
+	return util::getRootPath(std::list<boost::filesystem::path>(sources.begin(),sources.end()));
 }
 
 std::list<data::Image> findFitting( const data::Image reference, std::list<data::Image> &org_images, const util::slist &props )
@@ -79,7 +94,7 @@ std::list<data::Image> findFitting( const data::Image reference, std::list<data:
 	std::list< data::Image > images;
 	images.splice( images.begin(), org_images ); //first move all into images
 
-	BOOST_FOREACH( const std::string & prop, props ) {
+	for( const std::string & prop :  props ) {
 		if( doFit( reference, org_images, images, prop.c_str() ) < 1 ) //now move all with different prop back into org
 			return images; // abort if no image is left
 	}
@@ -91,9 +106,9 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 	bool ret = false;
 	util::PropertyMap::DiffMap diff = img1.getDifference( img2 );
 	diff.erase( "source" ); //its kinda obvious that images from different sources have different source flag (and its useless to consider this a difference anyway)
-	BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
+	for( util::slist::const_reference ref :  ignore )
 		diff.erase( util::istring( ref.begin(), ref.end() ) );
-	}
+
 	const std::string name1 = img1.identify();
 	const std::string name2 = img2.identify();
 	LOG( DiffLog, info ) << "Comparing " << name1 << " and " << name2;
@@ -124,7 +139,7 @@ bool diff( const data::Image &img1, const data::Image &img2, const util::slist &
 
 void dropWith( util::slist props, std::list< data::Image > &images )
 {
-	BOOST_FOREACH( util::slist::const_reference propStr, props ) {
+	for( util::slist::const_reference propStr :  props ) {
 		const std::list< std::string > ppair = util::stringToList<std::string>( propStr, '=' );
 		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), util::PropertyValue( ppair.back() ) ) );
 	}
@@ -148,8 +163,8 @@ int main( int argc, char *argv[] )
 	app.addLogging<DiffLog>();
 	app.addLogging<DiffDebug>();
 
-	data::IOApplication::addInput( app.parameters, true, "1", " of the first image" );
-	data::IOApplication::addInput( app.parameters, true, "2", " of the second image" );
+	data::IOApplication::addInput( app.parameters, " of the first image", "1" );
+	data::IOApplication::addInput( app.parameters, " of the second image", "2" );
 
 	app.addExample( "-in1 orphaned_data/ -in2 /archive/archived.dataset/ -ignore DICOM/PatientID",
 					"Check if (and where) a \"found\" dataset differs from one in your archive ignoring different \"DICOM/PatientID\"s (in case you anonymize your archive)." );
@@ -175,7 +190,7 @@ int main( int argc, char *argv[] )
 	std::list<data::Image> images1, images2;
 	util::slist ignore = app.parameters["ignore"];
 	ignore.push_back( "source" );
-	boost::shared_ptr<util::ConsoleFeedback> feedback( new util::ConsoleFeedback );
+	std::shared_ptr<util::ConsoleFeedback> feedback( new util::ConsoleFeedback );
 
 	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
 		app.parameters["in1"] = util::slist( 1, in1.first );
@@ -219,7 +234,7 @@ int main( int argc, char *argv[] )
 					<< "Could not find a unique image fitting " << first->identify()
 					<< ". " << candidates.size() << " where found";
 
-			BOOST_FOREACH( const data::Image & second, candidates ) {
+			for( const data::Image & second :  candidates ) {
 				if( diff( *first, second, ignore ) )
 					ret++;
 			}

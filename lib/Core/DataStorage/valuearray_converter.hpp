@@ -20,8 +20,7 @@
 #ifndef TYPEPTR_CONVERTER_H
 #define TYPEPTR_CONVERTER_H
 
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <map>
 #include "../CoreUtils/value_base.hpp"
 
@@ -42,15 +41,15 @@ class ValueArrayConverterBase
 {
 public:
 	virtual void convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &scaling )const;
-	virtual void generate( const ValueArrayBase &src, boost::scoped_ptr<ValueArrayBase>& dst, const scaling_pair &scaling )const = 0;
+	virtual void generate( const ValueArrayBase &src, std::unique_ptr<ValueArrayBase>& dst, const scaling_pair &scaling )const = 0;
 	/// Create a ValueArray based on the ID - if len==0 a pointer to NULL is created
-	virtual void create( boost::scoped_ptr<ValueArrayBase>& dst, size_t len )const = 0;
+	virtual void create( std::unique_ptr<ValueArrayBase>& dst, size_t len )const = 0;
 	virtual scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
-	static boost::shared_ptr<const ValueArrayConverterBase> get() {return boost::shared_ptr<const ValueArrayConverterBase>();}
+	static std::shared_ptr<const ValueArrayConverterBase> get() {return std::shared_ptr<const ValueArrayConverterBase>();}
 	virtual ~ValueArrayConverterBase() {}
 };
 
-class ValueArrayConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueArrayConverterBase> > >
+class ValueArrayConverterMap : public std::map< int , std::map<int, std::shared_ptr<const ValueArrayConverterBase> > >
 {
 public:
 	ValueArrayConverterMap();

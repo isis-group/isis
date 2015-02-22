@@ -41,6 +41,8 @@ bool PropertyValue::operator!=( const ValueBase& second ) const
 
 
 PropertyValue::PropertyValue ( ) : m_needed( false ) {}
+PropertyValue &PropertyValue::operator=(const PropertyValue& other){container=other.container;return *this;}
+
 
 PropertyValue PropertyValue::copyByID( short unsigned int ID ) const
 {
@@ -58,10 +60,10 @@ std::string PropertyValue::toString( bool labeled )const
 	} else if(size()==1)
 		return front().toString(labeled);
 	else{
-		const PropertyValue buff=copyByID(Value<std::string>::staticID);
+		const PropertyValue buff=copyByID(Value<std::string>::staticID());
 		std::string ret=listToString(buff.begin(),buff.end(),",","[","]");
 		if(labeled && !isEmpty())
-			ret+="("+getTypeName()+"["+boost::lexical_cast<std::string>(size())+"])";
+			ret+="("+getTypeName()+"["+std::to_string(size())+"])";
 		return ret;
 	}
 }
@@ -95,14 +97,16 @@ void PropertyValue::transfer(isis::util::PropertyValue::iterator at, PropertyVal
 	}
 }
 
-void PropertyValue::transfer(PropertyValue& ref)
+void PropertyValue::transfer(PropertyValue& ref, bool overwrite)
 {
 	if(ref.isEmpty()){
 		LOG(Debug,error) << "Not transfering empty Property";
 	} else {
-		LOG_IF(!isEmpty(),Debug,warning) << "Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
-		container.clear();
-		swap(ref);
+		if(isEmpty() || overwrite){
+			container.clear();
+			swap(ref);
+		} else 
+			LOG(Debug,warning) << "Not Transfering " << MSubject(ref.toString(true)) <<  " into non empty " << MSubject(*this);
 	}
 }
 void PropertyValue::swap(PropertyValue& ref)
@@ -113,7 +117,7 @@ void PropertyValue::swap(PropertyValue& ref)
 bool PropertyValue::transform(uint16_t dstID)
 {
 	PropertyValue ret,err;
-	BOOST_FOREACH(const ValueBase& ref,container){
+	for(const ValueBase& ref : container){
 		const ValueBase::Reference erg = ref.copyByID( dstID );
 		if(erg.isEmpty()){
 			err=ref;
@@ -173,6 +177,7 @@ void PropertyValue::resize( size_t size, const ValueBase &clone ){ // the builti
 
 std::vector< PropertyValue > PropertyValue::splice( const size_t len )
 {
+	assert(len);
 	std::vector<PropertyValue> ret(ceil(double(size())/len));
 	
 	for(std::vector<PropertyValue>::iterator dst=ret.begin();container.size()>=len;dst++){ //as long as there is enough transfer given amount
@@ -270,4 +275,6 @@ bool PropertyValue::lt( const PropertyValue& ref ) const{
 
 namespace std{
 template<> void swap< isis::util::PropertyValue >(isis::util::PropertyValue& a, isis::util::PropertyValue& b){a.swap(b);}
+bool less< isis::util::PropertyValue >::operator()(const isis::util::PropertyValue& x, const isis::util::PropertyValue& y) const{return x.lt(y);}
+
 }

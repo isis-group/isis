@@ -13,8 +13,8 @@
 #ifndef ISISTYPE_BASE_HPP
 #define ISISTYPE_BASE_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <type_traits>
+#include <memory>
 #include <boost/lexical_cast.hpp>
 
 #include "types.hpp"
@@ -123,7 +123,7 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyByID( Value<T>::staticID );
+		Reference ret = copyByID( Value<T>::staticID() );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
@@ -220,10 +220,11 @@ public:
 	Reference multiply( const ValueBase &ref )const;
 	Reference divide( const ValueBase &ref )const;
 
-	template<typename T> typename boost::enable_if<knowType<T>,bool>::type apply(const T &val){
-		return convert(Value<T>(val),*this);
+	template<typename T> typename std::enable_if<knowType<T>::value,bool>::type apply(const T &val){
+		return apply(Value<T>(val));
 	}
-
+	bool apply(const ValueBase &val);
+	
 	virtual ValueBase& add( const ValueBase &ref ) =0;
 	virtual ValueBase& substract( const ValueBase &ref ) =0;
 	virtual ValueBase& multiply_me( const ValueBase &ref ) = 0;

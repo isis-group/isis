@@ -60,13 +60,13 @@ public:
 	////////////////////////////////////////////////////////////////////////////
 	void push_back(const PropertyValue& ref);
 	void push_back(const ValueBase& ref);
-	template<typename T> typename boost::enable_if<knowType<T> >::type push_back(const T& ref){insert(end(),ref);}
+	template<typename T> typename std::enable_if<knowType<T>::value >::type push_back(const T& ref){insert(end(),ref);}
 
 	iterator insert(iterator at,const ValueBase& ref);
 	void insert(iterator at,const PropertyValue& ref);
 	
-	template<typename T> typename boost::enable_if<knowType<T>, iterator >::type insert(iterator at,const T& ref){
-		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID,Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
+	template<typename T> typename std::enable_if<knowType<T>::value, iterator >::type insert(iterator at,const T& ref){
+		LOG_IF(!isEmpty() && getTypeID()!=Value<T>::staticID(),Debug,error) << "Inserting inconsistent type " << MSubject(Value<T>(ref).toString(true)) << " in " << MSubject(*this);
 		return container.insert(at,new Value<T>(ref));
 	}
 
@@ -77,7 +77,7 @@ public:
 	
 	void reserve(size_t size);
 	void resize( size_t size, const ValueBase& clone );
-	template<typename T> typename boost::enable_if<knowType<T>,ValueBase& >::type set(size_t idx,const T& val){
+	template<typename T> typename std::enable_if<knowType<T>::value,ValueBase& >::type set(size_t idx,const T& val){
 		if(size()<=idx)
 			resize(idx,Value<T>());
 		return *container.replace(idx,new Value<T>(val));
@@ -101,6 +101,7 @@ public:
 	 * Distribute entries into new PropertyValues of given equal length.
 	 * \note the last PropertyValue may have less entries (aka remainder)
 	 * \note this is a transfer function, so *this will be empty afterwards.
+	 * \param len the requested size of the "splinters"
 	 * \returns a vector of (mostly) equally sized PropertyValues.
 	 */
 	std::vector<PropertyValue> splice(const size_t len);
@@ -125,20 +126,28 @@ public:
 	 * The transfered data will replace the properties in the target.
 	 * The source will be empty afterwards.
 	 */
-	void transfer(PropertyValue &src);
+	void transfer(PropertyValue &src, bool overwrite=false);
 
 	/// Swap properties from one PropertyValue with another.
 	void swap(PropertyValue &src);
 
 	/// Transform all contained properties into type T
 	bool transform( uint16_t dstID );
-	template<typename T> bool transform(){return transform(Value<T>::staticID);}
+	template<typename T> bool transform(){return transform(Value<T>::staticID());}
 	
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
 	 */
 	PropertyValue();
+	/**
+	 * Copy operator.
+	 * Copies the content of another Property.
+	 * \param other the source to copy from
+	 * \note the needed state wont change, regardless of what it is in other
+	 */
+	PropertyValue &operator=(const PropertyValue &other);
+	
 	/// accessor to mark as (not) needed
 	bool &needed();
 	/// returns true if PropertyValue is marked as needed, false otherwise
@@ -181,7 +190,7 @@ public:
 	 * \note The needed flag won't be affected by that.
 	 * \note To prevent accidential use this can only be used explicetly. \code util::PropertyValue propA; propA=5; \endcode is valid. But \code util::PropertyValue propA=5; \endcode is not,
 	 */
-	template<typename T> typename boost::enable_if<knowType<T>,PropertyValue&>::type operator=( const T &ref){
+	template<typename T> typename std::enable_if<knowType<T>::value,PropertyValue&>::type operator=( const T &ref){
 		container.clear();
 		container.push_back(new Value<T>(ref));
 		return *this;
@@ -339,7 +348,7 @@ public:
 	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
 	 * \returns front().eq(second) if the property contains exactly one value, false otherwise
 	 */
-	template<typename T> typename boost::enable_if<knowType<T>,bool>::type operator ==( const T &second )const{return size()==1 && front().eq(Value<T>(second));}
+	template<typename T> typename std::enable_if<knowType<T>::value,bool>::type operator ==( const T &second )const{return size()==1 && front().eq(Value<T>(second));}
 	/**
 	 * Unequality to a basic value.
 	 * Properties are unequal to basic values if:
@@ -348,7 +357,7 @@ public:
 	 * \warning This is using the more fuzzy Value::eq. So the type won't be compared and rounding might be done (which will send a warning to Debug).
 	 * \returns !front().eq(second) if the property contains exactly one value, false otherwise
 	 */
-	template<typename T> typename boost::enable_if<knowType<T>,bool>::type operator !=( const T &second )const{return size()==1 && !front().eq(Value<T>(second));}
+	template<typename T> typename std::enable_if<knowType<T>::value,bool>::type operator !=( const T &second )const{return size()==1 && !front().eq(Value<T>(second));}
 	
 	template<typename T> PropertyValue& operator +=( const T &second ){front().add(Value<T>(second));return *this;}
 	template<typename T> PropertyValue& operator -=( const T &second ){front().substract(Value<T>(second));return *this;}
@@ -374,6 +383,9 @@ namespace std
 		return out<<s.toString(true);
 	}
 	template<> void swap<isis::util::PropertyValue>(isis::util::PropertyValue &a,isis::util::PropertyValue &b);
+	template<> struct less<isis::util::PropertyValue> : binary_function <isis::util::PropertyValue,isis::util::PropertyValue,bool> {
+		bool operator() (const isis::util::PropertyValue& x, const isis::util::PropertyValue& y) const;
+	};
 }
 #endif
 

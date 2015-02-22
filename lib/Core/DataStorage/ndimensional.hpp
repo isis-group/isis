@@ -16,7 +16,6 @@
 #define __need_size_t
 #include <stddef.h>
 #include <algorithm>
-#include <boost/static_assert.hpp>
 #include <string>
 #include "common.hpp"
 #include "../CoreUtils/vector.hpp"

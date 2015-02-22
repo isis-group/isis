@@ -21,7 +21,7 @@ public:
 	util::istring dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
-		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
 			const std::list<util::istring> s = format->getSuffixes();
 			suffixes.insert( suffixes.end(), s.begin(), s.end() );
 		}
@@ -41,7 +41,7 @@ public:
 
 		while( !in.eof() ) {
 			in >> fnames ;
-			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
+			for( const std::string fname : util::stringToList<std::string>( fnames, linebreak ) ) {
 				LOG( Runtime, info ) << "loading " << fname;
 				std::list<data::Chunk> loaded=data::IOFactory::loadChunks(fname, "", dialect );
 				fcnt++;
@@ -54,7 +54,7 @@ public:
 		return ret;
 	}
 
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {
 		if( filename.empty() ) {
 			LOG( Runtime, info ) << "getting filelist from stdin";
 			return doLoad( std::cin, dialect );
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

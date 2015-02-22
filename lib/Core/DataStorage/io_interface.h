@@ -104,8 +104,7 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
-	throw( std::runtime_error & ) = 0; //@todo should be locked
+	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) = 0; //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
@@ -115,8 +114,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
-	throw( std::runtime_error & ) = 0;
+	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) = 0;
 
 	/**
 	 * Write a image list.
@@ -127,7 +125,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> feedback )
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )
 	throw( std::runtime_error & );
 
 	virtual ~FileFormat() {}

@@ -12,9 +12,9 @@ using namespace isis;
 class FakedRawFormat: public image_io::FileFormat
 {
 	std::string getName()const {return "";};
-	std::list< data::Chunk > load( const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return std::list< data::Chunk>();}
+	std::list< data::Chunk > load( const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return std::list< data::Chunk>();}
 	util::istring suffixes( io_modes /*modes = both*/ ) const {return "";}
-	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
+	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
 	std::pair< std::string, std::string > makeBasename( const std::string &filename )const {
 		return std::make_pair( filename, std::string( "" ) );
 	}
@@ -98,7 +98,7 @@ int main( int argc, char *argv[] )
 		std::list< std::string >::const_iterator iOut = fnames.begin();
 		const util::Selection wrepn = app.parameters["repn"];
 
-		BOOST_FOREACH( const data::Image & img, app.images ) {
+		for( const data::Image & img :  app.images ) {
 			const unsigned short sRepn = ( int )wrepn ? : img.getMajorTypeID(); // get repn eigther from the parameter, or from the image
 			size_t repnsize = data::ValueArrayBase::createByID( sRepn, 1 )->bytesPerElem(); //create a dummy ValueArray to determine the elementsize of the requested repn
 			const size_t imgsize = img.getVolume() * repnsize;

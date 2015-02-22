@@ -14,7 +14,6 @@
 #define LOG_H
 
 #include <string>
-#include <boost/scoped_ptr.hpp>
 #include "message.hpp"
 #include "singletons.hpp"
 #include <limits.h>
@@ -30,21 +29,21 @@ namespace _internal
 template<class MODULE> class Log
 {
 	friend class util::Singletons;
-	boost::shared_ptr<MessageHandlerBase> m_handle;
-	static boost::shared_ptr<MessageHandlerBase> &getHandle() {
-		boost::shared_ptr<util::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
+	std::shared_ptr<MessageHandlerBase> m_handle;
+	static std::shared_ptr<MessageHandlerBase> &getHandle() {
+		std::shared_ptr<util::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
 		return handle;
 	}
 	Log(): m_handle( new DefaultMsgPrint( notice ) ) {}
 public:
 	template<class HANDLE_CLASS> static void enable( LogLevel enable ) {
-		setHandler( boost::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );
+		Log<MODULE>::setHandler( std::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );
 	}
-	static void setHandler( boost::shared_ptr<MessageHandlerBase> handler ) {
-		getHandle() = handler;
+	static void setHandler( std::shared_ptr<MessageHandlerBase> handler ) {
+		Log<MODULE>::getHandle() = handler;
 	}
 	static Message send( const char file[], const char object[], int line, LogLevel level ) {
-		boost::shared_ptr<util::MessageHandlerBase> &handle = getHandle();
+		std::shared_ptr<util::MessageHandlerBase> &handle = Log<MODULE>::getHandle();
 		return Message( object, MODULE::name(), file, line, level, handle );
 	}
 };

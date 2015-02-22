@@ -2,7 +2,6 @@
 #pragma warning(disable:4996)
 #endif
 
-#include <boost/foreach.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -25,24 +24,24 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END;
 
-void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, boost::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, std::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		std::string uniquePath = *( inames++ );
 
 		try {
 			write( ref, uniquePath, dialect, progress );
 			LOG( Runtime, notice )
-					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
+					<< "Image of size " << util::MSubject(ref.getSizeAsVector()) << " written to " <<  util::MSubject(uniquePath)
 					<< " using " <<  getName() << ( dialect.empty() ?
 													util::istring() :
 													util::istring( " and dialect " ) + dialect
 												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
-					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
+					<< "Failed to write image to " << util::MSubject(uniquePath) << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
 }
@@ -81,7 +80,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const
 {
 	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ).c_str() );
-	BOOST_FOREACH( util::istring & ref, ret ) {
+	for( util::istring & ref :  ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
 	ret.sort( _internal::moreCmp ); //start with the longest suffix
@@ -92,7 +91,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 {
 	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
-	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
+	for( const util::istring & suffix :  supported_suffixes ) {
 		util::istring check = ifilename.substr( ifilename.length() - suffix.length(), suffix.length() );
 
 		if( filename[filename.length() - suffix.length() - 1] == '.' && check == suffix ) {
@@ -134,22 +133,22 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 				unsigned short tID;
 
 				switch ( tID = props.property( prop ).getTypeID() ) {
-				case util::Value<uint8_t>::staticID:
+				case util::Value<uint8_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
 					break;
-				case util::Value<int8_t>::staticID:
+				case util::Value<int8_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int8_t>::max() ) );
 					break;
-				case util::Value<uint16_t>::staticID:
+				case util::Value<uint16_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint16_t>::max() ) );
 					break;
-				case util::Value<int16_t>::staticID:
+				case util::Value<int16_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int16_t>::max() ) );
 					break;
-				case util::Value<uint32_t>::staticID:
+				case util::Value<uint32_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint32_t>::max() ) );
 					break;
-				case util::Value<int32_t>::staticID:
+				case util::Value<int32_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<int32_t>::max() ) );
 					break;
 				default:
@@ -188,17 +187,17 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Im
 {
 	std::list<std::string> ret;
 	std::map<std::string, unsigned short> names, used_names;
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		names[makeFilename( ref, namePattern )]++;
 	}
 
-	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+	for( std::list<data::Image>::const_reference ref :  images ) {
 		std::string name = makeFilename( ref, namePattern );
 
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];
 			const unsigned short length = ( uint16_t )log10( ( float )names[name] ) - ( uint16_t )log10( ( float )number );
-			const std::string snumber = std::string( length, '0' ) + boost::lexical_cast<std::string>( number );
+			const std::string snumber = std::string( length, '0' ) + std::to_string( number );
 			const std::pair<std::string, std::string> splitted = makeBasename( name );
 			name = splitted.first + "_" + snumber + splitted.second;
 		}

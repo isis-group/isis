@@ -22,7 +22,6 @@
 #include <map>
 #include "common.hpp"
 #include "istring.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {

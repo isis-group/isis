@@ -41,7 +41,7 @@ public:
 		return "SiemensTcpIp";
 	}
 
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
 
 
 		printf( "IMAGE: %d\n", image_counter );
@@ -174,19 +174,19 @@ public:
 					unsigned short tSize = 0;
 
 					if ( 0 == data_type.compare( "byte" ) ) {
-						tID = data::ValueArray<uint8_t>::staticID;
+						tID = data::ValueArray<uint8_t>::staticID();
 						tSize = sizeof( uint8_t );
 
 					} else if ( 0 == data_type.compare( "short" ) ) {
-						tID = data::ValueArray<uint16_t>::staticID;
+						tID = data::ValueArray<uint16_t>::staticID();
 						tSize = sizeof( uint16_t );
 
 					} else if ( 0 == data_type.compare( "long" ) ) {
-						tID = data::ValueArray<uint32_t>::staticID;
+						tID = data::ValueArray<uint32_t>::staticID();
 						tSize = sizeof( uint32_t );
 
 					} else if ( 0 == data_type.compare( "float" ) ) {
-						tID = data::ValueArray<float>::staticID;
+						tID = data::ValueArray<float>::staticID();
 						tSize = sizeof( float );
 					} else {
 						LOG( isis::image_io::Runtime, isis::error ) << "Retrieving data over TCP/IP with an unknown datatype: " << tID;
@@ -218,7 +218,7 @@ public:
 
 					// now, create a real chunk in memory and convert it to float data
 					data::Chunk myChunk( valPtrBuffer, width_slice, height_slice, iim );
-					myChunk.convertToType( isis::data::ValueArray<float>::staticID );
+					myChunk.convertToType( isis::data::ValueArray<float>::staticID() );
 
 					// set all the general properties - i.e. feed the generated chunk with metadata
 
@@ -288,7 +288,7 @@ public:
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
 		throwGenericError( "Writing TCP/IP is not supportet" );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
@@ -369,7 +369,7 @@ isis::image_io::FileFormat *factory()
 
 	//Just a workaround to generate all the converters
 	isis::data::MemChunk<int32_t> test( 2, 3, 4 );
-	test.convertToType( isis::data::ValueArray<float>::staticID );
+	test.convertToType( isis::data::ValueArray<float>::staticID() );
 	printf( "end of plugin load\n" );
 	return ( isis::image_io::FileFormat * ) pluginRtExport;
 }

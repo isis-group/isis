@@ -7,6 +7,10 @@
 #include <dcmtk/dcmdata/dcdicent.h>
 #include <dcmtk/oflog/config.h>
 
+#include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
+#include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
+
+
 namespace isis
 {
 namespace image_io
@@ -34,10 +38,8 @@ class DicomChunk : public data::Chunk
 		return new data::Chunk(dest,width,height);
 	}
 public:
-	//this uses auto_ptr by intention
-	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
 	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, DcmFileFormat &dcfile, const util::istring &dialect ) {
-		std::auto_ptr<data::Chunk> ret;
+		std::unique_ptr<data::Chunk> ret;
 		DicomImage img( &dcfile, EXS_Unknown );
 
 		if ( img.getStatus() == EIS_Normal ) {
@@ -71,7 +73,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret.get() ) {
+					if ( ret ) {
 						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
@@ -87,7 +89,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret.get() ) {
+					if ( ret ) {
 						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
@@ -97,7 +99,7 @@ public:
 				FileFormat::throwGenericError( "Didn't get any pixel data" );
 			}
 		} else {
-			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() )  + ")" );
+			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() ));
 		}
 
 		return *ret;
@@ -133,7 +135,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
 
@@ -175,7 +177,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		dicomTree.remove( "SeriesTime" );
 
 		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
-		BOOST_FOREACH( const char * d, dates ) {
+		for( const char * d :  dates ) {
 			if( dicomTree.hasProperty( d ) ) {
 				sequenceStart = genTimeStamp( dicomTree.getValueAs<date>( d ), sequenceStart );
 				dicomTree.remove( d );
@@ -189,7 +191,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			dicomTree.remove( "AcquisitionTime" );
 
 			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
-			BOOST_FOREACH( const char * d, dates ) {
+			for( const char * d :  dates ) {
 				if( dicomTree.hasProperty( d ) ) {
 					acTime = genTimeStamp( dicomTree.getValueAs<date>( d ), acTime );
 					dicomTree.remove( d );
@@ -228,20 +230,24 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	// compute voxelSize and gap
 	{
 		util::fvector3 voxelSize( invalid_float, invalid_float, invalid_float );
-
-		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
-			voxelSize = dicomTree.getValueAs<util::fvector3>( "PixelSpacing" );
-			dicomTree.remove( "PixelSpacing" );
-			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
-		} else {
-			voxelSize[2] = 1 / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
+		const util::istring pixelsize_params[]={"PixelSpacing","ImagePlanePixelSpacing","ImagerPixelSpacing"};
+		for(const util::istring &name:pixelsize_params){
+			if ( hasOrTell( prefix + name, object, warning ) ) {
+				voxelSize = dicomTree.getValueAs<util::fvector3>( name );
+				dicomTree.remove( name );
+				std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
+				break;
+			}
+			
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
 			voxelSize[2] = dicomTree.getValueAs<float>( "SliceThickness" );
 			dicomTree.remove( "SliceThickness" );
+		} else {
+			voxelSize[2] = 1 / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
 		}
-
+		
 		object.setValueAs( "voxelSize", voxelSize );
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
@@ -331,7 +337,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 
 		if( set ) {
-			object.property( "subjectGender" ) = isisGender;
+			object.setValueAs( "subjectGender", isisGender);
 			dicomTree.remove( "PatientsSex" );
 		}
 	}
@@ -365,11 +371,14 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
 			foundGrad= object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
 		} else {
+			if(bValue)
 			LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+			else
+				LOG(Runtime, notice ) << "Ignoring DiffusionBValue 0 as there is no diffusionGradient";
 		}
 
 		if( bValue && foundGrad ) // if bValue is not zero multiply the diffusionGradient by it
-			object.refValueAs<util::fvector3>("diffusionGradient").get()*=bValue;
+			object.refValueAs<util::fvector3>("diffusionGradient")*=bValue;
 	}
 
 
@@ -443,7 +452,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector3 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector3 &origin = *source.refValueAs<util::fvector3>( "indexOrigin" );
+	util::fvector3 &origin = source.refValueAs<util::fvector3>( "indexOrigin" );
 	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setValueAs( prefix + "ImageType", iType );
@@ -477,14 +486,14 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
-		util::fvector3 &ref = *dest.refValueAs<util::fvector3>( "fov" );
+		util::fvector3 &ref = dest.refValueAs<util::fvector3>( "fov" );
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
 	}
 
 	// for every slice
-	util::PropertyValue &ordProp= haveAcqTimeList ? dest.property( "acquisitionTime"):dest.property( "acquisitionNumber");
+	util::PropertyValue &ordProp= haveAcqTimeList ? dest.touchProperty( "acquisitionTime"):dest.touchProperty( "acquisitionNumber");
 	ordProp=util::PropertyValue(); //reset the selected ordering property to empty
 	
 	for ( size_t slice = 0; slice < images; slice++ ) {
@@ -509,13 +518,13 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, boost::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, std::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
 {
 	DcmFileFormat dcfile;
 	OFCondition loaded = dcfile.loadFile( filename.c_str() );
-	std::list< data::Chunk > ret;
 
 	if ( loaded.good() ) {
+		std::list< data::Chunk > ret;
 		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, dialect );
@@ -528,16 +537,20 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 			} else {
 				ret.push_back( readMosaic( chunk ) );
 			}
-		} else {
+		} else if( dialect == "forcemosaic" ) 
+			ret.push_back( readMosaic( chunk ) );
+		else 
 			ret.push_back( chunk );
-		}
+
+		return ret;
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
+		return std::list< data::Chunk >();
 	}
-	return ret;
+
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
@@ -551,6 +564,7 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 		DcmDataDictionary &dict = dcmDataDict.wrlock();
 		addDicomDict( dict );
 		dcmDataDict.unlock(); 
+		DJDecoderRegistration::registerCodecs();
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
@@ -574,6 +588,15 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	for( unsigned short i = 0x0010; i <= 0x00FF; i++ ) {
 		dictionary[DcmTag( 0x0029, i )] = ( std::string( "Private Code for " ) + DcmTag( 0x0029, i << 8 ).toString().c_str() + "-" + DcmTag( 0x0029, ( i << 8 ) + 0xFF ).toString().c_str() ).c_str();
 	}
+	
+	//http://www.healthcare.siemens.com/siemens_hwem-hwem_ssxa_websites-context-root/wcm/idc/groups/public/@global/@services/documents/download/mdaw/mtiy/~edisp/2008b_ct_dicomconformancestatement-00073795.pdf
+	for( unsigned short i = 0x0; i <= 0x02FF; i++ ) {
+		char buff[7];
+		std::snprintf(buff,7,"0x%.4X",i);
+		dictionary[DcmTag( 0x6000, i )] = util::PropertyMap::PropPath("DICOM overlay info") / util::PropertyMap::PropPath(buff);
+	}
+	dictionary[DcmTag( 0x6000, 0x3000 )] = util::PropertyMap::PropPath("DICOM overlay data");
+	
 
 	//hack to steal logging from dcmtk and redirect it to our own
 	log4cplus::Logger logger = log4cplus::Logger::getRoot();

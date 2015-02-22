@@ -26,10 +26,10 @@
 #include "../CoreUtils/log.hpp"
 #include "common.hpp"
 #include <boost/regex.hpp>
-#include <boost/foreach.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string.hpp>
 #include "../CoreUtils/singletons.hpp"
+
 
 namespace isis
 {
@@ -126,7 +126,7 @@ bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
 			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
 			<< util::MSubject( plugin->getName() )
 			<< " with supported suffixes " << suffixes;
-	BOOST_FOREACH( util::istring & it, suffixes ) {
+	for( util::istring & it :  suffixes ) {
 		io_suffix[it].push_back( plugin );
 	}
 	return true;
@@ -226,24 +226,24 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << with_dialect << " was found";
 		}
 	} else {
-		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
+		for( FileFormatList::const_reference it :  formatReader ) {
 			LOG( ImageIoDebug, info )
 					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
 
 			try {
 				std::list<data::Chunk> loaded=it->load( filename.native(), dialect, m_feedback );
-				BOOST_FOREACH( Chunk & ref, loaded ) {
+				for( Chunk & ref :  loaded ) {
 					ref.refValueAsOr( "source", filename.native() ); // set source to filename or leave it if its already set
 				}
 				return loaded;
-			} catch ( std::runtime_error &e ) {
+			} catch ( const std::exception& e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
 							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
 							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
-							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
+							<< " with " << util::MSubject( e.what() ) << ", maybe it just wasn't the right format";
 				}
 			}
 		}
@@ -334,16 +334,21 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optio
 std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::istring suffix_override, isis::util::istring dialect, optional< isis::util::slist& > rejected  )
 {
 	const boost::filesystem::path p( path );
-	return boost::filesystem::is_directory( p ) ?
-		get().loadPath( p, suffix_override, dialect, rejected) :
-		get().loadFile( p, suffix_override, dialect );
+	if(boost::filesystem::is_directory( p ))
+		return get().loadPath( p, suffix_override, dialect, rejected);
+	else{
+		const std::list< Chunk > loaded=get().loadFile( p, suffix_override, dialect );
+		if(rejected && loaded.empty())
+			rejected->push_back(path);
+		return loaded;
+	}
 }
 
 std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
 	size_t loaded = 0;
-	BOOST_FOREACH( const std::string & path, paths ) {
+	for( const std::string & path :  paths ) {
 		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect, rejected );
 		chunks.splice(chunks.end(),loaded);
 	}
@@ -353,7 +358,7 @@ std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suf
 
 	// store paths of red, but rejected chunks
 	std::set<std::string> image_rej;
-	BOOST_FOREACH(const data::Chunk &ch, chunks ){
+	for(const data::Chunk &ch :  chunks ){
 		image_rej.insert(ch.getValueAs<std::string>("source"));
 	}
 	if(rejected)
@@ -407,12 +412,12 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 {
 	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 
-	BOOST_FOREACH( std::list<data::Image>::reference ref, images ) {
+	for( std::list<data::Image>::reference ref :  images ) {
 		ref.checkMakeClean();
 	}
 
 	if( formatWriter.size() ) {
-		BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
+		for( FileFormatList::const_reference it :  formatWriter ) {
 			LOG( Debug, info )
 					<< "plugin to write to " <<  path << ": " << it->getName()
 					<<  ( dialect.empty() ?
@@ -430,7 +435,7 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 							  util::istring( " and dialect: " ) + dialect
 							);
 				return true;
-			} catch ( std::runtime_error &e ) {
+			} catch ( const std::exception &e ) {
 				LOG( Runtime, warning )
 						<< "Failed to write " <<  images.size()
 						<< " images to " << path << " using " <<  it->getName() << " (" << e.what() << ")";
@@ -442,7 +447,7 @@ bool IOFactory::write( std::list< isis::data::Image > images, const std::string 
 
 	return false;
 }
-void IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback )
+void IOFactory::setProgressFeedback( std::shared_ptr<util::ProgressFeedback> feedback )
 {
 	IOFactory &This = get();
 

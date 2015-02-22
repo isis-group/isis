@@ -22,8 +22,6 @@
 #include "../CoreUtils/value_base.hpp"
 #include "valuearray_converter.hpp"
 #include "common.hpp"
-#include <boost/mpl/if.hpp>
-#include <boost/utility/enable_if.hpp>
 
 namespace isis
 {
@@ -153,7 +151,7 @@ public:
 	typedef value_iterator value_reference;
 	typedef const_value_iterator const_value_reference;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
-	class DelProxy : public boost::shared_ptr<const void>
+	class DelProxy : public std::shared_ptr<const void>
 	{
 	public:
 		/**
@@ -173,10 +171,10 @@ public:
 	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer
 	 * \returns a shared_ptr with the memory address of the data handled by this ValueArray.
 	 */
-	virtual boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
+	virtual std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
 
 	/// \copydoc getRawAddress
-	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
+	virtual std::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
 
 	virtual value_iterator beginGeneric() = 0;
 	value_iterator endGeneric();
@@ -290,7 +288,7 @@ public:
 	 * \returns a the newly created ValueArray
 	 */
 	template<typename T> ValueArray<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		Reference erg = copyByID( ValueArray<T>::staticID, scaling );
+		Reference erg = copyByID( ValueArray<T>::staticID(), scaling );
 		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 
@@ -302,7 +300,7 @@ public:
 	 * - scaling.first (the scaling offset) is not 0
 	 *
 	 * Otherwise a cheap copy is done.
-	 * \param ID the ID of the requeseted type (use ValueArray::staticID)
+	 * \param ID the ID of the requeseted type (use ValueArray::staticID())
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns a reference of eigther a cheap copy or a newly created ValueArray
 	 * \returns an empty reference if the conversion failed
@@ -322,7 +320,7 @@ public:
 	 * \returns eigther a cheap copy or a newly created ValueArray
 	 */
 	template<typename T> ValueArray<T> as( scaling_pair scaling = scaling_pair() ) {
-		Reference erg = convertByID( ValueArray<T>::staticID, scaling );
+		Reference erg = convertByID( ValueArray<T>::staticID(), scaling );
 		return erg.isEmpty() ? ValueArray<T>( 0 ) : erg->castToValueArray<T>();
 	}
 

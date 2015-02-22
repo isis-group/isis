@@ -41,7 +41,7 @@ int main( int argc, char **argv )
 	try {
 		VoxelOp vop( op );
 
-		BOOST_FOREACH( data::Image & img, app.images ) {
+		for( data::Image & img: app.images ) {
 			std::cout << "Computing vox=(" << op << ") for each voxel of the " << img.getSizeAsString() << "-Image" << std::endl;
 			img.foreachVoxel<double>( vop );
 		}

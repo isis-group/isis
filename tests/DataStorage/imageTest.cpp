@@ -10,7 +10,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/foreach.hpp>
 #include <DataStorage/image.hpp>
 #include <DataStorage/io_factory.hpp>
 
@@ -48,17 +47,18 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 
 		// inserting insufficient Chunk should fail
-		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 );
+		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 ); //don't raise error about inserting valid chunk
 		BOOST_CHECK( ! img.insertChunk( data::MemChunk<float>( 4, 4 ) ) );
-		data::enableLog<util::DefaultMsgPrint>( error );
+		data::enableLog<util::DefaultMsgPrint>( error ); // still block warning about inserting into existing image
 
 		//inserting the same chunk twice should fail
 		BOOST_CHECK( ! img.insertChunk( ch ) );
-
+		
 		// but inserting another Chunk should work
 		ch = genSlice<float>( 4, 4, 0, 2 );
 		img.insertChunk( ch );
-
+		data::enableLog<util::DefaultMsgPrint>( notice );//back to normal
+		
 		// Chunks should be inserted based on their position (lowest first)
 		ch = genSlice<float>( 4, 4, 1, 1 );
 		BOOST_REQUIRE( img.insertChunk( ch ) );
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		//List of the properties shall be as if every chunk of the image was asked for the property
 		std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
 		unsigned int i = 0;
-		BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
+		for( const util::PropertyValue & ref :  origins ) {
 			BOOST_CHECK( ref == util::fvector3( 0, 0, i++ ) );
 		}
 	}
@@ -189,6 +189,22 @@ BOOST_AUTO_TEST_CASE ( copy_image_test )
 	data::Image copy = img.copyByID();
 	BOOST_CHECK( img.compare( copy ) == 0 );
 }
+BOOST_AUTO_TEST_CASE ( ident_image_test )
+{
+	data::Chunk ch = genSlice<float>( 4, 4 ); 
+	std::vector<data::MemChunk<float> > chunks( 10, ch ); 
+	boost::posix_time::ptime now=boost::posix_time::second_clock::local_time();
+	for(int i=0;i<10;i++){
+		chunks[i].setValueAs<uint32_t>( "acquisitionNumber", i ); 
+		chunks[i].setValueAs<float>( "acquisitionTime", i );
+		chunks[i].setValueAs( "source", std::string("root/")+boost::lexical_cast<std::string>(i) );
+		chunks[i].setValueAs( "sequenceStart",now);
+		chunks[i].setValueAs( "sequenceDescription","test");
+	}
+	
+	data::Image img( chunks );
+	BOOST_CHECK_EQUAL(img.identify(),std::string("S0_test from root taken at ")+util::PropertyValue(now).toString());
+}
 
 BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 {
@@ -211,8 +227,10 @@ BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 	BOOST_CHECK_EQUAL( img.voxel<float>( 0 ), ( float )M_PI ); //so image will _not_ be changed
 }
 
-BOOST_AUTO_TEST_CASE ( proplist_image_test )
+BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 {
+	const util::PropertyValue *dummy=&util::PropertyMap().property("nothing");//hack to get the address of the dummy return for failed property access
+	
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
 
 	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
@@ -221,19 +239,36 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
 	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
+	ch.touchProperty( "nothing")=util::PropertyValue();
 
-
+	// make c a proplist
 	for( int i = 0; i < 4; i++ ) {
-		ch.property( "acquisitionNumber")[3 - i].apply(( uint32_t )i); //change the acquisitionNumber of that to 1
-		ch.property( "acquisitionTime")[3 - i].apply(( uint32_t )i);
+		ch.touchProperty( "acquisitionNumber").push_back(3-i); 
+		ch.touchProperty( "acquisitionTime").push_back(3-i); 
 	}
 
-	data::Image img( ch );
-	BOOST_REQUIRE_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // the dim should be 2 now
+	data::Image img( ch );  
+	BOOST_CHECK_EQUAL( img.getRelevantDims(), 3 ); // still a 4x4x4 volume
+	BOOST_CHECK_EQUAL( img.property( "acquisitionTime").size(),4); // also still a proplist
+	BOOST_CHECK_EQUAL( img.property( "acquisitionNumber").size(),4); // also still a proplist
+
+	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should be there (aka not the dummy)
+	BOOST_CHECK(img.property("nothing").isEmpty()); // but empty
+	
+	img.spliceDownTo(data::sliceDim);
+
+	BOOST_CHECK_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // now its sliced
+	BOOST_CHECK( !img.hasProperty( "acquisitionTime")); // its in the chunks now
+	BOOST_CHECK( !img.hasProperty( "acquisitionNumber")); // its in the chunks now
+
+	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should still be there
+	BOOST_CHECK(img.property("nothing").isEmpty()); // but still empty
 
 	for( uint32_t i = 0; i < 4; i++ ) {
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).property( "acquisitionTime" ), i );
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).property( "acquisitionNumber" ), i );
+		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionTime" ));
+		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionNumber" ));
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionTime" ), i );
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionNumber" ), i );
 	}
 }
 
@@ -317,7 +352,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	data::scaling_pair scale = img.getScalingTo( data::ValueArray<uint8_t>::staticID );
+	data::scaling_pair scale = img.getScalingTo( data::ValueArray<uint8_t>::staticID() );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
 }
@@ -735,7 +770,9 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
+		data::enableLog<util::DefaultMsgPrint>(error); // don't warn about downscaling
 		data::MemImage<uint8_t> img2( img );
+		data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -800,7 +837,9 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
+		data::enableLog<util::DefaultMsgPrint>(error); // don't warn about downscaling
 		data::TypedImage<uint8_t> img2( img );
+		data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -850,8 +889,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	}
 
 	data::Image img( chunks );
-	BOOST_FOREACH( const char * str, needed ) {
-		BOOST_CHECK( img.property( str ).needed() );
+	for( const char * str :  needed ) {
+		BOOST_CHECK( img.property( str ).isNeeded() );
 	}
 
 	BOOST_REQUIRE( img.isClean() );
@@ -899,7 +938,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const size_t D[] = {0, 0, 0, 0};
 
 	cpSource.copyRange( S1, S2, chSlice, D );
-	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
+	float *pValues = ( ( std::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
 	float *pRun = pValues;
 
 	for ( unsigned int iy = 0; iy < nrY; iy++ ) {
@@ -924,7 +963,6 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
 
-	util::DefaultMsgPrint::stopBelow( warning );
 	img.spliceDownTo( data::sliceDim );
 	std::vector<data::Chunk > chunks = img.copyChunksToVector( false );
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );
@@ -1076,8 +1114,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	std::list<data::Chunk> empty;
 
+	data::enableLog<util::DefaultMsgPrint>(error); // don't warn about empty insert
 	data::Image img6( empty );
-
+	data::enableLog<util::DefaultMsgPrint>(notice); // back to normal
+	
 	const size_t dummy6[] = {nrX, nrY, nrS, nrT};
 
 	const util::vector4<size_t> sizeVec6( dummy6 );
@@ -1210,7 +1250,7 @@ BOOST_AUTO_TEST_CASE ( image_swapdim_test )
 	BOOST_REQUIRE( img.isValid() );
 
 	uint32_t cnt=0;
-	BOOST_FOREACH( data::Image::reference ref, img )
+	for( data::Image::reference ref :  img )
 		ref = util::Value<uint32_t>( cnt++);
 	
 	img.swapDim(data::columnDim,data::sliceDim);

@@ -44,7 +44,7 @@ protected:
 			return false;
 		}
 	}
-	std::map<png_byte, std::map<png_byte, boost::shared_ptr<Reader> > > readers;
+	std::map<png_byte, std::map<png_byte, std::shared_ptr<Reader> > > readers;
 public:
 	ImageFormat_png() {
 		readers[PNG_COLOR_TYPE_GRAY][8].reset( new GenericReader<uint8_t> );
@@ -188,7 +188,7 @@ public:
 		png_read_update_info( png_ptr, info_ptr );
 		const png_byte color_type = png_get_color_type ( png_ptr, info_ptr );
 		const png_byte bit_depth = png_get_bit_depth( png_ptr, info_ptr );
-		boost::shared_ptr< Reader > reader = readers[color_type][bit_depth];
+		std::shared_ptr< Reader > reader = readers[color_type][bit_depth];
 
 		if( !reader ) {
 			LOG( Runtime, error ) << "Sorry, the color type " << ( int )color_type << " with " << ( int )bit_depth << " bits is not supportet.";
@@ -200,7 +200,7 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 	{
 		data::Chunk ch = read_png( filename );
 
@@ -215,7 +215,7 @@ public:
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
 			}
 		} else {
-			if( extractNumberFromName<uint32_t>( filename, ch.property( "acquisitionNumber" ) ) ) {
+			if( extractNumberFromName<uint32_t>( filename, ch.touchProperty( "acquisitionNumber" ) ) ) {
 				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" ) << " from filename";
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,indexOrigin,rowVec and voxelSize";
 			} else {
@@ -234,7 +234,7 @@ public:
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
@@ -246,19 +246,19 @@ public:
 		png_byte color_type, bit_depth; ;
 
 		switch( isis_data_type ) {
-		case data::ValueArray< int8_t>::staticID: // if its signed, fall "back" to unsigned
-		case data::ValueArray<uint8_t>::staticID:
-			tImg.convertToType( data::ValueArray<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
+		case data::ValueArray< int8_t>::staticID(): // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint8_t>::staticID():
+			tImg.convertToType( data::ValueArray<uint8_t>::staticID() ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 8;
-		case data::ValueArray< int16_t>::staticID: // if its signed, fall "back" to unsigned
-		case data::ValueArray<uint16_t>::staticID:
-			tImg.convertToType( data::ValueArray<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
+		case data::ValueArray< int16_t>::staticID(): // if its signed, fall "back" to unsigned
+		case data::ValueArray<uint16_t>::staticID():
+			tImg.convertToType( data::ValueArray<uint16_t>::staticID() ); // make sure whole image has same type (u16bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 16;
 			break;
-		case data::ValueArray<util::color24>::staticID:
-		case data::ValueArray<util::color48>::staticID:
+		case data::ValueArray<util::color24>::staticID():
+		case data::ValueArray<util::color48>::staticID():
 			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
 			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).getBytesPerVoxel() * 8 / 3;
@@ -287,8 +287,8 @@ public:
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
-			BOOST_FOREACH( const data::Chunk & ref, chunks ) {
-				const std::string num = boost::lexical_cast<std::string>( ++number );
+			for( const data::Chunk & ref :  chunks ) {
+				const std::string num = std::to_string( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 
 				if( !write_png( name, ref, color_type, bit_depth ) ) {

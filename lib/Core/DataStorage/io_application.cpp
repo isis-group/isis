@@ -30,15 +30,15 @@ namespace isis
 {
 namespace data
 {
-IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
-	Application( name ),
+	IOApplication::IOApplication( const char name[], bool have_input, bool have_output, const char cfg[] ):
+	Application( name, cfg ),
 	m_input( have_input ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input )
-		addInput( parameters );
+		addInput();
 
 	if ( have_output )
-		addOutput( parameters );
+		addOutput();
 
 	parameters["help-io"] = false;
 	parameters["help-io"].needed() = false;
@@ -47,7 +47,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 IOApplication::~IOApplication()
 {
-	data::IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback>() );
+	data::IOFactory::setProgressFeedback( std::shared_ptr<util::ProgressFeedback>() );
 }
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
@@ -64,7 +64,7 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 	return true;
 }
 
-void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
+void IOApplication::addInput ( util::ParameterMap &parameters, const std::string &desc, const std::string &suffix, bool needed)
 {
 	parameters[std::string( "in" ) + suffix] = util::slist();
 	parameters[std::string( "in" ) + suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
@@ -87,8 +87,13 @@ void IOApplication::addInput ( util::ParameterMap &parameters, bool needed, cons
 		parameters["np"].hidden() = true;
 	}
 }
+void IOApplication::addInput(const std::string& desc, const std::string& suffix, bool needed)
+{
+	addInput(parameters,desc,suffix,needed);
+}
 
-void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, const std::string &suffix, const std::string &desc )
+
+void IOApplication::addOutput( util::ParameterMap &parameters, const std::string &desc, const std::string &suffix, bool needed)
 {
 	parameters[std::string( "out" ) + suffix] = std::string();
 	parameters[std::string( "out" ) + suffix].setDescription( "output filename" + desc );
@@ -105,13 +110,13 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 	std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 	// remove some types which are useless as representation
 	// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-	types.erase( ( unsigned short )data::ValueArray<util::Selection>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<std::string>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<boost::posix_time::ptime>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<boost::gregorian::date>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<util::ilist>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<util::dlist>::staticID );
-	types.erase( ( unsigned short )data::ValueArray<util::slist>::staticID );
+	types.erase( ( unsigned short )data::ValueArray<util::Selection>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<std::string>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<boost::posix_time::ptime>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<boost::gregorian::date>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<util::ilist>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<util::dlist>::staticID() );
+	types.erase( ( unsigned short )data::ValueArray<util::slist>::staticID() );
 
 	for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
 		i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
@@ -136,6 +141,10 @@ void IOApplication::addOutput ( util::ParameterMap &parameters, bool needed, con
 		parameters["np"].hidden() = true;
 	}
 }
+void IOApplication::addOutput(const std::string& desc, const std::string& suffix, bool needed)
+{
+	addOutput(parameters,desc,suffix,needed);
+}
 
 
 void IOApplication::printHelp( bool withHidden ) const
@@ -145,7 +154,7 @@ void IOApplication::printHelp( bool withHidden ) const
 	} else if( parameters["help-io"].as<bool>() ) { // if help-io was set to true
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
-		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
+		for( data::IOFactory::FileFormatList::const_reference pi :  plugins ) {
 			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
@@ -158,12 +167,12 @@ void IOApplication::printHelp( bool withHidden ) const
 	}
 }
 
-bool IOApplication::autoload( bool exitOnError )
+bool IOApplication::autoload( bool exitOnError,optional< util::slist& > rejected)
 {
-	return autoload( parameters, images, exitOnError, "", feedback );
+	return autoload( parameters, images, exitOnError, "", feedback,rejected );
 
 }
-bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ConsoleFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	std::string rf = parameters[std::string( "rf" ) + suffix];
@@ -180,7 +189,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str() );
+	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str(),rejected );
 	images.splice( images.end(), tImages );
 
 	if ( images.empty() ) {
@@ -209,14 +218,14 @@ bool IOApplication::autowrite( Image out_image, bool exitOnError ) {return autow
 bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 {
 	const bool no_progress = parameters["np"];
-	return autowrite( parameters, out_images, exitOnError, "", no_progress ? boost::shared_ptr<util::ConsoleFeedback>() : feedback );
+	return autowrite( parameters, out_images, exitOnError, "", no_progress ? std::shared_ptr<util::ConsoleFeedback>() : feedback );
 }
 
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	return autowrite( parameters, std::list<Image>( 1, out_image ), exitOnError, suffix, feedback );
 }
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, boost::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
 {
 	const util::Selection repn = parameters[std::string( "repn" ) + suffix];
 	const util::Selection scale_mode = parameters[std::string( "scale_mode" ) + suffix];
@@ -237,7 +246,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<<  ", because -repn" << suffix << " was not given";
 
 	if( repn != 0 ) {
-		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
+		for( std::list<Image>::reference ref :  out_images ) {
 			ref.convertToType( repn, static_cast<autoscaleOption>( scale_mode - 1 ) ); //noscale is 0 but 1 in the selection
 		}
 	}
@@ -264,7 +273,7 @@ Image IOApplication::fetchImage()
 	return ret;
 }
 
-boost::shared_ptr< util::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
+std::shared_ptr< util::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
 {
 	return isis::util::Application::getLogHandler( module, level );
 }

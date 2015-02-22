@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
 	BOOST_REQUIRE( images.size() >= 1 );
 
-	BOOST_FOREACH( data::Image & null, images ) {
+	for( data::Image & null :  images ) {
 
 		// adapt additional/non supported properties
 		null.setValueAs( "nifti/qform_code", formCode );
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 		BOOST_REQUIRE( data::IOFactory::write( null, niifile.native() ) );
 
 		// nifti does not know voxelGap - so some other properties have to be modified
-		null.property( "voxelSize" ).castTo<util::fvector3>() += null.property( "voxelGap" ).castTo<util::fvector3>();
+		null.touchProperty( "voxelSize" ) += null.getValueAs<util::fvector3>( "voxelGap" );
 		null.remove( "voxelGap" );
 
 		// that will be set by the nifti reader
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 
 			// because of the quaternions we get some rounding errors in rowVec and columnVec
 			const char *fuzzies[] = {"rowVec", "columnVec", "voxelSize"};
-			BOOST_FOREACH( const char * fuzz, fuzzies ) {
+			for( const char * fuzz :  fuzzies ) {
 				const util::fvector3 niiVec = niiChunks[i].getValueAs<util::fvector3>( fuzz );
 				const util::fvector3 nullVec = nullChunks[i].getValueAs<util::fvector3>( fuzz );
 				BOOST_REQUIRE( niiVec.fuzzyEqual( nullVec ) );

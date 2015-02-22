@@ -26,7 +26,6 @@
 #include <CoreUtils/application.hpp>
 #include <CoreUtils/matrix.hpp>
 #include <DataStorage/io_application.hpp>
-#include <boost/scoped_ptr.hpp>
 #include "qdefaultmessageprint.hpp"
 
 namespace isis
@@ -36,7 +35,7 @@ namespace qt5
 
 class QtApplication : public util::Application
 {
-	boost::scoped_ptr<QGuiApplication> m_qapp;
+	std::unique_ptr<QGuiApplication> m_qapp;
 public:
 	QGuiApplication &getQApplication();
 	QtApplication( const char name[] );
@@ -47,13 +46,13 @@ class IOQtApplication : public data::IOApplication
 {
 	int m_argc; //same as above
 	char **m_argv;
-	boost::scoped_ptr<QGuiApplication> m_qapp;
+	std::unique_ptr<QGuiApplication> m_qapp;
 public:
 	QGuiApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 protected:
-	virtual boost::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 

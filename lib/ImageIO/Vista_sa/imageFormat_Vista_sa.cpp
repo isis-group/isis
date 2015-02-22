@@ -70,7 +70,7 @@ int ImageFormat_VistaSa::load ( std::list< data::Chunk >& chunks, const std::str
 	//                                                                      >> '{',
 	//                      d );
 	//  std::cout << r << std::endl;
-	//  BOOST_FOREACH( std::list< data::ValueArray< uint8_t > >::const_reference number, d)
+	//  for( std::list< data::ValueArray< uint8_t > >::const_reference number :  d)
 	//  {
 	//      std::cout << number << std::endl;
 	//  }

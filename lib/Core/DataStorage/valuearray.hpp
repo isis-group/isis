@@ -20,13 +20,10 @@
 #ifndef TYPEPTR_HPP
 #define TYPEPTR_HPP
 
-#include <boost/static_assert.hpp>
-
 #include "valuearray_base.hpp"
 #include "valuearray_converter.hpp"
 #include "../CoreUtils/value.hpp"
 #include "common.hpp"
-#include <boost/type_traits/remove_const.hpp>
 #include "endianess.hpp"
 
 namespace isis
@@ -39,7 +36,7 @@ namespace _internal
 /// @cond _internal
 template<typename T, uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_STATIC_ASSERT( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate ); //well we're pretty f**ed in this case
+	static_assert( std::numeric_limits<T>::has_denorm != std::denorm_indeterminate, "denormisation not known" ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
 		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
@@ -104,7 +101,7 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 };
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
 	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
-		BOOST_STATIC_ASSERT( sizeof( std::complex<T> ) == sizeof( T ) * 2 ); // we need this for the calcMinMax-hack below
+		static_assert( sizeof( std::complex<T> ) == sizeof( T ) * 2, "complex type seems not POD" ); // we need this for the calcMinMax-hack below
 		//use complex as a two element array and find the respective minmax for the two elements
 		const std::pair<T, T > minmax[] = {
 			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ), ref.getLength() * 2 ),
@@ -139,7 +136,7 @@ template<typename TYPE> class ValueArrayIterator: public std::iterator<std::rand
 public:
 	ValueArrayIterator(): p( NULL ) {}
 	ValueArrayIterator( TYPE *_p ): p( _p ) {}
-	ValueArrayIterator( const ValueArrayIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
+	ValueArrayIterator( const ValueArrayIterator<typename std::remove_const<TYPE>::type > &src ): p( src.p ) {}
 
 	ValueArrayIterator<TYPE>& operator++() {++p; return *this;}
 	ValueArrayIterator<TYPE>& operator--() {--p; return *this;}
@@ -182,7 +179,7 @@ public:
  */
 template<typename TYPE> class ValueArray: public ValueArrayBase
 {
-	boost::shared_ptr<TYPE> m_val;
+	std::shared_ptr<TYPE> m_val;
 	static const util::ValueReference getValueFrom( const void *p ) {
 		return util::Value<TYPE>( *reinterpret_cast<const TYPE *>( p ) );
 	}
@@ -200,12 +197,14 @@ public:
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 
-	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
+	constexpr static unsigned short staticID(){
+		return util::Value<TYPE>::staticID()<<8 ;
+	}
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") as automatic deletion was disabled for it";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
@@ -232,13 +231,13 @@ public:
 	}
 
 	/**
-	 * Creates ValueArray from a boost::shared_ptr of the same type.
+	 * Creates ValueArray from a std::shared_ptr of the same type.
 	 * It will inherit the deleter of the shared_ptr.
 	 * \param ptr the shared_ptr to share the data with
 	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValueArray( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
+	ValueArray( const std::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValueArray from a pointer of type TYPE.
@@ -263,16 +262,16 @@ public:
 
 	virtual ~ValueArray() {}
 
-	boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
+	std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
 		if( offset ) {
 			DelProxy proxy( *this );
 			const uint8_t *const b_ptr = reinterpret_cast<const uint8_t *>( m_val.get() ) + offset;
-			return boost::shared_ptr<const void>( b_ptr, proxy );
+			return std::shared_ptr<const void>( b_ptr, proxy );
 		} else
-			return boost::static_pointer_cast<const void>( m_val );
+			return std::static_pointer_cast<const void>( m_val );
 	}
-	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
-		return boost::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
+	std::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
+		return std::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
 	}
 	virtual value_iterator beginGeneric() {
 		return value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
@@ -299,11 +298,11 @@ public:
 			ret += util::Value<TYPE>( *( end() - 1 ) ).toString( labeled );
 		}
 
-		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
+		return std::to_string( m_len ) + "#" + ret;
 	}
 
 	std::string getTypeName()const {return staticName();}
-	unsigned short getTypeID()const {return staticID;}
+	unsigned short getTypeID()const {return staticID();}
 	bool isFloat() const {return boost::is_float< TYPE >::value;}
 	bool isInteger() const {return boost::is_integral< TYPE >::value;}
 
@@ -324,13 +323,13 @@ public:
 		return begin()[idx];
 	}
 	/**
-	 * Implicit conversion to boost::shared_ptr\<TYPE\>
+	 * Implicit conversion to std::shared_ptr\<TYPE\>
 	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data
 	 * (using the given deleter) if required.
-	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
+	 * \return std::shared_ptr\<TYPE\> handling same data as the object.
 	 */
-	operator boost::shared_ptr<TYPE>&() {return m_val;}
-	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
+	operator std::shared_ptr<TYPE>&() {return m_val;}
+	operator const std::shared_ptr<TYPE>&()const {return m_val;}
 
 	size_t bytesPerElem()const {return sizeof( TYPE );}
 
@@ -340,7 +339,7 @@ public:
 			return std::pair<util::ValueReference, util::ValueReference>();
 		} else {
 
-			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, std::is_arithmetic<TYPE>::value>()( *this );
 
 			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 		}
@@ -372,7 +371,7 @@ public:
 	}
 	//
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		if( typeID == staticID && scaleopt == autoscale ) { // if id is the same and autoscale is requested
+		if( typeID == staticID() && scaleopt == autoscale ) { // if id is the same and autoscale is requested
 			static const util::Value<uint8_t> one( 1 );
 			static const util::Value<uint8_t> zero( 0 );
 			return std::pair<util::ValueReference, util::ValueReference>( one, zero ); // the result is always 1/0
@@ -394,7 +393,7 @@ template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigne
 template<typename T> bool ValueArrayBase::is()const
 {
 	util::checkType<T>();
-	return getTypeID() == ValueArray<T>::staticID;
+	return getTypeID() == ValueArray<T>::staticID();
 }
 
 

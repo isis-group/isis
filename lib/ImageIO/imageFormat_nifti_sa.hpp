@@ -61,6 +61,7 @@
 #include <CoreUtils/matrix.hpp>
 #include <DataStorage/fileptr.hpp>
 #include <sys/stat.h>
+#include <memory>
 
 namespace isis
 {
@@ -174,26 +175,26 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::map<unsigned short, demuxer_type> prop_demuxer;
 	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
 		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
-		return data::ValueArray<NEW_T>::staticID;
+		return data::ValueArray<NEW_T>::staticID();
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
-	static std::list<data::Chunk> parseSliceOrdering( const boost::shared_ptr< _internal::nifti_1_header > &head, data::Chunk current );
+	   void parseSliceOrdering( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk& current );
 
 	static bool parseDescripForSPM( util::PropertyMap &props, const char desc[] );
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
-	void parseHeader( const boost::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
-	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
+	void parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
+	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
-	bool checkSwapEndian ( boost::shared_ptr< _internal::nifti_1_header > header );
+	bool checkSwapEndian ( std::shared_ptr< _internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
 
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
+	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm withExtProtocols";}
 

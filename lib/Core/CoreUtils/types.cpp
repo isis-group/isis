@@ -22,7 +22,7 @@
 #include <complex>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/mpl/for_each.hpp>
-#include <boost/foreach.hpp>
+
 
 namespace isis
 {
@@ -88,9 +88,9 @@ struct type_lister {
 	bool m_withValues, m_withValueArrays;
 	type_lister( std::map< unsigned short, std::string > &map, bool withValues, bool withValueArrays ): m_map( map ), m_withValues( withValues ), m_withValueArrays( withValueArrays ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_withValues )m_map.insert( std::make_pair( util::Value<SRC>::staticID, util::Value<SRC>::staticName() ) );
+		if( m_withValues )m_map.insert( std::make_pair( util::Value<SRC>::staticID(), util::Value<SRC>::staticName() ) );
 
-		if( m_withValueArrays )m_map.insert( std::make_pair( data::ValueArray<SRC>::staticID, data::ValueArray<SRC>::staticName() ) );
+		if( m_withValueArrays )m_map.insert( std::make_pair( data::ValueArray<SRC>::staticID(), data::ValueArray<SRC>::staticName() ) );
 	}
 };
 
@@ -109,7 +109,7 @@ std::map< std::string, unsigned short > getTransposedTypeMap( bool withValues, b
 	typedef std::map< std::string, unsigned short> transposedMapType;
 	typedef std::map< unsigned short, std::string > mapType;
 	transposedMapType ret;
-	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withValues, withValueArrays ) ) {
+	for( mapType::const_reference ref : util::getTypeMap( withValues, withValueArrays ) ) {
 		ret[ref.second] = ref.first;
 	}
 	return ret;

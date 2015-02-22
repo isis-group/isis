@@ -73,6 +73,9 @@ BOOST_AUTO_TEST_CASE( property_compare_test )
 	BOOST_CHECK_NE(buff,fives16bit);
 	buff.erase(4);
 	BOOST_CHECK_NE(buff,fives16bit); // compares 5,5,5,5,6 and 5,5,5,5,5
+	
+	BOOST_CHECK(!(PropertyValue()!=PropertyValue())); //empty properies are not unequal
+	BOOST_CHECK(!(PropertyValue()==PropertyValue())); //nor are they equal
 
 	// converting compare
 	BOOST_CHECK( fives16bit.eq(fivesint));

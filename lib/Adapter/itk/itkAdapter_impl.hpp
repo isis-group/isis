@@ -34,32 +34,32 @@ template<typename TImage> typename TImage::Pointer
 itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkReader )
 {
 	typedef TImage OutputImageType;
-	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image( src ) );
+	m_ImageISIS = std::shared_ptr< data::Image >( new data::Image( src ) );
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
-	case data::ValueArray<int8_t>::staticID:
+	case data::ValueArray<int8_t>::staticID():
 		return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int8_t>::staticID:
+	case data::ValueArray<u_int8_t>::staticID():
 		return this->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<int16_t>::staticID:
+	case data::ValueArray<int16_t>::staticID():
 		return this->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int16_t>::staticID:
+	case data::ValueArray<u_int16_t>::staticID():
 		return this->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<int32_t>::staticID:
+	case data::ValueArray<int32_t>::staticID():
 		return this->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<u_int32_t>::staticID:
+	case data::ValueArray<u_int32_t>::staticID():
 		return this->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<float>::staticID:
+	case data::ValueArray<float>::staticID():
 		return this->internCreateItk<float, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::ValueArray<double>::staticID:
+	case data::ValueArray<double>::staticID():
 		return this->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 		break;
 	default:
@@ -72,28 +72,28 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 {
 	if( m_TypeID ) {
 		switch ( m_TypeID ) {
-		case data::ValueArray<int8_t>::staticID:
+		case data::ValueArray<int8_t>::staticID():
 			return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int8_t>::staticID:
+		case data::ValueArray<u_int8_t>::staticID():
 			return this->internCreateISIS<TImage, u_int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<int16_t>::staticID:
+		case data::ValueArray<int16_t>::staticID():
 			return this->internCreateISIS<TImage, int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID():
 			return this->internCreateISIS<TImage, u_int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<int32_t>::staticID:
+		case data::ValueArray<int32_t>::staticID():
 			return this->internCreateISIS<TImage, int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<u_int32_t>::staticID:
+		case data::ValueArray<u_int32_t>::staticID():
 			return this->internCreateISIS<TImage, u_int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<float>::staticID:
+		case data::ValueArray<float>::staticID():
 			return this->internCreateISIS<TImage, float>( src, behaveAsItkWriter );
 			break;
-		case data::ValueArray<double>::staticID:
+		case data::ValueArray<double>::staticID():
 			return this->internCreateISIS<TImage, double>( src, behaveAsItkWriter );
 			break;
 		default:
@@ -210,11 +210,11 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
 	std::vector< data::Chunk> chList = m_ImageISIS->copyChunksToVector();
 	size_t chunkIndex = 0;
-	BOOST_FOREACH(  std::vector<data::Chunk >::reference ref, chList ) {
+	for(  std::vector<data::Chunk >::reference ref: chList ) {
 		data::Chunk &chRef = ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
 		chRef.getValueArray<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
-		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
+		std::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropertyMapVector.push_back( tmpMap );
 	}
 	importer->SetImportPointer( refTarget, itkSize[0], false );
@@ -253,7 +253,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 
 	data::Chunk
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2] ) ) ;
-	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID );
+	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID() );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	tmpChunk.setValueAs<uint16_t>( "sequenceNumber", 1 );
@@ -289,7 +289,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	LOG_IF( chList.size() != m_ChunkPropertyMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
 	//iterate through the spliced chunks of the image and set all the chunk specific parameters
 	size_t chunkCounter = 0;
-	BOOST_FOREACH( std::vector< data::Chunk >::reference chRef, chList ) {
+	for( std::vector< data::Chunk >::reference chRef: chList ) {
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropertyMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
@@ -321,7 +321,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	T( 2, 1 ) = 0;
 	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
-	BOOST_FOREACH( std::list<data::Image>::reference ref, retList ) {
+	for( std::list<data::Image>::reference ref: retList ) {
 		ref.transformCoords( T );
 	}
 	return retList;

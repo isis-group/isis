@@ -12,7 +12,6 @@
 //
 
 #include "propmap.hpp"
-#include <boost/foreach.hpp>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -26,35 +25,10 @@ API_EXCLUDE_BEGIN;
 namespace _internal
 {
 
-/**
- * Continously searches in a sorted list using the given less-than comparison.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Then it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns, it references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \param compOp the comparison functor. It must provide "bool operator()(T,T)".
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, const CMP &compOp )
-{
-	//find the first iterator which does not compare less
-	current = std::lower_bound( current, end, compare, compOp );
-
-	if ( current == end //if we're at the end
-		 || compOp( compare, *current ) //or compare less than that iterator
-	   )
-		return false;//we didn't find a match
-	else
-		return true;//not(current <> compare) makes compare == current
-}
 struct MapStrAdapter: boost::static_visitor<PropertyValue> {
 	PropertyValue operator()( const PropertyValue &val )const {return val;}
 	PropertyValue operator()( const PropertyMap &map )const {
-		return PropertyValue( std::string( "[[PropertyMap with " ) + boost::lexical_cast<std::string>( map.container.size() ) + " entries]]" );
+		return PropertyValue( std::string( "[[PropertyMap with " ) + std::to_string( map.container.size() ) + " entries]]" );
 	}
 };
 struct RemoveEqualCheck: boost::static_visitor<bool> {
@@ -81,11 +55,11 @@ struct JoinTreeVisitor: boost::static_visitor<bool> {
 	bool operator()( PropertyValue &first, PropertyValue &second )const { // if both are Values
 		if( first.isEmpty() || overwrite ) { // if ours is empty or overwrite is enabled
 			//replace ours by the other
-			if(delsource)first.transfer(second);
+			if(delsource)first.transfer(second,true);
 			else first = second; 
 			return true;
 		} else { // otherwise put the other into rejected if its unequal to ours
-			if( first != second )
+			if( first != second && !second.isEmpty())
 				rejects.insert( rejects.end(), prefix / name );
 			return false;
 		}
@@ -126,7 +100,7 @@ struct TreeInvalidCheck: boost::static_visitor<bool> {
 
 struct parser {
 	typedef BOOST_TYPEOF( boost::spirit::ascii::space | '\t' | boost::spirit::eol ) skip_type;
-	template<typename T> struct rule{typedef boost::spirit::qi::rule<uint8_t*, T(), skip_type > decl;};
+	template<typename T> struct rule{typedef boost::spirit::qi::rule<const uint8_t*, T(), skip_type > decl;};
 	typedef boost::variant<PropertyValue, PropertyMap> value_cont;
 
 	struct add_member {
@@ -147,7 +121,7 @@ struct parser {
 					target.branch( label ) = boost::get<PropertyMap>( container );
 					break;
 				case 0:
-					target.property( label ) = boost::get<PropertyValue>( container );
+					target.touchProperty( label ) = boost::get<PropertyValue>( container );
 					break;
 				}
 
@@ -186,12 +160,17 @@ size_t PropertyMap::PropPath::length()const
 	if( empty() )return 0;
 
 	size_t ret = 0;
-	BOOST_FOREACH( const_reference ref, *this )
+	for( const_reference ref :  *this )
 	ret += ref.length();
 	return ret + size() - 1;
 }
 
-
+std::string PropertyMap::PropPath::toString()const
+{
+	std::stringstream out;
+	out << *this;
+	return out.str();
+}
 ///////////////////////////////////////////////////////////////////
 // Contructors
 ///////////////////////////////////////////////////////////////////
@@ -281,18 +260,18 @@ const PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )c
 	}
 }
 
-PropertyValue &PropertyMap::property( const PropertyMap::PropPath &path )
+PropertyValue &PropertyMap::touchProperty( const PropertyMap::PropPath &path )
 {
-	return *tryFetchEntry<PropertyValue>( path );
+	return tryFetchEntry<PropertyValue>( path ).get();
 }
 
 const PropertyMap &PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
-	return *tryFindEntry<PropertyMap>( path );
+	return tryFindEntry<PropertyMap>( path ).get();
 }
 PropertyMap &PropertyMap::branch( const PropPath &path )
 {
-	return *tryFetchEntry<PropertyMap>( path );
+	return tryFetchEntry<PropertyMap>( path ).get();
 }
 
 bool PropertyMap::remove( const PropPath &path )
@@ -308,9 +287,11 @@ bool PropertyMap::remove( const PropPath &path )
 bool PropertyMap::remove( const PathSet &removeList, bool keep_needed )
 {
 	bool ret = true;
-	BOOST_FOREACH( PathSet::const_reference key, removeList ) {
-		if( hasProperty( key ) ) { // remove everything which is there
-			if( !( property( key ).isNeeded() && keep_needed ) ) { // if its not needed or keep_need is not true
+	for( PathSet::const_reference key :  removeList ) {
+		optional< PropertyValue& > found = tryFindEntry<PropertyValue>( key );
+
+		if( found ) { // remove everything which is there
+			if( !(found->isNeeded() && keep_needed) ) { // if its not needed or keep_need is not true
 				ret &= remove( key );
 			}
 		} else {
@@ -329,7 +310,7 @@ bool PropertyMap::remove( const PropertyMap &removeMap, bool keep_needed )
 	//remove everything that is also in second
 	for ( container_type::const_iterator otherIt = removeMap.container.begin(); otherIt != removeMap.container.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
 			if ( thisIt->second.type() == typeid( PropertyMap ) && otherIt->second.type() == typeid( PropertyMap ) ) { //both are a branch => recurse
 				PropertyMap &mySub = boost::get<PropertyMap>( thisIt->second );
 				const PropertyMap &otherSub = boost::get<PropertyMap>( otherIt->second );
@@ -370,14 +351,14 @@ PropertyMap::DiffMap PropertyMap::getDifference( const PropertyMap &other ) cons
 	return ret;
 }
 
-void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &ret, const PropPath &prefix ) const
+void PropertyMap::diffTree( const container_type& other, DiffMap& ret, const PropPath& prefix ) const
 {
 	container_type::const_iterator otherIt = other.begin();
 
 	//insert everything that is in this, but not in second or is on both but differs
 	for ( container_type::const_iterator thisIt = container.begin(); thisIt != container.end(); thisIt++ ) {
 		//find the closest match for thisIt->first in other (use the value-comparison-functor of the container)
-		if ( _internal::continousFind( otherIt, other.end(), *thisIt, container.value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
+		if ( continousFind( otherIt, other.end(), *thisIt, container.value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
 			if( thisIt->second.type() == typeid( PropertyMap ) && otherIt->second.type() == typeid( PropertyMap ) ) { // both are branches -- recursion step
 				const PropertyMap &thisMap = boost::get<PropertyMap>( thisIt->second ), &refMap = boost::get<PropertyMap>( otherIt->second );
 				thisMap.diffTree( refMap.container, ret, prefix / thisIt->first );
@@ -397,7 +378,7 @@ void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &r
 						boost::apply_visitor( _internal::MapStrAdapter(), otherIt->second )
 													   ) ) );
 			}
-		} else { // if ref is not in the other map
+		} else { // if ref is not in the other map 
 			const PropertyValue firstVal = boost::apply_visitor( _internal::MapStrAdapter(), thisIt->second );
 			ret.insert( // add (propertyname|(value1|[empty]))
 				ret.end(),      // we know it has to be at the end
@@ -413,7 +394,7 @@ void PropertyMap::diffTree( const container_type &other, PropertyMap::DiffMap &r
 	container_type::const_iterator thisIt = container.begin();
 
 	for ( otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
-		if ( ! _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //there is nothing in this which has the same key as ref
+		if ( ! continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //there is nothing in this which has the same key as ref
 
 			const PropertyValue secondVal = boost::apply_visitor( _internal::MapStrAdapter(), otherIt->second );
 			ret.insert(
@@ -433,7 +414,7 @@ void PropertyMap::removeEqual ( const PropertyMap &other, bool removeNeeded )
 	//remove everything that is also in second and equal (or also empty)
 	for ( container_type::const_iterator otherIt = other.container.begin(); otherIt != other.container.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
 
 			//          if(thisIt->second.type()==typeid(PropertyValue) && otherIt->second.type()==typeid(PropertyValue)){ // if both are Values
 			if( boost::apply_visitor( _internal::RemoveEqualCheck( removeNeeded ), thisIt->second, otherIt->second ) ) {
@@ -450,14 +431,15 @@ PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite
 {
 	PathSet rejects;
 	joinTree( const_cast<PropertyMap &>(other), overwrite, false, PropPath(), rejects );
-	LOG_IF(!rejects.empty(),Debug,notice) << "The properties " << MSubject(rejects) << " where rejected during the join";
+	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the join";
 	return rejects;
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 {
+#warning test non removal of rejected
 	PathSet rejects;
 	joinTree( other, overwrite, true, PropPath(), rejects );
-	LOG_IF(!rejects.empty(),Debug,notice) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
+	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
 	return rejects;
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, const PropPath &path, bool overwrite)
@@ -479,7 +461,7 @@ void PropertyMap::joinTree( PropertyMap &other, bool overwrite, bool delsource, 
 	container_type::iterator thisIt = container.begin();
 
 	for ( container_type::iterator otherIt = other.container.begin(); otherIt != other.container.end(); ) { //iterate through the elements of other
-		if ( _internal::continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
+		if ( continousFind( thisIt, container.end(), *otherIt, container.value_comp() ) ) { // if the element is allready here
 			if(
 				boost::apply_visitor( _internal::JoinTreeVisitor( overwrite, delsource, rejects, prefix, thisIt->first ), thisIt->second, otherIt->second ) &&
 				delsource
@@ -512,7 +494,7 @@ PropertyMap::FlatMap PropertyMap::getFlatMap() const
 
 bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t dstID)
 {
-	PropertyValue &src = property( from );
+	const PropertyValue src = property( from );
 	if(src.isEmpty())
 		return false;
 	
@@ -526,7 +508,7 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t
 		PropertyValue buff= src.copyByID( dstID );
 
 		if( !buff.isEmpty() ){
-			property( to ).swap(buff);
+			touchProperty( to ).swap(buff);
 			if(from!=to)remove( from );
 			return true;
 		}
@@ -538,9 +520,19 @@ bool PropertyMap::transform( const PropPath &from,  const PropPath &to, uint16_t
 PropertyMap::PathSet PropertyMap::getKeys()const   {return genKeyList<TrueP>();}
 PropertyMap::PathSet PropertyMap::getMissing()const {return genKeyList<InvalidP>();}
 
+PropertyMap::PathSet PropertyMap::getLocalBranches() const
+{
+	return getLocal<PropertyMap>();
+}
+PropertyMap::PathSet PropertyMap::getLocalProps() const
+{
+	return getLocal<PropertyValue>();
+}
+
+
 void PropertyMap::addNeeded( const PropPath &path )
 {
-	property( path ).needed() = true;
+	touchProperty( path ).needed() = true;
 }
 
 
@@ -581,7 +573,7 @@ PropertyMap::PropPath PropertyMap::find( const key_type &key, bool allowProperty
 	  ) {
 		return found->first;
 	} else { // otherwise search in the branches
-		BOOST_FOREACH( container_type::const_reference ref, container ) {
+		for( container_type::const_reference ref :  container ) {
 			if( ref.second.type() == typeid( PropertyMap ) ) {
 				const PropPath found = boost::get<PropertyMap>( ref.second ).find( name.back(), allowProperty, allowBranch );
 
@@ -633,7 +625,7 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 {
 #warning getDifference is waste of time here
 	const DiffMap difference = common.getDifference( *this ); 
-	BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
+	for( const DiffMap::value_type & ref :  difference ) {
 		if ( ! ref.second.first.isEmpty() ) {
 			LOG( Debug, verbose_info ) << "Detected difference in " << ref << " removing from common";
 			common.remove( ref.first );//if there is something in common, remove it
@@ -641,7 +633,7 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 	}
 }
 
-bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra_token, std::string list_trees )
+bool PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees )
 {
 	using namespace boost::spirit;
 	using qi::lit;
@@ -649,7 +641,12 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 
 	parser::rule<boost::fusion::vector2<std::string, parser::value_cont> >::decl member;
 	
-	parser::rule<std::string>::decl string( lexeme['"' >> *( ascii::print - '"' ) >> '"'], "string" );
+	qi::symbols<char const, char const> esc_char;
+	esc_char.add("\\a", '\a')("\\b", '\b')("\\f", '\f')("\\n", '\n')
+	("\\r", '\r')("\\t", '\t')("\\v", '\v')("\\\\", '\\')
+	("\\\'", '\'')("\\\"", '\"');
+	
+	parser::rule<std::string>::decl string( lexeme['"' >> *(esc_char | "\\x" >> qi::hex | ascii::print - '"')>> '"'], "string" );
 	parser::rule<std::string>::decl label( string >> ':', "label" );
 	parser::rule<int>::decl integer( int_ >> !lit( '.' ), "integer" ) ; // an integer followed by a '.' is not an integer
 	parser::rule<dlist>::decl dlist( lit( '[' ) >> double_ % ',' >> ']', "dlist" );
@@ -661,13 +658,13 @@ bool PropertyMap::readJson( uint8_t* streamBegin, uint8_t* streamEnd, char extra
 	parser::rule<PropertyMap>::decl object( lit( '{' ) >> ( member[parser::add_member( extra_token )] % ',' || eps ) >> '}', "object" );
 	parser::rule<PropertyMap>::decl list_object( lit( '{' ) >> ( ( label >> vallist )[parser::add_member( extra_token )] % ',' || eps ) >> '}', "list_object" );
 
-	BOOST_FOREACH(const std::string &label,util::stringToList<std::string>(list_trees,':')){
+	for(const std::string &label : util::stringToList<std::string>(list_trees,':')){
 		member= member.copy() | lexeme['"' >> ascii::string( label ) >> '"'] >> ':' >> list_object;
 	}
 
 	member= member.copy() | label >> ( value | vallist | object );
 
-	uint8_t* end = streamEnd;
+	const uint8_t* end = streamEnd;
 	qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
 	return end == streamEnd;
 }
@@ -687,10 +684,19 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 
 	return out;
 }
+PropertyValue& PropertyMap::setValueAs(const PropertyMap::PropPath& path, const char* val, size_t at){
+	return setValueAs<std::string>(path,val,at);
+}
+PropertyValue& PropertyMap::setValueAs(const PropertyMap::PropPath& path, const char* val){
+	return setValueAs<std::string>(path,val);
+}
+
 
 /// @cond _internal
 bool PropertyMap::TrueP::operator()( const PropertyValue &/*ref*/ ) const {return true;}
 bool PropertyMap::InvalidP::operator()( const PropertyValue &ref ) const {return ref.isNeeded() && ref.isEmpty();}
+bool PropertyMap::EmptyP::operator()(const PropertyValue& ref) const {return ref.isEmpty();};
+
 /// @endcond _internal
 
 }

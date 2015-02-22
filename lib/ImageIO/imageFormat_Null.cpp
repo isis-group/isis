@@ -59,14 +59,14 @@ public:
 		return "50 500 1000 2000";
 	}
 
-	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 
 		size_t size = getSize( dialect );
 
 		// normal sequencial image
 		std::list<data::Chunk> ret,loaded = makeImage( size, 0, "normal sequencial Image" );
 		uint32_t s = 0;
-		BOOST_FOREACH( data::Chunk & ref, ret ) {
+		for( data::Chunk & ref :  ret ) {
 			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 		}
 		ret.splice( ret.end(), loaded );
@@ -93,7 +93,7 @@ public:
 		return timesteps * size;
 	}
 
-	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 		data::Image image = img;
 
 		// set by the core, thus the newChunks cannot have one
@@ -110,7 +110,7 @@ public:
 		switch( image.getValueAs<int>( "sequenceNumber" ) ) {
 		case 0: //image 0 is a "normal" image
 			newChunks = makeImage( size, 0, "normal sequencial Image" );
-			BOOST_FOREACH( data::Chunk & ref, newChunks ) {
+			for( data::Chunk & ref :  newChunks ) {
 				ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 			}
 			break;

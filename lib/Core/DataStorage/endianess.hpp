@@ -1,10 +1,10 @@
 #ifndef ENDIANESS_HPP
 #define ENDIANESS_HPP
 
-#include <boost/type_traits/is_arithmetic.hpp>
 #include "../CoreUtils/types.hpp"
 #include "../CoreUtils/value.hpp"
 #include "common.hpp"
+#include <type_traits>
 
 #ifdef HAVE_BYTESWAP
 #include <byteswap.h>
@@ -78,9 +78,9 @@ template<typename TYPE> struct EndianSwapper<TYPE, true> {
 template<typename TYPE> struct EndianSwapper<util::color<TYPE>, false> {
 	static util::color<TYPE> swap( const util::color<TYPE> &src ) {
 		util::color<TYPE> ret;
-		ret.r = EndianSwapper<TYPE, boost::is_arithmetic<TYPE>::value>::swap( src.r );
-		ret.g = EndianSwapper<TYPE, boost::is_arithmetic<TYPE>::value>::swap( src.g );
-		ret.b = EndianSwapper<TYPE, boost::is_arithmetic<TYPE>::value>::swap( src.b );
+		ret.r = EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap( src.r );
+		ret.g = EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap( src.g );
+		ret.b = EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap( src.b );
 		return ret;
 	}
 };
@@ -89,7 +89,7 @@ template<typename TYPE> struct EndianSwapper<util::color<TYPE>, false> {
 template<typename TYPE> struct EndianSwapper<std::list<TYPE>, false> {
 	static std::list<TYPE> swap( const std::list<TYPE> &src ) {
 		std::list<TYPE> ret;
-		std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper<TYPE, boost::is_arithmetic<TYPE>::value>::swap );
+		std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap );
 		return ret;
 	}
 };
@@ -98,7 +98,7 @@ template<typename TYPE> struct EndianSwapper<std::list<TYPE>, false> {
 template<typename TYPE, size_t SIZE> struct EndianSwapper<util::FixedVector<TYPE, SIZE>, false> {
 	static util::FixedVector<TYPE, SIZE> swap( const util::FixedVector<TYPE, SIZE> &src ) {
 		util::FixedVector<TYPE, SIZE> ret;
-		std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper<TYPE, boost::is_arithmetic<TYPE>::value>::swap );
+		std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap );
 		return ret;
 	}
 };
@@ -108,7 +108,7 @@ template<typename TYPE, size_t SIZE> struct EndianSwapper<util::FixedVector<TYPE
 // public interface
 template<typename T> static  T endianSwap( const T &var )
 {
-	return _internal::EndianSwapper<T, boost::is_arithmetic< T >::value >::swap( var );
+	return _internal::EndianSwapper<T, std::is_arithmetic< T >::value >::swap( var );
 }
 template<typename ITER, typename TITER> static  void endianSwapArray( const ITER begin, const ITER end, TITER target )
 {

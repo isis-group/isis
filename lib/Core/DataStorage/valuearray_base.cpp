@@ -31,7 +31,7 @@ size_t ValueArrayBase::getLength() const { return m_len;}
 
 ValueArrayBase::~ValueArrayBase() {}
 
-ValueArrayBase::DelProxy::DelProxy( const isis::data::ValueArrayBase &master ): boost::shared_ptr<const void>( master.getRawAddress() )
+ValueArrayBase::DelProxy::DelProxy( const isis::data::ValueArrayBase &master ): std::shared_ptr<const void>( master.getRawAddress() )
 {
 	LOG( Debug, verbose_info ) << "Creating DelProxy for " << master.getTypeName() << " at " << this->get();
 }
@@ -80,9 +80,9 @@ size_t ValueArrayBase::compare( size_t start, size_t end, const ValueArrayBase &
 			<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
 
 	// lock the memory so we can mem-compare the elements (use uint8_t because some compilers do not like arith on void*)
-	const boost::shared_ptr<const uint8_t>
-	src_s = boost::static_pointer_cast<const uint8_t>( getRawAddress() ),
-	dst_s = boost::static_pointer_cast<const uint8_t>( dst.getRawAddress() );
+	const std::shared_ptr<const uint8_t>
+	src_s = std::static_pointer_cast<const uint8_t>( getRawAddress() ),
+	dst_s = std::static_pointer_cast<const uint8_t>( dst.getRawAddress() );
 	const uint8_t *src_p = src_s.get(), *dst_p = dst_s.get();
 	const size_t el_size = bytesPerElem();
 
@@ -102,7 +102,7 @@ ValueArrayBase::Reference ValueArrayBase::copyByID( unsigned short ID, scaling_p
 	const Converter &conv = getConverterTo( ID );
 
 	if( conv ) {
-		boost::scoped_ptr<ValueArrayBase> ret;
+		std::unique_ptr<ValueArrayBase> ret;
 		conv->generate( *this, ret, getScaling( scaling, ID ) );
 		return *ret;
 	} else {
@@ -136,7 +136,7 @@ ValueArrayBase::Reference ValueArrayBase::createByID( unsigned short ID, size_t 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
 	if( f1 != converters().end() && ( f2 = f1->second.find( ID ) ) != f1->second.end() ) {
 		const _internal::ValueArrayConverterBase &conv = *( f2->second );
-		boost::scoped_ptr<ValueArrayBase> ret;
+		std::unique_ptr<ValueArrayBase> ret;
 		conv.create( ret, len );
 		return *ret;
 	} else {
@@ -183,8 +183,8 @@ void ValueArrayBase::copyRange( size_t start, size_t end, ValueArrayBase &dst, s
 		LOG( Runtime, error )
 				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
 	} else {
-		boost::shared_ptr<void> daddr = dst.getRawAddress();
-		const boost::shared_ptr<const void> saddr = getRawAddress();
+		std::shared_ptr<void> daddr = dst.getRawAddress();
+		const std::shared_ptr<const void> saddr = getRawAddress();
 		const size_t soffset = bytesPerElem() * start; //source offset in bytes
 		const int8_t *const  src = ( int8_t * )saddr.get();
 		const size_t doffset = bytesPerElem() * dst_start;//destination offset in bytes

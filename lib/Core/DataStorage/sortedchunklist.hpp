@@ -22,7 +22,7 @@
 #include "chunk.hpp"
 #include "../CoreUtils/vector.hpp"
 #include <stack>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 using boost::optional;
 
@@ -51,23 +51,38 @@ public:
 		bool operator()( const util::fvector3 &a, const util::fvector3 &b ) const;
 	};
 	struct chunkPtrOperator {
-		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr ) = 0;
+		virtual std::shared_ptr<Chunk> operator()( const std::shared_ptr<Chunk> &ptr ) = 0;
 		virtual ~chunkPtrOperator();
 	};
+	struct getproplist:public std::set<util::PropertyValue>
+	{
+		util::PropertyMap::PropPath name;
+		getproplist(util::PropertyMap::PropPath _name):name(_name){}
+		template<typename T> void operator()(const std::shared_ptr<T> &p){operator()(*p);}
+		void operator()(const util::PropertyMap &c){
+			util::PropertyValue p=c.property(name);
+			if(p.size()>1){
+				const std::vector< util::PropertyValue > spliters=p.splice(1);
+				insert(spliters.begin(),spliters.end());
+			} else if(p.size()==1)
+				insert(p);
+		}
+	};
+	
 private:
-	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
+	typedef std::map<util::PropertyValue, std::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
 	typedef std::map<util::fvector3, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
 	PrimaryMap chunks;
 
 	// low level finding
-	boost::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
+	std::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
 	SecondaryMap *primaryFind( const util::fvector3 &key );
 
 	// low level inserting
-	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
-	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
+	std::pair<std::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
+	std::pair<std::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
 	std::list<util::PropertyMap::PropPath> equalProps;
 public:
@@ -88,6 +103,17 @@ public:
 
 	///runs op on all entries of the list (the order is not defined) and replaces the entries by the return value
 	void transform( chunkPtrOperator &op );
+	
+	///runs op on all entries of the list (the order is not defined)
+	template<typename T> void forall( T &func)const
+	{
+		for( PrimaryMap::const_reference outer : chunks ) {
+			for( const SecondaryMap::const_reference inner : outer.second ) {
+				func( inner.second );
+			}
+		}
+	}
+	
 
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );
@@ -99,7 +125,7 @@ public:
 	void clear();
 
 	/// \returns a ordered vector of pointers to the chunks in the list
-	std::vector<boost::shared_ptr<Chunk> > getLookup();
+	std::vector<std::shared_ptr<Chunk> > getLookup();
 
 	/**
 	 * Get the list of the different lengths of the primary sorted "columns".
@@ -117,6 +143,21 @@ public:
 
 	/// \returns the amount secondary sorted entries
 	size_t getHorizontalSize();
+	
+	/**
+	 * Generate a string identifying the stored chunks
+	 * The identifier is made of
+	 * - sequenceNumber
+	 * - sequenceDescription if available
+	 * - the common path of all chunk-sources (or the source file, if there is only one) if withpath is true
+	 * - sequenceStart if available
+	 * \param withpath add the common path of all sources to the identifying string
+	 */
+	std::string identify( bool withpath = true, bool withdate=true, 
+						  getproplist source=getproplist("source"),
+						  getproplist seqNum=getproplist("sequenceNumber"),
+						  getproplist seqDesc=getproplist("sequenceDescription"),
+						  getproplist seqStart=getproplist("sequenceStart") )const;
 };
 
 

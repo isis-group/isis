@@ -60,8 +60,9 @@ public:
 	 * \param props the value as string written on commandline to be put into this parameter
 	 * \return true if parsing was succesful, false otherwise
 	 */
-	bool parse( const isis::util::Value< std::string >& props );
-	bool parse_list( const isis::util::Value< util::slist >& props_list );
+	bool parse( const std::string &prop );
+	bool parse_list( const util::slist &props_list );
+	
 	/// \return the description string
 	const std::string &description()const;
 	/* set the description string
@@ -77,7 +78,7 @@ public:
 	}
 
 #ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
-	operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+	operator std::unique_ptr<ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 #else
 	explicit operator bool()const;
 #endif

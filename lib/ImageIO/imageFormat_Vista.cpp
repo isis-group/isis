@@ -49,7 +49,7 @@ boost::is_unsigned<VBit>::type,
 void
 ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const util::istring &/*dialect*/,
-						  boost::shared_ptr<util::ProgressFeedback> progress )
+						  std::shared_ptr<util::ProgressFeedback> progress )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -117,41 +117,41 @@ throw( std::runtime_error & )
 		// from the chunk since the chunks can have different types.
 		switch( image.getMajorTypeID() ) {
 			// VBit
-		case data::ValueArray<bool>::staticID:
+		case data::ValueArray<bool>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 			copyImageToVista<vista_bitmask_type>( image, vimages[0] );
 			break;
 			// VUByte
-		case data::ValueArray<VUByte>::staticID:
+		case data::ValueArray<VUByte>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 			copyImageToVista<VUByte>( image, vimages[0] );
 			break;
 			// VSByte
-		case data::ValueArray<VSByte>::staticID:
+		case data::ValueArray<VSByte>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
-		case data::ValueArray<u_int16_t>::staticID:
+		case data::ValueArray<u_int16_t>::staticID():
 			LOG( Runtime, info ) << "Vista does not support " << util::Value<u_int16_t>::staticName() << ". Falling back to " << util::Value<VShort>::staticName();
-		case data::ValueArray<VShort>::staticID:
+		case data::ValueArray<VShort>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
 #if defined(_M_X64) || defined(__amd64__) && not defined (__APPLE__)
 			// VLong
-		case data::ValueArray<VLong>::staticID:
+		case data::ValueArray<VLong>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
 #endif
 			// VFloat
-		case data::ValueArray<VFloat>::staticID:
+		case data::ValueArray<VFloat>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 			copyImageToVista<VFloat>( image, vimages[0] );
 			break;
 			// VDouble
-		case data::ValueArray<VDouble>::staticID:
+		case data::ValueArray<VDouble>::staticID():
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
 			copyImageToVista<VDouble>( image, vimages[0] );
 			break;
@@ -174,7 +174,7 @@ throw( std::runtime_error & )
 	// count number of history entries
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
-	BOOST_FOREACH( util::PropertyMap::KeyList::key_type key, keyset ) {
+	for( util::PropertyMap::KeyList::key_type key :  keyset ) {
 		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
@@ -215,7 +215,7 @@ throw( std::runtime_error & )
 }
 
 
-std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, boost::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
@@ -383,7 +383,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		//remove the images with size 1x1 from the imageVector
 		VAttrList refList = VImageAttrList( vImageVector.front() );
-		BOOST_FOREACH( std::vector< VImage >::const_reference oneVoxelImage, emptySlices ) {
+		for( std::vector< VImage >::const_reference oneVoxelImage :  emptySlices ) {
 			std::vector< VImage >::iterator iter = std::find( vImageVector.begin(), vImageVector.end(), oneVoxelImage );
 			vImageVector.erase( iter );
 			VImage image = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
@@ -458,7 +458,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		std::set<util::fvector3, data::_internal::SortedChunkList::posCompare> originCheckSet;
 		//first we have to create a vista chunkList so we can get the number of slices
-		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
+		for( std::vector<VImage>::reference sliceRef :  vImageVector ) {
 			VistaChunk<VShort> vchunk( sliceRef, true );
 			vistaChunkList.push_back( vchunk );
 
@@ -478,7 +478,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		if( progress ) progress->show( vistaChunkList.size() );
 
-		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
+		for( std::vector<VistaChunk<VShort> >::reference sliceRef :  vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
 			uint16_t repetitionTime = 0;
@@ -611,7 +611,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 			std::list<data::Chunk> splices = sliceRef.splice( data::sliceDim );
 			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
-			BOOST_FOREACH( data::Chunk & spliceRef, splices ) {
+			for( data::Chunk & spliceRef :  splices ) {
 				uint32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
 				spliceRef.setValueAs<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
@@ -636,7 +636,7 @@ std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, con
 
 		//handle the residual images
 		uint16_t sequenceNumber = 0;
-		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
+		for( std::vector<VImage>::reference vImageRef :  residualVImages ) {
 			if( switchHandle( vImageRef, chunks ) ) {
 				chunks.back().setValueAs<uint16_t>( "sequenceNumber", ++sequenceNumber );
 				// add history information
@@ -921,7 +921,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// get property value
 			util::PropertyValue pv = vista_branch.property( *kiter );
 			// VBit -> VBit (char *)
-			BOOST_STATIC_ASSERT( sizeof( char ) == sizeof( uint8_t ) );
+			static_assert( sizeof( char ) == sizeof( uint8_t ) );
 
 			if( pv.is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
@@ -997,7 +997,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 	const util::vector4<size_t> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
-	const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID );
+	const data::scaling_pair scale = image.getScalingTo( data::ValueArray<T>::staticID() );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {

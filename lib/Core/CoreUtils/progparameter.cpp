@@ -12,12 +12,11 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If !, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 #include "progparameter.hpp"
-#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -38,40 +37,39 @@ bool &ProgParameter::hidden()
 	return m_hidden;
 }
 
-bool ProgParameter::parse( const Value<std::string> &props )
+bool ProgParameter::parse( const std::string &prop )
 {
 	ValueBase &me = this->front();
 	bool ret = false;
 
-	if ( ( ( std::string )props ).empty() ) {
+	if ( prop.empty() ) {
 		if ( me.is<bool>() ) {
 			me.castTo<bool>() = true;
 			ret = true;
 		}
 	} else {
-		ret = ValueBase::convert( props, me );
+		ret = ValueBase::convert( Value<std::string>(prop), me );
 	}
 
-	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
+	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( prop ) << " as " << me.toString( true );
 
 	if( ret )m_set = true;
 
 	return ret;
 }
-bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
+bool ProgParameter::parse_list( const slist& theList )
 {
 	ValueBase &me = this->front();
 	bool ret = false;
-	const util::slist &theList = props_list.castTo<util::slist>();
 
-	if ( theList.empty() ) {
-		//there is nothing like a bool-list (yet)
-	} else {
-		ret = ValueBase::convert( props_list, me );
-	}
-
-	LOG_IF( ret, Debug, info )
+	ret = ValueBase::convert( Value<slist>(theList), me );
+	if(theList.empty()){
+		LOG_IF( ret, Debug, info )
+		<< "Parsed empty parameter list as " << me.toString( true );
+	}else{
+		LOG_IF( ret, Debug, info )
 			<< "Parsed parameter list " << MSubject( util::listToString( theList.begin(), theList.end(), " ", "", "" ) ) << " as " << me.toString( true );
+	}
 
 	if( ret )m_set = true;
 
@@ -118,7 +116,7 @@ bool ParameterMap::parse( int argc, char **argv )
 			}
 
 			std::list<std::string> matchingStrings;
-			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
+			for( ParameterMap::const_reference parameterRef :  *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
 					if( parameterRef.first.length() == pName.length() ) { //if its an exact match
 						matchingStrings = std::list<std::string>( 1, pName ); //use that
@@ -130,7 +128,7 @@ bool ParameterMap::parse( int argc, char **argv )
 
 			if( matchingStrings.size() > 1 ) {
 				std::stringstream matchingStringStream;
-				BOOST_FOREACH( std::list<std::string>::const_reference stringRef, matchingStrings ) {
+				for( std::list<std::string>::const_reference stringRef :  matchingStrings ) {
 					matchingStringStream << stringRef << " ";
 				}
 				LOG( Runtime, warning )
@@ -180,9 +178,9 @@ const ProgParameter ParameterMap::operator[] ( const std::string key ) const
 ProgParameter &ParameterMap::operator[] ( const std::string key ) {return std::map<std::string, ProgParameter>::operator[]( key );}
 
 #ifdef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
-ProgParameter::operator boost::scoped_ptr<ValueBase>::unspecified_bool_type()const
+ProgParameter::operator std::unique_ptr<ValueBase>::unspecified_bool_type()const
 {
-	boost::scoped_ptr<ValueBase> dummy;
+	std::unique_ptr<ValueBase> dummy;
 
 	if( ( *this ).castTo<bool>() )dummy.reset( new Value<int16_t> );
 
