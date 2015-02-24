@@ -18,8 +18,9 @@ endif(CMAKE_MAJOR_VERSION EQUAL 3)
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)
 
-
 project(ISIS)
+
+include(CTest)
 
 ############################################################
 # set isis version number
@@ -86,7 +87,6 @@ option(ISIS_DEBUG_LOG "Enable debug logging" ON)
 ############################################################
 # optional components
 ############################################################
-option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
 
 # enable RUNTIME_LOG
@@ -106,11 +106,11 @@ endif(ISIS_DEBUG_LOG)
 
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
-if(ISIS_BUILD_TESTS)
+if(BUILD_TESTING)
 	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time unit_test_framework)
-else(ISIS_BUILD_TESTS)
+else(BUILD_TESTING)
 	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
-endif(ISIS_BUILD_TESTS)
+endif(BUILD_TESTING)
 
 include_directories(${Boost_INCLUDE_DIR})
 
@@ -189,18 +189,14 @@ add_subdirectory(apps)
 # configure coding style tools
 add_subdirectory(design)
 
+# configure tests
+add_subdirectory(tests)
+
 # build the ISIS tools.
 if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
-
-# build the ISIS tests.
-if(ISIS_BUILD_TESTS)
-  message(STATUS "Building unit tests")
-  enable_testing()
-  add_subdirectory(tests)
-endif(ISIS_BUILD_TESTS)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
