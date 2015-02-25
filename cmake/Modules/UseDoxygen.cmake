@@ -44,7 +44,7 @@ macro(usedoxygen_set_default name value)
 	endif()
 endmacro()
 
-find_package(Doxygen)
+find_package(Doxygen QUIET)
 
 if(DOXYGEN_FOUND)
 	find_file(DOXYFILE_IN "Doxyfile.in"
@@ -98,6 +98,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 
 	configure_file(${DOXYFILE_IN} Doxyfile ESCAPE_QUOTES IMMEDIATE @ONLY)
 
+	message(STATUS "found doxygen, make target \"doxygen\" to generate documentation in ${DOXYFILE_OUTPUT_DIR}")
 	add_custom_target(doc)		
 	add_dependencies(doc doxygen)
 endif()
