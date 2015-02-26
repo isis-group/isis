@@ -114,7 +114,6 @@ void Application::addExample ( std::string params, std::string desc )
 
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
-	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
 	bool err = false;
 	m_filename=argv[0];
 
@@ -132,15 +131,8 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		addConfigFile(cfg->second.as<std::string>());
 	}
 
-	for( logger_ref ref: logs ) {
-		const std::string dname = std::string( "d" ) + ref.first;
-		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
-		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
-		for( setLogFunction setter: ref.second ) {
-			( this->*setter )( level );
-		}
-	}
-
+	resetLogging();
+	
 	if ( ! parameters.isComplete() ) {
 		std::cerr << "Missing parameters: ";
 
@@ -163,6 +155,19 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 	return ! err;
 }
+void Application::resetLogging()
+{
+	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
+	for( logger_ref ref: logs ) {
+		const std::string dname = std::string( "d" ) + ref.first;
+		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
+		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
+		for( setLogFunction setter: ref.second ) {
+			( this->*setter )( level );
+		}
+	}
+}
+
 void Application::printHelp( bool withHidden )const
 {
 	typedef std::list<std::pair<std::string, std::string> >::const_reference example_type;
