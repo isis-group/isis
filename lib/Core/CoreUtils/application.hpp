@@ -129,6 +129,12 @@ public:
 	 * \param exitOnError if true the programm will exit, if there is a problem during the initialisation (like missing parameters).
 	 */
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	
+	/**
+	 * (re)set log Handlers by calling setLog for each registered module.
+	 * Usefull if Application::getLogHandler was reimplemented and its behavior changes during runtime.
+	 */
+	void resetLogging();
 	/**
 	 * Virtual function to display a short help text.
 	 * Ths usually shall print the programm name plus all entries of parameters with their description.

@@ -115,7 +115,7 @@ struct NumericOverflowHandler {
 };
 boost::numeric::range_check_result NumericOverflowHandler::result = boost::numeric::cInRange;
 
-// basic numeric to numeric conversion (does rounding and handles overlow)
+// basic numeric to numeric conversion (does rounding and handles overflow)
 template<typename SRC, typename DST> boost::numeric::range_check_result num2num( const SRC &src, DST &dst )
 {
 	typedef boost::numeric::converter <
@@ -280,7 +280,7 @@ template<typename DST> struct StrTransformer {
 		const boost::numeric::range_check_result result = str2scalar( src, ret );
 
 		if( result != boost::numeric::cInRange )
-			range_ok = result; // keep the first error
+			range_ok = result; // keep the last error
 
 		return ret;
 	}
@@ -343,14 +343,13 @@ template<typename CLASS, typename SRC, typename DST> static std::shared_ptr<cons
 }
 
 // special to string conversions
-template<typename T> std::string toStringConv( const T &src )
+template<typename T> std::string toStringConv( const T &src, std::false_type )
 {
 	std::stringstream s;
 	s << std::boolalpha << src; // bool will be converted to true/false
 	return s.str();
 }
-template<> std::string toStringConv<uint8_t>( const uint8_t &src ) {return toStringConv( static_cast<uint16_t>( src ) );}
-template<> std::string toStringConv<int8_t> ( const  int8_t &src ) {return toStringConv( static_cast< int16_t>( src ) );}
+template<typename T> std::string toStringConv( const T &src, std::true_type ) {return std::to_string( src );}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -689,7 +688,7 @@ public:
 		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>() );
+		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>(), std::is_arithmetic<SRC>() );
 		return boost::numeric::cInRange; // this should allways be ok
 	}
 	virtual ~ValueConverter() {}
