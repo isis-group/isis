@@ -62,16 +62,9 @@ bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
 {
 	ValueBase &me = **this;
 	bool ret = false;
-	const util::slist &theList = props_list.castTo<util::slist>();
 
-	if ( theList.empty() ) {
-		//there is nothing like a bool-list (yet)
-	} else {
-		ret = ValueBase::convert( props_list, me );
-	}
-
-	LOG_IF( ret, Debug, info )
-			<< "Parsed parameter list " << MSubject( util::listToString( theList.begin(), theList.end(), " ", "", "" ) ) << " as " << me.toString( true );
+	ret = ValueBase::convert( props_list, me );
+	LOG_IF( ret, Debug, info ) << "Parsed parameter list " << MSubject( props_list.castTo<util::slist>() ) << " as " << me.toString( true );
 
 	if( ret )m_set = true;
 

@@ -143,7 +143,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols keepmosaic forcemosaic";}
 
 
 
@@ -379,7 +379,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 				diff = dicomTree.getPropertyAs<util::fvector3>( "SiemensDiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "SiemensDiffusionGradientOrientation" );
 			} else {
+			if(bValue)
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+			else
+				LOG(Runtime, notice ) << "Ignoring DiffusionBValue 0 as there is no diffusionGradient";
 			}
 		}
 	}
@@ -540,9 +543,10 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 			} else {
 				chunks.push_back( readMosaic( chunk ) );
 			}
-		} else {
+		} else if( dialect == "forcemosaic" ) 
+			chunks.push_back( readMosaic( chunk ) );
+		else 
 			chunks.push_back( chunk );
-		}
 
 		return 1;
 	} else {
