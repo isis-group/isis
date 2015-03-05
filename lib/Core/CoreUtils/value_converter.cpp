@@ -688,7 +688,7 @@ public:
 		return std::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>(), std::is_arithmetic<SRC>() );
+		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>(), std::is_integral<SRC>() );
 		return boost::numeric::cInRange; // this should allways be ok
 	}
 	virtual ~ValueConverter() {}

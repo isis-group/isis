@@ -86,7 +86,8 @@ bool Application::addConfigFile(const std::string& filename)
 					assert(p.size()==1);
 					ProgParameter &dst=parameters[p.front().c_str()];
 					PropertyValue &src=param->touchProperty(p);
-					if(!dst.isSet()){ // don't touch it, if its not just the default
+					if(!dst.isParsed()){ // don't touch it, if its not just the default
+						LOG(Runtime,verbose_info) << "Setting parameter " << std::make_pair(p,src) << " from configuration";
 						if(dst.isEmpty())
 							dst.swap(src);
 						else if(!dst.front().apply(src.front())){ //replace builtin default with value from config if there is one already
@@ -94,6 +95,7 @@ bool Application::addConfigFile(const std::string& filename)
 							continue;
 						}
 					}
+					dst.needed()=false; //param has got its deafult from the configuration, so its not needed anymore
 					param->remove(p);
 				}
 			}
@@ -127,8 +129,11 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 	std::map< std::string, ProgParameter >::iterator cfg=parameters.find("cfg");
-	if(cfg!=parameters.end()){ // TODO this will override given parameters
-		addConfigFile(cfg->second.as<std::string>());
+	if(cfg!=parameters.end()){ 
+		if(!addConfigFile(cfg->second.as<std::string>()) && exitOnError){
+			std::cerr << "Exiting..." << std::endl;
+			exit( 1 );
+		}
 	}
 
 	resetLogging();

@@ -23,7 +23,7 @@ namespace isis
 namespace util
 {
 
-ProgParameter::ProgParameter(): m_hidden( false ), m_set( false )
+ProgParameter::ProgParameter(): m_hidden( false ), m_parsed( false )
 {
 	needed() = true;
 }
@@ -53,7 +53,10 @@ bool ProgParameter::parse( const std::string &prop )
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( prop ) << " as " << me.toString( true );
 
-	if( ret )m_set = true;
+	if( ret ) {
+		needed()= false;//remove needed flag, because the value is set (aka "not needed anymore")
+		m_parsed = true; 
+	}
 
 	return ret;
 }
@@ -71,8 +74,11 @@ bool ProgParameter::parse_list( const slist& theList )
 			<< "Parsed parameter list " << MSubject( util::listToString( theList.begin(), theList.end(), " ", "", "" ) ) << " as " << me.toString( true );
 	}
 
-	if( ret )m_set = true;
-
+	if( ret ) {
+		needed()= false;//remove needed flag, because the value is set (aka "not needed anymore")
+		m_parsed = true; 
+	}
+	
 	return ret;
 }
 
@@ -85,9 +91,9 @@ void ProgParameter::setDescription( const std::string &desc )
 {
 	m_description = desc;
 }
-bool ProgParameter::isSet() const
+bool ProgParameter::isParsed() const
 {
-	return m_set;
+	return m_parsed;
 }
 
 
@@ -126,7 +132,7 @@ bool ParameterMap::parse( int argc, char **argv )
 				}
 			}
 
-			if( matchingStrings.size() > 1 ) {
+			if( matchingStrings.size() > 1 ) { // multiple matches
 				std::stringstream matchingStringStream;
 				for( std::list<std::string>::const_reference stringRef :  matchingStrings ) {
 					matchingStringStream << stringRef << " ";
@@ -135,23 +141,16 @@ bool ParameterMap::parse( int argc, char **argv )
 						<< "The parameter \"" << pName << "\" is ambiguous. The parameters \""
 						<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
 						<< "\" are possible. Ignoring this parameter!";
-			} else if ( !matchingStrings.size() ) {
+			} else if ( matchingStrings.empty() ) { // no match
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
-			} else {
-				if( at( matchingStrings.front() ).is<util::slist>() &&
-					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) )
-				  ) { //dont do tokenizing if the target is an slist (is already done by the shell)
-					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
-				} else if ( at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
-					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
-				} else {
-					LOG( Runtime, error )
+			} else { //exact one match
+				parsed = at( matchingStrings.front() ).is<util::slist>() ? //dont do tokenizing if the target is an slist (is already done by the shell)
+					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) ) :
+					at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) );
+				LOG_IF(!parsed, Runtime, error )
 							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
 							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
 							<< " was given, but a " << at( matchingStrings.front() ).getTypeName() << " was expected.";
-					parsed = false;
-				}
-
 			}
 		}
 	}

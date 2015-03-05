@@ -36,7 +36,7 @@ namespace util
 class ProgParameter: public PropertyValue
 {
 	std::string m_description;
-	bool m_hidden, m_set;
+	bool m_hidden, m_parsed;
 public:
 	/**
 	 * Default constructor.
@@ -51,7 +51,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param is_needed flag if parameter is a needed one (default: true)
 	 */
-	template<typename T> ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_set( false ) {}
+	template<typename T> ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_parsed( false ) {}
 	/**
 	 * Put the given value into this parameter.
 	 * The parsing is done by automatic (!) type-conversion from std::string to the type of the parameter.
@@ -84,7 +84,7 @@ public:
 #endif
 
 	/// \returns true, if the parameter was ever successfully parsed
-	bool isSet()const;
+	bool isParsed()const;
 
 	///returns true for hidden parameters, false otherwise
 	bool isHidden()const;
