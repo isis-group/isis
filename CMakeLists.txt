@@ -108,9 +108,9 @@ endif(ISIS_DEBUG_LOG)
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
 if(BUILD_TESTING)
-	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time iostreams unit_test_framework)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time unit_test_framework)
 else(BUILD_TESTING)
-	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time iostreams)
+	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 endif(BUILD_TESTING)
 
 include_directories(${Boost_INCLUDE_DIR})

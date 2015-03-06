@@ -146,6 +146,8 @@ endif(ISIS_IOPLUGIN_PNG)
 # COMP proxy plugin
 ############################################################
 if(ISIS_IOPLUGIN_COMP)
+  find_package(Boost REQUIRED COMPONENTS iostreams)
+
   option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
   find_library(LIB_BZ2 "bz2")
@@ -163,7 +165,7 @@ if(ISIS_IOPLUGIN_COMP)
   endif(ISIS_IOPLUGIN_COMP_LZMA)
   
   add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
-  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${COMP_LIBS})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 
