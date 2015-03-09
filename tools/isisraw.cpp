@@ -59,7 +59,7 @@ int main( int argc, char *argv[] )
 
 	const uint64_t offset = app.parameters["offset"];
 
-	if( app.parameters["read_repn"].isSet() ) { // reading raw
+	if( app.parameters["read_repn"].isParsed() ) { // reading raw
 		util::slist infiles = app.parameters["in"];
 		LOG_IF( infiles.size() > 1, RawLog, warning ) << "Cannot read multiple raw files at once, will only read " << infiles.front();
 		data::FilePtr src( infiles.front() );

@@ -70,6 +70,7 @@ public:
 	 *
 	 * \param name name of the application.
 	 * \param cfg the default path of the config file. If empty, no config file will be loaded
+	 * \note set \code parameters["cfg"].needed()=true \endcode to prevent the programm from running without given config file
 	 */
 	Application( const char name[], const char cfg[]="" );
 	virtual ~Application();

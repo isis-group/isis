@@ -20,6 +20,7 @@ include(CheckIncludeFiles)
 
 project(ISIS)
 
+option(BUILD_TESTING OFF)
 include(CTest)
 
 ############################################################

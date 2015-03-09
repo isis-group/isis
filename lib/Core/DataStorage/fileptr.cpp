@@ -51,15 +51,18 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 	} else
 		par.flags=mapped_file::priv;
 	
-	file.open(par);	
-	
-	if( file.is_open() && file.const_data()) {
-		const Closer cl = {file, filename};
-		static_cast<ValueArray<uint8_t>&>( *this ) = ValueArray<uint8_t>( reinterpret_cast<uint8_t * const>( file.data() ), file.size(), cl );
-		LOG( Debug, info ) << "Mapped " << file.size() << " bytes of " << util::MSubject( filename ) << " at " << getRawAddress().get();
-	}else{
-		LOG( Runtime, error ) << "Failed to open " << util::MSubject(filename) << ", the error was: " << util::getLastSystemError();
-		return;
+	try{
+		file.open(par);
+		if( file.is_open() && file.const_data()) {
+			const Closer cl = {file, filename};
+			static_cast<ValueArray<uint8_t>&>( *this ) = ValueArray<uint8_t>( reinterpret_cast<uint8_t * const>( file.data() ), file.size(), cl );
+			LOG( Debug, info ) << "Mapped " << file.size() << " bytes of " << util::MSubject( filename ) << " at " << getRawAddress().get();
+		}else{
+			LOG( Runtime, error ) << "Failed to mmap " << util::MSubject(filename) << ", the error was: " << util::getLastSystemError();
+			return;
+		}
+	} catch (std::ios_base::failure &e){
+		LOG( Runtime, error ) << "Failed to mmap " << util::MSubject(filename) << ", the error was: " << e.what();
 	}
 }
 

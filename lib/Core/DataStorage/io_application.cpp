@@ -149,7 +149,7 @@ void IOApplication::addOutput(const std::string& desc, const std::string& suffix
 
 void IOApplication::printHelp( bool withHidden ) const
 {
-	if( !parameters["help-io"].isSet() ) { // if help-io was not set - print normal help
+	if( !parameters["help-io"].isParsed() ) { // if help-io was not given - print normal help
 		Application::printHelp( withHidden );
 	} else if( parameters["help-io"].as<bool>() ) { // if help-io was set to true
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
@@ -241,7 +241,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 
-	LOG_IF( parameters[std::string( "scale_mode" ) + suffix].isSet() && repn == 0, Runtime, warning )
+	LOG_IF( parameters[std::string( "scale_mode" ) + suffix].isParsed() && repn == 0, Runtime, warning )
 			<< "Ignoring -scale_mode" << suffix << " " << util::MSubject( scale_mode )
 			<<  ", because -repn" << suffix << " was not given";
 
