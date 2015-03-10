@@ -108,7 +108,7 @@ public:
 	template<typename T> void forall( T &func)const
 	{
 		for( PrimaryMap::const_reference outer : chunks ) {
-			for( const SecondaryMap::const_reference inner : outer.second ) {
+			for( SecondaryMap::const_reference inner : outer.second ) {
 				func( inner.second );
 			}
 		}

@@ -97,7 +97,7 @@ Image &Image::operator=( const data::Image &ref )
 	//replace all chunks (in set) by cheap copies of them
 	struct : public _internal::SortedChunkList::chunkPtrOperator {
 		std::shared_ptr< Chunk > operator()( const std::shared_ptr< Chunk >& ptr ) {
-			return std::shared_ptr< Chunk > ( new Chunk( *ptr ) );
+			return std::make_shared< Chunk > ( *ptr );
 		}
 	} replace;
 	set.transform( replace );
@@ -571,7 +571,7 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 		std::pair<util::ValueReference, util::ValueReference> scale;
 		unsigned short ID;
 		std::shared_ptr<Chunk> operator() ( const std::shared_ptr< Chunk >& ptr ) {
-			return std::shared_ptr<Chunk> ( new Chunk ( ptr->copyByID( ID, scale ) ) );
+			return std::make_shared<Chunk> ( ptr->copyByID( ID, scale ) );
 		}
 	} conv_op;
 
