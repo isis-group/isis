@@ -9,16 +9,23 @@
 #ifndef FILEPTR_HPP
 #define FILEPTR_HPP
 
-#include <boost/iostreams/device/mapped_file.hpp>
+#define BOOST_FILESYSTEM_VERSION 3 
+#include <boost/filesystem.hpp>
 #include <boost/detail/endian.hpp>
 #include "valuearray.hpp"
 #include "endianess.hpp"
+
+#ifdef WIN32
+#include <windows.h>
+#define FILE_HANDLE HANDLE
+#else
+#define FILE_HANDLE int
+#endif
 
 namespace isis
 {
 namespace data
 {
-	using boost::iostreams::mapped_file;
 /**
  * Class to map files into memory.
  * This can be used read only, or for read/write.
@@ -31,7 +38,8 @@ namespace data
 class FilePtr: public ValueArray<uint8_t>
 {
 	struct Closer {
-		mapped_file file;
+		FILE_HANDLE file, mmaph;
+		size_t len;
 		boost::filesystem::path filename;
 		bool write;
 		void operator()( void *p );
@@ -50,9 +58,11 @@ class FilePtr: public ValueArray<uint8_t>
 			}
 		};
 	};
-	mapped_file file;
-	bool map( const boost::filesystem::path& filename );
 
+	bool map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename );
+
+	size_t checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size = 0 );
+	bool m_good, writing;
 public:
 	/// empty creator - result will not be usefull until filled
 	FilePtr();
@@ -75,7 +85,6 @@ public:
 	 * \param filename the file to map into memory
 	 * \param len the requested length of the resulting ValueArray in bytes (automatically set if 0)
 	 * \param write the file be opened for writing (writing to the mapped memory will write to the file, otherwise it will cause a copy-on-write)
-	 * \warning opening a file for writing might wipe the former content of that file
 	 */
 	FilePtr( const boost::filesystem::path &filename, size_t len = 0, bool write = false );
 
@@ -92,7 +101,6 @@ public:
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
 	template<typename T> ValueArray<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
-		const bool writing=file.flags() & mapped_file::readwrite;
 		std::shared_ptr<T> ptr = std::static_pointer_cast<T>( getRawAddress( offset ) );
 
 		if( len == 0 ) {

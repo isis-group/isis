@@ -3,6 +3,7 @@
 
 #include <CoreUtils/tmpfile.hpp>
 #include <DataStorage/fileptr.hpp>
+#define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
@@ -14,25 +15,13 @@ namespace test
 BOOST_AUTO_TEST_CASE( FilePtr_init_test )
 {
 	util::TmpFile testfile;
-	{
-	data::ValueArray<uint8_t> ptr(1);
 	BOOST_REQUIRE_EQUAL( boost::filesystem::file_size( testfile ), 0 );
 	{
 		data::FilePtr fptr1( testfile, 1024, true ); // create a file for writing
 		BOOST_REQUIRE( fptr1.good() ); // it should be "good"
 		BOOST_REQUIRE_EQUAL( boost::filesystem::file_size( testfile ), 1024 ); // and it should have the size 1024 by now
 		BOOST_CHECK_EQUAL( fptr1.getLength(), 1024 );
-		ptr = fptr1.as<uint8_t>();
 	}//fptr1 must be freed / testfile must be closed before trying to open it again or windows will cry for its mamma
-	strcpy( ( char * )&ptr[0], "Hello_world!\n" );//must not be closed before here
-	}
-	{
-	boost::filesystem::ifstream in( testfile );
-	BOOST_REQUIRE( in.good() );
-	std::string red;
-	in >> red;
-	BOOST_CHECK_EQUAL( red, "Hello_world!" );
-	}
 
 	data::FilePtr fptr2( testfile ); // create a file for reading
 	BOOST_REQUIRE( fptr2.good() ); // it should be "good"
