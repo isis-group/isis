@@ -34,7 +34,7 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 # NIFTI plugin
 ############################################################
 if(ISIS_IOPLUGIN_NIFTI_SA)
-	add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp imageFormat_nifti_parser.cpp )
+	add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp imageFormat_nifti_dcmstack.cpp )
 	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
@@ -43,80 +43,19 @@ endif(ISIS_IOPLUGIN_NIFTI_SA)
 # vista
 ############################################################
 if(ISIS_IOPLUGIN_VISTA)
-  # This code snipped was taken from the lipsia source package.
-
-  # - FindVIA.cmake
-  #
-  # Author: Thomas Proeger
-  #
-  # Find the header files and libraries for the libvia and libvia-dev packages
-  #
-  # This find package exports the following variables:
-  # VIA_INCLUDE_DIR         - directory for via.h viadata.h
-  # VIAIO_INCLUDE_DIR       - directory for VImage.h, option.h, etc. pp
-  # VIA_LIBRARY             - libvia
-  # VIAIO_LIBRARY           - libviaio
-  # VX_LIBRARY              - libvx
-  #
-
   # SET a root VIA include directory if necessary. This should be the directory
   # containing the via and viaio include dirs.
-  if(VIA_ROOT_INCLUDE_DIR)
-    include_directories(${VIA_ROOT_INCLUDE_DIR})
-  endif(VIA_ROOT_INCLUDE_DIR)
-
   # include directories
-  find_path(VIA_INCLUDE_DIR
-    NAMES via.h
-    PATH_SUFFIXES via
-    DOC "The include directory containing via.h"
-    )
-
-  find_path(VIAIO_INCLUDE_DIR
-    NAMES VImage.h
-    PATH_SUFFIXES viaio
-    DOC "The include directory containing VImage.h and option.h"
-    )
+	find_path(VIA_ROOT_INCLUDE_DIR NAMES "viaio/VImage.h" PATH_SUFFIXES DOC "The include directory containing VImage.h and option.h")
 
   # LIBRARY files
-  find_library(VIA_LIBRARY
-    NAMES via libvia
-    DOC "The library file libvia.so"
-    )
-
-  find_library(VIAIO_LIBRARY
-    NAMES viaio libviaio
-    DOC "The library file libviaio.so"
-    )
-
-  find_library(VX_LIBRARY
-    NAMES vx libvx
-    DOC "The library file libvx.so"
-    )
-
-  # these variables are only visible in 'advanced mode'
-  mark_as_advanced(VIA_INCLUDE_DIR
-    VIAIO_INCLUDE_DIR
-    VIA_LIBRARY
-    VIAIO_LIBRARY
-    VX_LIBRARY
-    )
+	find_library(VIAIO_LIBRARY NAMES viaio libviaio DOC "The library file libviaio.so")
 
   # if via components found configure build environment
-  if(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
-      AND VIA_LIBRARY AND VIAIO_LIBRARY)
-
-    include_directories(${VIA_INCLUDE_DIR} ${VIAIO_INCLUDE_DIR})
-    add_library(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
-    target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} ${isis_core_lib})
-    set(TARGETS ${TARGETS} isisImageFormat_Vista)
-  else(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
-      AND VIA_LIBRARY AND VIAIO_LIBRARY)
-
-    message(FATAL_ERROR, "Cannot find viaiio libraries. Please install the package libvia-dev")
-
-  endif(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
-    AND VIA_LIBRARY AND VIAIO_LIBRARY)
+	include_directories(${VIA_ROOT_INCLUDE_DIR})
+	add_library(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
+	target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} ${isis_core_lib})
+	set(TARGETS ${TARGETS} isisImageFormat_Vista)
 endif(ISIS_IOPLUGIN_VISTA)
 
 ############################################################
