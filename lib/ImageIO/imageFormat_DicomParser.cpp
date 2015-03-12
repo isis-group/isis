@@ -147,33 +147,30 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 	boost::posix_time::time_duration time;
 	elem->getOFString( buff, 0 );
 
-	// Insert the ":" -- make it hh:mm:ss.frac
-	if ( buff.at( 2 ) != ':' ) {
-		buff.insert( 2, 1, ':' );
-		shift++;
-	}
-
-	if ( ( buff.size() > size_t( 4 + shift ) ) && ( buff.at( 4 + shift ) != ':' ) ) {
-		buff.insert( 4 + shift, 1, ':' );
-		shift++;
-	}
-
-	//Try standard-parser for hh:mm:ss.frac
+	//Try iso-parser (hhmmss.frac)
 	try {
-		time = boost::posix_time::duration_from_string( buff.c_str() );
+		time = boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(buff.c_str());
 		ok = not time.is_not_a_date_time();
 	} catch ( std::logic_error e ) {
 		ok = false;
 	}
 
 	if ( ok ) {
-		LOG( Debug, verbose_info )
-				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
+		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map.propertyValue( name ) = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
-		//although TM is defined as time of day we dont have a day here, so we fake one
+		//although TM is defined as time of day we don't have a day here, so we fake one
 	} else
-		LOG( Runtime, warning )
-				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+}
+
+void ImageFormat_Dicom::parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map ){
+	OFString buff;
+	bool ok = true;
+	elem->getOFString( buff, 0 );
+	buff.insert(8,"T"); // the format is YYYYMMDDHHMMSS.FFFFFF but iso says it should be YYYYMMDDTHHMMSS.FFFFFF
+	const util::ValueReference ref=util::Value<std::string>(buff.c_str()).copyByID(util::Value<boost::posix_time::ptime>::staticID);
+	if(!ref.isEmpty())
+		map.propertyValue( name ) = ref->castTo<boost::posix_time::ptime>();
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -189,6 +186,10 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	case EVR_TM: {
 		parseTM( elem, name, map );
+	}
+	break;
+	case EVR_DT: {
+		parseDT( elem, name, map );
 	}
 	break;
 	case EVR_FL: {
@@ -247,6 +248,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	case EVR_ST: //short text
 	case EVR_UT: //Unlimited Text
 	case EVR_UI: //Unique Identifier [0-9\.]
+	case EVR_AT: // @todo find a better way to interpret the value (see http://northstar-www.dartmouth.edu/doc/idl/html_6.2/Value_Representations.html)
 	case EVR_PN: { //Person Name
 		OFString buff;
 		elem->getOFString( buff, 0 );
@@ -284,9 +286,8 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	default: {
 		OFString buff;
 		elem->getOFString( buff, 0 );
-		LOG( Runtime, notice ) << "Implement me " << name << "("
-							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							   << buff;
+		LOG( Runtime, notice ) << "Don't know how to handle Value Representation " << util::MSubject(const_cast<DcmTag &>( elem->getTag() ).getVRName()) << 
+		" of " << std::make_pair(name ,buff);
 	}
 	break;
 	}
@@ -457,7 +458,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
 	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<uint32_t>( val );
-	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
+	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "UT" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );
@@ -465,8 +466,6 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.propertyValue( name ) = boost::lexical_cast<uint16_t>( val );
 	} else if ( vr == "SS" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int16_t>( val );
-	} else if ( vr == "UT" or vr == "LT" ) {
-		map.propertyValue( name ) = val;
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -484,7 +483,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = util::listToList<double>( val.begin(), val.end() );
-	} else if ( vr == "UT" or vr == "LT" ) {
+	} else if ( vr == "CS" ) {
 		map.propertyValue( name ) = val;
 	} else {
 		LOG( Runtime, error ) << "Don't know how to parse CSA entry list " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );

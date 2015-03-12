@@ -68,7 +68,6 @@ BOOST_AUTO_TEST_CASE( propMap_remove_test )
 	BOOST_CHECK( map.remove( "Test2" ) );
 	BOOST_CHECK( map.remove( "Test3" ) );
 	BOOST_CHECK( map.remove( "Test4" ) );
-	BOOST_CHECK( ! map.remove( "sub" ) ); //non empty branches should not be deleted
 	BOOST_CHECK( map.remove( "sub/Test1" ) );
 	BOOST_CHECK( ! map.branch( "sub" ).isEmpty() ); //the submap must still be there
 	BOOST_CHECK( map.remove( "sub/Test2" ) );

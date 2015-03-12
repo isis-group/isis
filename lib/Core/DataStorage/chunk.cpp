@@ -246,8 +246,9 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 			util::PropertyValue acqVal = it->propertyValue( "acquisitionNumber" );//@todo acquisitionTime needs to be fixed as well
 
 			if( acqVal == ret.front().propertyValue( "acquisitionNumber" ) ) {
+				#warning test me
 				LOG( Debug, verbose_info ) << "acquisitionNumber was " << acqVal << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
-				it->setPropertyAs<uint32_t>( "acquisitionNumber",acqVal.as<uint32_t>() * acquisitionNumberStride + cnt); //@todo this might cause trouble if we try to insert this chunks into an image
+				it->setPropertyAs<uint32_t>( "acquisitionNumber",acqVal.as<uint32_t>() + acquisitionNumberStride * cnt); //@todo this might cause trouble if we try to insert this chunks into an image
 			}
 		}
 	}

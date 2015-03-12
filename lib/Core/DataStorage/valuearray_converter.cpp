@@ -294,10 +294,10 @@ public:
 		BOOST_STATIC_ASSERT( sizeof( std::complex<SRC> ) == sizeof( SRC ) * 2 );
 		BOOST_STATIC_ASSERT( sizeof( std::complex<DST> ) == sizeof( DST ) * 2 );
 
-		const SRC *sp = &src.castToValueArray<std::complex<SRC> >().begin()->real();
-		DST *dp = &dst.castToValueArray<std::complex<DST> >().begin()->real();
+		boost::shared_ptr<const SRC> sp = boost::static_pointer_cast<const SRC>(src.castToValueArray<std::complex<SRC> >().getRawAddress());
+		boost::shared_ptr<DST> dp = boost::static_pointer_cast<DST>(dst.castToValueArray<std::complex<DST> >().getRawAddress());
 
-		NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value>::convert( sp, dp, scaling, getConvertSize( src, dst ) * 2 );
+		NumConvImpl<SRC, DST, boost::is_same<SRC, DST>::value>::convert( sp.get(), dp.get(), scaling, getConvertSize( src, dst ) * 2 );
 	}
 	scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
 		return getScalingToComplex<SRC, DST>( min, max, scaleopt );
