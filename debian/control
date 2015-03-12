@@ -6,7 +6,7 @@ Uploaders: Enrico Reimer <reimer@cbs.mpg.de>, Michael Hanke <mih@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), cmake, libbz2-dev,
  libmuparser-dev, liboil-dev, libqt4-dev,
  libpng-dev, libtiff-dev, libdcmtk2-dev, 
- libboost-iostreams1.48-dev, libboost-filesystem1.48-dev, libboost-system1.48-dev, libboost-date-time1.48-dev,
+ libboost-iostreams-dev, libboost-filesystem-dev, libboost-system-dev, libboost-date-time-dev,
  help2man, liblzma-dev
 Standards-Version: 3.9.2
 Homepage: https://github.com/isis-group

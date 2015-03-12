@@ -46,7 +46,8 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DGIT_REVISION="Debian-$(debver)" \
             -DCMAKE_C_FLAGS=-msse2 \
             -DCMAKE_CXX_FLAGS=-msse2 \
-            -DVIAIO_LIBRARY=/usr/lib/libviaio.a
+            -DVIA_ROOT_INCLUDE_DIR=/tmp/include \
+            -DVIAIO_LIBRARY=/tmp/lib/libviaio.a
 
 override_dh_auto_test:
 	# don't work ATM
