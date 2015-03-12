@@ -143,6 +143,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 				if ( ref.getBranch().isEmpty() )
 					root.erase( found ); // remove the now empty branch
 			} else {
+				LOG_IF(!ref.is_leaf(),Debug,warning) << "Removing non empty branch " << *path_it;
 				root.erase( found );
 				ret = true;
 			}

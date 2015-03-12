@@ -26,7 +26,7 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi_repeat.hpp>
 #include "boost/date_time/posix_time/posix_time.hpp"
-#include <isis/CoreUtils/vector.hpp>
+#include <CoreUtils/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"
 #include <CoreUtils/value_base.hpp>
