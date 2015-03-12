@@ -145,33 +145,20 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 	boost::posix_time::time_duration time;
 	elem->getOFString( buff, 0 );
 
-	// Insert the ":" -- make it hh:mm:ss.frac
-	if ( buff.at( 2 ) != ':' ) {
-		buff.insert( 2, 1, ':' );
-		shift++;
-	}
-
-	if ( ( buff.size() > size_t( 4 + shift ) ) && ( buff.at( 4 + shift ) != ':' ) ) {
-		buff.insert( 4 + shift, 1, ':' );
-		shift++;
-	}
-
-	//Try standard-parser for hh:mm:ss.frac
+	//Try iso-parser (hhmmss.frac)
 	try {
-		time = boost::posix_time::duration_from_string( buff.c_str() );
+		time = boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(buff.c_str());
 		ok = not time.is_not_a_date_time();
 	} catch ( std::logic_error e ) {
 		ok = false;
 	}
 
 	if ( ok ) {
-		LOG( Debug, verbose_info )
-				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
+		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map.setValueAs( name, boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time ) );
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
-		LOG( Runtime, warning )
-				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -457,7 +444,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::Prope
 		map.setValueAs( name, std::stoi( val ));
 	} else if ( vr == "UL" ) {
 		map.setValueAs( name, boost::lexical_cast<uint32_t>( val ));
-	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
+	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "UT" ) {
 		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.setValueAs( name, std::stod( val ));
