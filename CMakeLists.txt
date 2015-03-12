@@ -9,15 +9,13 @@
 ############################################################
 FIND_PACKAGE(Git)
 
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0048 NEW)
-cmake_policy(SET CMP0045 OLD)
+cmake_minimum_required(VERSION 2.6)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)
 
 
-project(ISIS VERSION 0.7.6)
+project(ISIS)
 
 ############################################################
 # set isis version number
@@ -29,6 +27,10 @@ set(ISIS_VERSION_PATCH "7")
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
 add_definitions(-D_ISIS_VERSION_PATCH=${ISIS_VERSION_PATCH})
+
+set(ISIS_VERSION
+  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
+  CACHE INTERNAL "The current Version of the ISIS project")
 
 set(ISIS_CORE_VERSION_API "3.0.0")
 set(ISIS_QT_VERSION_API "0.0.0")
