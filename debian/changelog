@@ -1,9 +1,11 @@
-isis (0.7.8-1) UNRELEASED; urgency=low
+isis (0.7.9-1) UNRELEASED; urgency=low
 
   * fix crash with empty dcmstack
   * in DICOM generate studyStart from StudyTime and StudyDate
+  * in DICOM add dialect to force MOSAIC decomposition
+  * bugfix for calculation of voxelSize
 
- -- ISIS Group <gr_isis@cbs.mpg.de>  Mon, 20 Oct 2014 15:02:14 +0200
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Thu, 12 Mar 2015 14:57:17 +0100
 
 isis (0.7.7-2) UNRELEASED; urgency=low
 
