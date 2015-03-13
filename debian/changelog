@@ -1,4 +1,4 @@
-isis (0.7.9-1) UNRELEASED; urgency=low
+isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 
   * fix crash with empty dcmstack
   * in DICOM generate studyStart from StudyTime and StudyDate
