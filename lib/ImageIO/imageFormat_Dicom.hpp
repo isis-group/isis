@@ -39,6 +39,7 @@ class ImageFormat_Dicom: public FileFormat
 	static void parseAS( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
 	static void parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
 	static void parseTM( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
+	static void parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
 	static boost::posix_time::ptime genTimeStamp( const boost::gregorian::date &date, const boost::posix_time::ptime &time );
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;

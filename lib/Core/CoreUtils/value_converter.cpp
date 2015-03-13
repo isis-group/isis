@@ -56,7 +56,7 @@ public:
 	boost::numeric::range_check_result generate( const ValueBase &src, boost::scoped_ptr<ValueBase>& dst )const {
 		create( dst );
 		assert( dst );
-		const boost::numeric::range_check_result result = convert( src.castToType<SRC>(), *dst );
+		const boost::numeric::range_check_result result = convert( src, *dst );
 		return result;
 	}
 };
@@ -152,35 +152,21 @@ template<> boost::numeric::range_check_result str2scalar<std::string>( const std
 // needs special handling
 template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptime>( const std::string &src, boost::posix_time::ptime &dst )
 {
-	try{
-		dst = boost::posix_time::time_from_string( src.c_str() ); //first try "2002-01-20 23:59:59.000"
-		if( !dst.is_not_a_date_time() )
-			return boost::numeric::cInRange;// ok its fine, lets leave here
-	} catch (boost::bad_lexical_cast &e){}
-	
-	// try iso formatting;
-	try{
-		dst = boost::posix_time::from_iso_string( src.c_str() );
-		if( !dst.is_not_a_date_time() )
-			return boost::numeric::cInRange;// ok its fine, lets leave here
-	} catch (boost::bad_lexical_cast &e){}
+	dst=boost::posix_time::not_a_date_time;
+	try{dst = boost::posix_time::time_from_string( src.c_str() );} //first try "2002-01-20 23:59:59.000"
+	catch(std::exception &e){LOG(Debug,info) << "time_from_string raised exception " << util::MSubject(e.what());}
 
-	// try iso formatted time duration
-	try{
-		const boost::posix_time::time_duration dur=boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(src.c_str());
-		if( !dur.is_not_a_date_time() ){
-			dst=boost::posix_time::ptime(boost::gregorian::date( 1400, 1, 1 ), dur);
-			return boost::numeric::cInRange;// ok its fine, lets leave here
-		}
-	} catch (boost::bad_lexical_cast &e){}
-
+	if( dst.is_not_a_date_time() ) 	{
+		try{dst = boost::posix_time::from_iso_string( src.c_str() );}// try iso formatting "YYYYMMDDThhmmss"
+		catch(std::exception &e){LOG(Debug,info) << "from_iso_string raised exception " << util::MSubject(e.what());}
+	}
 	LOG_IF( dst.is_not_a_date_time(), Runtime, error ) // if its still broken at least tell the user
 			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
 template<> boost::numeric::range_check_result str2scalar<boost::gregorian::date>( const std::string &str, boost::gregorian::date &dst )
 {
-	dst = boost::gregorian::date( boost::gregorian::not_a_date_time );
+	dst = boost::gregorian::date(boost::gregorian::not_a_date_time);
 
 	// first try ISO format
 	try {dst = boost::gregorian::date_from_iso_string( str );}
