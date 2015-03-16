@@ -247,6 +247,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 		if(!acqWasList && acquisitionNumberStride){//@todo acquisitionTime needs to be fixed as well
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << it->property( "acquisitionNumber" ) << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
 			it->touchProperty( "acquisitionNumber" ) += acquisitionNumberStride * cnt; 
+				#warning test me
 		}
 	}
 

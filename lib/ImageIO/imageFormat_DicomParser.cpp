@@ -156,9 +156,19 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 	if ( ok ) {
 		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map.setValueAs( name, boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time ) );
-		//although TM is defined as time of day we dont have a day here, so we fake one
+		//although TM is defined as time of day we don't have a day here, so we fake one
 	} else
 		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+}
+
+void ImageFormat_Dicom::parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map ){
+	OFString buff;
+	bool ok = true;
+	elem->getOFString( buff, 0 );
+	buff.insert(8,"T"); // the format is YYYYMMDDHHMMSS.FFFFFF but iso says it should be YYYYMMDDTHHMMSS.FFFFFF
+	const util::ValueReference ref=util::Value<std::string>(buff.c_str()).copyByID(util::Value<boost::posix_time::ptime>::staticID());
+	if(!ref.isEmpty())
+		map.setValueAs( name, ref->castTo<boost::posix_time::ptime>() );
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -174,6 +184,10 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	break;
 	case EVR_TM: {
 		parseTM( elem, name, map );
+	}
+	break;
+	case EVR_DT: {
+		parseDT( elem, name, map );
 	}
 	break;
 	case EVR_FL: {
@@ -232,6 +246,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	case EVR_ST: //short text
 	case EVR_UT: //Unlimited Text
 	case EVR_UI: //Unique Identifier [0-9\.]
+	case EVR_AT: // @todo find a better way to interpret the value (see http://northstar-www.dartmouth.edu/doc/idl/html_6.2/Value_Representations.html)
 	case EVR_PN: { //Person Name
 		OFString buff;
 		elem->getOFString( buff, 0 );
@@ -269,9 +284,8 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	default: {
 		OFString buff;
 		elem->getOFString( buff, 0 );
-		LOG( Runtime, notice ) << "Implement me " << name << "("
-							   << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
-							   << buff;
+		LOG( Runtime, notice ) << "Don't know how to handle Value Representation " << util::MSubject(const_cast<DcmTag &>( elem->getTag() ).getVRName()) << 
+		" of " << std::make_pair(name ,buff);
 	}
 	break;
 	}
@@ -471,7 +485,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 		map.setValueAs( name, val );
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.setValueAs( name, util::listToList<double>( val.begin(), val.end() ) );
-	} else if ( vr == "UT" or vr == "LT" ) {
+	} else if ( vr == "CS" ) {
 		map.setValueAs( name, val );
 	} else {
 		LOG( Runtime, error ) << "Don't know how to parse CSA entry list " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );

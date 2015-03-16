@@ -584,6 +584,7 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	dictionary[DcmTag( 0x0019, 0x100a )] = "SiemensNumberOfImagesInMosaic";
 	dictionary[DcmTag( 0x0019, 0x100c )] = "SiemensDiffusionBValue";
 	dictionary[DcmTag( 0x0019, 0x100e )] = "SiemensDiffusionGradientOrientation";
+	dictionary.erase(DcmTag( 0x0021, 0x1010 )); // dcmtk says its ImageType but it isn't (at least not on Siemens)
 
 	for( unsigned short i = 0x0010; i <= 0x00FF; i++ ) {
 		dictionary[DcmTag( 0x0029, i )] = ( std::string( "Private Code for " ) + DcmTag( 0x0029, i << 8 ).toString().c_str() + "-" + DcmTag( 0x0029, ( i << 8 ) + 0xFF ).toString().c_str() ).c_str();

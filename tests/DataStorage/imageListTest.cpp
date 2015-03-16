@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	for ( size_t i = 0; i < timesteps; i++ ) {
 		for ( size_t c = 0; c < images; c++ ) {
 			data::MemChunk<float> ch( 3, 3, 3 );
-			ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
+			ch.setValueAs( "indexOrigin", util::fvector3( ) );
 			ch.setValueAs( "acquisitionNumber",  ( uint32_t )i );
 			ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
 			ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
