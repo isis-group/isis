@@ -79,7 +79,7 @@ bool Application::addConfigFile(const std::string& filename)
 	if(f.good()){
 		const data::ValueArray< uint8_t > buffer=f.at<uint8_t>(0);
 		if(configuration.readJson(&buffer[0],&buffer[buffer.getLength()],'/')){
-			boost::optional< PropertyMap& > param=configuration.hasBranch("parameters");
+			boost::optional< PropertyMap& > param=configuration.queryBranch("parameters");
 			// if there is a "parameters" section in the file, use that as default parameters for the app
 			if(param){
 				for(PropertyMap::PropPath p:param->getLocalProps()){

@@ -57,9 +57,20 @@ bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyV
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Chunk operators
+// operators implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
+
+void SortedChunkList::getproplist::operator()(const util::PropertyMap& c)
+{
+	optional< const util::PropertyValue & > p=c.queryProperty(name);
+	if(p && p->size()>1){ // if property holds many value, flatten it
+		util::PropertyValue dummy=p.get();
+		const std::vector< util::PropertyValue > splinters=dummy.splice(1);
+		insert(splinters.begin(),splinters.end());
+	} else if(p && p->size()==1) // otherwise just use it
+		insert(*p);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,10 +101,11 @@ SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector
 std::pair<std::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
 {
 	util::PropertyMap::key_type propName = map.key_comp().propertyName;
+	const boost::optional< const util::PropertyValue & > found = ch.queryProperty( propName );
 
-	if( ch.hasProperty( propName ) ) {
+	if( found ) {
 		//check, if there is already a chunk
-		std::shared_ptr<Chunk> &pos = map[ch.property( propName )];
+		std::shared_ptr<Chunk> &pos = map[found.get()];
 		bool inserted = false;
 
 		//if not. put oures there
@@ -154,7 +166,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 	if( !isEmpty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
-		Chunk &first = *( chunks.begin()->second.begin()->second );
+		const Chunk &first = *( chunks.begin()->second.begin()->second );
 
 		if ( first.getSizeAsVector() != ch.getSizeAsVector() ) { // if they have different size - do not insert
 			LOG( Debug, verbose_info )
@@ -164,10 +176,10 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 		for(const util::PropertyMap::PropPath & ref :  equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
-			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.property( ref ) != ch.property( ref ) ) {
+			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.queryProperty( ref ) != ch.queryProperty( ref ) ) {
 				LOG( Debug, verbose_info )
-						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.property( ref ) )
-						<< " but chunks already in the list have " << util::MSubject( first.property( ref ) );
+						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.queryProperty( ref ) )
+						<< " but chunks already in the list have " << util::MSubject( first.queryProperty( ref ) );
 				return false;
 			}
 		}
@@ -196,18 +208,17 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
+	const std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
-			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.property( "indexOrigin" ) << ") with the equal property "
-			<< std::make_pair( secondarySort.top().propertyName, ch.property( secondarySort.top().propertyName ) );
+			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.queryProperty( "indexOrigin" ) << ") with the equal property "
+			<< std::make_pair( secondarySort.top().propertyName, ch.queryProperty( secondarySort.top().propertyName ) );
 
 	LOG_IF(
 		inserted.first && !inserted.second &&
-		ch.hasProperty( "source" ) && inserted.first->hasProperty( "source" ) &&
-		!( ch.property( "source" ) == inserted.first->property( "source" ) ),
+		ch.queryProperty( "source" ) != std::const_pointer_cast<const Chunk>(inserted.first)->queryProperty( "source" ),//empty properties are not unequal
 		Debug, verbose_info )
-			<< "The conflicting chunks where " << ch.property( "source" ).toString( false ) << " and " << inserted.first->property( "source" ).toString( false );
+			<< "The conflicting chunks where from " << ch.getValueAs<std::string>( "source" ) << " and " << inserted.first->getValueAs<std::string>( "source" );
 
 	return inserted.second;
 }

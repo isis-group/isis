@@ -59,14 +59,7 @@ public:
 		util::PropertyMap::PropPath name;
 		getproplist(util::PropertyMap::PropPath _name):name(_name){}
 		template<typename T> void operator()(const std::shared_ptr<T> &p){operator()(*p);}
-		void operator()(const util::PropertyMap &c){
-			util::PropertyValue p=c.property(name);
-			if(p.size()>1){
-				const std::vector< util::PropertyValue > spliters=p.splice(1);
-				insert(spliters.begin(),spliters.end());
-			} else if(p.size()==1)
-				insert(p);
-		}
+		void operator()(const util::PropertyMap &c);
 	};
 	
 private:

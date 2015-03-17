@@ -88,17 +88,17 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 	//translate TM sets we know about to proper Timestamps
 	const char *TMs[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 	for( const util::PropertyMap::PropPath tm :  TMs ) {
-		const boost::optional< util::PropertyValue& > found=hasProperty( tm );
+		const boost::optional< util::PropertyValue& > found=queryProperty( tm );
 		found && found->transform<ptime>();
 	}
 
 
 	// compute acquisitionTime as relative to DICOM/SeriesTime TODO include date
-	optional< util::PropertyValue& > serTime=hasProperty( "DICOM/SeriesTime" );
+	optional< util::PropertyValue& > serTime=queryProperty( "DICOM/SeriesTime" );
 	if(serTime){
 		const char *time_stor[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 		for( const char * time :  time_stor ) {
-			optional< util::PropertyValue& > src=hasProperty( time );
+			optional< util::PropertyValue& > src=queryProperty( time );
 			if( src ) {
 				const ComputeTimeDist comp = {serTime->as<ptime>()};
 				util::PropertyValue &dst = touchProperty( "acquisitionTime" );
@@ -140,7 +140,7 @@ void DCMStack::decodeMosaic()
 		hasProperty( NumberOfImagesInMosaicProp ) && hasProperty( NumberOfImagesInMosaicProp ) &&
 		hasProperty( "DICOM/Columns" ) && hasProperty( "DICOM/Rows" ) &&
 		hasProperty( "DICOM/SliceThickness" ) && hasProperty( "DICOM/PixelSpacing" ) &&
-		property( MosaicOrigin ).size() == 1
+		hasProperty( MosaicOrigin ) == 1
 	) {
 		// All is fine, lets start
 		uint16_t slices = getValueAs<uint16_t>( NumberOfImagesInMosaicProp );
@@ -178,7 +178,7 @@ void DCMStack::decodeMosaic()
 	if( ! mosaicTimes.empty() ) { // if there are MosaicRefAcqTimes recompute acquisitionTime
 
 		util::PropertyValue &acq = touchProperty( "acquisitionTime" );
-		const util::PropertyValue &mos = property( mosaicTimes );
+		const util::PropertyValue &mos = queryProperty( mosaicTimes ).get();
 
 		if( !acq.isEmpty() && ( acq.is<util::ilist>() || acq.is<util::dlist>() || acq.is<util::slist>() ) ) {
 			LOG( Runtime, warning ) << "There is already an acquisitionTime for each slice, won't recompute it from " << mosaicTimes;
