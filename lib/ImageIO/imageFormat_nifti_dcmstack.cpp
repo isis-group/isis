@@ -42,7 +42,7 @@ DCMStack::DCMStack( const util::PropertyMap &src ): util::PropertyMap( src ) {}
 ////////////////////////////////////////////////////////////////////////////////
 // low level json parser
 ////////////////////////////////////////////////////////////////////////////////
-bool DCMStack::readJson( data::ValueArray< uint8_t > stream, char extra_token )
+std::ptrdiff_t  DCMStack::readJson( data::ValueArray< uint8_t > stream, char extra_token )
 {
 	return PropertyMap::readJson(&stream[0],&stream[stream.getLength()],extra_token,"samples:slices");
 }
@@ -66,16 +66,16 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 
 	if( hasBranch( "time" ) ) { //store pervolume data (samples and slices) 
 		//get "samples" and "slices" into DICOM
-		branch( "DICOM" ).transfer( *this,"time/samples" );
-		branch( "DICOM" ).transfer( *this,"time/slices" );
+		touchBranch( "DICOM" ).transfer( *this,"time/samples" );
+		touchBranch( "DICOM" ).transfer( *this,"time/slices" );
 	}
 
 	if( hasBranch( "global/const" ) ) { //store const data 
-		branch( "DICOM" ).transfer( *this, "global/const" );
+		touchBranch( "DICOM" ).transfer( *this, "global/const" );
 	}
 
 	if( hasBranch( "global/slices" ) ) { //store slice data 
-		branch( "DICOM" ).transfer( *this,"global/slices" );
+		touchBranch( "DICOM" ).transfer( *this,"global/slices" );
 	}
 
 	// if we have a DICOM/AcquisitionNumber-list or DICOM/InstanceNumber rename that to acquisitionNumber 

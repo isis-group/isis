@@ -104,7 +104,6 @@ protected:
 	container_type container;
 
 /// @cond _internal
-API_EXCLUDE_BEGIN;
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal predicats
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +113,7 @@ API_EXCLUDE_BEGIN;
 	struct InvalidP { bool operator()( const PropertyValue &ref )const;};
 	struct EmptyP { bool operator()( const PropertyValue &ref )const;};
 	
+	API_EXCLUDE_BEGIN;
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -374,7 +374,7 @@ public:
 	 * \param path the path to the property
 	 * \returns the requested property or an empty property
 	 */
-	PropertyValue property( const PropPath &path )const;
+	const PropertyValue property( const PropPath &path )const;
 
 	/**
 	 * Access the property referenced by the path, create it if its not there.
@@ -409,7 +409,7 @@ public:
 	 * \returns the requested branch or an empty PropertyMap
 	 * \warning as this creates a deep copy of the branch it can be an expensive call. Its usually better to use queryBranch( const PropPath &path )const.
 	 */
-	PropertyMap branch( const PropPath &path )const;
+	const PropertyMap branch( const PropPath &path )const;
 
 	/**
 	 * Remove the property adressed by the path.
@@ -854,9 +854,11 @@ public:
 	 * \param streamEnd pointer behind the end of the character stream
 	 * \param extra_token to seperate entry paths in the map ("CsaSeries.MrPhoenixProtocol" from json will become property path "CsaSeries/MrPhoenixProtocol" if '.' is given)
 	 * \param list_trees colon separated labels for json-subtrees where property listing should be tried before using lists from the known types (e.g. "samples:slices")
-	 * \returns true if the whole stream was parsed
+	 * \returns distance from streamEnd to the last successfully parsed byte
+	 * - 0 if all given data where parsed
+	 * - a negative value if some unparsed data remain
 	 */
-	bool readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
+	ptrdiff_t readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
 
 	/**
 	 * "Print" the property tree.

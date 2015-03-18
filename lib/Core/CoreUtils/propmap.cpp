@@ -118,7 +118,7 @@ struct parser {
 				const value_cont &container= a.m1;
 				switch( container.which() ) {
 				case 1:
-					target.branch( label ) = boost::get<PropertyMap>( container );
+					target.touchBranch( label ) = boost::get<PropertyMap>( container );
 					break;
 				case 0:
 					target.touchProperty( label ) = boost::get<PropertyValue>( container );
@@ -261,7 +261,7 @@ PropertyValue &PropertyMap::touchProperty( const PropertyMap::PropPath &path )
 {
 	return tryFetchEntry<PropertyValue>( path ).get();
 }
-PropertyValue PropertyMap::property(const PropertyMap::PropPath& path) const
+const PropertyValue PropertyMap::property(const PropertyMap::PropPath& path) const
 {
 	return queryProperty(path).get_value_or(PropertyValue());
 }
@@ -278,7 +278,7 @@ PropertyMap& PropertyMap::touchBranch(const PropertyMap::PropPath& path)
 {
 	return tryFetchEntry<PropertyMap>( path ).get();
 }
-PropertyMap PropertyMap::branch( const PropertyMap::PropPath &path ) const
+const PropertyMap PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
 	return queryBranch( path ).get_value_or(PropertyMap());
 }
@@ -626,7 +626,7 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 	}
 }
 
-bool PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees )
+ptrdiff_t PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees )
 {
 	using namespace boost::spirit;
 	using qi::lit;
@@ -659,7 +659,7 @@ bool PropertyMap::readJson( const uint8_t* streamBegin, const uint8_t* streamEnd
 
 	const uint8_t* end = streamEnd;
 	qi::phrase_parse( streamBegin, end, object[boost::phoenix::ref( *this ) = _1], ascii::space | '\t' | eol );
-	return end == streamEnd;
+	return end - streamEnd;
 }
 
 
