@@ -49,7 +49,7 @@ struct splicer {
 
 		} else { // seems like we're done - insert it into the image
 			assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
-			LOG( Debug, verbose_info ) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.property( "indexOrigin" );
+			LOG( Debug, verbose_info ) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.queryProperty( "indexOrigin" );
 			m_image.insertChunk( ch );
 		}
 	}
@@ -364,7 +364,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	}
 
 	if(!hasProperty("indexOrigin")){ // if there is no common indexOrigin
-		optional< const util::PropertyValue& > found =first.hasProperty("indexOrigin");
+		optional< const util::PropertyValue& > found =first.queryProperty("indexOrigin");
 		if(found) // get it from the first chunk - which than by definition should have one
 			touchProperty("indexOrigin")=found.get();
 		else{
@@ -384,12 +384,12 @@ bool Image::reIndex(optional< util::slist& > rejected)
 
 
 	//if we have at least two slides (and have slides (with different positions) at all)
-	const optional< const util::PropertyValue& > firstV = first.hasProperty( "indexOrigin" );
+	const optional< const util::PropertyValue& > firstV = first.queryProperty( "indexOrigin" );
 
 	if ( chunk_dims == 2 && structure_size[2] > 1 && firstV ) {
 		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
-		optional< const util::PropertyValue& > lastV = last.hasProperty( "indexOrigin" );
+		optional< const util::PropertyValue& > lastV = last.queryProperty( "indexOrigin" );
 
 		if ( lastV ) {
 			//check the slice vector
@@ -673,12 +673,12 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 	std::list<util::PropertyValue > ret;
 
 	if( clean ) {
-		for( const std::shared_ptr<Chunk> &ref :  lookup ) {
-			const optional< const util::PropertyValue& > prop = std::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+		for( const std::shared_ptr<const Chunk> &ref :  lookup ) {
+			const optional< const util::PropertyValue& > prop = ref->queryProperty( key );
 
 			if(unique){ // if unique
-				if( (prop && !ret.empty() &&  prop->eq(ret.back())) || // if there is prop, skip if its equal
-					!prop //if there is none skip anyway
+				if( !prop || prop->isEmpty() || //if there is no (or an empty)  prop in ref skip it
+					(prop && !ret.empty() &&  prop.get() == ret.back()) // if there is a prop, skip if its the same as the one inserted before
 				) 
 					continue;
 			}
@@ -916,12 +916,12 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	
 	//transfer properties needed for the chunk back into the chunk (if they're there but not lists)
 	for( util::PropertyMap::PathSet::const_reference need : needed ) { 
-		const boost::optional< util::PropertyValue& > foundNeed=this->hasProperty( need );
+		const boost::optional< util::PropertyValue& > foundNeed=queryProperty( need );
 		if(foundNeed){
 			for( std::shared_ptr<Chunk> &ref : lookup ) {
 				if( !ref->hasProperty( need ) ) {
-					LOG( Debug, verbose_info ) << "Copying " << std::make_pair(need, *foundNeed) << " from the image to the chunk for splicing";
-					ref->touchProperty( need ) = *foundNeed;
+					LOG( Debug, verbose_info ) << "Copying " << std::make_pair(need, foundNeed) << " from the image to the chunk for splicing";
+					ref->touchProperty( need ) = foundNeed.get();
 				} else 
 					LOG(Debug,error) << need << " was found in the chunk although it is in the image as well. It will be deleted in the image";
 			}

@@ -74,7 +74,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					// if there are 3 planes data is actually an array of 3 pointers
@@ -90,7 +90,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -162,7 +162,7 @@ void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring dialect )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
-	util::PropertyMap &dicomTree = object.branch( dicomTagTreeName );
+	util::PropertyMap &dicomTree = object.touchBranch( dicomTagTreeName );
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////

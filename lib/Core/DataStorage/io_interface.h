@@ -52,7 +52,7 @@ protected:
 	template<typename TYPE> static bool
 	transformOrTell( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
-			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.property( to );
+			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.queryProperty( to );
 			return true;
 		}
 

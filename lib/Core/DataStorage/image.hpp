@@ -561,8 +561,8 @@ public:
 		std::list<T> ret;
 
 		if( clean ) {
-			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
-				const optional< const util::PropertyValue& > prop = std::const_pointer_cast<const Chunk>(ref)->hasProperty( key );
+			for( const std::shared_ptr<const Chunk> &ref :  lookup ) {
+				const optional< const util::PropertyValue& > prop = ref->queryProperty( key );
 
 				if(unique){ // if unique
 					if( ( prop && !ret.empty() &&  *prop == ret.back() ) || // if there is prop, skip if its equal

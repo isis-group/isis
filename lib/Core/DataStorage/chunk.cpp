@@ -210,7 +210,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 		offset = getValueAs<util::fvector3>( "columnVec" );
 		break;
 	case sliceDim:{
-		const optional< util::PropertyValue& > svec=hasProperty( "sliceVec" );
+		const optional< util::PropertyValue& > svec=queryProperty( "sliceVec" );
 		if( svec ) {
 			offset = svec->as<util::fvector3>();
 		} else {
@@ -229,8 +229,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 
 	// prepare some attributes
 	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3();
-	const bool acqWasList=property("acquisitionNumber").size()==getDimSize(atDim);
-	const bool originWasList=property("indexOrigin").size()==getDimSize(atDim);
+	const bool acqWasList=queryProperty("acquisitionNumber")->size()==getDimSize(atDim);
+	const bool originWasList=queryProperty("indexOrigin")->size()==getDimSize(atDim);
 	
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
@@ -240,12 +240,12 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 
 	for( uint32_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them 
 		if(!originWasList){
-			LOG( Debug, verbose_info ) << "Origin was " << it->property( "indexOrigin" ) << " will be moved by " << indexOriginOffset << "*"  << cnt;
+			LOG( Debug, verbose_info ) << "Origin was " << it->queryProperty( "indexOrigin" ) << " will be moved by " << indexOriginOffset << "*"  << cnt;
 			it->touchProperty( "indexOrigin" )+= util::fvector3(indexOriginOffset * cnt);
 		}
 
 		if(!acqWasList && acquisitionNumberStride){//@todo acquisitionTime needs to be fixed as well
-			LOG( Debug, verbose_info ) << "acquisitionNumber was " << it->property( "acquisitionNumber" ) << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
+			LOG( Debug, verbose_info ) << "acquisitionNumber was " << it->queryProperty( "acquisitionNumber" ) << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
 			it->touchProperty( "acquisitionNumber" ) += acquisitionNumberStride * cnt; 
 				#warning test me
 		}

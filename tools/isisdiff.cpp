@@ -30,11 +30,13 @@ std::pair<std::string, int>  parseFilename( std::string name )
 	return ret;
 }
 
-bool hasSameProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
+bool hasSameProp( const data::Image &img, const util::PropertyMap::PropPath &pname, const util::PropertyValue pval )
 {
-	return ( !img.hasProperty( pname ) && pval.isEmpty() ) || img.property( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
+	return 
+	( !img.hasProperty( pname ) && pval.isEmpty() ) || 
+	img.property( pname ) == pval; // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
 }
-bool hasDifferentProp( const data::Image &img, const util::PropertyMap::PropPath &pname, util::PropertyValue pval )
+bool hasDifferentProp( const data::Image &img, const util::PropertyMap::PropPath &pname, const util::PropertyValue pval )
 {
 	return !hasSameProp( img, pname, pval ); // if property does not exist, an empty propertyValue is returned and those compare unequal to everything
 }

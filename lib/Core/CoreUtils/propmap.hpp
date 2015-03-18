@@ -225,13 +225,13 @@ protected:
 			assign( buff.begin(), buff.end() );
 		}
 		void applyTo( PropertyMap &props ) {
-			for( const PropPath & ref :  *this ) {
+			for( const PropPath & ref: *this ) {
 				props.addNeeded( ref );
 			}
 		}
 	};
 	template<typename T> optional<T &> queryValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
-		const optional< PropertyValue & > found = tryFindEntry<PropertyValue>( path );
+		const optional< PropertyValue & > found = queryProperty( path );
 
 		if( found && found->size()>at.get_value_or(0) ) {// apparently it has a value so lets try use that
 			if( !found->is<T>() ) {
@@ -249,7 +249,7 @@ protected:
 		return optional<T &>();
 	}
 	template<typename T> T getValueAsImpl( const PropPath &path, const optional<size_t> &at )const {
-		const optional< const PropertyValue & > ref = tryFindEntry<PropertyValue>( path );
+		const optional< const PropertyValue & > ref = queryProperty( path );
 
 		if( !ref ){
 			LOG( Runtime, warning ) << "Property " << MSubject( path ) << " doesn't exist returning " << MSubject( Value<T>() );
@@ -359,12 +359,22 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Access the property referenced by the path.
-	 * If the property does not exist an empty dummy is referenced.
+	 * If the property does not exist false is returned.
 	 * As well as for accessing errors like the given path is a branch instead of a property.
 	 * \param path the path to the property
-	 * \returns a reference to the property
+	 * \returns boost::optional referencing the property or false
 	 */
-	const PropertyValue &property( const PropPath &path )const;
+	optional< const PropertyValue & > queryProperty( const PropPath &path )const;
+
+	/// @copydoc queryProperty( const PropPath &path )const
+	optional< PropertyValue & > queryProperty( const PropPath &path );
+	
+	/**
+	 * Get the property at the path, or an empty one if there is none.
+	 * \param path the path to the property
+	 * \returns the requested property or an empty property
+	 */
+	PropertyValue property( const PropPath &path )const;
 
 	/**
 	 * Access the property referenced by the path, create it if its not there.
@@ -375,21 +385,31 @@ public:
 	PropertyValue &touchProperty( const PropPath &path );
 
 	/**
+	 * Access the property branch referenced by the path.
+	 * If the branch does not exist false is returned.
+	 * As well as for accessing errors like the given path is a property instead of a branch.
+	 * \param path the path to the branch
+	 * \returns boost::optional referencing the branch or false
+	 */
+	optional< const PropertyMap & > queryBranch( const PropPath &path )const;
+
+	/// @copydoc queryBranch( const PropPath &path )const
+	optional< PropertyMap & > queryBranch( const PropPath &path );
+
+	/**
 	 * Access the branch referenced by the path, create it if its not there.
 	 * Accessing errors like if the given path exists as a property already will fail an assertion.
 	 * \param path the path to the branch
-	 * \returns a reference to the branching PropertyMap
+	 * \returns a reference to the branch
 	 */
-	PropertyMap &branch( const PropPath &path );
-
+	PropertyMap &touchBranch( const PropPath &path );
 	/**
-	 * Access the branch referenced by the path.
-	 * If the branch does not exist, a failed assertion will be raised.
-	 * As well as for accessing errors like the given path is a property instead of a branch.
+	 * Get the branch at the path, or an empty one if there is none.
 	 * \param path the path to the branch
-	 * \returns a reference to the branching PropertyMap
+	 * \returns the requested branch or an empty PropertyMap
+	 * \warning as this creates a deep copy of the branch it can be an expensive call. Its usually better to use queryBranch( const PropPath &path )const.
 	 */
-	const PropertyMap &branch( const PropPath &path )const;
+	PropertyMap branch( const PropPath &path )const;
 
 	/**
 	 * Remove the property adressed by the path.
@@ -427,11 +447,9 @@ public:
 	/**
 	 * check if a property is available
 	 * \param path the path to the property
-	 * \note the return value is a optional thus the actual PropertyValue can be accessed via the * or -> operators (if there is one of course)
-	 * \returns true if the given property does exist and is not empty, false otherwise
+	 * \returns the amount of Values in the Property is it exists, "0" otherwise
 	 */
-	optional< const PropertyValue & > hasProperty( const PropPath &path )const;
-	optional< PropertyValue & > hasProperty( const PropPath &path );
+	size_t hasProperty( const PropPath &path )const;
 
 	/**
 	 * Search for a property/branch in the whole Tree.
@@ -445,11 +463,9 @@ public:
 	/**
 	 * check if branch of the tree is available
 	 * \param path the path to the branch
-	 * \note the return value is a optional thus the actual PropertyMap can be accessed via the * or -> operators (if there is one of course)
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
-	optional< const PropertyMap & > hasBranch( const PropPath &path )const;
-	optional< PropertyMap & > hasBranch( const PropPath &path );
+	bool hasBranch( const PropPath &path )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -469,7 +485,15 @@ public:
 	 */
 	PathSet getKeys()const;
 	
+	/**
+	 * Get a list of the paths of all properties directly on this branch.
+	 * \returns a flat list of the paths to all properties in the PropertyMap
+	 */
 	PathSet getLocalProps()const;
+	/**
+	 * Get a list of the paths of all sub-branches directly on this branch.
+	 * \returns a flat list of the paths to all properties in the PropertyMap
+	 */
 	PathSet getLocalBranches()const;
 	
 	/**
@@ -617,6 +641,7 @@ public:
 		return ret;
 	}
 	PropertyValue &setValueAs( const PropPath &path, const char *val );
+	
 	/**
 	 * Set the given property to a given value/type at a specified index.
 	 * The needed flag (if set) will be kept.

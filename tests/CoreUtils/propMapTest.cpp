@@ -54,11 +54,11 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 	BOOST_CHECK_EQUAL( map1.property( "Test2" ), ( int32_t )5 );
 	BOOST_CHECK_EQUAL( map1.property( "Test3" ), util::fvector4( 1, 1, 1, 1 ) );
 	BOOST_CHECK_EQUAL( map1.property( "Test4" ), std::string( "Hallo" ) );
-	PropertyMap &ref = map1.branch( "sub" );
-	BOOST_CHECK( ! ref.isEmpty() );
-	BOOST_CHECK_EQUAL( ref.property( "Test1" ), ( int32_t )1 );
-	BOOST_CHECK_EQUAL( ref.property( "Test2" ), ( int32_t )2 );
-	BOOST_CHECK( map1.property( "new" ).isEmpty() );
+	PropertyMap sub = map1.branch( "sub" );
+	BOOST_CHECK( ! sub.isEmpty() );
+	BOOST_CHECK_EQUAL( sub.property( "Test1" ), ( int32_t )1 );
+	BOOST_CHECK_EQUAL( sub.property( "Test2" ), ( int32_t )2 );
+	BOOST_CHECK( map1.touchProperty( "new" ).isEmpty() );
 }
 
 BOOST_AUTO_TEST_CASE( propMap_set_test )
@@ -97,8 +97,6 @@ BOOST_AUTO_TEST_CASE( propMap_join_test )
 	map1.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ));
 	map1.setValueAs( "Test4", std::string( "Hallo" ) );
 	
-	//create empty Property "Test5" through accessing it
-	BOOST_CHECK( map1.property( "Test5" ).isEmpty() );
 	map2.setValueAs( "Test2", ( int32_t )5);
 	map2.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ));
 	map2.setValueAs( "Test4", std::string( "Hallo Welt" ));
@@ -138,7 +136,7 @@ BOOST_AUTO_TEST_CASE( propMap_diff_test )
 	map1.setValueAs( "Test6/2", std::string( "leer" ) );
 	PropertyMap::PathSet rej;
 	//create empty Property "Test5" through accessing it
-	BOOST_CHECK( map1.property( "Test5" ).isEmpty() );
+	BOOST_CHECK( map1.touchProperty( "Test5" ).isEmpty() );
 	map2.setValueAs( "Test2", ( int32_t )5 );
 	map2.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
 	map2.setValueAs( "Test4", std::string( "Hallo Welt" ) );
@@ -227,7 +225,7 @@ BOOST_AUTO_TEST_CASE( prop_list_test )
 
 	for( int i = 0; i < 5; i++ ) {
 		BOOST_CHECK_EQUAL( map.getValueAs<int>( "test1", i ), five[i] );
-		BOOST_CHECK_EQUAL( map.property( "test1" )[i], five[i] );
+		BOOST_CHECK_EQUAL( map.property( "test1" ).at(i), five[i] );
 		map.touchProperty( "test2" ).push_back( five[i] ); //adding same values to prop test2
 	}
 

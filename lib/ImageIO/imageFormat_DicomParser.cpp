@@ -503,14 +503,14 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
 		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) || tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSAImageHeaderInfo
-			boost::optional< util::PropertyValue& > known = map.hasProperty( "Private Code for (0029,1000)-(0029,10ff)" );
+			boost::optional< util::PropertyValue& > known = map.queryProperty( "Private Code for (0029,1000)-(0029,10ff)" );
 
 			if( known && known->as<std::string>() == "SIEMENS CSA HEADER" ) {
 				if(dialect!="nocsa"){
 					const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
 					DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 					try{
-						parseCSA( elem, map.branch( name ), dialect );
+						parseCSA( elem, map.touchBranch( name ), dialect );
 					} catch(std::exception &e){
 						LOG( Runtime, error ) << "Error parsing CSA data ("<< util::MSubject(e.what()) <<"). Deleting " << util::MSubject(name);
 					}
@@ -542,7 +542,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			else
 				parseList( elem, tag2Name( tag ), map );
 		} else {
-			dcmObject2PropMap( obj, map.branch( tag2Name( tag ) ), dialect );
+			dcmObject2PropMap( obj, map.touchBranch( tag2Name( tag ) ), dialect );
 		}
 	}
 }

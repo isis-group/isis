@@ -125,14 +125,15 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 		util::PropertyMap::key_type prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
 		const std::string::iterator start = what[0].first, end = what[0].second;
 
-		if( props.hasProperty( prop ) ) {
+		const boost::optional< util::PropertyValue const& > found= props.queryProperty( prop );
+		if( found && !found->isEmpty() ) {
 			std::string pstring;
 
 			if ( true == isFormatUsed ) {
 				size_t overallDigits = 0;
 				unsigned short tID;
 
-				switch ( tID = props.property( prop ).getTypeID() ) {
+				switch ( tID = found->getTypeID() ) {
 				case util::Value<uint8_t>::staticID():
 					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
 					break;

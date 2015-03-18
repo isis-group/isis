@@ -46,14 +46,13 @@ struct pluginDeleter {
 	void operator()( image_io::FileFormat *format ) {
 		delete format;
 #ifdef WIN32
-
 		if( !FreeLibrary( ( HINSTANCE )m_dlHandle ) )
 #else
 		if ( dlclose( m_dlHandle ) != 0 )
 #endif
 			std::cerr << "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 
-		//we cannot use LOG here, because the loggers are gone allready
+		// TODO we cannot use LOG here, because the loggers are gone allready
 	}
 };
 struct dialect_missing {

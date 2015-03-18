@@ -229,8 +229,6 @@ BOOST_AUTO_TEST_CASE ( copyChunksToVector_test )
 
 BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 {
-	const util::PropertyValue *dummy=&util::PropertyMap().property("nothing");//hack to get the address of the dummy return for failed property access
-	
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
 
 	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
@@ -252,7 +250,7 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 	BOOST_CHECK_EQUAL( img.property( "acquisitionTime").size(),4); // also still a proplist
 	BOOST_CHECK_EQUAL( img.property( "acquisitionNumber").size(),4); // also still a proplist
 
-	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should be there (aka not the dummy)
+	BOOST_CHECK( const_cast<const data::Image&>(img).queryProperty( "nothing"));  //should be there (aka optional::operator bool=true)
 	BOOST_CHECK(img.property("nothing").isEmpty()); // but empty
 	
 	img.spliceDownTo(data::sliceDim);
@@ -261,7 +259,7 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 	BOOST_CHECK( !img.hasProperty( "acquisitionTime")); // its in the chunks now
 	BOOST_CHECK( !img.hasProperty( "acquisitionNumber")); // its in the chunks now
 
-	BOOST_CHECK_NE( &const_cast<const data::Image&>(img).property( "nothing"), dummy);  //should still be there
+	BOOST_CHECK( const_cast<const data::Image&>(img).queryProperty( "nothing"));  //should still be there
 	BOOST_CHECK(img.property("nothing").isEmpty()); // but still empty
 
 	for( uint32_t i = 0; i < 4; i++ ) {
