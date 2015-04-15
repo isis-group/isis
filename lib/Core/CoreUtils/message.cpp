@@ -166,10 +166,6 @@ void DefaultMsgPrint::commit( const Message &mesg )
 
 void DefaultMsgPrint::commit_tty(const Message& mesg)
 {
-	//first remove everything which is to old anyway
-	std::list< std::pair<boost::posix_time::ptime, std::string> >::iterator begin = last.begin();
-	static const boost::posix_time::millisec dist( max_age );
-
 	const char *color_code="";
 	
 #ifdef HAVE_CURSES
@@ -177,11 +173,12 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 	static int is_no_term=setupterm(0,fileno(stderr),&err_dummy);
 	
 	// terminal color codes
-	const char red_code[]="\x1B[31m";
-	const char yellow_code[]="\x1B[33m";
-	const char green_code[]="\x1B[32m";
-	const char white_code[]="\x1B[37m";
-	const char norm_code[]="\x1B[0m";
+	static const char 
+		red_code[]="\x1B[31m",
+		yellow_code[]="\x1B[33m",
+		green_code[]="\x1B[32m",
+		white_code[]="\x1B[37m",
+		norm_code[]="\x1B[0m";
 	
 	if(!is_no_term && cur_term && max_colors>=8)
 		switch(mesg.m_level){
@@ -193,16 +190,6 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 		}
 #endif //HAVE_CURSES
 
-	while( begin != last.end() && begin->first + dist < mesg.m_timeStamp ) {
-		begin++;
-		last.pop_front();
-	}
-
-	const _internal::IsEqualMsg isEqual = {mesg.str()};
-
-	begin = std::find_if( last.begin(), last.end(), isEqual );
-
-	if( begin == last.end() ) { // its not in the list of the last xxx milliseconds - so print it
 #ifndef NDEBUG //if with debug-info
 		fprintf(stderr,"%s:%s[%s:%d]%s\n",
 				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_file.leaf().c_str(),mesg.m_line,mesg.merge(color_code).c_str()
@@ -212,11 +199,6 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_object.c_str(),mesg.merge(color_code).c_str()
 		);
 #endif //NDEBUG
-	} else {
-		last.erase( begin ); // it was in the list - remove it
-	}
-
-	last.push_back( std::make_pair( mesg.m_timeStamp, mesg.str() ) ); // put new message on the top
 }
 
 void DefaultMsgPrint::commit_pipe(const Message& mesg)
