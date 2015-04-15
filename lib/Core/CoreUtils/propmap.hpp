@@ -83,8 +83,6 @@ public:
 		PropPath( const std::list<key_type> &path );
 		PropPath operator/( const PropPath &s )const;
 		PropPath &operator/=( const PropPath &s );
-		PropPath operator/( key_type s )const;
-		PropPath &operator/=( key_type s );
 		bool operator==( const key_type &s )const {return *this == PropPath( s );}
 		bool operator!=( const key_type &s )const {return *this != PropPath( s );}
 		size_t length()const;

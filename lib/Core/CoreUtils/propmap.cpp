@@ -147,13 +147,7 @@ PropertyMap::PropPath &PropertyMap::PropPath::operator/=( const PropertyMap::Pro
 	insert( end(), s.begin(), s.end() );
 	return *this;
 }
-PropertyMap::PropPath &PropertyMap::PropPath::operator/=( key_type s )
-{
-	push_back( s );
-	return *this;
-}
 PropertyMap::PropPath PropertyMap::PropPath::operator/( const PropertyMap::PropPath &s )const {return PropPath( *this ) /= s;}
-PropertyMap::PropPath PropertyMap::PropPath::operator/( key_type s )const {return PropPath( *this ) /= s;}
 
 size_t PropertyMap::PropPath::length()const
 {
