@@ -286,15 +286,18 @@ protected:
 	optional<PropertyMap::mapped_type &> findEntry( const PropPath &path  )throw( boost::bad_get );
 
 	template<typename T> optional<const T &> tryFindEntry( const PropPath &path )const {
-		try {
-			const optional<const PropertyMap::mapped_type &> ref = findEntry( path );
+		if(!path.empty()){
+			try {
+				const optional<const PropertyMap::mapped_type &> ref = findEntry( path );
 
-			if( ref )
-				return boost::get<T>( *ref );
-		} catch ( const boost::bad_get &e ) {
-			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
+				if( ref )
+					return boost::get<T>( *ref );
+			} catch ( const boost::bad_get &e ) {
+				LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
+			}
+		} else {
+			LOG( Runtime, error ) << "Got empty path, will return nothing";
 		}
-
 		return  optional<const T &>();
 	}
 	template<typename T> optional<T &> tryFindEntry( const PropPath &path ){
