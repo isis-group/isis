@@ -21,7 +21,6 @@ option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-option(ISIS_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (tar, gz, bzip2 and Z)" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
 option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
@@ -40,24 +39,6 @@ if(ISIS_IOPLUGIN_NIFTI_SA)
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
-############################################################
-# vista
-############################################################
-if(ISIS_IOPLUGIN_VISTA)
-  # SET a root VIA include directory if necessary. This should be the directory
-  # containing the via and viaio include dirs.
-  # include directories
-	find_path(VIA_ROOT_INCLUDE_DIR NAMES "viaio/VImage.h" PATH_SUFFIXES DOC "The include directory containing VImage.h and option.h")
-
-  # LIBRARY files
-	find_library(VIAIO_LIBRARY NAMES viaio libviaio DOC "The library file libviaio.so")
-
-  # if via components found configure build environment
-	include_directories(${VIA_ROOT_INCLUDE_DIR})
-	add_library(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
-	target_link_libraries(isisImageFormat_Vista ${VIAIO_LIBRARY} ${isis_core_lib})
-	set(TARGETS ${TARGETS} isisImageFormat_Vista)
-endif(ISIS_IOPLUGIN_VISTA)
 
 ############################################################
 # NULL plugin

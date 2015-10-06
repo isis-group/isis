@@ -16,6 +16,7 @@ if(CURSES_FOUND)
 	include_directories(${CURSES_INCLUDE_DIR})
 	add_definitions(-DHAVE_CURSES)
 else(CURSES_FOUND)
+	message(STATUS "Logging won't be colored")
 	set(CURSES_LIBRARIES "")
 endif(CURSES_FOUND)
 

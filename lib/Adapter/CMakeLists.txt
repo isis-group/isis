@@ -16,23 +16,12 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 # optional components
 ############################################################
-option(ISIS_ITK "Enable adapter to the ITK library" OFF)
-# remove option until build issues are solved.
-# option(ISIS_VTK "Enable adapter to the VTK library" OFF)
 option(ISIS_QT4 "Enable adapter to the Qt4 library" OFF)
 option(ISIS_QT5 "Enable adapter to the Qt5 library" OFF)
 
 if(ISIS_QT4 AND ISIS_QT5)
 	message(FATAL_ERROR "Cannot build support for qt4 and qt5 at the same time")
 endif(ISIS_QT4 AND ISIS_QT5)
-
-############################################################
-# use ITK component
-############################################################
-if(ISIS_ITK)
-  # export header files
-  list(APPEND ADAPTER_HDR_FILES itk/itkAdapter.hpp itk/itkAdapter_impl.hpp)
-endif(ISIS_ITK)
 
 ############################################################
 # use QT4 component
