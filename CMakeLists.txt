@@ -18,6 +18,7 @@ endif(CMAKE_MAJOR_VERSION EQUAL 3)
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)
 
+cmake_policy(SET CMP0048 OLD)
 project(ISIS)
 
 option(BUILD_TESTING OFF)
@@ -181,6 +182,33 @@ SET(CPACK_NSIS_MODIFY_PATH ON)
 SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
+###########################################################
+# Doxygen target
+###########################################################
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" false)
+if(BUILD_DOCUMENTATION)
+	find_package(Doxygen)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen and latex are needed to build the documentation.")
+    endif()
+
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Doxyfile.in)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+
+#    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
+endif()
+
+
+
+
 # build the ISIS libraries
 add_subdirectory(lib)
 
@@ -202,8 +230,3 @@ endif(ISIS_BUILD_TOOLS)
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)
