@@ -18,7 +18,6 @@ endif(CMAKE_MAJOR_VERSION EQUAL 3)
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)
 
-cmake_policy(SET CMP0048 OLD)
 project(ISIS)
 
 option(BUILD_TESTING OFF)
