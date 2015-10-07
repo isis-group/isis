@@ -22,7 +22,6 @@
 #endif
 
 #ifdef HAVE_CURSES
-#include <curses.h>
 #include <term.h>
 #endif // HAVE_CURSES
 
