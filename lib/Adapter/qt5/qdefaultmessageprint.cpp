@@ -1,6 +1,6 @@
 #include "qdefaultmessageprint.hpp"
-#include <CoreUtils/singletons.hpp>
-#include <DataStorage/image.hpp>
+#include <util/singletons.hpp>
+#include <data/image.hpp>
 #include <QMessageBox>
 
 isis::qt5::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )

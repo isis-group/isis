@@ -8,9 +8,9 @@
 #define BOOST_TEST_MODULE ImageLoadTest
 #include <boost/test/unit_test.hpp>
 
-#include <DataStorage/image.hpp>
-#include <DataStorage/io_factory.hpp>
-#include <CoreUtils/log.hpp>
+#include <data/image.hpp>
+#include <data/io_factory.hpp>
+#include <util/log.hpp>
 
 namespace isis
 {

@@ -18,7 +18,7 @@
 #ifndef IMAGEFORMAT_VISTA_SA_HPP
 #define IMAGEFORMAT_VISTA_SA_HPP
 
-#include <DataStorage/io_interface.h>
+#include <data/io_interface.h>
 
 #include "VistaSaParser.hpp"
 

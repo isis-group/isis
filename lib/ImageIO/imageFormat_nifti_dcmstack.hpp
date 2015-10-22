@@ -21,8 +21,8 @@
 #define IMAGEFORMAT_NIFTI_PARSER_HPP
 
 
-#include "DataStorage/valuearray.hpp"
-#include "DataStorage/chunk.hpp"
+#include "data/valuearray.hpp"
+#include "data/chunk.hpp"
 
 namespace isis
 {

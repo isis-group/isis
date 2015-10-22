@@ -2,8 +2,8 @@
 #define ZLIB_WINAPI
 #endif
 
-#include "DataStorage/io_interface.h"
-#include <DataStorage/io_factory.hpp>
+#include "data/io_interface.h"
+#include <data/io_factory.hpp>
 #include <fstream>
 
 namespace isis

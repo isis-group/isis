@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "CoreUtils/log.hpp"
-#include "CoreUtils/log_modules.hpp"
+#include "util/log.hpp"
+#include "util/log_modules.hpp"
 #include <iostream>
-#include <CoreUtils/message.hpp>
+#include <util/message.hpp>
 
 
 using namespace isis; //needed for the log-levels

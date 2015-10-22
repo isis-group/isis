@@ -1,7 +1,7 @@
-#include <DataStorage/image.hpp>
-#include <DataStorage/io_factory.hpp>
-#include <CoreUtils/log.hpp>
-#include <CoreUtils/tmpfile.hpp>
+#include <data/image.hpp>
+#include <data/io_factory.hpp>
+#include <util/log.hpp>
+#include <util/tmpfile.hpp>
 
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/unit_test.hpp>

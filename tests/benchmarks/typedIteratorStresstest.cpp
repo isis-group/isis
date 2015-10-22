@@ -1,4 +1,4 @@
-#include "DataStorage/image.hpp"
+#include "data/image.hpp"
 #include <boost/timer.hpp>
 
 using namespace isis;

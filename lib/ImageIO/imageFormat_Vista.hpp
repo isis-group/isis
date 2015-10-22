@@ -32,8 +32,8 @@
 #include <list>
 
 // local includes
-#include <DataStorage/io_interface.h>
-#include <CoreUtils/istring.hpp>
+#include <data/io_interface.h>
+#include <util/istring.hpp>
 
 namespace isis
 {

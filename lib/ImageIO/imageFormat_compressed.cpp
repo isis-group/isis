@@ -1,8 +1,8 @@
 
-#include "DataStorage/io_interface.h"
-#include <DataStorage/io_factory.hpp>
-#include <CoreUtils/tmpfile.hpp>
-#include <DataStorage/io_factory.hpp>
+#include "data/io_interface.h"
+#include <data/io_factory.hpp>
+#include <util/tmpfile.hpp>
+#include <data/io_factory.hpp>
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <boost/filesystem/fstream.hpp>
-#include "DataStorage/fileptr.hpp"
+#include "data/fileptr.hpp"
 #include <boost/iostreams/categories.hpp>  // tags
 
 #ifdef HAVE_LZMA

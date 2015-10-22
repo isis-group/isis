@@ -28,7 +28,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
-#include "DataStorage/fileptr.hpp"
+#include "data/fileptr.hpp"
 
 namespace isis
 {

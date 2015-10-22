@@ -1,6 +1,6 @@
 #include "imageFormat_Dicom.hpp"
-#include <DataStorage/common.hpp>
-#include <CoreUtils/istring.hpp>
+#include <data/common.hpp>
+#include <util/istring.hpp>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>

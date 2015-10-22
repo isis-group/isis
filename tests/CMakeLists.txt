@@ -23,8 +23,8 @@ if(BUILD_TESTING)
 		message(STATUS "${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} seems to be a dynamic library adding \"-DBOOST_TEST_DYN_LINK\"")
 	endif(DOT_LIB OR DOT_A)
 
-	add_subdirectory(CoreUtils)
-	add_subdirectory(DataStorage)
+	add_subdirectory(util)
+	add_subdirectory(data)
 	add_subdirectory(ImageIO)
 	add_subdirectory(ExternalLibraryAdapter)
 

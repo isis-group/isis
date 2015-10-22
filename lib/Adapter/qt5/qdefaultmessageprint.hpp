@@ -1,7 +1,7 @@
 #ifndef QDEFAULTMESSAGEPRINT_HPP
 #define QDEFAULTMESSAGEPRINT_HPP
 
-#include "CoreUtils/message.hpp"
+#include "util/message.hpp"
 #include <QString>
 #include <QObject>
 

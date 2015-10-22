@@ -21,8 +21,8 @@
  *****************************************************************/
 
 #include "itkAdapter.hpp"
-#include <DataStorage/chunk.hpp>
-#include <DataStorage/io_factory.hpp>
+#include <data/chunk.hpp>
+#include <data/io_factory.hpp>
 
 namespace isis
 {

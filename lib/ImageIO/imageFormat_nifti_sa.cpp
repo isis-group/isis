@@ -1,6 +1,6 @@
 // #define BOOST_SPIRIT_DEBUG  ///$$$ DEFINE THIS BEFORE ANYTHING ELSE $$$///
 
-#include <DataStorage/fileptr.hpp>
+#include <data/fileptr.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <errno.h>

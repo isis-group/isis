@@ -1,6 +1,6 @@
-#include "DataStorage/io_factory.hpp"
+#include "data/io_factory.hpp"
 #include <fstream>
-#include "DataStorage/io_application.hpp"
+#include "data/io_application.hpp"
 #include <iomanip>
 
 using namespace isis;

@@ -1,6 +1,6 @@
-#include <DataStorage/io_factory.hpp>
-#include <DataStorage/io_application.hpp>
-#include <DataStorage/fileptr.hpp>
+#include <data/io_factory.hpp>
+#include <data/io_application.hpp>
+#include <data/fileptr.hpp>
 
 
 struct RawLog {static const char *name() {return "Raw";}; enum {use = _ENABLE_LOG};};

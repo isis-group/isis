@@ -1,6 +1,6 @@
-#include "DataStorage/io_factory.hpp"
-#include "DataStorage/io_application.hpp"
-#include "CoreUtils/application.hpp"
+#include "data/io_factory.hpp"
+#include "data/io_application.hpp"
+#include "util/application.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <algorithm>

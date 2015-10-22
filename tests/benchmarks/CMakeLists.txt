@@ -1,7 +1,7 @@
 ############################################################
 # The ISIS project
 # 
-# Main CMake configuration file of the ISIS DataStorage tests.
+# Main CMake configuration file of the ISIS data tests.
 #
 # Author: Thomas Proeger <thomasproeger@googlemail.com>
 # Date: Tue, 28 Jun 2011 18:46:55 +0200

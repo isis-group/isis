@@ -56,9 +56,9 @@ endif(ISIS_LIB_DEPENDS)
 ############################################################
 
 # add source files to this parameter list
-file(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
-file(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
-file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
+file(GLOB CORE_SRC_FILES "data/*.cpp" "util/*.cpp")
+file(GLOB COREUTILS_HDR_FILES "util/*.hpp" "util/*.h")
+file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 
 #add the core library
 add_lib(isis_core
@@ -69,14 +69,14 @@ add_lib(isis_core
 
 ############################################################
 # set the plugin directory and the system dependend shared
-# library naming conventions for DataStorage/io_factory.cpp
+# library naming conventions for data/io_factory.cpp
 ############################################################
 if(WIN32)
-set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
+set_source_files_properties( "data/io_factory.cpp" PROPERTIES COMPILE_FLAGS
 	"-DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
 )
 else(WIN32)
-set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
+set_source_files_properties( "data/io_factory.cpp" PROPERTIES COMPILE_FLAGS
 	"-DPLUGIN_PATH=\\\"${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}\\\" -DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
 )
 endif(WIN32)
@@ -87,8 +87,8 @@ endif(WIN32)
 
 # install header files
 install(FILES "config.hpp" DESTINATION include/isis COMPONENT Development)
-install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/CoreUtils COMPONENT Development)
-install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/DataStorage COMPONENT Development)
+install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/util COMPONENT Development)
+install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/data COMPONENT Development)
 
 # write configuration file
 configure_file(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)

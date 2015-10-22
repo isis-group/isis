@@ -18,7 +18,7 @@
 
 #include "imageFormat_Vista_sa.hpp"
 
-#include "DataStorage/fileptr.hpp"
+#include "data/fileptr.hpp"
 
 
 namespace isis

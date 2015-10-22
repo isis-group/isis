@@ -23,9 +23,9 @@
 #include <QGuiApplication>
 #include <QMatrix4x4>
 
-#include <CoreUtils/application.hpp>
-#include <CoreUtils/matrix.hpp>
-#include <DataStorage/io_application.hpp>
+#include <util/application.hpp>
+#include <util/matrix.hpp>
+#include <data/io_application.hpp>
 #include "qdefaultmessageprint.hpp"
 
 namespace isis

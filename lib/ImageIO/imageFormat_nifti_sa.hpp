@@ -57,9 +57,9 @@
 #define NIFTI_UNITS_PPM    40
 #define NIFTI_UNITS_RADS   48
 
-#include <DataStorage/io_interface.h>
-#include <CoreUtils/matrix.hpp>
-#include <DataStorage/fileptr.hpp>
+#include <data/io_interface.h>
+#include <util/matrix.hpp>
+#include <data/fileptr.hpp>
 #include <sys/stat.h>
 #include <memory>
 
