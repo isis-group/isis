@@ -45,7 +45,7 @@ macro( add_lib name sources deps soversion version)
 	endif(ISIS_BUILD_STATIC_AND_SHARED)
 endmacro( add_lib )
 				
-add_subdirectory(Core)
+add_subdirectory(core)
 
 add_subdirectory(ImageIO)
 add_subdirectory(Adapter)

@@ -8,7 +8,7 @@
 # 
 ############################################################
 
-include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+include_directories(${CMAKE_SOURCE_DIR}/lib/core)
 
 ############################################################
 # optional components

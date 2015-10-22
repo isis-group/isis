@@ -8,7 +8,7 @@
 # 
 ############################################################
 
-include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+include_directories(${CMAKE_SOURCE_DIR}/lib/core)
 
 if(BUILD_TESTING)
 	message(STATUS "Unit tests will be built (run with \"make test\")")

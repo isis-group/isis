@@ -11,7 +11,7 @@
 ############################################################
 # include the ISIS core header files
 ############################################################
-include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
+include_directories(${CMAKE_SOURCE_DIR}/lib/core)
 find_package(ZLIB)
 
 ############################################################
