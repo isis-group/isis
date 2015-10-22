@@ -25,7 +25,7 @@ if(BUILD_TESTING)
 
 	add_subdirectory(util)
 	add_subdirectory(data)
-	add_subdirectory(ImageIO)
+	add_subdirectory(io)
 	add_subdirectory(ExternalLibraryAdapter)
 
 	if(ISIS_BUILD_FILTER )
