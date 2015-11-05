@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 #include <boost/mpl/assert.hpp>
 #include <set>
@@ -142,61 +142,49 @@ template<typename T, typename InputIterator> std::list<T> listToList( InputItera
 }
 
 /**
- * Generic tokenizer.
- * Splits source into tokens and tries to lexically cast them to TARGET.
- * If that fails, boost::bad_lexical_cast is thrown.
- * \param source the source string to be split up
- * \param separator regular expression to delimit the tokens (defaults to \\s+)
- * \param prefix regular expression for text to be removed from the string before it is split up
- * ("^" if not given, will be added at the beginning)
- * \param postfix regular expression for text to be removed from the string before it is split up
- * ("$" if not given, will be added at the end)
- * \returns a list of the casted tokens
- */
-template<typename TARGET> std::list<TARGET> stringToList(
-	std::string source, const boost::regex &separator,
-	boost::regex prefix, boost::regex postfix )
-{
-	std::list<TARGET> ret;
-	assert( ! separator.empty() );
-
-	if ( ! prefix.empty() ) {
-		if ( prefix.str()[0] != '^' )
-			prefix = boost::regex( std::string( "^" ) + prefix.str(), prefix.flags() );
-
-		source = boost::regex_replace( source, prefix, "", boost::format_first_only | boost::match_default );
-	}
-
-	if ( ! postfix.empty() ) {
-		if ( postfix.str()[postfix.size() - 1] != '$' )
-			postfix = boost::regex( postfix.str() + "$", postfix.flags() );
-
-		source = boost::regex_replace( source, postfix, "", boost::format_first_only | boost::match_default );
-	}
-
-	boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
-	const boost::sregex_token_iterator token_end;
-
-	while ( i != token_end ) {
-		ret.push_back( boost::lexical_cast<TARGET>( ( i++ )->str() ) );
-	}
-
-	return ret;
-}
-/**
  * Simple tokenizer (regexp version).
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * Before the string is split up leading and rear separators will be cut.
  * \param source the source string to be split up
- * \param separator string to delimit the tokens
+ * \param separator regular expression to delimit the tokens (defaults to [\\s,;])
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> stringToList(
-	std::string source,
-	const boost::regex separator = boost::regex( "[[:space:]]" ) )
+	const std::string &source,
+	const std::regex separator = std::regex( "[\\s,;]",std::regex_constants::optimize ) )
 {
-	return stringToList<TARGET>( source, separator, separator, separator );
+	std::list<TARGET> ret;
+	std::sregex_iterator i(source.begin(),source.end(), separator );
+	const std::sregex_iterator end=std::sregex_iterator();
+	
+	while ( i != end ) {
+		ret.push_back( boost::lexical_cast<TARGET>( ( i++ )->str() ) );
+	}
+	return ret;
+}
+/**
+ * Generic tokenizer.
+ * Splits source into tokens and tries to lexically cast them to TARGET.
+ * If that fails, boost::bad_lexical_cast is thrown.
+ * \param source the source string to be split up
+ * \param separator string to delimit the tokens
+ * \param prefix regular expression for text to be removed from the string before it is split up
+ * ("^" is recommended to be there)
+ * \param postfix regular expression for text to be removed from the string before it is split up
+ * ("$" is recommended to be there)
+ * \returns a list of the casted tokens
+ */
+template<typename TARGET> std::list<TARGET> stringToList(
+	std::string source, const std::regex &separator,
+	std::regex prefix, std::regex postfix )
+{
+	std::list<TARGET> ret;
+	const std::string empty;
+	source=std::regex_replace(source,prefix,empty);
+	source=std::regex_replace(source,postfix,empty);
+	
+	return stringToList<TARGET>(source,separator);
 }
 
 /**

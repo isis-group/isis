@@ -254,7 +254,7 @@ template<bool IS_NUM> struct Tokenizer { //jump from number to number in the str
 };
 template<> struct Tokenizer<false> { // not for numbers / tokenize string at spaces,"," and ";"
 	static std::list<std::string> run( const std::string &src ) {
-		return util::stringToList<std::string>( src, boost::regex( "[\\s,;]+" ) );
+		return util::stringToList<std::string>( src );
 	}
 };
 
