@@ -5,6 +5,7 @@
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <errno.h>
 #include <fstream>
+#include <boost/regex.hpp>
 
 
 namespace isis

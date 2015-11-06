@@ -107,8 +107,8 @@ struct parser {
 		const char extra_token;
 		add_member( char _extra_token ): extra_token( _extra_token ) {}
 		void operator()( const boost::fusion::vector2<std::string, value_cont> &a, rule<PropertyMap>::decl::context_type &context, bool & )const {
-			const PropertyMap::PropPath label = extra_token ?
-			stringToList<PropertyMap::key_type>( a.m0, extra_token ) :
+			//todo test me
+			const PropertyMap::PropPath label = extra_token ? stringToList<PropertyMap::key_type>( a.m0, std::regex(&extra_token) ) :
 			PropertyMap::PropPath( a.m0.c_str() );
 			PropertyMap &target = context.attributes.car;
 

@@ -147,21 +147,28 @@ template<typename T, typename InputIterator> std::list<T> listToList( InputItera
  * If that fails, boost::bad_lexical_cast is thrown.
  * Before the string is split up leading and rear separators will be cut.
  * \param source the source string to be split up
- * \param separator regular expression to delimit the tokens (defaults to [\\s,;])
+ * \param separator regular expression to delimit the tokens (defaults to [^\\s,;])
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> stringToList(
-	const std::string &source,
-	const std::regex separator = std::regex( "[\\s,;]",std::regex_constants::optimize ) )
+template<typename TARGET, typename charT, typename traits> std::list<TARGET> stringToList(
+	const std::basic_string<charT, traits> &source,
+	const std::regex separator = std::regex( "[\\s,;]+",std::regex_constants::optimize ) )
 {
+	typedef typename std::basic_string<charT, traits>::const_iterator iterator_type;
 	std::list<TARGET> ret;
-	std::sregex_iterator i(source.begin(),source.end(), separator );
-	const std::sregex_iterator end=std::sregex_iterator();
+	std::regex_token_iterator<iterator_type> i(source.begin(),source.end(), separator,-1 );
+	static const std::regex_token_iterator<iterator_type> end=std::regex_token_iterator<iterator_type>();
 	
 	while ( i != end ) {
 		ret.push_back( boost::lexical_cast<TARGET>( ( i++ )->str() ) );
 	}
 	return ret;
+}
+template<typename TARGET> std::list<TARGET> stringToList(
+	const char source[],
+	const std::regex separator = std::regex( "[\\s,;]+",std::regex_constants::optimize ) )
+{
+	return stringToList<TARGET>(std::string(source),separator);
 }
 /**
  * Generic tokenizer.
@@ -175,9 +182,9 @@ template<typename TARGET> std::list<TARGET> stringToList(
  * ("$" is recommended to be there)
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> stringToList(
-	std::string source, const std::regex &separator,
-	std::regex prefix, std::regex postfix )
+template<typename TARGET, typename charT, typename traits> std::list<TARGET> stringToList(
+	std::basic_string<charT, traits> source, const std::regex &separator,
+	const std::regex prefix, const std::regex postfix )
 {
 	std::list<TARGET> ret;
 	const std::string empty;
@@ -193,10 +200,8 @@ template<typename TARGET> std::list<TARGET> stringToList(
  * If that fails, boost::bad_lexical_cast is thrown.
  * Leading and trailing seperators are ignored.
  *
- * In contrast to the versions based on regular expressions, this can handle any basic_string as input.
- *
  * \param source the source string to be split up
- * \param separator string to delimit the tokens
+ * \param separator character to delimit the tokens
  * \returns a list of the casted tokens
  */
 //@todo test

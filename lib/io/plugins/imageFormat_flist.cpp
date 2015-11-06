@@ -33,7 +33,7 @@ public:
 	std::string getName()const {return "filelist proxy (gets filenames from files or stdin)";}
 
 	std::list<data::Chunk> doLoad( std::istream &in, const util::istring &dialect ) {
-		const boost::regex linebreak( "[[.newline.][.carriage-return.]]" );
+		static const std::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
 		size_t fcnt = 0;
 

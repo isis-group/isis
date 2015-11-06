@@ -31,5 +31,17 @@ BOOST_AUTO_TEST_CASE( fuzzy_equal_test )
 	BOOST_CHECK( util::fuzzyEqual( a4, b4, 1 ) ); // distance of epsilon for float is _not_ considered equal for double
 }
 
+BOOST_AUTO_TEST_CASE( string_to_list_test )
+{
+	const std::list<int> i_numbers{1,2,3,4,50};
+	const std::list<std::string> s_numbers{"1","2","3","4","50"};
+	
+	BOOST_CHECK_EQUAL(util::stringToList<std::string>("1,2;3\t4 50"),s_numbers);
+	BOOST_CHECK_EQUAL(util::stringToList<int>("1,2;3\t4  50"),i_numbers);
+	
+	const std::list<std::string> multiline{"Hello","there","world  (how are you)"};
+	BOOST_CHECK_EQUAL(util::stringToList<std::string>("Hello\rthere\nworld  (how are you)",std::regex("[[.newline.][.carriage-return.]]")),multiline);
+}
+
 }
 }

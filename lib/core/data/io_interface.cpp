@@ -2,7 +2,7 @@
 #pragma warning(disable:4996)
 #endif
 
-#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <iostream>
