@@ -2,7 +2,6 @@
 #pragma warning(disable:4996)
 #endif
 
-#include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <iostream>
@@ -101,87 +100,45 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	return std::make_pair( filename, std::string() );
 }
 
-std::string FileFormat::makeFilename( const util::PropertyMap &props, std::string namePattern )
+std::string FileFormat::makeFilename( const util::PropertyMap &props, const std::string namePattern )
 {
-	boost::regex reg( "\\{[^{}]+\\}" );
-	boost::regex regFormatInt( "%d_" ); // add leading zeros to int values - always as much as possible
+	static const std::regex reg( "\\{[^{}]+\\}" );
+	static const std::regex regFormatInt( "%[-+#+]*[\\d]*[di]$" ); // add leading zeros to int values - always as much as possible
+	std::string result=namePattern;
+	ptrdiff_t offset=0;
+	
 	//NOTE: can also be done for rounding floats, but at the moment not required so not done right now
 
-	boost::match_results<std::string::iterator> what;
-	std::string::iterator pos = namePattern.begin();
 
-
-	while( boost::regex_search( pos, namePattern.end() , what, reg ) ) {
-
-		bool isFormatUsed = false;
-		boost::cmatch m;
-		size_t mSize = 1;
-
-		if ( boost::regex_match( what[0].str().substr( 1, regFormatInt.size() ).c_str(), m, regFormatInt ) ) {
-			mSize += regFormatInt.size();
-			isFormatUsed = true;
+	//iterate through all {whatever} in the pattern
+	for(std::sregex_iterator i=std::sregex_iterator(namePattern.begin(),namePattern.end(), reg); i!=std::sregex_iterator();i++){
+		std::string smatch=i->str().substr(1,i->length()-2); // get the string inside the {}
+		std::smatch fwhat;
+		std::string format;
+		
+		if(std::regex_search( smatch, fwhat, regFormatInt )){ //check if we have a printf formatting in there
+			smatch.erase(fwhat[0].first,fwhat[0].second); // remove it
+			format=fwhat[0].str();
 		}
-
-		util::PropertyMap::key_type prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
-		const std::string::iterator start = what[0].first, end = what[0].second;
-
+		
+		util::PropertyMap::key_type prop( smatch.c_str() ); // use remaining string to look for property
 		const boost::optional< util::PropertyValue const& > found= props.queryProperty( prop );
+		std::string pstring;
 		if( found && !found->isEmpty() ) {
-			std::string pstring;
-
-			if ( true == isFormatUsed ) {
-				size_t overallDigits = 0;
-				unsigned short tID;
-
-				switch ( tID = found->getTypeID() ) {
-				case util::Value<uint8_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
-					break;
-				case util::Value<int8_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<int8_t>::max() ) );
-					break;
-				case util::Value<uint16_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<uint16_t>::max() ) );
-					break;
-				case util::Value<int16_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<int16_t>::max() ) );
-					break;
-				case util::Value<uint32_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<uint32_t>::max() ) );
-					break;
-				case util::Value<int32_t>::staticID():
-					overallDigits = ceil( log10( std::numeric_limits<int32_t>::max() ) );
-					break;
-				default:
-					break;
-				}
-
-				pstring =  boost::regex_replace( props.getValueAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
-
-				if ( 0 < overallDigits ) {
-					size_t zerosToFill = overallDigits - pstring.length();
-					pstring.insert( 0, zerosToFill, '0' );
-				}
+			if(!format.empty()){
+				char buffer[1024];
+				std::snprintf(buffer,1024,format.c_str(),found->as<int>());
+				pstring=std::string(buffer);
 			} else {
-				pstring =  boost::regex_replace( props.getValueAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+				pstring=found->toString();
 			}
-
-			const size_t dist = start - namePattern.begin();
-
-			namePattern.replace( start, end, pstring );
-
-			pos = namePattern.begin() + dist + pstring.length();
-
-			LOG( Debug, info )
-					<< "Replacing " << util::PropertyMap::key_type( "{" ) + prop + "}" << " by "   << props.getValueAs<std::string>( prop )
-					<< " the string is now " << namePattern;
-		} else {
-			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";
-			namePattern.replace( start, end, "" ); // it must be removed, or it will match forever
-		}
+			result.replace(i->position()+offset, i->length(),pstring);
+			offset+=pstring.length()-i->length();
+		} else
+			LOG(Runtime,warning) << "Won't replace " << i->str() << " as there is no such property";
 	}
 
-	return namePattern;
+	return result;
 }
 
 std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const

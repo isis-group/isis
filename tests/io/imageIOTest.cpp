@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	data::MemChunk<uint8_t> ch( 5, 5, 5 );
 	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
 	ch.setValueAs<uint32_t>( "acquisitionNumber", 0 );
-	ch.setValueAs<float>( "acquisitionTime", 0 );
+	ch.setValueAs<float>( "acquisitionTime", 1234 );
 	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
 	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
 	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
@@ -33,11 +33,8 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	BOOST_REQUIRE( img.isValid() );
 
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{acquisitionNumber}.nii" ), "/tmp/S0.nii" );
-	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{nich da}.nii" ), "/tmp/S.nii" ); // {nich da} does not exist - so we just remove it from the string
-	BOOST_CHECK_EQUAL(
-		image_io::FileFormat::makeFilename( img, "/tmp/acq{acquisitionTime}.nii" ),
-		std::string( "/tmp/acq" ) + img.getValueAs<std::string>( "acquisitionTime" ) + ".nii"
-	);
+	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{nich da}.nii" ), "/tmp/S{nich da}.nii" ); // {nich da} does not exist - so we do not touch it
+	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{acquisitionNumber}_acq{acquisitionTime}.nii" ), "/tmp/S0_acq1234.nii");
 }
 
 BOOST_AUTO_TEST_CASE ( imageNameUseFormatTest )
@@ -61,7 +58,7 @@ BOOST_AUTO_TEST_CASE ( imageNameUseFormatTest )
 	// no format string
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{acquisitionNumber}.nii" ), "/tmp/S0.nii" );
 	// minimum 0 with format
-	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{%d_acquisitionNumber}.nii" ), "/tmp/S0000000000.nii" );
+	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{%d_acquisitionNumber}.nii" ), "/tmp/S0.nii" );
 	// some value  with format
 	img.setValueAs<uint32_t>( "acquisitionNumber", 123 );
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{%d_acquisitionNumber}.nii" ), "/tmp/S0000000123.nii" );
