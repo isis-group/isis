@@ -4,6 +4,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <algorithm>
+#include <boost/regex.hpp>
 
 
 struct DiffLog {static const char *name() {return "Diff";}; enum {use = _ENABLE_LOG};};

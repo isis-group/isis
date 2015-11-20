@@ -12,22 +12,18 @@
 
 #include "io_factory.hpp"
 #ifdef WIN32
-#include <windows.h>
-#include <Winbase.h>
-#define BOOST_FILESYSTEM_VERSION 3 
-#include <boost/filesystem/path.hpp>
+	#include <windows.h>
+	#include <Winbase.h>
 #else
-#include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 #include "../util/log.hpp"
 #include "common.hpp"
-#include <boost/regex.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/algorithm/string.hpp>
 #include "../util/singletons.hpp"
 
 
@@ -146,13 +142,14 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	}
 
 	LOG( Runtime, info )   << "Scanning " << util::MSubject( p ) << " for plugins";
-	boost::regex pluginFilter( std::string( "^" ) + DL_PREFIX + "isisImageFormat_" + "[[:word:]]+" + DL_SUFFIX + "$", boost::regex::perl | boost::regex::icase );
+	static const std::string pluginFilterStr=std::string(DL_PREFIX)+"isisImageFormat_[\\w]+"+DL_SUFFIX;
+	static const std::regex pluginFilter( pluginFilterStr, std::regex_constants::ECMAScript | std::regex_constants::icase);
 	unsigned int ret = 0;
 
 	for ( boost::filesystem::directory_iterator itr( p ); itr != boost::filesystem::directory_iterator(); ++itr ) {
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 
-		if ( boost::regex_match( itr->path().filename().string(), pluginFilter ) ) {
+		if ( std::regex_match( itr->path().filename().string(), pluginFilter ) ) {
 			const std::string pluginName = itr->path().native();
 #ifdef WIN32
 			HINSTANCE handle = LoadLibrary( pluginName.c_str() );
@@ -195,7 +192,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
-			LOG( Runtime, verbose_info ) << "Ignoring " << *itr << " because it doesn't match " << pluginFilter.str();
+			LOG( Runtime, verbose_info ) << "Ignoring " << *itr << " because it doesn't match " << pluginFilterStr;
 		}
 	}
 

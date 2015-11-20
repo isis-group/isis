@@ -18,9 +18,6 @@
 #include <map>
 #include <string>
 #include <memory>
-#include <boost/regex.hpp>
-#define BOOST_FILESYSTEM_VERSION 3 
-#include <boost/filesystem.hpp>
 
 #include "io_interface.h"
 #include "../util/progressfeedback.hpp"
