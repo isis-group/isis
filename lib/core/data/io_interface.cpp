@@ -102,9 +102,13 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 
 std::string FileFormat::makeFilename( const util::PropertyMap &props, const std::string namePattern )
 {
-	static const std::regex reg( "\\{[^{}]+\\}" );
-	static const std::regex regFormatInt( "%[-+#+]*[\\d]*[di]$" ); // add leading zeros to int values - always as much as possible
+	using namespace std::regex_constants;
+	static const std::regex reg( "\\{[^{}]+\\}", ECMAScript|optimize);
+	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", ECMAScript|optimize );
+	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  ECMAScript|optimize );
+	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", ECMAScript|optimize| icase); 
 	std::string result=namePattern;
+	enum formatting_type {none,integer,uinteger,floating};
 	ptrdiff_t offset=0;
 	
 	//NOTE: can also be done for rounding floats, but at the moment not required so not done right now
@@ -116,21 +120,38 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 		std::smatch fwhat;
 		std::string format;
 		
-		if(std::regex_search( smatch, fwhat, regFormatInt )){ //check if we have a printf formatting in there
-			smatch.erase(fwhat[0].first,fwhat[0].second); // remove it
+		//check if we have a printf formatting in there
+		formatting_type formatting =
+			std::regex_search( smatch, fwhat, regFormatInt ) ? integer:
+			std::regex_search( smatch, fwhat, regFormatUInt ) ? uinteger:
+			std::regex_search( smatch, fwhat, regFormatFloat ) ? floating:
+			none;
+		
+		if(formatting!=none){ 
 			format=fwhat[0].str();
+			smatch.erase(fwhat[0].first,fwhat[0].second); // remove it
 		}
 		
 		util::PropertyMap::key_type prop( smatch.c_str() ); // use remaining string to look for property
 		const boost::optional< util::PropertyValue const& > found= props.queryProperty( prop );
 		std::string pstring;
 		if( found && !found->isEmpty() ) {
-			if(!format.empty()){
-				char buffer[1024];
-				std::snprintf(buffer,1024,format.c_str(),found->as<int>());
-				pstring=std::string(buffer);
-			} else {
+			if(formatting==none){
 				pstring=found->toString();
+			} else {
+				char buffer[1024];
+				switch(formatting){
+				case integer:
+					std::snprintf(buffer,1024,format.c_str(),found->as<long>());
+					break;
+				case uinteger:
+					std::snprintf(buffer,1024,format.c_str(),found->as<unsigned long>());
+					break;
+				case  floating:
+					std::snprintf(buffer,1024,format.c_str(),found->as<double>());
+					break;
+				} 
+				pstring=std::string(buffer);
 			}
 			result.replace(i->position()+offset, i->length(),pstring);
 			offset+=pstring.length()-i->length();
