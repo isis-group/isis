@@ -72,29 +72,25 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 
 	ch1.setValueAs( "indexOrigin", util::fvector3( 0, 0, 2 ) );
 	ch1.setValueAs( "sequenceNumber", 0 );
-	ch1.setValueAs<uint32_t>( "acquisitionNumber", 0 );
-	ch1.setValueAs<float>( "acquisitionTime", 0 );
+	ch1.setValueAs( "acquisitionNumber", 0 );
 	ch1.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
 	ch1.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
 	ch1.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
 
-	for( uint32_t i = 0; i < 5; i++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list
-		data::MemChunk<uint8_t> ch( ch1 );
-		ch.setValueAs<uint32_t>( "acquisitionNumber", i );
-		chunks.push_back( ch );
+	for( int i = 0; i < 5; i++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list
+		for( int t = 0; t < 5; t++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list
+			data::MemChunk<uint8_t> ch( ch1 );
+			ch.setValueAs( "sequenceNumber", i );
+			ch.setValueAs( "acquisitionNumber", t );
+			chunks.push_back( ch );
+		}
 	}
 
 
 	std::list<data::Image> images = data::IOFactory::chunkListToImageList( chunks );
 
 	BOOST_REQUIRE_EQUAL( images.size(), 5 );
-	//  int number = 0;
-
-	// @todo this needs an actual io-plugin
-	/*  std::list<std::string> names=image_io::FileFormat::makeUniqueFilenames(images,"/tmp/S{acquisitionNumber}.nii");
-	    for(const std::string &ref : names){
-	        BOOST_REQUIRE_EQUAL(ref,std::string("/tmp/S.nii").insert(6,util::Value<uint32_t>(number++).toString(false)));
-	    }*/
+	BOOST_CHECK_EQUAL( images.front().getDimSize(data::timeDim), 5 );
 }
 
 }
