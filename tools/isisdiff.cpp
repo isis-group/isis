@@ -1,10 +1,8 @@
 #include "data/io_factory.hpp"
 #include "data/io_application.hpp"
 #include "util/application.hpp"
-#include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
 #include <algorithm>
-#include <boost/regex.hpp>
+#include <regex>
 
 
 struct DiffLog {static const char *name() {return "Diff";}; enum {use = _ENABLE_LOG};};
@@ -17,12 +15,12 @@ using namespace isis;
 
 std::pair<std::string, int>  parseFilename( std::string name )
 {
-	const boost::regex reg( "^([^:]*):([[:digit:]]+)$" );
-	boost::cmatch results;
+	static const std::regex reg( "^([^:]*):([\\d]+)$", std::regex_constants::optimize|std::regex_constants::ECMAScript );
+	std::smatch results;
 	std::pair<std::string, int> ret;
 	ret.second = -1;
 
-	if ( boost::regex_match( name.c_str(), results, reg ) ) {
+	if ( std::regex_match( name, results, reg ) ) {
 		ret.first = results.str( results.size() - 2 );
 		ret.second = std::stoi( results.str( results.size() - 1 ) );
 	} else
@@ -144,7 +142,7 @@ void dropWith( util::slist props, std::list< data::Image > &images )
 {
 	for( util::slist::const_reference propStr :  props ) {
 		const std::list< std::string > ppair = util::stringToList<std::string>( propStr, '=' );
-		images.remove_if( boost::bind( hasSameProp, _1, ppair.front().c_str(), util::PropertyValue( ppair.back() ) ) );
+		images.remove_if( std::bind( hasSameProp, std::placeholders::_1, ppair.front().c_str(), util::PropertyValue( ppair.back() ) ) );
 	}
 }
 
@@ -261,9 +259,6 @@ int main( int argc, char *argv[] )
 		LOG( DiffLog, error ) << "Cannot mix single and multi image mode, exiting.";
 		return -1;
 	}
-
-
-
 
 	return ret;
 }
