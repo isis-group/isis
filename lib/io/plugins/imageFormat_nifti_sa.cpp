@@ -1,11 +1,9 @@
-// #define BOOST_SPIRIT_DEBUG  ///$$$ DEFINE THIS BEFORE ANYTHING ELSE $$$///
-
 #include <data/fileptr.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <errno.h>
 #include <fstream>
-#include <boost/regex.hpp>
+#include <regex>
 
 
 namespace isis
@@ -14,7 +12,6 @@ namespace image_io
 {
 using boost::posix_time::ptime;
 using boost::gregorian::date;
-
 
 namespace _internal
 {
@@ -406,18 +403,19 @@ void ImageFormat_NiftiSa::storeDescripForSPM( const util::PropertyMap &props, ch
 bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, const char desc[] )
 {
 	//check description for tr, te and fa and date which is written by spm8
-	boost::regex descriptionRegex(
-		".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*"
+	// @test against recent spm
+	std::regex descriptionRegex(
+		".*TR=([\\d]+)ms.*TE=([\\d]+)ms.*FA=([\\d]+)deg\\ *([\\d]{1,2}).([[:word:]]{3}).([\\d]{4})\\ *([\\d]{1,2}):([\\d]{1,2}):([\\d]{1,2}).*"
 	);
-	boost::cmatch results;
+	std::cmatch results;
 
-	if ( boost::regex_match( desc, results,  descriptionRegex ) ) {
-		props.setValueAs( "repetitionTime", boost::lexical_cast<uint16_t>( results.str( 1 ) ) );
-		props.setValueAs( "echoTime", boost::lexical_cast<uint16_t>( results.str( 2 ) ) );
-		props.setValueAs( "flipAngle", boost::lexical_cast<uint16_t>( results.str( 3 ) ) );
+	if ( std::regex_match( desc, results,  descriptionRegex ) ) {
+		props.setValueAs( "repetitionTime", std::stoi( results.str( 1 ) ) );
+		props.setValueAs( "echoTime", std::stoi( results.str( 2 ) ) );
+		props.setValueAs( "flipAngle", std::stoi( results.str( 3 ) ) );
 
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
-		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
+		const util::Value<uint8_t> hours = results.str( 7 ), minutes = results.str( 8 ), seconds = results.str( 9 );
 
 		ptime sequenceStart = ptime(
 								  boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
