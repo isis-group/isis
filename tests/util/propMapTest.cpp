@@ -342,7 +342,28 @@ BOOST_AUTO_TEST_CASE( propMap_transfer_test )
 	BOOST_CHECK_EQUAL(map2.property( "Test1" ), ( int32_t )1); // its here now
 	BOOST_CHECK_EQUAL(map2.property( "Test2" ), ( int32_t )2);
 }
-
+BOOST_AUTO_TEST_CASE( propMap_read_json_test )
+{
+	const char test_string[]=R"(
+	{
+	"number.int"  : 3,
+	"number.float": 3.14,
+	"list.string":[
+		"python",
+		"c++",
+		"ruby"
+	],
+	"list.int":[1,2,3],
+	"list.float":[1,2,3.5],
+	"my-indent" : {"length": 3, "use_space": true }
+	}
+	)";
+	PropertyMap map;
+	map.readJson((uint8_t*)test_string,(uint8_t*)(test_string+sizeof(test_string)));
+	
+	BOOST_CHECK(map.hasProperty("number/int"));
+	BOOST_CHECK_EQUAL(map.property("number/int"),3);
+}
 
 }
 }

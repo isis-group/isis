@@ -859,7 +859,7 @@ public:
 	 * - 0 if all given data where parsed
 	 * - a negative value if some unparsed data remain
 	 */
-	ptrdiff_t readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token, std::string list_trees=std::string() );
+	ptrdiff_t readJson( const uint8_t* streamBegin, const uint8_t* streamEnd, char extra_token='/', std::string list_trees=std::string() );
 
 	/**
 	 * "Print" the property tree.
