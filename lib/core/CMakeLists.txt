@@ -12,7 +12,7 @@ set(ISIS_USE_JSONCPP OFF CACHE BOOL "use external json parser library jsoncpp (i
 if(ISIS_USE_JSONCPP)
 	find_library(LIB_JSONCPP jsoncpp)
 	find_path(INC_JSONCPP "json/version.h")
-	include_directories(INC_JSONCPP)
+	include_directories(${INC_JSONCPP})
 else(ISIS_USE_JSONCPP)
 	set(LIB_JSONCPP "")
 endif(ISIS_USE_JSONCPP)
