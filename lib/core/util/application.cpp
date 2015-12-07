@@ -32,8 +32,8 @@ namespace util
 
 Application::Application( const char name[], const char cfg[]): m_name( name )
 {
-	addLogging<CoreLog>( "Core" );
-	addLogging<CoreDebug>( "Core" );
+	addLogging<CoreLog>( "Util" );
+	addLogging<CoreDebug>( "Util" );
 	addLogging<DataLog>( "Data" );
 	addLogging<DataDebug>( "Data" );
 	addLogging<ImageIoLog>( "ImageIO" );

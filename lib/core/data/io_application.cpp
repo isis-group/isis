@@ -179,9 +179,9 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 	std::string dl = parameters[std::string( "rdialect" ) + suffix];
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
-			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
-			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
-			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format: " ) + rf )
+			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
+			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	bool no_progress = parameters["np"];
 
