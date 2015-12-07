@@ -17,11 +17,11 @@ namespace util
 Selection::Selection( const char *entries, const char *init_val ): m_set( 0 )
 {
 	int ID = 1;
-	for( const util::istring & ref :  stringToList<util::istring>( util::istring( entries )) ) {
+	for( const util::istring & ref :  stringToList<util::istring>( entries ) ) {
 		const MapType::value_type pair( ref, ID++ );
 
 		if( ! ent_map.insert( pair ).second ) {
-			LOG( Debug, error ) << "Entry " << util::MSubject( pair ) << " could not be inserted";
+			LOG( Debug, error ) << "Entry " << pair << " could not be inserted";
 		}
 	}
 
@@ -33,11 +33,16 @@ Selection::Selection(): m_set( 0 ) {}
 Selection::operator int()const {return m_set;}
 Selection::operator util::istring()const
 {
-	for( MapType::const_reference ref :  ent_map ) {
-		if ( ref.second == m_set )
-			return ref.first;
+	if(m_set){
+		for( MapType::const_reference ref :  ent_map ) {
+			if ( ref.second == m_set )
+				return ref.first;
+		}
+		assert(false); // m_set should either be in the map or 0
+		return util::istring( "<<UNKNOWN>>" );
+	} else {
+		return util::istring( "<<NOT_SET>>" );
 	}
-	return util::istring( "<<NOT_SET>>" );
 }
 Selection::operator std::string()const
 {
@@ -47,7 +52,7 @@ Selection::operator std::string()const
 
 bool Selection::set( unsigned short entry )
 {
-	if( getEntries().size() > entry ) {
+	if( ent_map.size()+1 > entry ) {
 		m_set = entry;
 		return true;
 	} else {
@@ -80,8 +85,11 @@ bool Selection::operator>( const int ref )       const{return std::greater<int>(
 
 std::list<util::istring> Selection::getEntries()const
 {
+	std::list<MapType::value_type> buffer(ent_map.begin(),ent_map.end());
+	buffer.sort([](const MapType::value_type &v1,const MapType::value_type &v2){return v1.second<v2.second;});
+	
 	std::list<util::istring> ret;
-	for( MapType::const_reference ref :  ent_map ) {
+	for( MapType::value_type &ref :  buffer ) {
 		ret.push_back( ref.first );
 	}
 	return ret;
