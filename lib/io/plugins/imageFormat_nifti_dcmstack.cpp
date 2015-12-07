@@ -111,7 +111,7 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 	}
 
 	// deal with mosaic
-	boost::optional< util::slist& > iType=refValueAs<util::slist>("DICOM/ImageType");
+	boost::optional< util::slist& > iType=queryValueAs<util::slist>("DICOM/ImageType");
 	if( iType && std::find( iType->begin(), iType->end(), std::string( "MOSAIC" ) ) != iType->end() )
 			decodeMosaic();
 

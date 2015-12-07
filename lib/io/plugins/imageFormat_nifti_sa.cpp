@@ -404,9 +404,10 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 {
 	//check description for tr, te and fa and date which is written by spm8
 	// @test against recent spm
-	std::regex descriptionRegex(
-		".*TR=([\\d]+)ms.*TE=([\\d]+)ms.*FA=([\\d]+)deg\\ *([\\d]{1,2}).([[:word:]]{3}).([\\d]{4})\\ *([\\d]{1,2}):([\\d]{1,2}):([\\d]{1,2}).*"
-	);
+	static const std::regex descriptionRegex(
+		".*TR=([\\d]+)ms.*TE=([\\d]+)ms.*FA=([\\d]+)deg\\ *([\\d]{1,2}).([\\w]{3}).([\\d]{4})\\ *([\\d]{1,2}):([\\d]{1,2}):([\\d]{1,2}).*",
+		std::regex_constants::ECMAScript|std::regex_constants::optimize
+	); 
 	std::cmatch results;
 
 	if ( std::regex_match( desc, results,  descriptionRegex ) ) {
@@ -524,14 +525,24 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 	props.setValueAs<uint16_t>( "sequenceNumber", 0 );
 
 	if( head->sform_code ) { // get srow if sform_code>0
-		props.setValueAs( "nifti/sform_code", formCode ).castTo<util::Selection>().set( head->sform_code );
+		util::Selection code=formCode;
+		if(code.set(head->sform_code))
+			props.setValueAs( "nifti/sform_code", code );
+		else
+			LOG(Runtime,warning) << "ignoring unknown sform_code " << head->sform_code << "(known are: " << formCode.getEntries() << ")";
+		
 		props.setValueAs( "nifti/srow_x", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_x, head->srow_x + 4 );;
 		props.setValueAs( "nifti/srow_y", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_y, head->srow_y + 4 );;
 		props.setValueAs( "nifti/srow_z", util::fvector4() ).castTo<util::fvector4>().copyFrom( head->srow_z, head->srow_z + 4 );;
 	}
 
 	if( head->qform_code ) { // get the quaternion if qform_code>0
-		props.setValueAs( "nifti/qform_code", formCode ).castTo<util::Selection>().set( head->qform_code );
+		util::Selection code=formCode;
+		if(code.set(head->qform_code))
+			props.setValueAs( "nifti/qform_code", code );
+		else
+			LOG(Runtime,warning) << "ignoring unknown qform_code " << head->qform_code << "(known are: " << formCode.getEntries() << ")";
+
 		props.setValueAs( "nifti/quatern_b", head->quatern_b );
 		props.setValueAs( "nifti/quatern_c", head->quatern_c );
 		props.setValueAs( "nifti/quatern_d", head->quatern_d );
@@ -759,14 +770,14 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 
 			if( swap_endian ) {
 				LOG( Runtime, info ) << "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
-									 << " elements (" << data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ) << "M)";
+									 << " elements (" << std::to_string(data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ))+"M" <<")";
 			} else {
 				LOG( Runtime, info ) << "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
-									 << " elements (" << data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ) << "M)";
+				                     << " elements (" << std::to_string(data_src->bytesPerElem()*data_src->getLength()*( 1. / 0x100000 ))+"M" <<")";
 			}
 
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
-					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
+					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() + "/" + std::to_string(header->bitpix) <<  ")";
 
 		} else {
 			LOG( Runtime, error ) << "Sorry, the nifti datatype " << header->datatype << " is not (yet) supported";
@@ -1031,7 +1042,7 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 	// [x_nii]=[ nifti/srow_y ] * [j]
 	// [x_nii] [ nifti/srow_z ]   [k]
 
-	LOG( Debug, info ) << "Using sform (" << props.queryProperty( "nifti/sform_code" ) << ") " << util::MSubject(
+	LOG( Debug, info ) << "Using sform (" << props.queryProperty( "nifti/sform_code" )->toString() << ") " << util::MSubject(
 						   props.getValueAs<std::string>( "nifti/srow_x" ) + "-" +
 						   props.getValueAs<std::string>( "nifti/srow_y" ) + "-" +
 						   props.getValueAs<std::string>( "nifti/srow_z" )
