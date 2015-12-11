@@ -118,7 +118,7 @@ bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
 	io_formats.push_back( plugin );
 	std::list<util::istring> suffixes = plugin->getSuffixes(  );
 	LOG( Runtime, info )
-			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
+			<< "Registering " << util::NoSubject( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
 			<< util::MSubject( plugin->getName() )
 			<< " with supported suffixes " << suffixes;
 	for( util::istring & it :  suffixes ) {
@@ -208,8 +208,8 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 {
 	FileFormatList formatReader;
 	formatReader = getFileFormatList( filename.string(), suffix_override, dialect );
-	const util::istring with_dialect = dialect.empty() ?
-									   util::istring( "" ) : util::istring( " with dialect \"" ) + dialect + "\"";
+	const util::NoSubject with_dialect = dialect.empty() ?
+	                                   util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
 
 	if ( formatReader.empty() ) {
 		if( !boost::filesystem::exists( filename ) ) {
@@ -224,7 +224,7 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 	} else {
 		for( FileFormatList::const_reference it :  formatReader ) {
 			LOG( ImageIoDebug, info )
-					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
+					<< "plugin to load file" << with_dialect << " " << filename << ": " << it->getName();
 
 			try {
 				std::list<data::Chunk> loaded=it->load( filename.native(), dialect, m_feedback );
@@ -239,7 +239,7 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 				} else {
 					LOG( Runtime, warning )
 							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
-							<< " with " << util::MSubject( e.what() ) << ", maybe it just wasn't the right format";
+							<< " with " << e.what() << ", maybe it just wasn't the right format";
 				}
 			}
 		}
@@ -343,14 +343,13 @@ std::list< Chunk > IOFactory::loadChunks( const std::string& path, isis::util::i
 std::list< Image > IOFactory::load ( const util::slist &paths, util::istring suffix_override, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
-	size_t loaded = 0;
 	for( const std::string & path :  paths ) {
 		std::list<Chunk> loaded=loadChunks( path , suffix_override, dialect, rejected );
 		chunks.splice(chunks.end(),loaded);
 	}
 	const std::list<data::Image> images = chunkListToImageList( chunks, rejected );
 	LOG( Runtime, info )
-			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << paths;
+			<< "Generated " << images.size() << " images out of " << paths;
 
 	// store paths of red, but rejected chunks
 	std::set<std::string> image_rej;

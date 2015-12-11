@@ -167,7 +167,9 @@ public:
 	ValueArrayBase &asValueArrayBase() {return operator*();}
 	const ValueArrayBase &getValueArrayBase()const {return operator*();}
 
+	/// reference the internal array representation of the pixel data in the chunk
 	template<typename TYPE> ValueArray<TYPE> &asValueArray() {return asValueArrayBase().castToValueArray<TYPE>();}
+	/// const version of asValueArray
 	template<typename TYPE> const ValueArray<TYPE> getValueArray()const {return getValueArrayBase().castToValueArray<TYPE>();}
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
