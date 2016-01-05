@@ -41,25 +41,25 @@ namespace data
 
 namespace _internal
 {
-using namespace boost::numeric::ublas;
+namespace ublas=boost::numeric::ublas;
 
 
 template <typename TYPE>
-bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
+bool inverseMatrix( const ublas::matrix<TYPE> &inMatrix, ublas::matrix<TYPE> &inverse )
 {
-	matrix<TYPE> A( inMatrix );
-	permutation_matrix<TYPE> pm( A.size1() );
+	ublas::matrix<TYPE> A( inMatrix );
+	ublas::permutation_matrix<TYPE> pm( A.size1() );
 
-	if( lu_factorize( A, pm ) != 0 ) {
+	if( ublas::lu_factorize( A, pm ) != 0 ) {
 		return false;
 	}
 
-	inverse.assign( identity_matrix<TYPE>( inMatrix.size1() ) );
-	lu_substitute( A, pm, inverse );
+	inverse.assign( ublas::identity_matrix<TYPE>( inMatrix.size1() ) );
+	ublas::lu_substitute( A, pm, inverse );
 	return true;
 }
 
-bool transformCoords( isis::util::PropertyMap &, const isis::util::vector4<size_t> size, boost::numeric::ublas::matrix<float>, bool transformCenterIsImageCenter = false );
+bool transformCoords( isis::util::PropertyMap &, const isis::util::vector4<size_t> size, ublas::matrix<float>, bool transformCenterIsImageCenter = false );
 
 }
 

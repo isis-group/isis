@@ -150,6 +150,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 				case  floating:
 					std::snprintf(buffer,1024,format.c_str(),found->as<double>());
 					break;
+				case none:;//should never happen / just to stop compiler from whining about missing 'none'
 				} 
 				pstring=std::string(buffer);
 			}

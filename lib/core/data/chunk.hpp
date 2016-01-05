@@ -22,8 +22,6 @@
 #include <list>
 #include "ndimensional.hpp"
 
-#include <boost/numeric/ublas/matrix.hpp>
-
 namespace isis
 {
 namespace data

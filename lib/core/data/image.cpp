@@ -286,7 +286,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	chunkVolume = first.getVolume();
 
 	//move all props from the image and move them (back) into the chunks to redo common check
-	for(int i=0;i<lookup.size()-1;i++) // copy the first n-1
+	for(size_t i=0;i+1<lookup.size();i++) // copy the first n-1
 		lookup[i]->join(*this); 
 	lookup.back()->transfer(*this); //transfer into the last
 	
