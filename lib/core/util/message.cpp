@@ -14,7 +14,7 @@
 #include "common.hpp"
 #include <sys/types.h>
 
-#include <boost/date_time/posix_time/posix_time.hpp> //needed to print the timestamp
+#include <iomanip>//needed to print the timestamp
 #include <sstream>
 
 #ifndef WIN32
@@ -33,7 +33,7 @@ namespace _internal
 {
 struct IsEqualMsg {
 	std::string newMsg;
-	bool operator()( const std::pair<boost::posix_time::ptime, std::string>& ms ) {return ms.second == newMsg;}
+	bool operator()( const std::pair<std::time_t, std::string>& ms ) {return ms.second == newMsg;}
 };
 }
 const char *logLevelName( LogLevel level )
@@ -79,9 +79,11 @@ bool MessageHandlerBase::requestStop( LogLevel _level )
 		return false;
 }
 
-std::string Message::strTime()const
+std::string Message::strTime(const char *formatting)const
 {
-	return boost::posix_time::to_simple_string( m_timeStamp );
+	std::stringstream buffer;
+	buffer << std::put_time(std::localtime(&m_timeStamp), formatting);
+	return buffer.str();
 }
 
 Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo )
@@ -89,7 +91,7 @@ Message::Message( std::string object, std::string module, std::string file, int 
 	  m_object( object ),
 	  m_module( module ),
 	  m_file( file ),
-	  m_timeStamp( boost::posix_time::microsec_clock::universal_time() ),
+	  m_timeStamp( std::time(nullptr) ),
 	  m_line( line ),
 	  m_level( level )
 {}
@@ -203,7 +205,7 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 void DefaultMsgPrint::commit_pipe(const Message& mesg)
 {
 	fprintf(stderr,"%s:%s %s [%s -- %s:%d]\n",
-			mesg.m_module.c_str(),util::logLevelName( mesg.m_level ),mesg.merge("").c_str(), mesg.strTime().c_str(),mesg.m_file.leaf().c_str(),mesg.m_line);
+			mesg.m_module.c_str(),util::logLevelName( mesg.m_level ),mesg.merge("").c_str(), mesg.strTime("%T").c_str(),mesg.m_file.leaf().c_str(),mesg.m_line);
 }
 
 }

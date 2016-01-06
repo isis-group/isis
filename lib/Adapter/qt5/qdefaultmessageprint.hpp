@@ -16,7 +16,7 @@ public:
 	std::string m_object, m_module;
 	boost::filesystem::path m_file;
 	std::list<std::string> m_subjects;
-	boost::posix_time::ptime m_timeStamp;
+	std::time_t m_timeStamp;
 	int m_line;
 	LogLevel m_level;
 	std::string message;

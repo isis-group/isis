@@ -19,6 +19,7 @@
 #include <list>
 #include <stdio.h>
 
+#include <chrono>
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -106,14 +107,14 @@ public:
 	std::string m_object, m_module;
 	boost::filesystem::path m_file;
 	std::list<std::string> m_subjects;
-	boost::posix_time::ptime m_timeStamp;
+	std::time_t m_timeStamp;
 	int m_line;
 	LogLevel m_level;
 	Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo );
 	Message( const Message &src );
 	~Message();
 	std::string merge(const std::string color_code)const;
-	std::string strTime()const;
+	std::string strTime(const char *formatting="%c")const;
 	template<size_t SIZE> Message &operator << ( const char (&str)[SIZE] ) { //send string literals as text
 		*( ( std::ostringstream * )this ) << str;
 		return *this;
