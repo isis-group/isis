@@ -32,7 +32,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <complex>
-
+#include <iomanip>
 
 /// @cond _internal
 namespace isis
@@ -174,6 +174,38 @@ template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptim
 	}
 	LOG_IF( dst.is_not_a_date_time(), Runtime, error ) // if its still broken at least tell the user
 			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
+	return boost::numeric::cInRange;
+}
+// needs special handling
+template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::string &src, timestamp &dst )
+{
+	//@todo support other formats
+	dst=timestamp();
+	
+	std::tm t = {};
+    std::istringstream ss(src);
+    ss >> std::get_time(&t, "%c"); // locales standard date and time
+    if (ss.fail()) {
+		LOG(Runtime, error ) // if its still broken at least tell the user
+			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<timestamp>::staticName() << " returning " << MSubject( dst );
+    } else {
+		dst=std::chrono::time_point_cast<timestamp::duration>(timestamp::clock::from_time_t(mktime(&t)));
+	}
+
+	
+	return boost::numeric::cInRange;
+}
+// needs special handling
+template<> boost::numeric::range_check_result str2scalar<duration>( const std::string &src, duration &dst )
+{
+	//@todo support other ratios as milli
+	try{
+		dst=duration(std::stoll(src));
+	} catch(std::logic_error &e) {
+		LOG(Runtime, error ) // if its still broken at least tell the user
+			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<duration>::staticName() << "(" << e.what() << ") returning " << MSubject( dst );
+		dst=duration();
+	}
 	return boost::numeric::cInRange;
 }
 template<> boost::numeric::range_check_result str2scalar<boost::gregorian::date>( const std::string &str, boost::gregorian::date &dst )

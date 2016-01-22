@@ -76,6 +76,8 @@ DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );
 
 DEF_TYPE( boost::posix_time::ptime, timestamp );
+DEF_TYPE( timestamp, tstamp );
+DEF_TYPE( duration, duration );
 DEF_TYPE( boost::gregorian::date, date );
 DEF_TYPE( boost::posix_time::time_duration, time_duration );
 DEF_TYPE( boost::gregorian::date_duration, date_duration );
