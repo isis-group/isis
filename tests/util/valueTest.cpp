@@ -19,7 +19,6 @@
 #include "util/vector.hpp"
 #include <chrono>
 #include <boost/numeric/conversion/converter.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <complex>
 
@@ -85,12 +84,10 @@ BOOST_AUTO_TEST_CASE( type_toString_test )
 	Value<int32_t> tInt( 42 );
 	Value<float> tFloat( 3.1415 );
 	Value<std::string> tString( std::string( "Hello World" ) );
-	Value<boost::posix_time::ptime> tTime = boost::posix_time::time_from_string( "2002-Jan-20 23:59:59" );
 
 	BOOST_CHECK_EQUAL( tInt.toString(), "42" );
 	BOOST_CHECK_EQUAL( tFloat.toString(), "3.1415" );
 	BOOST_CHECK_EQUAL( tString.toString(), "Hello World" );
-	BOOST_CHECK_EQUAL( tTime.toString(), "2002-Jan-20 23:59:59" );
 }
 
 // TestCase is()
@@ -278,7 +275,11 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
-	
+
+}
+
+BOOST_AUTO_TEST_CASE( time_conversion_test )
+{
 	util::timestamp the_day_after(std::chrono::hours(24)+std::chrono::milliseconds(1));
 	
 	std::time_t current_time;

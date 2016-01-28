@@ -3,7 +3,6 @@
 #include <util/istring.hpp>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <dcmtk/dcmdata/dcdicent.h>
 #include <dcmtk/oflog/config.h>
 
@@ -121,7 +120,6 @@ protected:
 };
 }
 
-using boost::posix_time::ptime;
 using boost::gregorian::date;
 
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
@@ -138,11 +136,6 @@ std::string ImageFormat_Dicom::getName()const {return "Dicom";}
 util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
-
-ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
-{
-	return ptime( date, time.time_of_day() );
-}
 
 void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 {
@@ -172,54 +165,57 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
-	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
-		ptime sequenceStart = dicomTree.getValueAs<ptime>( "SeriesTime" );
-		dicomTree.remove( "SeriesTime" );
-
-		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
-		for( const char * d :  dates ) {
-			if( dicomTree.hasProperty( d ) ) {
-				sequenceStart = genTimeStamp( dicomTree.getValueAs<date>( d ), sequenceStart );
-				dicomTree.remove( d );
-				break;
-			}
-		}
-
-		// compute acquisitionTime
-		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
-			ptime acTime = dicomTree.getValueAs<ptime>( "AcquisitionTime" );
-			dicomTree.remove( "AcquisitionTime" );
-
-			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
-			for( const char * d :  dates ) {
-				if( dicomTree.hasProperty( d ) ) {
-					acTime = genTimeStamp( dicomTree.getValueAs<date>( d ), acTime );
-					dicomTree.remove( d );
-					break;
-				}
-			}
-
-			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
-			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
-			object.setValueAs( "acquisitionTime", fAcDist );
-		}
-
-		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
-		object.setValueAs( "sequenceStart", sequenceStart );
-	}
+#warning implement me when date is ready
+// 	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
+// 		// @todo test me
+// 		util::duration sequenceStart = dicomTree.getValueAs<util::duration>( "SeriesTime" );
+// 		dicomTree.remove( "SeriesTime" );
+// 
+// 		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
+// 		for( const char * d :  dates ) {
+// 			if( dicomTree.hasProperty( d ) ) {
+// 				sequenceStart = genTimeStamp( dicomTree.getValueAs<date>( d ), sequenceStart );
+// 				dicomTree.remove( d );
+// 				break;
+// 			}
+// 		}
+// 
+// 		// compute acquisitionTime
+// 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
+// 			ptime acTime = dicomTree.getValueAs<ptime>( "AcquisitionTime" );
+// 			dicomTree.remove( "AcquisitionTime" );
+// 
+// 			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
+// 			for( const char * d :  dates ) {
+// 				if( dicomTree.hasProperty( d ) ) {
+// 					acTime = genTimeStamp( dicomTree.getValueAs<date>( d ), acTime );
+// 					dicomTree.remove( d );
+// 					break;
+// 				}
+// 			}
+// 
+// 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
+// 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
+// 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
+// 			object.setValueAs( "acquisitionTime", fAcDist );
+// 		}
+// 
+// 		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
+// 		object.setValueAs( "sequenceStart", sequenceStart );
+// 	}
 
 	// compute studyStart
-	if ( hasOrTell( prefix + "StudyTime", object, warning ) && hasOrTell( prefix + "StudyDate", object, warning ) ) {
-		const date dt=dicomTree.getValueAs<date>("StudyDate");
-		const ptime tm=dicomTree.getValueAs<ptime>("StudyTime");
-		if(!(dt.is_not_a_date() || tm.is_not_a_date_time())){
-			object.setValueAs("studyStart",genTimeStamp(dt,tm));
-			dicomTree.remove("StudyTime");
-			dicomTree.remove("StudyDate");
-		}
-		
-	}
+#warning implement me when date is ready
+// 	if ( hasOrTell( prefix + "StudyTime", object, warning ) && hasOrTell( prefix + "StudyDate", object, warning ) ) {
+// 		const date dt=dicomTree.getValueAs<date>("StudyDate");
+// 		const ptime tm=dicomTree.getValueAs<ptime>("StudyTime");
+// 		if(!(dt.is_not_a_date() || tm.is_not_a_date_time())){
+// 			object.setValueAs("studyStart",genTimeStamp(dt,tm));
+// 			dicomTree.remove("StudyTime");
+// 			dicomTree.remove("StudyDate");
+// 		}
+// 		
+// 	}
 	
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
 	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );

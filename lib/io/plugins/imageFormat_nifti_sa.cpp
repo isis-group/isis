@@ -10,7 +10,6 @@ namespace isis
 {
 namespace image_io
 {
-using boost::posix_time::ptime;
 using boost::gregorian::date;
 
 namespace _internal
@@ -403,7 +402,7 @@ void ImageFormat_NiftiSa::storeDescripForSPM( const util::PropertyMap &props, ch
 bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, const char desc[] )
 {
 	//check description for tr, te and fa and date which is written by spm8
-	// @test against recent spm
+	// @todo test against recent spm
 	static const std::regex descriptionRegex(
 		".*TR=([\\d]+)ms.*TE=([\\d]+)ms.*FA=([\\d]+)deg\\ *([\\d]{1,2}).([\\w]{3}).([\\d]{4})\\ *([\\d]{1,2}):([\\d]{1,2}):([\\d]{1,2}).*",
 		std::regex_constants::ECMAScript|std::regex_constants::optimize
@@ -415,14 +414,20 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 		props.setValueAs( "echoTime", std::stoi( results.str( 2 ) ) );
 		props.setValueAs( "flipAngle", std::stoi( results.str( 3 ) ) );
 
-		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
-		const util::Value<uint8_t> hours = results.str( 7 ), minutes = results.str( 8 ), seconds = results.str( 9 );
+		tm t={
+			std::stoi(results.str( 9 )), //tm_sec
+			std::stoi(results.str( 8 )), //tm_min
+			std::stoi(results.str( 7 )), //tm_hour
+			std::stoi(results.str( 4 )), // tm_mday
+			std::stoi(results.str( 5 ))-1, // tm_mon [0, 11] 
+			std::stoi(results.str( 6 ))-1900, // tm_year years since 1900
+			0,0,-1,0,                           // tm_wday, tm_yday, tm_isdst
+			nullptr
+		};
 
-		ptime sequenceStart = ptime(
-								  boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
-								  boost::posix_time::time_duration( hours, minutes, seconds )
-							  );
-		props.setValueAs<ptime>( "sequenceStart", sequenceStart );
+		util::timestamp sequenceStart = std::chrono::time_point_cast<util::timestamp::duration>(std::chrono::system_clock::from_time_t(mktime(&t)));
+
+		props.setValueAs<util::timestamp>( "sequenceStart", sequenceStart );
 
 		LOG( Runtime, info ) << "Using Tr=" << props.queryProperty( "repetitionTime" ) << ", Te=" << props.queryProperty( "echoTime" )
 							 << ", flipAngle=" << props.queryProperty( "flipAngle" ) << " and sequenceStart=" << props.queryProperty( "sequenceStart" )

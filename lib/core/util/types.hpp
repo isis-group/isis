@@ -1,7 +1,7 @@
 #ifndef TYPES_HPP_INCLUDED
 #define TYPES_HPP_INCLUDED
 
-#include <boost/mpl/vector/vector40.hpp>
+#include <boost/mpl/vector/vector30.hpp>
 #include <boost/mpl/contains.hpp>
 
 #ifndef _MSC_VER
@@ -9,7 +9,6 @@
 #endif
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include "vector.hpp"
 #include "color.hpp"
 #include "selection.hpp"
@@ -34,7 +33,7 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector31 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector29 < //increase this if a type is added (if >30 consider including vector40 above)
 bool //1
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
 , float, double // 11
@@ -44,8 +43,8 @@ bool //1
 , ilist, dlist, slist // 21
 , std::string, isis::util::Selection //23
 , std::complex<float>, std::complex<double> //25
-, boost::posix_time::ptime, boost::gregorian::date //27
-, boost::posix_time::time_duration, boost::gregorian::date_duration //29
+, boost::gregorian::date //27
+, boost::gregorian::date_duration //29
 , timestamp, duration
 > types;
 
@@ -100,8 +99,6 @@ template<> struct has_op<std::string>:_internal::ordered<true>,_internal::multip
 // cannot multiply time
 template<> struct has_op<boost::gregorian::date>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 template<> struct has_op<boost::gregorian::date_duration>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
-template<> struct has_op<boost::posix_time::ptime>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
-template<> struct has_op<boost::posix_time::time_duration>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 
 template<> struct has_op<timestamp>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 
@@ -135,19 +132,13 @@ class Value;
 }
 }
 
-// define +/- operations for ptime and date
+// define +/- operations for timestamp and date
 namespace std{
 	template<> struct plus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
 		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x+y;}
 	};
 	template<> struct minus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
 		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x-y;}
-	};
-	template<> struct plus<boost::posix_time::ptime>:binary_function<boost::posix_time::ptime,boost::posix_time::time_duration,boost::posix_time::ptime>{
-		boost::posix_time::ptime operator() (const boost::posix_time::ptime& x, const boost::posix_time::time_duration& y) const {return x+y;}
-	};
-	template<> struct minus<boost::posix_time::ptime>:binary_function<boost::posix_time::ptime,boost::posix_time::time_duration,boost::posix_time::ptime>{
-		boost::posix_time::ptime operator() (const boost::posix_time::ptime& x, const boost::posix_time::time_duration& y) const {return x-y;}
 	};
 
 	template<> struct plus<isis::util::timestamp>:binary_function<isis::util::timestamp,isis::util::duration,isis::util::timestamp>{

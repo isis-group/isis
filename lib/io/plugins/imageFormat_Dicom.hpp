@@ -27,8 +27,6 @@
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcdict.h>
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-
 namespace isis
 {
 namespace image_io
@@ -38,9 +36,7 @@ class ImageFormat_Dicom: public FileFormat
 {
 	static void parseAS( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
 	static void parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static void parseTM( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static void parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static boost::posix_time::ptime genTimeStamp( const boost::gregorian::date &date, const boost::posix_time::ptime &time );
+	static void parseTMDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID );
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;
 #if __BYTE_ORDER == __LITTLE_ENDIAN

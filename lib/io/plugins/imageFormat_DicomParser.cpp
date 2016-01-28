@@ -1,6 +1,5 @@
 #include "imageFormat_Dicom.hpp"
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <data/common.hpp>
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmdata/dcdicent.h>
@@ -120,6 +119,7 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::Prop
 
 /**
  * Parses the Time string
+ * For duration (VR=TM):
  * A string of characters of the format hhmmss.frac; where hh contains hours (range "00" - "23"),
  * mm contains minutes (range "00" - "59"), ss contains seconds (range "00" - "59"), and frac contains
  * a fractional part of a second as small as 1 millionth of a second (range "000000" - "999999").
@@ -133,42 +133,20 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::Prop
  * - "070907.0705" represents a time of 7 hours, 9 minutes and 7.0705 seconds.
  * - "1010" represents a time of 10 hours, and 10 minutes.
  * - "021" is an invalid value.
- *
- * For reasons of backward compatibility with versions of this standard prior to V3.0, it is
- * recommended that implementations also support a string of characters of the format hh:mm:ss.frac for this VR.
+ * For timestamp (VR=TM) see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
  */
-void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseTMDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID )
 {
-	short shift = 0;
+	// @todo test me
 	OFString buff;
-	bool ok = true;
-	boost::posix_time::time_duration time;
 	elem->getOFString( buff, 0 );
-
-	//Try iso-parser (hhmmss.frac)
-	try {
-		time = boost::date_time::parse_undelimited_time_duration<boost::posix_time::time_duration>(buff.c_str());
-		ok = not time.is_not_a_date_time();
-	} catch ( std::logic_error e ) {
-		ok = false;
-	}
-
-	if ( ok ) {
-		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
-		map.setValueAs( name, boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time ) );
-		//although TM is defined as time of day we don't have a day here, so we fake one
+	
+	map.setValueAs( name, buff.c_str()); // store string
+	
+	if ( map.transform(name,name,dstID) ) { // try to convert it into timestamp or duration
+		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << map.property(name);
 	} else
 		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
-}
-
-void ImageFormat_Dicom::parseDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map ){
-	OFString buff;
-	bool ok = true;
-	elem->getOFString( buff, 0 );
-	buff.insert(8,"T"); // the format is YYYYMMDDHHMMSS.FFFFFF but iso says it should be YYYYMMDDTHHMMSS.FFFFFF
-	const util::ValueReference ref=util::Value<std::string>(buff.c_str()).copyByID(util::Value<boost::posix_time::ptime>::staticID());
-	if(!ref.isEmpty())
-		map.setValueAs( name, ref->castTo<boost::posix_time::ptime>() );
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
@@ -183,11 +161,11 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	}
 	break;
 	case EVR_TM: {
-		parseTM( elem, name, map );
+		parseTMDT( elem, name, map, util::Value<util::duration>::staticID() );
 	}
 	break;
 	case EVR_DT: {
-		parseDT( elem, name, map );
+		parseTMDT( elem, name, map, util::Value<util::timestamp>::staticID() );
 	}
 	break;
 	case EVR_FL: {

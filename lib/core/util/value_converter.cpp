@@ -29,7 +29,6 @@
 
 // @todo we need to know this for lexical_cast (toString)
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <complex>
 #include <iomanip>
@@ -169,21 +168,6 @@ template<typename DST> typename std::enable_if<!std::is_arithmetic<DST>::value,b
 template<> boost::numeric::range_check_result str2scalar<std::string>( const std::string &src, std::string &dst )
 {
 	dst = src;
-	return boost::numeric::cInRange;
-}
-// needs special handling
-template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptime>( const std::string &src, boost::posix_time::ptime &dst )
-{
-	dst=boost::posix_time::not_a_date_time;
-	try{dst = boost::posix_time::time_from_string( src.c_str() );} //first try "2002-01-20 23:59:59.000"
-	catch(std::exception &e){LOG(Debug,info) << "time_from_string raised exception " << util::MSubject(e.what());}
-
-	if( dst.is_not_a_date_time() ) 	{
-		try{dst = boost::posix_time::from_iso_string( src.c_str() );}// try iso formatting "YYYYMMDDThhmmss"
-		catch(std::exception &e){LOG(Debug,info) << "from_iso_string raised exception " << util::MSubject(e.what());}
-	}
-	LOG_IF( dst.is_not_a_date_time(), Runtime, error ) // if its still broken at least tell the user
-			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<boost::posix_time::ptime>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
 // needs special handling

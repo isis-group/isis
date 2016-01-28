@@ -290,7 +290,6 @@ public:
 		std::string ret;
 
 		if ( m_len ) {
-			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
 			for ( const_iterator i = begin(); i < end() - 1; i++ )
 				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
 

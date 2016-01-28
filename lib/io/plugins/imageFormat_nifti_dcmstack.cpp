@@ -31,7 +31,6 @@ namespace isis
 namespace image_io
 {
 
-using boost::posix_time::ptime;
 using boost::gregorian::date;
 
 namespace _internal
@@ -53,10 +52,9 @@ std::ptrdiff_t  DCMStack::readJson( data::ValueArray< uint8_t > stream, char ext
 
 // some basic functors for later use
 struct ComputeTimeDist {
-	ptime sequenceStart;
-	util::Value<float> operator()( const util::ValueBase &val )const {
-		const boost::posix_time::time_duration acDist = val.as<ptime>() - sequenceStart;
-		return float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
+	util::timestamp sequenceStart;
+	util::Value<util::duration> operator()( const util::ValueBase &val )const {
+		return val.as<util::timestamp>() - sequenceStart;
 	}
 };
 
@@ -89,7 +87,7 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 	const char *TMs[] = {"DICOM/ContentTime", "DICOM/AcquisitionTime"};
 	for( const util::PropertyMap::PropPath tm :  TMs ) {
 		const boost::optional< util::PropertyValue& > found=queryProperty( tm );
-		found && found->transform<ptime>();
+		found && found->transform<util::timestamp>();
 	}
 
 
@@ -100,7 +98,8 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 		for( const char * time :  time_stor ) {
 			optional< util::PropertyValue& > src=queryProperty( time );
 			if( src ) {
-				const ComputeTimeDist comp = {serTime->as<ptime>()};
+				//@todo test me
+				const ComputeTimeDist comp = {serTime->as<util::timestamp>()};
 				util::PropertyValue &dst = touchProperty( "acquisitionTime" );
                 for(util::PropertyValue::const_iterator i=src->begin();i!=src->end();i++)//@todo use transform in c++11
                     dst.push_back(comp(*i) );

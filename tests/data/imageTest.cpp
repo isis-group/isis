@@ -193,7 +193,8 @@ BOOST_AUTO_TEST_CASE ( ident_image_test )
 {
 	data::Chunk ch = genSlice<float>( 4, 4 ); 
 	std::vector<data::MemChunk<float> > chunks( 10, ch ); 
-	boost::posix_time::ptime now=boost::posix_time::second_clock::local_time();
+	util::timestamp now=std::chrono::time_point_cast<util::timestamp::duration>(util::timestamp::clock::now());
+
 	for(int i=0;i<10;i++){
 		chunks[i].setValueAs<uint32_t>( "acquisitionNumber", i ); 
 		chunks[i].setValueAs<float>( "acquisitionTime", i );

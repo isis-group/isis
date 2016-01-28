@@ -24,6 +24,7 @@
 #include <cmath>
 
 #include <type_traits>
+#include <boost/operators.hpp>
 
 namespace isis
 {
