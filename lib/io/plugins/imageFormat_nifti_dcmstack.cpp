@@ -31,8 +31,6 @@ namespace isis
 namespace image_io
 {
 
-using boost::gregorian::date;
-
 namespace _internal
 {
 

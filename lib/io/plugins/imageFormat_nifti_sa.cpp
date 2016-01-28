@@ -10,8 +10,6 @@ namespace isis
 {
 namespace image_io
 {
-using boost::gregorian::date;
-
 namespace _internal
 {
 WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
@@ -1274,7 +1272,7 @@ void ImageFormat_NiftiSa::sanitise( data::Chunk &object )
 	transformIfNotSet<uint16_t>       ( prefix + "PatientsAge",             "subjectAge",     object, info );
 	transformIfNotSet<std::string>    ( prefix + "SeriesDescription",       "sequenceDescription", object, warning );
 	transformIfNotSet<std::string>    ( prefix + "PatientsName",            "subjectName",        object, info );
-	transformIfNotSet<date>           ( prefix + "PatientsBirthDate",       "subjectBirth",       object, info );
+	transformIfNotSet<util::date>     ( prefix + "PatientsBirthDate",       "subjectBirth",       object, info );
 	transformIfNotSet<uint16_t>       ( prefix + "PatientsWeight",          "subjectWeigth",      object, info );
 	transformIfNotSet<std::string>    ( prefix + "PerformingPhysiciansName", "performingPhysician", object, info );
 	transformIfNotSet<uint16_t>       ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );

@@ -76,8 +76,7 @@ DEF_TYPE( Selection, selection );
 
 DEF_TYPE( timestamp, timestamp );
 DEF_TYPE( duration, duration );
-DEF_TYPE( boost::gregorian::date, date );
-DEF_TYPE( boost::gregorian::date_duration, date_duration );
+DEF_TYPE( date, date );
 
 API_EXCLUDE_BEGIN;
 namespace _internal
@@ -115,6 +114,15 @@ std::map< std::string, unsigned short > getTransposedTypeMap( bool withValues, b
 }
 
 }
+}
+
+isis::util::date& std::operator+=(isis::util::date& x, const isis::util::duration& y)
+{
+	return x+=chrono::duration_cast<chrono::days>(y);
+}
+isis::util::date& std::operator-=(isis::util::date& x, const isis::util::duration& y)
+{
+	return x-=chrono::duration_cast<chrono::days>(y);
 }
 
 /// @endcond

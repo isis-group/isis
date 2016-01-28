@@ -8,7 +8,6 @@
 #include <stdint.h>
 #endif
 
-#include <boost/date_time/gregorian/gregorian_types.hpp>
 #include "vector.hpp"
 #include "color.hpp"
 #include "selection.hpp"
@@ -16,6 +15,10 @@
 #include <complex>
 #include <chrono>
 #include <iomanip>
+
+namespace std{namespace chrono{
+typedef duration<int32_t,ratio<int(3600*24)> > days;  
+}}
 
 namespace isis
 {
@@ -26,6 +29,7 @@ typedef std::list<int32_t> ilist;
 typedef std::list<double> dlist;
 typedef std::list<std::string> slist;
 typedef std::chrono::time_point<std::chrono::system_clock,std::chrono::milliseconds> timestamp;
+typedef std::chrono::time_point<std::chrono::system_clock,std::chrono::days> date;
 typedef timestamp::duration duration; // @todo float duration might be nice
 
 /// @cond _internal
@@ -33,7 +37,7 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector29 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector28 < //increase this if a type is added (if >30 consider including vector40 above)
 bool //1
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
 , float, double // 11
@@ -43,9 +47,7 @@ bool //1
 , ilist, dlist, slist // 21
 , std::string, isis::util::Selection //23
 , std::complex<float>, std::complex<double> //25
-, boost::gregorian::date //27
-, boost::gregorian::date_duration //29
-, timestamp, duration
+, date, timestamp, duration
 > types;
 
 template<bool ENABLED> struct ordered{
@@ -97,9 +99,7 @@ template<> struct has_op<Selection>:_internal::ordered<true>,_internal::additive
 template<> struct has_op<std::string>:_internal::ordered<true>,_internal::multiplicative<false>{static const bool plus=true,minus=false;};
 
 // cannot multiply time
-template<> struct has_op<boost::gregorian::date>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
-template<> struct has_op<boost::gregorian::date_duration>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
-
+template<> struct has_op<date>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 template<> struct has_op<timestamp>:_internal::ordered<true>,_internal::additive<true>,_internal::multiplicative<false>{};
 
 
@@ -134,12 +134,14 @@ class Value;
 
 // define +/- operations for timestamp and date
 namespace std{
-	template<> struct plus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
-		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x+y;}
+	template<> struct plus<isis::util::date>:binary_function<isis::util::date,isis::util::duration,isis::util::date>{
+		isis::util::date operator() (const isis::util::date& x, const isis::util::duration& y) const {return x+chrono::duration_cast<chrono::days>(y);}
 	};
-	template<> struct minus<boost::gregorian::date>:binary_function<boost::gregorian::date,boost::gregorian::date_duration,boost::gregorian::date>{
-		boost::gregorian::date operator() (const boost::gregorian::date& x, const boost::gregorian::date_duration& y) const {return x-y;}
+	template<> struct minus<isis::util::date>:binary_function<isis::util::date,isis::util::duration,isis::util::date>{
+		isis::util::date operator() (const isis::util::date& x, const isis::util::duration& y) const {return x-chrono::duration_cast<chrono::days>(y);}
 	};
+	isis::util::date &operator+=(isis::util::date &x,const isis::util::duration &y);
+	isis::util::date &operator-=(isis::util::date &x,const isis::util::duration &y);
 
 	template<> struct plus<isis::util::timestamp>:binary_function<isis::util::timestamp,isis::util::duration,isis::util::timestamp>{
 		isis::util::timestamp operator() (const isis::util::timestamp& x, const isis::util::duration& y) const {return x+y;}
