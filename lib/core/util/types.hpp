@@ -27,7 +27,7 @@ typedef std::list<int32_t> ilist;
 typedef std::list<double> dlist;
 typedef std::list<std::string> slist;
 typedef std::chrono::time_point<std::chrono::system_clock,std::chrono::milliseconds> timestamp;
-typedef timestamp::duration duration; // @todo floating point might be nice
+typedef timestamp::duration duration; // @todo float duration might be nice
 
 /// @cond _internal
 namespace _internal
@@ -174,7 +174,7 @@ namespace std{
 	template<typename charT, typename traits>
 	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::timestamp &s )
 	{
-		const time_t tme=isis::util::timestamp::clock::to_time_t(s);
+		const time_t tme(chrono::duration_cast<chrono::seconds>(s.time_since_epoch()).count());
 		if(s>=(isis::util::timestamp()+std::chrono::hours(24))) // if we have a real timepoint (not just time)
 			return out<<std::put_time(std::localtime(&tme), "%c"); // write time and date
 		else

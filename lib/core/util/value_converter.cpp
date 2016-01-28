@@ -129,6 +129,16 @@ template<typename SRC, typename DST> boost::numeric::range_check_result num2num(
 	return NumericOverflowHandler::result;
 }
 
+std::ios_base::iostate formattedTimeParse(std::istringstream &ss,std::tm t,const std::string &format,const std::locale &locale){
+	const auto& tg = std::use_facet<std::time_get<char>>(locale);
+	std::ios_base::iostate err = std::ios_base::goodbit;
+
+	std::istreambuf_iterator<char> pos = tg.get(
+		std::istreambuf_iterator<char>(ss),std::istreambuf_iterator<char>(),
+		ss, err, &t,&format[0],&format[0]+format.size());
+	return err;
+}
+
 // if a converter from double is available first map to double and then convert that into DST
 template<typename DST> typename std::enable_if<std::is_arithmetic<DST>::value,boost::numeric::range_check_result>::type str2scalar( const std::string &src, DST &dst )
 {
@@ -179,20 +189,32 @@ template<> boost::numeric::range_check_result str2scalar<boost::posix_time::ptim
 // needs special handling
 template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::string &src, timestamp &dst )
 {
-	//@todo support other formats
+	// see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html for dicom VRs
+	//@todo support other formats and parse offset part of the DICOM VR "DT"
+	//@todo %c and %x are broken in gcc 
+	static const char *formats[]={"%Y%m%d%H%M%S","%H%M%S","%H:%M:%S"};
+
+	for(const char *format:formats){
+		std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
+		t.tm_isdst=-1;
+		std::istringstream ss(src);
+		ss >> std::get_time(&t, format);
+		if(!ss.fail()) {
+			dst=std::chrono::time_point_cast<timestamp::duration>(timestamp::clock::from_time_t(mktime(&t)));
+			if(ss.peek()=='.'){
+				float frac=0;
+				ss >> frac;
+				dst+=std::chrono::duration_cast<util::duration>(std::chrono::duration<float>(frac));
+			}
+			LOG_IF(!ss.eof(),Debug,info) << ss.str() << "remained afer parsing timestamp" << src;
+			return boost::numeric::cInRange;
+		}
+	};
+
 	dst=timestamp();
 	
-	std::tm t = {};
-    std::istringstream ss(src);
-    ss >> std::get_time(&t, "%c"); // locales standard date and time
-    if (ss.fail()) {
-		LOG(Runtime, error ) // if its still broken at least tell the user
-			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<timestamp>::staticName() << " returning " << MSubject( dst );
-    } else {
-		dst=std::chrono::time_point_cast<timestamp::duration>(timestamp::clock::from_time_t(mktime(&t)));
-	}
-
-	
+	LOG(Runtime, error ) // if its still broken at least tell the user
+		<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<timestamp>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
 // needs special handling
@@ -201,7 +223,12 @@ template<> boost::numeric::range_check_result str2scalar<duration>( const std::s
 	//@todo support other ratios as milli
 	try{
 		dst=duration(std::stoll(src));
-	} catch(std::logic_error &e) {
+	} 
+	catch(std::out_of_range &){
+		dst=duration();
+		return boost::numeric::cPosOverflow;
+	}
+	catch(std::invalid_argument &e) {
 		LOG(Runtime, error ) // if its still broken at least tell the user
 			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<duration>::staticName() << "(" << e.what() << ") returning " << MSubject( dst );
 		dst=duration();

@@ -17,6 +17,7 @@
 #include <string>
 #include "util/value.hpp"
 #include "util/vector.hpp"
+#include <chrono>
 #include <boost/numeric/conversion/converter.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -255,6 +256,7 @@ BOOST_AUTO_TEST_CASE( vector_convert_test )
 
 BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 {
+	util::enableLog<util::DefaultMsgPrint>(info);
 	// convert a string into a list of strings
 	const char *sentence[] = {"This", "is", "a", "sentence"};
 	Value<std::string> sSentence( "This is a sentence" );
@@ -276,6 +278,29 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
+	
+	util::timestamp the_day_after(std::chrono::hours(24)+std::chrono::milliseconds(1));
+	
+	std::time_t current_time;
+	std::time(&current_time);
+	struct std::tm *timeinfo = std::localtime(&current_time);
+	
+	// strings are parsed in local time - so we need an offset
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "19700102000000.001").as<util::timestamp>(),the_day_after-std::chrono::seconds(timeinfo->tm_gmtoff));
+
+	{ //@todo %c is broken
+// 	std::ostringstream str;
+// 	str << the_day_after;
+// 	BOOST_CHECK_EQUAL( util::Value<std::string>( str.str()).as<util::timestamp>(),the_day_after); 
+	}
+
+	{
+	std::ostringstream str;
+	util::timestamp rhs=util::timestamp()+std::chrono::hours(1)+std::chrono::minutes(1);
+	str << (rhs);
+	util::timestamp lhs=util::Value<std::string>( str.str()).as<util::timestamp>();
+	BOOST_CHECK_EQUAL(lhs, rhs); 
+	}
 }
 
 }
