@@ -205,7 +205,7 @@ template<> boost::numeric::range_check_result str2scalar<date>( const std::strin
 	dst=date();
 	
 	LOG(Runtime, error ) // if its still broken at least tell the user
-		<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<timestamp>::staticName() << " returning " << MSubject( dst );
+		<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<date>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
 // needs special handling
@@ -231,19 +231,10 @@ template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::
 template<> boost::numeric::range_check_result str2scalar<duration>( const std::string &src, duration &dst )
 {
 	//@todo support other ratios as milli
-	try{
-		dst=duration(std::stoll(src));
-	} 
-	catch(std::out_of_range &){
-		dst=duration();
-		return boost::numeric::cPosOverflow;
-	}
-	catch(std::invalid_argument &e) {
-		LOG(Runtime, error ) // if its still broken at least tell the user
-			<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<duration>::staticName() << "(" << e.what() << ") returning " << MSubject( dst );
-		dst=duration();
-	}
-	return boost::numeric::cInRange;
+	duration::rep count;
+	const boost::numeric::range_check_result result=str2scalar(src,count);
+	dst=duration(count);
+	return result;
 }
 // this as well (interpret everything like true/false yes/no y/n)
 template<> boost::numeric::range_check_result str2scalar<bool>( const std::string &src, bool &dst )
