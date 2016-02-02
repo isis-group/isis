@@ -42,7 +42,28 @@ namespace _internal
 
 template<typename SRC,typename DST> constexpr bool is_num(){return std::is_arithmetic<SRC>::value && std::is_arithmetic<DST>::value;};
 template<typename SRC,typename DST> constexpr bool is_same(){return std::is_same<SRC, DST>::value;}
-	
+
+template<typename T_DUR> bool parseTimeString(const std::string &src, const char *format,std::chrono::time_point<std::chrono::system_clock,T_DUR> &dst){
+	std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
+	t.tm_isdst=-1;
+	std::istringstream ss(src);
+	ss >> std::get_time(&t, format);
+	if(!ss.fail()) {
+		time_t tt = mktime(&t);
+		//@todo use round in C++17
+//		dst=std::chrono::round<T>(std::chrono::system_clock::from_time_t(tt));
+		const auto round=std::chrono::duration_cast<std::chrono::seconds>(T_DUR(1))/2;
+		dst=std::chrono::time_point_cast<T_DUR>(std::chrono::system_clock::from_time_t(tt)+round);
+		if(ss.peek()=='.'){
+			float frac=0;
+			ss >> frac;
+			dst+=std::chrono::duration_cast<T_DUR>(std::chrono::duration<float>(frac));
+		}
+		LOG_IF(!ss.eof(),Debug,info) << ss.str() << "remained afer parsing timestamp" << src;
+		return true;
+	} else 
+		return false;
+}
 	
 //Define generator - this can be global because its using convert internally
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
@@ -171,7 +192,20 @@ template<> boost::numeric::range_check_result str2scalar<std::string>( const std
 // needs special handling
 template<> boost::numeric::range_check_result str2scalar<date>( const std::string &src, date &dst )
 {
-#warning implement me  
+	// see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html for dicom VRs
+	//@todo support other formats and parse offset part of the DICOM VR "DT"
+	//@todo %c and %x are broken in gcc 
+	static const char *formats[]={"%Y%m%d","%Y-%m-%d","%y%m%d"};
+
+	for(const char *format:formats){
+		if(parseTimeString(src,format,dst))
+			return boost::numeric::cInRange;
+	};
+
+	dst=date();
+	
+	LOG(Runtime, error ) // if its still broken at least tell the user
+		<< "Miserably failed to interpret " << MSubject( src ) << " as " << Value<timestamp>::staticName() << " returning " << MSubject( dst );
 	return boost::numeric::cInRange;
 }
 // needs special handling
@@ -180,23 +214,11 @@ template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::
 	// see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html for dicom VRs
 	//@todo support other formats and parse offset part of the DICOM VR "DT"
 	//@todo %c and %x are broken in gcc 
-	static const char *formats[]={"%Y%m%d%H%M%S","%H%M%S","%H:%M:%S"};
+	static const char *formats[]={"%Y%m%d%H%M%S","%Y%m%dT%H%M%S","%H%M%S","%H:%M:%S"};
 
 	for(const char *format:formats){
-		std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
-		t.tm_isdst=-1;
-		std::istringstream ss(src);
-		ss >> std::get_time(&t, format);
-		if(!ss.fail()) {
-			dst=std::chrono::time_point_cast<timestamp::duration>(timestamp::clock::from_time_t(mktime(&t)));
-			if(ss.peek()=='.'){
-				float frac=0;
-				ss >> frac;
-				dst+=std::chrono::duration_cast<util::duration>(std::chrono::duration<float>(frac));
-			}
-			LOG_IF(!ss.eof(),Debug,info) << ss.str() << "remained afer parsing timestamp" << src;
+		if(parseTimeString(src,format,dst))
 			return boost::numeric::cInRange;
-		}
 	};
 
 	dst=timestamp();

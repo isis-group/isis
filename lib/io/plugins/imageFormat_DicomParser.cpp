@@ -95,29 +95,6 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
 }
 
 /**
- * Parses the Date string
- * A string of characters of the format yyyymmdd;
- * where yyyy shall contain year, mm shall contain the month, and dd shall contain the day.
- * This conforms to the ANSI HISPP MSDS Date common data type.
- * Example - "19930822" would represent August 22, 1993.
- */
-void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
-{
-	OFString buff;
-	elem->getOFString( buff, 0 );
-	const boost::gregorian::date date=boost::gregorian::from_undelimited_string(buff.c_str());
-
-	if ( date.is_not_a_date()){
-		LOG( Runtime, warning )
-			<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
-	} else {
-		LOG( Debug, verbose_info )
-		<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
-		map.setValueAs( name, date );
-	}
-}
-
-/**
  * Parses the Time string
  * For duration (VR=TM):
  * A string of characters of the format hhmmss.frac; where hh contains hours (range "00" - "23"),
@@ -133,9 +110,9 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::Prop
  * - "070907.0705" represents a time of 7 hours, 9 minutes and 7.0705 seconds.
  * - "1010" represents a time of 10 hours, and 10 minutes.
  * - "021" is an invalid value.
- * For timestamp (VR=TM) see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
+ * For timestamp (VR=TM and DA) see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
  */
-void ImageFormat_Dicom::parseTMDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID )
+void ImageFormat_Dicom::parseTime( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID )
 {
 	// @todo test me
 	OFString buff;
@@ -144,7 +121,7 @@ void ImageFormat_Dicom::parseTMDT( DcmElement *elem, const util::PropertyMap::Pr
 	map.setValueAs( name, buff.c_str()); // store string
 	
 	if ( map.transform(name,name,dstID) ) { // try to convert it into timestamp or duration
-		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << map.property(name);
+		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << map.property(name).toString(true);
 	} else
 		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
@@ -157,15 +134,15 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	}
 	break;
 	case EVR_DA: {
-		parseDA( elem, name, map );
+		parseTime( elem, name, map, util::Value<util::date>::staticID() );
 	}
 	break;
 	case EVR_TM: {
-		parseTMDT( elem, name, map, util::Value<util::duration>::staticID() );
+		parseTime( elem, name, map, util::Value<util::duration>::staticID() );
 	}
 	break;
 	case EVR_DT: {
-		parseTMDT( elem, name, map, util::Value<util::timestamp>::staticID() );
+		parseTime( elem, name, map, util::Value<util::timestamp>::staticID() );
 	}
 	break;
 	case EVR_FL: {

@@ -35,8 +35,7 @@ namespace image_io
 class ImageFormat_Dicom: public FileFormat
 {
 	static void parseAS( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static void parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
-	static void parseTMDT( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID );
+	static void parseTime( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID );
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;
 #if __BYTE_ORDER == __LITTLE_ENDIAN

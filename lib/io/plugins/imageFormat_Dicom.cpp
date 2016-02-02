@@ -120,8 +120,6 @@ protected:
 };
 }
 
-using boost::gregorian::date;
-
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
@@ -221,7 +219,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
 	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
-	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
+	transformOrTell<util::date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
 	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
 	// compute voxelSize and gap
 	{
