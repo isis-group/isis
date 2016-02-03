@@ -65,6 +65,44 @@ bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util:
 		return false;
 	}
 }
+util::PropertyMap::key_type FileFormat::hasOrTell(const std::initializer_list< util::PropertyMap::key_type > names, const util::PropertyMap& object, LogLevel level)
+{
+	for(const util::PropertyMap::key_type &key:names){ // iterate through all props
+		if ( object.hasProperty( key ) )
+			return key;
+	}
+	LOG(Runtime,level)  << "Didn't find at least one of the properties " << std::list<util::PropertyMap::key_type>(names.begin(),names.end());
+	return util::PropertyMap::key_type();
+}
+
+optional< util::PropertyValue > FileFormat::extractOrTell(const util::PropertyMap::key_type &name, util::PropertyMap& object, LogLevel level)
+{
+	optional< util::PropertyValue > ret;
+	boost::optional< util::PropertyValue& > found=object.queryProperty(name);
+	if(found){ // if we found one, swap its contet with ret and remove it
+		ret.reset(util::PropertyValue());
+		found->swap(*ret);
+		object.remove(name);
+	}
+	LOG_IF(!ret, Runtime, level ) << "Missing property " << name;
+	return ret;
+}
+optional< util::PropertyValue > FileFormat::extractOrTell(const std::initializer_list< util::PropertyMap::key_type > names, util::PropertyMap& object, LogLevel level)
+{
+	optional< util::PropertyValue > ret;
+	for(const util::PropertyMap::key_type &key:names){ // iterate through all props
+		boost::optional< util::PropertyValue& > found=object.queryProperty(key);
+		if(found){ // if we found one, swap its contet with ret and remove it
+			ret.reset(util::PropertyValue());
+			found->swap(*ret);
+			object.remove(key);
+			break;
+		}
+	}
+	LOG_IF(!ret,Runtime,level)  << "Didn't find at least one of the properties " << std::list<util::PropertyMap::key_type>(names.begin(),names.end());
+	return ret;
+}
+
 
 void FileFormat::throwGenericError( std::string desc )
 {
