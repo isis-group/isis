@@ -163,57 +163,43 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
-#warning implement me when date is ready
-// 	if ( hasOrTell( prefix + "SeriesTime", object, warning ) ) {
-// 		// @todo test me
-// 		util::duration sequenceStart = dicomTree.getValueAs<util::duration>( "SeriesTime" );
-// 		dicomTree.remove( "SeriesTime" );
-// 
-// 		const char *dates[] = {"SeriesDate", "AcquisitionDate", "ContentDate"};
-// 		for( const char * d :  dates ) {
-// 			if( dicomTree.hasProperty( d ) ) {
-// 				sequenceStart = genTimeStamp( dicomTree.getValueAs<date>( d ), sequenceStart );
-// 				dicomTree.remove( d );
-// 				break;
-// 			}
-// 		}
-// 
-// 		// compute acquisitionTime
-// 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) ) {
-// 			ptime acTime = dicomTree.getValueAs<ptime>( "AcquisitionTime" );
-// 			dicomTree.remove( "AcquisitionTime" );
-// 
-// 			const char *dates[] = {"AcquisitionDate", "ContentDate", "SeriesDate"};
-// 			for( const char * d :  dates ) {
-// 				if( dicomTree.hasProperty( d ) ) {
-// 					acTime = genTimeStamp( dicomTree.getValueAs<date>( d ), acTime );
-// 					dicomTree.remove( d );
-// 					break;
-// 				}
-// 			}
-// 
-// 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-// 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
-// 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
-// 			object.setValueAs( "acquisitionTime", fAcDist );
-// 		}
-// 
-// 		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
-// 		object.setValueAs( "sequenceStart", sequenceStart );
-// 	}
+	{
+		// get series start time (remember this is in UTC)
+		optional< util::PropertyValue > o_seqStart=extractOrTell("SeriesTime",dicomTree,warning );
+		if(o_seqStart) {
+			optional< util::PropertyValue > o_acDate= extractOrTell({"SeriesDate", "AcquisitionDate", "ContentDate"},dicomTree,warning);
+			if( o_acDate ) { // add days since epoch from the date
+				const util::timestamp seqStart = o_seqStart->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
+				object.setValueAs( "sequenceStart", seqStart);
+				LOG(Debug,verbose_info) 
+					<< "Merging SeriesTime " << *o_seqStart << " and Date " << *o_acDate << " as " 
+					<< std::make_pair("sequenceStart",object.property("sequenceStart"));
+			}
+		}
+	}
+	{
+			// compute acquisitionTime
+		optional< util::PropertyValue > o_acTime= extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
+		if ( o_acTime ) {
+			optional< util::PropertyValue > o_acDate= extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
+			if( o_acDate ) {
+				const util::timestamp acTime = o_acTime->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
+				object.setValueAs<util::timestamp>("acquisitionTime", acTime);
+				LOG(Debug,verbose_info) 
+					<< "Merging Content Time " << *o_acTime << " and Date " << *o_acDate
+					<< " as " << std::make_pair("acquisitionTime",object.property("acquisitionTime"));
+			}
+		}
+	}
 
 	// compute studyStart
-#warning implement me when date is ready
-// 	if ( hasOrTell( prefix + "StudyTime", object, warning ) && hasOrTell( prefix + "StudyDate", object, warning ) ) {
-// 		const date dt=dicomTree.getValueAs<date>("StudyDate");
-// 		const ptime tm=dicomTree.getValueAs<ptime>("StudyTime");
-// 		if(!(dt.is_not_a_date() || tm.is_not_a_date_time())){
-// 			object.setValueAs("studyStart",genTimeStamp(dt,tm));
-// 			dicomTree.remove("StudyTime");
-// 			dicomTree.remove("StudyDate");
-// 		}
-// 		
-// 	}
+	if ( hasOrTell( "StudyTime", dicomTree, warning ) && hasOrTell( "StudyDate", dicomTree, warning ) ) {
+		const util::date dt=dicomTree.getValueAs<util::date>("StudyDate");
+		const util::timestamp tm=dicomTree.getValueAs<util::timestamp>("StudyTime");
+			object.setValueAs("studyStart",tm+dt.time_since_epoch());
+			dicomTree.remove("StudyTime");
+			dicomTree.remove("StudyDate");
+	}
 	
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
 	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );

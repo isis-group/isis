@@ -114,13 +114,12 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::Prop
  */
 void ImageFormat_Dicom::parseTime( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map,uint16_t dstID )
 {
-	// @todo test me
 	OFString buff;
 	elem->getOFString( buff, 0 );
 	
-	map.setValueAs( name, buff.c_str()); // store string
+	util::PropertyValue &prop=map.setValueAs( name, buff.c_str()); // store string
 	
-	if ( map.transform(name,name,dstID) ) { // try to convert it into timestamp or duration
+	if ( prop.transform(dstID) ) { // try to convert it into timestamp or date
 		LOG( Debug, verbose_info ) << "Parsed time for " << name << "(" <<  buff << ")" << " as " << map.property(name).toString(true);
 	} else
 		LOG( Runtime, warning ) << "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
@@ -138,7 +137,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::
 	}
 	break;
 	case EVR_TM: {
-		parseTime( elem, name, map, util::Value<util::duration>::staticID() );
+		parseTime( elem, name, map, util::Value<util::timestamp>::staticID() ); //duration is for milliseconds stored as decimal number
 	}
 	break;
 	case EVR_DT: {
