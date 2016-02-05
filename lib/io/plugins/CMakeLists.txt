@@ -142,7 +142,7 @@ endif(WIN32)
 
 foreach(PLUGIN ${TARGETS})
   message(STATUS " == ${PLUGIN}")
-  set_target_properties(${PLUGIN} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} INSTALL_RPATH_USE_LINK_PATH TRUE)
+  set_target_properties(${PLUGIN} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 endforeach(PLUGIN)
 
 ###########################################################
