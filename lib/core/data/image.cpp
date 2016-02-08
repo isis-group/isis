@@ -203,10 +203,9 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 {
 #warning test me
 	//for transforming we have to ensure to have the below properties in our chunks and image
-	static const char  *neededProps[] = {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"};
 	//propagate needed properties to chunks
 	std::set<PropPath> propPathList;
-	for( const char * prop :  neededProps ) {
+	for( const char * prop :  {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"} ) {
 		const util::PropertyMap::PropPath pPath( prop );
 
 		if( hasProperty ( pPath ) ) {

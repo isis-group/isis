@@ -323,13 +323,13 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
 
-	const std::list<data::Chunk> splices = ch1.autoSplice( 1 );
+	const std::list<data::Chunk> splices = ch1.autoSplice( 2 );
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	for( const data::Chunk & ref :  splices ) {
 		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
 		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
-		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt );// we ha a stride of 1, so acquisitionNumber should be 0 1 2 ..
+		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt*2 );// we ha a stride of 1, so acquisitionNumber should be 0 2 4 ..
 		cnt++;
 	}
 }

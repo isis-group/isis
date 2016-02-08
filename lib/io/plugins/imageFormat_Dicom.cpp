@@ -172,7 +172,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 				const util::timestamp seqStart = o_seqStart->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
 				object.setValueAs( "sequenceStart", seqStart);
 				LOG(Debug,verbose_info) 
-					<< "Merging SeriesTime " << *o_seqStart << " and Date " << *o_acDate << " as " 
+					<< "Merging Series Time " << *o_seqStart << " and Date " << *o_acDate << " as " 
 					<< std::make_pair("sequenceStart",object.property("sequenceStart"));
 			}
 		}

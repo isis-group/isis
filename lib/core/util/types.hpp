@@ -179,9 +179,10 @@ namespace std{
 			if(msec.count()){
 				if(msec.count()<0)
 					msec+=chrono::seconds(1);
+				// we dont want to mess with out, so we don't use stream formatting
 				char buff[5];
-				snprintf(buff,5,".%3d",msec.count());
-				out << buff; // we dont want to mess with out, so we don't use stream formatting
+				snprintf(buff,5,".%3ld",msec.count());
+				out << buff; 
 			}
 		}
 		return out;
@@ -190,7 +191,7 @@ namespace std{
 	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::date &s )
 	{
 		const time_t tme(chrono::duration_cast<chrono::seconds>(s.time_since_epoch()).count());
-		return out<<std::put_time(std::localtime(&tme), "%x"); // otherwise write just the time
+		return out<<std::put_time(std::localtime(&tme), "%x"); 
 	}
 }
 
