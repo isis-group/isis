@@ -8,14 +8,9 @@
 # 
 ############################################################
 
-set(ISIS_USE_JSONCPP OFF CACHE BOOL "use external json parser library jsoncpp (instead on internal parser)" )
-if(ISIS_USE_JSONCPP)
-	find_library(LIB_JSONCPP jsoncpp)
-	find_path(INC_JSONCPP "json/version.h")
-	include_directories(${INC_JSONCPP})
-else(ISIS_USE_JSONCPP)
-	set(LIB_JSONCPP "")
-endif(ISIS_USE_JSONCPP)
+find_library(LIB_JSONCPP jsoncpp)
+find_path(INC_JSONCPP "json/version.h" DOC "path where json/version.h can be found")
+include_directories(${INC_JSONCPP})
 
 ############################################################
 # check for ncurses
@@ -68,12 +63,6 @@ endif(ISIS_LIB_DEPENDS)
 file(GLOB CORE_SRC_FILES "data/*.cpp" "util/*.cpp")
 file(GLOB COREUTILS_HDR_FILES "util/*.hpp" "util/*.h")
 file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
-
-if(ISIS_USE_JSONCPP)
-list(REMOVE_ITEM CORE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/util/propmap_json_int.cpp)
-else(ISIS_USE_JSONCPP)
-list(REMOVE_ITEM CORE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/util/propmap_json_ext.cpp)
-endif(ISIS_USE_JSONCPP)
 
 #add the core library
 add_lib(isis_core
