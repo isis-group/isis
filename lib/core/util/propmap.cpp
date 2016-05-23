@@ -226,7 +226,8 @@ PropertyValue &PropertyMap::touchProperty( const PropertyMap::PropPath &path )
 }
 const PropertyValue PropertyMap::property(const PropertyMap::PropPath& path) const
 {
-	return queryProperty(path).get_value_or(PropertyValue());
+	const boost::optional< const PropertyValue& > prop = queryProperty(path);
+	return prop ? prop.get() : PropertyValue();
 }
 
 boost::optional< PropertyMap& > PropertyMap::queryBranch(const PropertyMap::PropPath& path)
@@ -243,7 +244,8 @@ PropertyMap& PropertyMap::touchBranch(const PropertyMap::PropPath& path)
 }
 const PropertyMap PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
-	return queryBranch( path ).get_value_or(PropertyMap());
+	const boost::optional< const PropertyMap& > branch=queryBranch( path );
+	return branch ? branch.get() : PropertyMap();
 }
 
 bool PropertyMap::remove( const PropPath &path )

@@ -681,7 +681,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 				) 
 					continue;
 			}
-			ret.push_back( prop.get_value_or(util::PropertyValue()) );
+			ret.push_back( prop ? prop.get() : util::PropertyValue() );
 		}
 	} else {
 		LOG( Runtime, error ) << "Cannot get chunk-properties from non clean images. Run reIndex first";
