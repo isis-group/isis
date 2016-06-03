@@ -252,43 +252,26 @@ size_t SortedChunkList::makeRectangular(optional< util::slist& > rejected)
 	size_t dropped = 0;
 
 	if( images.size() > 1 ) { //cut down everything else if there is some
-		if( chunks.begin()->second.begin()->second->getRelevantDims() >= 4 ) {
-			#warning test me
-			size_t resize = *images.rbegin();
+		assert(chunks.begin()->second.begin()->second->getRelevantDims()<4); //images made of multiple 4D Chunks cannot be
+		size_t resize = *images.begin();
 
-			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); ) {
-				if( c->second.size() != resize ) {
-					if(rejected)
-						for(const SecondaryMap::value_type &ch:c->second)
-							rejected->push_back(ch.second->getValueAs<std::string>("source"));
-					dropped += c->second.size();
-					chunks.erase( c++ );
-				} else
-					c++;
-			}
-			LOG( Runtime, warning ) << "Fourth dimension already used, dropping all but " << resize << " volumes (" << dropped << ") to make " << identify(true,false) << " rectagular";
+		for(PrimaryMap::value_type &c:chunks) { // in every "column"
+			SecondaryMap &it = c.second;
 
-		} else {
-			size_t resize = *images.begin();
-
-			for( PrimaryMap::iterator c = chunks.begin(); c != chunks.end(); c++ ) { // in every "column"
-				SecondaryMap &it = c->second;
-
-				if( it.size() > resize ) { //remove everything behind the shortest length
-					dropped += it.size() - resize;
-					SecondaryMap::iterator firstinvalid = it.begin();
-					std::advance( firstinvalid, resize );
-					if(rejected)
-						for(SecondaryMap::iterator i=firstinvalid;i!=it.end();i++)
-							rejected->push_back(i->second->getValueAs<std::string>("source"));
-					it.erase( firstinvalid, it.end() );
-				}
-
-				assert( it.size() == resize );
+			if( it.size() > resize ) { //remove everything behind the shortest length
+				dropped += it.size() - resize;
+				SecondaryMap::iterator firstinvalid = it.begin();
+				std::advance( firstinvalid, resize );
+				if(rejected)
+					for(SecondaryMap::iterator i=firstinvalid;i!=it.end();i++)
+						rejected->push_back(i->second->getValueAs<std::string>("source"));
+				it.erase( firstinvalid, it.end() );
 			}
 
-			LOG_IF( dropped, Runtime, warning ) << "Dropped " << dropped << " chunks to make " << identify(true,false) << " rectagular";
+			assert( it.size() == resize );
 		}
+
+		LOG_IF( dropped, Runtime, warning ) << "Dropped " << dropped << " chunks to make " << identify(true,false) << " rectagular";
 	}
 
 	return dropped;
