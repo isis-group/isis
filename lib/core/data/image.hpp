@@ -570,7 +570,9 @@ public:
 					)
 						continue;
 				}
-				ret.push_back( prop.get_value_or(util::PropertyValue(T())).as<T>() );
+				ret.push_back(
+					prop ? prop.get().as<T>() : T()
+				);
 			}
 		} else {
 			LOG( Runtime, error ) << "Cannot get chunk-properties from non clean images. Run reIndex first";
