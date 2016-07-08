@@ -179,9 +179,9 @@ bool Image::insertChunk ( const Chunk &chunk )
 		lookup.clear();
 		return true;
 	} else {
-		// if the insertion failed, but the image was clean - de-duplicate properties again
-		// the image is still clean - no need to reindex
-		#warning test me (why deduplicate)
+		// if the insertion failed, but the image was clean (aka we above moved properties back into chunks)
+		// so we have to de-duplicate properties again
+		// the image is still clean though, no need to reindex
 		if( clean )
 			deduplicateProperties();
 
@@ -201,7 +201,7 @@ void Image::setIndexingDim( dimensions d )
 
 bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
 {
-#warning test me
+#pragma message("test me")
 	//for transforming we have to ensure to have the below properties in our chunks and image
 	//propagate needed properties to chunks
 	std::set<PropPath> propPathList;
@@ -243,7 +243,7 @@ bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_ma
 
 dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 {
-#warning test me
+#pragma message("test me")
 	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
 	boost::numeric::ublas::vector<float>mapping( 4 );
 	latchedOrientation( getValueAs<util::fvector3>("rowVec").getBiggestVecElemAbs(), 0 ) = 1;

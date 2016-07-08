@@ -410,7 +410,7 @@ PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 {
-#warning test non removal of rejected
+#pragma message("test non removal of rejected")
 	PathSet rejects;
 	joinTree( other, overwrite, true, PropPath(), rejects );
 	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
@@ -581,7 +581,7 @@ bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname, boo
 
 void PropertyMap::removeUncommon( PropertyMap &common )const
 {
-#warning getDifference is waste of time here
+#pragma message("getDifference is waste of time here")
 	const DiffMap difference = common.getDifference( *this ); 
 	for( const DiffMap::value_type & ref :  difference ) {
 		if ( ! ref.second.first.isEmpty() ) {
