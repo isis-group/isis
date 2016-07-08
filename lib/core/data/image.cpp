@@ -199,67 +199,6 @@ void Image::setIndexingDim( dimensions d )
 	}
 }
 
-bool Image::transformCoords( boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter )
-{
-#pragma message("test me")
-	//for transforming we have to ensure to have the below properties in our chunks and image
-	//propagate needed properties to chunks
-	std::set<PropPath> propPathList;
-	for( const char * prop :  {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"} ) {
-		const util::PropertyMap::PropPath pPath( prop );
-
-		if( hasProperty ( pPath ) ) {
-			const util::fvector3 p = getValueAs<util::fvector3> ( pPath );
-			for( std::vector<std::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
-				if ( !chRef->hasProperty ( pPath ) ) {
-					chRef->setValueAs<util::fvector3> ( pPath, p );
-					propPathList.insert( pPath );
-				}
-			}
-		} else {
-			LOG( Runtime, error ) << "Cannot do transformCoords on image without " << prop;
-			return false;
-		}
-	}
-
-	for( std::vector<std::shared_ptr< data::Chunk> >::reference chRef :  lookup ) {
-		if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) ) {
-			return false;
-		}
-
-		for( std::list<PropPath>::const_reference pPathNotNeeded :  propPathList ) {
-			chRef->remove( pPathNotNeeded );
-		}
-	}
-	//      establish initial state
-
-	if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-		LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
-		return false;
-	}
-
-	return true;
-}
-
-dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
-{
-#pragma message("test me")
-	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
-	boost::numeric::ublas::vector<float>mapping( 4 );
-	latchedOrientation( getValueAs<util::fvector3>("rowVec").getBiggestVecElemAbs(), 0 ) = 1;
-	latchedOrientation( getValueAs<util::fvector3>("columnVec").getBiggestVecElemAbs(), 1 ) = 1;
-	latchedOrientation( getValueAs<util::fvector3>("sliceVec").getBiggestVecElemAbs(), 2 ) = 1;
-	latchedOrientation( 3, 3 ) = 1;
-
-	for( size_t i = 0; i < 4; i++ ) {
-		mapping( i ) = i;
-	}
-
-	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
-
-}
-
-
 bool Image::reIndex(optional< util::slist& > rejected)
 {
 	if ( set.isEmpty() ) {

@@ -8,10 +8,9 @@
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
 #include <data/image.hpp>
 #include <data/io_factory.hpp>
+#include <../math/transform.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -1176,7 +1175,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	BOOST_REQUIRE( !img.isEmpty() );
 	boost::numeric::ublas::matrix<float> transformMatrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 	transformMatrix( 1, 1 ) = -1;
-	BOOST_REQUIRE( img.transformCoords( transformMatrix, true ) );
+	BOOST_REQUIRE( math::transformCoords(img, transformMatrix, true ) );
 	float err = 0.0005;
 
 	for ( size_t i = 0; i < 3; i++ ) {
@@ -1208,7 +1207,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform( 2, 0 ) = -1;
 	transform( 1, 1 ) = -1;
 	transform( 0, 2 ) = -1;
-	BOOST_REQUIRE( img.transformCoords( transform, true ) );
+	BOOST_REQUIRE( math::transformCoords(img, transform, true ) );
 	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "indexOrigin" ), util::fvector3( 49.5, 49.5, 49.5 ) );
 	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "rowVec" ), util::fvector3( 0, 0, -1 ) );
 	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "columnVec" ), util::fvector3( 0, -1, 0 ) );
@@ -1219,7 +1218,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform( 1, 1 ) = transform( 2, 2 ) = cos( 45 * M_PI / 180 );
 	transform( 1, 2 ) = -sin( 45 * M_PI / 180 );
 	transform( 2, 1 ) = sin( 45 * M_PI / 180 );
-	BOOST_REQUIRE( img.transformCoords( transform, true ) );
+	BOOST_REQUIRE( math::transformCoords(img, transform, true ) );
 	float err = 0.0005;
 	//what we should get
 	util::fvector3 trueIO = util::fvector3( 0, 70.0036, 49.5 );

@@ -11,7 +11,6 @@
 #include "util/vector.hpp"
 #include "util/matrix.hpp"
 
-#include <boost/numeric/ublas/matrix.hpp>
 #include <string.h>
 
 namespace isis

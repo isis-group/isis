@@ -1,6 +1,7 @@
 #include <data/fileptr.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
+#include <../math/transform.hpp>
 #include <errno.h>
 #include <fstream>
 #include <regex>
@@ -899,7 +900,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		if( dialect == "spm" ) {
-			writer->addFlip( image.mapScannerAxisToImageDimension( data::z ) );
+			writer->addFlip( math::mapScannerAxisToImageDimension(image, data::z ) );
 		} else if( dialect == "fsl" ) {
 			//dcm2nii flips the slice ordering of a mosaic if the determinant of the orientation is negative
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it

@@ -15,6 +15,10 @@ struct DataDebug {static const char *name() {return "DataDebug";}; enum {use = _
 
 struct FilterLog {static const char *name() {return "Filter";}; enum {use = _ENABLE_LOG};};
 struct FilterDebug {static const char *name() {return "FilterDebug";}; enum {use = _ENABLE_DEBUG};};
+
+struct MathLog {static const char *name() {return "MathLog";}; enum {use = _ENABLE_LOG};};
+struct MathDebug {static const char *name() {return "MathDebug";}; enum {use = _ENABLE_DEBUG};};
+
 }
 /// @endcond
 

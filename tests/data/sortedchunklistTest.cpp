@@ -1,8 +1,6 @@
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 #include "data/image.hpp"
 #include "data/io_factory.hpp"

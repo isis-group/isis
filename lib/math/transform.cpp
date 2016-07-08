@@ -1,30 +1,29 @@
-//
-// C++ Implementation: common (DataStorage)
-//
-// Description:
-//
-//
-// Author: Thomas Pröger <proeger@cbs.mpg.de>, (C) 2010
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/*
+ * <one line to give the program's name and a brief idea of what it does.>
+ * Copyright (C) 2016  Enrico Reimer <reimer@cbs.mpg.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
+#include "transform.hpp"
 #include "common.hpp"
-#include "image.hpp"
-#include <boost/numeric/ublas/io.hpp>
 
-namespace isis
-{
-
-namespace data
-{
-
-namespace _internal
-{
+namespace ublas=boost::numeric::ublas;
 
 
-bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
+bool isis::math::_internal::transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
 {
 	LOG_IF( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
 			|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ), Debug, error )
@@ -134,6 +133,58 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	properties.setValueAs( "sliceVec", slice );
 	return true;
 }
+
+
+bool isis::math::transformCoords(isis::data::Chunk& chk, boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+{
+	//for transforming we have to ensure to have the below properties in our chunks
+	std::set<util::PropertyMap::PropPath> propPathList;
+	for( const char * prop :  {"indexOrigin", "rowVec", "columnVec", "sliceVec", "voxelSize"} ) {
+		const util::PropertyMap::PropPath pPath( prop );
+		if ( !chk.hasProperty ( pPath ) ) {
+			LOG( Runtime, error ) << "Cannot do transformCoords without " << prop;
+			return false;
+		}
+	}
+
+	if( !_internal::transformCoords( chk, chk.getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+		LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
+		return false;
+	}
+
+	return true;
 }
+
+bool isis::math::transformCoords(isis::data::Image& img, boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+{
+#pragma message("test me")
+	// we transform an image by transforming its chunks
+	std::vector< data::Chunk > chunks=img.copyChunksToVector();
+
+	for( data::Chunk &chRef :  chunks ) {
+		if ( !transformCoords (chRef, transform_matrix, transformCenterIsImageCenter ) ) {
+			return false;
+		}
+	}
+	//re-build image from transformed chunks
+	img=data::Image(chunks);
+	return img.isClean();
 }
+
+isis::data::dimensions isis::math::mapScannerAxisToImageDimension(const data::Image &img, isis::data::scannerAxis scannerAxes)
+{
+#pragma message("test me")
+	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
+	boost::numeric::ublas::vector<float>mapping( 4 );
+	latchedOrientation( img.getValueAs<util::fvector3>("rowVec").getBiggestVecElemAbs(), 0 ) = 1;
+	latchedOrientation( img.getValueAs<util::fvector3>("columnVec").getBiggestVecElemAbs(), 1 ) = 1;
+	latchedOrientation( img.getValueAs<util::fvector3>("sliceVec").getBiggestVecElemAbs(), 2 ) = 1;
+	latchedOrientation( 3, 3 ) = 1;
+
+	for( size_t i = 0; i < 4; i++ ) {
+		mapping( i ) = i;
+	}
+
+	return static_cast<isis::data::dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
+
 }

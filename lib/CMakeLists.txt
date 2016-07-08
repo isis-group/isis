@@ -46,6 +46,7 @@ macro( add_lib name sources deps soversion version)
 endmacro( add_lib )
 				
 add_subdirectory(core)
+add_subdirectory(math)
 
 add_subdirectory(io/plugins)
 add_subdirectory(Adapter)

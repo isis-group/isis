@@ -1,9 +1,9 @@
 #include "data/io_application.hpp"
 #include "data/io_factory.hpp"
+#include "math/transform.hpp"
 
 #include <map>
 #include <boost/assign.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 using namespace isis;
 
@@ -74,7 +74,7 @@ int main( int argc, char **argv )
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {
-			dim = refImage.mapScannerAxisToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
+			dim = math::mapScannerAxisToImageDimension(refImage, static_cast<data::scannerAxis>( dim - 3 ) );
 		}
 
 		T( dim, dim ) *= -1;
@@ -92,7 +92,7 @@ int main( int argc, char **argv )
 		}
 
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
-			refImage.transformCoords( T, app.parameters["center"] );
+			math::transformCoords(refImage, T, app.parameters["center"] );
 		}
 
 		finImageList.push_back( refImage );

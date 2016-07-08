@@ -255,30 +255,6 @@ public:
 	std::list<Chunk> splice( isis::data::dimensions atDim );
 
 	/**
-	 * Transforms the image coordinate system into an other system by multiplying
-	 * the orientation matrix with a user defined transformation matrix. Additionally,
-	 * the index origin will be transformed into the new coordinate system. This
-	 * function only changes the
-	 *
-	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
-	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
-	 * according to the DICOM conventions. Maybe some ISIS algorithms that
-	 * depend on correct image orientations won't work as expected. Use this method
-	 * with caution!
-	 */
-	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		LOG_IF(  !hasProperty( "rowVec" ) || !hasProperty( "columnVec" ) || !hasProperty( "sliceVec" )
-				 || !hasProperty( "voxelSize" ) || !hasProperty( "indexOrigin" ), Debug, error )
-				<< "Cannot do Chunk::transformCoords because of missing properties!";
-
-		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
-			return false;
-		}
-
-		return true;
-	}
-	/**
 	  * Flips the chunk along a dimension dim in image space.
 	  */
 	void swapAlong( const dimensions dim ) const;

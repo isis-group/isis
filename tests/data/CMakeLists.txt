@@ -24,7 +24,7 @@ target_link_libraries( valueArrayTest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( filePtrTest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( chunkTest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( sortedchunklistTest ${Boost_LIBRARIES} ${isis_core_lib} )
-target_link_libraries( imageTest ${Boost_LIBRARIES} ${isis_core_lib} )
+target_link_libraries( imageTest ${Boost_LIBRARIES} ${isis_core_lib} ${isis_math_lib})
 target_link_libraries( imageListTest ${Boost_LIBRARIES} ${isis_core_lib} )
 target_link_libraries( byteswapTest ${Boost_LIBRARIES} ${isis_core_lib} )
 

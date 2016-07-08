@@ -41,7 +41,7 @@ set_target_properties(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisconv "general MR image converter")
 
 add_executable(isisflip isisflip.cpp)
-target_link_libraries(isisflip ${isis_core_lib})
+target_link_libraries(isisflip ${isis_core_lib} ${isis_math_lib})
 set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisflip "flip MR images along specific dimensions")
 
