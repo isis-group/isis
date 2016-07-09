@@ -38,6 +38,8 @@ Application::Application( const char name[], const char cfg[]): m_name( name )
 	addLogging<DataDebug>( "Data" );
 	addLogging<ImageIoLog>( "ImageIO" );
 	addLogging<ImageIoDebug>( "ImageIO" );
+	addLogging<MathLog>( "Math" );
+	addLogging<MathDebug>( "Math" );
 
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );

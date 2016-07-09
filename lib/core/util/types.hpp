@@ -181,7 +181,7 @@ namespace std{
 					msec+=chrono::seconds(1);
 				// we dont want to mess with out, so we don't use stream formatting
 				char buff[5];
-				snprintf(buff,5,".%3ld",msec.count());
+				snprintf(buff,5,".%3lld",msec.count());
 				out << buff; 
 			}
 		}
