@@ -20,12 +20,10 @@
 #include <vector>
 #include <boost/shared_array.hpp>
 #include <stack>
-#include <boost/none.hpp>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
 
 using boost::optional;
-using boost::none;
 
 namespace isis
 {
@@ -35,20 +33,20 @@ namespace _internal
 {
 /**
  * Generic iterator for voxels in Images.
- * It automatically jumps from chunk to Chunk.
+ * It automatically jumps from chunk to chunk.
  * It needs the chunks and the image to be there for to work properly (so don't delete the image, and dont reIndex it),
  * It assumes that all Chunks have the same size (which is a rule for Image as well, so this should be given)
  */
 template<typename CHUNK_TYPE> class ImageIteratorTemplate: public std::iterator <
 	std::random_access_iterator_tag,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::value_type,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::difference_type,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::pointer,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::reference
+	typename std::conditional<std::is_const<CHUNK_TYPE>::value, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::value_type,
+	typename std::conditional<std::is_const<CHUNK_TYPE>::value, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::difference_type,
+	typename std::conditional<std::is_const<CHUNK_TYPE>::value, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::pointer,
+	typename std::conditional<std::is_const<CHUNK_TYPE>::value, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::reference
 	>
 {
 protected:
-	typedef typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type inner_iterator;
+	typedef typename std::conditional<std::is_const<CHUNK_TYPE>::value, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type inner_iterator;
 	typedef CHUNK_TYPE chunk_type;
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
@@ -334,7 +332,7 @@ public:
 	 * \returns amount of successfully inserted chunks
 	 */
 	template<typename T> size_t insertChunksFromList ( std::list<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >() ) {
-		BOOST_MPL_ASSERT ( ( boost::is_base_of<Chunk, T> ) );
+		static_assert( std::is_base_of<Chunk, T>::value, "Can only insert objects derived from Chunks" );
 		size_t cnt = 0;
 
 		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks

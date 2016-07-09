@@ -72,9 +72,7 @@ template< typename T > struct knowType :  boost::mpl::contains<_internal::types,
  * compiler to raise an error if this datatype is not in the list of the supported types.
  */
 template< typename T > struct checkType {
-	BOOST_MPL_ASSERT_MSG(
-		( knowType<T>::value ), TYPE_IS_NOT_KNOWN, ( T )
-	);
+	static_assert(knowType<T>::value, "type not in list of known types");
 };
 
 /**

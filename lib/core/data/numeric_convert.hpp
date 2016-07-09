@@ -28,7 +28,7 @@ template<typename T> T round_impl( double x, boost::mpl::bool_<false> )
 }
 template<typename T> T round( double x )
 {
-	BOOST_MPL_ASSERT( ( boost::is_arithmetic<T> ) );
+	static_assert( std::is_arithmetic<T>::value, "Cannot round non-number" );
 	return round_impl<T>( x, boost::mpl::bool_<std::numeric_limits<T>::is_integer>() ); //we do use overloading intead of (forbidden) partial specialization
 }
 

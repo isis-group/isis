@@ -24,7 +24,6 @@
 #include <sstream>
 #include <regex>
 #include <boost/lexical_cast.hpp>
-#include <boost/mpl/assert.hpp>
 #include <set>
 #include <cmath>
 #include "log.hpp"
@@ -236,7 +235,7 @@ stringToList( const std::basic_string<charT, traits> &source,  charT separator )
  */
 template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale = 10 )
 {
-	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
+	static_assert( std::is_floating_point<T>::value, "must be called with floating point" );
 
 	static const T epsilon = std::numeric_limits<T>::epsilon(); // get the distange between 1 and the next representable value
 	T bigger, smaller;

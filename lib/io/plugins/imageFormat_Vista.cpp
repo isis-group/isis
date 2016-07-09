@@ -39,7 +39,7 @@ namespace image_io
 {
 
 // unfortunately VBit is not clearly defined - so adapt to what the system thinks it is
-typedef boost::mpl::if_ <
+typedef std::conditional <
 boost::is_unsigned<VBit>::type,
 	  uint8_t,
 	  int8_t

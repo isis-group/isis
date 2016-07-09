@@ -302,8 +302,8 @@ public:
 
 	std::string getTypeName()const {return staticName();}
 	unsigned short getTypeID()const {return staticID();}
-	bool isFloat() const {return boost::is_float< TYPE >::value;}
-	bool isInteger() const {return boost::is_integral< TYPE >::value;}
+	bool isFloat() const {return std::is_floating_point< TYPE >::value;}
+	bool isInteger() const {return std::is_integral< TYPE >::value;}
 
 	/// @copydoc util::Value::staticName
 	static std::string staticName() {

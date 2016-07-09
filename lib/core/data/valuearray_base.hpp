@@ -67,13 +67,13 @@ public:
 
 template<bool IS_CONST> class GenericValueIterator :
 	public std::iterator < std::random_access_iterator_tag,
-	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
+	typename std::conditional<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
 	ptrdiff_t,
-	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
-	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type
+	typename std::conditional<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
+	typename std::conditional<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type
 	>
 {
-	typedef typename boost::mpl::if_c<IS_CONST, const uint8_t *, uint8_t *>::type ptr_type;
+	typedef typename std::conditional<IS_CONST, const uint8_t *, uint8_t *>::type ptr_type;
 	ptr_type p, start; //we need the starting position for operator[]
 	size_t byteSize;
 	ConstValueAdapter::Getter getValueFunc;

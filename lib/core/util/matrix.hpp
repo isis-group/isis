@@ -102,10 +102,7 @@ public:
 	}
 
 	FixedMatrix<TYPE, COLS, ROWS> inverse( bool &invertible )const throw ( std::logic_error & ) {
-		if( COLS != ROWS ) {
-			LOG( Runtime, error ) << "Matrix is not a square matrix so is not invertible!";
-			throw( std::logic_error( "Matrix is not a square matrix so is not invertible!" ) );
-		}
+		static_assert( COLS == ROWS, "Matrix is not a square matrix so is not invertible!" );
 
 		using namespace boost::numeric::ublas;
 		FixedMatrix<TYPE, COLS, ROWS> ret;
