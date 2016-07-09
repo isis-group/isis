@@ -19,7 +19,7 @@
 #include <boost/mpl/for_each.hpp>
 #include "../util/singletons.hpp"
 
-#include <utime.h>
+#include <sys/time.h>
 
 namespace isis
 {

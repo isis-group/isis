@@ -35,7 +35,7 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 ############################################################
 if(ISIS_IOPLUGIN_NIFTI_SA)
 	add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp imageFormat_nifti_dcmstack.cpp )
-	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} )
+	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} ${isis_math_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
@@ -112,11 +112,12 @@ endif(ISIS_IOPLUGIN_PROCESS)
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
+        find_package(zlib REQUIRED)
 
 	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${isis_core_lib})
+        target_link_libraries(isisImageFormat_Dicom ${ZLIB_LIBRARIES} ${DCMTK_LIBRARIES} ${DCMTK_oflog_LIBRARY_RELEASE} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 

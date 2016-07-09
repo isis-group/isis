@@ -5,6 +5,8 @@
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <dcmtk/dcmdata/dcdicent.h>
 #include <dcmtk/oflog/config.h>
+#include <dcmtk/oflog/tstring.h>
+#include <dcmtk/oflog/spi/logevent.h>
 
 #include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
 #include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
@@ -105,16 +107,16 @@ public:
 	}
 };
 
-class DcmtkLogger : public log4cplus::Appender{
-	std::set<log4cplus::tstring> ignores;
+class DcmtkLogger : public dcmtk::log4cplus::Appender{
+	std::set<dcmtk::log4cplus::tstring> ignores;
 public:
-    DcmtkLogger(){
+	DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
 	}
-    virtual void close(){}
+	virtual void close(){}
 protected:
-    virtual void append(const log4cplus::spi::InternalLoggingEvent& event){
-		const log4cplus::tstring &msg=event.getMessage();
+	virtual void append(const dcmtk::log4cplus::spi::InternalLoggingEvent& event){
+		const dcmtk::log4cplus::tstring &msg=event.getMessage();
 		LOG_IF(ignores.find(msg)==ignores.end(),Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
@@ -580,10 +582,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	
 
 	//hack to steal logging from dcmtk and redirect it to our own
-	log4cplus::Logger logger = log4cplus::Logger::getRoot();
+	dcmtk::log4cplus::Logger logger = dcmtk::log4cplus::Logger::getRoot();
 	// there shall be no logging besides me
 	logger.removeAllAppenders();
-	logger.addAppender(log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
+	logger.addAppender(dcmtk::log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const

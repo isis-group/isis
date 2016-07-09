@@ -21,9 +21,8 @@
 #include <signal.h>
 #endif
 
-#ifdef HAVE_CURSES
-#include <term.h>
-#endif // HAVE_CURSES
+#include <unistd.h>   // for isatty()
+#include <stdio.h>    // for fileno()
 
 namespace isis
 {
@@ -169,9 +168,7 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 {
 	const char *color_code="";
 	
-#ifdef HAVE_CURSES
-	static int err_dummy;
-	static int is_no_term=setupterm(0,fileno(stderr),&err_dummy);
+	static int is_term=isatty(fileno(stderr));
 	
 	// terminal color codes
 	static const char 
@@ -181,31 +178,46 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 		white_code[]="\x1B[37m",
 		norm_code[]="\x1B[0m";
 	
-	if(!is_no_term && cur_term && max_colors>=8)
+	if(is_term)
 		switch(mesg.m_level){
-			case error:color_code=red_code;
+			case error:color_code=red_code;break;
 			case warning:color_code=yellow_code;break;
 			case notice:color_code=green_code;break;
 			case info:color_code=white_code;break;
 			default:color_code=norm_code;break;
 		}
-#endif //HAVE_CURSES
 
 #ifndef NDEBUG //if with debug-info
-		fprintf(stderr,"%s:%s[%s:%d]%s\n",
-				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_file.leaf().c_str(),mesg.m_line,mesg.merge(color_code).c_str()
+		fprintf(
+			stderr,"%s:%s[%s:%d]%s\n",
+			mesg.m_module.c_str(),
+			logLevelName( mesg.m_level ),
+			mesg.m_file.leaf().c_str(),
+			mesg.m_line,
+			mesg.merge(color_code).c_str()
 		);
 #else
-		fprintf(stderr,"%s:%s[%s]%s\n",
-				mesg.m_module.c_str(),logLevelName( mesg.m_level ),mesg.m_object.c_str(),mesg.merge(color_code).c_str()
+		fprintf(
+			stderr,"%s:%s[%s]%s\n",
+			mesg.m_module.c_str(),
+			logLevelName( mesg.m_level ),
+			mesg.m_object.c_str(),
+			mesg.merge(color_code).c_str()
 		);
 #endif //NDEBUG
 }
 
 void DefaultMsgPrint::commit_pipe(const Message& mesg)
 {
-	fprintf(stderr,"%s:%s %s [%s -- %s:%d]\n",
-			mesg.m_module.c_str(),util::logLevelName( mesg.m_level ),mesg.merge("").c_str(), mesg.strTime("%T").c_str(),mesg.m_file.leaf().c_str(),mesg.m_line);
+	fprintf(
+		stderr,"%s:%s %s [%s -- %s:%d]\n",
+		mesg.m_module.c_str(),
+		util::logLevelName( mesg.m_level ),
+		mesg.merge("").c_str(),
+		mesg.strTime("%T").c_str(),
+		mesg.m_file.leaf().c_str(),
+		mesg.m_line
+	);
 }
 
 }

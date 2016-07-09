@@ -138,6 +138,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	return std::make_pair( filename, std::string() );
 }
 
+// @todo document me (esp. the formatting-stuff)
 std::string FileFormat::makeFilename( const util::PropertyMap &props, const std::string namePattern )
 {
 	using namespace std::regex_constants;
@@ -180,10 +181,10 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 				char buffer[1024];
 				switch(formatting){
 				case integer:
-					std::snprintf(buffer,1024,format.c_str(),found->as<long>());
+					std::snprintf(buffer,1024,format.c_str(),found->as<int64_t>());
 					break;
 				case uinteger:
-					std::snprintf(buffer,1024,format.c_str(),found->as<unsigned long>());
+					std::snprintf(buffer,1024,format.c_str(),found->as<uint64_t>());
 					break;
 				case  floating:
 					std::snprintf(buffer,1024,format.c_str(),found->as<double>());

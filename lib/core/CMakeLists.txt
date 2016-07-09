@@ -13,20 +13,6 @@ find_path(INC_JSONCPP "json/version.h" DOC "path where json/version.h can be fou
 include_directories(${INC_JSONCPP})
 
 ############################################################
-# check for ncurses
-############################################################
-find_package(Curses QUIET)
-if(CURSES_FORM_LIBRARY)
-	include_directories(${CURSES_CURSES_H_PATH})
-	add_definitions(-DHAVE_CURSES)
-	message(STATUS "curses form library ${CURSES_FORM_LIBRARY} found. Enable colored logging.")
-else(CURSES_FORM_LIBRARY)
-	message(STATUS "curses form library not found. Logging won't be colored.")
-	set(CURSES_FORM_LIBRARY "")
-endif(CURSES_FORM_LIBRARY)
-
-
-############################################################
 # check for liboil
 ############################################################
 set(ISIS_USE_LIBOIL OFF CACHE BOOL "use liboil" )
@@ -42,7 +28,7 @@ endif(ISIS_USE_LIBOIL)
 ############################################################
 # export library dependencies of isis_core
 ############################################################
-foreach(FILE ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} ${CURSES_FORM_LIBRARY} ${LIB_JSONCPP})
+foreach(FILE ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} ${LIB_JSONCPP})
 		string(REGEX MATCH "${CMAKE_SHARED_LIBRARY_SUFFIX}$" IS_SHARED ${FILE})
 		if(IS_SHARED)
 				LIST(APPEND ISIS_LIB_DEPENDS ${FILE})
@@ -67,7 +53,7 @@ file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${CMAKE_DL_LIBS};${LibOil_LIBRARY};${Boost_LIBRARIES};${CURSES_FORM_LIBRARY};${LIB_JSONCPP}"
+	"${CMAKE_DL_LIBS};${LibOil_LIBRARY};${Boost_LIBRARIES};${LIB_JSONCPP}"
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 
