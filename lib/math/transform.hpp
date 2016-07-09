@@ -22,33 +22,11 @@
 
 #include "../core/data/image.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 
 namespace isis
 {
-
 namespace math
 {
-namespace _internal{
-template <typename TYPE>
-bool inverseMatrix( const boost::numeric::ublas::matrix<TYPE> &inMatrix, boost::numeric::ublas::matrix<TYPE> &inverse )
-{
-	boost::numeric::ublas::matrix<TYPE> A( inMatrix );
-	boost::numeric::ublas::permutation_matrix<TYPE> pm( A.size1() );
-
-	if( boost::numeric::ublas::lu_factorize( A, pm ) != 0 ) {
-		return false;
-	}
-
-	inverse.assign( boost::numeric::ublas::identity_matrix<TYPE>( inMatrix.size1() ) );
-	boost::numeric::ublas::lu_substitute( A, pm, inverse );
-	return true;
-}
-
-bool transformCoords( isis::util::PropertyMap& propertyObject, const isis::util::vector4< size_t > size, boost::numeric::ublas::matrix< float > transform, bool transformCenterIsImageCenter = false );
-}
-
 /**
  * Transforms the image coordinate system into an other system by multiplying
  * the orientation matrix with a user defined transformation matrix. Additionally,

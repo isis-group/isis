@@ -9,7 +9,7 @@
 ############################################################
 
 find_library(LIB_JSONCPP jsoncpp)
-find_path(INC_JSONCPP "json/version.h" DOC "path where json/version.h can be found")
+find_path(INC_JSONCPP "json/version.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/version.h can be found")
 include_directories(${INC_JSONCPP})
 
 ############################################################

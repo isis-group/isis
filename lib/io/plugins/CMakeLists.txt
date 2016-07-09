@@ -112,7 +112,7 @@ endif(ISIS_IOPLUGIN_PROCESS)
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
-        find_package(zlib REQUIRED)
+        find_package(ZLIB REQUIRED)
 
 	include_directories(${DCMTK_dcmtk_INCLUDE_DIR})
 

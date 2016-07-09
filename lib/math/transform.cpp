@@ -19,34 +19,53 @@
 
 #include "transform.hpp"
 #include "common.hpp"
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 
 namespace ublas=boost::numeric::ublas;
 
-
-bool isis::math::_internal::transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
+namespace isis{
+namespace math {
+namespace _internal{
+template <typename TYPE>
+bool inverseMatrix( const ublas::matrix<TYPE> &inMatrix, ublas::matrix<TYPE> &inverse )
 {
-	LOG_IF( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
-			|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ), Debug, error )
+	ublas::matrix<TYPE> A( inMatrix );
+	ublas::permutation_matrix<TYPE> pm( A.size1() );
+
+	if( ublas::lu_factorize( A, pm ) != 0 ) {
+		return false;
+	}
+
+	inverse.assign( ublas::identity_matrix<TYPE>( inMatrix.size1() ) );
+	ublas::lu_substitute( A, pm, inverse );
+	return true;
+}
+
+bool transformCoords( util::PropertyMap& propertyObject, const util::vector4< size_t > size, ublas::matrix< float > transform, bool transformCenterIsImageCenter = false )
+{
+	LOG_IF( !propertyObject.hasProperty( "rowVec" ) || !propertyObject.hasProperty( "columnVec" ) || !propertyObject.hasProperty( "sliceVec" )
+			|| !propertyObject.hasProperty( "voxelSize" ) || !propertyObject.hasProperty( "indexOrigin" ), Debug, error )
 			<< "Missing one of the properties (rowVec, columnVec, sliceVec, voxelSize, indexOrigin)";
 
-	using namespace boost::numeric::ublas;
+	using namespace ublas;
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the
 	// properties rowVec, columnVec, sliceVec and indexOrigin.
 	// get row, column and slice vector from property map
-	isis::util::fvector3 row = properties.getValueAs<util::fvector3>( "rowVec" );
-	isis::util::fvector3 column = properties.getValueAs<util::fvector3>( "columnVec" );
-	isis::util::fvector3 slice = properties.getValueAs<util::fvector3>( "sliceVec" );
+	util::fvector3 row = propertyObject.getValueAs<util::fvector3>( "rowVec" );
+	util::fvector3 column = propertyObject.getValueAs<util::fvector3>( "columnVec" );
+	util::fvector3 slice = propertyObject.getValueAs<util::fvector3>( "sliceVec" );
 	// get index origin from property map
-	isis::util::fvector3 indexorig = properties.getValueAs<util::fvector3>( "indexOrigin" );
+	util::fvector3 indexorig = propertyObject.getValueAs<util::fvector3>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
 	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
-	isis::util::fvector3 scaling;
+	util::fvector3 scaling;
 
-	if( properties.hasProperty( "voxelGap" ) ) {
-		scaling  = properties.getValueAs<util::fvector3>( "voxelSize" ) +  properties.getValueAs<util::fvector3>( "voxelGap" );
+	if( propertyObject.hasProperty( "voxelGap" ) ) {
+		scaling  = propertyObject.getValueAs<util::fvector3>( "voxelSize" ) +  propertyObject.getValueAs<util::fvector3>( "voxelGap" );
 	} else {
-		scaling  = properties.getValueAs<util::fvector3>( "voxelSize" );
+		scaling  = propertyObject.getValueAs<util::fvector3>( "voxelSize" );
 	}
 
 	// create boost::numeric data structures
@@ -127,15 +146,17 @@ bool isis::math::_internal::transformCoords( isis::util::PropertyMap &properties
 	}
 
 	// write modified values back into property map
-	properties.setValueAs( "indexOrigin", indexorig );
-	properties.setValueAs( "rowVec", row );
-	properties.setValueAs( "columnVec", column );
-	properties.setValueAs( "sliceVec", slice );
+	propertyObject.setValueAs( "indexOrigin", indexorig );
+	propertyObject.setValueAs( "rowVec", row );
+	propertyObject.setValueAs( "columnVec", column );
+	propertyObject.setValueAs( "sliceVec", slice );
 	return true;
 }
 
+	
+}
 
-bool isis::math::transformCoords(isis::data::Chunk& chk, boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+bool transformCoords(data::Chunk& chk, ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
 {
 	//for transforming we have to ensure to have the below properties in our chunks
 	std::set<util::PropertyMap::PropPath> propPathList;
@@ -155,7 +176,7 @@ bool isis::math::transformCoords(isis::data::Chunk& chk, boost::numeric::ublas::
 	return true;
 }
 
-bool isis::math::transformCoords(isis::data::Image& img, boost::numeric::ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
+bool transformCoords(data::Image& img, ublas::matrix< float > transform_matrix, bool transformCenterIsImageCenter)
 {
 #pragma message("test me")
 	// we transform an image by transforming its chunks
@@ -171,11 +192,11 @@ bool isis::math::transformCoords(isis::data::Image& img, boost::numeric::ublas::
 	return img.isClean();
 }
 
-isis::data::dimensions isis::math::mapScannerAxisToImageDimension(const data::Image &img, isis::data::scannerAxis scannerAxes)
+data::dimensions mapScannerAxisToImageDimension(const data::Image &img, data::scannerAxis scannerAxes)
 {
 #pragma message("test me")
-	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
-	boost::numeric::ublas::vector<float>mapping( 4 );
+	ublas::matrix<float> latchedOrientation = ublas::zero_matrix<float>( 4, 4 );
+	ublas::vector<float>mapping( 4 );
 	latchedOrientation( img.getValueAs<util::fvector3>("rowVec").getBiggestVecElemAbs(), 0 ) = 1;
 	latchedOrientation( img.getValueAs<util::fvector3>("columnVec").getBiggestVecElemAbs(), 1 ) = 1;
 	latchedOrientation( img.getValueAs<util::fvector3>("sliceVec").getBiggestVecElemAbs(), 2 ) = 1;
@@ -185,6 +206,10 @@ isis::data::dimensions isis::math::mapScannerAxisToImageDimension(const data::Im
 		mapping( i ) = i;
 	}
 
-	return static_cast<isis::data::dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
+	return static_cast<data::dimensions>( ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
 
+}
+
+
+}
 }
