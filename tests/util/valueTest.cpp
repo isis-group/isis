@@ -287,7 +287,10 @@ BOOST_AUTO_TEST_CASE( time_conversion_test )
 	struct std::tm *timeinfo = std::localtime(&current_time);
 	
 	// strings are parsed in local time - so we need an offset
-	BOOST_CHECK_EQUAL( util::Value<std::string>( "19700102000000.001").as<util::timestamp>(),the_day_after-std::chrono::seconds(timeinfo->tm_gmtoff));
+	BOOST_CHECK_EQUAL(
+		util::Value<std::string>( "19700102000000.001").as<util::timestamp>(),
+		the_day_after-std::chrono::seconds(timeinfo->tm_gmtoff)+std::chrono::hours(timeinfo->tm_isdst)
+	);
 	
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "19700102").as<util::date>(),util::date()+std::chrono::days(1));
 

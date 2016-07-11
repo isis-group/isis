@@ -359,7 +359,7 @@ BOOST_AUTO_TEST_CASE( propMap_read_json_test )
 	}
 	)";
 	PropertyMap map;
-	map.readJson((uint8_t*)test_string,(uint8_t*)(test_string+sizeof(test_string)));
+	map.readJson((uint8_t*)test_string,(uint8_t*)(test_string+sizeof(test_string)),'.');
 	
 	BOOST_CHECK(map.hasProperty("number/int"));
 	BOOST_CHECK_EQUAL(map.property("number/int"),3);

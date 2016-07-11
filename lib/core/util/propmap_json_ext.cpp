@@ -23,7 +23,6 @@ namespace _internal {
 			const PropertyMap::PropPath path(
 				util::stringToList<PropertyMap::key_type>(PropertyMap::key_type(name.c_str()),extra_token)
 			);
-			std::cout << name << ":" << obj.toStyledString() << std::endl;
 			value2prop(branch,path,obj[name],extra_token);
 		}
 	}

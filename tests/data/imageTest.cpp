@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE ( minindexdim_test )
 	std::list<data::Chunk> chunks2( chunks1 );
 
 	data::Image img1( chunks1 );
-	data::Image img2( chunks2, none, data::timeDim );
+	data::Image img2( chunks2, boost::none, data::timeDim );
 
 	const size_t size1[] = {4, 4, 3, 1};
 	const size_t size2[] = {4, 4, 1, 3};
