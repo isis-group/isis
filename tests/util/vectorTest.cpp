@@ -10,6 +10,7 @@
 #include <boost/test/unit_test.hpp>
 #include "util/vector.hpp"
 #include "util/matrix.hpp"
+#include <../math/transform.hpp>
 
 #include <string.h>
 
@@ -124,12 +125,13 @@ BOOST_AUTO_TEST_CASE( matrix_from_boost_to_boost )
 		}
 	}
 
-	isis::util::FixedMatrix<float, n, m> isis_matrix( boost_matrix );
+	isis::util::FixedMatrix<float, n, m> isis_matrix= math::fromBoostMatrix<float,n,m>(boost_matrix);
 
 	for ( unsigned short i = 0; i < m; i++ ) {
 		for ( unsigned short j = 0; j < n; j++ ) {
+			const matrix<float> dummy= math::toBoostMatrix(isis_matrix);
 			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix.elem( j, i ) );
-			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix.getBoostMatrix()( i, j ) );
+			BOOST_CHECK_EQUAL( boost_matrix( i, j ), dummy(i,j) );
 		}
 	}
 }
@@ -148,9 +150,11 @@ BOOST_AUTO_TEST_CASE( matrix_inverse )
 	initial_matrix.elem( 1, 2 ) = 0;
 	initial_matrix.elem( 2, 2 ) = 1;
 	bool ok;
-	isis::util::FixedMatrix<float, 3, 3> inverse = initial_matrix.inverse( ok );
+	isis::util::FixedMatrix<float, 3, 3> inverse = math::inverseMatrix(initial_matrix, ok );
 	BOOST_CHECK( ok );
-	isis::util::FixedMatrix<float, 3, 3> result( boost::numeric::ublas::prod( inverse.getBoostMatrix(), initial_matrix.getBoostMatrix() ) );
+	isis::util::FixedMatrix<float, 3, 3> result = math::fromBoostMatrix<float,3,3>(
+			boost::numeric::ublas::prod( math::toBoostMatrix(inverse), math::toBoostMatrix(initial_matrix))
+	);
 
 	for( unsigned short i = 0; i < 3; i++ ) {
 		for( unsigned short j = 0; j < 3; j++ ) {

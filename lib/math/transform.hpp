@@ -21,7 +21,10 @@
 #define TRANSFORM_H
 
 #include "../core/data/image.hpp"
+#include "../core/util/matrix.hpp"
+#include "common.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 
 namespace isis
 {
@@ -73,7 +76,64 @@ bool transformCoords(isis::data::Image& img, boost::numeric::ublas::matrix< floa
 *  \return the mapped image dimension
 */
 
-isis::data::dimensions mapScannerAxisToImageDimension ( const isis::data::Image& img, isis::data::scannerAxis scannerAxes );
+data::dimensions mapScannerAxisToImageDimension ( const data::Image& img, data::scannerAxis scannerAxes );
+
+template<typename TYPE,size_t COLS,size_t ROWS>
+boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::FixedMatrix<TYPE,COLS,ROWS> &mat)
+{
+	boost::numeric::ublas::matrix<TYPE> ret = boost::numeric::ublas::matrix<TYPE>( ROWS, COLS );
+
+	for( size_t m = 0; m < ROWS; m++ ) {
+		for( size_t n = 0; n < COLS; n++ ) {
+			ret( m, n ) = mat.elem( n, m );
+		}
+	}
+
+	return ret;
+}
+
+template<typename TYPE,size_t COLS,size_t ROWS>
+util::FixedMatrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
+{
+	util::FixedMatrix<TYPE,COLS,ROWS> ret;
+	if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
+		for( size_t m = 0; m < ROWS; m++ ) {
+			for( size_t n = 0; n < COLS; n++ ) {
+				ret.elem( n, m ) = boost_matrix( m, n );
+			}
+		}
+	} else {
+		LOG( Runtime, error ) << "The size of the boost matrix ("
+								<< boost_matrix.size1() << ", " << boost_matrix.size2()
+								<< ") does not coincide with the size of the isis matrix (" << ROWS << ", " << COLS << ").";
+		throw( std::logic_error( "Size mismatch" ) );
+	}
+	return ret;
+};
+
+
+template<typename TYPE, size_t SIZE>
+util::FixedMatrix<TYPE, SIZE, SIZE> inverseMatrix(const util::FixedMatrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
+{
+	using namespace boost::numeric::ublas;
+	util::FixedMatrix<TYPE, SIZE, SIZE> ret;
+	matrix<TYPE> boost_matrix_in = toBoostMatrix(mat);
+	matrix<TYPE> boost_matrix_inverse( SIZE, SIZE );
+	permutation_matrix<TYPE> pm( boost_matrix_in.size1() );
+	//check if det is 0 -> singular
+	invertible = lu_factorize( boost_matrix_in, pm ) == 0;
+
+	if( invertible ) {
+		boost_matrix_inverse.assign( identity_matrix<TYPE>( boost_matrix_in.size1() ) ) ;
+		lu_substitute( boost_matrix_in, pm, boost_matrix_inverse );
+		return fromBoostMatrix<TYPE, SIZE, SIZE>( boost_matrix_inverse );
+	} else {
+		LOG( Runtime, error ) << "Matrix is singular. Returning initial matrix.";
+		return mat;
+	}
+}
+
+
 
 }
 }
