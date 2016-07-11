@@ -23,7 +23,7 @@ PropertyMap getFilledMap(){
 	PropertyMap map;
 	map.setValueAs( "Test1", M_PI );
 	map.setValueAs<int32_t>( "Test2", 5 );
-	map.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
+	map.setValueAs( "Test3", util::fvector4( {1, 1, 1, 1} ) );
 	map.setValueAs( "Test4", std::string( "Hallo" ) );
 	map.setValueAs<int32_t>( "sub/Test1", 1);
 	map.setValueAs<int32_t>( "sub/Test2", 2);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 	PropertyMap map1=getFilledMap();
 	BOOST_CHECK_EQUAL( map1.property( "Test1" ), M_PI );
 	BOOST_CHECK_EQUAL( map1.property( "Test2" ), ( int32_t )5 );
-	BOOST_CHECK_EQUAL( map1.property( "Test3" ), util::fvector4( 1, 1, 1, 1 ) );
+	BOOST_CHECK_EQUAL( map1.property( "Test3" ), util::fvector4( {1, 1, 1, 1} ) );
 	BOOST_CHECK_EQUAL( map1.property( "Test4" ), std::string( "Hallo" ) );
 	PropertyMap sub = map1.branch( "sub" );
 	BOOST_CHECK( ! sub.isEmpty() );
@@ -94,11 +94,11 @@ BOOST_AUTO_TEST_CASE( propMap_join_test )
 {
 	PropertyMap map1, map2, result, org;
 	map1.setValueAs( "Test1", M_PI);
-	map1.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ));
+	map1.setValueAs( "Test3", util::fvector4( {1, 1, 1, 1} ));
 	map1.setValueAs( "Test4", std::string( "Hallo" ) );
 	
 	map2.setValueAs( "Test2", ( int32_t )5);
-	map2.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ));
+	map2.setValueAs( "Test3", util::fvector4( {1, 1, 1, 1} ));
 	map2.setValueAs( "Test4", std::string( "Hallo Welt" ));
 	map2.setValueAs( "Test5", std::string( "nix leer" ));
 	//First check not overwriting join
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE( propMap_diff_test )
 {
 	PropertyMap map1, map2;
 	map1.setValueAs( "Test1", M_PI );
-	map1.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
+	map1.setValueAs( "Test3", util::fvector4( {1, 1, 1, 1} ) );
 	map1.setValueAs( "Test4", std::string( "Hallo" ) );
 	map1.setValueAs( "Test6/1", std::string( "nix" ) );
 	map1.setValueAs( "Test6/2", std::string( "leer" ) );
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( propMap_diff_test )
 	//create empty Property "Test5" through accessing it
 	BOOST_CHECK( map1.touchProperty( "Test5" ).isEmpty() );
 	map2.setValueAs( "Test2", ( int32_t )5 );
-	map2.setValueAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
+	map2.setValueAs( "Test3", util::fvector4( {1, 1, 1, 1} ) );
 	map2.setValueAs( "Test4", std::string( "Hallo Welt" ) );
 	map2.setValueAs( "Test5", std::string( "Hallo leer" ) );
 	map2.setValueAs( "Test6", std::string( "Hallo branch" ) );
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( propMap_rename_test )
 	BOOST_CHECK( !map.rename("Test2","Test3") );//should not rename into existing stuff
 	util::enableLog<util::DefaultMsgPrint>(notice); // back to normal
 	BOOST_CHECK_EQUAL( map.property("Test2"), ( int32_t )5); //should still be there
-	BOOST_CHECK_EQUAL( map.property("Test3"), util::fvector4( 1, 1, 1, 1 )); // as well as this
+	BOOST_CHECK_EQUAL( map.property("Test3"), util::fvector4( {1, 1, 1, 1} )); // as well as this
 
 	// tree rename
 	BOOST_CHECK( map.rename("sub","sup") );
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE( propMap_transform_test )
 	BOOST_CHECK_EQUAL( map.property( "sub/Test1float" ), ( float )1 );
 	BOOST_CHECK_EQUAL( map.property( "sub/Test1float" ), ( int32_t )1 ); // this will do an automatic transform back to int for comparison
 	BOOST_CHECK_EQUAL( map.property( "Test1int" ), ( int32_t )M_PI );
-	BOOST_CHECK_EQUAL( map.property( "Test3int" ), util::ivector4( 1, 1, 1, 1 ) );
+	BOOST_CHECK_EQUAL( map.property( "Test3int" ), util::ivector4( {1, 1, 1, 1} ) );
 }
 
 BOOST_AUTO_TEST_CASE( propMap_find_test )
@@ -298,8 +298,8 @@ BOOST_AUTO_TEST_CASE( prop_list_splice_test )
 BOOST_AUTO_TEST_CASE( prop_value_ref_test )
 {
 	PropertyMap map;
-	map.setValueAs( "Test1", util::fvector3( 1, 2, 3 ) );
-	BOOST_CHECK_EQUAL( map.property( "Test1" ), util::fvector3( 1, 2, 3 ) );
+	map.setValueAs( "Test1", util::fvector3( {1, 2, 3} ) );
+	BOOST_CHECK_EQUAL( map.property( "Test1" ), util::fvector3( {1, 2, 3} ) );
 
 	BOOST_CHECK( map.queryValueAs<util::fvector3>( "Test1" ) ); //should be available as fvector3
 
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE( prop_value_ref_test )
 
 	// changes should affect the property
 	vec4.get()[3] = 4;
-	BOOST_CHECK_EQUAL( map.getValueAs<util::fvector4>( "Test1" ), util::fvector4( 1, 2, 3, 4 ) );
+	BOOST_CHECK_EQUAL( map.getValueAs<util::fvector4>( "Test1" ), util::fvector4( {1, 2, 3, 4} ) );
 }
 
 BOOST_AUTO_TEST_CASE( propMap_transfer_test )
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE( propMap_transfer_test )
 	// stuff should be in map2 now
 	BOOST_CHECK_EQUAL(map2.property( "Test1" ), M_PI);
 	BOOST_CHECK_EQUAL(map2.property( "Test2" ), ( int32_t )5);
-	BOOST_CHECK_EQUAL(map2.property( "Test3" ), util::fvector4( 1, 1, 1, 1 ));
+	BOOST_CHECK_EQUAL(map2.property( "Test3" ), util::fvector4( {1, 1, 1, 1} ));
 	BOOST_CHECK_EQUAL(map2.property( "Test4" ), std::string( "Hallo" ));
 	BOOST_CHECK_EQUAL(map2.property( "sub/Test1" ), ( int32_t )1);
 	BOOST_CHECK_EQUAL(map2.property( "sub/Test2" ), ( int32_t )2);

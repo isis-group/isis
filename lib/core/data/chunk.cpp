@@ -49,9 +49,9 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 	if( fakeValid ) {
 		setValueAs( "indexOrigin", util::fvector3() );
 		setValueAs( "acquisitionNumber", 0 );
-		setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-		setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-		setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+		setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
+		setValueAs( "rowVec", util::fvector3({1, 0} ));
+		setValueAs( "columnVec", util::fvector3({0, 1}) );
 		setValueAs( "sequenceNumber", ( uint16_t )0 );
 	}
 }
@@ -63,7 +63,7 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 
 Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid )
 {
-	util::vector4<size_t> newSize( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
+	util::vector4<size_t> newSize( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	assert( newSize.product() );
 	const ValueArrayReference created( ValueArrayBase::createByID( ID, newSize.product() ) );
 	return  Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3], fakeValid );

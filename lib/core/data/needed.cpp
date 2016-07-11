@@ -19,6 +19,6 @@ const char *isis::data::_internal::ChunkBase::neededProperties = "indexOrigin,ac
 // Stuff needed for any Image
 const char *isis::data::Image::neededProperties = "voxelSize,rowVec,columnVec,sliceVec,sequenceNumber";
 
-const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/InversionTime";
+const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/InversionTime,DICOM/CSAImageHeaderInfo/ImaCoilString";
 
 /// @endcond _internal

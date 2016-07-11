@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 	Value<int32_t> tInt( 42 );
 	Value<float> tFloat1( 3.1415 );
 	Value<float> tFloat2( 3.5415 );
-	Value<ivector4> vec( ivector4( 1, 2, 3, 4 ) );
+	Value<ivector4> vec( ivector4( {1, 2, 3, 4} ) );
 	ValueBase *iRef = &tInt;
 	ValueBase *fRef1 = &tFloat1;
 	ValueBase *fRef2 = &tFloat2;
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 	BOOST_CHECK_EQUAL( fRef1->as<int32_t>(), ( int32_t )ceil( tFloat1 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<int32_t>(), ( int32_t )ceil( tFloat2 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<std::string>(), "3.5415" );
-	BOOST_CHECK_EQUAL( vRef->as<fvector4>(), fvector4( 1, 2, 3, 4 ) );
+	BOOST_CHECK_EQUAL( vRef->as<fvector4>(), fvector4( {1, 2, 3, 4}) );
 }
 
 BOOST_AUTO_TEST_CASE( complex_conversion_test )
@@ -269,9 +269,9 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 	BOOST_CHECK_EQUAL( sNumbers.as<util::ilist>(), std::list<int>( inumbers, inumbers + 5 ) ); // 4.4 and 4.6 will be rounded
 	BOOST_CHECK_EQUAL( sNumbers.as<util::dlist>(), std::list<double>( dnumbers, dnumbers + 5 ) );
 
-	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3 ) ); //should also work for fvector
-	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3|4|5>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
-	BOOST_CHECK_EQUAL( util::Value<std::string>( "1,2,3,4,5>" ).as<util::ivector4>(), util::ivector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3>" ).as<util::fvector4>(), util::fvector4( {1, 2, 3} ) ); //should also work for fvector
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3|4|5>" ).as<util::fvector4>(), util::fvector4( {1, 2, 3, 4} ) ); //elements behind end are ignored
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "1,2,3,4,5>" ).as<util::ivector4>(), util::ivector4( {1, 2, 3, 4} ) ); //elements behind end are ignored
 
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1,2,3,4,5>" ).as<util::color24>(), col24 ); //elements behind end are ignored
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<100,200,300,4,5>" ).as<util::color48>(), col48 ); //elements behind end are ignored
