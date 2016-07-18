@@ -24,9 +24,9 @@ using util::fvector4;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( vector_init_test )
 {
-	fvector4 test;
+	util::FixedVector<float,4> test({1,1,1,1}); // @todo get rid of outer brackets (and the explicit constructor) if c++17 is available
 	float *start = &test[0];
-	const float compare1[] = {0, 0, 0, 0};
+	const float compare1[] = { 1,  1,  1,  1};
 	const float compare2[] = {42, 42, 42, 42};
 	BOOST_CHECK( memcmp( start, compare1, sizeof( float ) * 4 ) == 0 );
 	test.fill( 42 );
@@ -75,13 +75,13 @@ BOOST_AUTO_TEST_CASE( matrix_init_test )
 
 BOOST_AUTO_TEST_CASE( matrix4x4_init_test )
 {
-	util::vector4<uint8_t> b1( 0, 1, 2, 3 );
-	util::vector4<uint8_t> b2( 4, 5, 6, 7 );
-	util::vector4<uint8_t> b3( 8, 9, 10, 11 );
-	util::vector4<uint8_t> b4( 12, 13, 14, 15 );
+	util::vector4<uint8_t> b1( {0, 1, 2, 3} );
+	util::vector4<uint8_t> b2( {4, 5, 6, 7} );
+	util::vector4<uint8_t> b3( {8, 9, 10, 11} );
+	util::vector4<uint8_t> b4( {12, 13, 14, 15} );
 
 
-	util::Matrix4x4<uint8_t> test( b1, b2, b3, b4 );
+	util::Matrix4x4<uint8_t> test( {b1, b2, b3, b4} );
 
 	for( int i = 0; i < 4; i++ )
 		for( int j = 0; j < 4; j++ )
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE( matrix4x4_init_test )
 
 BOOST_AUTO_TEST_CASE( matrix_dot_test )
 {
-	util::vector4<float> b1( 1 / sqrt( 2 ), -1 / sqrt( 2 ) );
-	util::vector4<float> b2( 1 / sqrt( 2 ), 1 / sqrt( 2 ) );
+	util::vector4<float> b1( {1 / sqrt( 2 ), -1 / sqrt( 2 )} );
+	util::vector4<float> b2( {1 / sqrt( 2 ),  1 / sqrt( 2 )} );
 
 	util::Matrix4x4<float> test( b1, b2 );
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( matrix_dot_test )
 
 	// applying two transformations on a vector has the same result as applying their "dot" on the vector
 	BOOST_CHECK(
-		test.dot( test ).dot( fvector4( 1, 2 ) ).fuzzyEqual( test.dot( test.dot( fvector4( 1, 2 ) ) ) )
+		test.dot( test ).dot( fvector4( {1, 2} ) ).fuzzyEqual( test.dot( test.dot( fvector4( {1, 2} ) ) ) )
 	);
 }
 

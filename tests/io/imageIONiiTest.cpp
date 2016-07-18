@@ -107,11 +107,11 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	aligned.set( "ALIGNED_ANAT" );
 
 	data::MemChunk<short> ch( size[0], size[1] );
-	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
-	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, 0} ) );
+	ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+	ch.setValueAs( "sliceVec", util::fvector3( {0, 0, 1} ) );
+	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 
 	ch.setValueAs( "acquisitionNumber", ( uint32_t )0 );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
 	chunks.back().setValueAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
 	chunks.back().setValueAs<float>( "acquisitionTime", 1 );
-	chunks.back().setValueAs( "indexOrigin", util::fvector3( 0, 0, 1 ) );
+	chunks.back().setValueAs( "indexOrigin", util::fvector3( {0, 0, 1} ) );
 
 	data::Image img( chunks );
 	BOOST_CHECK( img.isClean() );

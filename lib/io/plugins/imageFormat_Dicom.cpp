@@ -107,16 +107,16 @@ public:
 	}
 };
 
-class DcmtkLogger : public dcmtk::log4cplus::Appender{
-	std::set<dcmtk::log4cplus::tstring> ignores;
+class DcmtkLogger : public log4cplus::Appender{
+	std::set<log4cplus::tstring> ignores;
 public:
 	DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
 	}
 	virtual void close(){}
 protected:
-	virtual void append(const dcmtk::log4cplus::spi::InternalLoggingEvent& event){
-		const dcmtk::log4cplus::tstring &msg=event.getMessage();
+	virtual void append(const log4cplus::spi::InternalLoggingEvent& event){
+		const log4cplus::tstring &msg=event.getMessage();
 		LOG_IF(ignores.find(msg)==ignores.end(),Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
@@ -211,7 +211,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
 	// compute voxelSize and gap
 	{
-		util::fvector3 voxelSize( invalid_float, invalid_float, invalid_float );
+		util::fvector3 voxelSize( {invalid_float, invalid_float, invalid_float} );
 		const util::istring pixelsize_params[]={"PixelSpacing","ImagePlanePixelSpacing","ImagerPixelSpacing"};
 		for(const util::istring &name:pixelsize_params){
 			if ( hasOrTell( prefix + name, object, warning ) ) {
@@ -237,7 +237,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
 			if ( voxelSize[2] != invalid_float ) {
-				object.setValueAs( "voxelGap", util::fvector3( 0, 0, dicomTree.getValueAs<float>( "SpacingBetweenSlices" ) - voxelSize[2] ) );
+				object.setValueAs( "voxelGap", util::fvector3( {0, 0, dicomTree.getValueAs<float>( "SpacingBetweenSlices" ) - voxelSize[2]} ) );
 				dicomTree.remove( "SpacingBetweenSlices" );
 			} else
 				LOG( Runtime, warning )
@@ -277,14 +277,14 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 	} else {
 		LOG( Runtime, warning ) << "Making up row and column vector, because the image lacks this information";
-		object.setValueAs( "rowVec" , util::fvector3( 1, 0, 0 ) );
-		object.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+		object.setValueAs( "rowVec" , util::fvector3( {1, 0, 0} ) );
+		object.setValueAs( "columnVec", util::fvector3( {0, 1, 0} ) );
 	}
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
 		object.setValueAs( "indexOrigin", dicomTree.getValueAs<util::fvector3>( "ImagePositionPatient" ) );
 	} else if( object.hasProperty( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
-		util::fvector3 orig( 0, 0, object.getValueAs<float>( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
+		util::fvector3 orig( {0, 0, object.getValueAs<float>( prefix + "CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getValueAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" )} );
 		LOG( Runtime, info ) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
 		object.setValueAs( "indexOrigin", orig );
 	} else {
@@ -393,7 +393,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		float row, column;
 
 		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &column, &row ) == 2 ) {
-			object.setValueAs( "fov", util::fvector3( row, column, invalid_float ) );
+			object.setValueAs( "fov", util::fvector3( {row, column, invalid_float} ) );
 		}
 	}
 }
@@ -423,7 +423,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	
 	const util::vector4<size_t> tSize = source.getSizeAsVector();
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
-	const util::vector3<size_t> size( tSize[0] / matrixSize, tSize[1] / matrixSize, images );
+	const util::vector3<size_t> size( {tSize[0] / matrixSize, tSize[1] / matrixSize, images} );
 
 	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into a " << size << " volume";
 	// fix the properties of the source (we 'll need them later)
@@ -582,10 +582,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	
 
 	//hack to steal logging from dcmtk and redirect it to our own
-	dcmtk::log4cplus::Logger logger = dcmtk::log4cplus::Logger::getRoot();
+	log4cplus::Logger logger = log4cplus::Logger::getRoot();
 	// there shall be no logging besides me
 	logger.removeAllAppenders();
-	logger.addAppender(dcmtk::log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
+	logger.addAppender(log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const

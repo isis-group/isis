@@ -357,7 +357,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 			if ( sliceDist > 0 ) {
 				static const float inf = -std::numeric_limits<float>::infinity();
 
-				util::fvector3 &voxelGap = refValueAsOr( "voxelGap", util::fvector3( 0, 0, inf ) ); //if there is no voxelGap yet, we create it as (0,0,inf)
+				util::fvector3 &voxelGap = refValueAsOr( "voxelGap", util::fvector3( {0, 0, inf} ) ); //if there is no voxelGap yet, we create it as (0,0,inf)
 
 				if ( voxelGap[2] != inf ) {
 					LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 200 ), Runtime, warning )
@@ -378,11 +378,11 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	if(rrow && rcolumn){
 		const util::fvector3 &row=*rrow,&column=*rcolumn;
 		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
-		const util::fvector3 crossVec = util::fvector3( //we could use their cross-product as sliceVector
+		const util::fvector3 crossVec = util::fvector3({ //we could use their cross-product as sliceVector
 											row[1] * column[2] - row[2] * column[1],
 											row[2] * column[0] - row[0] * column[2],
 											row[0] * column[1] - row[1] * column[0]
-										);
+										});
 		optional< util::fvector3& > sliceVec = queryValueAs<util::fvector3>( "sliceVec" );
 
 		if ( sliceVec ) {
@@ -696,9 +696,7 @@ size_t Image::compare( const isis::data::Image &comp ) const
 		ret += ( getSizeAsVector() - comp.getSizeAsVector() ).product();
 	}
 
-	util::ivector4 compVect( util::minVector( chunkPtrAt( 0 )->getSizeAsVector(), comp.chunkPtrAt( 0 )->getSizeAsVector() ) );
-	util::ivector4 start;
-	const size_t increment = compVect.product();
+	const size_t increment = util::minVector( chunkPtrAt( 0 )->getSizeAsVector(), comp.chunkPtrAt( 0 )->getSizeAsVector() ).product();
 
 	for ( size_t i = 0; i < getVolume(); i += increment ) {
 		const size_t nexti = i + increment - 1;
@@ -726,12 +724,12 @@ Image::orientation Image::getMainOrientation()const
 	row.norm();
 	column.norm();
 	LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
-	const util::fvector3 crossVec = util::fvector3(
+	const util::fvector3 crossVec = util::fvector3({
 										row[1] * column[2] - row[2] * column[1],
 										row[2] * column[0] - row[0] * column[2],
 										row[0] * column[1] - row[1] * column[0]
-									);
-	const util::fvector3 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
+									});
+	const util::fvector3 x({1, 0}), y({0, 1}), z({0, 0, 1});
 	double a_axial    = std::acos( crossVec.dot( z ) ) / M_PI;
 	double a_sagittal = std::acos( crossVec.dot( x ) ) / M_PI;
 	double a_coronal  = std::acos( crossVec.dot( y ) ) / M_PI;
@@ -936,7 +934,7 @@ util::fvector3 Image::getFoV() const
 
 	LOG_IF( ret[timeDim], Runtime, warning ) << "Ignoring fourth dim extend of " << ret[timeDim] << " in Image";
 
-	return util::fvector3( ret[0], ret[1], ret[2] );
+	return util::fvector3( {ret[0], ret[1], ret[2]} );
 }
 
 Image::iterator Image::begin()

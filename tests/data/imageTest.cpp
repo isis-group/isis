@@ -23,11 +23,11 @@ namespace test
 template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, size_t at = 0, uint32_t acnum = 0 )
 {
 	data::MemChunk<T> ch( columns, rows );
-	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, at ) );
-	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
-	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, at} ) );
+	ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+	ch.setValueAs( "sliceVec", util::fvector3( {0, 0, 1} ) );
+	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 
 	ch.setValueAs( "acquisitionNumber", ( uint32_t )acnum );
 	ch.setValueAs( "acquisitionTime", ( float )acnum );
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
 
 		for( unsigned int i = 0; i < list.size(); i++ ) {
-			BOOST_CHECK_EQUAL( list[i].property( "indexOrigin" ), util::fvector3( 0, 0, i ) );
+			BOOST_CHECK_EQUAL( list[i].property( "indexOrigin" ), util::fvector3( {0, 0, i} ) );
 			BOOST_CHECK_EQUAL( list[i].property( "acquisitionNumber" ), 2 - i ); // AcqNumber and time are in the oposite direction
 			BOOST_CHECK_EQUAL( list[i].property( "acquisitionTime" ), 2 - i );
 		}
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
 		unsigned int i = 0;
 		for( const util::PropertyValue & ref :  origins ) {
-			BOOST_CHECK( ref == util::fvector3( 0, 0, i++ ) );
+			BOOST_CHECK( ref == util::fvector3( {0, 0, i++} ) );
 		}
 	}
 	{
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::list<data::Chunk> chunks;
 
 		for( int i = 0; i < 3; i++ ) {
-			chunks.push_back( genSlice<float>( 4, 4, i, 3 + i ) );
+			chunks.push_back( genSlice<float>(4, 4, i, 3 + i ) );
 		}
 
 		data::Image img( chunks );
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_CHECK_EQUAL( img.getValueAs<std::string>( "testProp" ), str );
 		data::Chunk ch = img.copyChunksToVector( false ).back();
 		//as all other chunks where timestep < 4 this must be at the end
-		BOOST_CHECK_EQUAL( ch.property( "indexOrigin" ), util::fvector3( 0, 0, 2 ) );
+		BOOST_CHECK_EQUAL( ch.property( "indexOrigin" ), util::fvector3( {0, 0, 2} ) );
 		BOOST_CHECK_EQUAL( ch.property( "acquisitionNumber" ), 5  );
 
 		// Check all dimensions
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		BOOST_REQUIRE( img2.isClean() );
 		BOOST_CHECK_EQUAL( img2.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
-		BOOST_CHECK_EQUAL( img2.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
+		BOOST_CHECK_EQUAL( img2.getSizeAsVector(), util::ivector4( {nrCols, nrRows, nrSlices, nrTimesteps} ) );
 
 		// Check all dimensions with limit sizes
 		nrRows = 212;
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		data::Image img3( chunks );
 		BOOST_REQUIRE( img3.isClean() );
 		BOOST_CHECK_EQUAL( img3.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
-		BOOST_CHECK_EQUAL( img3.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
+		BOOST_CHECK_EQUAL( img3.getSizeAsVector(), util::ivector4( {nrCols, nrRows, nrSlices, nrTimesteps} ) );
 
 
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		BOOST_REQUIRE( img4.isClean() );
 		BOOST_CHECK_EQUAL( img4.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
-		BOOST_CHECK_EQUAL( img4.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
+		BOOST_CHECK_EQUAL( img4.getSizeAsVector(), util::ivector4( {nrCols, nrRows, nrSlices, nrTimesteps} ) );
 	}
 }
 
@@ -231,11 +231,11 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
 
-	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-	ch.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
-	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, 0} ) );
+	ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+	ch.setValueAs( "sliceVec", util::fvector3( {0, 0, 1} ) );
+	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
 	ch.touchProperty( "nothing")=util::PropertyValue();
 
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_CHECK_EQUAL( img.getVolume(), 9 * 9 );
-	BOOST_CHECK_EQUAL( img.getSizeAsVector(), util::ivector4( 3, 3, 3, 3 ) );
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), util::ivector4( {3, 3, 3, 3} ) );
 
 	const data::Chunk &ref11 = img.getChunk( 0, 0, 0 );
 	const data::Chunk &ref12 = img.getChunk( 1, 1, 1 );
@@ -379,16 +379,16 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	const data::Chunk &ref21 = img.getChunk( 0, 0, 0, 1 );
 	const data::Chunk &ref23 = img.getChunk( 2, 2, 2, 1 );
 
-	BOOST_CHECK_EQUAL( ref11.property( "indexOrigin" ), util::fvector3( 0, 0, 0 ) );
-	BOOST_CHECK_EQUAL( ref12.property( "indexOrigin" ), util::fvector3( 0, 0, 1 ) );
-	BOOST_CHECK_EQUAL( ref13.property( "indexOrigin" ), util::fvector3( 0, 0, 2 ) );
+	BOOST_CHECK_EQUAL( ref11.property( "indexOrigin" ), util::fvector3( {0, 0, 0} ) );
+	BOOST_CHECK_EQUAL( ref12.property( "indexOrigin" ), util::fvector3( {0, 0, 1} ) );
+	BOOST_CHECK_EQUAL( ref13.property( "indexOrigin" ), util::fvector3( {0, 0, 2} ) );
 	BOOST_CHECK_EQUAL( ref11.property( "acquisitionNumber" ), ( uint32_t )0 );
 	BOOST_CHECK_EQUAL( ref12.property( "acquisitionNumber" ), ( uint32_t )1 );
 	BOOST_CHECK_EQUAL( ref13.property( "acquisitionNumber" ), ( uint32_t )2 );
 	BOOST_CHECK_EQUAL( ref21.property( "acquisitionNumber" ), ( uint32_t )3 );
 	BOOST_CHECK_EQUAL( ref22.property( "acquisitionNumber" ), ( uint32_t )4 );
 	BOOST_CHECK_EQUAL( ref23.property( "acquisitionNumber" ), ( uint32_t )5 );
-	BOOST_CHECK_EQUAL( ref22.property( "indexOrigin" ), util::fvector3( 0, 0, 1 ) );
+	BOOST_CHECK_EQUAL( ref22.property( "indexOrigin" ), util::fvector3( {0, 0, 1} ) );
 	BOOST_CHECK( ref22.property( "indexOrigin" ) == ref12.property( "indexOrigin" ) );
 	BOOST_CHECK( !( ref22.property( "acquisitionNumber" ) == ref12.property( "acquisitionNumber" ) ) );
 	BOOST_CHECK_EQUAL( ref11.voxel<float>( 0, 0 ), 42 );
@@ -527,11 +527,11 @@ BOOST_AUTO_TEST_CASE ( image_const_iterator_test )
 	BOOST_CHECK_EQUAL( *i, util::Value<int>( 42 ) ); // first voxel should be 42
 	BOOST_CHECK_EQUAL( *( ++i ), util::Value<int>( 0 ) ); // but the second should be 0
 
-	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	i += img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) );
 	BOOST_CHECK_EQUAL( *i, util::Value<int>( 0 ) ); // we missed the next 42 just by one voxel
 	BOOST_CHECK_EQUAL( *( --i ), util::Value<int>( 42 ) ); // here it is
 
-	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 
 	// @todo does not work yet
 	//  const data::Image invalid(empty);
@@ -575,11 +575,11 @@ BOOST_AUTO_TEST_CASE ( typed_image_const_iterator_test )
 	BOOST_CHECK_EQUAL( *i, 42 ); // first voxel should be 42
 	BOOST_CHECK_EQUAL( *( ++i ), 0 ); // but the second should be 0
 
-	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	i += img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) );
 	BOOST_CHECK_EQUAL( *i, 0 ); // we missed the next 42 just by one voxel
 	BOOST_CHECK_EQUAL( *( --i ), 42 ); // here it is
 
-	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 
 	// @todo does not work yet
 	//  const data::Image invalid(empty);
@@ -621,14 +621,14 @@ BOOST_AUTO_TEST_CASE ( image_iterator_test )
 	BOOST_CHECK_EQUAL( *i, util::Value<int>( 42 ) ); // first voxel should be 42
 	BOOST_CHECK_EQUAL( *( ++i ), util::Value<int>( 0 ) ); // but the second should be 0
 
-	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	i += img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) );
 	BOOST_CHECK_EQUAL( *i, util::Value<int>( 0 ) ); // we missed the next 42 just by one voxel
 	BOOST_CHECK_EQUAL( *( --i ), util::Value<int>( 42 ) ); // here it is
 
 	( *i ) = util::Value<int>( 23 );
 	BOOST_CHECK_EQUAL( *i, util::Value<int>( 23 ) ); // not anymore
 
-	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 }
 
 BOOST_AUTO_TEST_CASE ( typed_image_iterator_test )
@@ -661,14 +661,14 @@ BOOST_AUTO_TEST_CASE ( typed_image_iterator_test )
 	BOOST_CHECK_EQUAL( *i, 42 ); // first voxel should be 42
 	BOOST_CHECK_EQUAL( *( ++i ), 0 ); // but the second should be 0
 
-	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	i += img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) );
 	BOOST_CHECK_EQUAL( *i, 0 ); // we missed the next 42 just by one voxel
 	BOOST_CHECK_EQUAL( *( --i ), 42 ); // here it is
 
 	( *i ) = 23;
 	BOOST_CHECK_EQUAL( *i, 23 ); // not anymore
 
-	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 }
 
 BOOST_AUTO_TEST_CASE ( image_voxel_value_test )
@@ -733,11 +733,11 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 BOOST_AUTO_TEST_CASE( orientation_test )
 {
 	data::MemChunk<float> ch( 3, 3, 3 );
-	ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, 0 ) );
-	ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-	ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
+	ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, 0} ) );
+	ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
 	ch.setValueAs( "acquisitionNumber", ( uint32_t )0 );
-	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
 
 	data::Image img( ch );
@@ -878,10 +878,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
 			chunks.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
-			chunks.back().setValueAs( "rowVec", util::fvector3( 17, 0, 0 ) );
-			chunks.back().setValueAs( "columnVec", util::fvector3( 0, 17, 0 ) );
-			chunks.back().setValueAs( "sliceVec", util::fvector3( 0, 0, 31 ) );
-			chunks.back().setValueAs( "voxelSize", util::fvector3( 3, 3, 3 ) );
+			chunks.back().setValueAs( "rowVec", util::fvector3( {17, 0, 0} ) );
+			chunks.back().setValueAs( "columnVec", util::fvector3( {0, 17, 0} ) );
+			chunks.back().setValueAs( "sliceVec", util::fvector3( {0, 0, 31} ) );
+			chunks.back().setValueAs( "voxelSize", util::fvector3( {3, 3, 3} ) );
 			chunks.back().setValueAs<uint16_t>( "sequenceNumber", 1 );
 		}
 	}
@@ -951,10 +951,10 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 {
 	data::MemChunk<uint8_t> original( 10, 10, 10, 10 );
 	original.setValueAs<uint32_t>( "acquisitionNumber", 1 );
-	original.setValueAs( "indexOrigin", util::fvector3( 0, 0 ) );
-	original.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	original.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-	original.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+	original.setValueAs( "indexOrigin", util::fvector3( {0, 0} ) );
+	original.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
+	original.setValueAs( "rowVec", util::fvector3( {1, 0, 0} ) );
+	original.setValueAs( "columnVec", util::fvector3( {0, 1, 0} ) );
 	original.setValueAs( "sequenceNumber", ( uint16_t )0 );
 	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
@@ -967,7 +967,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 
 	for( size_t i = 0; i < chunks.size(); i++ ) {
 		BOOST_CHECK_EQUAL( chunks[i].getValueAs<int32_t>( "acquisitionNumber" ), i + 1 );
-		BOOST_CHECK_EQUAL( chunks[i].getValueAs<util::fvector3>( "indexOrigin" ), util::fvector3( 0, 0, i % 10 ) );
+		BOOST_CHECK_EQUAL( chunks[i].getValueAs<util::fvector3>( "indexOrigin" ), util::fvector3( {0, 0, i % 10} ) );
 	}
 }
 
@@ -1130,9 +1130,9 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 	data::MemChunk<uint8_t> original( 11, 23, 90, 12 );
 	original.setValueAs<uint32_t>( "acquisitionNumber", 1 );
 	original.setValueAs( "indexOrigin", util::fvector3() );
-	original.setValueAs<util::fvector3>( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	original.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-	original.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
+	original.setValueAs<util::fvector3>( "voxelSize", util::fvector3( {1, 1, 1} ) );
+	original.setValueAs( "rowVec", util::fvector3( {1, 0, 0} ) );
+	original.setValueAs( "columnVec", util::fvector3( {0, 1, 0} ) );
 	original.setValueAs( "sequenceNumber", ( uint16_t )0 );
 	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
@@ -1155,19 +1155,19 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	At the end we compare the output of the our flipped isis image and the outcome of the spm dicom import.
 	*/
 	//ground truth (pure irony, since it comes from SPM :-) )
-	util::fvector3 SPMIo = util::fvector3( 92.5167, -159.366, -108.687 );
-	util::fvector3 SPMrow = util::fvector3( -0.0105192, 0.999945, -6.52652e-09 );
-	util::fvector3 SPMcolumn = util::fvector3( -0.041812, -0.000439848, 0.999125 );
-	util::fvector3 SPMslice = util::fvector3( -0.99907, -0.01051, -0.0418143 );
+	util::fvector3 SPMIo = util::fvector3( {92.5167, -159.366, -108.687} );
+	util::fvector3 SPMrow = util::fvector3( {-0.0105192, 0.999945, -6.52652e-09} );
+	util::fvector3 SPMcolumn = util::fvector3( {-0.041812, -0.000439848, 0.999125} );
+	util::fvector3 SPMslice = util::fvector3( {-0.99907, -0.01051, -0.0418143} );
 
 	data::MemChunk<uint8_t> minChunk( 320, 320, 240, 1 );
 	minChunk.setValueAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setValueAs<uint16_t>( "sequenceNumber", 1 );
-	minChunk.setValueAs( "indexOrigin", util::fvector3( 83.1801, -159.464, 114.418 ) );
-	minChunk.setValueAs( "rowVec", util::fvector3( -0.0105192, 0.999945, -6.52652e-09 ) );
-	minChunk.setValueAs( "columnVec", util::fvector3( 0.041812, 0.000439848, -0.999125 ) );
-	minChunk.setValueAs( "sliceVec", util::fvector3( -0.99907, -0.01051, -0.0418143 ) );
-	minChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( 0.7, 0.7, 0.7 ) );
+	minChunk.setValueAs( "indexOrigin", util::fvector3( {83.1801, -159.464, 114.418} ) );
+	minChunk.setValueAs( "rowVec", util::fvector3( {-0.0105192, 0.999945, -6.52652e-09} ) );
+	minChunk.setValueAs( "columnVec", util::fvector3( {0.041812, 0.000439848, -0.999125} ) );
+	minChunk.setValueAs( "sliceVec", util::fvector3( {-0.99907, -0.01051, -0.0418143} ) );
+	minChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( {0.7, 0.7, 0.7} ) );
 	minChunk.setValueAs<util::fvector3>( "voxelGap", util::fvector3() );
 	data::Image img( minChunk );
 	BOOST_REQUIRE( img.isClean() );
@@ -1192,12 +1192,12 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	data::MemChunk<uint8_t> minChunk( 100, 100, 100, 1 );
 	minChunk.setValueAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setValueAs<uint16_t>( "sequenceNumber", 1 );
-	minChunk.setValueAs( "indexOrigin", util::fvector3( -49.5, -49.5, -49.5 ) );
-	minChunk.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-	minChunk.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-	minChunk.setValueAs( "sliceVec", util::fvector3( 0, 0, 1 ) );
+	minChunk.setValueAs( "indexOrigin", util::fvector3( {-49.5, -49.5, -49.5} ) );
+	minChunk.setValueAs( "rowVec", util::fvector3( {1, 0, 0} ) );
+	minChunk.setValueAs( "columnVec", util::fvector3( {0, 1, 0} ) );
+	minChunk.setValueAs( "sliceVec", util::fvector3( {0, 0, 1} ) );
 	minChunk.setValueAs<util::fvector3>( "voxelGap", util::fvector3() );
-	minChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	minChunk.setValueAs<util::fvector3>( "voxelSize", util::fvector3( {1, 1, 1} ) );
 	data::Image img( minChunk );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
@@ -1208,10 +1208,10 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform( 1, 1 ) = -1;
 	transform( 0, 2 ) = -1;
 	BOOST_REQUIRE( math::transformCoords(img, transform, true ) );
-	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "indexOrigin" ), util::fvector3( 49.5, 49.5, 49.5 ) );
-	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "rowVec" ), util::fvector3( 0, 0, -1 ) );
-	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "columnVec" ), util::fvector3( 0, -1, 0 ) );
-	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "sliceVec" ), util::fvector3( -1, 0, 0 ) );
+	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "indexOrigin" ), util::fvector3( {49.5, 49.5, 49.5} ) );
+	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "rowVec" ), util::fvector3( {0, 0, -1} ) );
+	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "columnVec" ), util::fvector3( {0, -1, 0} ) );
+	BOOST_CHECK_EQUAL( img.getValueAs<util::fvector3>( "sliceVec" ), util::fvector3( {-1, 0, 0} ) );
 	//here we rotate
 	transform = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
 	transform( 0, 0 ) = 1;
@@ -1221,10 +1221,10 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	BOOST_REQUIRE( math::transformCoords(img, transform, true ) );
 	float err = 0.0005;
 	//what we should get
-	util::fvector3 trueIO = util::fvector3( 0, 70.0036, 49.5 );
-	util::fvector3 trueRowVec = util::fvector3( 0, 0, -1 );
-	util::fvector3 trueColumnVec = util::fvector3( -sqrt( 2 ) * 0.5, -sqrt( 2 ) * 0.5, 0 );
-	util::fvector3 trueSliceVec = util::fvector3( -sqrt( 2 ) * 0.5, sqrt( 2 ) * 0.5, 0 );
+	util::fvector3 trueIO = util::fvector3( {0, 70.0036, 49.5} );
+	util::fvector3 trueRowVec = util::fvector3( {0, 0, -1} );
+	util::fvector3 trueColumnVec = util::fvector3( {-sqrt( 2 ) * 0.5, -sqrt( 2 ) * 0.5, 0} );
+	util::fvector3 trueSliceVec = util::fvector3( {-sqrt( 2 ) * 0.5, sqrt( 2 ) * 0.5, 0} );
 
 	for ( size_t i = 0; i < 3; i++ ) {
 		//for some reason util::fuzzycheck does not work as expected - so we do it our own way
@@ -1257,7 +1257,7 @@ BOOST_AUTO_TEST_CASE ( image_swapdim_test )
 		for(int y=0;y<40;y++)
 			for(int x=0;x<50;x++)
 			{
-				size_t idx=oldshape.getLinearIndex(util::vector4<size_t>(x,y,z));
+				size_t idx=oldshape.getLinearIndex(util::vector4<size_t>({x,y,z}));
 				BOOST_CHECK_EQUAL(img.voxel<uint32_t>(x,z,y),idx);
 			}
 }

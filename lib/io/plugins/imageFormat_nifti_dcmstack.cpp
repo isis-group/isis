@@ -116,7 +116,7 @@ void DCMStack::translateToISIS( data::Chunk &orig )
 	if ( hasProperty( "DICOM/SliceThickness" ) && hasProperty( "DICOM/SpacingBetweenSlices" ) ) {
 		const float gap = getValueAs<float>( "DICOM/SpacingBetweenSlices" ) - getValueAs<float>( "DICOM/SliceThickness" );
 
-		if( gap )setValueAs( "voxelGap", util::fvector3( 0, 0, gap ) );
+		if( gap )setValueAs( "voxelGap", util::fvector3( {0, 0, gap} ) );
 
 		remove( "DICOM/SpacingBetweenSlices" );
 		remove( "DICOM/SliceThickness" );
@@ -142,7 +142,7 @@ void DCMStack::decodeMosaic()
 		// All is fine, lets start
 		uint16_t slices = getValueAs<uint16_t>( NumberOfImagesInMosaicProp );
 		const uint16_t matrixSize = std::ceil( std::sqrt( slices ) );
-		const util::vector3<size_t> size( getValueAs<uint64_t>( "DICOM/Columns" ) / matrixSize, getValueAs<uint64_t>( "DICOM/Rows" ) / matrixSize, slices );
+		const util::vector3<size_t> size( {getValueAs<uint64_t>( "DICOM/Columns" ) / matrixSize, getValueAs<uint64_t>( "DICOM/Rows" ) / matrixSize, slices} );
 		const util::dlist orientation = getValueAs<util::dlist>( "DICOM/ImageOrientationPatient" );
 		util::dlist::const_iterator middle = orientation.begin();
 		std::advance( middle, 3 );

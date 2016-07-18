@@ -138,15 +138,15 @@ std::pair<std::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Ch
 	const util::fvector3 columnVec = ch.getValueAs<util::fvector3>( columnVecProb );
 	const util::fvector3 sliceVec = ch.getValueAsOr<util::fvector3>(
 		sliceVecProb,
-		util::fvector3(
+		util::fvector3({
 			rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 			rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
 			rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-		)
+		})
 	);
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
-	const util::fvector3 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ) );
+	const util::fvector3 key({ origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec )});
 	const scalarPropCompare &secondaryComp = secondarySort.top();
 
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)

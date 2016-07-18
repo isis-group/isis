@@ -145,12 +145,12 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	BOOST_CHECK( !ch.isValid() );
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
 	//with a position and an orientation its valid
-	util::fvector3 pos( 1, 1, 1 );
+	util::fvector3 pos( {1, 1, 1} );
 	ch.setValueAs( "indexOrigin", pos );
 	BOOST_CHECK( !ch.isValid() );
 	ch.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 	BOOST_CHECK( !ch.isValid() );
 	ch.setValueAs( "rowVec", pos );
 	BOOST_CHECK( !ch.isValid() );
@@ -170,12 +170,12 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional
 		ch.voxel<float>( i, i, i, i ) = i;
 
 	for ( size_t i = 0; i < ch.getDimSize( data::rowDim ); i++ )
-		BOOST_CHECK_EQUAL( ch.voxel<float>( i, i, i, i ), i );
+		BOOST_CHECK_EQUAL( ch.voxel<float>(i, i, i, i), i );
 
 	data::Chunk ch2 = ch;
 
 	for ( size_t i = 0; i < ch.getDimSize( data::rowDim ); i++ )
-		BOOST_CHECK_EQUAL( ch2.voxel<float>( i, i, i, i ), i );
+		BOOST_CHECK_EQUAL( ch2.voxel<float>(i, i, i, i), i );
 }
 
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 		   boost::numeric::RoundEven<double>
 		   > converter;
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
-	ch1.setValueAs( "indexOrigin", util::fvector3( 1, 2, 3 ) );
+	ch1.setValueAs( "indexOrigin", util::fvector3( {1, 2, 3} ) );
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
@@ -309,11 +309,11 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 3, 3, 3 );
-	ch1.setValueAs( "indexOrigin", util::fvector3( 1, 1, 1 ) );
-	ch1.setValueAs( "rowVec", util::fvector3( 1, 0, 0 ) );
-	ch1.setValueAs( "columnVec", util::fvector3( 0, 1, 0 ) );
-	ch1.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
-	ch1.setValueAs( "voxelGap", util::fvector3( 1, 1, 1 ) );
+	ch1.setValueAs( "indexOrigin", util::fvector3( {1, 1, 1} ) );
+	ch1.setValueAs( "rowVec", util::fvector3( {1, 0, 0} ) );
+	ch1.setValueAs( "columnVec", util::fvector3( {0, 1, 0} ) );
+	ch1.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
+	ch1.setValueAs( "voxelGap", util::fvector3( {1, 1, 1} ) );
 	ch1.setValueAs<uint32_t>( "acquisitionNumber", 0 );
 
 	const util::Value<int> buff[] = {0, 1, 2};
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	for( const data::Chunk & ref :  splices ) {
-		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( 1, 1, 1 + cnt * 2 ) );
+		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( {1, 1, 1 + cnt * 2} ) );
 		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
 		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt*2 );// we ha a stride of 1, so acquisitionNumber should be 0 2 4 ..
 		cnt++;
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 		for( int z = 0; z < 30; z++ )
 			for( int y = 0; y < 40; y++ )
 				for( int x = 0; x < 50; x++ ) {
-					size_t idx = ch.getLinearIndex( util::vector4<size_t>( x, y, z, t ) );
+					size_t idx = ch.getLinearIndex( util::vector4<size_t>( {x, y, z, t} ) );
 					BOOST_REQUIRE_EQUAL( ch.voxel<uint32_t>( x, y, z, t ), idx );
 					BOOST_CHECK_EQUAL( swapped.voxel<uint32_t>( x, z, y, t ), idx );
 				}

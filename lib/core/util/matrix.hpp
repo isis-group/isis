@@ -30,8 +30,8 @@ namespace isis
 namespace util
 {
 
-template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS *COLS>::container_type >
-class FixedMatrix : public FixedVector<TYPE, ROWS *COLS, CONTAINER>
+template < typename TYPE, size_t COLS, size_t ROWS>
+class FixedMatrix : public FixedVector<TYPE, ROWS *COLS>
 {
 public:
 	static const size_t rows = ROWS;
@@ -39,8 +39,8 @@ public:
 
 	typedef TYPE value_type;
 
-	template<typename TYPE2, typename CONTAINER2>
-	void copyFrom( const FixedVector<TYPE2, COLS, CONTAINER2> src[ROWS] ) {
+	template<typename TYPE2>
+	void copyFrom( const FixedVector<TYPE2, COLS> src[ROWS] ) {
 		for( size_t r = 0; r < ROWS; r++ ) {
 			const TYPE2 *ptr = &src[r][0];
 			std::copy( ptr, ptr + COLS, &elem( 0, r ) );
@@ -50,10 +50,10 @@ public:
 	FixedMatrix() {}
 
 	template<typename TYPE2>
-	FixedMatrix( const TYPE2 src[ROWS *COLS] ): FixedVector<TYPE, ROWS *COLS, CONTAINER>( src ) {}
+	FixedMatrix( const TYPE2 src[ROWS *COLS] ): FixedVector<TYPE, ROWS *COLS>( src ) {}
 
-	template<typename TYPE2, typename CONTAINER2>
-	FixedMatrix( const FixedVector<TYPE2, COLS, CONTAINER2> src[ROWS] ) {copyFrom( src );}
+	template<typename TYPE2>
+	FixedMatrix( const FixedVector<TYPE2, COLS> src[ROWS] ) {copyFrom( src );}
 
 	TYPE &elem( size_t column, size_t row ) {return ( *this )[column + row * COLS];}
 	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column + row * COLS];}
@@ -69,12 +69,12 @@ public:
 		return ret;
 	}
 
-	template<typename TYPE2, size_t COLS2, typename CONTAINER2>
-	FixedMatrix<decltype(TYPE()*TYPE2()), COLS2, ROWS> dot( const FixedMatrix<TYPE2, COLS2, COLS, CONTAINER2> &right )const {
+	template<typename TYPE2, size_t COLS2>
+	FixedMatrix<decltype(TYPE()*TYPE2()), COLS2, ROWS> dot( const FixedMatrix<TYPE2, COLS2, COLS> &right )const {
 		// transpose the right, so we can use columns as rows
 		typedef decltype(TYPE()*TYPE2()) result_type;
-		const FixedMatrix<TYPE2, COLS, COLS2, CONTAINER2> rightT = right.transpose();
-		const FixedMatrix<TYPE, COLS, ROWS, CONTAINER> &left = *this;
+		const FixedMatrix<TYPE2, COLS, COLS2> rightT = right.transpose();
+		const FixedMatrix<TYPE, COLS, ROWS> &left = *this;
 		FixedMatrix<result_type, COLS2, ROWS> ret;
 
 		for( size_t c = 0; c < right.columns; c++ ) { //result has as much columns as right
@@ -90,9 +90,9 @@ public:
 	}
 
 
-	template<typename TYPE2, typename CONTAINER2>
-	FixedVector<decltype(TYPE()*TYPE2()), COLS> dot( const FixedVector<TYPE2, COLS, CONTAINER2> &right )const {
-		const FixedMatrix<TYPE, COLS, ROWS, CONTAINER> &left = *this;
+	template<typename TYPE2>
+	FixedVector<decltype(TYPE()*TYPE2()), COLS> dot( const FixedVector<TYPE2, COLS> &right )const {
+		const FixedMatrix<TYPE, COLS, ROWS> &left = *this;
 		typedef decltype(TYPE()*TYPE2()) result_type;
 		FixedVector<result_type, ROWS> ret;
 		const TYPE2 *rstart = &right[0];
@@ -107,8 +107,8 @@ public:
 
 	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
 		FixedVector<TYPE, COLS> ret;
-		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS * COLS, CONTAINER>::begin() + rownum * COLS;
-		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator end = start + COLS;
+		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator start = FixedVector<TYPE, ROWS * COLS>::begin() + rownum * COLS;
+		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator end = start + COLS;
 		ret.copyFrom( start, end );
 		return ret;
 	}
@@ -145,8 +145,8 @@ public:
 	template<typename TYPE2> Matrix4x4(
 		const FixedVector<TYPE2, 4> &row1,
 		const FixedVector<TYPE2, 4> &row2,
-		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( 0, 0, 1, 0 ),
-		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( 0, 0, 0, 1 )
+		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( {0, 0, 1, 0} ),
+		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( {0, 0, 0, 1} )
 	) {
 		const FixedVector<TYPE2, 4> src[4] = {row1, row2, row3, row4};
 		FixedMatrix<TYPE, 4, 4>::copyFrom( src );
@@ -178,8 +178,8 @@ public:
 namespace std
 {
 
-template<typename charT, typename traits, typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER > basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedMatrix<TYPE, COLS, ROWS, CONTAINER>& m )
+template<typename charT, typename traits, typename TYPE, size_t COLS, size_t ROWS> basic_ostream<charT, traits>&
+operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedMatrix<TYPE, COLS, ROWS>& m )
 {
 	out << "FixedMatrix of size (" << m.columns << " columns, " << m.rows << " rows):" << std::endl;
 
