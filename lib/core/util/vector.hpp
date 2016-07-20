@@ -46,7 +46,7 @@ protected:
 	/// Generic operations
 	template<typename OP> this_class& binaryOp ( const TYPE &src ){
 		const OP op = OP();
-		for (TYPE x :*this)
+		for (TYPE &x :*this)
 			x = op( x, src );
 		return *this;
 	}
