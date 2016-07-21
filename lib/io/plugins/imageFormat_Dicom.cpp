@@ -481,11 +481,11 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
-			const size_t dpos[] = {0, line, slice, 0}; //begin of the target line
+			const std::array<size_t,4> dpos = {0, line, slice, 0}; //begin of the target line
 			const size_t column = slice % matrixSize; //column of the mosaic
 			const size_t row = slice / matrixSize; //row of the mosaic
-			const size_t sstart[] = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
-			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
+			const std::array<size_t,4> sstart = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
+			const std::array<size_t,4> send = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, dest, dpos );
 		}
 

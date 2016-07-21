@@ -28,8 +28,7 @@ namespace _internal
 
 ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
-	init( idx );
+	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	util::Singletons::get<NeededsList<Chunk>, 0>().applyTo( *this );
 	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
@@ -114,13 +113,15 @@ std::string Chunk::getShapeString(bool upper) const
 
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
-	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
-	const size_t idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
-	const size_t idx3[] = {0, 0, thirdDimD, fourthDimD};
-	copyRange( idx1, idx2, dst, idx3 );
+	copyRange(
+		{0, 0, thirdDimS, fourthDimS},
+		{getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS},
+		dst,
+		{0, 0, thirdDimD, fourthDimD}
+	);
 }
 
-void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
+void Chunk::copyRange( const std::array<size_t,4> &source_start, const std::array<size_t,4> &source_end, Chunk &dst, const std::array<size_t,4> &destination ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "Copy start " << util::vector4<size_t>( source_start )
@@ -137,7 +138,7 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	getValueArrayBase().copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
+size_t Chunk::compareRange( const std::array<size_t,4> &source_start, const std::array<size_t,4> &source_end, Chunk &dst, const std::array<size_t,4> &destination ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "memcmp start " << util::vector4<size_t>( source_start )
@@ -342,27 +343,19 @@ Chunk::const_iterator Chunk::end()const
 
 const util::ValueReference Chunk::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
 {
-	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF(!isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ), Debug, isis::error )
+		<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << nrOfTimesteps
+		<< " is out of range (" << getSizeAsString() << ")";
 
-	if ( !isInRange( idx ) ) {
-		LOG( Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
-				<< " is out of range (" << getSizeAsString() << ")";
-	}
-
-	return begin()[getLinearIndex( idx )];
+	return begin()[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )];
 }
 void Chunk::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF(!isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ), Debug, isis::error )
+			<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << nrOfTimesteps
+			<< " is out of range (" << getSizeAsString() << ")";
 
-	if ( !isInRange( idx ) ) {
-		LOG( Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
-				<< " is out of range (" << getSizeAsString() << ")";
-	}
-
-	begin()[getLinearIndex( idx )] = val;
+	begin()[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )] = val;
 }
 
 

@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 	public:
 		setIdx( data::_internal::NDimensional<4> geo ): geometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
-			vox = geometry.getLinearIndex( &pos[0] );
+			vox = geometry.getLinearIndex( pos );
 			return true;
 		}
 	};
@@ -931,11 +931,12 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 
 
 	const data::Chunk cpSource = img.getChunk( 0, 0, 12, 8, false );
-	const size_t S1[] = {0, 0, 0, 0};
-	const size_t S2[] = {cpSource.getSizeAsVector()[0] - 1, cpSource.getSizeAsVector()[1] - 1, 0, 0};
-	const size_t D[] = {0, 0, 0, 0};
 
-	cpSource.copyRange( S1, S2, chSlice, D );
+	cpSource.copyRange(
+		{0, 0, 0, 0},
+		{cpSource.getSizeAsVector()[0] - 1, cpSource.getSizeAsVector()[1] - 1, 0, 0},
+		chSlice
+	);
 	float *pValues = ( ( std::shared_ptr<float> ) chSlice.getValueArray<float>() ).get();
 	float *pRun = pValues;
 

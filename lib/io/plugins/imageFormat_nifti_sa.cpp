@@ -140,8 +140,7 @@ public:
 	FslRgbWriteOp( const data::Image &image ):
 		WriteOp( image, 8 ), m_scale( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) ) ) {
 		assert( image.getDimSize( 3 ) == 1 ); //make sure the image has only one timestep
-		size_t dims[4];
-		image.getSizeAsVector().copyTo( dims );
+		std::array<size_t,4> dims=image.getSizeAsVector();
 		dims[3] = 3;
 		init( dims ); // reset our shape to use 3 timesteps as colors
 	}

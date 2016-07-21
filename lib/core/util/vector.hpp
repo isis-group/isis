@@ -236,11 +236,6 @@ public:
 	template<typename TYPE2> FixedVector( const FixedVector<TYPE2, SIZE> &src ) {
 		src.copyTo( std::begin(*this) );
 	}
-
-	/// write the elements formated to basic_ostream
-	template<typename charT, typename traits> void writeTo( std::basic_ostream<charT, traits> &out )const {
-		util::listToOStream( std::begin(*this), std::end(*this), out, "|", "<", ">" );
-	}
 };
 
 template<typename TYPE> using vector3 = FixedVector<TYPE, 3>;
@@ -307,9 +302,9 @@ namespace std
 {
 
 template<typename charT, typename traits, typename TYPE, size_t SIZE> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedVector<TYPE, SIZE>& s )
+operator<<( basic_ostream<charT, traits> &out, const std::array<TYPE, SIZE>& s )
 {
-	s.writeTo( out );
+	isis::util::listToOStream( std::begin(s), std::end(s), out, "|", "<", ">" );
 	return out;
 }
 }

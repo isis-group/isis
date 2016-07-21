@@ -59,22 +59,18 @@ template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] )
 /// Base class for anything that has dimensional size
 template<unsigned short DIMS> class NDimensional
 {
-	size_t m_dim[DIMS];
+	std::array<size_t,DIMS> m_dim;
 protected:
+	static constexpr size_t dims = DIMS;
 	NDimensional() {}
 public:
-	static const size_t dims = DIMS;
 	/**
 	 * Initializes the size-vector.
 	 * This must be done before anything else, or behaviour will be undefined.
 	 * \param d array with sizes to use. (d[0] is most iterating element / lowest dimension)
 	 */
-	void init( const size_t d[DIMS] ) {
-		std::copy( d, d + DIMS, m_dim );
-		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
-	}
-	void init( const util::FixedVector<size_t, DIMS>& d ) {
-		d.copyTo( m_dim );
+	void init(const std::array<size_t,DIMS> &d ) {
+		m_dim = d;
 		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
@@ -82,37 +78,33 @@ public:
 	}
 	/**
 	 * Compute linear index from n-dimensional index,
-	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
+	 * \param coord array of indexes (d[0] is most iterating element / lowest dimension)
 	 */
-	size_t getLinearIndex( const size_t d[DIMS] )const {
-		return __dim2index < DIMS - 1 > ( d, m_dim );
-	}
-	/// \copydoc getLinearIndex
-	size_t getLinearIndex( const util::FixedVector<size_t, DIMS> &d )const {
-		return __dim2index < DIMS - 1 > ( &d[0], m_dim );
+	size_t getLinearIndex( const std::array<size_t,DIMS> &coord )const {
+		return __dim2index < DIMS - 1 > ( coord.data(), m_dim.data() );
 	}
 	/**
 	 * Compute coordinates from linear index,
-	 * \param d array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension)
+	 * \param coord array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension)
 	 * \param index the linear index to compute the coordinates from
 	 */
-	void getCoordsFromLinIndex( const size_t index, size_t d[DIMS] )const {
-		__index2dim < DIMS - 1 > ( index, d, m_dim, getVolume() / m_dim[DIMS - 1] );
+	void getCoordsFromLinIndex( const size_t index, std::array<size_t,DIMS> &coord )const {
+		__index2dim < DIMS - 1 > ( index, coord.data(), m_dim.data(), getVolume() / m_dim[DIMS - 1] );
 	}
 	/**
 	 * Check if index fits into the dimensional size of the object.
-	 * \param d index to be checked (d[0] is most iterating element / lowest dimension)
+	 * \param coord index to be checked (d[0] is most iterating element / lowest dimension)
 	 * \returns true if given index will get a reasonable result when used for getLinearIndex
 	 */
-	bool isInRange( const size_t d[DIMS] )const {
-		return __rangeCheck < DIMS - 1 > ( d, m_dim );
+	bool isInRange( const std::array<size_t,DIMS> &coord )const {
+		return __rangeCheck < DIMS - 1 > ( coord.data(), m_dim.data() );
 	}
 	/**
 	 * Get the size of the object in elements of TYPE.
 	 * \returns \f$ \prod_{i=0}^{DIMS-1} getDimSize(i) \f$
 	 */
 	size_t getVolume()const {
-		return __dimStride<DIMS>( m_dim );
+		return __dimStride<DIMS>( m_dim.data() );
 	}
 	///\returns the size of the object in the given dimension
 	size_t getDimSize( size_t idx )const {
@@ -121,7 +113,7 @@ public:
 
 	/// generates a string representing the size
 	std::string getSizeAsString( std::string delim = "x" )const {
-		return util::listToString( m_dim, m_dim + DIMS, delim, "", "" );
+		return util::listToString( std::begin(m_dim), std::end(m_dim), delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
@@ -159,7 +151,7 @@ public:
 		//reshape myself
 		std::swap(m_dim[dim_a],m_dim[dim_b]);
 		ITER cycle = at,last=cycle+getVolume();
-		size_t currIndex[DIMS];
+		std::array<size_t,DIMS> currIndex;
 
 		while(++cycle != last){
 			size_t i=cycle-at;

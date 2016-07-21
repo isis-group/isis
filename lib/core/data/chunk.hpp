@@ -93,11 +93,10 @@ public:
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop).
 	 */
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
-		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
-		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( idx ) << " is out of range " << getSizeAsString();
+		LOG_IF( ! isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ), Debug, isis::error )
+				<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << " is out of range " << getSizeAsString();
 		ValueArray<TYPE> &ret = asValueArray<TYPE>();
-		return ret[getLinearIndex( idx )];
+		return ret[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )];
 	}
 
 	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
@@ -108,17 +107,15 @@ public:
 	 * \copydetails Chunk::voxel
 	 */
 	template<typename TYPE> const TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const {
-		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
-
-		if ( !isInRange( idx ) ) {
+		if ( !isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
+					<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << nrOfTimesteps
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
 		const ValueArray<TYPE> &ret = const_cast<Chunk &>( *this ).asValueArray<TYPE>();
 
-		return ret[getLinearIndex( idx )];
+		return ret[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )];
 	}
 
 	void copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const;
@@ -226,10 +223,10 @@ public:
 	
 	template<typename T> bool is()const {return getValueArrayBase().is<T>();}
 
-	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
+	void copyRange( const std::array< size_t, 4 >& source_start, const std::array< size_t, 4 >& source_end, isis::data::Chunk& dst, const std::array< size_t, 4 >& destination=std::array< size_t, 4 >({0,0,0,0}) )const;
 
 	size_t compare( const Chunk &dst )const;
-	size_t compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] )const;
+	size_t compareRange( const std::array<size_t,4> &source_start, const std::array<size_t,4> &source_end, Chunk &dst, const std::array<size_t,4> &destination )const;
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 

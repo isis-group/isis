@@ -40,15 +40,13 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 BOOST_AUTO_TEST_CASE ( chunk_index_test )
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
-	size_t idx[4], ridx[4];
-	idx[0] = idx[1] = idx[2] = 1;
-	idx[3] = 0;
+	std::array<size_t,4> idx={1,1,1,0}, ridx={42,42,42,42};
 	const size_t at = 3 * 4 + 4 + 1;
 	ch.getCoordsFromLinIndex( at, ridx );
 
 
 	BOOST_CHECK_EQUAL( ch.getLinearIndex( idx ), at );
-	BOOST_CHECK( memcmp( idx, ridx, 4 ) == 0 );
+	BOOST_CHECK_EQUAL( idx, ridx );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
@@ -70,7 +68,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	public:
 		setIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
-			vox = chunkGeometry.getLinearIndex( &pos[0] );
+			vox = chunkGeometry.getLinearIndex( pos );
 			return true;
 		}
 	};
@@ -80,7 +78,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	public:
 		checkIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
-			return vox == chunkGeometry.getLinearIndex( &pos[0] );
+			return vox == chunkGeometry.getLinearIndex( pos );
 		}
 	};
 

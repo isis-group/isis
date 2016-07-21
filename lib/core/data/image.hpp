@@ -248,14 +248,13 @@ private:
 	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
 	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const {
-		const size_t idx[] = {first, second, third, fourth};
 		LOG_IF ( ! clean, Debug, error )
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 		LOG_IF ( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
-		LOG_IF ( !isInRange ( idx ), Debug, isis::error )
-				<< "Index " << util::vector4<size_t> ( idx ) << " is out of range (" << getSizeAsString() << ")";
-		const size_t index = getLinearIndex ( idx );
+		LOG_IF ( !isInRange ( {first, second, third, fourth} ), Debug, isis::error )
+				<< "Index " << util::vector4<size_t> ( {first, second, third, fourth} ) << " is out of range (" << getSizeAsString() << ")";
+		const size_t index = getLinearIndex ( {first, second, third, fourth} );
 		return std::make_pair ( index / chunkVolume, index % chunkVolume );
 	}
 
