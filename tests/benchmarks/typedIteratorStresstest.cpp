@@ -6,10 +6,11 @@ using namespace isis;
 template<typename T> data::MemChunk<T> makeChunk( size_t size, short slice )
 {
 	data::MemChunk<T> ret( size, size );
-	ret.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-	ret.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-	ret.setValueAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
-	ret.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ret.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ret.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+	ret.setValueAs( "indexOrigin", util::fvector3( {0, 0, slice} ) );
+	ret.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
+	ret.setValueAs( "sequenceNumber",0);
 	return ret;
 }
 
@@ -20,11 +21,11 @@ int main()
 	{
 		std::cout << "===============Testing Image==================" << std::endl;
 		std::list<data::Chunk> chunks;
-		const short slices = 256;
+		const short slices = 512;
 		timer.restart();
 
 		for ( short slice = 0; slice < slices; slice++ ) {
-			chunks.push_back( makeChunk<short>( 256, slice ) );
+			chunks.push_back( makeChunk<short>( 512, slice ) );
 			chunks.back().setValueAs( "acquisitionNumber", slice );
 		}
 

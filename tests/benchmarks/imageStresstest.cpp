@@ -17,11 +17,11 @@ int main()
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {
 			chunks.push_back( data::MemChunk<short>( slice_size, slice_size ) );
-			chunks.back().setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-			chunks.back().setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-			chunks.back().setValueAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+			chunks.back().setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+			chunks.back().setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+			chunks.back().setValueAs( "indexOrigin", util::fvector3( {0, 0, slice} ) );
 			chunks.back().setValueAs( "acquisitionNumber", ++acq );
-			chunks.back().setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+			chunks.back().setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 		}
 	}
 

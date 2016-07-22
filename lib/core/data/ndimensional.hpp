@@ -26,40 +26,42 @@ namespace data
 {
 namespace _internal
 {
-/// @cond _internal
-
-template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
-{
-	return __dimStride < DIM - 1 > ( dim ) * dim[DIM - 1];
-}
-
-template<unsigned short DIM> size_t __dim2index( const size_t d[], const size_t dim[] )
-{
-	return d[DIM] * __dimStride<DIM>( dim ) + __dim2index < DIM - 1 > ( d, dim );
-}
-
-template<unsigned short DIM> void __index2dim( const size_t index, size_t d[], const size_t dim[], size_t vol )
-{
-	d[DIM] = index / vol;
-	__index2dim < DIM - 1 > ( index % vol, d, dim, vol / dim[DIM - 1] );
-}
-
-template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t dim[] )
-{
-	return ( d[DIM] < dim[DIM] ) && __rangeCheck < DIM - 1 > ( d, dim );
-}
-
-template<> inline size_t __dimStride<0>( const size_t[] /*dim*/ ) {return 1;}
-template<> inline size_t __dim2index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
-template<> inline void __index2dim<0>( const size_t index, size_t d[], const size_t[], size_t /*vol*/ ) {d[0] = index;}
-template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
-
-/// @endcond
 
 /// Base class for anything that has dimensional size
 template<unsigned short DIMS> class NDimensional
 {
 	std::array<size_t,DIMS> m_dim;
+	constexpr size_t _dimStride( const unsigned short &dim )
+	{
+		return dim ? _dimStride( dim-1 ) * m_dim[dim - 1]:1;
+	}
+	constexpr size_t _dim2index( const std::array<size_t,DIMS> &d, const unsigned short &DIM )
+	{
+		if(DIM)
+			return d[DIM] * _dimStride( DIM ) + _dim2index( d, DIM - 1 );
+		else
+			return d[0] * _dimStride( 0 );
+	}
+	constexpr std::array<size_t,DIMS> _index2dim( const size_t index, unsigned short DIM, size_t vol )const
+	{
+		if(DIM){
+			std::array<size_t,DIMS> ret=_index2dim( index % vol, DIM - 1, vol / m_dim[DIM - 1] );
+			ret[DIM] = index / vol;
+			return ret;
+		} else {
+			assert(vol == 1);
+			return {index};
+		}
+	}
+	constexpr bool _rangeCheck( const std::array<size_t,DIMS> &d, unsigned short DIM )
+	{
+		return DIM ?
+			( d[DIM] < m_dim[DIM] ) && _rangeCheck( d, DIM - 1 ):
+			d[0] < m_dim[0];
+	}
+
+
+
 protected:
 	static constexpr size_t dims = DIMS;
 	NDimensional() {}
@@ -81,15 +83,15 @@ public:
 	 * \param coord array of indexes (d[0] is most iterating element / lowest dimension)
 	 */
 	size_t getLinearIndex( const std::array<size_t,DIMS> &coord )const {
-		return __dim2index < DIMS - 1 > ( coord.data(), m_dim.data() );
+		return _dim2index( coord, DIMS - 1 );
 	}
 	/**
 	 * Compute coordinates from linear index,
 	 * \param coord array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension)
 	 * \param index the linear index to compute the coordinates from
 	 */
-	void getCoordsFromLinIndex( const size_t index, std::array<size_t,DIMS> &coord )const {
-		__index2dim < DIMS - 1 > ( index, coord.data(), m_dim.data(), getVolume() / m_dim[DIMS - 1] );
+	std::array<size_t,DIMS> getCoordsFromLinIndex( const size_t index )const {
+		return _index2dim( index, DIMS - 1, getVolume() / m_dim[DIMS - 1] );
 	}
 	/**
 	 * Check if index fits into the dimensional size of the object.
@@ -97,14 +99,14 @@ public:
 	 * \returns true if given index will get a reasonable result when used for getLinearIndex
 	 */
 	bool isInRange( const std::array<size_t,DIMS> &coord )const {
-		return __rangeCheck < DIMS - 1 > ( coord.data(), m_dim.data() );
+		return _rangeCheck( coord, DIMS - 1 );
 	}
 	/**
 	 * Get the size of the object in elements of TYPE.
 	 * \returns \f$ \prod_{i=0}^{DIMS-1} getDimSize(i) \f$
 	 */
 	size_t getVolume()const {
-		return __dimStride<DIMS>( m_dim.data() );
+		return _dimStride( DIMS );
 	}
 	///\returns the size of the object in the given dimension
 	size_t getDimSize( size_t idx )const {
@@ -151,14 +153,13 @@ public:
 		//reshape myself
 		std::swap(m_dim[dim_a],m_dim[dim_b]);
 		ITER cycle = at,last=cycle+getVolume();
-		std::array<size_t,DIMS> currIndex;
 
 		while(++cycle != last){
 			size_t i=cycle-at;
 			if(visited[i])continue;
 			
 			do{
-				oldshape.getCoordsFromLinIndex(i,currIndex);
+				std::array<size_t,DIMS> currIndex=oldshape.getCoordsFromLinIndex(i);
 				std::swap(currIndex[dim_a],currIndex[dim_b]);
 				i=getLinearIndex(currIndex);
 				std::swap(at[i],*cycle);
