@@ -14,7 +14,7 @@
 /// @cond _internal
 
 // Stuff needed for every Chunk
-const char *isis::data::_internal::ChunkBase::neededProperties = "indexOrigin,acquisitionNumber,voxelSize,rowVec,columnVec";
+const char *isis::data::Chunk::neededProperties = "indexOrigin,acquisitionNumber,voxelSize,rowVec,columnVec";
 
 // Stuff needed for any Image
 const char *isis::data::Image::neededProperties = "voxelSize,rowVec,columnVec,sliceVec,sequenceNumber";

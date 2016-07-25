@@ -23,26 +23,15 @@ namespace isis
 namespace data
 {
 /// @cond _internal
-namespace _internal
-{
+/// @endcond _internal
 
-ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid ): ValueArrayReference( src )
 {
 	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	util::Singletons::get<NeededsList<Chunk>, 0>().applyTo( *this );
 	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
-}
 
-ChunkBase::~ChunkBase() { }
-
-}
-/// @endcond _internal
-
-Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid ):
-	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
-	ValueArrayReference( src )
-{
 	assert( ( *this )->getLength() == getVolume() );
 
 	if( fakeValid ) {
@@ -178,13 +167,6 @@ scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleop
 scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
 	return getValueArrayBase().getScalingTo( typeID, minmax, scaleopt );
-}
-
-Chunk &Chunk::operator=( const Chunk &ref )
-{
-	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
-	ValueArrayReference::operator=( static_cast<const ValueArrayReference &>( ref ) ); // copy the reference of ref's data
-	return *this;
 }
 
 std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )

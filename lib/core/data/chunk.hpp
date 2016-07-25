@@ -32,18 +32,6 @@ class Chunk;
 /// @cond _internal
 namespace _internal
 {
-class ChunkBase : public NDimensional<4>, public util::PropertyMap
-{
-protected:
-	ChunkBase() {}; //do not use this
-public:
-	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
-	typedef isis::util::_internal::GenericReference<ChunkBase > Reference;
-
-	ChunkBase( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps );
-	virtual ~ChunkBase(); //needed to make it polymorphic
-	static const char *neededProperties;
-};
 }
 /// @endcond _internal
 
@@ -60,11 +48,12 @@ public:
  * Like in ValueArray, the copy of a Chunk will reference the same data. (cheap copy)
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, protected ValueArrayReference
+class Chunk : public _internal::NDimensional<4>, public util::PropertyMap, protected ValueArrayReference
 {
 	friend class Image;
 	friend class std::vector<Chunk>;
 protected:
+	Chunk() {}; //do not use this
 	/**
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
@@ -74,11 +63,13 @@ protected:
 	 * \param nrOfSlices size in the third dimension (usually slice-encoded dim)
 	 * \param nrOfTimesteps size in the fourth dimension
 	 */
-	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ), ValueArrayReference( ValueArray<TYPE>( src, getVolume(), d ) ) {}
+	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false  ):
+		Chunk(ValueArray<TYPE>( src, getVolume(), d ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps,fakeValid)
+		{}
 
-	Chunk() {}; //do not use this
 public:
+	static const char *neededProperties;
+	typedef isis::util::_internal::GenericReference<Chunk> Reference;
 
 	typedef ValueArrayBase::value_iterator iterator;
 	typedef ValueArrayBase::const_value_iterator const_iterator;
@@ -230,8 +221,6 @@ public:
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 
-	Chunk &operator=( const Chunk &ref );
-
 	/**
 	 * Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.
 	 * This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets
@@ -265,8 +254,8 @@ template<typename TYPE> class MemChunk : public Chunk
 {
 public:
 	/// Create an empty MemChunk with the given size
-	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {}
+	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false ):
+		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid ) {}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -278,7 +267,7 @@ public:
 	 * \param nrOfSlices
 	 * \param nrOfTimesteps size of the resulting image
 	 */
-	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
+	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false  ):
 		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {
 		util::checkType<T>();
 		asValueArrayBase().copyFromMem( org, getVolume() );

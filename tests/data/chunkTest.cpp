@@ -221,6 +221,7 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
+	ch1.setValueAs("test",1);
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asValueArray<float>()[i] = i;
@@ -228,6 +229,10 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 	data::scaling_pair no_scale( util::Value<int>( 1 ), util::Value<int>( 0 ) );
 
 	data::Chunk ch2 = ch1;//This shall clone the underlying ValueArray-Object
+
+	//make sure the properties are copied
+	BOOST_CHECK_EQUAL( ch2.getValueAs<int>("test"),1);
+
 	data::Chunk copyF = ch2.copyByID(); // this shall copy as the same as ch2 (float)
 	data::Chunk copyI = ch2.copyByID( data::ValueArray<uint32_t>::staticID(), no_scale ); // this shall copy as unsigned int (we need to set scale because float=>int always scales up)
 
