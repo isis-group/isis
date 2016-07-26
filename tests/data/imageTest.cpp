@@ -631,6 +631,47 @@ BOOST_AUTO_TEST_CASE ( image_iterator_test )
 	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 }
 
+BOOST_AUTO_TEST_CASE ( image_iterator_for_test )
+{
+	//  get a voxel from inside and outside the image
+	std::list<data::Chunk> chunks;
+
+	for( int i = 0; i < 3; i++ )
+		chunks.push_back( genSlice<float>( 3, 3, i, i ) );
+
+	std::list<data::Chunk>::iterator k = chunks.begin();
+	( k++ )->voxel<float>( 0, 0 ) = 42.0;
+	( k++ )->voxel<float>( 1, 1 ) = 42.0;
+	( k++ )->voxel<float>( 2, 2 ) = 42;
+
+	data::Image img( chunks );
+
+	float v_sum=0;
+
+	//iterate through image and get values as references (will implicitely make ValueReference from the Adapter
+	// Note: ValueBase cannot be used, as it cannot exist on its own
+	for(util::ValueReference v:img){
+		v_sum+=v->as<float>();
+	}
+	BOOST_CHECK_EQUAL(v_sum,42*3);
+
+	v_sum=0;
+	//Adapter can also just act as ValueReference through "->"-Magic
+	for(auto v:img){
+		v_sum+=v->as<float>();
+	}
+	BOOST_CHECK_EQUAL(v_sum,42*3);
+
+		// zeroing
+	for(auto v:img){ //would be the same with util::ValueReference
+		v=util::Value<float>(0);
+	}
+	BOOST_CHECK_EQUAL(img.voxel<float>(0,0),0);
+	BOOST_CHECK_EQUAL(img.voxel<float>(1,1),0);
+	BOOST_CHECK_EQUAL(img.voxel<float>(2,2),0);
+
+}
+
 BOOST_AUTO_TEST_CASE ( typed_image_iterator_test )
 {
 	//  get a voxel from inside and outside the image
@@ -670,6 +711,42 @@ BOOST_AUTO_TEST_CASE ( typed_image_iterator_test )
 
 	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( {1, 1, 1} ) ) ); //we should be exactly at the position of the second 42 now
 }
+
+BOOST_AUTO_TEST_CASE ( typed_image_iterator_for_test )
+{
+	//  get a voxel from inside and outside the image
+	std::list<data::Chunk> chunks;
+
+	for( int i = 0; i < 3; i++ )
+		chunks.push_back( genSlice<float>( 3, 3, i, i ) );
+
+	std::list<data::Chunk>::iterator k = chunks.begin();
+	( k++ )->voxel<float>( 0, 0 ) = 42.0;
+	( k++ )->voxel<float>( 1, 1 ) = 42.0;
+	( k++ )->voxel<float>( 2, 2 ) = 42;
+
+	data::TypedImage<float> img = data::Image( chunks );
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_CHECK( img.isValid() );
+
+	// the
+	BOOST_CHECK_EQUAL(typeid(data::TypedImage<float>::reference).name(),typeid(float).name());
+
+	float v_sum=0;
+	for(auto v:img){
+		v_sum+=v;
+	}
+	BOOST_CHECK_EQUAL(v_sum,42*3);
+
+	// zeroing
+	for(auto &v:img){
+		v=0;
+	}
+	BOOST_CHECK_EQUAL(img.voxel<float>(0,0),0);
+	BOOST_CHECK_EQUAL(img.voxel<float>(1,1),0);
+	BOOST_CHECK_EQUAL(img.voxel<float>(2,2),0);
+}
+
 
 BOOST_AUTO_TEST_CASE ( image_voxel_value_test )
 {
