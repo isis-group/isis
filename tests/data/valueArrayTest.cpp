@@ -417,6 +417,12 @@ BOOST_AUTO_TEST_CASE( ValueArray_iterator_test )
 		BOOST_CHECK_EQUAL( *( array.begin() + cnt ), cnt + 1 ); //+=
 	}
 
+	cnt=0;
+	for( auto x: array ) {
+		BOOST_CHECK_EQUAL( x, ++cnt ); // normal increment
+	}
+
+
 	BOOST_CHECK_EQUAL( *std::min_element( array.begin(), array.end() ), 1 );
 	BOOST_CHECK_EQUAL( *std::max_element( array.begin(), array.end() ), *( array.end() - 1 ) );
 
