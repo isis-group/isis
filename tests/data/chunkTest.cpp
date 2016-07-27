@@ -115,6 +115,11 @@ BOOST_AUTO_TEST_CASE ( chunk_iterator_test )
 		const util::Value<short> datVal( data[std::distance( const_cast<const data::MemChunk<short>&>( ch ).begin(), i )] );
 		BOOST_CHECK_EQUAL( *i, datVal );
 	}
+
+	const short *d=data;
+	for(auto v:ch){
+		BOOST_CHECK_EQUAL( v, util::Value<short>( *d++ ) );
+	}
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_voxel_value_test )
@@ -262,9 +267,8 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 		BOOST_CHECK_EQUAL( copyF.getValueArray<float>()[i], i );
 		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
 	}
-
-
 }
+
 BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 {
 	static boost::numeric::converter <  short, double,
@@ -453,6 +457,46 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 				}
 
 }
+
+BOOST_AUTO_TEST_CASE ( typed_chunk )//Copy chunks
+{
+	data::MemChunk<float> ch1( 4, 3, 2, 1 );
+	ch1.setValueAs("test",1);
+
+	for ( size_t i = 0; i < ch1.getVolume(); i++ )
+		ch1.asValueArray<float>()[i] = i;
+
+	data::TypedChunk<float> ch2 = ch1;//This shall clone the underlying ValueArray-Object
+
+	//make sure the properties are copied
+	BOOST_CHECK_EQUAL( ch2.getValueAs<uint32_t>("test"),1);
+
+	data::TypedChunk<float> copyI = ch2;
+
+	//but it should of course be of the same type and contain the same data
+	BOOST_CHECK( ch1.getValueArrayBase().is<float>() );
+	BOOST_CHECK( ch1.getValueArrayBase().isSameType( ch2.getValueArrayBase() ) );
+	BOOST_CHECK( copyI.getValueArrayBase().is<uint32_t>() );
+
+	BOOST_CHECK_EQUAL( ch1.getVolume(), ch2.getVolume() );
+	BOOST_CHECK_EQUAL( ch1.getVolume(), copyI.getVolume() );
+
+	// all entries should be the same as for ch1
+	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
+		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], i );
+		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
+	}
+
+
+	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
+		//cloning chunks is a cheap copy, thus any copied chunk shares data
+		ch1.asValueArray<float>()[i] = 0;
+		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], 0 );
+		// but deep copies should not be changed
+		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
+	}
+}
+
 
 }
 }
