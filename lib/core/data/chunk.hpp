@@ -52,8 +52,8 @@ class Chunk : public _internal::NDimensional<4>, public util::PropertyMap, prote
 {
 	friend class Image;
 	friend class std::vector<Chunk>;
-protected:
 	Chunk() {}; //do not use this
+protected:
 	/**
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
@@ -306,73 +306,6 @@ public:
 	}
 };
 
-
-template<typename TYPE> class MemChunkNonDel : public Chunk
-{
-public:
-	//
-	/// Create an empty MemChunkNoDel with the given size
-	MemChunkNonDel( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk(
-			( TYPE * )calloc( nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns, sizeof( TYPE ) ),
-			typename ValueArray<TYPE>::NonDeleter(),
-			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
-		) {}
-	/**
-	 * Create a MemChunkNoDel as copy of a given raw memory block
-	 * \warning This chunk won't be deleted automatically - IT HAS TO BE DELETED MANUALLY
-	 * This will create a MemChunkNoDel of the given size and fill it with the data at the given address.
-	 * No range check will be done.
-	 * An automatic conversion will be done if necessary.
-	 * \param org pointer to the raw data which shall be copied
-	 * \param nrOfColumns
-	 * \param nrOfRows
-	 * \param nrOfSlices
-	 * \param nrOfTimesteps size of the resulting image
-	 */
-	template<typename T> MemChunkNonDel( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk(
-			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
-			typename ValueArray<TYPE>::NonDeleter(),
-			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
-		) {
-		util::checkType<T>();
-		asValueArrayBase().copyFromMem( org, getVolume() );
-	}
-	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
-	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );
-	}
-	/**
-	 * Create a deep copy of a given Chunk.
-	 * An automatic conversion used if datatype does not fit
-	 * \param ref the source chunk
-	 * \param min
-	 * \param max the value range of the source to be used when the scaling for the conversion is computed
-	 */
-	MemChunkNonDel( const Chunk &ref, const util::ValueBase &min, const  util::ValueBase &max ): Chunk( ref ) {
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID(), min, max ) );
-	}
-	MemChunkNonDel( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );
-	}
-	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
-	MemChunkNonDel &operator=( const Chunk &ref ) {
-		LOG_IF( useCount() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
-		Chunk::operator=( ref ); //copy the chunk of ref
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );
-		return *this;
-	}
-	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
-	MemChunkNonDel &operator=( const MemChunkNonDel<TYPE> &ref ) { //this is needed, to prevent generation of default-copy operator
-		return operator=( static_cast<const Chunk &>( ref ) );
-	}
-};
 }
 }
 namespace std
