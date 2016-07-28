@@ -73,6 +73,10 @@ public:
 	// @todo use implicit aggregate_initialization when it gets available http://en.cppreference.com/w/cpp/language/aggregate_initialization
 	FixedVector(const std::array<TYPE,SIZE> &src):std::array<TYPE,SIZE>(src){}
 
+	template<typename T2,size_t S2> explicit FixedVector(const std::array<T2,S2> &src){
+		std::copy(std::begin(src),std::end(src),std::begin(*this));
+	}
+
 	/// Set all elements to a value
 	void fill( const TYPE &val ) {
 		std::fill( std::begin(*this), std::end(*this), val );

@@ -84,10 +84,13 @@ public:
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop).
 	 */
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
-		LOG_IF( ! isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ), Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << " is out of range " << getSizeAsString();
+		voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
+	}
+	template<typename TYPE> TYPE &voxel( std::array<size_t,4> pos) {
+		LOG_IF( ! isInRange( pos ), Debug, isis::error )
+				<< "Index " << util::vector4<size_t>( pos ) << " is out of range " << getSizeAsString();
 		ValueArray<TYPE> &ret = asValueArray<TYPE>();
-		return ret[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )];
+		return ret[getLinearIndex( pos )];
 	}
 
 	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;

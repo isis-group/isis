@@ -31,11 +31,11 @@ namespace _internal
 template<unsigned short DIMS> class NDimensional
 {
 	std::array<size_t,DIMS> m_dim;
-	constexpr size_t _dimStride( const unsigned short &dim )
+	constexpr size_t _dimStride( const unsigned short &dim )const
 	{
 		return dim ? _dimStride( dim-1 ) * m_dim[dim - 1]:1;
 	}
-	constexpr size_t _dim2index( const std::array<size_t,DIMS> &d, const unsigned short &DIM )
+	constexpr size_t _dim2index( const std::array<size_t,DIMS> &d, const unsigned short &DIM )const
 	{
 		if(DIM)
 			return d[DIM] * _dimStride( DIM ) + _dim2index( d, DIM - 1 );
@@ -53,7 +53,7 @@ template<unsigned short DIMS> class NDimensional
 			return {index};
 		}
 	}
-	constexpr bool _rangeCheck( const std::array<size_t,DIMS> &d, unsigned short DIM )
+	constexpr bool _rangeCheck( const std::array<size_t,DIMS> &d, unsigned short DIM )const
 	{
 		return DIM ?
 			( d[DIM] < m_dim[DIM] ) && _rangeCheck( d, DIM - 1 ):
