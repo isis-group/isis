@@ -106,13 +106,16 @@ BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 BOOST_AUTO_TEST_CASE ( chunk_iterator_test )
 {
 	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-	data::MemChunk<short> ch( data, 3, 3 );
+	//hack to get generic Chunk instead of typed MemChunk
+	//(MemChunk's storage is still ValueArray, so its shared/tracked anyway)
+	data::Chunk ch(data::MemChunk<short>( data, 3, 3 ));
+
 	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
 
-	data::Chunk::const_iterator i = ch.begin();
+	data::Chunk::const_iterator i = data::Chunk(ch).begin();
 
 	for( ; i != ch.end(); ++i ) {
-		const util::Value<short> datVal( data[std::distance( const_cast<const data::MemChunk<short>&>( ch ).begin(), i )] );
+		const util::Value<short> datVal( data[std::distance( const_cast<const data::Chunk&>( ch ).begin(), i )] );
 		BOOST_CHECK_EQUAL( *i, datVal );
 	}
 
@@ -439,7 +442,9 @@ BOOST_AUTO_TEST_CASE ( chunk_copySlice_Test )
 
 BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 {
-	data::MemChunk<uint32_t> ch( 50, 40, 30, 20 );
+	//hack to get generic Chunk instead of typed MemChunk
+	//(MemChunk's storage is still ValueArray, so its shared/tracked anyway)
+	data::Chunk ch(data::MemChunk<uint32_t>( 50, 40, 30, 20 ));
 	uint32_t cnt = 0;
 	for( data::Chunk::reference ref :  ch )
 	ref = util::Value<uint32_t>( cnt++ );
@@ -458,20 +463,21 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 
 }
 
-BOOST_AUTO_TEST_CASE ( typed_chunk )//Copy chunks
+BOOST_AUTO_TEST_CASE ( typed_chunk_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
 	ch1.setValueAs("test",1);
 
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
-		ch1.asValueArray<float>()[i] = i;
+		ch1.asValueArray<float>()[i] = i+1;
 
 	data::TypedChunk<float> ch2 = ch1;//This shall clone the underlying ValueArray-Object
 
 	//make sure the properties are copied
 	BOOST_CHECK_EQUAL( ch2.getValueAs<uint32_t>("test"),1);
 
-	data::TypedChunk<float> copyI = ch2;
+	data::scaling_pair no_scale( util::Value<int>( 1 ), util::Value<int>( 0 ) );
+	data::TypedChunk<uint32_t> copyI(ch2,no_scale); //This shall convert the underlying ValueArray-Object (without scaling it)
 
 	//but it should of course be of the same type and contain the same data
 	BOOST_CHECK( ch1.getValueArrayBase().is<float>() );
@@ -483,18 +489,15 @@ BOOST_AUTO_TEST_CASE ( typed_chunk )//Copy chunks
 
 	// all entries should be the same as for ch1
 	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
-		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], i );
-		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
+		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], i+1 );
+		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i+1 );
 	}
 
-
-	for ( size_t i = 0; i < ch2.getVolume(); i++ ) {
-		//cloning chunks is a cheap copy, thus any copied chunk shares data
-		ch1.asValueArray<float>()[i] = 0;
-		BOOST_CHECK_EQUAL( ch2.getValueArray<float>()[i], 0 );
-		// but deep copies should not be changed
-		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i );
+	float v_sum;
+	for ( auto v:ch2 ) {
+		v_sum += v;
 	}
+	BOOST_CHECK_EQUAL(v_sum,ch2.getVolume()*(ch2.getVolume()+1)/2);
 }
 
 

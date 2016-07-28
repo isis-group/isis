@@ -21,7 +21,7 @@ int main()
 		std::cout << "===============Testing Chunk==================" << std::endl;
 		std::list<data::Chunk> chunks;
 
-		data::MemChunk<short> ch( 256, 256, 256 );
+		data::Chunk  ch(data::MemChunk<short>( 256, 256, 256 ));
 		timer.restart();
 
 		for( data::Chunk::reference ref :  ch ) {

@@ -52,8 +52,11 @@ class Chunk : public _internal::NDimensional<4>, public util::PropertyMap, prote
 {
 	friend class Image;
 	friend class std::vector<Chunk>;
-	Chunk() {}; //do not use this
 protected:
+	/** Create a Chunk "Husk" without any data
+	 * \Warning You must set ValueArrayReference in the drived Class
+	 */
+	Chunk(bool fakeValid=false);
 	/**
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
@@ -84,11 +87,11 @@ public:
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop).
 	 */
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
-		voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
+		return voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
 	}
-	template<typename TYPE> TYPE &voxel( std::array<size_t,4> pos) {
+	template<typename TYPE> TYPE &voxel( std::array<size_t,4> &&pos) {
 		LOG_IF( ! isInRange( pos ), Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( pos ) << " is out of range " << getSizeAsString();
+				<< "Index " << util::vector4<size_t>( pos ) << " is out of range (" << getSizeAsString() << ")";
 		ValueArray<TYPE> &ret = asValueArray<TYPE>();
 		return ret[getLinearIndex( pos )];
 	}
@@ -101,17 +104,18 @@ public:
 	 * \copydetails Chunk::voxel
 	 */
 	template<typename TYPE> const TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const {
-		if ( !isInRange( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) ) {
+		return voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
+	}
+	template<typename TYPE> const TYPE &voxel( std::array<size_t,4> &&pos )const {
+		if ( !isInRange( pos ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << util::vector4<size_t>( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} ) << nrOfTimesteps
-					<< " is out of range (" << getSizeAsString() << ")";
+				<< "Index " << util::vector4<size_t>( pos ) << " is out of range (" << getSizeAsString() << ")";
 		}
 
 		const ValueArray<TYPE> &ret = const_cast<Chunk &>( *this ).asValueArray<TYPE>();
 
-		return ret[getLinearIndex( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} )];
+		return ret[getLinearIndex( pos )];
 	}
-
 	void copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const;
 
 	/**
@@ -252,13 +256,45 @@ public:
 	void swapDim(unsigned short dim_a,unsigned short dim_b);
 };
 
+template<typename TYPE> class TypedChunk : public Chunk{
+protected:
+	/** Create a TypedChunk "Husk" without any data
+	 * \Warning You must set data ValueArray in the drived Class
+	 */
+	TypedChunk(bool fakeValid=false):Chunk(fakeValid){}
+	TypedChunk( const ValueArray<TYPE> &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false ):
+		Chunk(src, nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid){}
+public:
+	typedef typename ValueArray<TYPE>::iterator iterator;
+	typedef typename ValueArray<TYPE>::const_iterator const_iterator;
+	typedef typename iterator::reference reference;
+	typedef typename const_iterator::reference const_reference;
+
+    TypedChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  ): Chunk( ref ) {
+		convertToType(ValueArray<TYPE>::staticID(),scaling);
+	}
+
+	iterator begin(){
+		return asValueArray<TYPE>().begin();
+	}
+	iterator end(){
+		return asValueArray<TYPE>().end();
+	}
+	const_iterator begin()const{
+		return getValueArray<TYPE>().begin();
+	}
+	const_iterator end()const{
+		return getValueArray<TYPE>().end();
+	}
+};
+
 /// Chunk class for memory-based buffers
-template<typename TYPE> class MemChunk : public Chunk
+template<typename TYPE> class MemChunk : public TypedChunk<TYPE>
 {
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false ):
-		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid ) {}
+		TypedChunk<TYPE>( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid ) {}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -269,35 +305,33 @@ public:
 	 * \param nrOfRows
 	 * \param nrOfSlices
 	 * \param nrOfTimesteps size of the resulting image
+	 * \param fakeValid set all needed properties to usefull values to make the Chunk a valid one
 	 */
 	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false  ):
-		Chunk( ValueArrayReference( ValueArray<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {
+		MemChunk<TYPE>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid )
+	{
 		util::checkType<T>();
-		asValueArrayBase().copyFromMem( org, getVolume() );
+		this->asValueArrayBase().copyFromMem( org, this->getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
-	MemChunk( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );
-	}
+	MemChunk( const MemChunk<TYPE> &ref ):MemChunk( static_cast<const Chunk&>(ref), data::scaling_pair( util::Value<int>( 1 ), util::Value<int>( 0 ) ) ){} // automatically built version would be cheap copy
 	/**
 	 * Create a deep copy of a given Chunk.
 	 * An automatic conversion is used if datatype does not fit
 	 * \param ref the source chunk
 	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
 	 */
-	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
+	MemChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  )
+	{
+		_internal::NDimensional<4>::init(ref.getSizeAsVector()); // initialize the shape
+		static_cast<util::PropertyMap&>(*this)=ref; // copy properties
 		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID(), scaling ) );
 	}
-	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );
-	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
-		LOG_IF( useCount() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
+		LOG_IF( this->useCount() > 1, Debug, warning )
+				<< "Not overwriting current chunk memory (which is still used by " << this->useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID() ) );

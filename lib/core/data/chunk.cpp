@@ -25,15 +25,9 @@ namespace data
 /// @cond _internal
 /// @endcond _internal
 
-Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid ): ValueArrayReference( src )
+Chunk::Chunk(bool fakeValid )
 {
-	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	util::Singletons::get<NeededsList<Chunk>, 0>().applyTo( *this );
-	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
-			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
-
-	assert( ( *this )->getLength() == getVolume() );
-
 	if( fakeValid ) {
 		setValueAs( "indexOrigin", util::fvector3() );
 		setValueAs( "acquisitionNumber", 0 );
@@ -44,6 +38,15 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 	}
 }
 
+Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps,bool fakeValid): Chunk(fakeValid)
+{
+	ValueArrayReference::operator=(src);
+	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
+	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
+			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
+	assert( ( *this )->getLength() == getVolume() );
+}
+
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
 	return createByID( getTypeID(), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps );
@@ -51,10 +54,10 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 
 Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid )
 {
-	util::vector4<size_t> newSize( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
+	const util::vector4<size_t> newSize( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	assert( newSize.product() );
 	const ValueArrayReference created( ValueArrayBase::createByID( ID, newSize.product() ) );
-	return  Chunk( created, newSize[0], newSize[1], newSize[2], newSize[3], fakeValid );
+	return  Chunk( created, nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid );
 }
 
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
