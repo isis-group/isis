@@ -1,15 +1,4 @@
 ############################################################
-# The ISIS project
-# 
-# CMake configuration file of the ISIS core library
-#
-# Author: Thomas Proeger <thomasproeger@googlemail.com>
-# Date: Wed, 06 Apr 2011 14:01:10 +0200
-# 
-############################################################
-
-
-############################################################
 # export library dependencies of isis_core
 ############################################################
 foreach(FILE ${Boost_LIBRARIES})
@@ -25,16 +14,21 @@ else(ISIS_MATH_LIB_DEPENDS)
 endif(ISIS_MATH_LIB_DEPENDS)
 
 
+find_package(PkgConfig)
+pkg_search_module(GSL gsl)
+include_directories(GSL_INCLUDE_DIRS)
+
+
 ############################################################
-# build the core library
+# build the math library
 ############################################################
 
 # add source files to this parameter list
-file(GLOB SRC_FILES "*.cpp")
-file(GLOB HDR_FILES "*.hpp")
+file(GLOB SRC_FILES "*.cpp" "gsl/*.cpp")
+file(GLOB HDR_FILES "*.hpp" "gsl/*.cpp")
 
 #add the core library
-add_lib(isis_math "${SRC_FILES}" "${isis_core_lib};${Boost_LIBRARIES}" ${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API})
+add_lib(isis_math "${SRC_FILES}" "${isis_core_lib};${Boost_LIBRARIES};${GSL_LIBRARIES}" ${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API})
 
 ############################################################
 # Installation
@@ -48,4 +42,6 @@ install(FILES ${HDR_FILES} DESTINATION include/isis/math COMPONENT Development)
 
 # install cmake configuration files
 #install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
+
+
 
