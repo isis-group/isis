@@ -11,6 +11,7 @@
 #include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
 #include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
 
+using namespace dcmtk;
 
 namespace isis
 {

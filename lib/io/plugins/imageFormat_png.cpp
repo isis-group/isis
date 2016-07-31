@@ -130,7 +130,7 @@ public:
 		row_pointers[0] = ( png_byte * )buff.getValueArrayBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
+			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( { 0, r, 0, 0 } ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -209,7 +209,7 @@ public:
 
 			if( extractNumberFromName<uint32_t>( filename, slice ) ) {
 				ch.setValueAs<uint32_t>( "acquisitionNumber", slice );
-				ch.setValueAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
+				ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, slice} ) );
 				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" )
 									 << " and slice position " <<  ch.property( "indexOrigin" ) <<  " from filename";
 				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
@@ -228,9 +228,9 @@ public:
 
 
 		ch.setValueAs( "sequenceNumber", ( uint16_t )1 );
-		ch.setValueAs( "rowVec", util::fvector3( 1, 0 ) );
-		ch.setValueAs( "columnVec", util::fvector3( 0, 1 ) );
-		ch.setValueAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+		ch.setValueAs( "rowVec",    util::fvector3( {1, 0} ) );
+		ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+		ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 		return std::list< data::Chunk >(1, ch);
 	}
 

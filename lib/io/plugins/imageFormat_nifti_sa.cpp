@@ -1125,7 +1125,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	}
 
 	LOG( Debug, info ) << "Using qform (" << props.queryProperty( "nifti/qform_code" )
-					   << ") quaternion=" << util::fvector4( {a, b, c, d} ) << " with qfac=" << props.queryProperty( "nifti/qfac" )
+					   << ") quaternion=" << util::vector4<double>( {a, b, c, d} ) << " with qfac=" << props.queryProperty( "nifti/qfac" )
 					   << ", pixdim=" << props.queryProperty( "nifti/pixdim" )
 					   << " and qoffset= " << props.queryProperty( "nifti/qoffset" );
 
@@ -1140,15 +1140,15 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	const int qfac = props.getValueAs<float>( "nifti/qfac" );
 
 	const util::Matrix4x4<double> image2nifti(
-		util::fvector4( {r_11, r_12, r_13 * qfac} ),
-		util::fvector4( {r_21, r_22, r_23 * qfac} ),
-		util::fvector4( {r_31, r_32, r_33 * qfac} )
+		util::vector4<double>( {r_11, r_12, r_13 * qfac}),
+		util::vector4<double>( {r_21, r_22, r_23 * qfac}),
+		util::vector4<double>( {r_31, r_32, r_33 * qfac})
 	);
 
 	LOG( Debug, info ) << "The matrix made from the qform is "
-					   << util::fvector3( {r_11, r_12, r_13 * qfac} ) << "-"
-					   << util::fvector3( {r_21, r_22, r_23 * qfac} ) << "-"
-					   << util::fvector3( {r_31, r_32, r_33 * qfac} );
+					   << util::vector3<double>( {r_11, r_12, r_13 * qfac} ) << "-"
+					   << util::vector3<double>( {r_21, r_22, r_23 * qfac} ) << "-"
+					   << util::vector3<double>( {r_31, r_32, r_33 * qfac} );
 
 	const util::Matrix4x4<double> image2isis = nifti2isis.dot( image2nifti );
 

@@ -37,10 +37,9 @@ template<unsigned short DIMS> class NDimensional
 	}
 	constexpr size_t _dim2index( const std::array<size_t,DIMS> &d, const unsigned short &DIM )const
 	{
-		if(DIM)
-			return d[DIM] * _dimStride( DIM ) + _dim2index( d, DIM - 1 );
-		else
-			return d[0] * _dimStride( 0 );
+		return DIM ?
+			d[DIM] * _dimStride( DIM ) + _dim2index( d, DIM - 1 ):
+			d[0]   * _dimStride( 0 );
 	}
 	constexpr std::array<size_t,DIMS> _index2dim( const size_t index, unsigned short DIM, size_t vol )const
 	{
