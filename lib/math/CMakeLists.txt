@@ -4,10 +4,20 @@
 
 LIST(APPEND _DEPENDS ${Boost_LIBRARIES})
 
+set(_CPP_GLOB "*.cpp")
+set(_HPP_GLOB "*.hpp")
+
+option(ISIS_USE_GSL "use gsl for math functions like fft" OFF)
+
+if(ISIS_USE_GSL)
+
 find_package(GSL)
 include_directories(${GSL_INCLUDE_DIR})
 LIST(APPEND _DEPENDS ${GSL_LIBRARY})
+LIST(APPEND _CPP_GLOB "gsl/*.cpp")
+LIST(APPEND _HPP_GLOB "gsl/*.hpp")
 
+endif(ISIS_USE_GSL)
 
 foreach(FILE ${_DEPENDS})
 		string(REGEX MATCH "${CMAKE_SHARED_LIBRARY_SUFFIX}$" IS_SHARED ${FILE})
@@ -27,8 +37,8 @@ endif(ISIS_MATH_LIB_DEPENDS)
 ############################################################
 
 # add source files to this parameter list
-file(GLOB SRC_FILES "*.cpp" "gsl/*.cpp")
-file(GLOB HDR_FILES "*.hpp" "gsl/*.cpp")
+file(GLOB SRC_FILES ${_CPP_GLOB})
+file(GLOB HDR_FILES ${_HPP_GLOB})
 
 #add the core library
 add_lib(isis_math "${SRC_FILES}" "${isis_core_lib};${_DEPENDS}" ${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API})
