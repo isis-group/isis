@@ -27,6 +27,7 @@ if(BUILD_TESTING)
 	add_subdirectory(data)
 	add_subdirectory(io)
 	add_subdirectory(ExternalLibraryAdapter)
+	add_subdirectory(math)
 
 	if(ISIS_BUILD_FILTER )
 		add_subdirectory(Filter)
@@ -41,5 +42,3 @@ if(ISIS_BUILD_BENCHMARKS)
   message(STATUS "Building stress tests")
   add_subdirectory(benchmarks)
 endif(ISIS_BUILD_BENCHMARKS)
-
-
