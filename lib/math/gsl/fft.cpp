@@ -51,11 +51,10 @@ void halfshift(isis::data::ValueArrayBase &src){
 	memcpy(begin.get()+shiftsize,buffer.get(),         shiftsize);
 }
 
-isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::data::Chunk& src, bool inverse)
+isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::data::Chunk& src, bool inverse,std::complex<double> scale)
 {
 	data::MemChunk<std::complex<double> > ret(src);
 	data::ValueArray< std::complex< double > > &array=ret.asValueArray<std::complex<double> >();
-
 
 	for(int rank=0;rank<src.getRelevantDims();rank++){
 		std::array<size_t,4> dummy_index={0,0,0,0};
@@ -63,20 +62,18 @@ isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::
 		size_t stride=src.getLinearIndex(dummy_index);
 		std::vector< data::ValueArrayBase::Reference > lines=array.splice(src.getDimSize(rank)*stride);//splice into lines of dimsize elements
 
-		const std::binder2nd < std::multiplies<std::complex< double > > > scaler(
-				std::multiplies<std::complex< double > >(),
-				inverse ?
-					std::complex<double>(sqrt(src.getDimSize(rank))):
-					std::complex<double>(1./sqrt(src.getDimSize(rank)))
-			);
-
 		for(size_t i=0;i<lines.size();i++){
 			data::ValueArray< std::complex< double > > &line=lines[i]->castToValueArray<std::complex<double> >();
 			halfshift(line);
 			fft_impl(line,inverse,stride);
 			halfshift(line);
-			std::transform(line.begin(),line.end(),line.begin(),scaler);
 		}
+	}
+	if(scale==std::complex<double>(0))
+		scale = inverse ? src.getVolume()/2:1./(src.getVolume()/2);
+
+	for(std::complex< double > &v:ret){
+		v*=scale;
 	}
 
 	return ret;
