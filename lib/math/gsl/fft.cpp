@@ -56,11 +56,14 @@ isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::
 	data::MemChunk<std::complex<double> > ret(src);
 	data::ValueArray< std::complex< double > > &array=ret.asValueArray<std::complex<double> >();
 
-	for(int rank=0;rank<src.getRelevantDims();rank++){
+	for(size_t rank=0;rank<src.getRelevantDims();rank++){
 		std::array<size_t,4> dummy_index={0,0,0,0};
 		dummy_index[rank]=1;
+		//splice into lines of dimsize elements
 		size_t stride=src.getLinearIndex(dummy_index);
-		std::vector< data::ValueArrayBase::Reference > lines=array.splice(src.getDimSize(rank)*stride);//splice into lines of dimsize elements
+		std::vector< data::ValueArrayBase::Reference > lines= (rank<src.getRelevantDims()-1) ? //do not call splice for the top rank (full volume)
+			array.splice(src.getDimSize(rank)*stride):
+			std::vector<data::ValueArrayBase::Reference>(1,array); 
 
 		for(size_t i=0;i<lines.size();i++){
 			data::ValueArray< std::complex< double > > &line=lines[i]->castToValueArray<std::complex<double> >();
