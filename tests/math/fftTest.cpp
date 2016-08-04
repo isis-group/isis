@@ -7,6 +7,9 @@
 
 namespace isis
 {
+	namespace math{
+		data::MemChunk<std::complex< float >> fft( data::MemChunk<std::complex< float >> src, bool inverse=false);
+	}
 namespace test
 {
 
@@ -26,7 +29,7 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 			}
 
 
-	data::MemChunk<std::complex< double > > k_space=math::gsl::fft(sinus,false);
+	data::MemChunk<std::complex< double > > k_space=math::fft(sinus,false);
 	std::pair< util::ValueReference, util::ValueReference > min_max=k_space.getMinMax();
 
 	BOOST_CHECK_EQUAL(
@@ -41,7 +44,7 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 	);
 	
 
-	data::MemChunk<std::complex< double > > inverse=math::gsl::fft(k_space,true);
+	data::MemChunk<std::complex< double > > inverse=math::fft(k_space,true);
 	
 	for(int z=0;z<zsize;z++)
 		for(int y=0;y<ysize;y++)
