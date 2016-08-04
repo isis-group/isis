@@ -8,6 +8,7 @@ set(_CPP_GLOB "*.cpp")
 set(_HPP_GLOB "*.hpp")
 
 option(ISIS_USE_GSL "use gsl for math functions like fft" OFF)
+option(ISIS_USE_clFFT "use clFFT for fft" OFF)
 
 if(ISIS_USE_GSL)
 	if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -24,6 +25,11 @@ if(ISIS_USE_GSL)
 	LIST(APPEND _CPP_GLOB "gsl/*.cpp")
 	LIST(APPEND _HPP_GLOB "gsl/*.hpp")
 endif(ISIS_USE_GSL)
+
+if(ISIS_USE_clFFT)
+	find_package(clFFT)
+	list(APPEND _DEPENDS clFFT)
+endif(ISIS_USE_clFFT)
 
 foreach(FILE ${_DEPENDS})
 		string(REGEX MATCH "${CMAKE_SHARED_LIBRARY_SUFFIX}$" IS_SHARED ${FILE})
