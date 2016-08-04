@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 
 	for ( int j = 0; j < 3; j++ ) {
 		data::MemChunk<float> ch( 3, 3 );
-		ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, j} ) );
+		ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, static_cast<float>(j)} ) );
 		ch.setValueAs( "acquisitionNumber", 0 );
 		ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
 		ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	// add the renmaining acquisitionNumber=1-chunks
 	for ( int j = 1; j < 3; j++ ) { //0 is already there
 		data::MemChunk<float> ch( 3, 3 );
-		ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, j} ) );
+		ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, static_cast<float>(j)} ) );
 		ch.setValueAs( "acquisitionNumber", 1 );
 		ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
 		ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );

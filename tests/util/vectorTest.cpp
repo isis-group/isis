@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE( matrix4x4_init_test )
 
 BOOST_AUTO_TEST_CASE( matrix_dot_test )
 {
-	util::vector4<float> b1( {1 / sqrt( 2 ), -1 / sqrt( 2 )} );
-	util::vector4<float> b2( {1 / sqrt( 2 ),  1 / sqrt( 2 )} );
+	util::vector4<float> b1( {1 / sqrtf( 2 ), -1 / sqrtf( 2 )} );
+	util::vector4<float> b2( {1 / sqrtf( 2 ),  1 / sqrtf( 2 )} );
 
 	util::Matrix4x4<float> test( b1, b2 );
 

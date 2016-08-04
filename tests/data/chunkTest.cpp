@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	unsigned short cnt = 0;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	for( const data::Chunk & ref :  splices ) {
-		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( {1, 1, 1 + cnt * 2} ) );
+		BOOST_CHECK_EQUAL( ref.property( "indexOrigin" ), util::fvector3( {1, 1, 1 + static_cast<float>(cnt * 2)} ) );
 		BOOST_CHECK_EQUAL( ref.property( "list_test" ), cnt );
 		BOOST_CHECK_EQUAL( ref.property( "acquisitionNumber" ), cnt*2 );// we ha a stride of 1, so acquisitionNumber should be 0 2 4 ..
 		cnt++;
@@ -452,11 +452,11 @@ BOOST_AUTO_TEST_CASE ( chunk_swapdim_test )
 	data::MemChunk<uint32_t> swapped( ch );
 	swapped.swapDim( data::columnDim, data::sliceDim );
 
-	for( int t = 0; t < 20; t++ )
-		for( int z = 0; z < 30; z++ )
-			for( int y = 0; y < 40; y++ )
-				for( int x = 0; x < 50; x++ ) {
-					size_t idx = ch.getLinearIndex( util::vector4<size_t>( {x, y, z, t} ) );
+	for( size_t t = 0; t < 20; t++ )
+		for( size_t z = 0; z < 30; z++ )
+			for( size_t y = 0; y < 40; y++ )
+				for( size_t x = 0; x < 50; x++ ) {
+					size_t idx = ch.getLinearIndex( {x, y, z, t} );
 					BOOST_REQUIRE_EQUAL( ch.voxel<uint32_t>( x, y, z, t ), idx );
 					BOOST_CHECK_EQUAL( swapped.voxel<uint32_t>( x, z, y, t ), idx );
 				}
