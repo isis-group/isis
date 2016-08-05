@@ -22,6 +22,7 @@
 
 #include <math.h>
 #include <gsl/gsl_fft_complex.h>
+#include "../details/details_fft.hxx"
 
 void fft_impl(isis::data::ValueArray<std::complex<double> > &data,bool inverse,size_t stride=1){
 	const size_t elements=data.getLength()/stride;
@@ -39,20 +40,9 @@ void fft_impl(isis::data::ValueArray<std::complex<double> > &data,bool inverse,s
 
 }
 
-void halfshift(isis::data::ValueArrayBase &src){
-	//shift backwards
-	assert(src.getLength()%2==0);
-	const size_t shiftsize=src.getLength()/2*src.bytesPerElem();
-	std::shared_ptr<uint8_t> begin=std::static_pointer_cast<uint8_t>(src.getRawAddress());
-
-	std::shared_ptr<uint8_t> buffer((uint8_t*)malloc(shiftsize));
-	memcpy(buffer.get(),         begin.get(),          shiftsize);
-	memcpy(begin.get(),          begin.get()+shiftsize,shiftsize);
-	memcpy(begin.get()+shiftsize,buffer.get(),         shiftsize);
-}
-
 isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::MemChunk< std::complex< double > > data, bool inverse,std::complex<double> scale)
 {
+	_internal::halfshift(data);
 	data::ValueArray< std::complex< double > > &array=data.asValueArray<std::complex<double> >();
 
 	for(size_t rank=0;rank<data.getRelevantDims();rank++){
@@ -64,19 +54,17 @@ isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::
 			array.splice(data.getDimSize(rank)*stride):
 			std::vector<data::ValueArrayBase::Reference>(1,array); 
 
-		for(size_t i=0;i<lines.size();i++){
-			data::ValueArray< std::complex< double > > &line=lines[i]->castToValueArray<std::complex<double> >();
-			halfshift(line);
-			fft_impl(line,inverse,stride);
-			halfshift(line);
-		}
+		for(data::ValueArrayBase::Reference line_ref:lines)
+			fft_impl(line_ref->castToValueArray<std::complex<double> >(),inverse,stride);
 	}
+
+	_internal::halfshift(data);
+
 	if(scale==std::complex<double>(0))
 		scale = inverse ? data.getVolume()/2:1./(data.getVolume()/2);
 
-	for(std::complex< double > &v:data){
+	for(std::complex< double > &v:data)
 		v*=scale;
-	}
 
 	return data;
 }

@@ -4,7 +4,7 @@
 
 LIST(APPEND _DEPENDS ${Boost_LIBRARIES})
 
-set(_CPP_GLOB "*.cpp")
+set(_CPP_GLOB "*.cpp" "details/*.cpp")
 set(_HPP_GLOB "*.hpp")
 
 option(ISIS_USE_GSL "use gsl for math functions like fft" OFF)
@@ -67,4 +67,3 @@ install(FILES ${HDR_FILES} DESTINATION include/isis/math COMPONENT Development)
 
 # install cmake configuration files
 #install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
-
