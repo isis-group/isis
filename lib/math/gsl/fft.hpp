@@ -26,7 +26,7 @@ namespace isis{
 namespace math{
 namespace gsl{
 
-data::MemChunk<std::complex<double> > fft(const isis::data::Chunk& src, bool inverse, std::complex< double > scale=0);
+data::TypedChunk< std::complex< double > > fft(data::MemChunk< std::complex< double > > data, bool inverse, std::complex< double > scale = 0);
 
 }
 }

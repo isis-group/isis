@@ -51,18 +51,17 @@ void halfshift(isis::data::ValueArrayBase &src){
 	memcpy(begin.get()+shiftsize,buffer.get(),         shiftsize);
 }
 
-isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::data::Chunk& src, bool inverse,std::complex<double> scale)
+isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::MemChunk< std::complex< double > > data, bool inverse,std::complex<double> scale)
 {
-	data::MemChunk<std::complex<double> > ret(src);
-	data::ValueArray< std::complex< double > > &array=ret.asValueArray<std::complex<double> >();
+	data::ValueArray< std::complex< double > > &array=data.asValueArray<std::complex<double> >();
 
-	for(size_t rank=0;rank<src.getRelevantDims();rank++){
+	for(size_t rank=0;rank<data.getRelevantDims();rank++){
 		std::array<size_t,4> dummy_index={0,0,0,0};
 		dummy_index[rank]=1;
 		//splice into lines of dimsize elements
-		size_t stride=src.getLinearIndex(dummy_index);
-		std::vector< data::ValueArrayBase::Reference > lines= (rank<src.getRelevantDims()-1) ? //do not call splice for the top rank (full volume)
-			array.splice(src.getDimSize(rank)*stride):
+		size_t stride=data.getLinearIndex(dummy_index);
+		std::vector< data::ValueArrayBase::Reference > lines= (rank<data.getRelevantDims()-1) ? //do not call splice for the top rank (full volume)
+			array.splice(data.getDimSize(rank)*stride):
 			std::vector<data::ValueArrayBase::Reference>(1,array); 
 
 		for(size_t i=0;i<lines.size();i++){
@@ -73,11 +72,11 @@ isis::data::MemChunk< std::complex< double > > isis::math::gsl::fft(const isis::
 		}
 	}
 	if(scale==std::complex<double>(0))
-		scale = inverse ? src.getVolume()/2:1./(src.getVolume()/2);
+		scale = inverse ? data.getVolume()/2:1./(data.getVolume()/2);
 
-	for(std::complex< double > &v:ret){
+	for(std::complex< double > &v:data){
 		v*=scale;
 	}
 
-	return ret;
+	return data;
 }
