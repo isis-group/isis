@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 	data::IOFactory::write(data::Image(sinus),"/tmp/sinus.nii");
 
 
-	data::TypedChunk<std::complex< double > > k_space=math::gsl::fft(sinus,false);
+	data::TypedChunk<std::complex< double > > k_space=math::fft(sinus,false);
 
 	// fslview doesn't like complex images -- so lets transform it
 	std::transform(
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 		0.001
 	);
 
-	data::TypedChunk<std::complex< double > > inverse=math::gsl::fft(k_space,true);
+	data::TypedChunk<std::complex< double > > inverse=math::fft(k_space,true);
 	std::transform(
 		inverse.begin(),inverse.end(),real.begin(),
 		[](std::complex< double > v){return v.real();}

@@ -29,6 +29,7 @@ endif(ISIS_USE_GSL)
 if(ISIS_USE_clFFT)
 	find_package(clFFT)
 	list(APPEND _DEPENDS clFFT)
+	LIST(APPEND _CPP_GLOB "details/opencl/*.cpp")
 endif(ISIS_USE_clFFT)
 
 foreach(FILE ${_DEPENDS})
