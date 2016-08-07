@@ -136,7 +136,7 @@ cl_context isis::math::_internal::OpenCLDevice::createContext(cl_platform_id pla
 			LOG(Runtime,notice) << "Using " << getDeviceIDs(platform,device_type).size() << " OpenCL device(s) from platform " << getPlatformName(platform);
 			return ret;
 		} else
-			LOG(Runtime,error) << "Failed to create OpenCL context on platform " << getPlatformName(platform);
+			LOG(Runtime,error) << "Failed to create OpenCL context on platform " << getPlatformName(platform) << " error was " << getErrorString(err);
 	} else {
 		LOG(Runtime,error) << "No devices available for platform " << getPlatformName(platform);
 	}
@@ -162,7 +162,9 @@ isis::math::_internal::OpenCLDevice::~OpenCLDevice(){
 bool isis::math::_internal::OpenCLDevice::good(){return ctx!=nullptr && err==CL_SUCCESS;}
 
 cl_command_queue isis::math::_internal::OpenCLDevice::clCreateCommandQueue(){
-	return ::clCreateCommandQueue( ctx, getMyDeviceIDs().front(), 0, &err );
+	const cl_command_queue ret = ::clCreateCommandQueue( ctx, getMyDeviceIDs().front(), 0, &err );
+	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clCreateCommandQueue failed with " << getErrorString(err);
+	return ret;
 }
 
 cl_mem isis::math::_internal::OpenCLDevice::clCreateBuffer(cl_mem_flags flags, size_t size, void *host_ptr, cl_int *errcode_ret){
