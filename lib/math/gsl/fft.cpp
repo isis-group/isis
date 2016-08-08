@@ -40,7 +40,7 @@ void fft_impl(isis::data::ValueArray<std::complex<double> > &data,bool inverse,s
 
 }
 
-isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::MemChunk< std::complex< double > > data, bool inverse,std::complex<double> scale)
+isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::MemChunk< std::complex< double > > data, bool inverse)
 {
 	_internal::halfshift(data);
 	data::ValueArray< std::complex< double > > &array=data.asValueArray<std::complex<double> >();
@@ -59,12 +59,6 @@ isis::data::TypedChunk<std::complex< double >> isis::math::gsl::fft(isis::data::
 	}
 
 	_internal::halfshift(data);
-
-	if(scale==std::complex<double>(0))
-		scale = inverse ? data.getVolume()/2:1./(data.getVolume()/2);
-
-	for(std::complex< double > &v:data)
-		v*=scale;
 
 	return data;
 }
