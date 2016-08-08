@@ -24,7 +24,7 @@ public:
 	static std::string getDeviceName(cl_device_id device);
 	static std::vector<cl_platform_id> getPlatformIDs();
 	static std::vector<cl_device_id> getDeviceIDs(cl_platform_id platform,cl_device_type device_type=CL_DEVICE_TYPE_ALL);
-	static constexpr char *getErrorString(cl_int err);
+	static std::string getErrorString(cl_int err);
 	std::vector<cl_device_id> getMyDeviceIDs();
 	cl_context createContext(cl_platform_id platform,cl_device_type  device_type=CL_DEVICE_TYPE_ALL);
 	OpenCLDevice();

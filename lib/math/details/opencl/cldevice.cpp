@@ -39,7 +39,7 @@ std::vector<cl_device_id> isis::math::_internal::OpenCLDevice::getDeviceIDs(cl_p
 		return std::vector<cl_device_id>(devices,devices+device_nr);
 }
 
-constexpr char *isis::math::_internal::OpenCLDevice::getErrorString(cl_int err)
+std::string isis::math::_internal::OpenCLDevice::getErrorString(cl_int err)
 {
 	switch(err){
 	// run-time and JIT compiler errors
