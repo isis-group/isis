@@ -165,6 +165,8 @@ public:
 	ValueArrayIterator<TYPE> &operator-=( distance n ) {p -= n; return *this;}
 
 	TYPE &operator[]( distance n )const {return *( p + n );}
+
+	explicit operator TYPE*(){return p;}
 };
 
 }

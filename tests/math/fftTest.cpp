@@ -14,7 +14,8 @@ namespace test
 BOOST_AUTO_TEST_CASE( sinus_fft_test )
 {
 	int xsize=256,ysize=256,zsize=16;
-	data::MemChunk<float> sinus(xsize,ysize,zsize,1,true),real(xsize,ysize,zsize,1,true);
+	data::MemChunk<float> sinus(xsize,ysize,zsize,1,true);
+	data::MemChunk<float> real(xsize,ysize,zsize,1,true);
 
 	for(int z=0;z<zsize;z++)
 		for(int y=0;y<ysize;y++)
@@ -24,17 +25,17 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 					(std::sin(x*M_PI*2/xsize)+std::sin(y*M_PI*2/ysize))/4 +
 					0.5;
 			}
-	data::IOFactory::write(data::Image(sinus),"/tmp/sinus.nii");
+// 	data::IOFactory::write(data::Image(sinus),"/tmp/sinus.nii");
 
 
 	data::TypedChunk<std::complex< float > > k_space=math::fft_single(sinus,false);
 
 	// fslview doesn't like complex images -- so lets transform it
-	std::transform(
-		k_space.begin(),k_space.end(),real.begin(),
-		[](std::complex< float > v){return v.real();}
-	);
-	data::IOFactory::write(data::Image(real),"/tmp/k_space.nii");
+// 	std::transform(
+// 		k_space.begin(),k_space.end(),real.begin(),
+// 		[](std::complex< float > v){return v.real();}
+// 	);
+// 	data::IOFactory::write(data::Image(real),"/tmp/k_space.nii");
 
 	std::pair< util::ValueReference, util::ValueReference > min_max=k_space.getMinMax();
 
@@ -50,11 +51,11 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 	);
 
 	data::TypedChunk<std::complex< float > > inverse=math::fft_single(k_space,true);
-	std::transform(
-		inverse.begin(),inverse.end(),real.begin(),
-		[](std::complex< float > v){return v.real();}
-	);
-	data::IOFactory::write(data::Image(real),"/tmp/inverse.nii");
+// 	std::transform(
+// 		inverse.begin(),inverse.end(),real.begin(),
+// 		[](std::complex< float > v){return v.real();}
+// 	);
+// 	data::IOFactory::write(data::Image(real),"/tmp/inverse.nii");
 
 	for(int z=0;z<zsize;z++)
 		for(int y=0;y<ysize;y++)

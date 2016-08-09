@@ -9,6 +9,10 @@
 #include "details/clfft.hxx"
 #endif //HAVE_CLFFT
 
+#ifdef HAVE_FFTW
+#include "details/fftw.hxx"
+#endif //HAVE_FFTW
+
 isis::data::Chunk isis::math::fft(isis::data::Chunk data, bool inverse)
 {
 	switch(data.getTypeID()){
@@ -28,20 +32,24 @@ isis::data::TypedChunk< std::complex< float > > isis::math::fft_single(isis::dat
 {
 #ifdef HAVE_CLFFT
 	return math::cl::fft(data,inverse);
+#elif HAVE_FFTW
+	return math::fftw::fft(data,inverse);
 #elif HAVE_GSL
 	return math::gsl::fft(data,inverse);
 #else
-	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl and/or clFFT)";
+	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl and/or fftw, clFFT)";
 	return data;
 #endif
 }
 
 isis::data::TypedChunk< std::complex< double > > isis::math::fft_double(isis::data::MemChunk< std::complex< double > > data, bool inverse)
 {
-#ifdef HAVE_GSL
+#ifdef HAVE_FFTW
+	return math::fftw::fft(data,inverse);
+#elif HAVE_GSL
 	return math::gsl::fft(data,inverse);
 #else
-	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl )";
+	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl and/or fftw)";
 	return data;
 #endif
 }
