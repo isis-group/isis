@@ -3,13 +3,10 @@
 
 #include <boost/test/unit_test.hpp>
 #include "data/io_factory.hpp"
-#include "../math/gsl/fft.hpp"
+#include "../math/fft.hpp"
 
 namespace isis
 {
-	namespace math{
-		data::TypedChunk<std::complex< float >> fft(data::MemChunk< std::complex< float > > data, bool inverse=false, float scale=0);
-	}
 namespace test
 {
 
@@ -30,32 +27,32 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 	data::IOFactory::write(data::Image(sinus),"/tmp/sinus.nii");
 
 
-	data::TypedChunk<std::complex< double > > k_space=math::fft(sinus,false);
+	data::TypedChunk<std::complex< float > > k_space=math::fft_single(sinus,false);
 
 	// fslview doesn't like complex images -- so lets transform it
 	std::transform(
 		k_space.begin(),k_space.end(),real.begin(),
-		[](std::complex< double > v){return v.real();}
+		[](std::complex< float > v){return v.real();}
 	);
 	data::IOFactory::write(data::Image(real),"/tmp/k_space.nii");
 
 	std::pair< util::ValueReference, util::ValueReference > min_max=k_space.getMinMax();
 
 	BOOST_CHECK_EQUAL(
-		k_space.voxel<std::complex< double >>(xsize/2,ysize/2,zsize/2).real(),
-		min_max.second->as<std::complex< double >>().real()
+		k_space.voxel<std::complex< float >>(xsize/2,ysize/2,zsize/2).real(),
+		min_max.second->as<std::complex< float >>().real()
 	);
 
 	BOOST_REQUIRE_CLOSE(
-		k_space.voxel<std::complex< double >>(xsize/2,ysize/2,zsize/2).real(),
+		k_space.voxel<std::complex< float >>(xsize/2,ysize/2,zsize/2).real(),
 		0.5 * k_space.getVolume(),
 		0.001
 	);
 
-	data::TypedChunk<std::complex< double > > inverse=math::fft(k_space,true);
+	data::TypedChunk<std::complex< float > > inverse=math::fft_single(k_space,true);
 	std::transform(
 		inverse.begin(),inverse.end(),real.begin(),
-		[](std::complex< double > v){return v.real();}
+		[](std::complex< float > v){return v.real();}
 	);
 	data::IOFactory::write(data::Image(real),"/tmp/inverse.nii");
 
@@ -63,8 +60,8 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 		for(int y=0;y<ysize;y++)
 			for(int x=0;x<xsize;x++)
 			{
-				const double value=(std::sin(x*M_PI*2/xsize)+std::sin(y*M_PI*2/ysize))/4 + 0.5;
-				BOOST_CHECK_CLOSE(inverse.voxel<std::complex< double >>(x,y,z).real()+0.1,value+0.1,0.0005); //+0.1 to stay away from problematic 0
+				const float value=(std::sin(x*M_PI*2/xsize)+std::sin(y*M_PI*2/ysize))/4 + 0.5;
+				BOOST_CHECK_CLOSE(inverse.voxel<std::complex< float >>(x,y,z).real()+0.1,value+0.1,0.0005); //+0.1 to stay away from problematic 0
 			}
 }
 

@@ -1,5 +1,5 @@
 #include <clFFT.h>
-#include "../core/data/chunk.hpp"
+#include "clfft.hpp"
 #include "common.hpp"
 #include "details/details_fft.hxx"
 #include "details/opencl/cldevice.hxx"
@@ -90,7 +90,8 @@ public:
 	}
 };
 }
-data::TypedChunk< std::complex< float > > fft(data::MemChunk< std::complex< float > > data, bool inverse, float scale)
+
+data::TypedChunk< std::complex< float > > cl::fft(data::MemChunk< std::complex< float > > data, bool inverse)
 {
 	// handle data
 	_internal::halfshift(data);

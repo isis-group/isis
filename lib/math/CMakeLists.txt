@@ -24,12 +24,16 @@ if(ISIS_USE_GSL)
 
 	LIST(APPEND _CPP_GLOB "gsl/*.cpp")
 	LIST(APPEND _HPP_GLOB "gsl/*.hpp")
+
+	add_definitions("-DHAVE_GSL")
 endif(ISIS_USE_GSL)
 
 if(ISIS_USE_clFFT)
 	find_package(clFFT)
 	list(APPEND _DEPENDS clFFT)
 	LIST(APPEND _CPP_GLOB "details/opencl/*.cpp")
+
+	add_definitions("-DHAVE_CLFFT")
 endif(ISIS_USE_clFFT)
 
 foreach(FILE ${_DEPENDS})
