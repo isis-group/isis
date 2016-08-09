@@ -1,7 +1,7 @@
 #ifndef CLFFT_HPP
 #define CLFFT_HPP
 
-#include "../core/data/chunk.hpp"
+#include "../../core/data/chunk.hpp"
 
 
 namespace isis{

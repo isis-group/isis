@@ -6,7 +6,7 @@
 #endif // HAVE_GSL
 
 #ifdef HAVE_CLFFT
-#include "clfft.hpp"
+#include "details/clfft.hxx"
 #endif //HAVE_CLFFT
 
 isis::data::Chunk isis::math::fft(isis::data::Chunk data, bool inverse)

@@ -4,7 +4,7 @@
 
 LIST(APPEND _DEPENDS ${Boost_LIBRARIES})
 
-set(_CPP_GLOB "*.cpp" "details/*.cpp")
+set(_CPP_GLOB "*.cpp" "details/details_fft.cpp")
 set(_HPP_GLOB "*.hpp")
 
 option(ISIS_USE_GSL "use gsl for math functions like fft" OFF)
@@ -32,7 +32,7 @@ if(ISIS_USE_clFFT)
 	find_package(clFFT)
 	list(APPEND _DEPENDS clFFT)
 	LIST(APPEND _CPP_GLOB "details/opencl/*.cpp")
-
+	LIST(APPEND _CPP_GLOB "details/clfft.cpp")
 	add_definitions("-DHAVE_CLFFT")
 endif(ISIS_USE_clFFT)
 

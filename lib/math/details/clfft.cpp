@@ -1,8 +1,8 @@
 #include <clFFT.h>
-#include "clfft.hpp"
-#include "common.hpp"
-#include "details/details_fft.hxx"
-#include "details/opencl/cldevice.hxx"
+#include "clfft.hxx"
+#include "../common.hpp"
+#include "details_fft.hxx"
+#include "opencl/cldevice.hxx"
 
 namespace isis{
 namespace math{
