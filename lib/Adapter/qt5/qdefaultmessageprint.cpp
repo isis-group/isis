@@ -23,7 +23,7 @@ void isis::qt5::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 	qMessage.m_object = msg.m_object;
 	qMessage.m_subjects = msg.m_subjects;
 	qMessage.m_timeStamp = msg.m_timeStamp;
-	qMessage.message = msg.merge();
+	qMessage.message = msg.merge("");
 	qMessage.time_str = msg.strTime();
 	util::Singletons::get<QMessageList, 10>().push_back( qMessage );
 	commitMessage( qMessage );
