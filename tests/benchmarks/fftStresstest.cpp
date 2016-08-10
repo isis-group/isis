@@ -1,4 +1,4 @@
-#include <../math/fft.hpp>
+#include <isis/math/fft.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;

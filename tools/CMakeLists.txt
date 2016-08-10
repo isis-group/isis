@@ -19,8 +19,7 @@
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-include_directories(${CMAKE_SOURCE_DIR}/lib/core)
-include_directories(${CMAKE_SOURCE_DIR}/lib)
+include_directories(${CMAKE_SOURCE_DIR})
 
 ############################################################
 # configure the targets

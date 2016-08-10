@@ -8,9 +8,9 @@
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <data/image.hpp>
-#include <data/io_factory.hpp>
-#include <../math/transform.hpp>
+#include <isis/data/image.hpp>
+#include <isis/data/io_factory.hpp>
+#include <isis/math/transform.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

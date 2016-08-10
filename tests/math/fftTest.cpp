@@ -2,8 +2,8 @@
 #define NOMINMAX 1
 
 #include <boost/test/unit_test.hpp>
-#include "data/io_factory.hpp"
-#include "../math/fft.hpp"
+#include <isis/data/io_factory.hpp>
+#include <isis/math/fft.hpp>
 
 namespace isis
 {

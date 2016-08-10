@@ -1,6 +1,6 @@
-#include "data/io_factory.hpp"
-#include "data/io_application.hpp"
-#include "util/application.hpp"
+#include <isis/data/io_factory.hpp>
+#include <isis/data/io_application.hpp>
+#include <isis/util/application.hpp>
 #include <algorithm>
 #include <regex>
 

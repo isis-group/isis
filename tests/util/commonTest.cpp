@@ -2,7 +2,7 @@
 #define NOMINMAX 1
 
 #include <boost/test/unit_test.hpp>
-#include "util/common.hpp"
+#include <isis/util/common.hpp>
 
 namespace isis
 {

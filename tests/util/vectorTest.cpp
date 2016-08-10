@@ -8,9 +8,9 @@
 
 #define BOOST_TEST_MODULE VectorTest
 #include <boost/test/unit_test.hpp>
-#include "util/vector.hpp"
-#include "util/matrix.hpp"
-#include <../math/transform.hpp>
+#include <isis/util/vector.hpp>
+#include <isis/util/matrix.hpp>
+#include <isis/math/transform.hpp>
 
 #include <string.h>
 

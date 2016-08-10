@@ -209,7 +209,7 @@ endif()
 
 
 # build the ISIS libraries
-add_subdirectory(lib)
+add_subdirectory(isis)
 
 # build the ISIS applications
 add_subdirectory(apps)
@@ -225,6 +225,7 @@ if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
+add_subdirectory(io_plugins)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)

@@ -5,10 +5,10 @@
  *      Author: Thomas Proeger
  */
 
-#include <data/image.hpp>
-#include <data/io_factory.hpp>
-#include <util/log.hpp>
-#include <util/tmpfile.hpp>
+#include <isis/data/image.hpp>
+#include <isis/data/io_factory.hpp>
+#include <isis/util/log.hpp>
+#include <isis/util/tmpfile.hpp>
 
 using namespace isis;
 

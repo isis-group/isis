@@ -7,8 +7,8 @@
 
 #define BOOST_TEST_MODULE ImageListTest
 #include <boost/test/unit_test.hpp>
-#include "data/image.hpp"
-#include "data/io_factory.hpp"
+#include <isis/data/image.hpp>
+#include <isis/data/io_factory.hpp>
 
 namespace isis
 {

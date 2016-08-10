@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE SelectionTest
 #include <boost/test/unit_test.hpp>
 #include <string>
-#include "util/selection.hpp"
+#include <isis/util/selection.hpp>
 
 namespace isis
 {
