@@ -488,7 +488,7 @@ public:
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
+	template<typename TYPE> TypedChunk<TYPE> getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
 		return getChunkAs<TYPE> ( getScalingTo ( ValueArray<TYPE>::staticID() ), first, second, third, fourth, copy_metadata );
 	}
 	/**
@@ -503,10 +503,8 @@ public:
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
-		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType ( ValueArray<TYPE>::staticID(), scaling ); // make it of type T
-		return ret; //return that
+	template<typename TYPE> TypedChunk<TYPE> getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const {
+		return TypedChunk<TYPE>(getChunk ( first, second, third, fourth, copy_metadata ),scaling); //return that
 	}
 
 	///for each chunk get the scaling (and offset) which would be used in an conversion to the given type
