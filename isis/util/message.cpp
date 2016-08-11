@@ -95,8 +95,7 @@ Message::Message( std::string object, std::string module, std::string file, int 
 	  m_level( level )
 {}
 
-Message::Message( const Message &src ) //we need a custom copy-constructor, because the copy-contructor of ostringstream is private
-	: std::ostringstream( src.str() ),
+Message::Message( Message &&src ) : std::ostringstream(std::forward<std::ostringstream>(src) ),
 	  commitTo( src.commitTo ),
 	  m_object( src.m_object ),
 	  m_module( src.m_module ),

@@ -110,7 +110,8 @@ public:
 	int m_line;
 	LogLevel m_level;
 	Message( std::string object, std::string module, std::string file, int line, LogLevel level, std::weak_ptr<MessageHandlerBase> _commitTo );
-	Message( const Message &src );
+	Message( const Message &src )=delete;
+	Message( Message &&src );
 	~Message();
 	std::string merge(const std::string color_code)const;
 	std::string strTime(const char *formatting="%c")const;
