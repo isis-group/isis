@@ -4,20 +4,23 @@
 #include "../../util/message.hpp"
 #include <QString>
 #include <QObject>
-#include <QDateTime>
 
 namespace isis
 {
 namespace qt5
 {
 
-class QMessage:public isis::util::Message
+class QMessage
 {
 public:
-	QMessage(const QMessage &src);
-	QMessage(const isis::util::Message &src);
-	QDateTime getTimestamp();
-	QString merge();
+	std::string m_object, m_module;
+	boost::filesystem::path m_file;
+	std::list<std::string> m_subjects;
+	std::time_t m_timeStamp;
+	int m_line;
+	LogLevel m_level;
+	std::string message;
+	std::string time_str;
 };
 
 class QMessageList : public std::list<QMessage> {};

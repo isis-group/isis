@@ -3,25 +3,6 @@
 #include "../../data/image.hpp"
 #include <QMessageBox>
 
-isis::qt5::QMessage::QMessage(const isis::util::Message& src): Message(src){}
-isis::qt5::QMessage::QMessage(const isis::qt5::QMessage& src): Message(src){}
-
-
-QDateTime isis::qt5::QMessage::getTimestamp(){
-	QDateTime ret;
-	ret.setTime_t(m_timeStamp);
-	return ret;
-}
-
-QString isis::qt5::QMessage::merge()
-{
-	QString ret=QString::fromStdString(str());
-
-	for(const auto &subj:m_subjects)
-		ret.replace(QString("{o}"),QString::fromStdString(subj));
-	return  ret;
-}
-
 isis::qt5::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )
 	: MessageHandlerBase( level ),
 	  m_QMessageLogLevel( isis::error )
@@ -34,7 +15,16 @@ void isis::qt5::QDefaultMessagePrint::qmessageBelow ( isis::LogLevel level )
 
 void isis::qt5::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 {
-	QMessage qMessage(msg);
+	QMessage qMessage;
+	qMessage.m_file = msg.m_file;
+	qMessage.m_level = msg.m_level;
+	qMessage.m_line = msg.m_line;
+	qMessage.m_module = msg.m_module;
+	qMessage.m_object = msg.m_object;
+	qMessage.m_subjects = msg.m_subjects;
+	qMessage.m_timeStamp = msg.m_timeStamp;
+	qMessage.message = msg.merge("");
+	qMessage.time_str = msg.strTime();
 	util::Singletons::get<QMessageList, 10>().push_back( qMessage );
 	commitMessage( qMessage );
 
@@ -56,11 +46,13 @@ void isis::qt5::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 			break;
 		}
 
+		std::stringstream windowTitle;
 		std::stringstream text;
+		windowTitle << qMessage.m_module << " (" << qMessage.time_str << ")";
 		text << util::logLevelName( msg.m_level ) << " in " << qMessage.m_file << ":" << qMessage.m_line;
-		msgBox.setWindowTitle( QString("%1 (%2)").arg(qMessage.m_module.c_str()).arg(qMessage.getTimestamp().toString()) );
+		msgBox.setWindowTitle( windowTitle.str().c_str() );
 		msgBox.setText( text.str().c_str() );
-		msgBox.setInformativeText( qMessage.merge() );
+		msgBox.setInformativeText( qMessage.message.c_str() );
 		msgBox.exec();
 	}
 }
