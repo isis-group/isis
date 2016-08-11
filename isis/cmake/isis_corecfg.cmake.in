@@ -17,7 +17,12 @@ SET(ISIS_PLUGIN_INFIX @ISIS_PLUGIN_INFIX@)
 # search isis core library
 SET(CMAKE_PREFIX_PATH @CMAKE_INSTALL_PREFIX@ ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core
 FIND_LIBRARY(ISIS_LIB "isis_core")
+FIND_LIBRARY(ISIS_MATH_LIB "isis_math")
+FIND_LIBRARY(ISIS_QT5_LIB "isisAdapter_qt5")
 
 MESSAGE(STATUS "isis core library: ${ISIS_LIB} (API ${ISIS_CORE_VERSION_API})")
+MESSAGE(STATUS "isis math library: ${ISIS_MATH_LIB} (API ${ISIS_CORE_VERSION_API})")
+MESSAGE(STATUS "isis qt5 adatpter library: ${ISIS_QT5_LIB} (API ${ISIS_CORE_VERSION_API})")
+
 MESSAGE(STATUS "isis core library dependencies: ${ISIS_LIB_DEPENDS}")
 MESSAGE(STATUS "isis include dirs: ${ISIS_INCLUDE_DIRS}")
