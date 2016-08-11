@@ -19,11 +19,10 @@
 
 #include "qtapplication.hpp"
 
-isis::qt5::QtApplication::QtApplication( const char name[] ):
-	Application( name )
+isis::qt5::QtApplication::QtApplication( const char name[] ): Application( name )
 {}
 
-QGuiApplication &isis::qt5::QtApplication::getQApplication()
+QApplication &isis::qt5::QtApplication::getQApplication()
 {
 	LOG_IF( not m_qapp, util::Debug, error ) << "The QGuiApplication was not yet created, you should run init() before using getccm	.";
 	return *m_qapp;
@@ -33,7 +32,7 @@ bool isis::qt5::QtApplication::init( int &argc, char **argv, bool exitOnError )
 	if ( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
-		m_qapp.reset( new QGuiApplication( argc, argv ) );
+		m_qapp.reset( new QApplication( argc, argv ) );
 	}
 
 	return util::Application::init( argc, argv, exitOnError );
@@ -44,7 +43,7 @@ isis::qt5::IOQtApplication::IOQtApplication( const char name[], bool have_input,
 	IOApplication( name, have_input, have_output )
 {}
 
-QGuiApplication &isis::qt5::IOQtApplication::getQApplication()
+QApplication &isis::qt5::IOQtApplication::getQApplication()
 {
 	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
 	return *m_qapp;
@@ -55,7 +54,7 @@ bool isis::qt5::IOQtApplication::init( int &argc, char **argv, bool exitOnError 
 	if( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
-		m_qapp.reset( new QGuiApplication( argc, argv ) );
+		m_qapp.reset( new QApplication( argc, argv ) );
 	}
 
 	return isis::data::IOApplication::init( argc, argv, exitOnError );

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SimpleImageView</class>
+ <widget class="QWidget" name="SimpleImageView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QSlider" name="sliceSelect">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGraphicsView" name="graphicsView"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QSlider" name="timeSelect">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>timeSelect</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SimpleImageView</receiver>
+   <slot>timeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>283</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliceSelect</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SimpleImageView</receiver>
+   <slot>sliceChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>279</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>timeChanged(int)</slot>
+  <slot>sliceChanged(int)</slot>
+ </slots>
+</ui>

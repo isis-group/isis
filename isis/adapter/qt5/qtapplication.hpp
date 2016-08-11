@@ -27,6 +27,7 @@
 #include "../../util/matrix.hpp"
 #include "../../data/io_application.hpp"
 #include "qdefaultmessageprint.hpp"
+#include <QApplication>
 
 namespace isis
 {
@@ -35,9 +36,9 @@ namespace qt5
 
 class QtApplication : public util::Application
 {
-	std::unique_ptr<QGuiApplication> m_qapp;
+	std::unique_ptr<QApplication> m_qapp;
 public:
-	QGuiApplication &getQApplication();
+	QApplication &getQApplication();
 	QtApplication( const char name[] );
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 };
@@ -46,9 +47,9 @@ class IOQtApplication : public data::IOApplication
 {
 	int m_argc; //same as above
 	char **m_argv;
-	std::unique_ptr<QGuiApplication> m_qapp;
+	std::unique_ptr<QApplication> m_qapp;
 public:
-	QGuiApplication &getQApplication();
+	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 protected:
