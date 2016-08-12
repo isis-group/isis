@@ -19,32 +19,27 @@
 
 #include "simpleimageview.hpp"
 #include "ui_simpleimageview.h"
+#include "common.hpp"
 
 
-isis::qt5::SimpleImageView::SimpleImageView(data::TypedImage<uint8_t>::Image img, QWidget *parent):QWidget(parent),ui(new Ui_SimpleImageView)
+isis::qt5::SimpleImageView::SimpleImageView(data::TypedImage<uint8_t>::Image img, QWidget *parent):QWidget(parent),ui(new Ui_SimpleImageView),m_img(img)
 {
     ui->setupUi(this);
 
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
-
-
-
+	m_img.spliceDownTo(data::sliceDim);
+/*
 
 	img.spliceDownTo(data::sliceDim);
 	slides.resize(img_size[data::timeDim]);
 	for(int t=0;t<img_size[data::timeDim];t++){
 		slides[t].resize(img_size[data::sliceDim]);
 		for(int s=0;s<img_size[data::sliceDim];s++){
-
-			QImage qi(img_size[data::rowDim],img_size[data::columnDim], QImage::Format_Grayscale8);
-			int idx=0;
-			for(const uint8_t &v:img.getChunkAs<uint8_t>(0,0,s,t)) {
-				qi.setPixel(idx%img_size[data::rowDim],idx/img_size[data::rowDim], qRgb(v,v,v));
-				++idx;
-			}
-			slides[t][s]=QPixmap::fromImage(qi);
+			slides[t][s]=QPixmap::fromImage(
+				QImage(makeQImage(img.getChunk(0,0,s,t).getValueArrayBase(),img_size[data::rowDim]))
+			);
 		}
-	}
+	}*/
 	if(img_size[data::sliceDim]>1)
 		ui->sliceSelect->setMaximum(img_size[data::sliceDim]);
 	else
@@ -66,11 +61,19 @@ void isis::qt5::SimpleImageView::sliceChanged(int slice)
 {
 	curr_slice=slice-1;
 	ui->graphicsView->scene()->clear();
-    ui->graphicsView->scene()->addPixmap(slides[curr_time][curr_slice]);
+	ui->graphicsView->scene()->addPixmap(
+		QPixmap::fromImage(
+			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim)))
+		)
+	);
 }
 void isis::qt5::SimpleImageView::timeChanged(int time)
 {
 	curr_time=time-1;
 	ui->graphicsView->scene()->clear();
-    ui->graphicsView->scene()->addPixmap(slides[curr_time][curr_slice]);
+	ui->graphicsView->scene()->addPixmap(
+		QPixmap::fromImage(
+			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim)))
+		)
+	);
 }
