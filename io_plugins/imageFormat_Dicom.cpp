@@ -443,7 +443,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	std::list<double>::const_iterator acqTimeIt;
 
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
-	float acqTime = 0;
+	isis::util::timestamp acqTime;
 	size_t acqNum = 0;
 
 	if( haveAcqTimeList ) {
@@ -453,7 +453,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		LOG( Debug, info ) << "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
 	}
 
-	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.getValueAs<float>( "acquisitionTime" );
+	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.getValueAs<isis::util::timestamp>( "acquisitionTime" );
 	else {
 		acqNum = source.getValueAs<uint32_t>( "acquisitionNumber" );
 		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
@@ -488,9 +488,9 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		if(haveAcqTimeList){
-			ordProp.push_back(float( acqTime +  * ( acqTimeIt++ ) ));
-		} else {
+		if(haveAcqTimeList){// property is timestamp
+			ordProp.push_back(acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) ));
+		} else { // property is an index
 			ordProp.push_back(uint32_t( acqNum * images +  slice ));
 		}
 	}
