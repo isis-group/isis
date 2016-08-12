@@ -60,7 +60,7 @@ void MessageHandlerBase::stopBelow( LogLevel stop )
 	return;
 #endif
 #ifdef NDEBUG
-	LOG( Debug, error ) << "Wont apply stopping because NDEBUG is set";
+	LOG( Runtime, warning ) << "Wont apply stopping because NDEBUG is set";
 	return;
 #endif
 	m_stop_below = stop;

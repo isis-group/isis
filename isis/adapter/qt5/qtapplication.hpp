@@ -52,9 +52,7 @@ public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
-protected:
 	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
-
 };
 
 }

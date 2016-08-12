@@ -142,7 +142,6 @@ public:
 	/// \overload autowrite( const util::ParameterMap &, Image, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback > feedback)
 	static bool autowrite( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
 
-protected:
 	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };
 
