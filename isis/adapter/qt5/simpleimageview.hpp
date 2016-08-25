@@ -36,9 +36,11 @@ class SimpleImageView : public QWidget
 	QVector<QVector<QPixmap>> slides;
 	size_t curr_slice=0,curr_time=0;
 	data::Image m_img;
+	data::scaling_pair scaling;
 protected Q_SLOTS:
 	void timeChanged(int time);
 	void sliceChanged(int slice);
+	void updateImage();
 public:
     SimpleImageView(data::Image img, QWidget *parent=nullptr);
 	~SimpleImageView();

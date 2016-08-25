@@ -22,10 +22,10 @@
 #include "common.hpp"
 
 
-isis::qt5::SimpleImageView::SimpleImageView(data::TypedImage<uint8_t>::Image img, QWidget *parent):QWidget(parent),ui(new Ui_SimpleImageView),m_img(img)
+isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QWidget *parent):QWidget(parent),ui(new Ui_SimpleImageView),m_img(img)
 {
     ui->setupUi(this);
-
+	scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
 	m_img.spliceDownTo(data::sliceDim);
 /*
@@ -51,29 +51,29 @@ isis::qt5::SimpleImageView::SimpleImageView(data::TypedImage<uint8_t>::Image img
 		ui->timeSelect->setEnabled(false);
 
 	ui->graphicsView->setScene(new QGraphicsScene(0,0,img_size[data::rowDim],img_size[data::columnDim],ui->graphicsView));
+	updateImage();
 }
 isis::qt5::SimpleImageView::~SimpleImageView()
 {
 	delete ui;
 }
 
-void isis::qt5::SimpleImageView::sliceChanged(int slice)
-{
+void isis::qt5::SimpleImageView::sliceChanged(int slice){
 	curr_slice=slice-1;
-	ui->graphicsView->scene()->clear();
-	ui->graphicsView->scene()->addPixmap(
-		QPixmap::fromImage(
-			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim)))
-		)
-	);
+	updateImage();
 }
 void isis::qt5::SimpleImageView::timeChanged(int time)
 {
 	curr_time=time-1;
+	updateImage();
+}
+void isis::qt5::SimpleImageView::updateImage()
+{
 	ui->graphicsView->scene()->clear();
 	ui->graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
-			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim)))
+			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling))
 		)
 	);
 }
+
