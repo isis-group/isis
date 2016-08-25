@@ -342,9 +342,12 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 		break;
 		case NIFTI_SLICE_SEQ_DEC:{
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+
 			for(short v=0;v<head->dim[4];v++)
-				for( short i = 0; i < head->dim[3]; i++ )
-					acqProp.push_back(v*head->dim[3]+head->dim[3]-i );
+				for(unsigned short i = 0; i < head->dim[3]; i++ ){
+                                        assert(v*head->dim[3]+head->dim[3]>=i);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+head->dim[3]-i);
+                                }
 		}
 		break;
 		case NIFTI_SLICE_ALT_INC: { //interlaced increment
@@ -352,9 +355,9 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 			for(short v=0;v<head->dim[4];v++){
 				short cnt=1;
 				for( short i = 0; i < head->dim[3]; i+=2)
-					acqProp.set(v*head->dim[3]+i,cnt++);
+					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
 				for( short i = 1; i < head->dim[3]; i+=2)
-					acqProp.set(v*head->dim[3]+i,cnt++);
+					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
 				assert(cnt==head->dim[3]);
 			}
 		}
@@ -364,9 +367,9 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 			for(short v=0;v<head->dim[4];v++){
 				short cnt=1;
 				for( short i = head->dim[3]-1; i>=0; i-=2)
-					acqProp.set(v*head->dim[3]+i,cnt++);
+					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
 				for( short i = head->dim[3]-2; i>=0; i-=2)
-					acqProp.set(v*head->dim[3]+i,cnt++);
+					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
 				assert(cnt==head->dim[3]);
 			}
 		}
@@ -375,9 +378,10 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 
 		if( head->slice_duration ) {
 			util::PropertyValue &acqTimeProp=current.touchProperty( "acquisitionTime");
+                        const util::timestamp start=current.getValueAsOr<util::timestamp>("sequenceStart",util::timestamp());
 			acqTimeProp.reserve(head->dim[3]*head->dim[4]);
 			for(util::PropertyValue::const_iterator i=acqProp.begin();i!=acqProp.end();i++){
-				acqTimeProp.push_back(i->as<float>() * head->slice_duration * time_fac);
+				acqTimeProp.push_back(start+std::chrono::milliseconds(i->as<int>() * int(head->slice_duration * time_fac)));
 			}
 		}
 	}
@@ -519,7 +523,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 	case NIFTI_UNITS_SEC:
 		time_fac = 1e3;
 		break;
-	case NIFTI_UNITS_USEC:
+        case NIFTI_UNITS_USEC: // @todo use std::ratio
 		time_fac = 1e-3;
 		break;
 	}
