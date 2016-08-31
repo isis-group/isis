@@ -28,17 +28,11 @@ if(ISIS_QT5)
 	include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 	add_definitions(${Qt5Widgets_DEFINITIONS})
-	qt5_wrap_ui(UI_FILE "qt5/simpleimageview.ui")
-
-
-# 	qt5_wrap_cpp(qdefaultmessageprint_moc qt5/qdefaultmessageprint.hpp)
-#	set(ISIS_QT5_LIBRARY_FILES qt5/qdefaultmessageprint.cpp qt5/qtapplication.cpp qt5/qmatrixconversion.cpp)
-#	set(ISIS_QT5_HEADER_FILES qt5/qtapplication.hpp qt5/qdefaultmessageprint.hpp qt5/qmatrixconversion.hpp)
 
 	file(GLOB ISIS_QT5_LIBRARY_FILES "qt5/*.cpp")
 	file(GLOB ISIS_QT5_HEADER_FILES "qt5/*.hpp")
 
-	add_lib(isisAdapter_qt5
+	add_lib(isis_adapter_qt5
 		"${ISIS_QT5_LIBRARY_FILES};${UI_FILE}"
 		"${isis_core_lib};Qt5::Widgets;${CMAKE_C_STANDARD_LIBRARIES}"
 		${ISIS_QT_VERSION_SO} ${ISIS_QT_VERSION_API}

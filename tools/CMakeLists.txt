@@ -49,6 +49,12 @@ target_link_libraries(isisraw ${isis_core_lib})
 set_target_properties(isisraw PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisraw "read or write raw data files from/to isis images")
 
+add_executable(isisview isisview.cpp)
+target_link_libraries(isisview ${isis_core_lib} ${isis_adapter_qt5_lib} )
+set_target_properties(isisview PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisdump "print out the metadata of an image")
+
+
 # the install targets.
 install(TARGETS
   isisdump

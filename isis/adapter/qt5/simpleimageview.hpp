@@ -21,11 +21,10 @@
 #define SIMPLEIMAGEVIEW_HPP
 
 #include <QWidget>
-#include <QList>
-#include <QPixmap>
 #include "../../data/image.hpp"
 
-class Ui_SimpleImageView;
+class QSlider;
+class QGraphicsView;
 
 namespace isis{
 namespace qt5{
@@ -37,16 +36,16 @@ class SimpleImageView : public QWidget
 	size_t curr_slice=0,curr_time=0;
 	data::Image m_img;
 	data::scaling_pair scaling;
+	
+	void setupUi();
+	QSlider *sliceSelect,*timeSelect;
+	QGraphicsView *graphicsView;
 protected Q_SLOTS:
 	void timeChanged(int time);
 	void sliceChanged(int slice);
 	void updateImage();
 public:
     SimpleImageView(data::Image img, QWidget *parent=nullptr);
-	~SimpleImageView();
-
-private:
-    Ui_SimpleImageView* ui;
 };
 }
 }

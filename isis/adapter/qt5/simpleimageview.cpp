@@ -18,44 +18,54 @@
  */
 
 #include "simpleimageview.hpp"
-#include "ui_simpleimageview.h"
 #include "common.hpp"
+#include <QSlider>
+#include <QGridLayout>
+#include <QGraphicsView>
 
+void isis::qt5::SimpleImageView::setupUi(){
 
-isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QWidget *parent):QWidget(parent),ui(new Ui_SimpleImageView),m_img(img)
+	QGridLayout *gridLayout = new QGridLayout(this);
+
+	sliceSelect = new QSlider(this);
+	sliceSelect->setMinimum(1);
+	sliceSelect->setOrientation(Qt::Vertical);
+	sliceSelect->setTickPosition(QSlider::TicksBelow);
+
+	gridLayout->addWidget(sliceSelect, 0, 1, 1, 1);
+
+    graphicsView = new QGraphicsView(this);
+	gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
+
+	timeSelect = new QSlider(this);
+	timeSelect->setMinimum(1);
+	timeSelect->setOrientation(Qt::Horizontal);
+	timeSelect->setTickPosition(QSlider::TicksBelow);
+	gridLayout->addWidget(timeSelect, 1, 0, 1, 1);
+
+	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
+	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
+}
+
+isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QWidget *parent):QWidget(parent),m_img(img)
 {
-    ui->setupUi(this);
+    setupUi();
 	scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
 	m_img.spliceDownTo(data::sliceDim);
-/*
 
-	img.spliceDownTo(data::sliceDim);
-	slides.resize(img_size[data::timeDim]);
-	for(int t=0;t<img_size[data::timeDim];t++){
-		slides[t].resize(img_size[data::sliceDim]);
-		for(int s=0;s<img_size[data::sliceDim];s++){
-			slides[t][s]=QPixmap::fromImage(
-				QImage(makeQImage(img.getChunk(0,0,s,t).getValueArrayBase(),img_size[data::rowDim]))
-			);
-		}
-	}*/
 	if(img_size[data::sliceDim]>1)
-		ui->sliceSelect->setMaximum(img_size[data::sliceDim]);
+		sliceSelect->setMaximum(img_size[data::sliceDim]);
 	else
-		ui->sliceSelect->setEnabled(false);
+		sliceSelect->setEnabled(false);
 
 	if(img_size[data::timeDim]>1)
-		ui->timeSelect->setMaximum(img_size[data::timeDim]);
+		timeSelect->setMaximum(img_size[data::timeDim]);
 	else
-		ui->timeSelect->setEnabled(false);
+		timeSelect->setEnabled(false);
 
-	ui->graphicsView->setScene(new QGraphicsScene(0,0,img_size[data::rowDim],img_size[data::columnDim],ui->graphicsView));
+	graphicsView->setScene(new QGraphicsScene(0,0,img_size[data::rowDim],img_size[data::columnDim],graphicsView));
 	updateImage();
-}
-isis::qt5::SimpleImageView::~SimpleImageView()
-{
-	delete ui;
 }
 
 void isis::qt5::SimpleImageView::sliceChanged(int slice){
@@ -69,8 +79,8 @@ void isis::qt5::SimpleImageView::timeChanged(int time)
 }
 void isis::qt5::SimpleImageView::updateImage()
 {
-	ui->graphicsView->scene()->clear();
-	ui->graphicsView->scene()->addPixmap(
+	graphicsView->scene()->clear();
+	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
 			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling))
 		)
