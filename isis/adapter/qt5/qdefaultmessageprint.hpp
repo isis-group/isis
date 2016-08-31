@@ -28,7 +28,7 @@ public:
 class LogEventList : public std::list<LogEvent> {};
 
 
-class QDefaultMessagePrint : public QObject, public util::MessageHandlerBase
+class QDefaultMessageHandler : public QObject, public util::MessageHandlerBase
 {
 	Q_OBJECT
 public:
@@ -38,8 +38,8 @@ Q_SIGNALS:
 public:
 	virtual void commit( const util::Message &msg );
 	void qmessageBelow( LogLevel level );
-	QDefaultMessagePrint( LogLevel level );
-	virtual ~QDefaultMessagePrint();
+	   QDefaultMessageHandler( LogLevel level );
+	virtual ~QDefaultMessageHandler();
 	const LogEventList &getMessageList() const;
 private:
 	LogLevel m_LogEventLogLevel;

@@ -25,21 +25,27 @@ QString isis::qt5::LogEvent::merge()
 }
 
 
-isis::qt5::QDefaultMessagePrint::QDefaultMessagePrint( isis::LogLevel level )
+isis::qt5::QDefaultMessageHandler::QDefaultMessageHandler( isis::LogLevel level )
 	: MessageHandlerBase( level ),
 	  m_LogEventLogLevel( isis::error )
 {}
 
-void isis::qt5::QDefaultMessagePrint::qmessageBelow ( isis::LogLevel level )
+void isis::qt5::QDefaultMessageHandler::qmessageBelow ( isis::LogLevel level )
 {
 	m_LogEventLogLevel = level;
 }
 
-void isis::qt5::QDefaultMessagePrint::commit( const isis::util::Message &msg )
+void isis::qt5::QDefaultMessageHandler::commit( const isis::util::Message &msg )
 {
 	LogEvent qMessage(msg);
 	util::Singletons::get<LogEventList, 10>().push_back( qMessage );
-	commitMessage( qMessage );
+	
+	if(receivers(SIGNAL(commitMessage( qt5::LogEvent ))))
+		commitMessage( qMessage );
+	else { // fall back to util::DefaultMsgPrint of nobody is listening
+		util::DefaultMsgPrint pr(m_level);
+		pr.commit(msg);
+	}
 
 	if( m_LogEventLogLevel > msg.m_level ) {
 		QMessageBox msgBox;
@@ -68,11 +74,8 @@ void isis::qt5::QDefaultMessagePrint::commit( const isis::util::Message &msg )
 	}
 }
 
-isis::qt5::QDefaultMessagePrint::~QDefaultMessagePrint()
-{
-
-}
-const isis::qt5::LogEventList &isis::qt5::QDefaultMessagePrint::getMessageList() const
+isis::qt5::QDefaultMessageHandler::~QDefaultMessageHandler(){}
+const isis::qt5::LogEventList &isis::qt5::QDefaultMessageHandler::getMessageList() const
 {
 	return util::Singletons::get<LogEventList, 10>();
 }
