@@ -56,7 +56,6 @@ static bool checkScale( const scaling_pair &scaling )
 {
 	assert( !scaling.first.isEmpty() && !scaling.first.isEmpty() );
 	const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
-	LOG_IF( scale < 1, Runtime, warning ) << "Downscaling your values by Factor " << scaling.first->as<double>() << " you might lose information.";
 	return ( scale != 1 || offset );
 }
 
@@ -120,7 +119,6 @@ struct NumConvImplBase {
 // default generic conversion between numeric types
 template<typename SRC, typename DST, bool SAME> struct NumConvImpl: NumConvImplBase {
 	static void convert( const SRC *src, DST *dst, const scaling_pair &scaling, size_t size ) {
-		checkScale( scaling );
 		const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
 		numeric_convert( src, dst, size, scale , offset );
 	}

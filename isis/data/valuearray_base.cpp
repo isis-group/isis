@@ -19,9 +19,12 @@ namespace data
  */
 scaling_pair ValueArrayBase::getScaling( const scaling_pair &scaling, short unsigned int ID )const
 {
-	if( scaling.first.isEmpty() || scaling.second.isEmpty() )
-		return getScalingTo( ID );
-	else
+	if( scaling.first.isEmpty() || scaling.second.isEmpty() ){
+		isis::data::scaling_pair &&computed_scaling=getScalingTo( ID );;
+		LOG_IF( computed_scaling.first->lt(util::Value<uint8_t>(1)), Runtime, warning ) 
+			<< "Downscaling your values by Factor " << computed_scaling.first->as<double>() << " you might lose information.";
+		return computed_scaling;
+	} else
 		return scaling;
 }
 
