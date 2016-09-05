@@ -451,6 +451,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 
 void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const util::istring &dialect )const
 {
+	const std::string  old_loc=std::setlocale(LC_ALL,"C");
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();
 
@@ -499,6 +500,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			dcmObject2PropMap( obj, map.touchBranch( tag2Name( tag ) ), dialect );
 		}
 	}
+	std::setlocale(LC_ALL,old_loc.c_str());
 }
 
 }
