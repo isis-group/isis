@@ -22,6 +22,22 @@
 #include <QSlider>
 #include <QGridLayout>
 #include <QGraphicsView>
+#include <QWheelEvent>
+
+class MriGraphicsView: public QGraphicsView{
+public:
+	MriGraphicsView(QWidget *parent=nullptr):QGraphicsView(parent){
+		setDragMode(QGraphicsView::ScrollHandDrag);
+	}
+	void wheelEvent(QWheelEvent * event) override{
+		setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+		if(event->delta()>0)
+			scale(1.1,1.1);
+		else
+			scale(0.9,0.9);
+	}
+};
 
 void isis::qt5::SimpleImageView::setupUi(){
 
@@ -34,7 +50,7 @@ void isis::qt5::SimpleImageView::setupUi(){
 
 	gridLayout->addWidget(sliceSelect, 0, 1, 1, 1);
 
-    graphicsView = new QGraphicsView(this);
+    graphicsView = new MriGraphicsView(this);
 	gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
 
 	timeSelect = new QSlider(this);

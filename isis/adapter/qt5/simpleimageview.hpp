@@ -24,7 +24,7 @@
 #include "../../data/image.hpp"
 
 class QSlider;
-class QGraphicsView;
+class MriGraphicsView;
 
 namespace isis{
 namespace qt5{
@@ -39,7 +39,7 @@ class SimpleImageView : public QWidget
 	
 	void setupUi();
 	QSlider *sliceSelect,*timeSelect;
-	QGraphicsView *graphicsView;
+	MriGraphicsView *graphicsView;
 protected Q_SLOTS:
 	void timeChanged(int time);
 	void sliceChanged(int slice);
