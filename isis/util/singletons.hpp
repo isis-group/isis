@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <typeinfo>
+#include <limits.h>
 
 namespace isis
 {
@@ -57,7 +58,7 @@ public:
 	 * all repetetive calls return this object.
 	 * \return a reference to the same object of type T.
 	 */
-	template<typename T, int PRIO> static T &get() {
+	template<typename T, int PRIO = INT_MAX-1 > static T &get() {
 		if ( !Singleton<T>::_instance ) {
 			Singleton<T>::_instance = new T();
 			prioMap &map = getMaster().map;
@@ -66,7 +67,7 @@ public:
 
 		return *Singleton<T>::_instance;
 	}
-	template<typename T, int PRIO, typename P1> static T &get(P1 p1) {
+	template<typename T, int PRIO = INT_MAX-1, typename P1> static T &get(P1 p1) {
 		if ( !Singleton<T>::_instance ) {
 			Singleton<T>::_instance = new T(p1);
 			prioMap &map = getMaster().map;
