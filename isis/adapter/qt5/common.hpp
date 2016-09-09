@@ -28,7 +28,7 @@ namespace qt5{
 	 * \Note The QApplication has just to be there, IOQtApplication::getQApplication().exec() can be called later.
 	 * If no QApplication is available display will create (an run) its own. In that case display it is blocking.
 	 */
-	void display(data::Image img);
+	void display(data::Image img, QString title="");
 }
 }
 

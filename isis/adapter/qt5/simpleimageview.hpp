@@ -45,7 +45,7 @@ protected Q_SLOTS:
 	void sliceChanged(int slice);
 	void updateImage();
 public:
-    SimpleImageView(data::Image img, QWidget *parent=nullptr);
+    SimpleImageView(data::Image img, QString title="", QWidget *parent=nullptr);
 };
 }
 }

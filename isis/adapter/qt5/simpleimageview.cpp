@@ -63,9 +63,16 @@ void isis::qt5::SimpleImageView::setupUi(){
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
 }
 
-isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QWidget *parent):QWidget(parent),m_img(img)
+isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
     setupUi();
+	
+	if(title.isEmpty())
+		title= QString::fromStdString(img.identify(true,false));
+	
+	if(!title.isEmpty())
+		setWindowTitle(title);
+	
 	scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
 	m_img.spliceDownTo(data::sliceDim);
