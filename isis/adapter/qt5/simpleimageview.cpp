@@ -81,6 +81,9 @@ isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QWidget *parent):QW
 		timeSelect->setEnabled(false);
 
 	graphicsView->setScene(new QGraphicsScene(0,0,img_size[data::rowDim],img_size[data::columnDim],graphicsView));
+	if(img_size[data::sliceDim]>1)
+		sliceSelect->setValue(img_size[data::sliceDim]/2);
+
 	updateImage();
 }
 
@@ -98,7 +101,7 @@ void isis::qt5::SimpleImageView::updateImage()
 	graphicsView->scene()->clear();
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
-			QImage(makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling))
+			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling)
 		)
 	);
 }
