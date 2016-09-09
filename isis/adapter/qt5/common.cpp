@@ -1,4 +1,8 @@
 #include "common.hpp"
+#include <QApplication>
+#include <QFile>
+#include "simpleimageview.hpp"
+
 
 QImage isis::qt5::makeQImage(const data::ValueArrayBase &data,size_t line_length,data::scaling_pair scaling)
 {
@@ -19,3 +23,25 @@ QImage isis::qt5::makeQImage(const data::ValueArrayBase &data,size_t line_length
 	return ret;
 }
 
+void isis::qt5::display(data::Image img)
+{
+	if(qApp)
+		(new SimpleImageView(img))->show(); // create image and show it
+	else { // if there is no qApp
+		QFile cmdline_file("/proc/self/cmdline");
+
+		if(!cmdline_file.open(QIODevice::ReadOnly)){
+			LOG(isis::qt5::Runtime,isis::error) 
+				<< "Failed to open " << isis::util::MSubject("/proc/self/cmdline") << " and thus can't create widget";
+			return;
+		}
+
+		QList<QByteArray> cmdline=cmdline_file.readAll().split(0);
+		static int argc=cmdline.length();
+		static char **argv=new char*[argc];
+		LOG(isis::qt5::Debug,isis::info) << "Creating QGuiApplication dummy ... ";
+		QApplication *app=new QApplication(argc,argv);
+		(new SimpleImageView(img))->show(); // create image and show it
+		app->exec();
+	}
+}

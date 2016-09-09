@@ -66,4 +66,6 @@ std::shared_ptr< isis::util::MessageHandlerBase > isis::qt5::IOQtApplication::ge
 	return std::shared_ptr< isis::util::MessageHandlerBase >( level ? new isis::qt5::QDefaultMessageHandler( level ) : 0 );
 }
 
-
+int isis::qt5::IOQtApplication::exec(){
+	return getQApplication().exec();
+}
