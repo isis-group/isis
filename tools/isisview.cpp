@@ -1,7 +1,7 @@
 #include <iostream>
 #include <isis/adapter/qt5/common.hpp>
 #include <isis/adapter/qt5/qtapplication.hpp>
-#include <isis/adapter/qt5/simpleimageview.hpp>
+#include <isis/adapter/qt5/display.hpp>
 
 using namespace isis::qt5;
 
