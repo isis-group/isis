@@ -31,7 +31,7 @@ if(ISIS_QT5)
 
 	file(GLOB ISIS_QT5_LIBRARY_FILES "qt5/*.cpp")
 	file(GLOB ISIS_QT5_HEADER_FILES "qt5/*.hpp")
-
+	
 	add_lib(isis_adapter_qt5
 		"${ISIS_QT5_LIBRARY_FILES};${UI_FILE}"
 		"${isis_core_lib};Qt5::Widgets;${CMAKE_C_STANDARD_LIBRARIES}"
@@ -45,3 +45,7 @@ endif(ISIS_QT5)
 ############################################################
 # Install header and helper files
 ############################################################
+
+# write configuration file
+configure_file(isis_adaptercfg.cmake.in ${CMAKE_BINARY_DIR}/ISISAdapterConfig.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/ISISAdapterConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)

@@ -33,7 +33,47 @@ macro( add_lib name sources deps soversion version)
 			build_lib(${name} SHARED "${sources}" "${deps}" ${soversion} ${version})
 		endif(ISIS_BUILD_STATIC_LIBS)
 	endif(ISIS_BUILD_STATIC_AND_SHARED)
+	
+	foreach(_FILE ${deps})
+		get_target_filename(${_FILE} ${name}-exported-deps)
+	endforeach(_FILE ${deps})
+	
+	#add deps to exported-deps if they are dynamically linked
+	foreach(_FILE ${${name}-exported-deps})
+		string(REGEX MATCH "${CMAKE_STATIC_LIBRARY_SUFFIX}$" IS_STATIC ${_FILE})
+		if(IS_STATIC)
+#			message(STATUS "${_FILE} is a static dep of ${name}")
+			list(REMOVE_ITEM ${name}-exported-deps ${_FILE})
+		endif(IS_STATIC)
+	endforeach(_FILE ${${name}-exported-deps})
+	
+	if(${name}-exported-deps)
+		message(STATUS "${name} will have external dependencies (stored in \${${name}-exported-deps})")
+		foreach(_FILE ${${name}-exported-deps})
+			message(STATUS "== ${_FILE}")
+		endforeach(_FILE ${${name}-exported-deps})
+	endif(${name}-exported-deps)
+
 endmacro( add_lib )
+
+macro(get_target_filename _TARGET VAR)
+	if(TARGET ${_TARGET})
+#		message(STATUS "make target ${_TARGET} into files")
+		get_target_property(_SO_LOC ${_TARGET} IMPORTED_LOCATION_RELEASE)
+		if(_SO_LOC)
+			list(APPEND ${VAR} "${_SO_LOC}")
+		endif(_SO_LOC)
+	
+		get_target_property(_SODEPS ${_TARGET} INTERFACE_LINK_LIBRARIES)
+		foreach(_DEP ${_SODEPS})
+			get_target_filename(${_DEP} ${VAR})
+		endforeach(_DEP ${_SODEPS})
+
+		list(REMOVE_DUPLICATES ${VAR})
+	else(TARGET ${_TARGET})
+		list(APPEND ${VAR} "${_TARGET}")
+	endif(TARGET ${_TARGET})
+endmacro(get_target_filename)
 
 find_library(LIB_JSONCPP jsoncpp)
 find_path(INC_JSONCPP "json/version.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/version.h can be found")
@@ -51,21 +91,6 @@ if(ISIS_USE_LIBOIL)
 else(ISIS_USE_LIBOIL)
 	set(LibOil_LIBRARY "")
 endif(ISIS_USE_LIBOIL)
-
-############################################################
-# export library dependencies of isis_core
-############################################################
-foreach(FILE ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY} ${LIB_JSONCPP})
-		string(REGEX MATCH "${CMAKE_SHARED_LIBRARY_SUFFIX}$" IS_SHARED ${FILE})
-		if(IS_SHARED)
-				LIST(APPEND ISIS_LIB_DEPENDS ${FILE})
-		endif(IS_SHARED)
-endforeach(FILE)
-if(ISIS_LIB_DEPENDS)
-	message(STATUS "${CMAKE_SYSTEM_NAME} core dependencies are:  ${ISIS_LIB_DEPENDS}")
-else(ISIS_LIB_DEPENDS)
-	message(STATUS "no core dependencies detected")
-endif(ISIS_LIB_DEPENDS)
 
 
 ############################################################
@@ -107,12 +132,11 @@ install(FILES "config.hpp" DESTINATION include/isis COMPONENT Development)
 install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/util COMPONENT Development)
 install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/data COMPONENT Development)
 
-# write configuration file
-configure_file(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
-
-# install cmake configuration files
-install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
-
 add_subdirectory(adapter)
 add_subdirectory(math)
+
+# write configuration file
+configure_file(isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
+
 
