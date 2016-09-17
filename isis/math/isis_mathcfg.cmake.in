@@ -1,0 +1,11 @@
+# -*- mode: cmake -*-
+# ISIS cmake configuration file
+#
+SET(isis_math-exported-deps        @isis_math-exported-deps@)
+FIND_LIBRARY(ISIS_MATH_LIB "isis_math")
+
+MESSAGE(STATUS "isis math library: ${ISIS_QT5} (API ${ISIS_CORE_VERSION_API})")
+list(APPEND ISIS_MATH_LIBS ${ISIS_QT5} ${isis_math-exported-deps})
+
+MESSAGE(STATUS "isis math library dependencies: ${isis_math-exported-deps}")
+

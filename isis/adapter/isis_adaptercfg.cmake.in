@@ -1,0 +1,10 @@
+# -*- mode: cmake -*-
+# ISIS cmake configuration file
+#
+SET(isis_adapter_qt5-exported-deps        @isis_adapter_qt5-exported-deps@)
+FIND_LIBRARY(ISIS_LIB "isis_adapter_qt5")
+
+MESSAGE(STATUS "isis qt5 library: ${ISIS_QT5} (API ${ISIS_CORE_VERSION_API})")
+list(APPEND ISIS_QT5_LIBS ${ISIS_QT5} ${isis_adapter_qt5-exported-deps})
+
+MESSAGE(STATUS "isis qt5 library dependencies: ${isis_adapter_qt5-exported-deps}")
