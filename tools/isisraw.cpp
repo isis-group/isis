@@ -1,6 +1,6 @@
-#include <DataStorage/io_factory.hpp>
-#include <DataStorage/io_application.hpp>
-#include <DataStorage/fileptr.hpp>
+#include <isis/data/io_factory.hpp>
+#include <isis/data/io_application.hpp>
+#include <isis/data/fileptr.hpp>
 
 
 struct RawLog {static const char *name() {return "Raw";}; enum {use = _ENABLE_LOG};};
@@ -12,10 +12,10 @@ using namespace isis;
 class FakedRawFormat: public image_io::FileFormat
 {
 	std::string getName()const {return "";};
-	int load( std::list< data::Chunk >& /*chunks*/, const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return 0;}
+	std::list< data::Chunk > load( const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return std::list< data::Chunk>();}
 	util::istring suffixes( io_modes /*modes = both*/ ) const {return "";}
-	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, boost::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
-	std::pair< std::string, std::string > makeBasename( const std::string &filename ) {
+	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
+	std::pair< std::string, std::string > makeBasename( const std::string &filename )const {
 		return std::make_pair( filename, std::string( "" ) );
 	}
 };
@@ -40,11 +40,11 @@ int main( int argc, char *argv[] )
 	app.parameters["read_repn"].needed() = false;
 	app.parameters["read_repn"].setDescription( "data type of the raw file (if given, mode for reading raw is assumed)" );
 
-	app.parameters["rawdims"] = util::ivector4( 0, 1, 1, 1 );
+	app.parameters["rawdims"] = util::ivector4( {0, 1, 1, 1} );
 	app.parameters["rawdims"].needed() = false;
 	app.parameters["rawdims"].setDescription( "the dimensions of the raw image, at least number of columns must be given (ignored when read_repn is not given)" );
 
-	app.parameters["voxel"] = util::fvector3( 1, 1, 1 );
+	app.parameters["voxel"] = util::fvector3( {1, 1, 1} );
 	app.parameters["voxel"].needed() = false;
 	app.parameters["voxel"].setDescription( "the size of the voxels in each direction" );
 
@@ -59,7 +59,7 @@ int main( int argc, char *argv[] )
 
 	const uint64_t offset = app.parameters["offset"];
 
-	if( app.parameters["read_repn"].isSet() ) { // reading raw
+	if( app.parameters["read_repn"].isParsed() ) { // reading raw
 		util::slist infiles = app.parameters["in"];
 		LOG_IF( infiles.size() > 1, RawLog, warning ) << "Cannot read multiple raw files at once, will only read " << infiles.front();
 		data::FilePtr src( infiles.front() );
@@ -87,8 +87,8 @@ int main( int argc, char *argv[] )
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();
 
 		data::Chunk ch( dat, dims[data::rowDim], dims[data::columnDim], dims[data::sliceDim], dims[data::timeDim], true );
-		ch.setPropertyAs<util::fvector3>( "indexOrigin", app.parameters["origin"] );
-		ch.setPropertyAs<util::fvector3>( "voxelSize", app.parameters["voxel"] );
+		ch.setValueAs<util::fvector3>( "indexOrigin", app.parameters["origin"] );
+		ch.setValueAs<util::fvector3>( "voxelSize", app.parameters["voxel"] );
 
 		app.autowrite( data::Image( ch ), true );
 	} else { // writing raw
@@ -98,7 +98,7 @@ int main( int argc, char *argv[] )
 		std::list< std::string >::const_iterator iOut = fnames.begin();
 		const util::Selection wrepn = app.parameters["repn"];
 
-		BOOST_FOREACH( const data::Image & img, app.images ) {
+		for( const data::Image & img :  app.images ) {
 			const unsigned short sRepn = ( int )wrepn ? : img.getMajorTypeID(); // get repn eigther from the parameter, or from the image
 			size_t repnsize = data::ValueArrayBase::createByID( sRepn, 1 )->bytesPerElem(); //create a dummy ValueArray to determine the elementsize of the requested repn
 			const size_t imgsize = img.getVolume() * repnsize;

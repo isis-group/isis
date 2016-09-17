@@ -1,9 +1,9 @@
-#include "DataStorage/image.hpp"
+#include <isis/data/image.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;
 
-const size_t chunk_size = 120;
+const size_t chunk_size = 150;
 
 template<typename TYPE>
 void check( const data::Chunk &chunk, const TYPE &value )
@@ -66,8 +66,7 @@ int main()
 		for( size_t s = 0; s < size[data::sliceDim]; s++ ) {
 			for( size_t c = 0; c < size[data::columnDim]; c++ ) {
 				for( size_t r = 0; r < size[data::rowDim]; r++ ) {
-					const size_t coords[] = { r, c, s, t };
-					ptr[big_chunk.getLinearIndex( coords )] = 3;
+					ptr[big_chunk.getLinearIndex( { r, c, s, t } )] = 3;
 				}
 			}
 		}

@@ -19,8 +19,7 @@
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
-include_directories(${CMAKE_SOURCE_DIR}/lib)
+include_directories(${CMAKE_SOURCE_DIR})
 
 ############################################################
 # configure the targets
@@ -41,7 +40,7 @@ set_target_properties(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisconv "general MR image converter")
 
 add_executable(isisflip isisflip.cpp)
-target_link_libraries(isisflip ${isis_core_lib})
+target_link_libraries(isisflip ${isis_core_lib} ${isis_math_lib})
 set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisflip "flip MR images along specific dimensions")
 
@@ -57,4 +56,13 @@ install(TARGETS
   isisconv
   isisflip
   isisraw RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+
+if(ISIS_QT5)
+	add_executable(isisview isisview.cpp)
+	target_link_libraries(isisview ${isis_core_lib} ${isis_adapter_qt5_lib} )
+	set_target_properties(isisview PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+	build_manpage(isisdump "print out the metadata of an image")
+
+	install(TARGETS isisview RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+endif(ISIS_QT5)
 

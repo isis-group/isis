@@ -1,10 +1,9 @@
-#include "DataStorage/io_application.hpp"
-#include "DataStorage/io_factory.hpp"
+#include <isis/data/io_application.hpp>
+#include <isis/data/io_factory.hpp>
+#include <isis/math/transform.hpp>
 
 #include <map>
 #include <boost/assign.hpp>
-#include <boost/foreach.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 using namespace isis;
 
@@ -69,13 +68,13 @@ int main( int argc, char **argv )
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
-	BOOST_FOREACH( data::Image & refImage, app.images ) {
+	for( data::Image & refImage :  app.images ) {
 		std::vector< data::Chunk > delme = refImage.copyChunksToVector( true );
 		isis::data::Image dummy( delme );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {
-			dim = refImage.mapScannerAxisToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
+			dim = math::mapScannerAxisToImageDimension(refImage, static_cast<data::scannerAxis>( dim - 3 ) );
 		}
 
 		T( dim, dim ) *= -1;
@@ -93,7 +92,7 @@ int main( int argc, char **argv )
 		}
 
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
-			refImage.transformCoords( T, app.parameters["center"] );
+			math::transformCoords(refImage, T, app.parameters["center"] );
 		}
 
 		finImageList.push_back( refImage );

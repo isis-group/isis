@@ -7,15 +7,21 @@
 # Date: Tue, 05 Apr 2011 10:50:31 +0200
 #
 ############################################################
-FIND_PACKAGE(Git)
+cmake_minimum_required(VERSION 2.8)
+find_package(Git)
 
-cmake_minimum_required(VERSION 2.6)
+if(CMAKE_MAJOR_VERSION EQUAL 3)
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0048 OLD)
+endif(CMAKE_MAJOR_VERSION EQUAL 3)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)
 
-
 project(ISIS)
+
+option(BUILD_TESTING OFF)
+include(CTest)
 
 ############################################################
 # set isis version number
@@ -32,7 +38,7 @@ set(ISIS_VERSION
   ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
   CACHE INTERNAL "The current Version of the ISIS project")
 
-set(ISIS_CORE_VERSION_API "3.0.0")
+set(ISIS_CORE_VERSION_API "4.0.0")
 set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
@@ -51,7 +57,6 @@ if(NOT WIN32)
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
-set(ISIS_FILTER_INFIX lib/isis/filter)
 endif(NOT WIN32)
 
 ############################################################
@@ -61,24 +66,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# compiler flags on 64Bit cpus
+# compiler flags 
 ############################################################
 
-if(${APPLE})
-  if(${CMAKE_OSX_ARCHITECTURES})
-    set(PROCESSOR ${CMAKE_OSX_ARCHITECTURES})
-  else(${CMAKE_OSX_ARCHITECTURES})
-    set(PROCESSOR "x86_64")
-  endif(${CMAKE_OSX_ARCHITECTURES})  
-else(${APPLE})
-  set(PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
-endif(${APPLE})
-
-if("${PROCESSOR}" STREQUAL "x86_64")
+if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
-endif("${PROCESSOR}" STREQUAL "x86_64" )
+endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall"  )
+
 
 ############################################################
 # Logging options are global for all components in the tree
@@ -89,10 +88,7 @@ option(ISIS_DEBUG_LOG "Enable debug logging" ON)
 ############################################################
 # optional components
 ############################################################
-option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
-option(ISIS_BUILD_FILTER "Build the ISIS filter." OFF)
-
 
 # enable RUNTIME_LOG
 if(ISIS_RUNTIME_LOG)
@@ -111,12 +107,12 @@ endif(ISIS_DEBUG_LOG)
 
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
-if(ISIS_BUILD_TESTS)
-	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time unit_test_framework)
-else(ISIS_BUILD_TESTS)
-	find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
-endif(ISIS_BUILD_TESTS)
-	
+if(BUILD_TESTING)
+	find_package(Boost REQUIRED COMPONENTS filesystem system unit_test_framework)
+else(BUILD_TESTING)
+	find_package(Boost REQUIRED COMPONENTS filesystem system)
+endif(BUILD_TESTING)
+
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
@@ -185,30 +181,35 @@ SET(CPACK_NSIS_MODIFY_PATH ON)
 SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
-# status messages
-# message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
-# message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
-# message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
-# if(WIN32)
-# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
-# else(WIN32)
-# message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
-# endif(WIN32)
-# 
-#build the filter
-if(ISIS_BUILD_FILTER )
-  #omp settings
-  option(ISIS_FILTER_ENABLE_OMP "Enables omp support for the filter" OFF )
-  if(ISIS_FILTER_ENABLE_OMP)
-	message(STATUS "Enabling omp support" )
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp ")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
-  endif(ISIS_FILTER_ENABLE_OMP)
-  add_subdirectory(lib/Filter)
-endif(ISIS_BUILD_FILTER)
+###########################################################
+# Doxygen target
+###########################################################
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" false)
+if(BUILD_DOCUMENTATION)
+	find_package(Doxygen)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen and latex are needed to build the documentation.")
+    endif()
+
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Doxyfile.in)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+
+#    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
+endif()
+
+
+
 
 # build the ISIS libraries
-add_subdirectory(lib)
+add_subdirectory(isis)
 
 # build the ISIS applications
 add_subdirectory(apps)
@@ -216,26 +217,16 @@ add_subdirectory(apps)
 # configure coding style tools
 add_subdirectory(design)
 
+# configure tests
+add_subdirectory(tests)
+
 # build the ISIS tools.
 if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
 endif(ISIS_BUILD_TOOLS)
 
-
-
-
-# build the ISIS tests.
-if(ISIS_BUILD_TESTS)
-  message(STATUS "Building unit tests")
-  enable_testing()
-  add_subdirectory(tests)
-endif(ISIS_BUILD_TESTS)
+add_subdirectory(io_plugins)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)

@@ -1,7 +1,7 @@
-#include "CoreUtils/log.hpp"
-#include "DataStorage/chunk.hpp"
-#include "CoreUtils/vector.hpp"
-#include "DataStorage/io_factory.hpp"
+#include "util/log.hpp"
+#include "data/chunk.hpp"
+#include "util/vector.hpp"
+#include "data/io_factory.hpp"
 
 using namespace isis::data;
 using namespace isis::util;

@@ -8,7 +8,7 @@ before_install:
 before_script:
    - mkdir build
    - cd build
-   - cmake .. -DISIS_BUILD_TESTS=ON
+   - cmake .. -DBUILD_TESTING=ON
 script: make && make test
 branches:
   only:

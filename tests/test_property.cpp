@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "CoreUtils/property.hpp"
-#include "CoreUtils/propmap.hpp"
+#include "util/property.hpp"
+#include "util/propmap.hpp"
 #include <iostream>
-#include "CoreUtils/log.hpp"
-#include "CoreUtils/vector.hpp"
+#include "util/log.hpp"
+#include "util/vector.hpp"
 
 using namespace isis::util; //needed for the log-levels
 

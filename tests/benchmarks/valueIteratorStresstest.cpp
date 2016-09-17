@@ -1,4 +1,4 @@
-#include "DataStorage/image.hpp"
+#include <isis/data/image.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;
@@ -6,10 +6,10 @@ using namespace isis;
 template<typename T> data::MemChunk<T> makeChunk( size_t size, short slice )
 {
 	data::MemChunk<T> ret( size, size );
-	ret.setPropertyAs( "rowVec", util::fvector3( 1, 0 ) );
-	ret.setPropertyAs( "columnVec", util::fvector3( 0, 1 ) );
-	ret.setPropertyAs( "indexOrigin", util::fvector3( 0, 0, slice ) );
-	ret.setPropertyAs( "voxelSize", util::fvector3( 1, 1, 1 ) );
+	ret.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
+	ret.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
+	ret.setValueAs( "indexOrigin", util::fvector3( {0, 0, slice} ) );
+	ret.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
 	return ret;
 }
 
@@ -21,10 +21,10 @@ int main()
 		std::cout << "===============Testing Chunk==================" << std::endl;
 		std::list<data::Chunk> chunks;
 
-		data::MemChunk<short> ch( 256, 256, 256 );
+		data::Chunk  ch(data::MemChunk<short>( 256, 256, 256 ));
 		timer.restart();
 
-		BOOST_FOREACH( data::Chunk::reference ref, ch ) {
+		for( data::Chunk::reference ref :  ch ) {
 			ref = util::Value<int>( 42 );
 		}
 
@@ -32,7 +32,7 @@ int main()
 
 		timer.restart();
 
-		BOOST_FOREACH( data::Chunk::const_reference ref, ch ) {
+		for( data::Chunk::const_reference ref :  ch ) {
 			if( ref->as<int>() != 42 )
 				std::cout << "Whoops, something is very wrong ..." << std::endl;
 		}
@@ -47,8 +47,8 @@ int main()
 
 		for ( short slice = 0; slice < slices; slice++ ) {
 			chunks.push_back( makeChunk<short>( 256, slice ) );
-			chunks.back().setPropertyAs( "acquisitionNumber", slice );
-			chunks.back().setPropertyAs( "sequenceNumber", 0 );
+			chunks.back().setValueAs( "acquisitionNumber", slice );
+			chunks.back().setValueAs( "sequenceNumber", 0 );
 		}
 
 		data::Image img( chunks );
@@ -61,14 +61,14 @@ int main()
 
 		timer.restart();
 
-		BOOST_FOREACH( data::Image::reference ref, img ) {
+		for( data::Image::reference ref :  img ) {
 			ref = util::Value<int>( 42 );
 		}
 
 		std::cout << img.getVolume() << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
 		timer.restart();
 
-		BOOST_FOREACH( data::Image::const_reference ref, img ) {
+		for( data::Image::const_reference ref :  img ) {
 			if( ref->as<int>() != 42 )
 				std::cout << "Whoops, something is very wrong ..." << std::endl;
 		}
