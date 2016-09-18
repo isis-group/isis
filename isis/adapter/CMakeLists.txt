@@ -9,11 +9,6 @@
 ############################################################
 
 ############################################################
-# include core header files
-############################################################
-include_directories(${CMAKE_SOURCE_DIR}/lib/core)
-
-############################################################
 # optional components
 ############################################################
 option(ISIS_QT5 "Enable adapter to the Qt5 library" OFF)
@@ -34,7 +29,7 @@ if(ISIS_QT5)
 	
 	add_lib(isis_adapter_qt5
 		"${ISIS_QT5_LIBRARY_FILES};${UI_FILE}"
-		"${isis_core_lib};Qt5::Widgets;${CMAKE_C_STANDARD_LIBRARIES}"
+		"" "${isis_core_lib};Qt5::Widgets"
 		${ISIS_QT_VERSION_SO} ${ISIS_QT_VERSION_API}
 	)
 
