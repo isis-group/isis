@@ -1,3 +1,9 @@
+isis (0.7.10-1ubuntu1) UNRELEASED; urgency=low
+
+  * big api change in progress
+
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Thu, 12 Mar 2015 14:57:17 +0100
+
 isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 
   * fix crash with empty dcmstack
