@@ -4,12 +4,12 @@ set(ISIS_BUILD_STATIC_LIBS OFF CACHE BOOL "build all libraries static. If OFF a 
 ############################################################
 # macros to generate libs
 ############################################################
-macro( build_lib name type sources deps soversion version)
+macro( build_lib name type sources deps private_deps soversion version)
 	message(STATUS "${name} will be built as ${type} and installed to ${CMAKE_INSTALL_PREFIX}/lib")
 
 	#build the library as -shared or as -static
 	add_library( ${name}-${type} ${type} ${sources} )
-	target_link_libraries( ${name}-${type} ${deps})
+	target_link_libraries( ${name}-${type} PUBLIC ${deps} PRIVATE ${private_deps})
 	set_target_properties( ${name}-${type} PROPERTIES SOVERSION ${soversion} VERSION ${version} OUTPUT_NAME ${name} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 
 	# install libraries
@@ -22,15 +22,15 @@ macro( build_lib name type sources deps soversion version)
 	set(${name}_lib ${name}-${type} CACHE INTERNAL "internal name for ${name}" FORCE)
 endmacro( build_lib )
 
-macro( add_lib name sources deps soversion version)
+macro( add_lib name sources deps private_deps soversion version)
 	if(ISIS_BUILD_STATIC_AND_SHARED)
-		build_lib(${name} STATIC "${sources}" "${deps}" ${soversion} ${version})
-		build_lib(${name} SHARED "${sources}" "${deps}" ${soversion} ${version}) #this will cause the shared libs logic name  to be used in ${name}_lib
+		build_lib(${name} STATIC "${sources}" "${deps}" "${private_deps}" ${soversion} ${version})
+		build_lib(${name} SHARED "${sources}" "${deps}" "${private_deps}" ${soversion} ${version}) #this will cause the shared libs logic name  to be used in ${name}_lib
 	else(ISIS_BUILD_STATIC_AND_SHARED)
 		if(ISIS_BUILD_STATIC_LIBS)
-			build_lib(${name} STATIC "${sources}" "${deps}" ${soversion} ${version})
+			build_lib(${name} STATIC "${sources}" "${deps}" "${private_deps}" ${soversion} ${version})
 		else(ISIS_BUILD_STATIC_LIBS)
-			build_lib(${name} SHARED "${sources}" "${deps}" ${soversion} ${version})
+			build_lib(${name} SHARED "${sources}" "${deps}" "${private_deps}" ${soversion} ${version})
 		endif(ISIS_BUILD_STATIC_LIBS)
 	endif(ISIS_BUILD_STATIC_AND_SHARED)
 	
@@ -105,7 +105,7 @@ file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${CMAKE_DL_LIBS};${LibOil_LIBRARY};${Boost_LIBRARIES};${LIB_JSONCPP}"
+	"${Boost_LIBRARIES}" "${LibOil_LIBRARY};${CMAKE_DL_LIBS};${LIB_JSONCPP}"
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 

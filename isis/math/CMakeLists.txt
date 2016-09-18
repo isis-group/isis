@@ -63,7 +63,7 @@ file(GLOB SRC_FILES ${_CPP_GLOB})
 file(GLOB HDR_FILES ${_HPP_GLOB})
 
 #add the core library
-add_lib(isis_math "${SRC_FILES}" "${isis_core_lib};${_DEPENDS}" ${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API})
+add_lib(isis_math "${SRC_FILES}" "" "${isis_core_lib};${_DEPENDS}" ${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API})
 
 ############################################################
 # Installation

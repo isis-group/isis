@@ -15,7 +15,6 @@
 
 #ifdef __cplusplus
 #include <string>
-#include <boost/system/system_error.hpp>
 #include "image.hpp"
 #include "common.hpp"
 #include "../util/istring.hpp"
