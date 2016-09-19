@@ -16,11 +16,14 @@ gitver = $(shell [ -x /usr/bin/git ] && git describe --tags --match '*\.*\.*' $$
 %:
 	dh $@ --buildsystem=cmake --parallel
 
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
 # this enables everything that upstream considers to be ready for production
 # currently tests only get built but do not run as the test suite assumes
 # an already installed package -- upstream is working on a fix
 CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
-            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DISIS_BUILD_STATIC_AND_SHARED:BOOL=ON \
             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
             -DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined" \
@@ -38,9 +41,7 @@ CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
             -DISIS_RUNTIME_LOG:BOOL=ON \
             -DISIS_DEBUG_LOG:BOOL=OFF \
             -DMANPAGES:BOOL=ON \
-            -DGIT_REVISION="Debian-$(debver)" \
-            -DCMAKE_C_FLAGS=-msse2 \
-            -DCMAKE_CXX_FLAGS=-msse2
+            -DGIT_REVISION="Debian-$(debver)"
 
 override_dh_auto_test:
 	# don't work ATM

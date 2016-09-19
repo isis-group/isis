@@ -27,7 +27,7 @@ if(ISIS_QT5)
 	file(GLOB ISIS_QT5_LIBRARY_FILES "qt5/*.cpp")
 	file(GLOB ISIS_QT5_HEADER_FILES "qt5/*.hpp")
 	
-	add_lib(isis_adapter_qt5
+	add_lib(isis_qt5
 		"${ISIS_QT5_LIBRARY_FILES};${UI_FILE}"
 		"" "${isis_core_lib};Qt5::Widgets"
 		${ISIS_QT_VERSION_SO} ${ISIS_QT_VERSION_API}
