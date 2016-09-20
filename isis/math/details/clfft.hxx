@@ -8,7 +8,7 @@ namespace isis{
 namespace math{
 namespace cl{
 
-data::TypedChunk< std::complex< float > > fft(data::MemChunk< std::complex< float > > data, bool inverse);
+void fft(data::TypedChunk< std::complex< float > > &data, bool inverse);
 
 }
 }

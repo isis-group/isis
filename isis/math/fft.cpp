@@ -31,25 +31,23 @@ isis::data::Chunk isis::math::fft(isis::data::Chunk data, bool inverse)
 isis::data::TypedChunk< std::complex< float > > isis::math::fft_single(isis::data::MemChunk< std::complex< float > > data, bool inverse)
 {
 #ifdef HAVE_CLFFT
-	return math::cl::fft(data,inverse);
+	cl::fft(data,inverse);
 #elif HAVE_FFTW
-	return math::fftw::fft(data,inverse);
-#elif HAVE_GSL
-	return math::gsl::fft(data,inverse);
+	fftw::fft(data,inverse);
 #else
-	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl and/or fftw, clFFT)";
-	return data;
+	LOG(Runtime,error) << "Sorry, no single precision fft support compiled in (enable clFFT and/or fftw)";
 #endif
+	return data;
 }
 
 isis::data::TypedChunk< std::complex< double > > isis::math::fft_double(isis::data::MemChunk< std::complex< double > > data, bool inverse)
 {
 #ifdef HAVE_FFTW
-	return math::fftw::fft(data,inverse);
+	fftw::fft(data,inverse);
 #elif HAVE_GSL
-	return math::gsl::fft(data,inverse);
+	gsl::fft(data,inverse);
 #else
-	LOG(Runtime,error) << "Sorry, no fft support compiled in (enable gsl and/or fftw)";
-	return data;
+	LOG(Runtime,error) << "Sorry, no double precision fft support compiled in (enable gsl and/or fftw)";
 #endif
+	return data;
 }
