@@ -1,8 +1,9 @@
-isis (0.7.10-1ubuntu1) UNRELEASED; urgency=low
+isis (0.7.10-1ubuntu2) UNRELEASED; urgency=low
 
   * big api change in progress
+  * updated packaging
 
- -- ISIS Group <gr_isis@cbs.mpg.de>  Thu, 12 Mar 2015 14:57:17 +0100
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Wed, 21 Sep 2016 14:28:30 +0200
 
 isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 

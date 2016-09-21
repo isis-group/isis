@@ -38,15 +38,13 @@ public:
 };
 
 
-isis::data::TypedChunk< std::complex< float > > isis::math::fftw::_internal::fft_impl(isis::data::MemChunk< std::complex< float > > data, bool inverse)
+void isis::math::fftw::_internal::fft_impl(isis::data::TypedChunk< std::complex< float > > &data, bool inverse)
 {
 	PlanObjF p(data,inverse ? FFTW_BACKWARD:FFTW_FORWARD);
 	fftwf_execute(p);
-	return data;
 }
-isis::data::TypedChunk< std::complex< double > > isis::math::fftw::_internal::fft_impl(isis::data::MemChunk< std::complex< double > > data, bool inverse)
+void isis::math::fftw::_internal::fft_impl(isis::data::TypedChunk< std::complex< double > > &data, bool inverse)
 {
 	PlanObj p(data,inverse ? FFTW_BACKWARD:FFTW_FORWARD);
 	fftw_execute(p);
-	return data;
 }

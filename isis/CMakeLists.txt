@@ -80,6 +80,21 @@ find_path(INC_JSONCPP "json/version.h" PATH_SUFFIXES "jsoncpp" DOC "path where j
 include_directories(${INC_JSONCPP})
 
 ############################################################
+# check for ncurses
+############################################################
+find_package(Curses QUIET)
+if(CURSES_FORM_LIBRARY)
+	include_directories(${CURSES_CURSES_H_PATH})
+	add_definitions(-DHAVE_CURSES)
+	message(STATUS "curses form library ${CURSES_FORM_LIBRARY} found. Enable colored logging.")
+else(CURSES_FORM_LIBRARY)
+	message(STATUS "curses form library not found. Logging won't be colored.")
+	set(CURSES_FORM_LIBRARY "")
+endif(CURSES_FORM_LIBRARY)
+ 
+ 
+
+############################################################
 # check for liboil
 ############################################################
 set(ISIS_USE_LIBOIL OFF CACHE BOOL "use liboil" )
@@ -105,7 +120,7 @@ file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${Boost_LIBRARIES}" "${LibOil_LIBRARY};${CMAKE_DL_LIBS};${LIB_JSONCPP}"
+	"${Boost_LIBRARIES}" "${LibOil_LIBRARY};${CURSES_LIBRARIES};${CMAKE_DL_LIBS};${LIB_JSONCPP}"
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 

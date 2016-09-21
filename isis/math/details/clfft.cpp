@@ -91,7 +91,7 @@ public:
 };
 }
 
-data::TypedChunk< std::complex< float > > cl::fft(data::MemChunk< std::complex< float > > data, bool inverse)
+void cl::fft(data::TypedChunk< std::complex< float > > &data, bool inverse)
 {
 	// handle data
 	_internal::halfshift(data);
@@ -106,7 +106,6 @@ data::TypedChunk< std::complex< float > > cl::fft(data::MemChunk< std::complex< 
 	plan.transform(data.asValueArray<std::complex< float >>(),inverse?CLFFT_BACKWARD:CLFFT_FORWARD);
 
 	_internal::halfshift(data);
-    return data;
 }
 }
 }
