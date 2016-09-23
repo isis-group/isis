@@ -34,19 +34,29 @@ protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
-	 * \returns object.hasProperty(name)
-	 */
-	static bool setGender( util::PropertyMap &object, const char *set, const char *entries = "female,male,other" );
-	/**
-	 * Check if a given property exists in the given PropMap.
-	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
-	 * \returns object.hasProperty(name)
+	 * \returns the property's exact path if it exists, boost::none otherwise
 	 */
 	static bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
+
+	/**
+	 * \copydoc hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
+	 * \returns the property if it exists, boost::none otherwise
+	 */
 	static boost::optional<util::PropertyValue> extractOrTell( const util::PropertyMap::key_type &name, util::PropertyMap &object, LogLevel level );
 
+	/**
+	 * Check if one of the given properties exists in the given PropMap.
+	 * If no property exists, a message will be sent to Log using the given loglevel.
+	 * \returns the first found property's exact path, boost::none otherwise
+	 */
 	static util::PropertyMap::key_type hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level );
+
+	/**
+	 * \copydoc hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level )
+	 * \returns the first found property, boost::none otherwise
+	 */
 	static boost::optional<util::PropertyValue> extractOrTell( const std::initializer_list<util::PropertyMap::key_type> names, util::PropertyMap &object, LogLevel level );
+	
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
@@ -63,7 +73,7 @@ protected:
 	}
 	/// \return the file-suffixes the plugin supports
 	virtual util::istring suffixes( io_modes modes = both )const = 0;
-	static const float invalid_float;
+	static constexpr float invalid_float=-std::numeric_limits<float>::infinity();
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
