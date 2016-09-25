@@ -410,7 +410,6 @@ PropertyMap::PathSet PropertyMap::join( const PropertyMap &other, bool overwrite
 }
 PropertyMap::PathSet PropertyMap::transfer(PropertyMap& other, int overwrite)
 {
-#pragma message("test non removal of rejected")
 	PathSet rejects;
 	joinTree( other, overwrite, true, PropPath(), rejects );
 	LOG_IF(!rejects.empty(),Debug,info) << "The properties " << MSubject(rejects) << " where rejected during the transfer";
