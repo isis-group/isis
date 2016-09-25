@@ -44,6 +44,9 @@ set(ISIS_QT_VERSION_API "0.0.0")
 STRING( REGEX MATCH "^[0-9]+" ISIS_QT_VERSION_SO ${ISIS_QT_VERSION_API})
 STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
 ############################################################
 # check for byteswap intrinsics
 ############################################################
@@ -72,13 +75,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
+  list(APPEND CMAKE_CXX_FLAGS "-fPIC" )
+  list(APPEND CMAKE_C_FLAGS  "-fPIC"  )
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall"  )
-
 
 ############################################################
 # Logging options are global for all components in the tree
