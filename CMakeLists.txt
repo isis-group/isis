@@ -75,8 +75,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
-  list(APPEND CMAKE_CXX_FLAGS "-fPIC" )
-  list(APPEND CMAKE_C_FLAGS  "-fPIC"  )
+  add_compile_options("-fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
