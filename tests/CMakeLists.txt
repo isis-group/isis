@@ -28,6 +28,7 @@ if(BUILD_TESTING)
 	add_subdirectory(io)
 	add_subdirectory(ExternalLibraryAdapter)
 	add_subdirectory(math)
+	add_subdirectory(adapter)
 
 	if(ISIS_BUILD_FILTER )
 		add_subdirectory(Filter)

@@ -37,7 +37,7 @@ class SimpleImageView : public QWidget
 	data::Image m_img;
 	data::scaling_pair scaling;
 	
-	void setupUi();
+	void setupUi(bool with_complex);
 	QSlider *sliceSelect,*timeSelect;
 	MriGraphicsView *graphicsView;
 protected Q_SLOTS:

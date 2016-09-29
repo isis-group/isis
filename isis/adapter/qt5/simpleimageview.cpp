@@ -23,6 +23,8 @@
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <QWheelEvent>
+#include <QGroupBox>
+#include <QRadioButton>
 
 class MriGraphicsView: public QGraphicsView{
 public:
@@ -39,7 +41,7 @@ public:
 	}
 };
 
-void isis::qt5::SimpleImageView::setupUi(){
+void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 
 	QGridLayout *gridLayout = new QGridLayout(this);
 
@@ -61,11 +63,27 @@ void isis::qt5::SimpleImageView::setupUi(){
 
 	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
+	
+	if(with_complex){
+		QGroupBox *groupBox = new QGroupBox("complex representation");
+		QVBoxLayout *vbox = new QVBoxLayout;
+		groupBox->setLayout(vbox);
+		vbox->addWidget(new QRadioButton("magnitude"));
+		vbox->addWidget(new QRadioButton("phase"));
+		
+		gridLayout->addWidget(groupBox,2,0,1,1);
+	}
 }
 
 isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
-    setupUi();
+	if(
+		img.getMajorTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
+		img.getMajorTypeID() == data::ValueArray<std::complex<double>>::staticID()
+	)
+	    setupUi(true);
+	else
+		setupUi(false);
 	
 	if(title.isEmpty())
 		title= QString::fromStdString(img.identify(true,false));

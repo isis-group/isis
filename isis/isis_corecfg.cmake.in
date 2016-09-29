@@ -13,6 +13,9 @@ SET(isis_core-exported-deps        @isis_core-exported-deps@)
 # only needed for plugins
 SET(ISIS_PLUGIN_INFIX @ISIS_PLUGIN_INFIX@)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
 # search isis core library
 SET(CMAKE_PREFIX_PATH @CMAKE_INSTALL_PREFIX@ ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core
 FIND_LIBRARY(ISIS_LIB "isis_core")

@@ -20,6 +20,11 @@ void isis::qt5::display(data::Image img, std::string title)
 		QList<QByteArray> cmdline=cmdline_file.readAll().split(0);
 		static int argc=cmdline.length();
 		static char **argv=new char*[argc];
+		for(int i=0;i<cmdline.length();i++){
+			argv[i]=new char[256];
+			strncpy(argv[i],cmdline[i],cmdline[i].length());
+		}
+		
 		LOG(isis::qt5::Debug,isis::info) << "Creating QGuiApplication dummy ... ";
 		QApplication *app=new QApplication(argc,argv);
 		(new SimpleImageView(img,QString::fromStdString(title)))->show(); // create image and show it
