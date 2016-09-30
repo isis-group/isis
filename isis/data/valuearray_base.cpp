@@ -57,10 +57,13 @@ const _internal::ValueArrayConverterMap &ValueArrayBase::converters()
 
 const ValueArrayBase::Converter &ValueArrayBase::getConverterTo( unsigned short ID )const
 {
-	const _internal::ValueArrayConverterMap::const_iterator f1 = converters().find( getTypeID() );
-	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()];
-	const _internal::ValueArrayConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
-	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()] << " to " << util::getTypeMap()[ID];
+	return getConverterFromTo(getTypeID(),ID);
+}
+const ValueArrayBase::Converter &ValueArrayBase::getConverterFromTo( unsigned short fromID, unsigned short toID ){
+	const _internal::ValueArrayConverterMap::const_iterator f1 = converters().find( fromID );
+	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[fromID];
+	const _internal::ValueArrayConverterMap::mapped_type::const_iterator f2 = f1->second.find( toID );
+	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[fromID] << " to " << util::getTypeMap()[toID];
 	return f2->second;
 }
 
