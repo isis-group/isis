@@ -102,22 +102,19 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
 	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
 		static_assert( sizeof( std::complex<T> ) == sizeof( T ) * 2, "complex type seems not POD" ); // we need this for the calcMinMax-hack below
-		//use complex as a two element array and find the respective minmax for the two elements
-		const std::pair<T, T > minmax[] = {
-			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ), ref.getLength() * 2 ),
-			calcMinMax<T, 2>( reinterpret_cast<const T *>( &ref[0] ) + 1, ref.getLength() * 2 )
-		};
-
-		//also use return as two element array and stuff results from above in there
-		std::pair<std::complex<T> , std::complex<T> > ret;
-		T *min = reinterpret_cast<T *>( &ret.first ), *max = reinterpret_cast<T *>( &ret.second );
-
-		for( int_fast8_t i = 0; i < 2; i++ ) {
-			min[i] = minmax[i].first;
-			max[i] = minmax[i].second;
+		//use compute min/max of magnitute / phase
+		T ret_min_pha=std::arg(ref[0]),ret_max_pha=std::arg(ref[0]),ret_min_mag=std::abs(ref[0]),ret_max_mag=std::abs(ref[0]);
+		
+		for(const std::complex<T> &v:ref){
+			const T &mag=std::abs(v);
+			const T &pha=std::arg(v);
+			if(ret_min_mag>mag)ret_min_mag=mag;
+			if(ret_max_mag<mag)ret_max_mag=mag;
+			if(ret_min_pha>pha)ret_min_pha=pha;
+			if(ret_max_pha<pha)ret_max_pha=pha;
 		}
 
-		return ret;
+		return std::make_pair(std::polar(ret_min_mag,ret_min_pha),std::polar(ret_max_mag,ret_max_pha));
 	}
 };
 /// @endcond
@@ -386,11 +383,6 @@ public:
 		data::endianSwapArray( begin(), end(), begin() );
 	}
 };
-/// @cond _internal
-// specialisation for complex - there shall be no scaling - and we cannot compute minmax
-template<> scaling_pair ValueArray<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-/// @endcond
 template<typename T> bool ValueArrayBase::is()const
 {
 	util::checkType<T>();
