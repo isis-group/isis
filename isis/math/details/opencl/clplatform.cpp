@@ -158,8 +158,15 @@ isis::math::_internal::OpenCLPlatform::OpenCLPlatform(){
 		if(biggest.second<dev_cnt)
 			biggest = {p,dev_cnt};
 	}
-	if(biggest.first)
+	if(biggest.first){
+		for(cl_device_id d:getDeviceIDs(biggest.first)){
+			LOG(Runtime,info)
+				<< "Selected device " << getDeviceName(d)
+				<< " has max worker size " << getDeviceInfo<size_t>(d,CL_DEVICE_MAX_WORK_GROUP_SIZE)
+				<< " and " << getDeviceInfo<cl_uint>(d,CL_DEVICE_MAX_COMPUTE_UNITS) << " computing units";
+		}
 		ctx=createContext(biggest.first);
+	}
 }
 
 isis::math::_internal::OpenCLPlatform::~OpenCLPlatform(){
