@@ -213,7 +213,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 
 	//redo lookup table
 	lookup = set.getLookup();
-	util::FixedVector<size_t, dims> structure_size; //storage for the size of the chunk structure
+	std::array<size_t, dims> structure_size; //storage for the size of the chunk structure
 	structure_size.fill( 1 );
 
 	//get primary attributes from geometrically first chunk - will be usefull
@@ -258,7 +258,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
 		for ( unsigned short i = chunk_dims; i < sortDims; i++ ) { //if there are dimensions left figure out their size
-			structure_size[i] = getChunkStride( structure_size.product() ) / structure_size.product();
+			structure_size[i] = getChunkStride( util::product(structure_size) ) / util::product(structure_size);
 			assert( structure_size[i] != 0 );
 		}
 	}
@@ -268,7 +268,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 		structure_size[sortDims] = timesteps; // fill the dim above the top geometric dim with the timesteps
 	}
 
-	assert( structure_size.product() == lookup.size() );
+	assert( util::product(structure_size) == lookup.size() );
 	//Clean up the properties
 	deduplicateProperties();
 
@@ -288,7 +288,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 		if ( found ) {
 			util::fvector3 &vec = found.get();
 
-			if( vec.sqlen() == 0 ) {
+			if( util::sqlen(vec) == 0 ) {
 				util::fvector3  v_one;
 				v_one[oneCnt] = 1;
 				LOG( Runtime, error )
@@ -296,7 +296,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 				vec = v_one;
 			}
 
-			vec.norm();
+			util::normalize(vec);
 		}
 		oneCnt++;
 	}
@@ -332,14 +332,14 @@ bool Image::reIndex(optional< util::slist& > rejected)
 		if ( lastV ) {
 			//check the slice vector
 			util::fvector3 distVecNorm = lastV->as<util::fvector3>() - firstV->as<util::fvector3>();
-			LOG_IF( distVecNorm.len() == 0, Runtime, error )
+			LOG_IF( util::len(distVecNorm) == 0, Runtime, error )
 					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
-			distVecNorm.norm();
+			util::normalize(distVecNorm);
 
 			const optional< util::fvector3& > sliceVec = queryValueAs<util::fvector3>( "sliceVec" );
 
 			if ( sliceVec ) {
-				LOG_IF( ! distVecNorm.fuzzyEqual( *sliceVec ), Runtime, info )
+				LOG_IF( ! util::fuzzyEqualV( distVecNorm,*sliceVec ), Runtime, info )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << structure_size[2] - 1
 						<< " " << distVecNorm;
@@ -350,7 +350,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 				setValueAs( "sliceVec", distVecNorm); // this should message if there really is a conflict
 			}
 
-			const float avDist = ( lastV->as<util::fvector3>() - firstV->as<util::fvector3>() ).len() / ( structure_size[2] - 1 ); //average dist between the middle of two slices
+			const float avDist = util::len( lastV->as<util::fvector3>() - firstV->as<util::fvector3>()) / ( structure_size[2] - 1 ); //average dist between the middle of two slices
 
 			const float sliceDist = avDist - voxeSize[2]; // the gap between two slices
 
@@ -377,7 +377,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 	const optional< util::fvector3& > rrow = queryValueAs<util::fvector3>( "rowVec" ),rcolumn = queryValueAs<util::fvector3>( "columnVec" );
 	if(rrow && rcolumn){
 		const util::fvector3 &row=*rrow,&column=*rcolumn;
-		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+		LOG_IF( util::dot( row, column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector3 crossVec = util::fvector3({ //we could use their cross-product as sliceVector
 											row[1] * column[2] - row[2] * column[1],
 											row[2] * column[0] - row[0] * column[2],
@@ -386,7 +386,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 		optional< util::fvector3& > sliceVec = queryValueAs<util::fvector3>( "sliceVec" );
 
 		if ( sliceVec ) {
-			LOG_IF( std::acos( crossVec.dot( *sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
+			LOG_IF( std::acos( util::dot(crossVec, *sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
 					<< "The existing sliceVec " << util::MSubject( sliceVec ) << " differs from the cross product of the row- and column vector " << util::MSubject( crossVec );
 		} else {
 			// We dont know anything about the slice-direction
@@ -569,7 +569,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 		const util::fvector3 secondV = chunkAt( base_stride ).getValueAs<util::fvector3>( "indexOrigin" );
 		const util::fvector3 dist1 = secondV - firstV;
 
-		if( dist1.sqlen() == 0 ) { //if there is no geometric structure anymore - so asume its flat from here on
+		if( util::sqlen(dist1) == 0 ) { //if there is no geometric structure anymore - so asume its flat from here on
 			LOG( Debug, info ) << "Distance between 0 and " << util::MSubject( base_stride )
 							   << " is zero. Assuming there are no dimensional breaks anymore. Returning " << util::MSubject( base_stride );
 			return base_stride;
@@ -580,9 +580,9 @@ size_t Image::getChunkStride ( size_t base_stride )
 				const util::fvector3 distThis = nextV - thisV;
 				LOG( Debug, verbose_info )
 						<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-						<< " is " << distThis.len() << ". Distance between 0 and " << util::MSubject( i + base_stride ) << " is " << distFirst.len();
+						<< " is " << util::len(distThis) << ". Distance between 0 and " << util::MSubject( i + base_stride ) << " is " << util::len(distThis);
 
-				if ( distFirst.sqlen() <= distThis.sqlen() ) { // the next chunk is nearer to the begin than to this => dimensional break => leave
+				if ( util::sqlen(distFirst) <= util::sqlen(distThis) ) { // the next chunk is nearer to the begin than to this => dimensional break => leave
 					LOG( Debug, info )
 							<< "Distance between chunk " << util::MSubject( i + base_stride )
 							<< " and 0 is not bigger than the distance between " << util::MSubject( i + base_stride )
@@ -693,10 +693,17 @@ size_t Image::compare( const isis::data::Image &comp ) const
 	if ( getSizeAsVector() != comp.getSizeAsVector() ) {
 		LOG( Runtime, warning ) << "Size of images differs (" << getSizeAsVector() << "/"
 								<< comp.getSizeAsVector() << "). Adding difference to the result.";
-		ret += ( getSizeAsVector() - comp.getSizeAsVector() ).product();
+		ret += util::product( getSizeAsVector() - comp.getSizeAsVector() );
 	}
 
-	const size_t increment = util::minVector( chunkPtrAt( 0 )->getSizeAsVector(), comp.chunkPtrAt( 0 )->getSizeAsVector() ).product();
+	const util::vector4<size_t> firstVec=chunkPtrAt( 0 )->getSizeAsVector(),secondVec=comp.chunkPtrAt( 0 )->getSizeAsVector();
+	util::vector4<size_t> minVector;
+	std::transform(
+		std::begin(firstVec),std::end(firstVec),
+		std::begin(secondVec),std::begin(minVector),
+		[](size_t first,size_t second){return std::min(first,second);}
+	);
+	const size_t increment = util::product(minVector);
 
 	for ( size_t i = 0; i < getVolume(); i += increment ) {
 		const size_t nexti = i + increment - 1;
@@ -721,18 +728,18 @@ Image::orientation Image::getMainOrientation()const
 	LOG_IF( ! isValid() || ! clean, Debug, warning ) << "You should not run this on non clean image. Run reIndex first.";
 	util::fvector3 row = getValueAs<util::fvector3>( "rowVec" );
 	util::fvector3 column = getValueAs<util::fvector3>( "columnVec" );
-	row.norm();
-	column.norm();
-	LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+	util::normalize(row);
+	util::normalize(column);
+	LOG_IF( util::dot(row, column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 	const util::fvector3 crossVec = util::fvector3({
 										row[1] * column[2] - row[2] * column[1],
 										row[2] * column[0] - row[0] * column[2],
 										row[0] * column[1] - row[1] * column[0]
 									});
 	const util::fvector3 x({1, 0}), y({0, 1}), z({0, 0, 1});
-	double a_axial    = std::acos( crossVec.dot( z ) ) / M_PI;
-	double a_sagittal = std::acos( crossVec.dot( x ) ) / M_PI;
-	double a_coronal  = std::acos( crossVec.dot( y ) ) / M_PI;
+	double a_axial    = std::acos( util::dot(crossVec, z ) ) / M_PI;
+	double a_sagittal = std::acos( util::dot(crossVec, x ) ) / M_PI;
+	double a_coronal  = std::acos( util::dot(crossVec, y ) ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
 	LOG( Debug, info ) << "Angles to vectors are " << ( a_sagittal * 180 ) << " to x, " << ( a_coronal * 180 ) << " to y and " << ( a_axial * 180 ) << " to z";
 
@@ -867,7 +874,7 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	// do the splicing
 	std::vector<std::shared_ptr<Chunk> > buffer;
 	buffer.swap(lookup); // move the old lookup table into a buffer, so its empty when the splicer starts inserting the new chunks
-	std::for_each(buffer.begin(),buffer.end(),_internal::splicer( dim, image_size.product(), *this ));
+	std::for_each(buffer.begin(),buffer.end(),_internal::splicer( dim, util::product(image_size), *this ));
 	reIndex();
 	return lookup.size();
 }

@@ -31,7 +31,7 @@ namespace util
 {
 
 template < typename TYPE, size_t COLS, size_t ROWS>
-class FixedMatrix : public FixedVector<TYPE, ROWS *COLS>
+class FixedMatrix : public std::array<TYPE, ROWS *COLS>
 {
 public:
 	static const size_t rows = ROWS;
@@ -40,7 +40,7 @@ public:
 	typedef TYPE value_type;
 
 	template<typename TYPE2>
-	void copyFrom( const FixedVector<TYPE2, COLS> src[ROWS] ) {
+	void copyFrom( const std::array<TYPE2, COLS> src[ROWS] ) {
 		for( size_t r = 0; r < ROWS; r++ ) {
 			const TYPE2 *ptr = &src[r][0];
 			std::copy( ptr, ptr + COLS, &elem( 0, r ) );
@@ -50,10 +50,12 @@ public:
 	FixedMatrix() {}
 
 	template<typename TYPE2>
-	FixedMatrix( const TYPE2 src[ROWS *COLS] ): FixedVector<TYPE, ROWS *COLS>( src ) {}
+	FixedMatrix( const TYPE2 src[ROWS*COLS] ){
+		std::copy(src,src+ROWS*COLS,std::begin(*this));
+	}
 
 	template<typename TYPE2>
-	FixedMatrix( const FixedVector<TYPE2, COLS> src[ROWS] ) {copyFrom( src );}
+	FixedMatrix( const std::array<TYPE2, COLS> src[ROWS] ) {copyFrom( src );}
 
 	TYPE &elem( size_t column, size_t row ) {return ( *this )[column + row * COLS];}
 	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column + row * COLS];}
@@ -91,10 +93,10 @@ public:
 
 
 	template<typename TYPE2>
-	FixedVector<decltype(TYPE()*TYPE2()), COLS> dot( const FixedVector<TYPE2, COLS> &right )const {
+	std::array<decltype(TYPE()*TYPE2()), COLS> dot( const std::array<TYPE2, COLS> &right )const {
 		const FixedMatrix<TYPE, COLS, ROWS> &left = *this;
 		typedef decltype(TYPE()*TYPE2()) result_type;
-		FixedVector<result_type, ROWS> ret;
+		std::array<result_type, ROWS> ret;
 		const TYPE2 *rstart = &right[0];
 
 		for( size_t r = 0; r < rows; r++ ) { //result has as much rows as left
@@ -105,11 +107,11 @@ public:
 		return ret;
 	}
 
-	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
-		FixedVector<TYPE, COLS> ret;
-		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator start = FixedVector<TYPE, ROWS * COLS>::begin() + rownum * COLS;
-		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator end = start + COLS;
-		ret.copyFrom( start, end );
+	std::array<TYPE, COLS> getRow( size_t rownum )const {
+		std::array<TYPE, COLS> ret;
+		const typename std::array<TYPE, ROWS *COLS>::const_iterator start = std::array<TYPE, ROWS * COLS>::begin() + rownum * COLS;
+		const typename std::array<TYPE, ROWS *COLS>::const_iterator end = start + COLS;
+		std::copy(start, end, std::begin(ret));
 		return ret;
 	}
 
@@ -143,12 +145,12 @@ public:
 
 	Matrix4x4( const TYPE src[16] ): FixedMatrix<TYPE, 4, 4>( src ) {}
 	template<typename TYPE2> Matrix4x4(
-		const FixedVector<TYPE2, 4> &row1,
-		const FixedVector<TYPE2, 4> &row2,
-		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( {0, 0, 1, 0} ),
-		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( {0, 0, 0, 1} )
+		const std::array<TYPE2, 4> &row1,
+		const std::array<TYPE2, 4> &row2,
+		const std::array<TYPE2, 4> &row3 = vector4<TYPE2>( {0, 0, 1, 0} ),
+		const std::array<TYPE2, 4> &row4 = vector4<TYPE2>( {0, 0, 0, 1} )
 	) {
-		const FixedVector<TYPE2, 4> src[4] = {row1, row2, row3, row4};
+		const std::array<TYPE2, 4> src[4] = {row1, row2, row3, row4};
 		FixedMatrix<TYPE, 4, 4>::copyFrom( src );
 	}
 };
@@ -163,11 +165,11 @@ public:
 
 	Matrix3x3( const TYPE src[9] ): FixedMatrix<TYPE, 3, 3>( src ) {}
 	template<typename TYPE2> Matrix3x3(
-		const FixedVector<TYPE2, 3> &row1,
-		const FixedVector<TYPE2, 3> &row2,
-		const FixedVector<TYPE2, 3> &row3 = vector3<TYPE2>( 0, 0, 1 )
+		const std::array<TYPE2, 3> &row1,
+		const std::array<TYPE2, 3> &row2,
+		const std::array<TYPE2, 3> &row3 = vector3<TYPE2>( 0, 0, 1 )
 	) {
-		const FixedVector<TYPE2, 3> src[3] = {row1, row2, row3};
+		const std::array<TYPE2, 3> src[3] = {row1, row2, row3};
 		FixedMatrix<TYPE, 3, 3>::copyFrom( src );
 	}
 };

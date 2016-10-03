@@ -55,8 +55,8 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 Chunk Chunk::createByID ( unsigned short ID, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps, bool fakeValid )
 {
 	const util::vector4<size_t> newSize( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
-	assert( newSize.product() );
-	const ValueArrayReference created( ValueArrayBase::createByID( ID, newSize.product() ) );
+	assert( util::product(newSize) );
+	const ValueArrayReference created( ValueArrayBase::createByID( ID, util::product(newSize) ) );
 	return  Chunk( created, nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid );
 }
 
@@ -202,8 +202,8 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 		} else {
 			const util::fvector3 row = getValueAs<util::fvector3>( "rowVec" );
 			const util::fvector3 column = getValueAs<util::fvector3>( "columnVec" );
-			assert( util::fuzzyEqual<float>( row.sqlen(), 1 ) );
-			assert( util::fuzzyEqual<float>( column.sqlen(), 1 ) );
+			assert( util::fuzzyEqual<float>( util::sqlen(row), 1 ) );
+			assert( util::fuzzyEqual<float>( util::sqlen(column), 1 ) );
 			offset[0] = row[1] * column[2] - row[2] * column[1];
 			offset[1] = row[2] * column[0] - row[0] * column[2];
 			offset[2] = row[0] * column[1] - row[1] * column[0];
@@ -245,13 +245,13 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )
 
 	//@todo should be locking
 	typedef std::vector<ValueArrayReference> ValueArrayList;
-	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
-	util::FixedVector<size_t, dims> spliceSize;
+	const std::array<size_t, dims> wholesize = getSizeAsVector();
+	std::array<size_t, dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
-	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
+	std::copy(std::begin(wholesize),std::begin(wholesize)+atDim,std::begin(spliceSize));
 	//get the spliced ValueArray's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
-	const ValueArrayList pointers = this->getValueArrayBase().splice( spliceSize.product() );
+	const ValueArrayList pointers = this->getValueArrayBase().splice( util::product(spliceSize) );
 
 	//create new Chunks from this ValueArray's
 	for( ValueArrayList::const_reference ref :  pointers ) {
@@ -273,9 +273,9 @@ void Chunk::swapAlong( const dimensions dim ) const
 
 	std::shared_ptr<uint8_t> swap_ptr = std::static_pointer_cast<uint8_t>( get()->getRawAddress() );
 	uint8_t *swap_start = swap_ptr.get();
-	const uint8_t *const swap_end = swap_start + whole_size.product() * elSize;
+	const uint8_t *const swap_end = swap_start + util::product(whole_size) * elSize;
 
-	size_t block_volume = whole_size.product();
+	size_t block_volume = util::product(whole_size);
 
 	for( int i = data::timeDim; i >= dim; i-- ) {
 		assert( ( block_volume % whole_size[i] ) == 0 );

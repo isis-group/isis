@@ -87,7 +87,7 @@ template< typename T > struct checkType {
  * - \c \b negate negation is applicable
  */
 template<typename T> struct has_op:
-	_internal::ordered<!std::is_base_of<_internal::VectorClass,T>::value && knowType<T>::value>, //vectors are not ordered
+	_internal::ordered<knowType<T>::value>,
 	_internal::additive<knowType<T>::value>,
 	_internal::multiplicative<knowType<T>::value>
 	{};

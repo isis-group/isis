@@ -39,8 +39,9 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	std::list<data::Image> list = data::IOFactory::chunkListToImageList( chunks );
 	BOOST_CHECK_EQUAL( list.size(), images );
 	short cnt = 0;
-	for( data::Image & ref :  list ) {
-		BOOST_CHECK( ref.getSizeAsVector() == util::fvector4( {3, 3, 3, timesteps} ) );
+	for( data::Image & ref : list ) {
+		const util::vector4<size_t> cmp{3, 3, 3, timesteps};
+		BOOST_CHECK_EQUAL( ref.getSizeAsVector(), cmp );
 
 		for ( size_t i = 0; i < timesteps; i++ )
 			BOOST_CHECK( ref.voxel<float>( 0, 0, 0, i ) == i + cnt );

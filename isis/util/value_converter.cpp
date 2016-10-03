@@ -297,7 +297,7 @@ template<typename DST> struct StrTransformer {
 };
 
 //helper to convert strings to FixedVectors
-template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, FixedVector<DST, NUM> &dstList )
+template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, std::array<DST, NUM> &dstList )
 {
 	const std::list<std::string> srcList = Tokenizer<std::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
 	std::list< std::string >::const_iterator end = srcList.begin();

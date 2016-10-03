@@ -1,4 +1,4 @@
-#include <data/io_interface.h>
+#include <isis/data/io_interface.h>
 
 #include <time.h>
 
@@ -20,12 +20,12 @@ class ImageFormat_Null: public FileFormat
 			for ( uint32_t s = 0; s < size; s++ ) {
 
 				data::MemChunk<uint8_t> ch( size, size );
-				ch.setValueAs( "indexOrigin", util::fvector3( 0, -150 / 2, s * 110. / size - 100 / 2 ) ); //don't use s*100./size-100/2 because we want a small gap
+				ch.setValueAs( "indexOrigin", util::fvector3{ 0, -150 / 2, s * 110.f / size - 100 / 2 } ); //don't use s*100./size-100/2 because we want a small gap
 				ch.setValueAs<uint16_t>( "sequenceNumber", sequence );
 				ch.setValueAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setValueAs( "rowVec",    util::fvector3(  cos( M_PI / 8 ), -sin( M_PI / 8 ) ) ); //rotated by pi/8
-				ch.setValueAs( "columnVec", util::fvector3(  sin( M_PI / 8 ),  cos( M_PI / 8 ) ) ); // @todo also rotate the sliceVec
-				ch.setValueAs( "voxelSize", util::fvector3( 150. / size, 150. / size, 100. / size ) );
+				ch.setValueAs( "rowVec",    util::fvector3{  cosf( M_PI / 8 ), -sinf( M_PI / 8 ) } ); //rotated by pi/8
+				ch.setValueAs( "columnVec", util::fvector3{  sinf( M_PI / 8 ),  cosf( M_PI / 8 ) } ); // @todo also rotate the sliceVec
+				ch.setValueAs( "voxelSize", util::fvector3{ 150.f / size, 150.f / size, 100.f / size } );
 				ch.setValueAs<uint16_t>( "repetitionTime", 1234 );
 				ch.setValueAs( "sequenceDescription", desc );
 
@@ -144,8 +144,8 @@ public:
 		for( size_t i = 0; i < oldChunks.size(); ++i, ++newCH ) {
 			// check for the orientation seperately
 			if(
-				newCH->getValueAs<util::fvector3>( "columnVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "columnVec" ) ) == false ||
-				newCH->getValueAs<util::fvector3>( "rowVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "rowVec" ) ) == false
+				util::fuzzyEqualV(newCH->getValueAs<util::fvector3>( "columnVec" ), oldChunks[i].getValueAs<util::fvector3>( "columnVec" ) ) == false ||
+				util::fuzzyEqualV(newCH->getValueAs<util::fvector3>( "rowVec" ), oldChunks[i].getValueAs<util::fvector3>( "rowVec" ) ) == false
 			) {
 				throwGenericError( "orientation is not equal" );
 			} else {

@@ -24,7 +24,7 @@ using util::fvector4;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( vector_init_test )
 {
-	util::FixedVector<float,4> test({1,1,1,1}); // @todo get rid of outer brackets (and the explicit constructor) if c++17 is available
+	std::array<float,4> test({1,1,1,1}); // @todo get rid of outer brackets (and the explicit constructor) if c++17 is available
 	float *start = &test[0];
 	const float compare1[] = { 1,  1,  1,  1};
 	const float compare2[] = {42, 42, 42, 42};
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE( vector_init_test )
 
 BOOST_AUTO_TEST_CASE( vector_output_test )
 {
-	fvector4 test1, test2;
+	fvector4 test1{}, test2;
 	test2.fill( 42 );
 	std::ostringstream o;
 	o << test1;
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( vector_output_test )
 
 BOOST_AUTO_TEST_CASE( vector_op_test )
 {
-	fvector4 test1, test2;
+	fvector4 test1{}, test2{};
 	BOOST_CHECK_EQUAL( test1, test2 );
 	test2.fill( 42 );
 	BOOST_CHECK( test1 != test2 );
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE( matrix_dot_test )
 	};
 	// an orthogonal matrix mult with its transpose is E
 	util::Matrix4x4<float> d = test.dot( test.transpose() );
-	BOOST_CHECK( d.fuzzyEqual( util::Matrix4x4<float>( E ) ) );
+	BOOST_CHECK( fuzzyEqualV( d, util::Matrix4x4<float>( E ) ) );
 
 	// applying two transformations on a vector has the same result as applying their "dot" on the vector
 	BOOST_CHECK(
-		test.dot( test ).dot( fvector4( {1, 2} ) ).fuzzyEqual( test.dot( test.dot( fvector4( {1, 2} ) ) ) )
+		util::fuzzyEqualV( test.dot( test ).dot( fvector4( {1, 2} ) ), test.dot( test.dot( fvector4( {1, 2} ) ) ) )
 	);
 }
 

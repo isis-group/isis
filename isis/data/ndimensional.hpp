@@ -118,8 +118,8 @@ public:
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
-	util::FixedVector<size_t, DIMS> getSizeAsVector()const {
-		return util::FixedVector<size_t, DIMS>( m_dim );
+	std::array<size_t, DIMS> getSizeAsVector()const {
+		return std::array<size_t, DIMS>( m_dim );
 	}
 
 	/**
@@ -138,10 +138,13 @@ public:
 
 		return ret;
 	}
-	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
+	std::array<float, DIMS> getFoV( const std::array<float, DIMS> &voxelSize, const std::array<float, DIMS> &voxelGap )const {
 		LOG_IF( getVolume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
-		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
-		const util::FixedVector<float, DIMS> gapSize = voxelGap * ( voxels - 1 );
+		std::array<size_t, DIMS> voxels = getSizeAsVector();
+		for(size_t &v:voxels)
+			--v;
+
+		const std::array<float, DIMS> gapSize = voxelGap * voxels;
 		return voxelSize * voxels + gapSize;
 	}
 	
