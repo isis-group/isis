@@ -141,7 +141,7 @@ ValueArrayBase::Reference ValueArrayBase::createByID( unsigned short ID, size_t 
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
 	if( f1 != converters().end() && ( f2 = f1->second.find( ID ) ) != f1->second.end() ) {
-		const _internal::ValueArrayConverterBase &conv = *( f2->second );
+		const ValueArrayConverterBase &conv = *( f2->second );
 		std::unique_ptr<ValueArrayBase> ret;
 		conv.create( ret, len );
 		return *ret;
