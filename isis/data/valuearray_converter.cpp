@@ -180,7 +180,7 @@ template<typename S, typename D> struct scaling_op_base : copy_op_base<S, D> {
 		return round<D>( *( copy_op_base<S, D>::s++ ) * scale + offset );
 	}
 };
-
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OK, now the converter classes
@@ -189,9 +189,14 @@ template<typename S, typename D> struct scaling_op_base : copy_op_base<S, D> {
 //default implementation of ValueArrayConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling
 scaling_pair ValueArrayConverterBase::getScaling( const isis::util::ValueBase &min, const isis::util::ValueBase &max, autoscaleOption scaleopt ) const
 {
-	return NumConvImplBase::getScaling( min, max, scaleopt );
+	return _internal::NumConvImplBase::getScaling( min, max, scaleopt );
+}
+void ValueArrayConverterBase::convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &/*scaling*/ ) const
+{
+	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.getTypeName() << " to " << dst.getTypeName() << " this is most likely an error.";
 }
 
+namespace _internal{
 //Define generator - this can be global because its using convert internally
 template<typename SRC, typename DST> class ValueArrayGenerator: public ValueArrayConverterBase
 {
@@ -208,10 +213,6 @@ public:
 		convert( src, *dst, scaling );//and convert into that
 	}
 };
-void ValueArrayConverterBase::convert( const ValueArrayBase &src, ValueArrayBase &dst, const scaling_pair &/*scaling*/ ) const
-{
-	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.getTypeName() << " to " << dst.getTypeName() << " this is most likely an error.";
-}
 
 
 /////////////////////////////////////////////////////////////////////////////
