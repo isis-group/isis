@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( qimage_complex_test )
 	BOOST_CHECK_CLOSE(phase_scale.first->as<float>(), 255/(M_PI*2),1);
 	BOOST_CHECK_CLOSE(phase_scale.second->as<float>(), 127.5,1);
 
-	auto magnitude_transfer = [magnitude_scale](uchar *dst, size_t line_length, const data::ValueArrayBase &line){
+	auto magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
 		const float scale=magnitude_scale.first->as<float>();
 		const float offset=magnitude_scale.second->as<float>();
 		for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( qimage_complex_test )
 		}
 	};
 
-	auto phase_transfer = [phase_scale](uchar *dst, size_t line_length, const data::ValueArrayBase &line){
+	auto phase_transfer = [phase_scale](uchar *dst, const data::ValueArrayBase &line){
 		const float scale=phase_scale.first->as<float>();
 		const float offset=phase_scale.second->as<float>();
 		for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
