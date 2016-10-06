@@ -226,22 +226,14 @@ BOOST_AUTO_TEST_CASE( ValueArray_conversion_test )
 
 BOOST_AUTO_TEST_CASE( ValueArray_complex_minmax_test )
 {
-	const std::complex<float> init[] = { std::complex<float>( -2, 1 ), -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, std::complex<float>( 0.2, -5 )};
+	const std::complex<float> init[] = { std::complex<float>( -2, 1 ), -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, std::complex<float>( 10, 10 )};
 	data::ValueArray<std::complex<float> > cfArray( 12 );
 	cfArray.copyFromMem( init, 12 );
-	float minMag=  std::numeric_limits<float>::max(),maxMag=  -std::numeric_limits<float>::max();
-	float minPhase=std::numeric_limits<float>::max(),maxPhase=-std::numeric_limits<float>::max();
-	for(std::complex<float> v:cfArray){
-		const float mag=std::abs(v), phase=std::arg(v);
-		if(minMag>mag)minMag=mag;
-		if(maxMag<mag)maxMag=mag;
-		if(minPhase>phase)minPhase=phase;
-		if(maxPhase<phase)maxPhase=phase;
-	}
+
 	std::pair< util::ValueReference, util::ValueReference > minmax = cfArray.getMinMax();
 
-	BOOST_CHECK_EQUAL( minmax.first->as<std::complex<float> >(),  std::polar( minMag, minPhase ) );
-	BOOST_CHECK_EQUAL( minmax.second->as<std::complex<float> >(), std::polar( maxMag, maxPhase ) );
+	BOOST_CHECK_EQUAL( minmax.first->as<float >(),  0.2f );
+	BOOST_CHECK_EQUAL( minmax.second->as<float >(), std::abs(std::complex<float>( 10, 10 )) );
 }
 
 BOOST_AUTO_TEST_CASE( ValueArray_complex_conversion_test )

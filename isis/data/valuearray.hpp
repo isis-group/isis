@@ -100,21 +100,18 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 	}
 };
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
-	std::pair<std::complex<T> , std::complex<T> > operator()( const ValueArray<std::complex<T> > &ref ) const {
+	std::pair<T, T> operator()( const ValueArray<std::complex<T> > &ref ) const {
 		static_assert( sizeof( std::complex<T> ) == sizeof( T ) * 2, "complex type seems not POD" ); // we need this for the calcMinMax-hack below
 		//use compute min/max of magnitute / phase
-		T ret_min_pha=std::arg(ref[0]),ret_max_pha=std::arg(ref[0]),ret_min_mag=std::abs(ref[0]),ret_max_mag=std::abs(ref[0]);
+		T ret_min_sqmag=std::norm(ref[0]),ret_max_sqmag=std::norm(ref[0]);
 		
 		for(const std::complex<T> &v:ref){
-			const T &mag=std::abs(v);
-			const T &pha=std::arg(v);
-			if(ret_min_mag>mag)ret_min_mag=mag;
-			if(ret_max_mag<mag)ret_max_mag=mag;
-			if(ret_min_pha>pha)ret_min_pha=pha;
-			if(ret_max_pha<pha)ret_max_pha=pha;
+			const T &sqmag=std::norm(v);
+			if(ret_min_sqmag>sqmag)ret_min_sqmag=sqmag;
+			if(ret_max_sqmag<sqmag)ret_max_sqmag=sqmag;
 		}
 
-		return std::make_pair(std::polar(ret_min_mag,ret_min_pha),std::polar(ret_max_mag,ret_max_pha));
+		return std::make_pair(std::sqrt(ret_min_sqmag),std::sqrt(ret_max_sqmag));
 	}
 };
 /// @endcond
@@ -337,9 +334,12 @@ public:
 			return std::pair<util::ValueReference, util::ValueReference>();
 		} else {
 
-			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, std::is_arithmetic<TYPE>::value>()( *this );
+			const auto result = _internal::getMinMaxImpl<TYPE, std::is_arithmetic<TYPE>::value>()( *this );
 
-			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
+			return std::pair<util::ValueReference, util::ValueReference>( 
+				util::Value<decltype(result.first)>( result.first ), 
+				util::Value<decltype(result.second)>( result.second ) 
+			);
 		}
 	}
 
