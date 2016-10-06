@@ -79,13 +79,13 @@ public:
 		}
 
 		// normal sequencial float image
-		loaded = makeImage<std::complex<float>>( size, 0, "normal sequencial float Image" );
+		loaded = makeImage<std::complex<float>>( size, 0, "sequencial complex float Image" );
 		s = 0;
 		for( data::Chunk & ref :  loaded ) {
 			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 		}
-
 		ret.splice( ret.end(), loaded );
+		
 		// interleaved image
 		loaded= makeImage<uint8_t>( size, 1, "interleaved Image" );
 		std::list< data::Chunk >::iterator ch = loaded.begin();

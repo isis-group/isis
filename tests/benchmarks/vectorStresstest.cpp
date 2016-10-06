@@ -12,7 +12,7 @@ int main()
 	util::vector4<float> v1( {1 , 1} );
 
 	util::Matrix4x4<float> test( b1, b2 );
-	const float len = v1.len();
+	const float len = util::len(v1);
 
 	timer.restart();
 
