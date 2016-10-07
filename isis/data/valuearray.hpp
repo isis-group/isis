@@ -101,7 +101,6 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 };
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
 	std::pair<T, T> operator()( const ValueArray<std::complex<T> > &ref ) const {
-		static_assert( sizeof( std::complex<T> ) == sizeof( T ) * 2, "complex type seems not POD" ); // we need this for the calcMinMax-hack below
 		//use compute min/max of magnitute / phase
 		T ret_min_sqmag=std::norm(ref[0]),ret_max_sqmag=std::norm(ref[0]);
 		
@@ -110,7 +109,6 @@ template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic m
 			if(ret_min_sqmag>sqmag)ret_min_sqmag=sqmag;
 			if(ret_max_sqmag<sqmag)ret_max_sqmag=sqmag;
 		}
-
 		return std::make_pair(std::sqrt(ret_min_sqmag),std::sqrt(ret_max_sqmag));
 	}
 };

@@ -29,9 +29,10 @@ class ImageFormat_Null: public FileFormat
 				ch.setValueAs( "repetitionTime", 1234 );
 				ch.setValueAs( "sequenceDescription", desc );
 
-				for ( int x = 10; x < 40; x++ )
-					for ( int y = 10; y < 40; y++ )
-						ch.template voxel<T>( x, y ) = 255 - s * 20;
+				for ( int y = 10; y < 40; y++ )
+					std::fill(ch.begin()+y*size+10,ch.begin()+y*size+40,uint8_t(255 - s * 10));
+
+				ch.template voxel<T>( 0, 0 ) = uint8_t(t * 10);
 
 				ch.template voxel<T>( 0, 0 ) = t * 40;
 				ret.push_back( ch );
