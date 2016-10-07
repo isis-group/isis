@@ -2,7 +2,7 @@
 #define NOMINMAX 1
 
 #include <boost/test/unit_test.hpp>
-#include <isis/adapter/qt5/common.hpp>
+#include "../../isis/adapter/qt5/common.hpp"
 #include <QImage>
 #include <tuple>
 
@@ -53,32 +53,25 @@ BOOST_AUTO_TEST_CASE( qimage_complex_test )
 	
 	//getScalingTo wont work here, as there is no conversion from complex to uint8_t
 	const std::pair<util::ValueReference,util::ValueReference> minmax = data.getMinMax();
-	const std::complex<float> min=minmax.first->as<std::complex<float>>(),max=minmax.second->as<std::complex<float>>();
-	
-	const util::Value<float> magnitude_min = std::abs(min),magnitude_max = std::abs(max);
-	const util::Value<float> phase_min = std::arg(min),phase_max = std::arg(max);
+	const float min=minmax.first->as<float>(),max=minmax.second->as<float>();
 	
 	const data::ValueArrayBase::Converter &c = data::ValueArrayBase::getConverterFromTo(data::ValueArray<float>::staticID(),data::ValueArray<uint8_t>::staticID());
-	const data::scaling_pair magnitude_scale=c->getScaling(magnitude_min,magnitude_max,data::autoscale);
-	const data::scaling_pair phase_scale=c->getScaling(phase_min,phase_max,data::autoscale);
+	const data::scaling_pair scaling=c->getScaling(*minmax.first,*minmax.second,data::autoscale);
 	
-	BOOST_REQUIRE_CLOSE(magnitude_scale.first->as<float>(), 0.5,1);
-	BOOST_REQUIRE_CLOSE(magnitude_scale.second->as<float>(), -0.5,1);
+	BOOST_REQUIRE_CLOSE(scaling.first->as<float>(), 0.5,1);
+	BOOST_REQUIRE_CLOSE(scaling.second->as<float>(), -0.5,1);
 
-	BOOST_CHECK_CLOSE(phase_scale.first->as<float>(), 255/(M_PI*2),1);
-	BOOST_CHECK_CLOSE(phase_scale.second->as<float>(), 127.5,1);
-
-	auto magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
-		const float scale=magnitude_scale.first->as<float>();
-		const float offset=magnitude_scale.second->as<float>();
+	auto magnitude_transfer = [scaling](uchar *dst, const data::ValueArrayBase &line){
+		const float scale=scaling.first->as<float>();
+		const float offset=scaling.second->as<float>();
 		for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
 			*(dst++)=std::abs(v)*scale+offset;
 		}
 	};
 
-	auto phase_transfer = [phase_scale](uchar *dst, const data::ValueArrayBase &line){
-		const float scale=phase_scale.first->as<float>();
-		const float offset=phase_scale.second->as<float>();
+	auto phase_transfer = [](uchar *dst, const data::ValueArrayBase &line){
+		const float scale=M_PI/128;
+		const float offset=128;
 		for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
 			*(dst++)=std::arg(v)*scale+offset;
 		}
@@ -90,8 +83,8 @@ BOOST_AUTO_TEST_CASE( qimage_complex_test )
 
 	for(int x=0;x<512;x++){
 		const std::complex<float> value = std::polar<float>(x+1,x);
-		const uint8_t magnitude_value = std::abs(value)*magnitude_scale.first->as<float>()+magnitude_scale.second->as<float>();
-		const uint8_t phase_value = std::arg(value)*phase_scale.first->as<float>()+phase_scale.second->as<float>();
+		const uint8_t magnitude_value = std::abs(value)*scaling.first->as<float>()+scaling.second->as<float>();
+		const uint8_t phase_value = std::arg(value)*M_PI/128 + 128;
 		for(int y=0;y<512;y++)
 		{
 			BOOST_CHECK_EQUAL(qGray(magnitude_img.pixel(x,y)),magnitude_value);
