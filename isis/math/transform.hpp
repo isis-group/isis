@@ -79,13 +79,13 @@ bool transformCoords(isis::data::Image& img, boost::numeric::ublas::matrix< floa
 data::dimensions mapScannerAxisToImageDimension ( const data::Image& img, data::scannerAxis scannerAxes );
 
 template<typename TYPE,size_t COLS,size_t ROWS>
-boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::FixedMatrix<TYPE,COLS,ROWS> &mat)
+boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::Matrix<TYPE,COLS,ROWS> &mat)
 {
 	boost::numeric::ublas::matrix<TYPE> ret = boost::numeric::ublas::matrix<TYPE>( ROWS, COLS );
 
 	for( size_t m = 0; m < ROWS; m++ ) {
 		for( size_t n = 0; n < COLS; n++ ) {
-			ret( m, n ) = mat.elem( n, m );
+			ret( m, n ) = mat[n][m];
 		}
 	}
 
@@ -93,13 +93,13 @@ boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::FixedMatrix<TYPE,C
 }
 
 template<typename TYPE,size_t COLS,size_t ROWS>
-util::FixedMatrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
+util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
 {
-	util::FixedMatrix<TYPE,COLS,ROWS> ret;
+	util::Matrix<TYPE,COLS,ROWS> ret;
 	if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
 		for( size_t m = 0; m < ROWS; m++ ) {
 			for( size_t n = 0; n < COLS; n++ ) {
-				ret.elem( n, m ) = boost_matrix( m, n );
+				ret[n][m] = boost_matrix( m, n );
 			}
 		}
 	} else {
@@ -112,11 +112,11 @@ util::FixedMatrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::
 };
 
 
-template<typename TYPE, size_t SIZE>
-util::FixedMatrix<TYPE, SIZE, SIZE> inverseMatrix(const util::FixedMatrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
+template<typename TYPE, size_t SIZE> util::Matrix<TYPE, SIZE, SIZE> 
+inverseMatrix(const util::Matrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
 {
 	using namespace boost::numeric::ublas;
-	util::FixedMatrix<TYPE, SIZE, SIZE> ret;
+	util::Matrix<TYPE, SIZE, SIZE> ret;
 	matrix<TYPE> boost_matrix_in = toBoostMatrix(mat);
 	matrix<TYPE> boost_matrix_inverse( SIZE, SIZE );
 	permutation_matrix<TYPE> pm( boost_matrix_in.size1() );

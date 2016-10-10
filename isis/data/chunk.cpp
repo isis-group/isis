@@ -214,7 +214,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 	}
 
 	// prepare some attributes
-	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3();
+	const util::fvector3 indexOriginOffset = atDim < data::timeDim ? offset * distance[atDim] : util::fvector3{0,0,0};
 	const bool acqWasList=queryProperty("acquisitionNumber")->size()==getDimSize(atDim);
 	const bool originWasList=queryProperty("indexOrigin")->size()==getDimSize(atDim);
 	
