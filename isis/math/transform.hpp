@@ -81,14 +81,10 @@ data::dimensions mapScannerAxisToImageDimension ( const data::Image& img, data::
 template<typename TYPE,size_t COLS,size_t ROWS>
 boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::Matrix<TYPE,COLS,ROWS> &mat)
 {
-	boost::numeric::ublas::matrix<TYPE> ret = boost::numeric::ublas::matrix<TYPE>( ROWS, COLS );
-
-	for( size_t m = 0; m < ROWS; m++ ) {
-		for( size_t n = 0; n < COLS; n++ ) {
-			ret( m, n ) = mat[n][m];
-		}
-	}
-
+	boost::numeric::ublas::matrix<TYPE> ret( ROWS, COLS );
+	auto row_it=ret.begin1();
+	for(size_t r = 0; r<ROWS; ++r,++row_it)
+		std::copy(std::begin(mat[r]),std::end(mat[r]),std::begin(row_it));
 	return ret;
 }
 
@@ -97,11 +93,9 @@ util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matri
 {
 	util::Matrix<TYPE,COLS,ROWS> ret;
 	if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
-		for( size_t m = 0; m < ROWS; m++ ) {
-			for( size_t n = 0; n < COLS; n++ ) {
-				ret[n][m] = boost_matrix( m, n );
-			}
-		}
+		auto row_it=boost_matrix.begin1();
+		for(size_t r = 0; r<ROWS; ++r,++row_it)
+			std::copy(std::begin(row_it),std::end(row_it),std::begin(ret[r]));
 	} else {
 		LOG( Runtime, error ) << "The size of the boost matrix ("
 								<< boost_matrix.size1() << ", " << boost_matrix.size2()

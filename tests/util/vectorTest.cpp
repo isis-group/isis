@@ -146,10 +146,10 @@ BOOST_AUTO_TEST_CASE( matrix_from_boost_to_boost )
 
 	isis::util::Matrix<float, n, m> isis_matrix= math::fromBoostMatrix<float,n,m>(boost_matrix);
 
+	const matrix<float> dummy= math::toBoostMatrix(isis_matrix);
 	for ( unsigned short i = 0; i < m; i++ ) {
 		for ( unsigned short j = 0; j < n; j++ ) {
-			const matrix<float> dummy= math::toBoostMatrix(isis_matrix);
-			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix[j][i] );
+			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix[i][j] );
 			BOOST_CHECK_EQUAL( boost_matrix( i, j ), dummy(i,j) );
 		}
 	}
@@ -158,16 +158,11 @@ BOOST_AUTO_TEST_CASE( matrix_from_boost_to_boost )
 BOOST_AUTO_TEST_CASE( matrix_inverse )
 {
 	auto identity_matrix = isis::util::identityMatrix<float, 3>();
-	isis::util::Matrix3x3<float> initial_matrix;
-	initial_matrix[0][0] = 0;
-	initial_matrix[1][0] = 1;
-	initial_matrix[2][0] = 0;
-	initial_matrix[0][1] = 1;
-	initial_matrix[1][1] = 0;
-	initial_matrix[2][1] = 0;
-	initial_matrix[0][2] = 0;
-	initial_matrix[1][2] = 0;
-	initial_matrix[2][2] = 1;
+	isis::util::Matrix3x3<float> initial_matrix{
+		0,1,0,
+		1,0,0,
+		0,0,1
+	};
 	bool ok;
 	isis::util::Matrix<float, 3, 3> inverse = math::inverseMatrix(initial_matrix, ok );
 	BOOST_CHECK( ok );

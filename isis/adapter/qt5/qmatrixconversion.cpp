@@ -36,36 +36,26 @@ namespace qt5
 // @todo test us
 QMatrix Matrix2QMatrix2x2 ( const util::Matrix< qreal, 2, 2 >& matrix )
 {
-	return QMatrix( matrix[0][0], matrix[1][0], matrix[0][1], matrix[1][1], 0, 0 );
+	return QMatrix( matrix[0][0], matrix[0][1], matrix[1][0], matrix[1][1], 0, 0 );
 }
 
 util::Matrix< qreal, 2, 2 > QMatrix2Matrix2x2 ( const QMatrix &matrix )
 {
-	return {matrix.m11(),matrix.m21(),matrix.m12(),matrix.m22()};
+	return {matrix.m11(),matrix.m12(),matrix.m21(),matrix.m22()};
 }
 
 #if QT_VERSION >= 0x040600
 
-QMatrix4x4 Matrix2QMatrix4x4 ( const util::Matrix4x4< qreal >& matrix )
+QMatrix4x4 Matrix2QMatrix4x4 ( const util::Matrix4x4< float >& matrix )
 {
-	QMatrix4x4 ret( matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0],
-					matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1],
-					matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2],
-					matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]
-				  );
+	QMatrix4x4 ret( std::begin(matrix));
 	return ret;
 }
 
-util::Matrix4x4< qreal > QMatrix2Matrix4x4 ( const QMatrix4x4 &matrix )
+util::Matrix4x4< float > QMatrix2Matrix4x4 ( const QMatrix4x4 &matrix )
 {
-	util::Matrix4x4<qreal> ret;
-
-	for ( unsigned short column = 0; column < 4; column++ ) {
-		for ( unsigned short row = 0; row < 4; row++ ) {
-			ret[column][row] = matrix( row, column );
-		}
-	}
-
+	util::Matrix4x4<float> ret;
+	matrix.copyDataTo(std::begin(ret));
 	return ret;
 }
 

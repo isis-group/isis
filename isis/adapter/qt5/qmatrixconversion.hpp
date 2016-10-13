@@ -42,8 +42,8 @@ namespace qt5
 isis::util::Matrix<qreal, 2, 2> QMatrix2Matrix2x2( const QMatrix &matrix );
 QMatrix Matrix2QMatrix2x2( const util::Matrix<qreal, 2, 2> &matrix );
 
-isis::util::Matrix4x4<qreal> QMatrix2Matrix4x4( const QMatrix4x4 &matrix );
-QMatrix4x4 Matrix2QMatrix4x4( const util::Matrix4x4<qreal> &matrix );
+isis::util::Matrix4x4<float> QMatrix2Matrix4x4( const QMatrix4x4 &matrix );
+QMatrix4x4 Matrix2QMatrix4x4( const util::Matrix4x4<float> &matrix );
 
 template<typename TYPE, unsigned int COLUMN, unsigned int ROW>
 isis::util::Matrix<TYPE, COLUMN, ROW> QMatrix2Matrix( const QGenericMatrix<ROW, COLUMN, TYPE> &matrix )

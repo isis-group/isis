@@ -69,10 +69,10 @@ fuzzyEqualM( const Matrix<TYPE1, COLS, ROWS> &first, const Matrix<TYPE2, COLS, R
 
 template<typename TYPE, size_t COLS, size_t ROWS=COLS> constexpr Matrix<TYPE, ROWS, COLS> 
 identityMatrix( TYPE value = 1 ){
-	Matrix<TYPE, ROWS, COLS> ret{0,0,0,0};
+	Matrix<TYPE, ROWS, COLS> ret{};
 	for( size_t m = 0; m < COLS; m++ ) {
 		for( size_t n = 0; n < ROWS; n++ ) {
-			ret[n][m] = (m == n)?value:TYPE();
+			ret[m][n] = (m == n)?value:TYPE();
 		}
 	}
 	return ret;
@@ -113,4 +113,22 @@ operator*( const util::Matrix<TYPE1, COLS, ROWS> &left, const std::array<TYPE2, 
 }
 }
 
+namespace std{
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr TYPE* begin(isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat[0]);
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr TYPE* end(isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat)+COLS*ROWS;
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr const TYPE* begin(const isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat[0]);
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr const TYPE* end(const isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat)+COLS*ROWS;
+	} 
+}
 #endif // ISIS_MATRIX_HPP

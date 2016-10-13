@@ -246,8 +246,8 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions fli
 float ImageFormat_NiftiSa::determinant( const util::Matrix3x3< float >& m )
 {
 	return 
-		  m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1]
-		- m[0][0] * m[1][2] * m[2][1] - m[0][1] * m[1][0] * m[2][2] - m[0][2] * m[1][1] * m[2][0];
+		  m[0][0] * m[1][1] * m[2][2] + m[1][0] * m[2][1] * m[0][2] + m[2][0] * m[0][1] * m[1][2]
+		- m[0][0] * m[2][1] * m[1][2] - m[1][0] * m[0][1] * m[2][2] - m[2][0] * m[1][1] * m[0][2];
 }
 
 void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration )
@@ -1260,9 +1260,9 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 		}
 	}
 
-	head->qoffset_x = nifti2image[0][3];
-	head->qoffset_y = nifti2image[1][3];
-	head->qoffset_z = nifti2image[2][3];
+	head->qoffset_x = nifti2image[3][0];
+	head->qoffset_y = nifti2image[3][1];
+	head->qoffset_z = nifti2image[3][2];
 
 	return true;
 }

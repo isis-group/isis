@@ -201,7 +201,7 @@ typedef std::array<int32_t,4> ivector4;
 }
 }
 
-/// Streaming output for vector
+/// Streaming output for FixedVector
 namespace std
 {
 
