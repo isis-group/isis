@@ -194,9 +194,10 @@ template<typename TYPE> using vector4 = std::array<TYPE, 4>;
 
 typedef std::array<float,4> fvector4;
 typedef std::array<double,4> dvector4;
+typedef std::array<int32_t,4> ivector4;
 typedef std::array<float,3> fvector3;
 typedef std::array<double,3> dvector3;
-typedef std::array<int32_t,4> ivector4;
+typedef std::array<int32_t,3> ivector3;
 
 }
 }

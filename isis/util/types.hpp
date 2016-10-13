@@ -37,17 +37,17 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector28 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector29 < //increase this if a type is added (if >30 consider including vector40 above)
 bool //1
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
 , float, double // 11
 , color24, color48 // 13
-, fvector3, dvector3 // 15
-, fvector4, dvector4, ivector4 // 18
-, ilist, dlist, slist // 21
-, std::string, isis::util::Selection //23
-, std::complex<float>, std::complex<double> //25
-, date, timestamp, duration
+, fvector3, dvector3, ivector3 // 16
+, fvector4, dvector4, ivector4 // 19
+, ilist, dlist, slist // 22
+, std::string, isis::util::Selection //24
+, std::complex<float>, std::complex<double> //26
+, date, timestamp, duration //29
 > types;
 
 template<bool ENABLED> struct ordered{
