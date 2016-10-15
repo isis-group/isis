@@ -1,4 +1,4 @@
-#include <data/io_interface.h>
+#include <isis/data/io_interface.h>
 
 #include <time.h>
 
@@ -10,7 +10,7 @@ namespace image_io
 class ImageFormat_Null: public FileFormat
 {
 	static const size_t timesteps = 20;
-	std::list<data::Chunk> makeImage( unsigned short size, uint16_t sequence, std::string desc ) {
+	template<typename T> std::list<data::Chunk> makeImage( unsigned short size, uint16_t sequence, std::string desc ) {
 		//##################################################################################################
 		//## standard null image
 		//##################################################################################################
@@ -19,21 +19,22 @@ class ImageFormat_Null: public FileFormat
 		for ( uint32_t t = 0; t < timesteps; t++ ) {
 			for ( uint32_t s = 0; s < size; s++ ) {
 
-				data::MemChunk<uint8_t> ch( size, size );
-				ch.setValueAs( "indexOrigin", util::fvector3( 0, -150 / 2, s * 110. / size - 100 / 2 ) ); //don't use s*100./size-100/2 because we want a small gap
-				ch.setValueAs<uint16_t>( "sequenceNumber", sequence );
+				data::MemChunk<T> ch( size, size );
+				ch.setValueAs( "indexOrigin", util::fvector3{ 0, -150 / 2, s * 110.f / size - 100 / 2 } ); //don't use s*100./size-100/2 because we want a small gap
+				ch.setValueAs( "sequenceNumber", sequence );
 				ch.setValueAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setValueAs( "rowVec",    util::fvector3(  cos( M_PI / 8 ), -sin( M_PI / 8 ) ) ); //rotated by pi/8
-				ch.setValueAs( "columnVec", util::fvector3(  sin( M_PI / 8 ),  cos( M_PI / 8 ) ) ); // @todo also rotate the sliceVec
-				ch.setValueAs( "voxelSize", util::fvector3( 150. / size, 150. / size, 100. / size ) );
-				ch.setValueAs<uint16_t>( "repetitionTime", 1234 );
+				ch.setValueAs( "rowVec",    util::fvector3{  cosf( M_PI / 8 ), -sinf( M_PI / 8 ) } ); //rotated by pi/8
+				ch.setValueAs( "columnVec", util::fvector3{  sinf( M_PI / 8 ),  cosf( M_PI / 8 ) } ); // @todo also rotate the sliceVec
+				ch.setValueAs( "voxelSize", util::fvector3{ 150.f / size, 150.f / size, 100.f / size } );
+				ch.setValueAs( "repetitionTime", 1234 );
 				ch.setValueAs( "sequenceDescription", desc );
 
-				for ( int x = 10; x < 40; x++ )
-					for ( int y = 10; y < 40; y++ )
-						ch.voxel<uint8_t>( x, y ) = 255 - s * 20;
+				for ( int y = 10; y < 40; y++ )
+					std::fill(ch.begin()+y*size+10,ch.begin()+y*size+40,uint8_t(255 - s * 10));
 
-				ch.voxel<uint8_t>( 0, 0 ) = t * 40;
+				ch.template voxel<T>( 0, 0 ) = uint8_t(t * 10);
+
+				ch.template voxel<T>( 0, 0 ) = t * 40;
 				ret.push_back( ch );
 			}
 		}
@@ -64,15 +65,30 @@ public:
 		size_t size = getSize( dialect );
 
 		// normal sequencial image
-		std::list<data::Chunk> ret,loaded = makeImage( size, 0, "normal sequencial Image" );
+		std::list<data::Chunk> ret,loaded = makeImage<uint8_t>( size, 0, "normal sequencial Image" );
 		uint32_t s = 0;
-		for( data::Chunk & ref :  ret ) {
+		for( data::Chunk & ref :  loaded ) {
 			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 		}
 		ret.splice( ret.end(), loaded );
 
+		// normal sequencial float image
+		loaded = makeImage<float>( size, 0, "normal sequencial float Image" );
+		s = 0;
+		for( data::Chunk & ref :  loaded ) {
+			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
+		}
+
+		// normal sequencial float image
+		loaded = makeImage<std::complex<float>>( size, 0, "sequencial complex float Image" );
+		s = 0;
+		for( data::Chunk & ref :  loaded ) {
+			ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
+		}
+		ret.splice( ret.end(), loaded );
+		
 		// interleaved image
-		loaded= makeImage( size, 1, "interleaved Image" );
+		loaded= makeImage<uint8_t>( size, 1, "interleaved Image" );
 		std::list< data::Chunk >::iterator ch = loaded.begin();
 
 		for ( size_t t = 0; t < timesteps; t++ ) {
@@ -90,7 +106,9 @@ public:
 		assert( ch == loaded.end() );
 		ret.splice( ret.end(), loaded );
 
-		return timesteps * size;
+
+
+		return ret;
 	}
 
 	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
@@ -109,13 +127,13 @@ public:
 
 		switch( image.getValueAs<int>( "sequenceNumber" ) ) {
 		case 0: //image 0 is a "normal" image
-			newChunks = makeImage( size, 0, "normal sequencial Image" );
+			newChunks = makeImage<uint8_t>( size, 0, "normal sequencial Image" );
 			for( data::Chunk & ref :  newChunks ) {
 				ref.setValueAs<uint32_t>( "acquisitionNumber", s++ );
 			}
 			break;
 		case 1: //image 1 is a "interleaved" image
-			newChunks = makeImage( size, 1, "interleaved Image" );
+			newChunks = makeImage<uint8_t>( size, 1, "interleaved Image" );
 			iCh = newChunks.begin();
 
 			for ( uint32_t t = 0; t < timesteps; t++ ) {
@@ -144,8 +162,8 @@ public:
 		for( size_t i = 0; i < oldChunks.size(); ++i, ++newCH ) {
 			// check for the orientation seperately
 			if(
-				newCH->getValueAs<util::fvector3>( "columnVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "columnVec" ) ) == false ||
-				newCH->getValueAs<util::fvector3>( "rowVec" ).fuzzyEqual( oldChunks[i].getValueAs<util::fvector3>( "rowVec" ) ) == false
+				util::fuzzyEqualV(newCH->getValueAs<util::fvector3>( "columnVec" ), oldChunks[i].getValueAs<util::fvector3>( "columnVec" ) ) == false ||
+				util::fuzzyEqualV(newCH->getValueAs<util::fvector3>( "rowVec" ), oldChunks[i].getValueAs<util::fvector3>( "rowVec" ) ) == false
 			) {
 				throwGenericError( "orientation is not equal" );
 			} else {

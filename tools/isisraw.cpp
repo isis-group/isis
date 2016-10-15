@@ -67,7 +67,7 @@ int main( int argc, char *argv[] )
 		util::ivector4 dims = app.parameters["rawdims"];
 		data::ValueArrayReference dat;
 
-		if( dims.product() == 0 ) {
+		if( util::product(dims) == 0 ) {
 			data::ValueArrayReference dat = src.atByID( rrepn, offset, 0, app.parameters["byteswap"] );
 
 			const size_t sidelength = sqrt( dat->getLength() );
@@ -81,7 +81,7 @@ int main( int argc, char *argv[] )
 				exit( -1 );
 			}
 		} else {
-			dat = src.atByID( rrepn, offset, dims.product(), app.parameters["byteswap"] );
+			dat = src.atByID( rrepn, offset, util::product(dims), app.parameters["byteswap"] );
 		}
 
 		LOG( RawLog, notice ) << "Reading " <<  dat->getLength()*dat->bytesPerElem() / ( 1024.*1024. ) << " MBytes from " << infiles.front();

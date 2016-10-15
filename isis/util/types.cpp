@@ -62,6 +62,7 @@ DEF_TYPE( fvector3, fvector3 );
 DEF_TYPE( fvector4, fvector4 );
 DEF_TYPE( dvector3, dvector3 );
 DEF_TYPE( dvector4, dvector4 );
+DEF_TYPE( ivector3, ivector3 );
 DEF_TYPE( ivector4, ivector4 );
 
 DEF_TYPE( ilist, list<int32_t> );

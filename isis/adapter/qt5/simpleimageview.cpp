@@ -25,6 +25,7 @@
 #include <QWheelEvent>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QButtonGroup>
 
 class MriGraphicsView: public QGraphicsView{
 public:
@@ -66,11 +67,17 @@ void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 	
 	if(with_complex){
 		QGroupBox *groupBox = new QGroupBox("complex representation");
-		QVBoxLayout *vbox = new QVBoxLayout;
+		transfer_function_group = new QButtonGroup(groupBox);
+		QHBoxLayout *vbox = new QHBoxLayout;
 		groupBox->setLayout(vbox);
-		vbox->addWidget(new QRadioButton("magnitude"));
-		vbox->addWidget(new QRadioButton("phase"));
 		
+		QRadioButton *mag=new QRadioButton("magnitude"),*pha=new QRadioButton("phase");
+		vbox->addWidget(mag);
+		vbox->addWidget(pha);
+		transfer_function_group->addButton(mag,1);
+		transfer_function_group->addButton(pha,2);
+		transfer_function_group->setExclusive(true);
+		mag->setChecked(true);
 		gridLayout->addWidget(groupBox,2,0,1,1);
 	}
 }
@@ -80,18 +87,46 @@ isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWid
 	if(
 		img.getMajorTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
 		img.getMajorTypeID() == data::ValueArray<std::complex<double>>::staticID()
-	)
-	    setupUi(true);
-	else
-		setupUi(false);
+	)is_complex=true;
+	else is_complex=false;
+	
+	setupUi(is_complex);
 	
 	if(title.isEmpty())
 		title= QString::fromStdString(img.identify(true,false));
 	
 	if(!title.isEmpty())
 		setWindowTitle(title);
+
+	if(is_complex){
+		const std::pair<util::ValueReference,util::ValueReference> minmax = img.getMinMax();
+		const data::ValueArrayBase::Converter &c = data::ValueArrayBase::getConverterFromTo(data::ValueArray<float>::staticID(),data::ValueArray<uint8_t>::staticID());
+		const data::scaling_pair magnitude_scale=c->getScaling(*minmax.first,*minmax.second,data::autoscale);
+		
+		magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
+			const float scale=magnitude_scale.first->as<float>();
+			const float offset=magnitude_scale.second->as<float>();
+			for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
+				*(dst++)=std::abs(v)*scale+offset;
+			}
+		};
+
+		phase_transfer = [](uchar *dst, const data::ValueArrayBase &line){
+			const float scale=M_PI/128;
+			for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
+				*(dst++)=std::arg(v)*scale+128;
+			}
+		};
+		transfer_function=magnitude_transfer;
+		connect(transfer_function_group, SIGNAL(buttonToggled(int, bool)),SLOT(selectTransfer(int,bool)));
+
+	} else {
+		const data::scaling_pair scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
+		transfer_function=[scaling](uchar *dst, const data::ValueArrayBase &line){
+			line.copyToMem<uint8_t>(dst,line.getLength(),scaling);
+		};
+	}
 	
-	scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
 	m_img.spliceDownTo(data::sliceDim);
 
@@ -126,8 +161,15 @@ void isis::qt5::SimpleImageView::updateImage()
 	graphicsView->scene()->clear();
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
-			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling)
+			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),transfer_function)
 		)
 	);
+}
+void isis::qt5::SimpleImageView::selectTransfer(int id, bool checked)
+{
+	if(checked){//prevent the toggle-off from triggering a useless redraw
+		transfer_function= (id==1?magnitude_transfer:phase_transfer);
+		updateImage();
+	}
 }
 

@@ -9,17 +9,31 @@
 
 #include <string>
 #include <vector>
+#include "../../common.hpp"
 
 namespace isis{
 namespace math{
 namespace _internal{
 
 
-class OpenCLDevice{
+class OpenCLPlatform{
 private:
 	cl_int err;
 	cl_context ctx = 0;
 public:
+	template<typename T> static T getDeviceInfo(cl_device_id device,cl_device_info info){
+		T ret;
+		const cl_int err=clGetDeviceInfo(device, info, sizeof(ret), &ret, NULL);
+		LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetDeviceInfo failed with " << getErrorString(err);
+		return ret;
+	}
+	template<typename T> static T getPlatformInfo(cl_platform_id platform,cl_platform_info info){
+		T ret;
+		const cl_int err=clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(ret), ret, NULL);
+		LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetPlatformInfo failed with " << getErrorString(err);
+		return ret;
+	}
+
 	static std::string getPlatformName(cl_platform_id platform);
 	static std::string getDeviceName(cl_device_id device);
 	static std::vector<cl_platform_id> getPlatformIDs();
@@ -27,8 +41,8 @@ public:
 	static std::string getErrorString(cl_int err);
 	std::vector<cl_device_id> getMyDeviceIDs();
 	cl_context createContext(cl_platform_id platform,cl_device_type  device_type=CL_DEVICE_TYPE_ALL);
-	OpenCLDevice();
-	~OpenCLDevice();
+	OpenCLPlatform();
+	~OpenCLPlatform();
 	bool good();
 
 	cl_command_queue clCreateCommandQueue();

@@ -493,7 +493,7 @@ BOOST_AUTO_TEST_CASE ( typed_chunk_test )//Copy chunks
 		BOOST_CHECK_EQUAL( copyI.getValueArray<uint32_t>()[i], i+1 );
 	}
 
-	float v_sum;
+	float v_sum=0;
 	for ( auto v:ch2 ) {
 		v_sum += v;
 	}

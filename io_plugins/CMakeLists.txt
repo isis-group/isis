@@ -12,7 +12,6 @@
 # include the ISIS core header files
 ############################################################
 include_directories(${CMAKE_SOURCE_DIR})
-find_package(ZLIB)
 
 ############################################################
 # add global options
@@ -71,6 +70,7 @@ if(ISIS_IOPLUGIN_COMP)
   option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
   find_library(LIB_BZ2 "bz2")
+  find_package(ZLIB)
 
   list(APPEND COMP_LIBS ${ZLIB_LIBRARIES} ${LIB_BZ2})
   list(APPEND COMP_SRC imageFormat_compressed.cpp)
@@ -112,14 +112,13 @@ endif(ISIS_IOPLUGIN_PROCESS)
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
-	find_package(ZLIB REQUIRED)
 
 	#this is ugly as hell, lets hope we won't have to drag this along for to long
 	set(LOG4CPLUS_NAMESPACE "dcmtk::log4cplus" CACHE STRING "namespace where to look for log4cplus-stuff in  dcmtk")
 	set_source_files_properties(imageFormat_Dicom.cpp PROPERTIES COMPILE_DEFINITIONS "LOG4CPLUS_NAMESPACE=${LOG4CPLUS_NAMESPACE}")
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${ZLIB_LIBRARIES} ${DCMTK_LIBRARIES} ${DCMTK_oflog_LIBRARY_RELEASE} ${isis_core_lib})
+	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${DCMTK_oflog_LIBRARY_RELEASE} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(ISIS_IOPLUGIN_DICOM)
 

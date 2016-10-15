@@ -625,7 +625,7 @@ public:
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			for( const std::shared_ptr<Chunk> &ref :  lookup ) {
-				const size_t cSize = ref->getSizeAsVector().product();
+				const size_t cSize = ref->getVolume();
 
 				if ( !ref->copyToMem<T> ( dst, len, scaling ) ) {
 					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValueArray<T>::staticName();

@@ -270,7 +270,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			LOG( Debug, info ) << "Extracting sliceVec from CSAImageHeaderInfo/SliceNormalVector " << dicomTree.property( "CSAImageHeaderInfo/SliceNormalVector" );
 			util::dlist list = dicomTree.getValueAs<util::dlist >( "CSAImageHeaderInfo/SliceNormalVector" );
 			util::fvector3 vec;
-			vec.copyFrom( list.begin(), list.end() );
+			std::copy(list.begin(), list.end(), std::begin(vec) );
 			object.setValueAs( "sliceVec", vec );
 			dicomTree.remove( "CSAImageHeaderInfo/SliceNormalVector" );
 		}
@@ -371,7 +371,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		const util::fvector3 org = object.getValueAs<util::fvector3>( "indexOrigin" );
 		const util::fvector3 comp = dicomTree.getValueAs<util::fvector3>( util::istring( unknownTagName ) + "(0019,1015)" );
 
-		if ( comp.fuzzyEqual( org ) )
+		if ( util::fuzzyEqualV(comp, org ) )
 			dicomTree.remove( util::istring( unknownTagName ) + "(0019,1015)" );
 		else
 			LOG( Debug, warning )

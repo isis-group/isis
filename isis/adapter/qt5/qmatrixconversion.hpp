@@ -39,16 +39,16 @@ namespace isis
 namespace qt5
 {
 
-isis::util::FixedMatrix<qreal, 2, 2> QMatrix2FixedMatrix2x2( const QMatrix &matrix );
-QMatrix FixedMatrix2QMatrix2x2( const util::FixedMatrix<qreal, 2, 2> &matrix );
+isis::util::Matrix<qreal, 2, 2> QMatrix2Matrix2x2( const QMatrix &matrix );
+QMatrix Matrix2QMatrix2x2( const util::Matrix<qreal, 2, 2> &matrix );
 
-isis::util::Matrix4x4<qreal> QMatrix2FixedMatrix4x4( const QMatrix4x4 &matrix );
-QMatrix4x4 FixedMatrix2QMatrix4x4( const util::Matrix4x4<qreal> &matrix );
+isis::util::Matrix4x4<float> QMatrix2Matrix4x4( const QMatrix4x4 &matrix );
+QMatrix4x4 Matrix2QMatrix4x4( const util::Matrix4x4<float> &matrix );
 
 template<typename TYPE, unsigned int COLUMN, unsigned int ROW>
-isis::util::FixedMatrix<TYPE, COLUMN, ROW> QMatrix2FixedMatrix( const QGenericMatrix<ROW, COLUMN, TYPE> &matrix )
+isis::util::Matrix<TYPE, COLUMN, ROW> QMatrix2Matrix( const QGenericMatrix<ROW, COLUMN, TYPE> &matrix )
 {
-	isis::util::FixedMatrix<TYPE, COLUMN, ROW> ret;
+	isis::util::Matrix<TYPE, COLUMN, ROW> ret;
 
 	for( unsigned int column = 0; column < COLUMN; column++ ) {
 		for( unsigned int row = 0; row < ROW; row++ ) {
@@ -60,7 +60,7 @@ isis::util::FixedMatrix<TYPE, COLUMN, ROW> QMatrix2FixedMatrix( const QGenericMa
 }
 
 template< typename TYPE, unsigned int COLUMN, unsigned int ROW >
-QGenericMatrix< ROW, COLUMN, TYPE > FixedMatrix2QMatrix( const util::FixedMatrix<TYPE, COLUMN, ROW> &matrix )
+QGenericMatrix< ROW, COLUMN, TYPE > Matrix2QMatrix( const util::Matrix<TYPE, COLUMN, ROW> &matrix )
 {
 	QGenericMatrix<ROW, COLUMN, TYPE> ret;
 

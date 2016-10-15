@@ -89,7 +89,7 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
 		return voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
 	}
-	template<typename TYPE> TYPE &voxel( std::array<size_t,4> &&pos) {
+	template<typename TYPE> TYPE &voxel( const std::array<size_t,4> &pos) {
 		LOG_IF( ! isInRange( pos ), Debug, isis::error )
 				<< "Index " << util::vector4<size_t>( pos ) << " is out of range (" << getSizeAsString() << ")";
 		ValueArray<TYPE> &ret = asValueArray<TYPE>();
@@ -106,7 +106,7 @@ public:
 	template<typename TYPE> const TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const {
 		return voxel<TYPE>({nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps});
 	}
-	template<typename TYPE> const TYPE &voxel( std::array<size_t,4> &&pos )const {
+	template<typename TYPE> const TYPE &voxel( const std::array<size_t,4> &pos )const {
 		if ( !isInRange( pos ) ) {
 			LOG( Debug, isis::error )
 				<< "Index " << util::vector4<size_t>( pos ) << " is out of range (" << getSizeAsString() << ")";
