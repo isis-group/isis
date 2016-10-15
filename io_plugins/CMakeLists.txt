@@ -17,6 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 # add global options
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
@@ -37,6 +38,13 @@ if(ISIS_IOPLUGIN_NIFTI_SA)
 	target_link_libraries(isisImageFormat_Nifti_sa ${isis_core_lib} ${isis_math_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
+
+
+if(ISIS_IOPLUGIN_VISTA_SA)
+	add_library(isisImageFormat_Vista_sa SHARED Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp)
+	target_link_libraries(isisImageFormat_Vista_sa isis_core )
+	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
+endif(ISIS_IOPLUGIN_VISTA_SA)
 
 
 ############################################################

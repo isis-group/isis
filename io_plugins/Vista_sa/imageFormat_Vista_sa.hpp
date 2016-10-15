@@ -18,7 +18,8 @@
 #ifndef IMAGEFORMAT_VISTA_SA_HPP
 #define IMAGEFORMAT_VISTA_SA_HPP
 
-#include <data/io_interface.h>
+#include <isis/data/io_interface.h>
+#include <isis/data/fileptr.hpp>
 
 #include "VistaSaParser.hpp"
 
@@ -30,20 +31,32 @@ namespace image_io
 
 class ImageFormat_VistaSa: public FileFormat
 {
-
+private:
+	static const std::locale vista_locale;
+	class vista_date_facet : public std::time_get< std::stringstream::char_type >{
+        virtual dateorder do_date_order() const{return std::time_base::dmy;}
+	};
+	template<typename STORED> static util::PropertyValue& setPropFormated(util::PropertyMap::PropPath name,const STORED &prop, util::PropertyMap &obj){
+		std::stringstream ss;
+		ss.imbue(vista_locale);
+		ss << prop;
+		return obj.touchProperty(name)=ss.str();
+	}
+	
 public:
-	ImageFormat_VistaSa();
-	std::string getName()const;
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const util::istring &/*dialect*/ )  throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect )  throw( std::runtime_error & );
+	std::string getName()const {return "Vista standalone";}
+	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & );
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); // not used
+	void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & );
+	
 	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
+	util::istring dialects( const std::string &/*filename*/ )const {return "";}
+	static void sanitize( util::PropertyMap &obj );
+	static void unsanitize( util::PropertyMap &obj );
+
 
 protected:
-	util::istring suffixes( io_modes mode = both )const;
-
-	std::shared_ptr< _internal::VistaHeader> m_vheader;
-
+	util::istring suffixes( io_modes /*mode = both */ )const {return ".v";}
 };
 
 }
