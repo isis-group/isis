@@ -27,6 +27,21 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 
+template<typename T> void _magnitudeTransfer(const isis::data::scaling_pair &magnitude_scale, uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
+	const T scale=magnitude_scale.first->as<T>();
+	const T offset=magnitude_scale.second->as<T>();
+	for(const std::complex<T> &v:line){
+		*(dst++)=std::abs(v)*scale+offset;
+	}
+}
+
+template<typename T> void _phaseTransfer(uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
+	const T scale=M_PI/128;
+	for(const std::complex<T> &v:line){
+		*(dst++)=std::arg(v)*scale+128;
+	}
+}
+
 class MriGraphicsView: public QGraphicsView{
 public:
 	MriGraphicsView(QWidget *parent=nullptr):QGraphicsView(parent){
@@ -104,17 +119,28 @@ isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWid
 		const data::scaling_pair magnitude_scale=c->getScaling(*minmax.first,*minmax.second,data::autoscale);
 		
 		magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
-			const float scale=magnitude_scale.first->as<float>();
-			const float offset=magnitude_scale.second->as<float>();
-			for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
-				*(dst++)=std::abs(v)*scale+offset;
+			switch(line.getTypeID()){
+				case data::ValueArray<std::complex<float>>::staticID():
+					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<float>>());
+					break;
+				case data::ValueArray<std::complex<double>>::staticID():
+					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<double>>());
+					break;
+				default:
+					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
 			}
 		};
 
 		phase_transfer = [](uchar *dst, const data::ValueArrayBase &line){
-			const float scale=M_PI/128;
-			for(const std::complex<float> &v:line.castToValueArray<std::complex<float>>()){
-				*(dst++)=std::arg(v)*scale+128;
+			switch(line.getTypeID()){
+				case data::ValueArray<std::complex<float>>::staticID():
+					_phaseTransfer(dst,line.castToValueArray<std::complex<float>>());
+					break;
+				case data::ValueArray<std::complex<double>>::staticID():
+					_phaseTransfer(dst,line.castToValueArray<std::complex<double>>());
+					break;
+				default:
+					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
 			}
 		};
 		transfer_function=magnitude_transfer;
