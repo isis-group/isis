@@ -18,8 +18,10 @@
 
 #include "imageFormat_Vista_sa.hpp"
 #include "VistaSaParser.hpp"
+#include "vistaprotoimage.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
+#include <lib/ImageIO/Vista_sa/vistaprotoimage.hpp>
 
 namespace isis
 {
@@ -111,20 +113,20 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	try{
 		if(hasOrTell("vista/date",obj,warning)){
-			boost::gregorian::date date=obj.getValueAs<util::date>("vista/date");
-			boost::posix_time::time_duration time;
+			util::date date=obj.getValueAs<util::date>("vista/date");
+			util::duration time;
 
-			if(date.is_not_a_date()){
+			if(date==util::date()){
 				LOG(Runtime,warning) << "Failed to parse date " << util::MSubject( obj.queryProperty("vista/date"));
 			} else {
 				obj.remove("vista/date");
 
 				if(hasOrTell("vista/time",obj,warning)){
-					time = boost::posix_time::duration_from_string(obj.getValueAs<std::string>("vista/time"));
-					if(!time.is_not_a_date_time())
+					time = obj.getValueAs<util::duration>("vista/time");
+					if(time==util::duration())
 						obj.remove("vista/time");
 				}
-				obj.setValueAs("sequenceStart",boost::posix_time::ptime(date,time));
+				obj.setValueAs<util::timestamp>("sequenceStart",date+time);
 			}
 			 
 			LOG(Debug,info) << "Parsed sequenceStart from date/time pair as " << obj.queryProperty("sequenceStart");
@@ -154,15 +156,16 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 
 	//store sequenceStart
 	if(obj.hasProperty("sequenceStart")){
-		const boost::posix_time::ptime stamp=obj.getValueAs<boost::posix_time::ptime>("sequenceStart");
-		setPropFormated("date",stamp.date(),obj);
-		setPropFormated("time",stamp.time_of_day(),obj);
+		const util::timestamp stamp=obj.getValueAs<util::timestamp>("sequenceStart");
+#pragma message "Implement me"
+// 		setPropFormated("date",stamp.date(),obj);
+// 		setPropFormated("time",stamp.time_of_day(),obj);
 		obj.remove("sequenceStart");
 	}
 
 	//store birth
 	if(obj.hasProperty("subjectBirth")){
-		setPropFormated("birth",obj.getValueAs<boost::gregorian::date>("subjectBirth"),obj);
+		setPropFormated("birth",obj.getValueAs<util::date>("subjectBirth"),obj);
 		obj.remove("subjectBirth");
 	}
 

@@ -41,8 +41,8 @@ endif(ISIS_IOPLUGIN_NIFTI_SA)
 
 
 if(ISIS_IOPLUGIN_VISTA_SA)
-	add_library(isisImageFormat_Vista_sa SHARED Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp)
-	target_link_libraries(isisImageFormat_Vista_sa isis_core )
+	add_library(isisImageFormat_Vista_sa SHARED Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/vistaprotoimage.cpp)
+	target_link_libraries(isisImageFormat_Vista_sa ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
 endif(ISIS_IOPLUGIN_VISTA_SA)
 

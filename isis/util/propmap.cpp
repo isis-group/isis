@@ -242,7 +242,7 @@ PropertyMap& PropertyMap::touchBranch(const PropertyMap::PropPath& path)
 {
 	return tryFetchEntry<PropertyMap>( path ).get();
 }
-const PropertyMap PropertyMap::branch( const PropertyMap::PropPath &path ) const
+PropertyMap PropertyMap::branch( const PropertyMap::PropPath &path ) const
 {
 	const boost::optional< const PropertyMap& > branch=queryBranch( path );
 	return branch ? branch.get() : PropertyMap();

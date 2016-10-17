@@ -410,7 +410,7 @@ public:
 	 * \returns the requested branch or an empty PropertyMap
 	 * \warning as this creates a deep copy of the branch it can be an expensive call. Its usually better to use queryBranch( const PropPath &path )const.
 	 */
-	const PropertyMap branch( const PropPath &path )const;
+	PropertyMap branch( const PropPath &path )const;
 
 	/**
 	 * Remove the property adressed by the path.
@@ -776,7 +776,7 @@ public:
 	 * Get a valid reference to the stored value in a given type.
 	 * This tries to access a property's first stored value as reference.
 	 * If the stored type is not T, a transformation is done in place.
-	 * If that fails, false is returned.
+	 * If that fails, an exception is raised.
 	 * If the property does not exist (or is empty) it is created with def as first value.
 	 * \param path the path to the property
 	 * \param def the default value to be used when creating the property

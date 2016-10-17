@@ -44,16 +44,17 @@ template<typename Iterator> void addEntry(
 {
 	isis::util::PropertyMap &pmap = context.attributes.car;
 	const isis::util::istring name = fusion::at_c<0>(a).c_str();
+	optional< util::PropertyValue & > prop_dummy;
 
 	if( pmap.hasBranch( name ) ) {
 		LOG( Runtime, warning ) << "There is allready a branch " << name << " skipping " << name << "=" << fusion::at_c<1>(a);
-	} else if( pmap.hasProperty( name ) ) {
-		if( pmap.propertyValue( name ) == fusion::at_c<1>(a) )
+	} else if( (prop_dummy=pmap.queryProperty( name )) ) {
+		if( *prop_dummy == fusion::at_c<1>(a) )
 			LOG( Runtime, info ) << "Skipping duplicate " << std::make_pair( name, fusion::at_c<1>(a) );
 		else
 			LOG( Runtime, warning ) << "There is already an entry " << std::make_pair( name, pmap.queryProperty( name ) ) << " skipping " << std::make_pair( name, fusion::at_c<1>(a) );
 	} else
-		context.attributes.car.setPropertyAs( name, fusion::at_c<1>(a) );
+		context.attributes.car.setValueAs( name, fusion::at_c<1>(a) );
 }
 
 template<typename Iterator> void addBlock(
@@ -67,7 +68,7 @@ template<typename Iterator> void addBlock(
 	if( pmap.hasBranch( name ) || pmap.hasProperty( name ) ) {
 		LOG( Runtime, error ) << "There is already an entry " << name << " skipping this one" ;
 	} else
-		pmap.branch( name ) = fusion::at_c<2>(a);
+		pmap.touchBranch( name ) = fusion::at_c<2>(a);
 }
 
 template<typename Iterator> void addHist(
@@ -76,15 +77,11 @@ template<typename Iterator> void addHist(
 )
 {
 	isis::util::PropertyMap &pmap = context.attributes.car;
-	isis::util::PropertyValue &hist = pmap.propertyValue( "history" );
+	isis::util::slist &hist = pmap.refValueAsOr( "history", isis::util::slist() );
 
-	if( hist.isEmpty() )
-		hist = isis::util::slist();
+	for( const s_entry & ref: a )
+		hist.push_back( ref.m0 + ":\t\"" + ref.m1 + "\"");
 
-	if( hist.is<isis::util::slist>() ) {
-		BOOST_FOREACH( const s_entry & ref, a )
-		hist.castTo<isis::util::slist>().push_back( ref.m0 + ":\t\"" + ref.m1 + "\"");
-	}
 }
 
 template<typename Iterator> void addChunk(
