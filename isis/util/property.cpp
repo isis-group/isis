@@ -269,6 +269,10 @@ bool PropertyValue::lt( const PropertyValue& ref ) const{
 	return ret;
 }
 
+PropertyValue& PropertyValue::operator +=( const PropertyValue &second ){front().add(second.front());return *this;}
+PropertyValue& PropertyValue::operator -=( const PropertyValue &second ){front().substract(second.front());return *this;}
+PropertyValue& PropertyValue::operator *=( const PropertyValue &second ){front().multiply_me(second.front());return *this;}
+PropertyValue& PropertyValue::operator /=( const PropertyValue &second ){front().divide_me(second.front());return *this;}
 
 }
 }

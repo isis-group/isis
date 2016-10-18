@@ -369,6 +369,11 @@ public:
 	template<typename T> PropertyValue operator*( const T &rhs )const {PropertyValue lhs(*this); return lhs*=rhs;}
 	template<typename T> PropertyValue operator/( const T &rhs )const {PropertyValue lhs(*this); return lhs/=rhs;}
 	
+	PropertyValue& operator +=( const PropertyValue &second );
+	PropertyValue& operator -=( const PropertyValue &second );
+	PropertyValue& operator *=( const PropertyValue &second );
+	PropertyValue& operator /=( const PropertyValue &second );
+
 };
 
 }
