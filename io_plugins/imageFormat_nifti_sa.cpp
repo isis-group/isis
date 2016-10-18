@@ -287,11 +287,13 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 				slice_code = NIFTI_SLICE_SEQ_INC;
 			}
 		}
-
-		slice_duration = fabs( second.as<float>() - second.as<float>() );
-
-		if( slice_code == NIFTI_SLICE_SEQ_INC || slice_code == NIFTI_SLICE_SEQ_DEC ) { // if its interleaved there was another slice between 0 and 1
-			slice_duration /= 2;
+		if(first.is<util::timestamp>() && second.is<util::timestamp>()){
+			//can't simply use first-second because that assumes result type timestamp
+			//@todo add support for such operations
+			util::duration duration= first.as<util::timestamp>() - second.as<util::timestamp>();  
+			if(slice_code == NIFTI_SLICE_ALT_INC || slice_code == NIFTI_SLICE_ALT_DEC) //@todo test me
+				duration /=  img.getSizeAsVector()[data::sliceDim] / 2;
+			slice_duration=std::fabs(std::chrono::milliseconds(duration).count());
 		}
 	}
 
