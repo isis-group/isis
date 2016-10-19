@@ -32,12 +32,18 @@ const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vist
 
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
+	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
 	auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		LOG(Debug,info) << "Directly using vista/rowVec and vista/columnVec";
 		obj.transform<util::fvector3>( "vista/columnVec", "rowVec" );
 		obj.transform<util::fvector3>( "vista/rowVec", "columnVec" );
 		transformOrTell<util::fvector3>( "vista/sliceVec", "sliceVec", obj, warning );
+	} else if( obj.hasProperty( "vista/x-axis" ) && obj.hasProperty( "vista/y-axis" ) && obj.hasProperty( "vista/z-axis" ) ) { // if we have the complete orientation
+		LOG(Debug,info) << "Using vista/x-axis, vista/y-axis and vista/z-axis";
+		obj.transform<util::fvector3>( "vista/x-axis", "rowVec" );
+		obj.transform<util::fvector3>( "vista/y-axis", "columnVec" );
+		transformOrTell<util::fvector3>( "vista/z-axis", "sliceVec", obj, warning );
 	} else if( queryOrientationPatient ) {
 		LOG(Debug,info) << "using vista/imageOrientationPatient " << queryOrientationPatient;
 		const util::dlist vecs = queryOrientationPatient->as<util::dlist>(); // if we have the dicom style partial orientation

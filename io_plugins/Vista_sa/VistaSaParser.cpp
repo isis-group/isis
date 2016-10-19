@@ -47,7 +47,7 @@ template<typename Iterator> void addEntry(
 	optional< util::PropertyValue & > prop_dummy;
 
 	if( pmap.hasBranch( name ) ) {
-		LOG( Runtime, warning ) << "There is allready a branch " << name << " skipping " << name << "=" << fusion::at_c<1>(a);
+		LOG( Runtime, warning ) << "There is already a branch " << name << " skipping " << name << ":" << fusion::at_c<1>(a);
 	} else if( (prop_dummy=pmap.queryProperty( name )) ) {
 		if( *prop_dummy == fusion::at_c<1>(a) )
 			LOG( Runtime, info ) << "Skipping duplicate " << std::make_pair( name, fusion::at_c<1>(a) );
@@ -108,10 +108,10 @@ bool parse_vista( data::ValueArray< uint8_t >::iterator &first, data::ValueArray
 	SKIP_TYPE skipper = ascii::space | '\t' | '\n';
 
 	qi::rule<Iterator, int(), SKIP_TYPE> magic = "V-data" >> int_;
-	qi::rule<Iterator, std::string(), SKIP_TYPE> word = lexeme[+( ascii::char_ - '"' - '{'-'}'-skipper )];
+	qi::rule<Iterator, std::string(), SKIP_TYPE> word = lexeme[+ascii::char_("a-zA-Z0-9_.-")];
 	qi::rule<Iterator, std::string(), SKIP_TYPE> quoted_string = lexeme['"' >> *( lit( "\\\"" )|( ascii::char_ - '"' ) ) >> '"'];
-	qi::rule<Iterator, std::string(), SKIP_TYPE> label = lexeme[+( ascii::alnum|'_'|'-'|'.'|'#' )] >> ':';
-	qi::rule<Iterator, s_entry(), SKIP_TYPE> entry = label >> ( quoted_string | word ) >> !lit( '{' );
+	qi::rule<Iterator, std::string(), SKIP_TYPE> label = word >> ':';
+	qi::rule<Iterator, s_entry(), SKIP_TYPE> entry = label >> ( word | quoted_string ) >> !lit( '{' );
 
 	qi::rule<Iterator, isis::util::PropertyMap(), SKIP_TYPE> block, chunk;
 	qi::rule<Iterator, std::vector<s_entry>(), SKIP_TYPE> hist_block = lit( "history" ) >> ':' >> '{' >> *entry >> '}';
@@ -131,14 +131,14 @@ bool parse_vista( data::ValueArray< uint8_t >::iterator &first, data::ValueArray
 	word.name( "word" );
 	chunk.name( "chunk" );
 
-	//  qi::debug(block);
-	//  qi::debug(magic);
-	//  qi::debug(entry);
-	//  qi::debug(label);
-	//  qi::debug(quoted_string);
-	//  qi::debug(word);
-	//  qi::debug(named_block);
-	//  qi::debug(chunk);
+// 	qi::debug(block);
+// 	qi::debug(magic);
+// 	qi::debug(entry);
+// 	qi::debug(label);
+// 	qi::debug(quoted_string);
+// 	qi::debug(word);
+// 	qi::debug(named_block);
+// 	qi::debug(chunk);
 
 	return phrase_parse( first, last, vista, skipper );
 }
