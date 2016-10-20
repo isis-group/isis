@@ -800,6 +800,29 @@ public:
 	virtual ~ValueConverter() {}
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Conversion timepoint => date (date is just a timestamp with days as resolition so it equals a rounding 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<> class ValueConverter<false, false, util::timestamp, util::date > : public ValueGenerator<util::timestamp, util::date>
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating time converter from " << Value<util::timestamp>::staticName() << " to " << Value<util::date>::staticName();
+	};
+public:
+	static std::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, util::timestamp, util::date > *ret = new ValueConverter<false, false, util::timestamp, util::date>;
+		return std::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		util::date &dstVal = dst.castTo<util::date>();		
+		dstVal=std::chrono::time_point_cast<std::chrono::days>(src.castTo<util::timestamp>());
+
+		return boost::numeric::cInRange;
+	}
+	virtual ~ValueConverter() {}
+};
+
+
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.
 ////////////////////////////////////////////////////////////////////////
