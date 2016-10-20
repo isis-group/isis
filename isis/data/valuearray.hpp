@@ -378,7 +378,8 @@ public:
 		}
 	}
 	void endianSwap() {
-		data::endianSwapArray( begin(), end(), begin() );
+		if(bytesPerElem()>1)
+			data::endianSwapArray( begin(), end(), begin() );
 	}
 };
 template<typename T> bool ValueArrayBase::is()const
