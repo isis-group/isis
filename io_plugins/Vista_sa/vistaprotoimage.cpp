@@ -107,7 +107,7 @@ bool VistaInputImage::add( util::PropertyMap props )
 	
 	if(vistaTree.hasProperty( "length" )){
 		LOG_IF(vistaTree.getValueAs<uint64_t>("length") != (ch_data->getLength()*ch_data->bytesPerElem()),Runtime,warning)
-			<< "Length given in the header (" << util::MSubject( *vistaTree.queryProperty("length")) <<") does not fit the images size " << util::MSubject(ch_size);
+			<< "Length given in the header (" << *vistaTree.queryProperty("length") <<") does not fit the images size " << ch_size;
 		vistaTree.remove( "length" );
 	}
 
@@ -119,10 +119,10 @@ bool VistaInputImage::add( util::PropertyMap props )
 	}
 
 	LOG( Runtime, verbose_info ) << "Creating " << ch_data->getTypeName() << "-Chunk of size "
-								 << ch_size << " (offset was " << std::hex << std::distance( m_fileptr.begin(), m_data_start ) + ch_offset << "/"
-								 << std::dec << std::distance( m_data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), m_fileptr.end() ) << " bytes are left)";
+								 << ch_size << " (offset was " << std::distance( m_fileptr.begin(), m_data_start ) + ch_offset << " / "
+								 << std::distance( m_data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), m_fileptr.end() ) << " bytes are left)";
 
-	push_back( data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2], ch_size[3] ) );
+	push_back( data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2] ) );
 	static_cast<util::PropertyMap &>( back() ) = props;
 	return true;
 }

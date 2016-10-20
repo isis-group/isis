@@ -33,13 +33,13 @@ const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vist
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
-	auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
+	const auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		LOG(Debug,info) << "Directly using vista/rowVec and vista/columnVec";
 		obj.transform<util::fvector3>( "vista/columnVec", "rowVec" );
 		obj.transform<util::fvector3>( "vista/rowVec", "columnVec" );
 		transformOrTell<util::fvector3>( "vista/sliceVec", "sliceVec", obj, warning );
-	} else if( obj.hasProperty( "vista/x-axis" ) && obj.hasProperty( "vista/y-axis" ) && obj.hasProperty( "vista/z-axis" ) ) { // if we have the complete orientation
+	} else if( obj.hasProperty( "vista/x-axis" ) && obj.hasProperty( "vista/y-axis" ) ) { // if we have the complete orientation
 		LOG(Debug,info) << "Using vista/x-axis, vista/y-axis and vista/z-axis";
 		obj.transform<util::fvector3>( "vista/x-axis", "rowVec" );
 		obj.transform<util::fvector3>( "vista/y-axis", "columnVec" );
@@ -61,7 +61,7 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	if(
 		transformOrTell<util::fvector3>( "vista/imagePositionPatient", "indexOrigin", obj, info ) ||
-		transformOrTell<util::fvector3>( "vista/indexOrigin", "indexOrigin", obj, warning )
+		transformOrTell<util::fvector3>( "vista/indexOrigin", "indexOrigin", obj, info )
 	);
 	else {
 		LOG( Runtime, warning ) << "No position info was found, assuming 0 0 0";
@@ -70,10 +70,11 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	if( transformOrTell<util::fvector3>( "vista/lattice", "voxelSize", obj, info ) ) { // if we have lattice
 		if( hasOrTell( "vista/voxel", obj, info ) ) { // use that as voxel size, and the difference to voxel as voxel gap
-			obj.setValueAs<util::fvector3>( "voxelGap", obj.getValueAs<util::fvector3>( "vista/voxel" ) - obj.getValueAs<util::fvector3>( "voxelSize" ) ) ;
+			obj.setValueAs( "voxelGap", obj.getValueAs<util::fvector3>( "vista/voxel" ) - obj.getValueAs<util::fvector3>( "voxelSize" ) ) ;
 			obj.remove( "vista/voxel" );
 		}
 	} else if( transformOrTell<util::fvector3>( "vista/voxel", "voxelSize", obj, warning ) ) {
+		LOG(Runtime,notice) << "No vista/lattice found, will use vista/voxel as voxelSize and won't compute voxelGap";
 	} else
 		obj.setValueAs( "voxelSize", util::fvector3{ 1, 1, 1 } );
 
@@ -94,13 +95,6 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
-	if ( obj.hasProperty( "vista/age" ) ) {
-		obj.setValueAs( "subjectAge",obj.getValueAs<uint16_t>("vista/age")*365.2425 );
-		obj.remove( "vista/age" );
-	}
-
-	transformOrTell<uint16_t>( "vista/age", "subjectAge", obj, warning );
-
 	transformOrTell<std::string>( "vista/coilID", "transmitCoil", obj, verbose_info ) ||
 	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
 
@@ -116,30 +110,33 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 			obj.remove( "vista/sex" );
 		}
 	}
-
+	
 	try{
-		if(hasOrTell("vista/date",obj,warning)){
-			util::date date=obj.getValueAs<util::date>("vista/date");
-			util::duration time;
+		const auto dateQuery = obj.queryProperty("vista/date");
+		const auto timeQuery = obj.queryProperty("vista/time");
 
-			if(date==util::date()){
-				LOG(Runtime,warning) << "Failed to parse date " << util::MSubject( obj.queryProperty("vista/date"));
-			} else {
-				obj.remove("vista/date");
-
-				if(hasOrTell("vista/time",obj,warning)){
-					time = obj.getValueAs<util::duration>("vista/time");
-					if(time==util::duration())
-						obj.remove("vista/time");
-				}
-				obj.setValueAs<util::timestamp>("sequenceStart",date+time);
-			}
-			 
-			LOG(Debug,info) << "Parsed sequenceStart from date/time pair as " << obj.queryProperty("sequenceStart");
+		if(dateQuery && timeQuery){
+			util::Value<std::string> date_time=dateQuery->as<std::string>()+" "+timeQuery->as<std::string>();
+			obj.setValueAs("sequenceStart",date_time.as<util::timestamp>());
+			obj.remove("vista/date");
+			obj.remove("vista/time");
+			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << obj.queryProperty("sequenceStart");
+		} else {
+			LOG(Runtime,warning) << "Vista file lacks date and/or time information, can't set sequenceStart";
 		}
-		
 	} catch(...){
-		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.queryProperty("vista/date") << "/" << obj.queryProperty("vista/time");
+		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.queryProperty("vista/date") << " " << obj.queryProperty("vista/time");
+	}
+
+	if ( obj.hasProperty( "vista/age" ) ) {
+		obj.setValueAs( "subjectAge",obj.getValueAs<uint16_t>("vista/age")*365.2425 );
+		obj.remove( "vista/age" );
+	} else if(obj.hasProperty("vista/birth") && (obj.hasProperty("vista/date") || obj.hasProperty("sequenceStart"))){
+		const util::date birthdate=obj.getValueAs<util::date>("vista/birth");
+		const util::date measuredate= obj.getValueAsOr("vista/date",obj.getValueAs<util::date>("sequenceStart"));
+			
+		obj.setValueAs<uint16_t>("subjectAge",std::chrono::duration_cast<std::chrono::days>(measuredate-birthdate).count());
+		LOG(Runtime,info) << "Computed subjectAge from measurement date and birthdate as " << obj.getValueAs<uint16_t>("subjectAge")/365.2425 << " years";
 	}
 
 	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
