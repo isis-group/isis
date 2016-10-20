@@ -289,10 +289,11 @@ bool Image::reIndex(optional< util::slist& > rejected)
 			util::fvector3 &vec = found.get();
 
 			if( util::sqlen(vec) == 0 ) {
-				util::fvector3  v_one;
+				util::fvector3  v_one{0,0,0};
 				v_one[oneCnt] = 1;
 				LOG( Runtime, error )
-						<< "The existing " << ref << " " << vec << ( hasProperty( "source" ) ? " from " + getValueAs<std::string>( "source" ) : "" ) << " has the length zero. Falling back to " << v_one << ".";
+						<< "The existing " << ref << " " << vec << ( hasProperty( "source" ) ? " from " + getValueAs<std::string>( "source" ) : "" ) 
+						<< " has the length zero. Falling back to " << v_one << ".";
 				vec = v_one;
 			}
 
