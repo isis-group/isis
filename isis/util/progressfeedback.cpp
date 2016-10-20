@@ -38,8 +38,7 @@ void ConsoleFeedback::show( size_t max, std::string header )
 	if( disp )
 		extend( max );
 	else {
-		header += "\n";
-		disp.reset( new boost::progress_display( max, std::cout, header ) );
+		disp.reset( new boost::progress_display( max, std::cout, header + "\n") );
 	}
 }
 
@@ -66,9 +65,8 @@ size_t ConsoleFeedback::getMax()
 }
 size_t ConsoleFeedback::progress( const std::string message, size_t step )
 {
-	LOG_IF( !disp, Debug, error ) << "Cannot call progress on a not displayed ConsoleFeedBack.";
 	LOG_IF( !message.empty(), Debug, warning ) << "ConsoleFeedBack does ignore the message string";
-	return disp->operator+=( step );
+	return disp ? disp->operator+=( step ):0;
 }
 
 
