@@ -21,7 +21,7 @@
 #include "vistaprotoimage.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
-#include <lib/ImageIO/Vista_sa/vistaprotoimage.hpp>
+#include <isis/util/matrix.hpp>
 
 namespace isis
 {
@@ -35,17 +35,25 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
 	const auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
-		LOG(Debug,info) << "Directly using vista/rowVec and vista/columnVec";
+		LOG(Runtime,info) << "Directly using vista/rowVec and vista/columnVec";
 		obj.transform<util::fvector3>( "vista/columnVec", "rowVec" );
 		obj.transform<util::fvector3>( "vista/rowVec", "columnVec" );
 		transformOrTell<util::fvector3>( "vista/sliceVec", "sliceVec", obj, warning );
-	} else if( obj.hasProperty( "vista/x-axis" ) && obj.hasProperty( "vista/y-axis" ) ) { // if we have the complete orientation
-		LOG(Debug,info) << "Using vista/x-axis, vista/y-axis and vista/z-axis";
-		obj.transform<util::fvector3>( "vista/x-axis", "rowVec" );
-		obj.transform<util::fvector3>( "vista/y-axis", "columnVec" );
-		transformOrTell<util::fvector3>( "vista/z-axis", "sliceVec", obj, warning );
+	} else if( obj.hasProperty( "vista/x-axis" ) && obj.hasProperty( "vista/y-axis" ) && obj.hasProperty( "vista/z-axis" ) ) { // if we have the complete orientation
+
+		static const util::Matrix3x3<float> vista2isis{
+			 0,-1, 0,
+			 0, 0, 1,
+			-1, 0, 0
+		};
+		
+		obj.setValueAs("rowVec",    vista2isis * obj.getValueAs<util::fvector3>("vista/x-axis"));
+		obj.setValueAs("columnVec", vista2isis * obj.getValueAs<util::fvector3>("vista/y-axis"));
+		obj.setValueAs("sliceVec",  vista2isis * obj.getValueAs<util::fvector3>("vista/z-axis"));
+		LOG(Runtime,info) << "Computed orientation from x/y/z-axis in vista";
+		
 	} else if( queryOrientationPatient ) {
-		LOG(Debug,info) << "using vista/imageOrientationPatient " << queryOrientationPatient;
+		LOG(Runtime,info) << "using vista/imageOrientationPatient " << queryOrientationPatient;
 		const util::dlist vecs = queryOrientationPatient->as<util::dlist>(); // if we have the dicom style partial orientation
 		util::dlist::const_iterator begin = vecs.begin(), middle = vecs.begin(), end = vecs.end();
 		std::advance( middle, 3 );
@@ -53,9 +61,9 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		std::copy(middle,end,std::begin(obj.refValueAsOr("columnVec",util::fvector3{})));
 	} else { // if we dont have an orientation
 		LOG( Runtime, warning ) << "No orientation info was found, assuming identity matrix";
-		obj.setValueAs( "rowVec",    util::fvector3{ 1, 0,  0 } );
-		obj.setValueAs( "columnVec", util::fvector3{ 0, 1,  0 } );
-		obj.setValueAs( "sliceVec",  util::fvector3{ 0, 0, -1 } );
+		obj.setValueAs( "rowVec",    util::fvector3{ 1, 0, 0 } );
+		obj.setValueAs( "columnVec", util::fvector3{ 0, 1, 0 } );
+		obj.setValueAs( "sliceVec",  util::fvector3{ 0, 0, 1 } );
 		obj.setValueAs( "vista/no_geometry",  true );
 	}
 
