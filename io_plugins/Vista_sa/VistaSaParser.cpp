@@ -80,7 +80,7 @@ template<typename Iterator> void addHist(
 	isis::util::slist &hist = pmap.refValueAsOr( "history", isis::util::slist() );
 
 	for( const s_entry & ref: a )
-		hist.push_back( ref.m0 + ":\t\"" + ref.m1 + "\"");
+		hist.push_back( fusion::at_c<0>(ref) + ":\t\"" + fusion::at_c<1>(ref) + "\"");
 
 }
 
