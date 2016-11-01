@@ -35,11 +35,7 @@ ProgressFeedback::~ProgressFeedback() {}
 
 void ConsoleFeedback::show( size_t max, std::string header )
 {
-	if( disp )
-		extend( max );
-	else {
-		disp.reset( new boost::progress_display( max, std::cout, header + "\n") );
-	}
+	disp.reset( new boost::progress_display( max, std::cout, header + "\n") );
 }
 
 size_t ConsoleFeedback::extend( size_t by )
