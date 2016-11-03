@@ -1,52 +1,56 @@
 #include "clplatform.hxx"
 
-template<> std::string isis::math::_internal::OpenCLPlatform::getDeviceInfo<std::string>(cl_device_id device,cl_device_info info){
+namespace isis{
+namespace math{
+namespace _internal{
+
+template<> std::string getDeviceInfo<std::string>(cl_device_id device,cl_device_info info){
 	char info_text[128];
 	const cl_int err=clGetDeviceInfo(device, info, sizeof(info_text), info_text, NULL);
-	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetDeviceInfo failed with " << getErrorString(err);
+	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetDeviceInfo failed with " << OpenCLPlatform::getErrorString(err);
 	return info_text;
 
 }
-template<> std::string isis::math::_internal::OpenCLPlatform::getPlatformInfo<std::string>(cl_platform_id platform,cl_platform_info info){
+template<> std::string getPlatformInfo<std::string>(cl_platform_id platform,cl_platform_info info){
 	char platform_info[128];
 	const cl_int err=clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(platform_info), platform_info, NULL);
-	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetPlatformInfo failed with " << getErrorString(err);
+	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetPlatformInfo failed with " << OpenCLPlatform::getErrorString(err);
 	return platform_info;
 }
 
-std::string isis::math::_internal::OpenCLPlatform::getPlatformName(cl_platform_id platform){
+std::string getPlatformName(cl_platform_id platform){
 	return getPlatformInfo<std::string>(platform,CL_PLATFORM_NAME);
 }
 
-std::string isis::math::_internal::OpenCLPlatform::getDeviceName(cl_device_id device){
+std::string getDeviceName(cl_device_id device){
 	return getDeviceInfo<std::string>(device,CL_DEVICE_NAME);
 }
 
-std::vector<cl_platform_id> isis::math::_internal::OpenCLPlatform::getPlatformIDs(){
+std::vector<cl_platform_id> getPlatformIDs(){
 	cl_platform_id platforms[10];
 	cl_uint platform_nr;
 	cl_int err;
 	if((err=clGetPlatformIDs( 10, platforms, &platform_nr)) != CL_SUCCESS){
-		LOG(Runtime,error) << "Failed to get available platforms (error was " << getErrorString(err) << ")";
+		LOG(Runtime,error) << "Failed to get available platforms (error was " << OpenCLPlatform::getErrorString(err) << ")";
 		return std::vector<cl_platform_id> ();
 	} else
 		return std::vector<cl_platform_id>(platforms,platforms+platform_nr);
 }
 
-std::vector<cl_device_id> isis::math::_internal::OpenCLPlatform::getDeviceIDs(cl_platform_id platform, cl_device_type device_type){
+std::vector<cl_device_id> getDeviceIDs(cl_platform_id platform, cl_device_type device_type){
 	cl_device_id devices[10];
 	cl_uint device_nr;
 	cl_int err;
 	if((err=clGetDeviceIDs( platform, device_type, 10, devices, &device_nr ))!= CL_SUCCESS){
 		LOG(Runtime,error)
 				<< "Failed to get available devices for platform " << getPlatformName(platform)
-				<< " (error was " << getErrorString(err) << ")";
+				<< " (error was " << OpenCLPlatform::getErrorString(err) << ")";
 		return std::vector<cl_device_id>();
 	} else
 		return std::vector<cl_device_id>(devices,devices+device_nr);
 }
 
-std::string isis::math::_internal::OpenCLPlatform::getErrorString(cl_int err)
+std::string OpenCLPlatform::getErrorString(cl_int err)
 {
 	switch(err){
 	// run-time and JIT compiler errors
@@ -123,7 +127,7 @@ std::string isis::math::_internal::OpenCLPlatform::getErrorString(cl_int err)
 	}
 }
 
-std::vector<cl_device_id> isis::math::_internal::OpenCLPlatform::getMyDeviceIDs(){
+std::vector<cl_device_id> OpenCLPlatform::getMyDeviceIDs(){
 	cl_device_id devices[10];
 	size_t device_nr;
 	cl_int err;
@@ -135,7 +139,7 @@ std::vector<cl_device_id> isis::math::_internal::OpenCLPlatform::getMyDeviceIDs(
 		return std::vector<cl_device_id>(devices,devices+device_nr);
 }
 
-cl_context isis::math::_internal::OpenCLPlatform::createContext(cl_platform_id platform, cl_device_type device_type){
+cl_context OpenCLPlatform::createContext(cl_platform_id platform, cl_device_type device_type){
 	if(getDeviceIDs(platform,device_type).size()){
 		cl_context_properties props[3] = {CL_CONTEXT_PLATFORM,(cl_context_properties)platform,0};
 		cl_context ret=clCreateContextFromType (props,device_type,nullptr,nullptr,&err);
@@ -150,7 +154,7 @@ cl_context isis::math::_internal::OpenCLPlatform::createContext(cl_platform_id p
 	return 0;
 }
 
-isis::math::_internal::OpenCLPlatform::OpenCLPlatform(){
+OpenCLPlatform::OpenCLPlatform(){
 	/* Setup OpenCL environment. */
 	std::pair<cl_platform_id,int> biggest;
 	for(cl_platform_id p:getPlatformIDs()){
@@ -169,24 +173,28 @@ isis::math::_internal::OpenCLPlatform::OpenCLPlatform(){
 	}
 }
 
-isis::math::_internal::OpenCLPlatform::~OpenCLPlatform(){
+OpenCLPlatform::~OpenCLPlatform(){
 	clReleaseContext( ctx );
 }
 
-bool isis::math::_internal::OpenCLPlatform::good(){return ctx!=nullptr && err==CL_SUCCESS;}
+bool OpenCLPlatform::good(){return ctx!=nullptr && err==CL_SUCCESS;}
 
-cl_command_queue isis::math::_internal::OpenCLPlatform::clCreateCommandQueue(){
+cl_command_queue OpenCLPlatform::clCreateCommandQueue(){
 	const cl_command_queue ret = ::clCreateCommandQueue( ctx, getMyDeviceIDs().front(), 0, &err );
 	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clCreateCommandQueue failed with " << getErrorString(err);
 	return ret;
 }
 
-cl_mem isis::math::_internal::OpenCLPlatform::clCreateBuffer(cl_mem_flags flags, size_t size, void *host_ptr, cl_int *errcode_ret){
+cl_mem OpenCLPlatform::clCreateBuffer(cl_mem_flags flags, size_t size, void *host_ptr, cl_int *errcode_ret){
 	return ::clCreateBuffer( ctx, flags, size, host_ptr, errcode_ret );
 }
 
-cl_int isis::math::_internal::OpenCLPlatform::clEnqueueWriteBuffer(cl_command_queue queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t buffer_size, const void *ptr, cl_uint num_events_in_wait_list, const cl_event *event_wait_list, cl_event *event){
+cl_int OpenCLPlatform::clEnqueueWriteBuffer(cl_command_queue queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t buffer_size, const void *ptr, cl_uint num_events_in_wait_list, const cl_event *event_wait_list, cl_event *event){
 	return ::clEnqueueWriteBuffer(queue, buffer, blocking_write, offset, buffer_size, ptr, num_events_in_wait_list, event_wait_list, event );
 }
 
-isis::math::_internal::OpenCLPlatform::operator cl_context(){return ctx;}
+OpenCLPlatform::operator cl_context(){return ctx;}
+
+}
+}
+}

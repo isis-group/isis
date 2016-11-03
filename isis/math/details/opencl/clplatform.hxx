@@ -15,30 +15,13 @@ namespace isis{
 namespace math{
 namespace _internal{
 
-
 class OpenCLPlatform{
 private:
 	cl_int err;
 	cl_context ctx = 0;
 public:
-	template<typename T> static T getDeviceInfo(cl_device_id device,cl_device_info info){
-		T ret;
-		const cl_int err=clGetDeviceInfo(device, info, sizeof(ret), &ret, NULL);
-		LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetDeviceInfo failed with " << getErrorString(err);
-		return ret;
-	}
-	template<typename T> static T getPlatformInfo(cl_platform_id platform,cl_platform_info info){
-		T ret;
-		const cl_int err=clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(ret), ret, NULL);
-		LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetPlatformInfo failed with " << getErrorString(err);
-		return ret;
-	}
-
-	static std::string getPlatformName(cl_platform_id platform);
-	static std::string getDeviceName(cl_device_id device);
-	static std::vector<cl_platform_id> getPlatformIDs();
-	static std::vector<cl_device_id> getDeviceIDs(cl_platform_id platform,cl_device_type device_type=CL_DEVICE_TYPE_ALL);
 	static std::string getErrorString(cl_int err);
+
 	std::vector<cl_device_id> getMyDeviceIDs();
 	cl_context createContext(cl_platform_id platform,cl_device_type  device_type=CL_DEVICE_TYPE_ALL);
 	OpenCLPlatform();
@@ -51,6 +34,24 @@ public:
 	cl_int clEnqueueWriteBuffer(cl_command_queue queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t buffer_size, const void *ptr, cl_uint num_events_in_wait_list=0, const cl_event *event_wait_list=nullptr, cl_event *event=nullptr);
 	operator cl_context();
 };
+
+std::string getPlatformName(cl_platform_id platform);
+std::string getDeviceName(cl_device_id device);
+std::vector<cl_platform_id> getPlatformIDs();
+std::vector<cl_device_id> getDeviceIDs(cl_platform_id platform,cl_device_type device_type=CL_DEVICE_TYPE_ALL);
+
+template<typename T> T getDeviceInfo(cl_device_id device,cl_device_info info){
+	T ret;
+	const cl_int err=clGetDeviceInfo(device, info, sizeof(ret), &ret, NULL);
+	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetDeviceInfo failed with " << OpenCLPlatform::getErrorString(err);
+	return ret;
+}
+template<typename T> T getPlatformInfo(cl_platform_id platform,cl_platform_info info){
+	T ret;
+	const cl_int err=clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(ret), ret, NULL);
+	LOG_IF(err!=CL_SUCCESS,Runtime,error) << "clGetPlatformInfo failed with " << OpenCLPlatform::getErrorString(err);
+	return ret;
+}
 
 }
 }
