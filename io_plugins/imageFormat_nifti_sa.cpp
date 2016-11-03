@@ -233,8 +233,9 @@ void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions fli
 {
 	static const char *names[] = {"rowVec", "columnVec", "sliceVec"};
 	assert( flipdim <= data::sliceDim );
-	const float vsize = image.getValueAs<util::fvector3>( "voxelSize" )[flipdim] +
-						image.getValueAsOr<util::fvector3>( "voxelGap", util::fvector3({0,0,0}) )[flipdim];
+	const float vsize = 
+		image.getValueAs<util::fvector3>( "voxelSize" )[flipdim] +
+		image.getValueAsOr<util::fvector3>( "voxelGap", util::fvector3{0,0,0} )[flipdim];
 	const float middle_to_middle = ( image.getSizeAsVector()[flipdim] - 1 ) * vsize; // the distance from the middle of the current first voxel to the "going to be first"
 	util::fvector3 &vec = image.refValueAs<util::fvector3>( names[flipdim] );
 	util::fvector3 &origin = image.refValueAs<util::fvector3>( "indexOrigin" );
@@ -575,12 +576,11 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		useQForm( props );
 	} else {
 		LOG( Runtime, warning ) << "Neither sform_code nor qform_code are set, using identity matrix for geometry";
-		const util::vector4<short> r[3] = {nifti2isis[0], nifti2isis[1], nifti2isis[2]};
-		props.setValueAs( "rowVec",      util::fvector3{(float)r[0][0], (float)r[0][1], (float)r[0][2]} ); // we use the transformation from nifti to isis as unity
-		props.setValueAs( "columnVec",   util::fvector3{(float)r[1][0], (float)r[1][1], (float)r[1][2]} ); // because the image will very likely be in nifti space
-		props.setValueAs( "sliceVec",    util::fvector3{(float)r[2][0], (float)r[2][1], (float)r[2][2]} );
+		props.setValueAs( "rowVec",      util::fvector3{nifti2isis[0][0], nifti2isis[0][1], nifti2isis[0][2]} ); // we use the transformation from nifti to isis as unity
+		props.setValueAs( "columnVec",   util::fvector3{nifti2isis[1][0], nifti2isis[1][1], nifti2isis[1][2]} ); // because the image will very likely be in nifti space
+		props.setValueAs( "sliceVec",    util::fvector3{nifti2isis[2][0], nifti2isis[2][1], nifti2isis[2][2]} );
 		props.setValueAs( "voxelSize",   util::fvector3{head->pixdim[1], head->pixdim[2], head->pixdim[3]} );
-		props.setValueAs( "indexOrigin", util::fvector3{0,0} );
+		props.setValueAs( "indexOrigin", util::fvector3{0,0,0} );
 	}
 
 	// set space unit factors
@@ -1070,31 +1070,31 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 
 	// transform from image space to nifti space
-	const util::Matrix4x4<float> image2nifti{
-		props.getValueAs<util::fvector4>( "nifti/srow_x" ),
-		props.getValueAs<util::fvector4>( "nifti/srow_y" ),
-		props.getValueAs<util::fvector4>( "nifti/srow_z" ),
+	const util::Matrix4x4<double> image2nifti{
+		props.getValueAs<util::dvector4>( "nifti/srow_x" ),
+		props.getValueAs<util::dvector4>( "nifti/srow_y" ),
+		props.getValueAs<util::dvector4>( "nifti/srow_z" ),
 		0, 0, 0, 0
 	};
-	util::Matrix4x4<float> image2isis = nifti2isis * image2nifti; // add transform to isis-space
+	auto image2isis = nifti2isis * image2nifti; // add transform to isis-space
 
 	//get position of image-voxel 0,0,0,0 in isis space
-	const util::fvector4 origin = image2isis * util::fvector4( {0, 0, 0, 1} );
-	props.setValueAs( "indexOrigin", util::fvector3( {origin[0], origin[1], origin[2]} ) );
+	const auto origin = image2isis * util::dvector4{0, 0, 0, 1};
+	props.setValueAs( "indexOrigin", util::dvector3{origin[0], origin[1], origin[2]} );
 	LOG( Debug, info ) << "Computed indexOrigin=" << props.queryProperty( "indexOrigin" ) << " from sform";
 
 	//remove offset from image2isis
-	image2isis = util::Matrix4x4<float>{
+	image2isis = util::Matrix4x4<double>{
 		1, 0, 0, -origin[0],
 		0, 1, 0, -origin[1],
 		0, 0, 1, -origin[2],
 		0, 0, 0, 0
 	} * image2isis;
 
-	const util::fvector3 voxelSize{ // get voxel sizes by transforming othogonal vectors of one voxel from image to isis
-		util::len(image2isis * util::fvector4{1, 0, 0, 0}),
-		util::len(image2isis * util::fvector4{0, 1, 0, 0}),
-		util::len(image2isis * util::fvector4{0, 0, 1, 0})
+	const util::dvector3 voxelSize{ // get voxel sizes by transforming othogonal vectors of one voxel from image to isis
+		util::len(image2isis * util::dvector4{1, 0, 0, 0}),
+		util::len(image2isis * util::dvector4{0, 1, 0, 0}),
+		util::len(image2isis * util::dvector4{0, 0, 1, 0})
 	};
 
 	props.setValueAs( "voxelSize", voxelSize );
@@ -1102,17 +1102,17 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 
 	//remove scaling from image2isis
-	image2isis = image2isis * util::Matrix4x4<float>{
+	image2isis = image2isis * util::Matrix4x4<double>{
 		1 / voxelSize[0], 0, 0,
 		0, 1 / voxelSize[1], 0,
 		0, 0, 1 / voxelSize[2],
 		0, 0, 0, 0
 	};
 
-	const util::fvector4 r[3] = {util::transpose(image2isis)[0], util::transpose(image2isis)[1], util::transpose(image2isis)[2]};
-	props.setValueAs( "rowVec",      util::fvector3{r[0][0], r[0][1], r[0][2]} );
-	props.setValueAs( "columnVec",   util::fvector3{r[1][0], r[1][1], r[1][2]} );
-	props.setValueAs( "sliceVec",    util::fvector3{r[2][0], r[2][1], r[2][2]} );
+	const auto r = util::transpose(image2isis);
+	props.setValueAs( "rowVec",      util::dvector3{r[0][0], r[0][1], r[0][2]} );
+	props.setValueAs( "columnVec",   util::dvector3{r[1][0], r[1][1], r[1][2]} );
+	props.setValueAs( "sliceVec",    util::dvector3{r[2][0], r[2][1], r[2][2]} );
 
 	LOG( Debug, info ) << "Computed rowVec=" << props.queryProperty( "rowVec" ) << ", "
 					   << "columnVec=" << props.queryProperty( "columnVec" ) << " and "
@@ -1129,12 +1129,12 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform.html for qfac
-	util::dvector4 quaternion({
+	util::dvector4 quaternion{
 		0,//a
 		props.getValueAs<double>( "nifti/quatern_b" ),
 		props.getValueAs<double>( "nifti/quatern_c" ),
 		props.getValueAs<double>( "nifti/quatern_d" )
-	});
+	};
 
 	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
 
@@ -1159,24 +1159,24 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	const double r_31 = _2bd - _2ac,  r_32 = _2cd + _2ab,  r_33 = a2 - b2 - c2 + d2;
 	const int qfac = props.getValueAs<float>( "nifti/qfac" );
 
-	const util::Matrix4x4<float> image2nifti{
-		r_11, r_12, r_13 * qfac,
-		r_21, r_22, r_23 * qfac,
-		r_31, r_32, r_33 * qfac,
-		0, 0, 0, 0
+	const util::Matrix4x4<double> image2nifti{
+		r_11, r_12, r_13 * qfac, 0,
+		r_21, r_22, r_23 * qfac, 0,
+		r_31, r_32, r_33 * qfac, 0,
+		   0,    0,           0, 0
 	};
 
 	LOG( Debug, info ) << "The matrix made from the qform is "
-					   << util::vector3<double>( {r_11, r_12, r_13 * qfac} ) << "-"
-					   << util::vector3<double>( {r_21, r_22, r_23 * qfac} ) << "-"
-					   << util::vector3<double>( {r_31, r_32, r_33 * qfac} );
+					   << util::vector3<double>{r_11, r_12, r_13 * qfac} << "-"
+					   << util::vector3<double>{r_21, r_22, r_23 * qfac} << "-"
+					   << util::vector3<double>{r_31, r_32, r_33 * qfac};
 
-	const util::Matrix4x4<float> image2isis = nifti2isis * image2nifti;
+	const auto image2isis = nifti2isis * image2nifti;
 
-	const util::fvector4 r[3] = {util::transpose(image2isis)[0], util::transpose(image2isis)[1], util::transpose(image2isis)[2]};
-	props.setValueAs( "rowVec",      util::fvector3( {r[0][0], r[0][1], r[0][2]} ) );
-	props.setValueAs( "columnVec",   util::fvector3( {r[1][0], r[1][1], r[1][2]} ) );
-	props.setValueAs( "sliceVec",    util::fvector3( {r[2][0], r[2][1], r[2][2]} ) );
+	const auto r = util::transpose(image2isis);
+	props.setValueAs( "rowVec",      util::dvector3{r[0][0], r[0][1], r[0][2]} );
+	props.setValueAs( "columnVec",   util::dvector3{r[1][0], r[1][1], r[1][2]} );
+	props.setValueAs( "sliceVec",    util::dvector3{r[2][0], r[2][1], r[2][2]} );
 
 	LOG( Debug, info ) << "Computed rowVec=" << props.queryProperty( "rowVec" ) << ", "
 					   << "columnVec=" << props.queryProperty( "columnVec" ) << " and "
@@ -1332,7 +1332,7 @@ void ImageFormat_NiftiSa::sanitise( data::Chunk &object )
 // The (x,y,z) coordinates refer to the CENTER of a voxel.
 // In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior (RAS).
 // So, the transform from nifti to isis is:
-const util::Matrix4x4<short> ImageFormat_NiftiSa::nifti2isis{
+const util::Matrix4x4<float> ImageFormat_NiftiSa::nifti2isis{
 	-1, 0, 0, 0,
 	 0,-1, 0, 0,
 	 0, 0, 1, 0,

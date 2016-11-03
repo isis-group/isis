@@ -159,7 +159,7 @@ public:
 
 class ImageFormat_NiftiSa: public FileFormat
 {
-	static const util::Matrix4x4<short> nifti2isis;
+	static const util::Matrix4x4<float> nifti2isis;
 	static const util::Selection formCode;
 
 	typedef bool( *demuxer_type )( const util::PropertyValue &value, std::list<data::Chunk> &chunks, util::PropertyMap::PropPath name );
