@@ -1,6 +1,7 @@
-debian/tmp/usr/lib/isis/plugins/libisisImageFormat_flist.so     usr/lib/isis/plugins
-debian/tmp/usr/lib/isis/plugins/libisisImageFormat_Nifti_sa.so  usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_flist.so      usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_Nifti_sa.so   usr/lib/isis/plugins
 #debian/tmp/usr/lib/isis/plugins/libisisImageFormat_Null.so      usr/lib/isis/plugins
-debian/tmp/usr/lib/isis/plugins/libisisImageFormat_png.so       usr/lib/isis/plugins
-debian/tmp/usr/lib/isis/plugins/libisisImageFormat_process.so   usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_png.so        usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_process.so    usr/lib/isis/plugins
 debian/tmp/usr/lib/isis/plugins/libisisImageFormat_comp_proxy.so usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_Vista_sa.so   usr/lib/isis/plugins
