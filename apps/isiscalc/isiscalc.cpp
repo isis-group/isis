@@ -9,7 +9,7 @@ class VoxelOp : public data::VoxelOp<double>
 {
 	mu::Parser parser;
 	double voxBuff;
-	util::FixedVector<double, 4> posBuff;
+	util::dvector4 posBuff;
 public:
 	VoxelOp( std::string expr ) {
 		parser.SetExpr( expr );
@@ -21,7 +21,7 @@ public:
 	}
 	bool operator()( double &vox, const isis::util::vector4<size_t>& pos ) {
 		voxBuff = vox; //using parser.DefineVar every time would slow down the evaluation
-		posBuff = pos;
+		posBuff = {double(pos[0]),double(pos[1]),double(pos[2])};
 		vox = parser.Eval();
 		return true;
 	}
