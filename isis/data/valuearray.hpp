@@ -99,7 +99,7 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 		return ret;
 	}
 };
-template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get bounding box in complex space)
+template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get min/max of abs(x))
 	std::pair<T, T> operator()( const ValueArray<std::complex<T> > &ref ) const {
 		//use compute min/max of magnitute / phase
 		T ret_min_sqmag=std::norm(ref[0]),ret_max_sqmag=std::norm(ref[0]);

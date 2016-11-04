@@ -50,7 +50,16 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		obj.setValueAs("rowVec",    vista2isis * obj.getValueAs<util::fvector3>("vista/x-axis"));
 		obj.setValueAs("columnVec", vista2isis * obj.getValueAs<util::fvector3>("vista/y-axis"));
 		obj.setValueAs("sliceVec",  vista2isis * obj.getValueAs<util::fvector3>("vista/z-axis"));
-		LOG(Runtime,info) << "Computed orientation from x/y/z-axis in vista";
+		obj.remove("vista/x-axis");
+		obj.remove("vista/y-axis");
+		obj.remove("vista/z-axis");
+		LOG(Runtime,info) 
+			<< "Computed orientation from x/y/z-axis in vista as " 
+			<< util::Matrix3x3<float>{
+				obj.getValueAs<util::fvector3>("rowVec"),
+				obj.getValueAs<util::fvector3>("columnVec"),
+				obj.getValueAs<util::fvector3>("sliceVec")
+			};
 		
 	} else if( queryOrientationPatient ) {
 		LOG(Runtime,info) << "using vista/imageOrientationPatient " << queryOrientationPatient;
