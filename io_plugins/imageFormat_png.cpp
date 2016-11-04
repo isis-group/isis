@@ -27,6 +27,7 @@ protected:
 			for ( unsigned short r = 0; r < height; r++ )
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
 
+			png_set_strip_alpha(png_ptr);
 			png_read_image( png_ptr, row_pointers.get() );
 			ret.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
 			return ret;
@@ -51,6 +52,10 @@ public:
 		readers[PNG_COLOR_TYPE_GRAY][16].reset( new GenericReader<uint16_t> );
 		readers[PNG_COLOR_TYPE_RGB][8].reset( new GenericReader<util::color24> );
 		readers[PNG_COLOR_TYPE_RGB][16].reset( new GenericReader<util::color48> );
+		
+		//the generic reader by default strips alpha, so we can use the same reader for images with/without alpha channel
+		readers[PNG_COLOR_TYPE_RGB_ALPHA]=readers[PNG_COLOR_TYPE_RGB];
+		readers[PNG_COLOR_TYPE_GRAY_ALPHA]=readers[PNG_COLOR_TYPE_GRAY];
 	}
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
@@ -189,6 +194,7 @@ public:
 		const png_byte color_type = png_get_color_type ( png_ptr, info_ptr );
 		const png_byte bit_depth = png_get_bit_depth( png_ptr, info_ptr );
 		std::shared_ptr< Reader > reader = readers[color_type][bit_depth];
+		LOG_IF(color_type&PNG_COLOR_MASK_ALPHA,Runtime,notice) << "Ignoring alpha channel in the image";
 
 		if( !reader ) {
 			LOG( Runtime, error ) << "Sorry, the color type " << ( int )color_type << " with " << ( int )bit_depth << " bits is not supportet.";
