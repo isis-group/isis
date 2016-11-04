@@ -44,6 +44,10 @@ Application::Application( const char name[], const char cfg[]): m_name( name )
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	parameters["help"].needed() = false;
+
+	parameters["locale"] = std::string("C");
+	parameters["locale"].setDescription( "locale to use for parsing/printing (use empty string to enforce use of system locale)");
+	parameters["locale"].needed() = false;
 	
 	if(strlen(cfg)){
 		parameters["cfg"]=std::string(cfg);
@@ -159,6 +163,10 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 			exit( 1 );
 		}
 	}
+	
+	const std::string loc=parameters["locale"];
+	if(!loc.empty())
+		std::setlocale(LC_ALL,loc.c_str());
 
 	return ! err;
 }

@@ -17,7 +17,7 @@
  *
  */
 
-#include "fft.hpp"
+#include "fft.hxx"
 #include "../common.hpp"
 
 #include <math.h>
@@ -32,15 +32,12 @@ void fft_impl(isis::data::ValueArray<std::complex<double> > &data,bool inverse,s
 	std::shared_ptr< double > ptr=std::static_pointer_cast<double>(data.getRawAddress());
 
 	for(size_t offset=0;offset<stride;offset++){
-		if(inverse)
-			gsl_fft_complex_inverse(ptr.get()+offset*2, stride, elements, wavetable.get(), workspace.get());
-		else
-			gsl_fft_complex_forward(ptr.get()+offset*2, stride, elements, wavetable.get(), workspace.get());
+		gsl_fft_complex_transform(ptr.get()+offset*2, stride, elements, wavetable.get(), workspace.get(),inverse?gsl_fft_backward:gsl_fft_forward);
 	}
 
 }
 
-void isis::math::gsl::fft(isis::data::TypedChunk< std::complex< double > > &data, bool inverse)
+void isis::math::gsl::fft(isis::data::TypedChunk< std::complex< double > > &data, bool inverse, double scale)
 {
 	_internal::halfshift(data);
 	data::ValueArray< std::complex< double > > &array=data.asValueArray<std::complex<double> >();
@@ -59,4 +56,11 @@ void isis::math::gsl::fft(isis::data::TypedChunk< std::complex< double > > &data
 	}
 
 	_internal::halfshift(data);
+	
+	if(scale==0)
+		scale=sqrt(1./data.getVolume());
+
+	if(scale!=1)
+		for(std::complex< double > &v:data)
+			v*=scale;
 }

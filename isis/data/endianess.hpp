@@ -95,9 +95,9 @@ template<typename TYPE> struct EndianSwapper<std::list<TYPE>, false> {
 };
 
 // FixedVector - do swap for each entry
-template<typename TYPE, size_t SIZE> struct EndianSwapper<util::FixedVector<TYPE, SIZE>, false> {
-	static util::FixedVector<TYPE, SIZE> swap( const util::FixedVector<TYPE, SIZE> &src ) {
-		util::FixedVector<TYPE, SIZE> ret;
+template<typename TYPE, size_t SIZE> struct EndianSwapper<std::array<TYPE, SIZE>, false> {
+	static std::array<TYPE, SIZE> swap( const std::array<TYPE, SIZE> &src ) {
+		std::array<TYPE, SIZE> ret;
 		std::transform( src.begin(), src.end(), ret.begin(), EndianSwapper<TYPE, std::is_arithmetic<TYPE>::value>::swap );
 		return ret;
 	}

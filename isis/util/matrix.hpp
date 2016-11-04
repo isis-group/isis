@@ -29,174 +29,106 @@ namespace isis
 {
 namespace util
 {
+	
+/// Row-Major Matrix (is made of ROWS arrays with the width COLS)
+template<typename TYPE, size_t COLS, size_t ROWS> using Matrix = std::array<std::array<TYPE, COLS>,ROWS>; 
+template<typename TYPE> using Matrix3x3 = Matrix<TYPE,3,3>;
+template<typename TYPE> using Matrix4x4 = Matrix<TYPE,4,4>;
 
-template < typename TYPE, size_t COLS, size_t ROWS>
-class FixedMatrix : public FixedVector<TYPE, ROWS *COLS>
-{
-public:
-	static const size_t rows = ROWS;
-	static const size_t columns = COLS;
+/// \return the transposed matrix of mat
+template<typename TYPE, size_t COLS, size_t ROWS> Matrix<TYPE, ROWS, COLS> 
+transpose(const Matrix<TYPE, COLS, ROWS> &mat){
+	Matrix<TYPE, ROWS, COLS> ret;
 
-	typedef TYPE value_type;
-
-	template<typename TYPE2>
-	void copyFrom( const FixedVector<TYPE2, COLS> src[ROWS] ) {
-		for( size_t r = 0; r < ROWS; r++ ) {
-			const TYPE2 *ptr = &src[r][0];
-			std::copy( ptr, ptr + COLS, &elem( 0, r ) );
-		}
-	}
-
-	FixedMatrix() {}
-
-	template<typename TYPE2>
-	FixedMatrix( const TYPE2 src[ROWS *COLS] ): FixedVector<TYPE, ROWS *COLS>( src ) {}
-
-	template<typename TYPE2>
-	FixedMatrix( const FixedVector<TYPE2, COLS> src[ROWS] ) {copyFrom( src );}
-
-	TYPE &elem( size_t column, size_t row ) {return ( *this )[column + row * COLS];}
-	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column + row * COLS];}
-
-	FixedMatrix<TYPE, ROWS, COLS> transpose()const {
-		FixedMatrix<TYPE, ROWS, COLS> ret;
-
-		for( size_t m = 0; m < COLS; m++ )
-			for( size_t n = 0; n < ROWS; n++ ) {
-				ret.elem( n, m ) = this->elem( m, n );
-			}
-
-		return ret;
-	}
-
-	template<typename TYPE2, size_t COLS2>
-	FixedMatrix<decltype(TYPE()*TYPE2()), COLS2, ROWS> dot( const FixedMatrix<TYPE2, COLS2, COLS> &right )const {
-		// transpose the right, so we can use columns as rows
-		typedef decltype(TYPE()*TYPE2()) result_type;
-		const FixedMatrix<TYPE2, COLS, COLS2> rightT = right.transpose();
-		const FixedMatrix<TYPE, COLS, ROWS> &left = *this;
-		FixedMatrix<result_type, COLS2, ROWS> ret;
-
-		for( size_t c = 0; c < right.columns; c++ ) { //result has as much columns as right
-			const TYPE2 *rstart = &rightT.elem( 0, c );
-
-			for( size_t r = 0; r < left.rows; r++ ) { //result has as much rows as left
-				const TYPE *lstart = &left.elem( 0, r ), *lend = lstart + left.columns;
-				ret.elem( c, r ) = std::inner_product( lstart, lend, rstart, result_type() );
-			}
+	for( size_t m = 0; m < COLS; m++ )
+		for( size_t n = 0; n < ROWS; n++ ) {
+			ret[n][m] = mat[m][n];
 		}
 
-		return ret;
-	}
-
-
-	template<typename TYPE2>
-	FixedVector<decltype(TYPE()*TYPE2()), COLS> dot( const FixedVector<TYPE2, COLS> &right )const {
-		const FixedMatrix<TYPE, COLS, ROWS> &left = *this;
-		typedef decltype(TYPE()*TYPE2()) result_type;
-		FixedVector<result_type, ROWS> ret;
-		const TYPE2 *rstart = &right[0];
-
-		for( size_t r = 0; r < rows; r++ ) { //result has as much rows as left
-			const TYPE *lstart = &elem( 0, r ), *lend = lstart + left.columns;
-			ret[r] = std::inner_product( lstart, lend, rstart, result_type() );
-		}
-
-		return ret;
-	}
-
-	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
-		FixedVector<TYPE, COLS> ret;
-		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator start = FixedVector<TYPE, ROWS * COLS>::begin() + rownum * COLS;
-		const typename FixedVector<TYPE, ROWS *COLS>::const_iterator end = start + COLS;
-		ret.copyFrom( start, end );
-		return ret;
-	}
-
-
-};
-
-template<typename TYPE, size_t ELEMS>
-class IdentityMatrix : public FixedMatrix<TYPE, ELEMS, ELEMS>
-{
-public:
-	IdentityMatrix( TYPE value = 1 ) {
-		for( size_t m = 0; m < ELEMS; m++ ) {
-			for( size_t n = 0; n < ELEMS; n++ ) {
-				if( m == n ) {
-					this->elem( n, m ) = static_cast<TYPE>( value );
-				} else {
-					this->elem( n, m ) = static_cast<TYPE>( 0 );
-				}
-			}
-		}
-	}
-};
-
-template<typename TYPE>
-class Matrix4x4: public FixedMatrix<TYPE, 4, 4>
-{
-public:
-	Matrix4x4() {};
-
-	Matrix4x4( const FixedMatrix<TYPE, 4, 4> &src ): FixedMatrix<TYPE, 4, 4>( src ) {}
-
-	Matrix4x4( const TYPE src[16] ): FixedMatrix<TYPE, 4, 4>( src ) {}
-	template<typename TYPE2> Matrix4x4(
-		const FixedVector<TYPE2, 4> &row1,
-		const FixedVector<TYPE2, 4> &row2,
-		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( {0, 0, 1, 0} ),
-		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( {0, 0, 0, 1} )
-	) {
-		const FixedVector<TYPE2, 4> src[4] = {row1, row2, row3, row4};
-		FixedMatrix<TYPE, 4, 4>::copyFrom( src );
-	}
-};
-
-template<typename TYPE>
-class Matrix3x3: public FixedMatrix<TYPE, 3, 3>
-{
-public:
-	Matrix3x3() {};
-
-	Matrix3x3( const FixedMatrix<TYPE, 3, 3> &src ): FixedMatrix<TYPE, 3, 3>( src ) {}
-
-	Matrix3x3( const TYPE src[9] ): FixedMatrix<TYPE, 3, 3>( src ) {}
-	template<typename TYPE2> Matrix3x3(
-		const FixedVector<TYPE2, 3> &row1,
-		const FixedVector<TYPE2, 3> &row2,
-		const FixedVector<TYPE2, 3> &row3 = vector3<TYPE2>( 0, 0, 1 )
-	) {
-		const FixedVector<TYPE2, 3> src[3] = {row1, row2, row3};
-		FixedMatrix<TYPE, 3, 3>::copyFrom( src );
-	}
-};
-
+	return ret;
 }
-}
-/// Streaming output for FixedMatrix
-namespace std
-{
 
-template<typename charT, typename traits, typename TYPE, size_t COLS, size_t ROWS> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedMatrix<TYPE, COLS, ROWS>& m )
-{
-	out << "FixedMatrix of size (" << m.columns << " columns, " << m.rows << " rows):" << std::endl;
+/**
+ * Fuzzy comparison for matrices.
+ * Does util::fuzzyEqual for the associated elements of the two vectors.
+ * @param other the "other" vector to compare to
+ * @param scale scaling factor forwarded to util::fuzzyEqual
+ * \returns true if util::fuzzyEqual for all elements
+ */
+template<typename TYPE1, typename TYPE2, size_t COLS, size_t ROWS> bool
+fuzzyEqualM( const Matrix<TYPE1, COLS, ROWS> &first, const Matrix<TYPE2, COLS, ROWS> &second, unsigned short scale = 10 ){
+	auto b = std::begin(second);
 
-	for( size_t row = 0; row < ROWS; row++ ) {
-		out << "<";
-
-		for( size_t col = 0; col < COLS; col++ ) {
-			out << m.elem( col, row );
-
-			if( col < COLS - 1 ) out << "\t";
-		}
-
-		out << ">" << std::endl;
+	for ( const std::array<TYPE1,COLS> &a : first ) {
+		if ( ! fuzzyEqualV( a, *(b++), scale ) )
+			return false;
 	}
 
-	return out;
+	return true;
+}
+
+template<typename TYPE, size_t COLS, size_t ROWS=COLS> constexpr Matrix<TYPE, ROWS, COLS> 
+identityMatrix( TYPE value = 1 ){
+	Matrix<TYPE, ROWS, COLS> ret{};
+	for( size_t m = 0; m < COLS; m++ ) {
+		for( size_t n = 0; n < ROWS; n++ ) {
+			ret[m][n] = (m == n)?value:TYPE();
+		}
+	}
+	return ret;
+}
+
+	
+}
+
+template<typename TYPE1, typename TYPE2,size_t COLS, size_t ROWS, size_t COLS2> util::Matrix<decltype(TYPE1()*TYPE2()), COLS2, ROWS>
+operator*( const util::Matrix<TYPE1, COLS, ROWS> &left, const util::Matrix<TYPE2, COLS2, COLS> &right ){
+	// transpose the right, so we can use columns as rows
+	typedef decltype(TYPE1()*TYPE2()) result_type;
+	const util::Matrix<TYPE2, COLS, COLS2> rightT = util::transpose(right);
+	util::Matrix<result_type, COLS2, ROWS> ret;
+
+	for( size_t c = 0; c < COLS2; c++ ) { //result has as much columns as right
+		const std::array<TYPE2, COLS> &rcol = rightT[c]; //columns of right are rows of rightT 
+		for( size_t r = 0; r < ROWS; r++ ) { //result has as much rows as left
+			const std::array<TYPE1, COLS> &lrow = left[r];
+			ret[r][c] = std::inner_product( std::begin(lrow), std::end(lrow), std::begin(rcol), result_type() );
+		}
+	}
+
+	return ret;
+}
+
+template<typename TYPE1, typename TYPE2,size_t COLS, size_t ROWS> std::array<decltype(TYPE1()*TYPE2()), ROWS> 
+operator*( const util::Matrix<TYPE1, COLS, ROWS> &left, const std::array<TYPE2, COLS> &right ){
+	typedef decltype(TYPE1()*TYPE2()) result_type;
+	std::array<result_type, ROWS> ret;
+
+	for( size_t r = 0; r < ROWS; r++ ) { //result has as much rows as left
+		const std::array<TYPE1, COLS> &lrow = left[r];
+		ret[r] = std::inner_product( std::begin(lrow), std::end(lrow), std::begin(right), result_type() );
+	}
+
+	return ret;
 }
 }
 
+namespace std{
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr TYPE* begin(isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat[0]);
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr TYPE* end(isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat)+COLS*ROWS;
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr const TYPE* begin(const isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat[0]);
+	} 
+	template <typename TYPE, size_t COLS, size_t ROWS> constexpr const TYPE* end(const isis::util::Matrix<TYPE,COLS,ROWS> &mat){
+		static_assert(std::is_pod<isis::util::Matrix<TYPE,COLS,ROWS>>::value,"isis::util::Matrix must be POD");
+		return begin(mat)+COLS*ROWS;
+	} 
+}
 #endif // ISIS_MATRIX_HPP

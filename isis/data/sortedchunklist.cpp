@@ -37,7 +37,7 @@ SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::
 
 bool SortedChunkList::posCompare::operator()( const util::fvector3 &posA, const util::fvector3 &posB ) const
 {
-	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
+	if ( util::lexical_less_reverse( posA, posB ) ) { //if chunk is "under" the other - put it there
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by in-image position (" << posA << " below " << posB << ")";
 		return true;
 	}
@@ -146,7 +146,7 @@ std::pair<std::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Ch
 	);
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
-	const util::fvector3 key({ origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec )});
+	const util::fvector3 key{ util::dot( origin,rowVec ), util::dot( origin,columnVec ), util::dot( origin,sliceVec )};
 	const scalarPropCompare &secondaryComp = secondarySort.top();
 
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)

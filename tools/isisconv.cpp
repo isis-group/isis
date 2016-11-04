@@ -4,7 +4,7 @@ using namespace isis;
 
 int main( int argc, char **argv )
 {
-// 	util::DefaultMsgPrint::stopBelow(info);
+	util::DefaultMsgPrint::stopBelow(warning);
 	data::IOApplication app( "isis data converter", true, true );
 	app.addExample( "-in myFile.nii -out myFile.v", "Simple conversion from a nifti file to a vista file." );
 	app.addExample(

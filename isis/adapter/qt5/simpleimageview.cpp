@@ -23,6 +23,24 @@
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <QWheelEvent>
+#include <QGroupBox>
+#include <QRadioButton>
+#include <QButtonGroup>
+
+template<typename T> void _magnitudeTransfer(const isis::data::scaling_pair &magnitude_scale, uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
+	const T scale=magnitude_scale.first->as<T>();
+	const T offset=magnitude_scale.second->as<T>();
+	for(const std::complex<T> &v:line){
+		*(dst++)=std::abs(v)*scale+offset;
+	}
+}
+
+template<typename T> void _phaseTransfer(uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
+	const T scale=M_PI/128;
+	for(const std::complex<T> &v:line){
+		*(dst++)=std::arg(v)*scale+128;
+	}
+}
 
 class MriGraphicsView: public QGraphicsView{
 public:
@@ -39,7 +57,7 @@ public:
 	}
 };
 
-void isis::qt5::SimpleImageView::setupUi(){
+void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 
 	QGridLayout *gridLayout = new QGridLayout(this);
 
@@ -61,19 +79,80 @@ void isis::qt5::SimpleImageView::setupUi(){
 
 	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
+	
+	if(with_complex){
+		QGroupBox *groupBox = new QGroupBox("complex representation");
+		transfer_function_group = new QButtonGroup(groupBox);
+		QHBoxLayout *vbox = new QHBoxLayout;
+		groupBox->setLayout(vbox);
+		
+		QRadioButton *mag=new QRadioButton("magnitude"),*pha=new QRadioButton("phase");
+		vbox->addWidget(mag);
+		vbox->addWidget(pha);
+		transfer_function_group->addButton(mag,1);
+		transfer_function_group->addButton(pha,2);
+		transfer_function_group->setExclusive(true);
+		mag->setChecked(true);
+		gridLayout->addWidget(groupBox,2,0,1,1);
+	}
 }
 
 isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
-    setupUi();
+	if(
+		img.getMajorTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
+		img.getMajorTypeID() == data::ValueArray<std::complex<double>>::staticID()
+	)is_complex=true;
+	else is_complex=false;
+	
+	setupUi(is_complex);
 	
 	if(title.isEmpty())
 		title= QString::fromStdString(img.identify(true,false));
 	
 	if(!title.isEmpty())
 		setWindowTitle(title);
+
+	if(is_complex){
+		const std::pair<util::ValueReference,util::ValueReference> minmax = img.getMinMax();
+		const data::ValueArrayBase::Converter &c = data::ValueArrayBase::getConverterFromTo(data::ValueArray<float>::staticID(),data::ValueArray<uint8_t>::staticID());
+		const data::scaling_pair magnitude_scale=c->getScaling(*minmax.first,*minmax.second,data::autoscale);
+		
+		magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
+			switch(line.getTypeID()){
+				case data::ValueArray<std::complex<float>>::staticID():
+					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<float>>());
+					break;
+				case data::ValueArray<std::complex<double>>::staticID():
+					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<double>>());
+					break;
+				default:
+					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
+			}
+		};
+
+		phase_transfer = [](uchar *dst, const data::ValueArrayBase &line){
+			switch(line.getTypeID()){
+				case data::ValueArray<std::complex<float>>::staticID():
+					_phaseTransfer(dst,line.castToValueArray<std::complex<float>>());
+					break;
+				case data::ValueArray<std::complex<double>>::staticID():
+					_phaseTransfer(dst,line.castToValueArray<std::complex<double>>());
+					break;
+				default:
+					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
+			}
+		};
+		transfer_function=magnitude_transfer;
+		connect(transfer_function_group, SIGNAL(buttonToggled(int, bool)),SLOT(selectTransfer(int,bool)));
+
+	} else {
+		const data::scaling_pair scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
+		transfer_function=[scaling](uchar *dst, const data::ValueArrayBase &line){
+			line.copyToMem<uint8_t>(dst,line.getLength(),scaling);
+		};
+	}
 	
-	scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
 	m_img.spliceDownTo(data::sliceDim);
 
@@ -108,8 +187,15 @@ void isis::qt5::SimpleImageView::updateImage()
 	graphicsView->scene()->clear();
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
-			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),scaling)
+			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),transfer_function)
 		)
 	);
+}
+void isis::qt5::SimpleImageView::selectTransfer(int id, bool checked)
+{
+	if(checked){//prevent the toggle-off from triggering a useless redraw
+		transfer_function= (id==1?magnitude_transfer:phase_transfer);
+		updateImage();
+	}
 }
 

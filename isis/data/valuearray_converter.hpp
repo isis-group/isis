@@ -34,9 +34,6 @@ enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 typedef std::pair<util::ValueReference, util::ValueReference> scaling_pair;
 class ValueArrayBase;
 
-API_EXCLUDE_BEGIN;
-namespace _internal
-{
 class ValueArrayConverterBase
 {
 public:
@@ -49,6 +46,9 @@ public:
 	virtual ~ValueArrayConverterBase() {}
 };
 
+API_EXCLUDE_BEGIN;
+namespace _internal
+{
 class ValueArrayConverterMap : public std::map< int , std::map<int, std::shared_ptr<const ValueArrayConverterBase> > >
 {
 public:

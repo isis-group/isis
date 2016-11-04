@@ -45,7 +45,6 @@ template<typename SRC,typename DST> constexpr bool is_same(){return std::is_same
 
 template<typename T_DUR> bool parseTimeString(const std::string &src, const char *format,std::chrono::time_point<std::chrono::system_clock,T_DUR> &dst){
 	std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
-	t.tm_isdst=-1;
 	std::istringstream ss(src);
 	ss >> std::get_time(&t, format);
 	if(!ss.fail()) {
@@ -195,7 +194,12 @@ template<> boost::numeric::range_check_result str2scalar<date>( const std::strin
 	// see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html for dicom VRs
 	//@todo support other formats and parse offset part of the DICOM VR "DT"
 	//@todo %c and %x are broken in gcc 
-	static const char *formats[]={"%Y%m%d","%Y-%m-%d","%y%m%d"};
+	static const char *formats[]={
+		"%Y%m%d",
+		"%Y-%m-%d",
+		"%y%m%d",
+		"%d.%m.%Y"
+	};
 
 	for(const char *format:formats){
 		if(parseTimeString(src,format,dst))
@@ -214,7 +218,7 @@ template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::
 	// see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html for dicom VRs
 	//@todo support other formats and parse offset part of the DICOM VR "DT"
 	//@todo %c and %x are broken in gcc 
-	static const char *formats[]={"%Y%m%d%H%M%S","%Y%m%dT%H%M%S","%H%M%S","%H:%M:%S"};
+	static const char *formats[]={"%Y%m%d%H%M%S","%Y%m%dT%H%M%S","%d.%m.%Y %H:%M:%S","%H%M%S","%H:%M:%S"};
 
 	for(const char *format:formats){
 		if(parseTimeString(src,format,dst))
@@ -230,6 +234,18 @@ template<> boost::numeric::range_check_result str2scalar<timestamp>( const std::
 // needs special handling
 template<> boost::numeric::range_check_result str2scalar<duration>( const std::string &src, duration &dst )
 {
+	// try to parse time format
+	static const char *formats[]={"%H:%M:%S"};
+	timestamp dummy;
+
+	for(const char *format:formats){
+		if(parseTimeString(src,format,dummy)){
+			dst=dummy-timestamp();
+			return boost::numeric::cInRange;
+		}
+	};
+	
+	// ok just use whatever number we can manage to parse
 	//@todo support other ratios as milli
 	duration::rep count;
 	const boost::numeric::range_check_result result=str2scalar(src,count);
@@ -297,7 +313,7 @@ template<typename DST> struct StrTransformer {
 };
 
 //helper to convert strings to FixedVectors
-template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, FixedVector<DST, NUM> &dstList )
+template<typename DST, int NUM> boost::numeric::range_check_result convertStr2Vector( const ValueBase &src, std::array<DST, NUM> &dstList )
 {
 	const std::list<std::string> srcList = Tokenizer<std::is_arithmetic<DST>::value>::run( src.castTo<std::string>() ); // tokenize the string based on the target type
 	std::list< std::string >::const_iterator end = srcList.begin();
@@ -783,6 +799,29 @@ public:
 	}
 	virtual ~ValueConverter() {}
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Conversion timepoint => date (date is just a timestamp with days as resolition so it equals a rounding 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<> class ValueConverter<false, false, util::timestamp, util::date > : public ValueGenerator<util::timestamp, util::date>
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating time converter from " << Value<util::timestamp>::staticName() << " to " << Value<util::date>::staticName();
+	};
+public:
+	static std::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, util::timestamp, util::date > *ret = new ValueConverter<false, false, util::timestamp, util::date>;
+		return std::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		util::date &dstVal = dst.castTo<util::date>();		
+		dstVal=std::chrono::time_point_cast<std::chrono::days>(src.castTo<util::timestamp>());
+
+		return boost::numeric::cInRange;
+	}
+	virtual ~ValueConverter() {}
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.

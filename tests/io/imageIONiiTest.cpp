@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 			for( const char * fuzz :  fuzzies ) {
 				const util::fvector3 niiVec = niiChunks[i].getValueAs<util::fvector3>( fuzz );
 				const util::fvector3 nullVec = nullChunks[i].getValueAs<util::fvector3>( fuzz );
-				BOOST_REQUIRE( niiVec.fuzzyEqual( nullVec ) );
+				BOOST_REQUIRE( util::fuzzyEqualV( niiVec, nullVec ) );
 				niiChunks[i].remove( fuzz );
 				nullChunks[i].remove( fuzz );
 			}
@@ -101,8 +101,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 
 BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 {
-	const size_t tsize[] = {128, 128, 2, 1};
-	util::vector4<size_t> size ( tsize );
+	util::vector4<size_t> size {128, 128, 2, 1};
 	util::Selection aligned = formCodes;
 	aligned.set( "ALIGNED_ANAT" );
 

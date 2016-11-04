@@ -2,7 +2,7 @@
 #include "clfft.hxx"
 #include "../common.hpp"
 #include "details_fft.hxx"
-#include "opencl/cldevice.hxx"
+#include "opencl/clplatform.hxx"
 
 namespace isis{
 namespace math{
@@ -10,13 +10,13 @@ namespace _internal{
 class CLFFTPlan{
     clfftPlanHandle planHandle;
 	cl_int err;
-	OpenCLDevice &device;
+	OpenCLPlatform &device;
 	cl_command_queue queue;
 	cl_mem buffer;
 public:
 	std::string getErrorString(cl_int err){
 		if(err < CLFFT_BUGCHECK)
-			return OpenCLDevice::getErrorString(err);
+			return OpenCLPlatform::getErrorString(err);
 
 		switch(err){
 		case CLFFT_BUGCHECK:return "CLFFT_BUGCHECK";break;
@@ -31,7 +31,7 @@ public:
 		}
 		return "Unknown OpenCL error";
 	}
-	CLFFTPlan(OpenCLDevice &dev, data::_internal::NDimensional<4> shape):device(dev){
+	CLFFTPlan(OpenCLPlatform &dev, data::_internal::NDimensional<4> shape, float scale):device(dev){
 		clfftSetupData fftSetup;
 		const clfftDim dim = (clfftDim)shape.getRelevantDims();
 		queue = dev.clCreateCommandQueue( );
@@ -51,6 +51,12 @@ public:
 		err = clfftSetPlanPrecision(planHandle, CLFFT_SINGLE);
 		err = clfftSetLayout(planHandle, CLFFT_COMPLEX_INTERLEAVED, CLFFT_COMPLEX_INTERLEAVED);
 		err = clfftSetResultLocation(planHandle, CLFFT_INPLACE);
+		
+		if(scale==0)
+			scale = 1./sqrt(shape.getVolume());
+		
+		err = clfftSetPlanScale(planHandle,CLFFT_FORWARD,scale);
+		err = clfftSetPlanScale(planHandle,CLFFT_BACKWARD,scale);
 
 		/* Bake the plan. */
 		err = clfftBakePlan(planHandle, 1, &queue, NULL, NULL);
@@ -91,16 +97,16 @@ public:
 };
 }
 
-void cl::fft(data::TypedChunk< std::complex< float > > &data, bool inverse)
+void cl::fft(data::TypedChunk< std::complex< float > > &data, bool inverse, float scale)
 {
 	// handle data
 	_internal::halfshift(data);
 
-	_internal::OpenCLDevice dev;
+	_internal::OpenCLPlatform platform;
 
 
     /* Setup clFFT. */
-	_internal::CLFFTPlan plan(dev,data);
+	_internal::CLFFTPlan plan(platform,data,scale);
 
 
 	plan.transform(data.asValueArray<std::complex< float >>(),inverse?CLFFT_BACKWARD:CLFFT_FORWARD);

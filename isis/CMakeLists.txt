@@ -76,21 +76,21 @@ macro(get_target_filename _TARGET VAR)
 endmacro(get_target_filename)
 
 find_library(LIB_JSONCPP jsoncpp)
-find_path(INC_JSONCPP "json/version.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/version.h can be found")
+find_path(INC_JSONCPP "json/config.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/config.h can be found")
 include_directories(${INC_JSONCPP})
 
 ############################################################
 # check for ncurses
 ############################################################
 find_package(Curses QUIET)
-if(CURSES_FORM_LIBRARY)
+if(CURSES_LIBRARIES)
 	include_directories(${CURSES_CURSES_H_PATH})
 	add_definitions(-DHAVE_CURSES)
-	message(STATUS "curses form library ${CURSES_FORM_LIBRARY} found. Enable colored logging.")
-else(CURSES_FORM_LIBRARY)
+	message(STATUS "curses form libraries ${CURSES_LIBRARIES} found. Enable colored logging.")
+else(CURSES_LIBRARIES)
 	message(STATUS "curses form library not found. Logging won't be colored.")
-	set(CURSES_FORM_LIBRARY "")
-endif(CURSES_FORM_LIBRARY)
+	set(CURSES_LIBRARIES "")
+endif(CURSES_LIBRARIES)
  
  
 

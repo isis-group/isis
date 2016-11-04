@@ -147,8 +147,8 @@ void DCMStack::decodeMosaic()
 		util::dlist::const_iterator middle = orientation.begin();
 		std::advance( middle, 3 );
 		util::fvector3 rowVec, columnVec;
-		rowVec.copyFrom( orientation.begin(), middle );
-		columnVec.copyFrom( middle, orientation.end() );
+		std::copy(orientation.begin(), middle,std::begin(rowVec));
+		std::copy(middle, orientation.end(),std::begin(columnVec));
 
 		// fix the properties of the source (we 'll need them later)
 		util::fvector3 voxelSize = getValueAs<util::fvector3>( "DICOM/PixelSpacing" );

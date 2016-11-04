@@ -133,8 +133,12 @@ std::string Message::merge(const std::string color_code)const
 
 	found = 0;
 
-	while ( ( found = ret.find( "{s}", found ) ) != std::string::npos )
-		ret.replace( found, 3, s_prefix + * ( subj++ ) + s_suffix );
+	while ( ( found = ret.find( "{s}", found ) ) != std::string::npos ){
+		if(subj->empty())
+			ret.erase(found, 3);
+		else
+			ret.replace( found, 3, s_prefix + * ( subj++ ) + s_suffix );
+	}
 
 	return  color_code+ret+reset_code;
 }

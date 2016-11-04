@@ -5,15 +5,6 @@ namespace isis
 namespace data
 {
 /// @cond _internal
-// specialisation for complex - there shall be no scaling - and we cannot compute minmax
-template<> scaling_pair ValueArray<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const
-{
-	return scaling_pair( util::Value<float>( 1 ), util::Value<float>( 0 ) );
-}
-template<> scaling_pair ValueArray<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const
-{
-	return scaling_pair( util::Value<double>( 1 ), util::Value<double>( 0 ) );
-}
 
 #ifdef __SSE2__
 

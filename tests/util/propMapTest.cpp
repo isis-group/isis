@@ -342,6 +342,18 @@ BOOST_AUTO_TEST_CASE( propMap_transfer_test )
 	BOOST_CHECK_EQUAL(map2.property( "Test1" ), ( int32_t )1); // its here now
 	BOOST_CHECK_EQUAL(map2.property( "Test2" ), ( int32_t )2);
 }
+
+BOOST_AUTO_TEST_CASE( propMap_transfer_rej_test )
+{
+	PropertyMap map1=getFilledMap(),map2;
+
+	map1.setValueAs("sub/TestRej",42);
+	map2.setValueAs("sub/TestRej",24);
+	BOOST_CHECK(!map2.transfer(map1).empty()); //42 should be in list of rejected
+
+	BOOST_CHECK_EQUAL(map1.property( "sub/TestRej" ), 42);
+	BOOST_CHECK_EQUAL(map2.property( "sub/TestRej" ), 24);
+}
 BOOST_AUTO_TEST_CASE( propMap_read_json_test )
 {
 	const char test_string[]=R"(

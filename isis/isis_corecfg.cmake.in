@@ -1,6 +1,10 @@
 # -*- mode: cmake -*-
 # ISIS cmake configuration file
 #
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
 SET(ISIS_INSTALL_PREFIX @CMAKE_INSTALL_PREFIX@)
 SET(ISIS_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/ @Boost_INCLUDE_DIR@ )
 SET(ISIS_RUNTIME_LOG  @ISIS_RUNTIME_LOG@)
@@ -12,6 +16,9 @@ SET(isis_core-exported-deps        @isis_core-exported-deps@)
 
 # only needed for plugins
 SET(ISIS_PLUGIN_INFIX @ISIS_PLUGIN_INFIX@)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
 
 # search isis core library
 SET(CMAKE_PREFIX_PATH @CMAKE_INSTALL_PREFIX@ ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core

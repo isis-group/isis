@@ -20,6 +20,7 @@ namespace qt5{
 	}
 
 	QImage makeQImage(const data::ValueArrayBase &data,size_t line_length,data::scaling_pair scaling = data::scaling_pair() );
+	QImage makeQImage(const data::ValueArrayBase& data, size_t line_length, const std::function<void (uchar *, const data::ValueArrayBase &)> &transfer_function);
 }
 }
 

@@ -65,7 +65,7 @@ struct dialect_missing {
 
 }
 /// @endcond _internal
-API_EXCLUDE_BEGIN;
+API_EXCLUDE_END;
 
 IOFactory::IOFactory()
 {

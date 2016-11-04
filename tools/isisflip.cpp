@@ -9,7 +9,7 @@ using namespace isis;
 
 bool swapProperties( data::Image &image, const unsigned short dim )
 {
-	const util::ivector4 size = image.getSizeAsVector();
+	const util::vector4<size_t> size = image.getSizeAsVector();
 	std::vector<data::Chunk> chunks = image.copyChunksToVector( true );
 
 	if( chunks.front().getRelevantDims() < 2 && dim >= chunks.front().getRelevantDims() ) {

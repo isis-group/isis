@@ -186,7 +186,8 @@ public:
 
 	template<typename T> bool is()const;
 
-	const Converter &getConverterTo( unsigned short ID )const;
+	const Converter& getConverterTo( unsigned short ID )const;
+	static const Converter& getConverterFromTo( unsigned short fromID, unsigned short toID );
 
 	/**
 	* Dynamically cast the ValueBase up to its actual ValueArray\<T\>. Constant version.

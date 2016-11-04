@@ -79,29 +79,23 @@ bool transformCoords(isis::data::Image& img, boost::numeric::ublas::matrix< floa
 data::dimensions mapScannerAxisToImageDimension ( const data::Image& img, data::scannerAxis scannerAxes );
 
 template<typename TYPE,size_t COLS,size_t ROWS>
-boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::FixedMatrix<TYPE,COLS,ROWS> &mat)
+boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::Matrix<TYPE,COLS,ROWS> &mat)
 {
-	boost::numeric::ublas::matrix<TYPE> ret = boost::numeric::ublas::matrix<TYPE>( ROWS, COLS );
-
-	for( size_t m = 0; m < ROWS; m++ ) {
-		for( size_t n = 0; n < COLS; n++ ) {
-			ret( m, n ) = mat.elem( n, m );
-		}
-	}
-
+	boost::numeric::ublas::matrix<TYPE> ret( ROWS, COLS );
+	auto row_it=ret.begin1();
+	for(size_t r = 0; r<ROWS; ++r,++row_it)
+		std::copy(std::begin(mat[r]),std::end(mat[r]),std::begin(row_it));
 	return ret;
 }
 
 template<typename TYPE,size_t COLS,size_t ROWS>
-util::FixedMatrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
+util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
 {
-	util::FixedMatrix<TYPE,COLS,ROWS> ret;
+	util::Matrix<TYPE,COLS,ROWS> ret;
 	if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
-		for( size_t m = 0; m < ROWS; m++ ) {
-			for( size_t n = 0; n < COLS; n++ ) {
-				ret.elem( n, m ) = boost_matrix( m, n );
-			}
-		}
+		auto row_it=boost_matrix.begin1();
+		for(size_t r = 0; r<ROWS; ++r,++row_it)
+			std::copy(std::begin(row_it),std::end(row_it),std::begin(ret[r]));
 	} else {
 		LOG( Runtime, error ) << "The size of the boost matrix ("
 								<< boost_matrix.size1() << ", " << boost_matrix.size2()
@@ -112,11 +106,11 @@ util::FixedMatrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::
 };
 
 
-template<typename TYPE, size_t SIZE>
-util::FixedMatrix<TYPE, SIZE, SIZE> inverseMatrix(const util::FixedMatrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
+template<typename TYPE, size_t SIZE> util::Matrix<TYPE, SIZE, SIZE> 
+inverseMatrix(const util::Matrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
 {
 	using namespace boost::numeric::ublas;
-	util::FixedMatrix<TYPE, SIZE, SIZE> ret;
+	util::Matrix<TYPE, SIZE, SIZE> ret;
 	matrix<TYPE> boost_matrix_in = toBoostMatrix(mat);
 	matrix<TYPE> boost_matrix_inverse( SIZE, SIZE );
 	permutation_matrix<TYPE> pm( boost_matrix_in.size1() );

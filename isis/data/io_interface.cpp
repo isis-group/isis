@@ -44,17 +44,6 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 		}
 	}
 }
-bool FileFormat::setGender( util::PropertyMap &object, const char *set, const char *entries )
-{
-	util::Selection g( entries );
-
-	if( g.set( set ) ) {
-		object.setValueAs( "subjectGender", g );
-		return true;
-	}
-
-	return false;
-}
 
 bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 {
@@ -226,6 +215,5 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Im
 	return ret;
 }
 
-const float FileFormat::invalid_float = -std::numeric_limits<float>::infinity();
 }
 }

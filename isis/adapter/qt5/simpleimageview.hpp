@@ -25,6 +25,7 @@
 
 class QSlider;
 class MriGraphicsView;
+class QButtonGroup;
 
 namespace isis{
 namespace qt5{
@@ -36,14 +37,18 @@ class SimpleImageView : public QWidget
 	size_t curr_slice=0,curr_time=0;
 	data::Image m_img;
 	data::scaling_pair scaling;
+	bool is_complex;
+	QButtonGroup *transfer_function_group;
+	std::function<void (uchar *, const data::ValueArrayBase &)> transfer_function,magnitude_transfer,phase_transfer;
 	
-	void setupUi();
+	void setupUi(bool with_complex);
 	QSlider *sliceSelect,*timeSelect;
 	MriGraphicsView *graphicsView;
 protected Q_SLOTS:
 	void timeChanged(int time);
 	void sliceChanged(int slice);
 	void updateImage();
+	void selectTransfer(int id, bool checked);
 public:
     SimpleImageView(data::Image img, QString title="", QWidget *parent=nullptr);
 };
