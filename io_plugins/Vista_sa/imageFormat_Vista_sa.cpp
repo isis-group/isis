@@ -23,16 +23,44 @@
 #include <fstream>
 #include <isis/util/matrix.hpp>
 
+
 namespace isis
 {
 
 namespace image_io
 {
+	
+namespace _internal
+{
+	template<typename DURATION> bool fixDateTime(util::PropertyValue &prop, std::initializer_list<std::string> formats){
+		std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
+		std::istringstream date_time(prop.as<std::string>());
+		for(std::string format:formats){
+// 			date_time.imbue(std::locale("de_DE.utf-8"));
+			date_time >> std::get_time(&t, format.c_str());
+			if(!date_time.fail()){
+				time_t tt = mktime(&t);
+				prop=std::chrono::time_point_cast<DURATION>(std::chrono::system_clock::from_time_t(tt));
+				return true;
+			}
+		}
+		return prop.transform<std::chrono::time_point<std::chrono::system_clock,DURATION>>();
+	}
+	template<typename DURATION> bool fixDateTime(util::PropertyMap &map, util::PropertyMap::PropPath path, std::initializer_list<std::string> formats){
+		auto query=map.queryProperty(path);
+		if(query && fixDateTime<DURATION>(*query,formats)){
+			LOG(Debug,info) << "Parsed " << path << " as " << *query;
+			return true;
+		} else
+			return false;
+	}
+}
 const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vista_date_facet());
 
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
+	
 	const auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		LOG(Runtime,info) << "Directly using vista/rowVec and vista/columnVec";
@@ -128,27 +156,20 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 	
+	// fix timestamps
 	try{
 		const auto dateQuery = obj.queryProperty("vista/date");
 		const auto timeQuery = obj.queryProperty("vista/time");
 
-		if(dateQuery && timeQuery){
+		if(dateQuery && timeQuery){ // if we have time and date, try to parse it as combined string
 			util::Value<std::string> date_time=dateQuery->as<std::string>()+" "+timeQuery->as<std::string>();
 			obj.setValueAs("sequenceStart",date_time.as<util::timestamp>());
 			obj.remove("vista/date");
 			obj.remove("vista/time");
-			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << obj.queryProperty("sequenceStart");
-		} else if(dateQuery){ //old format (is actually a weird timestamp) -- 15:09:18 25 Sep 2001
-			std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
-			std::istringstream date_time(dateQuery->as<std::string>());
-// 			date_time.imbue(std::locale("de_DE.utf-8"));
-			date_time >> std::get_time(&t, "%H:%M:%S %d %b %Y");
-			if(!date_time.fail()){
-				time_t tt = mktime(&t);
-				util::timestamp stamp=std::chrono::time_point_cast<util::timestamp::duration>(std::chrono::system_clock::from_time_t(tt));
-				obj.setValueAs("sequenceStart",stamp);
-				LOG(Debug,info) << "Parsed sequenceStart from vista/date " << dateQuery << " as " << obj.queryProperty("sequenceStart");
-			}
+			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << *obj.queryProperty("sequenceStart");
+		} else if(dateQuery && _internal::fixDateTime<util::timestamp::duration>(*dateQuery,{"%H:%M:%S %d %b %Y"})){ //old format (is date actually a weird timestamp) -- eg: 15:09:18 25 Sep 2001
+			obj.transform<util::timestamp>("vista/date","sequenceStart");
+			LOG(Debug,info) << "Parsed sequenceStart from vista/date as " << *obj.queryProperty("sequenceStart");
 		}else {
 			LOG(Runtime,warning) << "Vista file lacks date and/or time information, can't set sequenceStart";
 		}
@@ -159,7 +180,7 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	if ( obj.hasProperty( "vista/age" ) ) {
 		obj.setValueAs( "subjectAge",obj.getValueAs<uint16_t>("vista/age")*365.2425 );
 		obj.remove( "vista/age" );
-	} else if(obj.hasProperty("vista/birth") && obj.hasProperty("sequenceStart")){
+	} else if(obj.hasProperty("vista/birth") && _internal::fixDateTime<util::date::duration>(obj,"vista/birth",{"%d%m%y"}) && obj.hasProperty("sequenceStart")){
 		const util::date birthdate=obj.getValueAs<util::date>("vista/birth");
 		const util::date measuredate= obj.getValueAs<util::date>("sequenceStart");
 			
