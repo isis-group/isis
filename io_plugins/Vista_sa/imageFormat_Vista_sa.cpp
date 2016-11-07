@@ -138,19 +138,30 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 			obj.remove("vista/date");
 			obj.remove("vista/time");
 			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << obj.queryProperty("sequenceStart");
-		} else {
+		} else if(dateQuery){ //old format (is actually a weird timestamp) -- 15:09:18 25 Sep 2001
+			std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
+			std::istringstream date_time(dateQuery->as<std::string>());
+// 			date_time.imbue(std::locale("de_DE.utf-8"));
+			date_time >> std::get_time(&t, "%H:%M:%S %d %b %Y");
+			if(!date_time.fail()){
+				time_t tt = mktime(&t);
+				util::timestamp stamp=std::chrono::time_point_cast<util::timestamp::duration>(std::chrono::system_clock::from_time_t(tt));
+				obj.setValueAs("sequenceStart",stamp);
+				LOG(Debug,info) << "Parsed sequenceStart from vista/date " << dateQuery << " as " << obj.queryProperty("sequenceStart");
+			}
+		}else {
 			LOG(Runtime,warning) << "Vista file lacks date and/or time information, can't set sequenceStart";
 		}
 	} catch(...){
 		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.queryProperty("vista/date") << " " << obj.queryProperty("vista/time");
 	}
-
+	
 	if ( obj.hasProperty( "vista/age" ) ) {
 		obj.setValueAs( "subjectAge",obj.getValueAs<uint16_t>("vista/age")*365.2425 );
 		obj.remove( "vista/age" );
-	} else if(obj.hasProperty("vista/birth") && (obj.hasProperty("vista/date") || obj.hasProperty("sequenceStart"))){
+	} else if(obj.hasProperty("vista/birth") && obj.hasProperty("sequenceStart")){
 		const util::date birthdate=obj.getValueAs<util::date>("vista/birth");
-		const util::date measuredate= obj.getValueAsOr("vista/date",obj.getValueAs<util::date>("sequenceStart"));
+		const util::date measuredate= obj.getValueAs<util::date>("sequenceStart");
 			
 		obj.setValueAs<uint16_t>("subjectAge",std::chrono::duration_cast<std::chrono::days>(measuredate-birthdate).count());
 		LOG(Runtime,info) << "Computed subjectAge from measurement date and birthdate as " << obj.getValueAs<uint16_t>("subjectAge")/365.2425 << " years";
