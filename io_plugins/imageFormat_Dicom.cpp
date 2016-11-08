@@ -444,7 +444,6 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 	isis::util::timestamp acqTime;
-	size_t acqNum = 0;
 
 	if( haveAcqTimeList ) {
 		acqTimeList = source.getValueAs<std::list<double> >( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
@@ -455,7 +454,6 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.getValueAs<isis::util::timestamp>( "acquisitionTime" );
 	else {
-		acqNum = source.getValueAs<uint32_t>( "acquisitionNumber" );
 		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
 		haveAcqTimeList = false;
 	}
@@ -476,7 +474,8 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	// for every slice
 	util::PropertyValue &ordProp= haveAcqTimeList ? dest.touchProperty( "acquisitionTime"):dest.touchProperty( "acquisitionNumber");
 	ordProp=util::PropertyValue(); //reset the selected ordering property to empty
-	
+	size_t acqNum = source.getValueAs<uint32_t>( "acquisitionNumber" );; 
+
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
@@ -491,7 +490,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		if(haveAcqTimeList){// property is timestamp
 			ordProp.push_back(acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) ));
 		} else { // property is an index
-			ordProp.push_back(uint32_t( acqNum * images +  slice ));
+			ordProp.push_back(uint32_t( acqNum * images +  slice )); //@todo think again -- is there any use in artificialy creating multi value
 		}
 	}
 
