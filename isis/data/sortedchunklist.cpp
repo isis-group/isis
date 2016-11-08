@@ -163,7 +163,39 @@ bool SortedChunkList::insert( const Chunk &ch )
 	LOG_IF( !ch.isValid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing();
 	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..";
 	assert( ch.isValid() );
+	
+	if(isEmpty()){ // find secondary Sort from first chunk
+		std::stack<scalarPropCompare> backup = secondarySort;
+		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
+			const util::PropertyMap::key_type temp = secondarySort.top().propertyName;
 
+			if ( secondarySort.size() > 1 ) {
+				secondarySort.pop();
+			} else {
+				LOG( Debug, warning )
+						<< "First chunk is missing the last secondary sort-property fallback (" << util::MSubject( temp ) << "), won't insert.";
+				secondarySort = backup;
+				return false;
+			}
+		}
+
+		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
+	}
+
+	
+	if(ch.queryProperty(secondarySort.top().propertyName)->size()>1){ // secondary sort is multi value, we have to splice the chunk and insert separately
+		bool ok=true;
+		std::pair<std::shared_ptr<Chunk>, bool> inserted;
+		for(const data::Chunk &c:ch.autoSplice()){
+			ok &=  insert_impl(c);
+		}
+		return ok;
+	} else {
+		return insert_impl(ch);
+	}
+}
+
+bool SortedChunkList::insert_impl(const Chunk &ch){
 	if( !isEmpty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
 		const Chunk &first = *( chunks.begin()->second.begin()->second );
@@ -185,34 +217,19 @@ bool SortedChunkList::insert( const Chunk &ch )
 		}
 	} else {
 		LOG( Debug, verbose_info ) << "Inserting 1st chunk";
-		std::stack<scalarPropCompare> backup = secondarySort;
 
 		if( ch.getDimSize( sliceDim ) > 1 ) {
 			LOG( Runtime, info ) << "We're dealing with volume chunks, considering indexOrigin as equal across Images";
 			equalProps.push_back( "indexOrigin" );
 		}
 
-		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
-			const util::PropertyMap::key_type temp = secondarySort.top().propertyName;
-
-			if ( secondarySort.size() > 1 ) {
-				secondarySort.pop();
-			} else {
-				LOG( Debug, warning )
-						<< "First chunk is missing the last secondary sort-property fallback (" << util::MSubject( temp ) << "), won't insert.";
-				secondarySort = backup;
-				return false;
-			}
-		}
-
-		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
 	const std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
-			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.queryProperty( "indexOrigin" ) << ") with the equal property "
-			<< std::make_pair( secondarySort.top().propertyName, ch.queryProperty( secondarySort.top().propertyName ) );
+		<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.queryProperty( "indexOrigin" ) << ") with the equal property "
+		<< std::make_pair( secondarySort.top().propertyName, ch.queryProperty( secondarySort.top().propertyName ) );
 
 	LOG_IF(
 		inserted.first && !inserted.second &&

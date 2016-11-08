@@ -172,7 +172,7 @@ scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::V
 	return getValueArrayBase().getScalingTo( typeID, minmax, scaleopt );
 }
 
-std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
+std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 {
 	if ( !isValid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
@@ -196,7 +196,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 		offset = getValueAs<util::fvector3>( "columnVec" );
 		break;
 	case sliceDim:{
-		const optional< util::PropertyValue& > svec=queryProperty( "sliceVec" );
+		const auto svec=queryProperty( "sliceVec" );
 		if( svec ) {
 			offset = svec->as<util::fvector3>();
 		} else {
@@ -239,15 +239,14 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )
 	return ret;
 }
 
-std::list<Chunk> Chunk::splice ( dimensions atDim )
+std::list<Chunk> Chunk::splice ( dimensions atDim )const
 {
 	std::list<Chunk> ret;
 
 	//@todo should be locking
 	typedef std::vector<ValueArrayReference> ValueArrayList;
 	const std::array<size_t, dims> wholesize = getSizeAsVector();
-	std::array<size_t, dims> spliceSize;
-	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
+	std::array<size_t, dims> spliceSize{1,1,1,1};
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	std::copy(std::begin(wholesize),std::begin(wholesize)+atDim,std::begin(spliceSize));
 	//get the spliced ValueArray's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
@@ -257,7 +256,8 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )
 	for( ValueArrayList::const_reference ref :  pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); 
 	}
-	PropertyMap::splice(ret.begin(),ret.end(),false);//copy/splice properties into spliced chunks
+	PropertyMap dummyMap(*this);
+	dummyMap.splice(ret.begin(),ret.end(),false);//copy/splice properties into spliced chunks @todo why is this not const
 	return ret;
 }
 

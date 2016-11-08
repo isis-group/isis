@@ -78,6 +78,9 @@ private:
 	std::pair<std::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
 	std::list<util::PropertyMap::PropPath> equalProps;
+	
+	bool insert_impl( const Chunk &ch );
+
 public:
 
 	//initialisation

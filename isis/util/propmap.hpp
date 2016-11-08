@@ -584,7 +584,7 @@ public:
 		const PathSet empty_before=genKeyList<EmptyP>();
 		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath(), lists_only) );
 		//some cleanup 
-		//delete all thats empty now, but wasn't back then (we shouldn't delete this that where empty before)
+		//delete all thats empty now, but wasn't back then (we shouldn't delete what where empty before) / spliters are moved so source will become empty
 		const PathSet empty_after=genKeyList<EmptyP>();
 		std::list<PropPath> deletes;
 		std::set_difference(empty_after.begin(),empty_after.end(),empty_before.begin(),empty_before.end(),std::back_inserter(deletes));
