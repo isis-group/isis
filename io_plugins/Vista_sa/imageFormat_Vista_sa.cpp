@@ -23,6 +23,7 @@
 #include <fstream>
 #include <isis/util/matrix.hpp>
 
+#include "VistaParser.h"
 
 namespace isis
 {
@@ -32,6 +33,7 @@ namespace image_io
 	
 namespace _internal
 {
+	
 	template<typename DURATION> bool fixDateTime(util::PropertyValue &prop, std::initializer_list<std::string> formats){
 		std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
 		std::istringstream date_time(prop.as<std::string>());
@@ -243,6 +245,10 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
 {
 	data::FilePtr mfile ( filename );
+	
+	vista_internal::VistaParser parser(filename);
+	parser.parse();
+	
 	std::list<data::Chunk> chunks;
 
 	if ( !mfile.good() ) {
@@ -254,10 +260,11 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 	}
 
 	//parse the vista header
+	
+	
 	data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
 	util::PropertyMap root_map;
 	std::list<util::PropertyMap> ch_list;
-	size_t old_size = chunks.size();
 
 	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
 
@@ -266,6 +273,7 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 		
 		for( const util::PropertyMap & chMap: ch_list ) {
 			util::PropertyMap root;
+			chMap.print(std::clog)<< std::endl;
 			root.touchBranch( "vista" ) = chMap;
 			sanitize( root );
 
