@@ -48,8 +48,8 @@ if(ISIS_IOPLUGIN_VISTA_SA)
 		COMMAND ${FLEXc++_EXECUTABLE} 
 		ARGS 
 			--no-lines
-			--target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer
+			--target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer.l
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer.l
 		OUTPUT 
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc 
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaScanner.ih
@@ -61,8 +61,8 @@ if(ISIS_IOPLUGIN_VISTA_SA)
 		ARGS 
 			--no-lines
 			--target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ 
-			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar
+			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar.y
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar.y
 		OUTPUT 
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/parse.cc
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaParser.ih
