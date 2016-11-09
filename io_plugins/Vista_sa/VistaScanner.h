@@ -3,7 +3,7 @@
 #ifndef vista_internalVistaScanner_H_INCLUDED_
 #define vista_internalVistaScanner_H_INCLUDED_
 
-// $insert baseclass_h
+#include <isis/util/propmap.hpp>
 #include "VistaScannerbase.h"
 #include "VistaParserbase.h"
 

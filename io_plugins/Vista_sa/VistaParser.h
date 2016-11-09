@@ -3,10 +3,8 @@
 #ifndef vista_internalVistaParser_h_included
 #define vista_internalVistaParser_h_included
 
-// $insert baseclass
-#include "VistaParserbase.h"
-// $insert scanner.h
 #include "VistaScanner.h"
+#include "VistaParserbase.h"
 
 // $insert namespace-open
 namespace vista_internal
