@@ -623,6 +623,7 @@ public:
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val ) {
 		PropertyValue &ret = touchProperty( path );
+		util::checkType<T>();
 
 		if( ret.isEmpty() ) { // set an empty property
 			ret = val;
