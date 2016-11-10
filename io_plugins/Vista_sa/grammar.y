@@ -1,24 +1,65 @@
 %scanner                VistaScanner.h
 %scanner-token-function d_scanner.lex()
-%debug
 %class-name VistaParser
 %scanner-class-name VistaScanner
 %namespace vista_internal
 %filenames VistaParser
 
-%token MAGIC WORD QUOTED_STRING HISTORY_KEY IMAGE_KEY
+%token MAGIC_KEY WORD QUOTED_STRING HISTORY_KEY IMAGE_KEY
 
-%polymorphic STRING: std::string; SPAIR: std::pair<std::string,std::string>; MAP: isis::util::PropertyMap
+%polymorphic STRING: std::string; SPAIR: std::pair<std::string,std::string>; MAP: isis::util::PropertyMap; SLIST: std::list<std::string>
 %type <STRING> word
 %type <SPAIR> entry
-%type <MAP> block
+%type <MAP> block block_entries
+%type <SLIST> history_list
 
 %%
 
-startrule:
-	magic block
+vista:
+	magic block 
+	{
+		VistaParser::root.transfer($2);
+		ACCEPT();
+	}
+;
+
+block:
+	'{' block_entries '}'{($$).transfer($2);}
+;
+
+block_entries:
+	// empty
+	{$$=isis::util::PropertyMap();}
 |
-	magic history block
+	block_entries entry
+	{
+		($$).setValueAs(($2).first.c_str(),($2).second);
+	}
+|
+	block_entries word ':' block
+	{
+/*   		($4).print(std::cout << "Got Sub-Block " << $2 << std::endl); */
+		($$).touchBranch( ($2).c_str() ).transfer($4);
+	}
+|
+	block_entries IMAGE_KEY ':' IMAGE_KEY block {
+/*  		($5).print(std::cout << "Got Image" << std::endl);  */
+		VistaParser::ch_list.push_back($5);
+	}
+|
+	block_entries HISTORY_KEY ':' '{' history_list '}'
+	{
+/* 		 isis::util::listToOStream(($5).begin(),($5).end(),std::cout << "Got history ") << std::endl;  */
+		 ($$).setValueAs("history",($5));
+	}
+;
+
+entry:
+	word ':' word
+	{
+/*  		std::cout << "Got " << std::make_pair($1,$3) << std::endl; */
+		$$ = std::make_pair($1,$3);
+	}
 ;
 
 word:
@@ -32,40 +73,16 @@ word:
 ;
 
 magic:
-	MAGIC word
+	MAGIC_KEY word
 	{
-		std::cout << "Magic " << $2 << std::endl;
+		// @todo check version
 	}
 ;
 
-entry:
-	word ':' word
-	{
-		std::cout << "Entry " << $1 << "=" << $3 << std::endl;
-		$$ = std::make_pair($1,$3);
-	}
+history_list:
+	//empty
+	{$$=std::list<std::string>();}
 |
-	block
+	history_list entry {($$).push_back(($2).first+":\t"+($2).second);}
 ;
-
-block_entries:
-	// empty
-|
-	block_entries entry
-;
-
-block:
-	'{' block_entries '}'
-;
-
-history:
-	HISTORY_KEY ':' block
-;
-
-image:
-	IMAGE_KEY block
-;
-
-chunk:
-	IMAGE_KEY ':' image
-;
+	
