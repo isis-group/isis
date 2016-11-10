@@ -114,7 +114,6 @@ class VistaOutputImage:public VistaProtoImage{
 	std::map<unsigned short,boost::shared_ptr<WriterSpec> > isis2vista;
 	unsigned short storeTypeID;
 	data::scaling_pair scaling;
-    std::_Rb_tree_iterator< std::pair< const int, boost::shared_ptr< WriterSpec > > > me;
 	template<typename FIRST,typename SECOND> static void typeFallback(unsigned short typeID){
 		LOG(Runtime,notice) 
 			<< util::MSubject(data::ValueArray<FIRST>::staticName()) << " is not supported in vista falling back to " 

@@ -151,8 +151,9 @@ if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
 
 	#this is ugly as hell, lets hope we won't have to drag this along for to long
-	set(LOG4CPLUS_NAMESPACE "dcmtk::log4cplus" CACHE STRING "namespace where to look for log4cplus-stuff in  dcmtk")
+	set(LOG4CPLUS_NAMESPACE "dcmtk::log4cplus" CACHE STRING "namespace where to look for log4cplus-stuff in dcmtk")
 	set_source_files_properties(imageFormat_Dicom.cpp PROPERTIES COMPILE_DEFINITIONS "LOG4CPLUS_NAMESPACE=${LOG4CPLUS_NAMESPACE}")
+	include_directories("${DCMTK_DIR}/include")
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
 	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${DCMTK_oflog_LIBRARY_RELEASE} ${isis_core_lib})
