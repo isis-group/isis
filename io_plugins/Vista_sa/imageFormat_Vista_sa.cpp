@@ -17,7 +17,6 @@
 */
 
 #include "imageFormat_Vista_sa.hpp"
-#include "VistaSaParser.hpp"
 #include "vistaprotoimage.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
@@ -246,9 +245,6 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 {
 	data::FilePtr mfile ( filename );
 	
-	vista_internal::VistaParser parser(filename);
-	parser.parse();
-	
 	std::list<data::Chunk> chunks;
 
 	if ( !mfile.good() ) {
@@ -260,45 +256,53 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 	}
 
 	//parse the vista header
-	
-	
-	data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
-	util::PropertyMap root_map;
+
 	std::list<util::PropertyMap> ch_list;
-
-	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
-
-		std::list<_internal::VistaInputImage> groups;
-		groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
-		
-		for( const util::PropertyMap & chMap: ch_list ) {
-			util::PropertyMap root;
-			chMap.print(std::clog)<< std::endl;
-			root.touchBranch( "vista" ) = chMap;
-			sanitize( root );
-
-			if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
-				groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
-				assert( groups.back().add( root ) ); //a new one should always work
-			}
-		}
-		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
-		
-		uint16_t sequence = 0;
-		if(feedback && ch_list.size()>10)
-			feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
-
-		for( _internal::VistaInputImage & group: groups ) {
-			if( group.isFunctional() )
-				group.transformFromFunctional();
-			else
-				group.fakeAcqNum(); // we have to fake the acquisitionNumber
-
-			group.store( chunks, root_map, sequence++,feedback ); //put the chunk group into the output
-		}
+	util::PropertyMap root;
+	std::ifstream stream(filename);
+	vista_internal::VistaParser parser(stream,root,ch_list);
+	
+	if(parser.parse()!=0)
+	{
+		LOG( Runtime, error ) << "Parsing vista file " << filename << " failed";
+		return chunks;
 	} else {
-		LOG( Runtime, error ) << "Parsing vista failed";
+		LOG(Debug,info) << "Parsed global properties " << root << " from " << filename;
 	}
+	
+	data::ValueArray< uint8_t >::iterator data_start = mfile.begin() + stream.tellg();
+	LOG(Debug,info) << "Vista data offset is " << stream.tellg();
+	stream.close();
+
+	std::list<_internal::VistaInputImage> groups;
+	groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
+
+	for( const util::PropertyMap & chMap: ch_list ) {
+		util::PropertyMap root;
+		LOG(Debug, info) << "Sanitizing image " << chMap;
+		root.touchBranch( "vista" ) = chMap;
+		sanitize( root );
+
+		if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
+			groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
+			assert( groups.back().add( root ) ); //a new one should always work
+		}
+	}
+	LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
+
+	uint16_t sequence = 0;
+	if(feedback && ch_list.size()>10)
+		feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
+
+	for( _internal::VistaInputImage & group: groups ) {
+		if( group.isFunctional() )
+			group.transformFromFunctional();
+		else
+			group.fakeAcqNum(); // we have to fake the acquisitionNumber
+
+		group.store( chunks, root, sequence++,feedback ); //put the chunk group into the output
+	}
+
 	return chunks;
 }
 

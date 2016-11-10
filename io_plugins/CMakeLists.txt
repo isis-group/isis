@@ -46,9 +46,7 @@ if(ISIS_IOPLUGIN_VISTA_SA)
 
 	ADD_CUSTOM_COMMAND(
 		COMMAND ${FLEXc++_EXECUTABLE} 
-		ARGS 
-			--no-lines
-			--target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer
+		ARGS --target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer
 		OUTPUT 
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc 
@@ -58,20 +56,16 @@ if(ISIS_IOPLUGIN_VISTA_SA)
 
 	ADD_CUSTOM_COMMAND(
 		COMMAND ${BISONc++_EXECUTABLE} 
-		ARGS 
-			--no-lines
-			--target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ 
-			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar
+		ARGS --target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar
 		OUTPUT 
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/parse.cc
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaParser.ih
 			${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaParserbase.h
-
 	)
 
 	add_library(isisImageFormat_Vista_sa SHARED 
-		Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/vistaprotoimage.cpp 
+		Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/vistaprotoimage.cpp 
 		${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc 
 		${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/parse.cc
 	)

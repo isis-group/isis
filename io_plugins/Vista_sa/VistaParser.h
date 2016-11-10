@@ -3,6 +3,7 @@
 #ifndef vista_internalVistaParser_h_included
 #define vista_internalVistaParser_h_included
 
+#include <isis/util/propmap.hpp>
 #include "VistaScanner.h"
 #include "VistaParserbase.h"
 
@@ -15,11 +16,13 @@ class VistaParser: public VistaParserBase
 {
     // $insert scannerobject
     VistaScanner d_scanner;
+	std::list<isis::util::PropertyMap> &ch_list;
+	isis::util::PropertyMap &root;
         
     public:
         int parse();
-		VistaParser(const std::string &filename){
-			d_scanner.switchIstream(filename);
+		VistaParser(std::istream &istream,isis::util::PropertyMap &global_map,std::list<isis::util::PropertyMap> &chunk_list):root(global_map),ch_list(chunk_list){
+			d_scanner.switchStreams(istream);
 		}
 
 
