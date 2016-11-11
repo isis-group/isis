@@ -146,9 +146,9 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 
-	transformOrTell<std::string>( "vista/seriesDescription", "sequenceDescription", obj, warning ) ||
-	transformOrTell<std::string>( "vista/protocol", "sequenceDescription", obj, warning ) ||
-	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, warning );
+	transformOrTell<std::string>( "vista/seriesDescription", "sequenceDescription", obj, info ) ||
+	transformOrTell<std::string>( "vista/protocol", "sequenceDescription", obj, info ) ||
+	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, info );
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
@@ -201,7 +201,7 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		LOG(Runtime,info) << "Computed subjectAge from measurement date and birthdate as " << obj.getValueAs<uint16_t>("subjectAge")/365.2425 << " years";
 	}
 
-	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
+	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, info );
 	transformOrTell<float>( "vista/echoTime", "echoTime", obj, warning );
 }
 
