@@ -62,6 +62,17 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
 	
+	if(obj.hasProperty("vista/MPIL_vista")){
+		const util::slist tokens=util::stringToList<std::string>(obj.getValueAs<std::string>("vista/MPIL_vista"),std::regex("[[:space:]:]+"));
+		obj.remove("vista/MPIL_vista");
+		auto &MPIL_vista=obj.touchBranch("vista/MPIL_vista");
+		for(util::slist::const_iterator i=tokens.begin();i!=tokens.end();){
+			util::PropertyMap::PropPath path=(i++)->c_str();
+			MPIL_vista.setValueAs(path,*(i++));
+			LOG(Debug,info) << "Got " << MPIL_vista.queryProperty(path) << " from vista/MPIL_vista";
+		}
+	}
+	
 	const auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		LOG(Runtime,info) << "Directly using vista/rowVec and vista/columnVec";
@@ -145,7 +156,8 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
 
 	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, verbose_info ) ||
-	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, info );
+	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, verbose_info ) || 
+	transformOrTell<uint16_t>( "vista/MPIL_vista/MPIL_repetition_time", "repetitionTime", obj, info );
 
 	if( hasOrTell( "vista/sex", obj, warning ) ) {
 		util::Selection gender( "male,female,other" );
