@@ -302,24 +302,18 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::list<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
-		set ( defaultChunkEqualitySet ),
-		clean ( false ) {
-		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
-		set.addSecondarySort ( "acquisitionNumber" );
+	template<typename T> Image ( std::list<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) : Image()
+	{
+		minIndexingDim = min_dim;
 		insertChunksFromList ( chunks, rejected );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image ( std::vector<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
-		set ( defaultChunkEqualitySet ),
-		clean ( false ) {
-		util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
-		set.addSecondarySort ( "acquisitionNumber" );
+	template<typename T> Image ( std::vector<T> &chunks, optional< util::slist& > rejected=optional< util::slist& >(), dimensions min_dim = rowDim ) : Image()
+	{
+		minIndexingDim = min_dim;
 		std::list<T> tmp( chunks.begin(), chunks.end() );
 		insertChunksFromList ( tmp );
 		chunks.assign( tmp.begin(), tmp.end() );

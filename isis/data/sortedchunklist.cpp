@@ -184,6 +184,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 	
 	if(ch.queryProperty(secondarySort.top().propertyName)->size()>1){ // secondary sort is multi value, we have to splice the chunk and insert separately
+		LOG(Runtime,info) << "Splicing chunk at top dim as secondary sorting property " << secondarySort.top().propertyName << " is a list of size " << ch.queryProperty(secondarySort.top().propertyName)->size();
 		bool ok=true;
 		std::pair<std::shared_ptr<Chunk>, bool> inserted;
 		for(const data::Chunk &c:ch.autoSplice()){
