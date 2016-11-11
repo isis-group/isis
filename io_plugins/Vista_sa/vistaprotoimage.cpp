@@ -209,8 +209,7 @@ void VistaInputImage::transformFromFunctional()
 			const util::PropertyValue p = *i->queryProperty( diff.first );
 			LOG( Debug, info ) << "Copying per timestep property " << std::make_pair( diff.first, p ) << " into " << ret.size() << " volumes";
 			for( data::Chunk & ref: ret ) {
-#pragma message "Implement me"
-// 				ref.propertyValueAt( diff.first, n ) = p;
+				ref.setValue( diff.first, p.front(), n);
 			}
 		}
 	}
