@@ -231,24 +231,23 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
 
-	ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, 0} ) );
-	ch.setValueAs( "rowVec", util::fvector3( {1, 0} ) );
-	ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
-	ch.setValueAs( "sliceVec", util::fvector3( {0, 0, 1} ) );
-	ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
+	ch.setValueAs( "indexOrigin", util::fvector3{0, 0, 0} );
+	ch.setValueAs( "rowVec",      util::fvector3{1, 0, 0} );
+	ch.setValueAs( "columnVec",   util::fvector3{0, 1, 0} );
+	ch.setValueAs( "sliceVec",    util::fvector3{0, 0, 1} );
+	ch.setValueAs( "voxelSize",   util::fvector3{1, 1, 1} );
 	ch.setValueAs( "sequenceNumber", ( uint16_t )0 );
+	ch.setValueAs( "acquisitionNumber", ( uint16_t )0 );
 	ch.touchProperty( "nothing")=util::PropertyValue();
 
 	// make c a proplist
 	for( int i = 0; i < 4; i++ ) {
-		ch.touchProperty( "acquisitionNumber").push_back(3-i); 
-		ch.touchProperty( "acquisitionTime").push_back(3-i); 
+		ch.touchProperty( "some_list").push_back(3-i); 
 	}
 
 	data::Image img( ch );  
 	BOOST_CHECK_EQUAL( img.getRelevantDims(), 3 ); // still a 4x4x4 volume
-	BOOST_CHECK_EQUAL( img.property( "acquisitionTime").size(),4); // also still a proplist
-	BOOST_CHECK_EQUAL( img.property( "acquisitionNumber").size(),4); // also still a proplist
+	BOOST_CHECK_EQUAL( img.property( "some_list").size(),4); // also still a proplist
 
 	BOOST_CHECK( const_cast<const data::Image&>(img).queryProperty( "nothing"));  //should be there (aka optional::operator bool=true)
 	BOOST_CHECK(img.property("nothing").isEmpty()); // but empty
@@ -256,17 +255,14 @@ BOOST_AUTO_TEST_CASE ( proplist_image_splice_test )
 	img.spliceDownTo(data::sliceDim);
 
 	BOOST_CHECK_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // now its sliced
-	BOOST_CHECK( !img.hasProperty( "acquisitionTime")); // its in the chunks now
-	BOOST_CHECK( !img.hasProperty( "acquisitionNumber")); // its in the chunks now
+	BOOST_CHECK( !img.hasProperty( "some_list")); // its in the chunks now
 
 	BOOST_CHECK( const_cast<const data::Image&>(img).queryProperty( "nothing"));  //should still be there
 	BOOST_CHECK(img.property("nothing").isEmpty()); // but still empty
 
 	for( uint32_t i = 0; i < 4; i++ ) {
-		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionTime" ));
-		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "acquisitionNumber" ));
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionTime" ), i );
-		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "acquisitionNumber" ), i );
+		BOOST_REQUIRE(img.getChunk( 0, 0, 3 - i, 0, false ).hasProperty( "some_list" ));
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i, 0, false ).property( "some_list" ), i );
 	}
 }
 
