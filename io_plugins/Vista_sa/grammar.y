@@ -1,4 +1,4 @@
-%scanner                VistaScanner.h
+%scanner VistaScanner.h
 %scanner-token-function d_scanner.lex()
 %class-name VistaParser
 %scanner-class-name VistaScanner
@@ -11,7 +11,7 @@
 %type <STRING> word
 %type <SPAIR> entry
 %type <MAP> block block_entries
-%type <SLIST> history_list
+%type <SLIST> history history_list
 
 %%
 
@@ -47,10 +47,10 @@ block_entries:
 		VistaParser::ch_list.push_back($5);
 	}
 |
-	block_entries HISTORY_KEY ':' '{' history_list '}'
+	block_entries history
 	{
 /* 		 isis::util::listToOStream(($5).begin(),($5).end(),std::cout << "Got history ") << std::endl;  */
-		 ($$).setValueAs("history",($5));
+		 ($$).setValueAs("history",($2));
 	}
 ;
 
@@ -77,6 +77,12 @@ magic:
 	{
 		// @todo check version
 	}
+;
+
+history:
+	HISTORY_KEY ':' '{' history_list '}' {$$=$4;}
+|
+	HISTORY_KEY ':' word {($$).push_back($3);}
 ;
 
 history_list:
