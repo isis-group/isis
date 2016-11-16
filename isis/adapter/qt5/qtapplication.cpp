@@ -69,3 +69,12 @@ std::shared_ptr< isis::util::MessageHandlerBase > isis::qt5::IOQtApplication::ge
 int isis::qt5::IOQtApplication::exec(){
 	return getQApplication().exec();
 }
+
+std::shared_ptr< isis::util::MessageHandlerBase > isis::qt5::QtApplication::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+{
+	return std::shared_ptr< isis::util::MessageHandlerBase >( level ? new isis::qt5::QDefaultMessageHandler( level ) : 0 );
+}
+
+int isis::qt5::QtApplication::exec(){
+	return getQApplication().exec();
+}
