@@ -62,7 +62,6 @@ if(ISIS_QT5)
 	add_executable(isisview isisview.cpp)
 	target_link_libraries(isisview ${isis_core_lib} ${isis_adapter_qt5_lib} Qt5::Widgets )
 	set_target_properties(isisview PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-	build_manpage(isisdump "print out the metadata of an image")
 
 	install(TARGETS isisview RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 endif(ISIS_QT5)
