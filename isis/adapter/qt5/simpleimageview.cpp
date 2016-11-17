@@ -100,9 +100,9 @@ void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
 	if(
-		img.getMajorTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
-		img.getMajorTypeID() == data::ValueArray<std::complex<double>>::staticID()
-	)is_complex=true;
+		img.getChunkAt(0).getTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
+		img.getChunkAt(0).getTypeID() == data::ValueArray<std::complex<double>>::staticID()
+	)is_complex=true; //img.getChunkAt(0).getTypeID() is cheaper than Image::getMajorTypeID() and its enough for this case
 	else is_complex=false;
 	
 	setupUi(is_complex);

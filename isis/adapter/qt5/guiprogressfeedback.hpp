@@ -54,6 +54,9 @@ public:
 	virtual size_t getMax()override;
 	/// extend the progress bars maximum by the given value
 	virtual size_t extend( size_t by )override;
+signals:
+	void signalNewValue( int value );
+	void signalNewMax( int value );
 };
 
 }

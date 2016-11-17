@@ -27,6 +27,8 @@ isis::qt5::GUIProgressFeedback::GUIProgressFeedback(bool autohide, QWidget* pare
 		QWidget::show();
 	setLayout(new QHBoxLayout());
 	layout()->addWidget(progressbar);
+	progressbar->connect(this,SIGNAL(signalNewValue(int)),SLOT(setValue(int)));
+	progressbar->connect(this,SIGNAL(signalNewMax(int)),SLOT(setMaximum(int)));
 }
 
 
@@ -37,7 +39,7 @@ void isis::qt5::GUIProgressFeedback::close()
 
 size_t isis::qt5::GUIProgressFeedback::extend(size_t by)
 {
-	progressbar->setMaximum(getMax()+by);
+	emit signalNewMax(getMax()+by);
 	return getMax();
 }
 
@@ -48,7 +50,7 @@ size_t isis::qt5::GUIProgressFeedback::getMax()
 
 size_t isis::qt5::GUIProgressFeedback::progress(const std::string message, size_t step)
 {
-	progressbar->setValue(progressbar->value()+step);
+	emit signalNewValue(progressbar->value()+step);
 	return progressbar->value();
 }
 
