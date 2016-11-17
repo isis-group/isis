@@ -132,7 +132,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic 2003";}
 
 
 
@@ -179,10 +179,14 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 	}
 	{
-			// compute acquisitionTime
-		auto o_acTime= extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
+		// compute acquisitionTime
+		auto o_acTime= (dialect == "2003") ?
+			extractOrTell({"AcquisitionTime","ContentTime"},dicomTree,warning):
+			extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
 		if ( o_acTime ) {
-			auto o_acDate= extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
+			auto o_acDate= (dialect == "2003") ?
+				extractOrTell({"AcquisitionDate", "ContentDate", "SeriesDate"},dicomTree,warning):
+				extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
 			if( o_acDate ) {
 				const util::timestamp acTime = o_acTime->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
 				object.setValueAs<util::timestamp>("acquisitionTime", acTime);
