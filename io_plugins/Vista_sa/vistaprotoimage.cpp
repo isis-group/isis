@@ -209,8 +209,7 @@ void VistaInputImage::transformFromFunctional()
 			const util::PropertyValue p = *i->queryProperty( diff.first );
 			LOG( Debug, info ) << "Copying per timestep property " << std::make_pair( diff.first, p ) << " into " << ret.size() << " volumes";
 			for( data::Chunk & ref: ret ) {
-#pragma message "Implement me"
-// 				ref.propertyValueAt( diff.first, n ) = p;
+				ref.setValue( diff.first, p.front(), n);
 			}
 		}
 	}
@@ -233,7 +232,10 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 	while( !empty() ) {
 		out.push_back( front() );
 		pop_front();
-		out.back().branch( "vista" ).join( root_map );
+		const auto rejected=out.back().touchBranch( "vista" ).join( root_map );
+		if(!rejected.empty()){
+			LOG(Runtime,warning) << "The global entries " << rejected << " where rejected";
+		} 
 
 		if( !out.back().hasProperty( "sequenceNumber" ) )
 			out.back().setValueAs( "sequenceNumber", sequence );
