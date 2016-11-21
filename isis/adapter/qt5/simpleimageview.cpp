@@ -18,6 +18,7 @@
  */
 
 #include "simpleimageview.hpp"
+#include "gradientwidget.hpp"
 #include "common.hpp"
 #include <QSlider>
 #include <QGridLayout>
@@ -27,20 +28,81 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 
-template<typename T> void _magnitudeTransfer(const isis::data::scaling_pair &magnitude_scale, uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
-	const T scale=magnitude_scale.first->as<T>();
-	const T offset=magnitude_scale.second->as<T>();
-	for(const std::complex<T> &v:line){
-		*(dst++)=std::abs(v)*scale+offset;
-	}
+namespace isis{
+namespace qt5{
+namespace _internal{
+	
+TransferFunction::TransferFunction(std::pair<util::ValueReference,util::ValueReference> in_minmax):minmax(in_minmax)
+{
+	//we dont actually want the converter, but its scaling function
+	//which is why we hard-wire it to double->uint8_t, so we allways get a full scaling
+	c=data::ValueArrayBase::getConverterFromTo(data::ValueArray<double>::staticID(),data::ValueArray<uint8_t>::staticID());
+	updateScale(0,1);
 }
 
-template<typename T> void _phaseTransfer(uchar *dst, const isis::data::ValueArray<std::complex<T>> &line){
-	const T scale=M_PI/128;
-	for(const std::complex<T> &v:line){
-		*(dst++)=std::arg(v)*scale+128;
-	}
+void TransferFunction::updateScale(qreal bottom, qreal top){
+	const util::Value<double> min = minmax.first->as<double>()+ bottom*(minmax.second->as<double>()-minmax.first->as<double>());
+	const util::Value<double> max= minmax.second->as<double>()*top;
+	scale= c->getScaling(min,max);
 }
+
+class MagnitudeTransfer : public TransferFunction{
+	template<typename T> void transferFunc(uchar *dst, const data::ValueArray<std::complex<T>> &line)const{
+		const T t_scale=scale.first->as<T>();
+		const T t_offset=scale.second->as<T>();
+		for(const std::complex<T> &v:line){
+			*(dst++)=std::abs(v)*t_scale+t_offset;
+		}
+	}
+
+public:
+	MagnitudeTransfer(const data::Image &img):TransferFunction(img.getMinMax()){}
+	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
+		switch(line.getTypeID()){
+			case data::ValueArray<std::complex<float>>::staticID():
+				transferFunc(dst,line.castToValueArray<std::complex<float>>());
+				break;
+			case data::ValueArray<std::complex<double>>::staticID():
+				transferFunc(dst,line.castToValueArray<std::complex<double>>());
+				break;
+			default:
+				LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
+		}
+	}
+};
+
+class PhaseTransfer : public TransferFunction{
+	
+	template<typename T> void transferFunc(uchar *dst, const data::ValueArray<std::complex<T>> &line)const{
+		const T scale=M_PI/128;
+		for(const std::complex<T> &v:line){
+			*(dst++)=std::arg(v)*scale+128;
+		}
+	}
+
+public:
+	PhaseTransfer(const data::Image &img):TransferFunction(std::pair<util::ValueReference,util::ValueReference>(util::Value<int16_t>(-180),util::Value<int16_t>(180))){}
+	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
+		switch(line.getTypeID()){
+			case data::ValueArray<std::complex<float>>::staticID():
+				transferFunc(dst,line.castToValueArray<std::complex<float>>());
+				break;
+			case data::ValueArray<std::complex<double>>::staticID():
+				transferFunc(dst,line.castToValueArray<std::complex<double>>());
+				break;
+			default:
+				LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
+		}
+	}
+};
+
+class LinearTransfer : public TransferFunction{
+public:
+	LinearTransfer(const data::Image &img):TransferFunction(img.getMinMax()){}
+	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
+		line.copyToMem<uint8_t>(dst,line.getLength(),scale);
+	}
+};
 
 class MriGraphicsView: public QGraphicsView{
 public:
@@ -57,7 +119,9 @@ public:
 	}
 };
 
-void isis::qt5::SimpleImageView::setupUi(bool with_complex){
+} //namespace _internal
+
+void SimpleImageView::setupUi(bool with_complex){
 
 	QGridLayout *gridLayout = new QGridLayout(this);
 
@@ -68,7 +132,7 @@ void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 
 	gridLayout->addWidget(sliceSelect, 0, 1, 1, 1);
 
-    graphicsView = new MriGraphicsView(this);
+    graphicsView = new _internal::MriGraphicsView(this);
 	gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
 
 	timeSelect = new QSlider(this);
@@ -76,7 +140,11 @@ void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 	timeSelect->setOrientation(Qt::Horizontal);
 	timeSelect->setTickPosition(QSlider::TicksBelow);
 	gridLayout->addWidget(timeSelect, 1, 0, 1, 1);
-
+	
+	QWidget *gradient=new GradientWidget(this);
+	gridLayout->addWidget(gradient,0,2,1,1);
+	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
+	
 	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
 	
@@ -97,7 +165,7 @@ void isis::qt5::SimpleImageView::setupUi(bool with_complex){
 	}
 }
 
-isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
+SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
 	if(
 		img.getChunkAt(0).getTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
@@ -114,43 +182,13 @@ isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWid
 		setWindowTitle(title);
 
 	if(is_complex){
-		const std::pair<util::ValueReference,util::ValueReference> minmax = img.getMinMax();
-		const data::ValueArrayBase::Converter &c = data::ValueArrayBase::getConverterFromTo(data::ValueArray<float>::staticID(),data::ValueArray<uint8_t>::staticID());
-		const data::scaling_pair magnitude_scale=c->getScaling(*minmax.first,*minmax.second,data::autoscale);
+		magnitude_transfer.reset(new _internal::MagnitudeTransfer(img));
+		phase_transfer.reset(new _internal::PhaseTransfer(img));
 		
-		magnitude_transfer = [magnitude_scale](uchar *dst, const data::ValueArrayBase &line){
-			switch(line.getTypeID()){
-				case data::ValueArray<std::complex<float>>::staticID():
-					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<float>>());
-					break;
-				case data::ValueArray<std::complex<double>>::staticID():
-					_magnitudeTransfer(magnitude_scale,dst,line.castToValueArray<std::complex<double>>());
-					break;
-				default:
-					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
-			}
-		};
-
-		phase_transfer = [](uchar *dst, const data::ValueArrayBase &line){
-			switch(line.getTypeID()){
-				case data::ValueArray<std::complex<float>>::staticID():
-					_phaseTransfer(dst,line.castToValueArray<std::complex<float>>());
-					break;
-				case data::ValueArray<std::complex<double>>::staticID():
-					_phaseTransfer(dst,line.castToValueArray<std::complex<double>>());
-					break;
-				default:
-					LOG(Runtime,error) << line.getTypeName() << " is no supported complex-type";
-			}
-		};
 		transfer_function=magnitude_transfer;
 		connect(transfer_function_group, SIGNAL(buttonToggled(int, bool)),SLOT(selectTransfer(int,bool)));
-
 	} else {
-		const data::scaling_pair scaling=img.getScalingTo(data::ValueArray<uint8_t>::staticID());
-		transfer_function=[scaling](uchar *dst, const data::ValueArrayBase &line){
-			line.copyToMem<uint8_t>(dst,line.getLength(),scaling);
-		};
+		transfer_function.reset(new _internal::LinearTransfer(img));;
 	}
 	
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
@@ -173,25 +211,30 @@ isis::qt5::SimpleImageView::SimpleImageView(data::Image img, QString title, QWid
 	updateImage();
 }
 
-void isis::qt5::SimpleImageView::sliceChanged(int slice){
+void SimpleImageView::sliceChanged(int slice){
 	curr_slice=slice-1;
 	updateImage();
 }
-void isis::qt5::SimpleImageView::timeChanged(int time)
+void SimpleImageView::timeChanged(int time)
 {
 	curr_time=time-1;
 	updateImage();
 }
-void isis::qt5::SimpleImageView::updateImage()
+void SimpleImageView::updateImage()
 {
 	graphicsView->scene()->clear();
+	auto transfer=transfer_function; //lambdas cannot bind members ??
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
-			makeQImage(m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),m_img.getDimSize(data::rowDim),transfer_function)
+			makeQImage(
+				m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
+				m_img.getDimSize(data::rowDim),
+				[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
+			)
 		)
 	);
 }
-void isis::qt5::SimpleImageView::selectTransfer(int id, bool checked)
+void SimpleImageView::selectTransfer(int id, bool checked)
 {
 	if(checked){//prevent the toggle-off from triggering a useless redraw
 		transfer_function= (id==1?magnitude_transfer:phase_transfer);
@@ -199,3 +242,12 @@ void isis::qt5::SimpleImageView::selectTransfer(int id, bool checked)
 	}
 }
 
+void SimpleImageView::reScale(qreal bottom, qreal top)
+{
+	transfer_function->updateScale(bottom,top);
+	updateImage();
+}
+
+
+}
+}
