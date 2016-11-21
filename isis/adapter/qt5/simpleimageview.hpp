@@ -38,7 +38,7 @@ protected:
 public:
 	TransferFunction(std::pair<util::ValueReference,util::ValueReference> in_minmax);
 	virtual void operator()(uchar *dst, const data::ValueArrayBase &line)const=0;
-	void updateScale(qreal bottom, qreal top);
+	std::pair<double,double> updateScale(qreal bottom, qreal top);
 };
 
 }
@@ -62,6 +62,7 @@ protected Q_SLOTS:
 	void updateImage();
 	void selectTransfer(int id, bool checked);
 	void reScale(qreal bottom, qreal top);
+	void doSave();
 public:
     SimpleImageView(data::Image img, QString title="", QWidget *parent=nullptr);
 };

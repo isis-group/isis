@@ -20,6 +20,7 @@
 #include "simpleimageview.hpp"
 #include "gradientwidget.hpp"
 #include "common.hpp"
+#include "../../data/io_factory.hpp"
 #include <QSlider>
 #include <QGridLayout>
 #include <QGraphicsView>
@@ -27,6 +28,8 @@
 #include <QGroupBox>
 #include <QRadioButton>
 #include <QButtonGroup>
+#include <QPushButton>
+#include <QFileDialog>
 
 namespace isis{
 namespace qt5{
@@ -40,10 +43,11 @@ TransferFunction::TransferFunction(std::pair<util::ValueReference,util::ValueRef
 	updateScale(0,1);
 }
 
-void TransferFunction::updateScale(qreal bottom, qreal top){
+std::pair<double,double> TransferFunction::updateScale(qreal bottom, qreal top){
 	const util::Value<double> min = minmax.first->as<double>()+ bottom*(minmax.second->as<double>()-minmax.first->as<double>());
 	const util::Value<double> max= minmax.second->as<double>()*top;
 	scale= c->getScaling(min,max);
+	return std::make_pair(min,max);
 }
 
 class MagnitudeTransfer : public TransferFunction{
@@ -145,6 +149,10 @@ void SimpleImageView::setupUi(bool with_complex){
 	gridLayout->addWidget(gradient,0,2,1,1);
 	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
 	
+	QPushButton *savebtn=new QPushButton("save",this);
+	gridLayout->addWidget(savebtn, 1, 1, 1, 2);
+	connect(savebtn, SIGNAL(clicked(bool)), SLOT(doSave()));
+	
 	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
 	
@@ -244,10 +252,14 @@ void SimpleImageView::selectTransfer(int id, bool checked)
 
 void SimpleImageView::reScale(qreal bottom, qreal top)
 {
-	transfer_function->updateScale(bottom,top);
+	std::pair<double,double> window=transfer_function->updateScale(bottom,top);
+	m_img.setValueAs("window/min",window.first);
+	m_img.setValueAs("window/max",window.second);
 	updateImage();
 }
-
+void SimpleImageView::doSave(){
+	data::IOFactory::write(m_img,QFileDialog::getSaveFileName(this,"Store image as..").toStdString());
+}
 
 }
 }
