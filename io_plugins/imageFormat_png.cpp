@@ -250,16 +250,27 @@ public:
 		}
 
 		png_byte color_type, bit_depth; ;
+		data::scaling_pair scale;
+		if(image.hasProperty("window/max") && image.hasProperty("window/min")){
+			auto minmax=image.getMinMax();
+			const util::PropertyValue min = image.property("window/min"),max = image.property("window/max");
+			scale=data::ValueArrayBase::getConverterFromTo(data::ValueArray<double>::staticID(),isis_data_type)->getScaling(min.front(),max.front());
+			
+			static const util::Value<uint8_t> one( 1 );
+			static const util::Value<uint8_t> zero( 0 );
+			LOG_IF(!(scale.first->eq(one) && scale.second->eq(zero)), Runtime,notice) << "Rescaling values with " << scale << " to fit windowing";
+		}
 
 		switch( isis_data_type ) {
 		case data::ValueArray< int8_t>::staticID(): // if its signed, fall "back" to unsigned
 		case data::ValueArray<uint8_t>::staticID():
-			tImg.convertToType( data::ValueArray<uint8_t>::staticID() ); // make sure whole image has same type   (u8bit)
+			tImg.convertToType( data::ValueArray<uint8_t>::staticID(), scale ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 8;
+			break;
 		case data::ValueArray< int16_t>::staticID(): // if its signed, fall "back" to unsigned
 		case data::ValueArray<uint16_t>::staticID():
-			tImg.convertToType( data::ValueArray<uint16_t>::staticID() ); // make sure whole image has same type (u16bit)
+			tImg.convertToType( data::ValueArray<uint16_t>::staticID(), scale ); // make sure whole image has same type (u16bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 16;
 			break;

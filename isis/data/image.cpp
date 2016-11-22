@@ -805,6 +805,24 @@ std::string Image::getMajorTypeName() const
 	return util::getTypeMap()[getMajorTypeID()];
 }
 
+bool Image::convertToType( short unsigned int ID, scaling_pair scale )
+{
+	bool retVal = true;
+	//we want all chunks to be of type ID - so tell them
+	for( std::shared_ptr<Chunk> &ref :  lookup ) {
+		retVal &= ref->convertToType( ID, scale );
+	}
+
+	//apply scaling to the window if its there
+	auto windowMax = queryProperty("window/max");
+	auto windowMin = queryProperty("window/min");
+	if(windowMax)
+		(*windowMax) = windowMax->multiply(*scale.first).add(*scale.second);
+	if(windowMin)
+		(*windowMin) = windowMin->multiply(*scale.first).add(*scale.second);
+
+	return retVal;
+}
 bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 {
 	bool retVal = true;
@@ -819,12 +837,7 @@ bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 	scaling_pair scale = getScalingTo( ID, scaleopt );
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
-	retVal = true;
-	//we want all chunks to be of type ID - so tell them
-	for( std::shared_ptr<Chunk> &ref :  lookup ) {
-		retVal &= ref->convertToType( ID, scale );
-	}
-	return retVal;
+	return convertToType(ID,scale);
 }
 
 size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim, timeDim

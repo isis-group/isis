@@ -705,6 +705,7 @@ public:
 	 * \returns false if there was an error
 	 */
 	bool convertToType ( short unsigned int ID, isis::data::autoscaleOption scaleopt = autoscale );
+	bool convertToType ( short unsigned int ID, scaling_pair scaling);
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.

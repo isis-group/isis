@@ -609,8 +609,8 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 
 
 	if( head->cal_max != 0 || head->cal_min != 0 ) { // maybe someone needs that, we dont ...
-		props.setValueAs( "nifti/cal_max", head->cal_max );
-		props.setValueAs( "nifti/cal_min", head->cal_min );
+		props.setValueAs( "window/max", head->cal_max );
+		props.setValueAs( "window/min", head->cal_min );
 	}
 
 }
@@ -993,9 +993,14 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			header->cal_min = 0;
 			header->cal_max = 0;
 		} else {
-			const std::pair< float, float > minmax = image.getMinMaxAs<float>();
-			header->cal_min = minmax.first;
-			header->cal_max = minmax.second;
+			if(image.hasProperty("window/max") && image.hasProperty("window/min")){
+				header->cal_min = image.getValueAs<float>("window/min");
+				header->cal_max = image.getValueAs<float>("window/max");
+			} else {
+				const std::pair< float, float > minmax = image.getMinMaxAs<float>();
+				header->cal_min = minmax.first;
+				header->cal_max = minmax.second;
+			}
 		}
 
 		{
@@ -1103,9 +1108,9 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 	//remove scaling from image2isis
 	image2isis = image2isis * util::Matrix4x4<double>{
-		1 / voxelSize[0], 0, 0,
-		0, 1 / voxelSize[1], 0,
-		0, 0, 1 / voxelSize[2],
+		1 / voxelSize[0], 0, 0, 0,
+		0, 1 / voxelSize[1], 0, 0,
+		0, 0, 1 / voxelSize[2], 0,
 		0, 0, 0, 0
 	};
 
