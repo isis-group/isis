@@ -41,6 +41,8 @@ public:
 	QApplication &getQApplication();
 	QtApplication( const char name[] );
 	virtual bool init( int &argc, char **argv, bool exitOnError = true );
+	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	int exec();
 };
 
 class IOQtApplication : public data::IOApplication

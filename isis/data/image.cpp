@@ -61,25 +61,22 @@ ChunkOp::~ChunkOp() {}
 Image::Image ( ) : set( defaultChunkEqualitySet ), clean( false )
 {
 	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
-	set.addSecondarySort( "acquisitionNumber" );
+	set.addSecondarySort( "acquisitionNumber");
+	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk, dimensions min_dim ) :
-	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ), set( defaultChunkEqualitySet ), clean( false )
+Image::Image ( const Chunk &chunk, dimensions min_dim ): Image()	
 {
-	util::Singletons::get<NeededsList<Image>, 0>().applyTo( *this );
-	set.addSecondarySort( "acquisitionNumber" );
-	
+	minIndexingDim=min_dim;
 	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
 		LOG( Runtime, error ) << "Failed to create image from single chunk.";
 	} else if( !isValid() ) {
 		LOG_IF( !getMissing().empty(), Debug, warning )
-				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+			<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 	}
 }
 
-Image::Image( const data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
-	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
+Image::Image( const data::Image &ref ): set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
@@ -808,6 +805,24 @@ std::string Image::getMajorTypeName() const
 	return util::getTypeMap()[getMajorTypeID()];
 }
 
+bool Image::convertToType( short unsigned int ID, scaling_pair scale )
+{
+	bool retVal = true;
+	//we want all chunks to be of type ID - so tell them
+	for( std::shared_ptr<Chunk> &ref :  lookup ) {
+		retVal &= ref->convertToType( ID, scale );
+	}
+
+	//apply scaling to the window if its there
+	auto windowMax = queryProperty("window/max");
+	auto windowMin = queryProperty("window/min");
+	if(windowMax)
+		(*windowMax) = windowMax->multiply(*scale.first).add(*scale.second);
+	if(windowMin)
+		(*windowMin) = windowMin->multiply(*scale.first).add(*scale.second);
+
+	return retVal;
+}
 bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 {
 	bool retVal = true;
@@ -822,12 +837,7 @@ bool Image::convertToType( short unsigned int ID, autoscaleOption scaleopt )
 	scaling_pair scale = getScalingTo( ID, scaleopt );
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
-	retVal = true;
-	//we want all chunks to be of type ID - so tell them
-	for( std::shared_ptr<Chunk> &ref :  lookup ) {
-		retVal &= ref->convertToType( ID, scale );
-	}
-	return retVal;
+	return convertToType(ID,scale);
 }
 
 size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim, timeDim
@@ -852,6 +862,7 @@ size_t Image::spliceDownTo( dimensions dim )   //rowDim = 0, columnDim, sliceDim
 	// reset the Chunk set, so we can insert new splices
 	set = _internal::SortedChunkList( defaultChunkEqualitySet );
 	set.addSecondarySort( "acquisitionNumber" );
+	set.addSecondarySort( "acquisitionTime" ); //@todo this should not be here
 
 	clean = false; // mark the image for reIndexing
 

@@ -41,7 +41,36 @@ endif(ISIS_IOPLUGIN_NIFTI_SA)
 
 
 if(ISIS_IOPLUGIN_VISTA_SA)
-	add_library(isisImageFormat_Vista_sa SHARED Vista_sa/VistaSaParser.cpp Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/vistaprotoimage.cpp)
+	option(REGEN_PARSER "Regenerate the parser files" OFF)
+	if(REGEN_PARSER)
+		find_program(FLEXc++_EXECUTABLE "flexc++")
+		find_program(BISONc++_EXECUTABLE "bisonc++")
+
+		ADD_CUSTOM_COMMAND(
+			COMMAND ${FLEXc++_EXECUTABLE} 
+			ARGS --target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer.l
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lexer.l
+			OUTPUT 
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc 
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaScanner.ih
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaScannerbase.h
+		)
+
+		ADD_CUSTOM_COMMAND(
+			COMMAND ${BISONc++_EXECUTABLE} 
+			ARGS --target-directory=${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/ ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar.y
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/lex.cc ${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/grammar.y
+			OUTPUT 
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/parse.cc
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaParser.ih
+				${CMAKE_CURRENT_SOURCE_DIR}/Vista_sa/VistaParserbase.h
+		)
+	endif(REGEN_PARSER)
+
+	add_library(isisImageFormat_Vista_sa SHARED 
+		Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/vistaprotoimage.cpp 
+		Vista_sa/lex.cc Vista_sa/parse.cc
+	)
 	target_link_libraries(isisImageFormat_Vista_sa ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
 endif(ISIS_IOPLUGIN_VISTA_SA)
@@ -122,8 +151,9 @@ if(ISIS_IOPLUGIN_DICOM)
 	find_package(DCMTK REQUIRED)
 
 	#this is ugly as hell, lets hope we won't have to drag this along for to long
-	set(LOG4CPLUS_NAMESPACE "dcmtk::log4cplus" CACHE STRING "namespace where to look for log4cplus-stuff in  dcmtk")
+	set(LOG4CPLUS_NAMESPACE "dcmtk::log4cplus" CACHE STRING "namespace where to look for log4cplus-stuff in dcmtk")
 	set_source_files_properties(imageFormat_Dicom.cpp PROPERTIES COMPILE_DEFINITIONS "LOG4CPLUS_NAMESPACE=${LOG4CPLUS_NAMESPACE}")
+	include_directories("${DCMTK_DIR}/include")
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
 	target_link_libraries(isisImageFormat_Dicom ${DCMTK_LIBRARIES} ${DCMTK_oflog_LIBRARY_RELEASE} ${isis_core_lib})

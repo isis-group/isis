@@ -24,11 +24,24 @@
 #include "../../data/image.hpp"
 
 class QSlider;
-class MriGraphicsView;
 class QButtonGroup;
 
 namespace isis{
 namespace qt5{
+namespace _internal {
+class MriGraphicsView;
+class TransferFunction{
+	data::ValueArrayBase::Converter c;
+	std::pair<util::ValueReference,util::ValueReference> minmax;
+protected:
+	data::scaling_pair scale;
+public:
+	TransferFunction(std::pair<util::ValueReference,util::ValueReference> in_minmax);
+	virtual void operator()(uchar *dst, const data::ValueArrayBase &line)const=0;
+	std::pair<double,double> updateScale(qreal bottom, qreal top);
+};
+
+}
 
 class SimpleImageView : public QWidget
 {
@@ -36,19 +49,20 @@ class SimpleImageView : public QWidget
 	QVector<QVector<QPixmap>> slides;
 	size_t curr_slice=0,curr_time=0;
 	data::Image m_img;
-	data::scaling_pair scaling;
 	bool is_complex;
 	QButtonGroup *transfer_function_group;
-	std::function<void (uchar *, const data::ValueArrayBase &)> transfer_function,magnitude_transfer,phase_transfer;
+	std::shared_ptr<_internal::TransferFunction> transfer_function,magnitude_transfer,phase_transfer;
 	
 	void setupUi(bool with_complex);
 	QSlider *sliceSelect,*timeSelect;
-	MriGraphicsView *graphicsView;
+	_internal::MriGraphicsView *graphicsView;
 protected Q_SLOTS:
 	void timeChanged(int time);
 	void sliceChanged(int slice);
 	void updateImage();
 	void selectTransfer(int id, bool checked);
+	void reScale(qreal bottom, qreal top);
+	void doSave();
 public:
     SimpleImageView(data::Image img, QString title="", QWidget *parent=nullptr);
 };

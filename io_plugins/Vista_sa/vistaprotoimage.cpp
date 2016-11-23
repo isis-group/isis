@@ -209,8 +209,7 @@ void VistaInputImage::transformFromFunctional()
 			const util::PropertyValue p = *i->queryProperty( diff.first );
 			LOG( Debug, info ) << "Copying per timestep property " << std::make_pair( diff.first, p ) << " into " << ret.size() << " volumes";
 			for( data::Chunk & ref: ret ) {
-#pragma message "Implement me"
-// 				ref.propertyValueAt( diff.first, n ) = p;
+				ref.setValue( diff.first, p.front(), n);
 			}
 		}
 	}
@@ -233,7 +232,10 @@ void VistaInputImage::store( std::list< data::Chunk >& out, const util::Property
 	while( !empty() ) {
 		out.push_back( front() );
 		pop_front();
-		out.back().branch( "vista" ).join( root_map );
+		const auto rejected=out.back().touchBranch( "vista" ).join( root_map );
+		if(!rejected.empty()){
+			LOG(Runtime,warning) << "The global entries " << rejected << " where rejected";
+		} 
 
 		if( !out.back().hasProperty( "sequenceNumber" ) )
 			out.back().setValueAs( "sequenceNumber", sequence );
@@ -254,7 +256,7 @@ WriterSpec::WriterSpec(std::string repn, std::string name, uint8_t prio, bool is
 	m_isInt(isInt),m_isFloat(isFloat),m_storeTypeID(storeTypeID),m_sizeFact(sizeFact),m_priority(prio),m_vistaRepnName(repn),m_vistaImageName(name){}
 void WriterSpec::modHeaderImpl(isis::util::PropertyMap& props, const isis::util::vector4<size_t>& size)
 {
-	props.setValueAs("length",util::product(size)*m_sizeFact);
+	props.setValueAs<uint64_t>("length",util::product(size)*m_sizeFact);
 	props.setValueAs("repn",m_vistaRepnName);
 
 	// store chunks size
@@ -418,11 +420,11 @@ void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vect
 	LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to store chunk properties because there are already some from the image with the same name: " << rejected;
 
 	//store offset and length of the data
-	store.setValueAs("data",data_offset);
+	store.setValueAs<uint64_t>("data",data_offset);
 	isis2vista[storeTypeID]->modHeaderImpl(store,size); // type specific properties
 	
 	// those names are swapped in vista
-	std::swap(*store.queryProperty("rowVec"),*store.queryProperty("columnVec"));
+	store.queryProperty("rowVec")->swap(*store.queryProperty("columnVec"));
 	
 	if(store.hasBranch("vista")){
 		util::PropertyMap vista;vista.branch("vista")=store.branch("vista"); //workaround for #66

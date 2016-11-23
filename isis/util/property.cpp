@@ -157,7 +157,7 @@ ValueBase& PropertyValue::front(){
 	
 }
 const ValueBase& PropertyValue::front() const{
-	LOG_IF(size()>1,Debug,warning) << "Doing single value operation on a multi value Property";
+	LOG_IF(size()>1,Debug,warning) << "Doing single value operation on a multi value Property (" << util::listToString(begin(),end()) << ")";
 	LOG_IF(isEmpty(),Debug,error) << "Doing single value operation on an empy Property, exception ahead ..";
 	return container.front();
 }

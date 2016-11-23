@@ -13,6 +13,7 @@ namespace qt5{
 	 * If no QApplication is available display will create (an run) its own. In that case display it is blocking.
 	 */
 	void display(data::Image img, std::string title="");
+	void display(data::Chunk chk, std::string title="");
 }
 }
 

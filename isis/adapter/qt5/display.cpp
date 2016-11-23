@@ -4,6 +4,18 @@
 #include "common.hpp"
 #include "simpleimageview.hpp"
 
+void isis::qt5::display(data::Chunk chk, std::string title)
+{
+	// make sure we have the needed props
+	chk.refValueAsOr("acquisitionNumber",0);
+	chk.refValueAsOr("rowVec",     util::fvector3{1,0,0});
+	chk.refValueAsOr("columnVec",  util::fvector3{0,1,0});
+	chk.refValueAsOr("indexOrigin",util::fvector3{0,0,0});
+	chk.refValueAsOr("voxelSize",  util::fvector3{1,1,1});
+	display(data::Image(chk),title);
+}
+
+
 void isis::qt5::display(data::Image img, std::string title)
 {
 	if(qApp)

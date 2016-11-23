@@ -31,41 +31,6 @@ namespace isis
 {
 namespace data
 {
-API_EXCLUDE_BEGIN;
-/// @cond _internal
-namespace _internal
-{
-struct pluginDeleter {
-	void *m_dlHandle;
-	std::string m_pluginName;
-	pluginDeleter( void *dlHandle, std::string pluginName ): m_dlHandle( dlHandle ), m_pluginName( pluginName ) {}
-	void operator()( image_io::FileFormat *format ) {
-		delete format;
-#ifdef WIN32
-		if( !FreeLibrary( ( HINSTANCE )m_dlHandle ) )
-#else
-		if ( dlclose( m_dlHandle ) != 0 )
-#endif
-			std::cerr << "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
-
-		// TODO we cannot use LOG here, because the loggers are gone allready
-	}
-};
-struct dialect_missing {
-	util::istring dialect;
-	std::string filename;
-	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		const util::istring dia = ref->dialects( filename );
-		std::list<util::istring> splitted = util::stringToList<util::istring>( dia, ' ' );
-		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
-		LOG_IF( ret, image_io::Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
-		return ret;
-	}
-};
-
-}
-/// @endcond _internal
-API_EXCLUDE_END;
 
 IOFactory::IOFactory()
 {
@@ -164,8 +129,21 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )dlsym( handle, "factory" );
 #endif
 
+				auto deleter = [handle, pluginName]( image_io::FileFormat *format ) {
+					delete format;
+#ifdef WIN32
+					if( !FreeLibrary( ( HINSTANCE )handle ) )
+						std::cerr << "Failed to release plugin " << pluginName << " (was loaded at " << handle << ")";
+					// TODO we cannot use LOG here, because the loggers are gone allready
+#else
+					if ( dlclose( handle ) != 0 )
+						std::cerr << "Failed to release plugin " << pluginName << " (was loaded at " << handle << ")";
+					// TODO we cannot use LOG here, because the loggers are gone allready
+#endif
+				};
+
 				if ( factory_func ) {
-					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
+					FileFormatPtr io_class( factory_func(), deleter );
 
 					if ( registerFileFormat( io_class ) ) {
 						io_class->plugin_file = pluginName;
@@ -187,7 +165,6 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 			} else
 #ifdef WIN32
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName );
-
 #else
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
@@ -254,7 +231,6 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 {
 	std::list<std::string> ext;
 	FileFormatList ret;
-	_internal::dialect_missing remove_op;
 
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
@@ -278,8 +254,13 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, ut
 	if( dialect.empty() ) {
 		LOG_IF( ret.size() > 1, Debug, info ) << "No dialect given. Will use all " << ret.size() << " plugins";
 	} else {//remove everything which lacks the dialect if there was some given
-		remove_op.dialect = dialect;
-		remove_op.filename = filename;
+		auto remove_op = [dialect,filename](FileFormatList::reference ref){
+			const util::istring dia = ref->dialects( filename );
+			std::list<util::istring> splitted = util::stringToList<util::istring>( dia, ' ' );
+			const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
+			LOG_IF( ret, image_io::Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
+			return ret;
+		};
 		ret.remove_if( remove_op );
 		LOG( Debug, info ) << "Removed everything which does not support the dialect " << util::MSubject( dialect ) << " on " << filename << "(" << ret.size() << " plugins left)";
 	}

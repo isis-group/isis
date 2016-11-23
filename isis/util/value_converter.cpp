@@ -801,7 +801,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Conversion timepoint => date (date is just a timestamp with days as resolition so it equals a rounding 
+// Conversion timepoint => date (date is just a timestamp with days as resolution so it equals a rounding 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<> class ValueConverter<false, false, util::timestamp, util::date > : public ValueGenerator<util::timestamp, util::date>
 {

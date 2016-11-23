@@ -238,14 +238,14 @@ public:
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0). The acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset.
 	 * \attention As this will also move alle properties into the "splinters" this chunk will be invalid afterwards
 	 */
-	std::list<Chunk> autoSplice( uint32_t acquisitionNumberStride = 0 );
+	std::list<Chunk> autoSplice( uint32_t acquisitionNumberStride = 0 )const;
 
 	/**
 	 * Splices the chunk at the given dimension and all dimensions above.
 	 * E.g. splice\(columnDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1
 	 * \attention As this will also move alle properties into the "splinters" this chunk will be invalid afterwards
 	 */
-	std::list<Chunk> splice( isis::data::dimensions atDim );
+	std::list<Chunk> splice( isis::data::dimensions atDim )const;
 
 	/**
 	  * Flips the chunk along a dimension dim in image space.

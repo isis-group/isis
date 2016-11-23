@@ -132,7 +132,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic 2003";}
 
 
 
@@ -166,9 +166,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
 	{
 		// get series start time (remember this is in UTC)
-		optional< util::PropertyValue > o_seqStart=extractOrTell("SeriesTime",dicomTree,warning );
+		auto o_seqStart=extractOrTell("SeriesTime",dicomTree,warning );
 		if(o_seqStart) {
-			optional< util::PropertyValue > o_acDate= extractOrTell({"SeriesDate", "AcquisitionDate", "ContentDate"},dicomTree,warning);
+			auto o_acDate= extractOrTell({"SeriesDate", "AcquisitionDate", "ContentDate"},dicomTree,warning);
 			if( o_acDate ) { // add days since epoch from the date
 				const util::timestamp seqStart = o_seqStart->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
 				object.setValueAs( "sequenceStart", seqStart);
@@ -179,10 +179,14 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 		}
 	}
 	{
-			// compute acquisitionTime
-		optional< util::PropertyValue > o_acTime= extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
+		// compute acquisitionTime
+		auto o_acTime= (dialect == "2003") ?
+			extractOrTell({"AcquisitionTime","ContentTime"},dicomTree,warning):
+			extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
 		if ( o_acTime ) {
-			optional< util::PropertyValue > o_acDate= extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
+			auto o_acDate= (dialect == "2003") ?
+				extractOrTell({"AcquisitionDate", "ContentDate", "SeriesDate"},dicomTree,warning):
+				extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
 			if( o_acDate ) {
 				const util::timestamp acTime = o_acTime->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
 				object.setValueAs<util::timestamp>("acquisitionTime", acTime);
@@ -395,6 +399,16 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			object.setValueAs( "fov", util::fvector3( {row, column, invalid_float} ) );
 		}
 	}
+	
+	auto windowCenterQuery=dicomTree.queryProperty("WindowCenter");
+	auto windowWidthQuery=dicomTree.queryProperty("WindowCenter");
+	if( windowCenterQuery && windowWidthQuery){
+		const double windowCenter=windowCenterQuery->as<double>(), windowWidth= windowWidthQuery->as<double>();
+		windowCenterQuery.reset();windowWidthQuery.reset();
+		dicomTree.remove("WindowCenter");dicomTree.remove("WindowWidth");
+		object.setValueAs("window/min",windowCenter-windowWidth/2);
+		object.setValueAs("window/max",windowCenter+windowWidth/2);
+	}
 }
 
 data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
@@ -444,7 +458,6 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 	isis::util::timestamp acqTime;
-	size_t acqNum = 0;
 
 	if( haveAcqTimeList ) {
 		acqTimeList = source.getValueAs<std::list<double> >( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
@@ -455,7 +468,6 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	if( source.hasProperty( "acquisitionTime" ) )acqTime = source.getValueAs<isis::util::timestamp>( "acquisitionTime" );
 	else {
-		acqNum = source.getValueAs<uint32_t>( "acquisitionNumber" );
 		LOG_IF( haveAcqTimeList, Runtime, info ) << "Ignoring CSAImageHeaderInfo/MosaicRefAcqTimes because there is no acquisitionTime";
 		haveAcqTimeList = false;
 	}
@@ -473,25 +485,23 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
 	}
 
-	// for every slice
-	util::PropertyValue &ordProp= haveAcqTimeList ? dest.touchProperty( "acquisitionTime"):dest.touchProperty( "acquisitionNumber");
-	ordProp=util::PropertyValue(); //reset the selected ordering property to empty
-	
+	// for every slice add acqTime to Multivalue
+
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
 			const std::array<size_t,4> dpos = {0, line, slice, 0}; //begin of the target line
 			const size_t column = slice % matrixSize; //column of the mosaic
 			const size_t row = slice / matrixSize; //row of the mosaic
-			const std::array<size_t,4> sstart = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
-			const std::array<size_t,4> send = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
+			const std::array<size_t,4> sstart{column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
+			const std::array<size_t,4> send{sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		if(haveAcqTimeList){// property is timestamp
+		if(haveAcqTimeList){
+			util::PropertyValue &ordProp= dest.touchProperty( "acquisitionTime"); 
+			ordProp=util::PropertyValue(); //reset the selected ordering property to empty
 			ordProp.push_back(acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) ));
-		} else { // property is an index
-			ordProp.push_back(uint32_t( acqNum * images +  slice ));
 		}
 	}
 

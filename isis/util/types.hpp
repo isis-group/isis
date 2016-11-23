@@ -170,18 +170,19 @@ namespace std{
 		if(s>=(isis::util::timestamp()+std::chrono::hours(24))) // if we have a real timepoint (not just time)
 			out<<std::put_time(std::localtime(&tme), "%c"); // write time and date
 		else {
-			out<<std::put_time(std::localtime(&tme), "%X"); // otherwise write just the time (maybe with milliseconds)
+			out<<std::put_time(std::localtime(&tme), "%X"); // otherwise write just the time 
+		}
+		// and maybe with milliseconds
 		
-			chrono::milliseconds msec = s.time_since_epoch()-sec;
-			assert(msec.count()<1000);
-			if(msec.count()){
-				if(msec.count()<0)
-					msec+=chrono::seconds(1);
-				// we dont want to mess with out, so we don't use stream formatting
-				char buff[5];
-				snprintf(buff,5,".%3lld",msec.count());
-				out << buff; 
-			}
+		chrono::milliseconds msec = s.time_since_epoch()-sec;
+		assert(msec.count()<1000);
+		if(msec.count()){
+			if(msec.count()<0)
+				msec+=chrono::seconds(1);
+			// we dont want to mess with out, so we don't use stream formatting
+			char buff[5];
+			snprintf(buff,5,"%3lld",msec.count());
+			out << "+" << buff << "ms"; 
 		}
 		return out;
 	}

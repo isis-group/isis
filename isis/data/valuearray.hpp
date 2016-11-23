@@ -55,6 +55,9 @@ template<typename T, uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data
 		if ( *i < result.first )result.first = *i; //*i is the new min if its smaller than the current (gets rid of nan as well)
 	}
 
+	LOG_IF(std::numeric_limits<T>::has_infinity && result.first>result.second,Runtime,warning) 
+		<< "Skipped all elements of this array, as they all are inf. Results will be invalid.";
+
 	return result;
 }
 

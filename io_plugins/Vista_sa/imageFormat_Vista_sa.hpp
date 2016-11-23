@@ -21,8 +21,6 @@
 #include <isis/data/io_interface.h>
 #include <isis/data/fileptr.hpp>
 
-#include "VistaSaParser.hpp"
-
 namespace isis
 {
 

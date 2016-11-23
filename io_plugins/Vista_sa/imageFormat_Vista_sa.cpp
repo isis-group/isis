@@ -17,22 +17,62 @@
 */
 
 #include "imageFormat_Vista_sa.hpp"
-#include "VistaSaParser.hpp"
 #include "vistaprotoimage.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <isis/util/matrix.hpp>
+
+#include "VistaParser.h"
 
 namespace isis
 {
 
 namespace image_io
 {
+	
+namespace _internal
+{
+	
+	template<typename DURATION> bool fixDateTime(util::PropertyValue &prop, std::initializer_list<std::string> formats){
+		std::tm t = {0,0,0,1,0,70,0,0,-1,0,nullptr};
+		std::istringstream date_time(prop.as<std::string>());
+		for(std::string format:formats){
+// 			date_time.imbue(std::locale("de_DE.utf-8"));
+			date_time >> std::get_time(&t, format.c_str());
+			if(!date_time.fail()){
+				time_t tt = mktime(&t);
+				prop=std::chrono::time_point_cast<DURATION>(std::chrono::system_clock::from_time_t(tt));
+				return true;
+			}
+		}
+		return prop.transform<std::chrono::time_point<std::chrono::system_clock,DURATION>>();
+	}
+	template<typename DURATION> bool fixDateTime(util::PropertyMap &map, util::PropertyMap::PropPath path, std::initializer_list<std::string> formats){
+		auto query=map.queryProperty(path);
+		if(query && fixDateTime<DURATION>(*query,formats)){
+			LOG(Debug,info) << "Parsed " << path << " as " << *query;
+			return true;
+		} else
+			return false;
+	}
+}
 const std::locale ImageFormat_VistaSa::vista_locale(std::cout.getloc(), new vista_date_facet());
 
 void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 {
 	LOG(Debug,verbose_info) << "Sanitizing " << obj.branch("vista");
+	
+	if(obj.hasProperty("vista/MPIL_vista")){
+		const util::slist tokens=util::stringToList<std::string>(obj.getValueAs<std::string>("vista/MPIL_vista"),std::regex("[[:space:]:]+"));
+		obj.remove("vista/MPIL_vista");
+		auto &MPIL_vista=obj.touchBranch("vista/MPIL_vista");
+		for(util::slist::const_iterator i=tokens.begin();i!=tokens.end();){
+			util::PropertyMap::PropPath path=(i++)->c_str();
+			MPIL_vista.setValueAs(path,*(i++));
+			LOG(Debug,info) << "Got " << MPIL_vista.queryProperty(path) << " from vista/MPIL_vista";
+		}
+	}
+	
 	const auto queryOrientationPatient = obj.queryProperty( "vista/imageOrientationPatient" );
 	if( obj.hasProperty( "vista/columnVec" ) && obj.hasProperty( "vista/rowVec" ) ) { // if we have the complete orientation
 		LOG(Runtime,info) << "Directly using vista/rowVec and vista/columnVec";
@@ -106,9 +146,9 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 
-	transformOrTell<std::string>( "vista/seriesDescription", "sequenceDescription", obj, warning ) ||
-	transformOrTell<std::string>( "vista/protocol", "sequenceDescription", obj, warning ) ||
-	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, warning );
+	transformOrTell<std::string>( "vista/seriesDescription", "sequenceDescription", obj, info ) ||
+	transformOrTell<std::string>( "vista/protocol", "sequenceDescription", obj, info ) ||
+	transformOrTell<std::string>( "vista/name", "sequenceDescription", obj, info );
 
 	transformOrTell<std::string>( "vista/patient", "subjectName", obj, warning );
 
@@ -116,7 +156,8 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 	transformOrTell<std::string>( "vista/transmitCoil", "transmitCoil", obj, info );
 
 	transformOrTell<uint16_t>( "vista/repetitionTime", "repetitionTime", obj, verbose_info ) ||
-	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, info );
+	transformOrTell<uint16_t>( "vista/repetition_time", "repetitionTime", obj, verbose_info ) || 
+	transformOrTell<uint16_t>( "vista/MPIL_vista/MPIL_repetition_time", "repetitionTime", obj, info );
 
 	if( hasOrTell( "vista/sex", obj, warning ) ) {
 		util::Selection gender( "male,female,other" );
@@ -128,35 +169,39 @@ void ImageFormat_VistaSa::sanitize( util::PropertyMap &obj )
 		}
 	}
 	
+	// fix timestamps
 	try{
 		const auto dateQuery = obj.queryProperty("vista/date");
 		const auto timeQuery = obj.queryProperty("vista/time");
 
-		if(dateQuery && timeQuery){
+		if(dateQuery && timeQuery){ // if we have time and date, try to parse it as combined string
 			util::Value<std::string> date_time=dateQuery->as<std::string>()+" "+timeQuery->as<std::string>();
 			obj.setValueAs("sequenceStart",date_time.as<util::timestamp>());
 			obj.remove("vista/date");
 			obj.remove("vista/time");
-			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << obj.queryProperty("sequenceStart");
-		} else {
+			LOG(Debug,info) << "Parsed sequenceStart from date/time as " << *obj.queryProperty("sequenceStart");
+		} else if(dateQuery && _internal::fixDateTime<util::timestamp::duration>(*dateQuery,{"%H:%M:%S %d %b %Y"})){ //old format (is date actually a weird timestamp) -- eg: 15:09:18 25 Sep 2001
+			obj.transform<util::timestamp>("vista/date","sequenceStart");
+			LOG(Debug,info) << "Parsed sequenceStart from vista/date as " << *obj.queryProperty("sequenceStart");
+		}else {
 			LOG(Runtime,warning) << "Vista file lacks date and/or time information, can't set sequenceStart";
 		}
 	} catch(...){
 		LOG(Runtime,warning) << "Failed to parse date/time pair " << obj.queryProperty("vista/date") << " " << obj.queryProperty("vista/time");
 	}
-
+	
 	if ( obj.hasProperty( "vista/age" ) ) {
 		obj.setValueAs( "subjectAge",obj.getValueAs<uint16_t>("vista/age")*365.2425 );
 		obj.remove( "vista/age" );
-	} else if(obj.hasProperty("vista/birth") && (obj.hasProperty("vista/date") || obj.hasProperty("sequenceStart"))){
+	} else if(obj.hasProperty("vista/birth") && _internal::fixDateTime<util::date::duration>(obj,"vista/birth",{"%d%m%y"}) && obj.hasProperty("sequenceStart")){
 		const util::date birthdate=obj.getValueAs<util::date>("vista/birth");
-		const util::date measuredate= obj.getValueAsOr("vista/date",obj.getValueAs<util::date>("sequenceStart"));
+		const util::date measuredate= obj.getValueAs<util::date>("sequenceStart");
 			
 		obj.setValueAs<uint16_t>("subjectAge",std::chrono::duration_cast<std::chrono::days>(measuredate-birthdate).count());
 		LOG(Runtime,info) << "Computed subjectAge from measurement date and birthdate as " << obj.getValueAs<uint16_t>("subjectAge")/365.2425 << " years";
 	}
 
-	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, warning );
+	transformOrTell<uint16_t>( "vista/seriesNumber", "sequenceNumber", obj, info );
 	transformOrTell<float>( "vista/echoTime", "echoTime", obj, warning );
 }
 
@@ -211,6 +256,7 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
 {
 	data::FilePtr mfile ( filename );
+	
 	std::list<data::Chunk> chunks;
 
 	if ( !mfile.good() ) {
@@ -222,43 +268,53 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 	}
 
 	//parse the vista header
-	data::ValueArray< uint8_t >::iterator data_start = mfile.begin();
-	util::PropertyMap root_map;
+
 	std::list<util::PropertyMap> ch_list;
-	size_t old_size = chunks.size();
-
-	if ( _internal::parse_vista( data_start, mfile.end(), root_map, ch_list ) ) {
-
-		std::list<_internal::VistaInputImage> groups;
-		groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
-		
-		for( const util::PropertyMap & chMap: ch_list ) {
-			util::PropertyMap root;
-			root.touchBranch( "vista" ) = chMap;
-			sanitize( root );
-
-			if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
-				groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
-				assert( groups.back().add( root ) ); //a new one should always work
-			}
-		}
-		LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
-		
-		uint16_t sequence = 0;
-		if(feedback && ch_list.size()>10)
-			feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
-
-		for( _internal::VistaInputImage & group: groups ) {
-			if( group.isFunctional() )
-				group.transformFromFunctional();
-			else
-				group.fakeAcqNum(); // we have to fake the acquisitionNumber
-
-			group.store( chunks, root_map, sequence++,feedback ); //put the chunk group into the output
-		}
+	util::PropertyMap root;
+	std::ifstream stream(filename);
+	vista_internal::VistaParser parser(stream,root,ch_list);
+	
+	if(parser.parse()!=0)
+	{
+		LOG( Runtime, error ) << "Parsing vista file " << filename << " failed";
+		return chunks;
 	} else {
-		LOG( Runtime, error ) << "Parsing vista failed";
+		LOG(Debug,info) << "Parsed global properties " << root << " from " << filename;
 	}
+	
+	data::ValueArray< uint8_t >::iterator data_start = mfile.begin() + stream.tellg();
+	LOG(Debug,info) << "Vista data offset is " << stream.tellg();
+	stream.close();
+
+	std::list<_internal::VistaInputImage> groups;
+	groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
+
+	for( const util::PropertyMap & chMap: ch_list ) {
+		util::PropertyMap root;
+		LOG(Debug, info) << "Sanitizing image " << chMap;
+		root.touchBranch( "vista" ) = chMap;
+		sanitize( root );
+
+		if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
+			groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
+			assert( groups.back().add( root ) ); //a new one should always work
+		}
+	}
+	LOG( Runtime, info ) << "Parsing vista succeeded " << groups.size() << " chunk-groups created";
+
+	uint16_t sequence = 0;
+	if(feedback && ch_list.size()>10)
+		feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
+
+	for( _internal::VistaInputImage & group: groups ) {
+		if( group.isFunctional() )
+			group.transformFromFunctional();
+		else
+			group.fakeAcqNum(); // we have to fake the acquisitionNumber
+
+		group.store( chunks, root, sequence++,feedback ); //put the chunk group into the output
+	}
+
 	return chunks;
 }
 

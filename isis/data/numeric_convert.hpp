@@ -38,8 +38,17 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 			<< "using generic scaling convert " << ValueArray<SRC>::staticName() << "=>" << ValueArray<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 
+	static const std::pair<DST, DST> limits(
+		std::numeric_limits<DST>::max(),
+		std::numeric_limits<DST>::has_denorm ? -std::numeric_limits<DST>::max() : std::numeric_limits<DST>::min() //for types with denormalization min is _not_ the lowest value
+	);
+
 	for ( size_t i = 0; i < count; i++ ) {
-		dst[i] = round<DST>( src[i] * scale + offset );
+		auto scaled=src[i] * scale + offset;
+		dst[i] = 
+			scaled<limits.second ? 
+				limits.second : scaled > limits.first ? 
+					limits.first : round<DST>( scaled );
 	}
 }
 
@@ -64,9 +73,7 @@ template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )    << "using generic scaling copy of " << ValueArray<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
-
-	for ( size_t i = 0; i < count; i++ )
-		dst[i] = src[i] * scale + offset;
+	numeric_convert_impl<T,T>(src,dst,count,scale,offset);
 }
 
 #ifdef ISIS_USE_LIBOIL

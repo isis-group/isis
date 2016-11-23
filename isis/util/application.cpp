@@ -20,6 +20,7 @@
  *
  *****************************************************************/
 
+#include <clocale>
 #include "application.hpp"
 #include "../data/fileptr.hpp"
 #define STR(s) _xstr_(s)

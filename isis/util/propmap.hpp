@@ -584,7 +584,7 @@ public:
 		const PathSet empty_before=genKeyList<EmptyP>();
 		std::for_each( container.begin(), container.end(), Splicer<ITER>( first, last, PropPath(), lists_only) );
 		//some cleanup 
-		//delete all thats empty now, but wasn't back then (we shouldn't delete this that where empty before)
+		//delete all thats empty now, but wasn't back then (we shouldn't delete what where empty before) / spliters are moved so source will become empty
 		const PathSet empty_after=genKeyList<EmptyP>();
 		std::list<PropPath> deletes;
 		std::set_difference(empty_after.begin(),empty_after.end(),empty_before.begin(),empty_before.end(),std::back_inserter(deletes));
@@ -602,6 +602,10 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Additional get/set - Functions
 	//////////////////////////////////////////////////////////////////////////////////////
+	
+	PropertyValue &setValue(const PropPath &path, const ValueBase &val, size_t at);
+	PropertyValue &setValue(const PropPath &path, const ValueBase &val);
+	
 	/**
 	 * Set the given property to a given value/type.
 	 * The needed flag (if set) will be kept.
@@ -622,24 +626,8 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val ) {
-		PropertyValue &ret = touchProperty( path );
-
-		if( ret.isEmpty() ) { // set an empty property
-			ret = val;
-		} else if( ret.size() == 1 ) {
-			if( ret.is<T>() ) { // override same type
-				ret.castTo<T>() = val;
-			} else {
-				if( ret[0].apply( val ) ) {
-					LOG( Debug, warning ) << "Storing " << MSubject( std::make_pair(path, Value<T>( val ).toString( true ) ) ) << " as " << MSubject( ret.toString( true ) ) << " as old value was already stored in that type";
-				} else {
-					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
-				}
-			}
-		} else
-			LOG( Runtime, error ) << "Won't override multivalue property " << MSubject( path ) << " with " << MSubject( Value<T>( val ).toString( true ) );
-
-		return ret;
+		util::checkType<T>();
+		return setValue(path,Value<T>( val ));
 	}
 	PropertyValue &setValueAs( const PropPath &path, const char *val );
 	
@@ -663,24 +651,8 @@ public:
 	 * the reference can be used to not ask for the Property each time)
 	 */
 	template<typename T> PropertyValue &setValueAs( const PropPath &path, const T &val, size_t at ) {
-		PropertyValue &ret = touchProperty( path );
-
-		if( ret.size() <= at ) {
-			LOG_IF(at, Debug, info ) << "Extending " << MSubject( std::make_pair( path, ret ) ) << " to fit length " << MSubject( at ); //dont tell about extending empty property
-			ret.resize( at + 1, Value<T>( val ) ); //resizing will insert the value
-		} else {
-			if( ret.is<T>() ) { // overwrite same type
-				ret[at].castTo<T>() = val;
-			} else {
-				if( ret[at].apply( val ) ) {
-					LOG( Debug, warning ) << "Storing " << MSubject( Value<T>( val ).toString( true ) ) << " as " << MSubject( ret.toString( true ) ) << " as Property already has that type";
-				} else {
-					LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't overwrite with " << MSubject( Value<T>( val ).toString( true ) );
-				}
-			}
-		}
-
-		return ret;
+		util::checkType<T>();
+		return setValue(path,Value<T>( val ), at);
 	}
 	PropertyValue &setValueAs( const PropPath &path, const char *val, size_t at );
 

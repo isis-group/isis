@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE( sinus_fft_test )
 
 	BOOST_REQUIRE_CLOSE(
 		k_space.voxel<std::complex< float >>(xsize/2,ysize/2,zsize/2).real(),
-		0.5 * k_space.getVolume(),
-		0.001
+		0.5 * k_space.getVolume() / sqrt(k_space.getVolume()),
+		0.0005
 	);
 
 	data::TypedChunk<std::complex< float > > inverse=math::fft_single(k_space,true);
