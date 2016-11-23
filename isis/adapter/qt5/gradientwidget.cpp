@@ -22,7 +22,7 @@
 #include <QMouseEvent>
 #include <iostream>
 
-GradientWidget::GradientWidget(QWidget* parent,uint8_t min,uint8_t max):QWidget(parent),shade(0, min, 0, 255)
+GradientWidget::GradientWidget(QWidget* parent, qreal in_bottom, qreal in_top):QWidget(parent),shade(0, 0, 0, 255),bottom(1-in_bottom),top(1-in_top)
 {
 	setMinimumWidth(15);
 	setMaximumWidth(15);

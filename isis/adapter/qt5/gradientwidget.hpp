@@ -26,13 +26,13 @@ class GradientWidget : public QWidget
 {
     Q_OBJECT
     QLinearGradient shade;
-	qreal bottom=1,top=0;
+	qreal bottom,top;
 protected:
 	QImage generateShade();
 	void paintEvent(QPaintEvent * event) override;
 	void mouseMoveEvent(QMouseEvent * ) override;
 public:
-	GradientWidget(QWidget* parent = nullptr, uint8_t min = 0, uint8_t max = 255);
+	GradientWidget(QWidget* parent = nullptr, qreal bottom = 0, qreal top = 1);
 signals:
 	void scaleUpdated(qreal bottom, qreal top);
 };
