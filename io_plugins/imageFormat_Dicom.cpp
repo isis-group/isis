@@ -399,6 +399,16 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 			object.setValueAs( "fov", util::fvector3( {row, column, invalid_float} ) );
 		}
 	}
+	
+	auto windowCenterQuery=dicomTree.queryProperty("WindowCenter");
+	auto windowWidthQuery=dicomTree.queryProperty("WindowCenter");
+	if( windowCenterQuery && windowWidthQuery){
+		const double windowCenter=windowCenterQuery->as<double>(), windowWidth= windowWidthQuery->as<double>();
+		windowCenterQuery.reset();windowWidthQuery.reset();
+		dicomTree.remove("WindowCenter");dicomTree.remove("WindowWidth");
+		object.setValueAs("window/min",windowCenter-windowWidth/2);
+		object.setValueAs("window/max",windowCenter+windowWidth/2);
+	}
 }
 
 data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
