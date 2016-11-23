@@ -60,7 +60,7 @@ class MagnitudeTransfer : public TransferFunction{
 	}
 
 public:
-	MagnitudeTransfer(const data::Image &img):TransferFunction(img.getMinMax()){}
+	MagnitudeTransfer(std::pair<util::ValueReference,util::ValueReference> minmax):TransferFunction(minmax){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
 		switch(line.getTypeID()){
 			case data::ValueArray<std::complex<float>>::staticID():
@@ -85,7 +85,7 @@ class PhaseTransfer : public TransferFunction{
 	}
 
 public:
-	PhaseTransfer(const data::Image &img):TransferFunction(std::pair<util::ValueReference,util::ValueReference>(util::Value<int16_t>(-180),util::Value<int16_t>(180))){}
+	PhaseTransfer():TransferFunction(std::pair<util::ValueReference,util::ValueReference>(util::Value<int16_t>(-180),util::Value<int16_t>(180))){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
 		switch(line.getTypeID()){
 			case data::ValueArray<std::complex<float>>::staticID():
@@ -102,7 +102,7 @@ public:
 
 class LinearTransfer : public TransferFunction{
 public:
-	LinearTransfer(const data::Image &img):TransferFunction(img.getMinMax()){}
+	LinearTransfer(std::pair<util::ValueReference,util::ValueReference> minmax):TransferFunction(minmax){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
 		line.copyToMem<uint8_t>(dst,line.getLength(),scale);
 	}
@@ -145,10 +145,6 @@ void SimpleImageView::setupUi(bool with_complex){
 	timeSelect->setTickPosition(QSlider::TicksBelow);
 	gridLayout->addWidget(timeSelect, 1, 0, 1, 1);
 	
-	QWidget *gradient=new GradientWidget(this);
-	gridLayout->addWidget(gradient,0,2,1,1);
-	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
-	
 	QPushButton *savebtn=new QPushButton("save",this);
 	gridLayout->addWidget(savebtn, 1, 1, 1, 2);
 	connect(savebtn, SIGNAL(clicked(bool)), SLOT(doSave()));
@@ -188,15 +184,17 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	
 	if(!title.isEmpty())
 		setWindowTitle(title);
+	
+	auto minmax=img.getMinMax();
 
 	if(is_complex){
-		magnitude_transfer.reset(new _internal::MagnitudeTransfer(img));
-		phase_transfer.reset(new _internal::PhaseTransfer(img));
+		magnitude_transfer.reset(new _internal::MagnitudeTransfer(minmax));
+		phase_transfer.reset(new _internal::PhaseTransfer);
 		
 		transfer_function=magnitude_transfer;
 		connect(transfer_function_group, SIGNAL(buttonToggled(int, bool)),SLOT(selectTransfer(int,bool)));
 	} else {
-		transfer_function.reset(new _internal::LinearTransfer(img));;
+		transfer_function.reset(new _internal::LinearTransfer(minmax));;
 	}
 	
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
@@ -215,6 +213,20 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	graphicsView->setScene(new QGraphicsScene(0,0,img_size[data::rowDim],img_size[data::columnDim],graphicsView));
 	if(img_size[data::sliceDim]>1)
 		sliceSelect->setValue(img_size[data::sliceDim]/2);
+	
+	QWidget *gradient;
+	if(img.hasProperty("window/max") && img.hasProperty("window/min")){
+		const double bottom=(img.getValueAs<double>("window/min")-minmax.first->as<double>()) / (minmax.second->as<double>()-minmax.first->as<double>());
+		const double top=img.getValueAs<double>("window/max") / minmax.second->as<double>();
+		
+		transfer_function->updateScale(bottom,top);
+		
+		gradient=new GradientWidget(this,bottom,top);
+	} else 
+		gradient=new GradientWidget(this);
+	
+	dynamic_cast<QGridLayout*>(layout())->addWidget(gradient,0,2,1,1);
+	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
 
 	updateImage();
 }
