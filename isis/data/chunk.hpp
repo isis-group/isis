@@ -258,10 +258,6 @@ public:
 
 template<typename TYPE> class TypedChunk : public Chunk{
 protected:
-	/** Create a TypedChunk "Husk" without any data
-	 * \Warning You must set data ValueArray in the drived Class
-	 */
-	TypedChunk(bool fakeValid=false):Chunk(fakeValid){}
 	TypedChunk( const ValueArray<TYPE> &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false ):
 		Chunk(src, nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid){}
 public:
@@ -270,7 +266,12 @@ public:
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 
-    TypedChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  ): Chunk( ref ) {
+	/** Create a TypedChunk "Husk" without any data
+	 * \Warning You must set data ValueArray in the drived Class
+	 */
+	TypedChunk(bool fakeValid=false):Chunk(fakeValid){}
+
+	TypedChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  ): Chunk( ref ) {
 		convertToType(ValueArray<TYPE>::staticID(),scaling);
 	}
 

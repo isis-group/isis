@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <iostream>
+#include <cmath>
 
 GradientWidget::GradientWidget(QWidget* parent, qreal in_bottom, qreal in_top):QWidget(parent),shade(0, 0, 0, 255),bottom(1-in_bottom),top(1-in_top)
 {
@@ -63,13 +64,13 @@ QImage GradientWidget::generateShade()
 
 void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	const qreal pos=event->pos().y();
+	const int pos=event->pos().y();
 	
 	if(pos<0 || pos > height())
 		return;
 	
-	const int bottom_dist=abs(bottom*height()-pos);
-	const int top_dist=   abs(   top*height()-pos);
+	const int bottom_dist=std::abs(bottom*height()-pos);
+	const int top_dist=   std::abs(   top*height()-pos);
 	
 	if( bottom_dist< 6 ) {
 		setCursor(Qt::PointingHandCursor);
