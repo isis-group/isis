@@ -20,6 +20,7 @@
 #include "guiprogressfeedback.hpp"
 #include <QProgressBar>
 #include <QHBoxLayout>
+#include <QVariant>
 
 isis::qt5::GUIProgressFeedback::GUIProgressFeedback(bool autohide, QWidget* parent):QGroupBox(parent),show_always(!autohide),progressbar(new QProgressBar(this))
 {
@@ -34,7 +35,7 @@ isis::qt5::GUIProgressFeedback::GUIProgressFeedback(bool autohide, QWidget* pare
 
 void isis::qt5::GUIProgressFeedback::close()
 {
-	QWidget::hide();
+	setProperty("visible",true);
 }
 
 size_t isis::qt5::GUIProgressFeedback::extend(size_t by)
@@ -56,8 +57,8 @@ size_t isis::qt5::GUIProgressFeedback::progress(const std::string message, size_
 
 void isis::qt5::GUIProgressFeedback::show(size_t max, std::string header)
 {
-	progressbar->setMaximum(max);
-	progressbar->setValue(0);
-	QGroupBox::setTitle(QString::fromStdString(header));
-	QWidget::show();
+	emit signalNewMax(max);
+	emit signalNewValue(0);
+	setProperty("title",QString::fromStdString(header));
+	setProperty("visible",true);
 }
