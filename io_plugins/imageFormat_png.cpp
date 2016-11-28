@@ -30,6 +30,9 @@ protected:
 			png_set_strip_alpha(png_ptr);
 			png_read_image( png_ptr, row_pointers.get() );
 			ret.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
+#if __BYTE_ORDER == __LITTLE_ENDIAN // png is always big endian, so we swap if we run on little endian
+			ret.asValueArrayBase().endianSwap();
+#endif
 			return ret;
 		}
 	};
