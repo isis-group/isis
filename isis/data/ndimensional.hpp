@@ -19,6 +19,7 @@
 #include <string>
 #include "common.hpp"
 #include "../util/vector.hpp"
+#include "../util/progressfeedback.hpp"
 
 namespace isis
 {
@@ -148,15 +149,19 @@ public:
 		return voxelSize * voxels + gapSize;
 	}
 	
-	template<typename ITER> void swapDim(size_t dim_a,size_t dim_b,ITER at){
+	template<typename ITER> void swapDim(size_t dim_a,size_t dim_b,ITER at, std::shared_ptr<util::ProgressFeedback> feedback=std::shared_ptr<util::ProgressFeedback>()){
 		std::vector<bool> visited(getVolume());
 		data::_internal::NDimensional<DIMS> oldshape=*this;
 
 		//reshape myself
 		std::swap(m_dim[dim_a],m_dim[dim_b]);
 		ITER cycle = at,last=cycle+getVolume();
+		if(feedback)
+			feedback->show(getVolume()-1, std::string("Swapping ")+std::to_string(getVolume())+" voxels");
 
 		while(++cycle != last){
+			if(feedback) 
+				feedback->progress();
 			size_t i=cycle-at;
 			if(visited[i])continue;
 			

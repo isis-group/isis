@@ -120,9 +120,9 @@ bool Image::isClean()const
 	return clean;
 }
 
-void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
+void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::shared_ptr<util::ProgressFeedback> feedback )
 {
-	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin() );
+	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback );
 }
 
 

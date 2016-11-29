@@ -302,9 +302,9 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 }
 
-void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b )
+void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b, std::shared_ptr<util::ProgressFeedback> feedback)
 {
-	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin());
+	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin(),feedback);
 }
 
 Chunk::iterator Chunk::begin()
