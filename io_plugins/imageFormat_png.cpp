@@ -221,7 +221,7 @@ public:
 				ch.setValueAs( "indexOrigin", util::fvector3( {0, 0, slice} ) );
 				LOG( Runtime, info ) << "Synthesized acquisitionNumber " << ch.property( "acquisitionNumber" )
 									 << " and slice position " <<  ch.property( "indexOrigin" ) <<  " from filename";
-				LOG( Runtime, notice ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
+				LOG( Runtime, info ) << ch.getSizeAsString() << "-image loaded from png. Making up columnVec,rowVec and voxelSize";
 			}
 		} else {
 			if( extractNumberFromName<uint32_t>( filename, ch.touchProperty( "acquisitionNumber" ) ) ) {
@@ -237,13 +237,13 @@ public:
 
 
 		ch.setValueAs( "sequenceNumber", ( uint16_t )1 );
-		ch.setValueAs( "rowVec",    util::fvector3( {1, 0} ) );
-		ch.setValueAs( "columnVec", util::fvector3( {0, 1} ) );
-		ch.setValueAs( "voxelSize", util::fvector3( {1, 1, 1} ) );
+		ch.setValueAs( "rowVec",    util::fvector3{1, 0, 0} );
+		ch.setValueAs( "columnVec", util::fvector3{0, 1, 0} );
+		ch.setValueAs( "voxelSize", util::fvector3{1, 1, 1} );
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ) {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
@@ -300,6 +300,9 @@ public:
 				throwGenericError( std::string( "Failed to write " ) + filename );
 			}
 		} else { //save all slices
+			if(feedback)
+				feedback->show(chunks.size(),std::string("Writing ")+std::to_string(chunks.size())+" slices as png files");
+			
 			size_t number = 0;
 			unsigned short numLen = std::log10( chunks.size() ) + 1;
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
@@ -308,6 +311,8 @@ public:
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
 			for( const data::Chunk & ref :  chunks ) {
+				if(feedback)
+					feedback->progress();
 				const std::string num = std::to_string( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 
