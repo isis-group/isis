@@ -26,6 +26,7 @@
 
 #include "progparameter.hpp"
 #include "propmap.hpp"
+#include "progressfeedback.hpp"
 
 namespace isis
 {
@@ -150,6 +151,8 @@ public:
 	}
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void );
+	
+	static std::shared_ptr<util::ProgressFeedback>& feedback();
 };
 }
 }

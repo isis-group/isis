@@ -35,7 +35,6 @@ class IOApplication: public util::Application
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
 		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
-	std::shared_ptr<util::ConsoleFeedback> feedback;
 
 public:
 	std::list<data::Image> images;
@@ -116,7 +115,7 @@ public:
 		std::list< Image >& images, 
 		bool exitOnError = false, 
 		const std::string &suffix = "", 
-		std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >(),
+		std::shared_ptr< util::ProgressFeedback > feedback = IOApplication::feedback(),
 		optional< util::slist& > rejected=optional< util::slist& >()
 	);
 
@@ -138,9 +137,9 @@ public:
 	 * \param suffix the same suffix used for addOutput()
 	 * \param feedback if given, the util::ConsoleFeedback object will be used to display reading progress if possible
 	 */
-	static bool autowrite( const util::ParameterMap &parameters, Image out_image, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
+	static bool autowrite( const util::ParameterMap &parameters, Image out_image, bool exitOnError = false, const std::string &suffix = "");
 	/// \overload autowrite( const util::ParameterMap &, Image, bool, const std::string &, std::shared_ptr< util::ConsoleFeedback > feedback)
-	static bool autowrite( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError = false, const std::string &suffix = "", std::shared_ptr< util::ConsoleFeedback > feedback = std::shared_ptr< util::ConsoleFeedback >() );
+	static bool autowrite( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError = false, const std::string &suffix = "");
 
 	virtual std::shared_ptr<util::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };

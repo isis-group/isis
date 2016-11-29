@@ -55,6 +55,11 @@ Application::Application( const char name[], const char cfg[]): m_name( name )
 		parameters["cfg"].setDescription("File to read configuration from");
 		parameters["cfg"].needed()=false;
 	}
+	
+	parameters["np"] = false;
+	parameters["np"].needed() = false;
+	parameters["np"].setDescription( "suppress progress bar" );
+	parameters["np"].hidden() = true;
 }
 Application::~Application() {}
 
@@ -165,6 +170,10 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		}
 	}
 	
+	if(!parameters["np"])
+		feedback().reset(new util::ConsoleFeedback);
+
+
 	const std::string loc=parameters["locale"];
 	if(!loc.empty())
 		std::setlocale(LC_ALL,loc.c_str());
@@ -245,6 +254,10 @@ const std::string Application::getCoreVersion( void )
 #endif
 }
 
+std::shared_ptr<util::ProgressFeedback>& Application::feedback(){
+	static std::shared_ptr<util::ProgressFeedback> fbk;
+	return fbk;
+}
 }
 }
 #undef STR
