@@ -221,9 +221,9 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 		
 		transfer_function->updateScale(bottom,top);
 		
-		gradient=new GradientWidget(this,bottom,top);
+		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()),bottom,top);
 	} else 
-		gradient=new GradientWidget(this);
+		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()));
 	
 	dynamic_cast<QGridLayout*>(layout())->addWidget(gradient,0,2,1,1);
 	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
