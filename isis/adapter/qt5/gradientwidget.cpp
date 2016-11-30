@@ -28,6 +28,8 @@ GradientWidget::GradientWidget(QWidget* parent, qreal in_bottom, qreal in_top):Q
 	setMinimumWidth(15);
 	setMaximumWidth(15);
 	setMouseTracking(true);
+	if(bottom>1)bottom=1;
+	if(top<0)top=0;
 }
 
 void GradientWidget::paintEvent(QPaintEvent* event)
@@ -64,7 +66,7 @@ QImage GradientWidget::generateShade()
 
 void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	const int pos=event->pos().y();
+	const qreal pos=event->pos().y();
 	
 	if(pos<0 || pos > height())
 		return;
