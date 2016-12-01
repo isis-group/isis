@@ -122,7 +122,12 @@ bool Image::isClean()const
 
 void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::shared_ptr<util::ProgressFeedback> feedback )
 {
-	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback );
+	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback ); // this runs through all chunks as the Iterator does that
+	for(auto pCh:lookup){ //but we still have to reshape the chunks
+		auto shape=pCh->getSizeAsVector();
+		std::swap(shape[dim_a],shape[dim_b]);
+		pCh->init(shape);
+	}
 }
 
 
