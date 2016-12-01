@@ -185,6 +185,11 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	if(!title.isEmpty())
 		setWindowTitle(title);
 	
+	const float dpmm_x=physicalDpiX()/25.4, dpmm_y=physicalDpiY()/25.4;
+	
+	auto voxelsize=img.getValueAs<util::fvector3>("voxelSize");
+	graphicsView->scale(voxelsize[0]*dpmm_x,voxelsize[1]*dpmm_y);
+	
 	auto minmax=img.getMinMax();
 
 	if(is_complex){
@@ -243,6 +248,7 @@ void SimpleImageView::timeChanged(int time)
 void SimpleImageView::updateImage()
 {
 	graphicsView->scene()->clear();
+
 	auto transfer=transfer_function; //lambdas cannot bind members ??
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(
