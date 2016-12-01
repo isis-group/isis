@@ -128,6 +128,16 @@ void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::sh
 		std::swap(shape[dim_a],shape[dim_b]);
 		pCh->init(shape);
 	}
+	
+	//swap voxel sizes
+	auto voxel_size_query=queryValueAs<util::fvector3>("voxelSize");
+	if(voxel_size_query && dim_a<data::timeDim && dim_b<data::timeDim){
+		util::fvector3 &voxel_size=*voxel_size_query;
+		std::swap(voxel_size[dim_a],voxel_size[dim_b]);
+	}
+		
+	//voxelsize is needed to be equal inside Images so there should be no voxelSize in the chunks
+	assert(!getChunkAt(0).hasProperty("voxelSize"));
 }
 
 

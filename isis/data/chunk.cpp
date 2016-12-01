@@ -305,6 +305,12 @@ void Chunk::swapAlong( const dimensions dim ) const
 void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b, std::shared_ptr<util::ProgressFeedback> feedback)
 {
 	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin(),feedback);
+	//swap voxel sizes
+	auto voxel_size_query=queryValueAs<util::fvector3>("voxelSize");
+	if(voxel_size_query && dim_a<data::timeDim && dim_b<data::timeDim){
+		util::fvector3 &voxel_size=*voxel_size_query;
+		std::swap(voxel_size[dim_a],voxel_size[dim_b]);
+	}
 }
 
 Chunk::iterator Chunk::begin()
