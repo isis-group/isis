@@ -37,6 +37,25 @@ if(ISIS_QT5)
 	install(FILES ${ISIS_QT5_HEADER_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/adapter/qt5 COMPONENT Development)
 endif(ISIS_QT5)
 
+option(ISIS_ITK "Enable adapter to the ITK library" OFF)
+
+if(ISIS_ITK)
+	find_package(ITK REQUIRED)
+	include(${ITK_USE_FILE})
+	
+	file(GLOB ISIS_ITK_LIBRARY_FILES "itk/*.cpp")
+	file(GLOB ISIS_ITK_HEADER_FILES "itk/*.hpp")
+
+	add_lib(isis_adapter_itk
+		"${ISIS_ITK_LIBRARY_FILES}"
+		"" "${isis_core_lib};${ITK_LIBRARIES}"
+		${ISIS_ITK_VERSION_SO} ${ISIS_ITK_VERSION_API}
+	)
+
+	# export header files
+	install(FILES ${ISIS_ITK_HEADER_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/adapter/qt5 COMPONENT Development)
+endif(ISIS_ITK)
+
 ############################################################
 # Install header and helper files
 ############################################################
