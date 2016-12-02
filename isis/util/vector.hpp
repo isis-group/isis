@@ -158,9 +158,10 @@ namespace util
 	 */
 	template<typename TYPE, size_t N>
 	TYPE product(const std::array<TYPE,N> &first){
-		return std::accumulate(std::begin(first),std::end(first),1,
-			[](const TYPE &init,const TYPE &x){return init*x;}
-		);
+		TYPE ret=1;
+		for(const TYPE &t:first)
+			ret*=t;
+		return ret;
 	}
 
 	/**
