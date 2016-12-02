@@ -40,7 +40,7 @@ endif(ISIS_QT5)
 option(ISIS_ITK "Enable adapter to the ITK library" OFF)
 
 if(ISIS_ITK)
-	find_package(ITK REQUIRED)
+	find_package(ITK REQUIRED ITKCommon ITKTransform)
 	include(${ITK_USE_FILE})
 	
 	file(GLOB ISIS_ITK_LIBRARY_FILES "itk/*.cpp")
@@ -49,7 +49,7 @@ if(ISIS_ITK)
 	add_lib(isis_adapter_itk
 		"${ISIS_ITK_LIBRARY_FILES}"
 		"" "${isis_core_lib};${ITK_LIBRARIES}"
-		${ISIS_ITK_VERSION_SO} ${ISIS_ITK_VERSION_API}
+		"0.0.0" "0.0.0"
 	)
 
 	# export header files

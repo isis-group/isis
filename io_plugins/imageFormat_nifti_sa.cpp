@@ -561,7 +561,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		props.setValueAs( "nifti/quatern_b", head->quatern_b );
 		props.setValueAs( "nifti/quatern_c", head->quatern_c );
 		props.setValueAs( "nifti/quatern_d", head->quatern_d );
-		props.setValueAs( "nifti/qoffset", util::fvector4( {head->qoffset_x, head->qoffset_y, head->qoffset_z, 0} ) );
+		props.setValueAs( "nifti/qoffset", util::fvector4{head->qoffset_x, head->qoffset_y, head->qoffset_z, 0} );
 		props.setValueAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
 		// copy pixdim
@@ -582,6 +582,10 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		props.setValueAs( "voxelSize",   util::fvector3{head->pixdim[1], head->pixdim[2], head->pixdim[3]} );
 		props.setValueAs( "indexOrigin", util::fvector3{0,0,0} );
 	}
+	
+	if(props.hasProperty("nifti/pixdim"))
+		LOG_IF(!props.property("nifti/pixdim").eq(props.property("voxelSize")),Runtime,warning) 
+			<< "the stored voxel size does not fit the computed voxel size (probably from sform";
 
 	// set space unit factors
 	props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
@@ -1202,7 +1206,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	util::dlist vsize = props.getValueAs<util::dlist>( "nifti/pixdim" );
 	vsize.resize( 3, 1 );
 	props.setValueAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
-	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.queryProperty( "voxelSize" ) << " from pixdim " << props.queryProperty( "nifti/pixdim" );
+	LOG( Debug, info ) << "Computed voxelSize=" << props.property( "voxelSize" ) << " from pixdim " << props.property( "nifti/pixdim" );
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
