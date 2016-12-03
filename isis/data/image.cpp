@@ -528,6 +528,8 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 
 	if( ID && ( scaling.first.isEmpty() || scaling.second.isEmpty() ) ) // if we have an ID but no scaling, compute it
 		conv_op.scale = getScalingTo( ID );
+	else
+		conv_op.scale = scaling;
 
 	conv_op.ID = ID;
 
