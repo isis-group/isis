@@ -11,10 +11,10 @@ namespace isis{
 
 namespace itk4{
 
-	template<typename TYPE> data::TypedImage<TYPE> resample(data::TypedImage<TYPE> source,util::vector4<size_t> in_newsize){
+	template<typename TYPE> data::TypedImage<TYPE> resample_impl(data::TypedImage<TYPE> source,util::vector4<size_t> in_newsize){
 		typedef itk::Image<TYPE,4> ImageType;
 		
-		auto scaleTransform = itk::ScaleTransform<TYPE, 4>::New();
+		auto scaleTransform = itk::ScaleTransform<double, 4>::New();
 
 		itkAdapter adapter;
 		itk::Size<4> newsize;
@@ -35,7 +35,7 @@ namespace itk4{
 		
 		LOG(Runtime,info) << "resampling image to " << in_newsize << " voxels, new voxelsize will be " << newspacing;
 
-		auto resampleFilter = itk::ResampleImageFilter<ImageType, ImageType, float>::New();
+		auto resampleFilter = itk::ResampleImageFilter<ImageType, ImageType>::New();
 		resampleFilter->SetTransform(scaleTransform);
 		resampleFilter->SetOutputSpacing(newspacing);
 		resampleFilter->SetOutputOrigin(image->GetOrigin());

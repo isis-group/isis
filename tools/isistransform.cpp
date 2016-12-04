@@ -66,7 +66,7 @@ int main( int argc, char **argv )
 				newsize[i]=(reqsize[i]!=-1)?
 					reqsize[i]:oldsize[i];
 			}
-			refImage=itk4::resample<float>(refImage,newsize);
+			refImage=itk4::resample(refImage,newsize);
 		}
 	}
 	app.autowrite( app.images );

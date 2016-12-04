@@ -20,7 +20,7 @@ namespace itk4{
 		ENABLE_LOG( ITKDebug, HANDLE, level );
 	}
 	
-	template<typename TYPE> data::TypedImage<TYPE> resample(data::TypedImage<TYPE> source,util::vector4<size_t> newsize);
+	data::Image resample(data::Image source,util::vector4<size_t> newsize);
 }
 }
 
