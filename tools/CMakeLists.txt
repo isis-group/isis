@@ -44,11 +44,6 @@ target_link_libraries(isisflip ${isis_core_lib} ${isis_math_lib})
 set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 build_manpage(isisflip "flip MR images along specific dimensions")
 
-add_executable(isistransform isistransform.cpp)
-target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib})
-set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-build_manpage(isistransform "geometricaly transform MR images")
-
 add_executable(isisraw isisraw.cpp)
 target_link_libraries(isisraw ${isis_core_lib})
 set_target_properties(isisraw PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -57,7 +52,6 @@ build_manpage(isisraw "read or write raw data files from/to isis images")
 # the install targets.
 install(TARGETS
   isisdump
-  isistransform
   isisdiff
   isisconv
   isisflip
@@ -73,3 +67,14 @@ if(ISIS_QT5)
 	build_manpage(isisview "display MRI data")
 endif(ISIS_QT5)
 
+if(ISIS_ITK)
+	find_package(ITK REQUIRED ITKCommon ITKTransform)
+	include(${ITK_USE_FILE})
+
+	add_executable(isistransform isistransform.cpp)
+	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk_lib} ${ITK_LIBRARIES})
+	set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+	
+	install(TARGETS isistransform RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+	build_manpage(isistransform "geometricaly transform MR images")
+endif(ISIS_ITK)
