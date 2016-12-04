@@ -1,0 +1,27 @@
+#ifndef ITK_COMMON_HPP
+#define ITK_COMMON_HPP
+
+#include "../../util/log.hpp"
+#include "../../data/image.hpp"
+
+
+namespace isis{
+	struct ITKLog {static const char *name() {return "ITK";}; enum {use = _ENABLE_LOG};};
+	struct ITKDebug {static const char *name() {return "ITKDebug";}; enum {use = _ENABLE_DEBUG};};
+
+namespace itk4{
+
+	typedef ITKDebug Debug;
+	typedef ITKLog Runtime;
+
+	template<typename HANDLE> void enableLog( LogLevel level )
+	{
+		ENABLE_LOG( ITKLog, HANDLE, level );
+		ENABLE_LOG( ITKDebug, HANDLE, level );
+	}
+	
+	template<typename TYPE> data::TypedImage<TYPE> resample(data::TypedImage<TYPE> source,util::vector4<size_t> newsize);
+}
+}
+
+#endif //ITK_COMMON_HPP
