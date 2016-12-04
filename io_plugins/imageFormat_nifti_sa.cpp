@@ -583,10 +583,15 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		props.setValueAs( "indexOrigin", util::fvector3{0,0,0} );
 	}
 	
-	if(props.hasProperty("nifti/pixdim"))
-		LOG_IF(!props.property("nifti/pixdim").eq(props.property("voxelSize")),Runtime,warning) 
-			<< "the stored voxel size does not fit the computed voxel size (probably from sform";
-
+	if(props.hasProperty("nifti/pixdim")){
+		// make a vector3 from the nifti/pixdim-list
+		const auto pixdim=props.getValueAs<util::dlist>("nifti/pixdim");
+		util::fvector3 buffer;auto pixdim3=pixdim.begin();std::advance(pixdim3,3);
+		std::copy(pixdim.begin(),pixdim3,std::begin(buffer));
+	
+		LOG_IF(props.getValueAs<util::fvector3>("voxelSize")!=buffer,Runtime,warning) 
+			<< "the stored voxel size does not fit the computed voxel size (probably from sform)";
+	}
 	// set space unit factors
 	props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
 	props.refValueAs<util::fvector3>( "indexOrigin" ) *= size_fac;
