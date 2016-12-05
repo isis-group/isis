@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 	public:
 		data::dimensions dim;
 		bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
-			ch.swapAlong( dim );
+			ch.flipAlong( dim );
 			return true;
 		}
 	} flifu;
@@ -81,7 +81,7 @@ int main( int argc, char **argv )
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			if( refImage.copyChunksToVector( false ).front().getRelevantDims() > dim ) {
+			if( refImage.getChunkAt(0).getRelevantDims() > dim ) {
 				flifu.dim = static_cast<data::dimensions>( dim );
 				refImage.foreachChunk( flifu );
 			} else {

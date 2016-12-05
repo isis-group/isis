@@ -29,7 +29,7 @@ protected:
 
 			png_set_strip_alpha(png_ptr);
 			png_read_image( png_ptr, row_pointers.get() );
-			ret.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
+			ret.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
 #if __BYTE_ORDER == __LITTLE_ENDIAN // png is always big endian, so we swap if we run on little endian
 			ret.asValueArrayBase().endianSwap();
 #endif
@@ -74,7 +74,7 @@ public:
 
 		//buff has to be swapped along the png-x-axis
 		data::Chunk buff = src.copyByID(); //make a deep copy to not interfere with the source
-		buff.swapAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+		buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
 
 		util::vector4<size_t> size = buff.getSizeAsVector();
 

@@ -266,7 +266,7 @@ size_t Chunk::useCount() const
 	return getValueArrayBase().useCount();
 }
 
-void Chunk::swapAlong( const dimensions dim ) const
+void Chunk::flipAlong( const dimensions dim ) const
 {
 	const size_t elSize = getBytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();

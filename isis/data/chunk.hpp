@@ -250,7 +250,7 @@ public:
 	/**
 	  * Flips the chunk along a dimension dim in image space.
 	  */
-	void swapAlong( const dimensions dim ) const;
+	void flipAlong( const dimensions dim ) const;
 
 	//http://en.wikipedia.org/wiki/In-place_matrix_transposition#Non-square_matrices%3a_Following_the_cycles
 	void swapDim(unsigned short dim_a,unsigned short dim_b,std::shared_ptr<util::ProgressFeedback> feedback=std::shared_ptr<util::ProgressFeedback>());

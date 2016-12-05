@@ -48,7 +48,7 @@ if(ISIS_ITK)
 
 	add_lib(isis_adapter_itk
 		"${ISIS_ITK_LIBRARY_FILES}"
-		"" "${isis_core_lib};${ITK_LIBRARIES}"
+		"" "${isis_core_lib};${isis_math_lib};${ITK_LIBRARIES}"
 		"0.0.0" "0.0.0"
 	)
 

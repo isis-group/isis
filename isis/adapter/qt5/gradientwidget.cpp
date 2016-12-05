@@ -24,7 +24,7 @@
 #include <cmath>
 
 GradientWidget::GradientWidget(QWidget* parent, std::pair< double, double > in_image_rage, qreal in_bottom, qreal in_top):
-bottom(1-in_bottom),top(1-in_top),image_rage(in_image_rage),min_str(QString::number(in_image_rage.first,'f',4)),max_str(QString::number(in_image_rage.second,'f',4))
+bottom(1-in_bottom),top(1-in_top),image_rage(in_image_rage),min_str(QString::number(in_image_rage.first,'g',4)),max_str(QString::number(in_image_rage.second,'g',4))
 {
 	setMinimumWidth(30);
 	setMaximumWidth(30);
@@ -80,14 +80,14 @@ void GradientWidget::paintEvent(QPaintEvent* event)
 	p.drawRect(QRect(0,top_pos-3,25,6));
 	
 	if(top_pos>text_hight && top_pos<height()-text_hight){
-		QString number=QString::number(image_rage.first+(1-top)*(image_rage.second-image_rage.first),'f',4);
+		QString number=QString::number(image_rage.first+(1-top)*(image_rage.second-image_rage.first),'g',4);
 		if(adaptWidth(&p,number,30))
 			return;
 		p.drawText(QPoint(30,top_pos+text_hight/2-3),number);
 	}
 	
 	if(bottom_pos<height()-text_hight && bottom_pos>text_hight){
-		QString number=QString::number(image_rage.first+(1-bottom)*(image_rage.second-image_rage.first),'f',4);
+		QString number=QString::number(image_rage.first+(1-bottom)*(image_rage.second-image_rage.first),'g',4);
 		if(adaptWidth(&p,number,30))
 			return;
 		p.drawText(QPoint(30,bottom_pos+text_hight/2-3),number);

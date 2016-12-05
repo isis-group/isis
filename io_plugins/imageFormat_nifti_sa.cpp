@@ -78,9 +78,9 @@ void WriteOp::applyFlipToData ( data::ValueArrayReference &dat, util::vector4< s
 }
 void WriteOp::applyFlipToData ( data::Chunk &dat )
 {
-	//iterate through all flips within than the block dimensionality
+	//iterate through all flips within the block dimensionality
 	for( std::set<data::dimensions>::const_iterator i = flip_list.begin(); i != flip_list.end() && *i < dat.getRelevantDims(); i++ ) {
-		dat.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
+		dat.flipAlong( *i ); // .. so changing its data, will also change the data we just copied
 	}
 }
 
