@@ -30,7 +30,6 @@ class FileFormat
 {
 public:
 	enum io_modes {read_only = 1, write_only = 2, both = 3};
-protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
@@ -71,6 +70,7 @@ protected:
 
 		return false;
 	}
+protected:
 	/// \return the file-suffixes the plugin supports
 	virtual util::istring suffixes( io_modes modes = both )const = 0;
 	static constexpr float invalid_float=-std::numeric_limits<float>::infinity();
