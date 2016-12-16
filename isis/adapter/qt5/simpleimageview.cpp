@@ -221,9 +221,14 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	
 	QWidget *gradient;
 	if(img.hasProperty("window/max") && img.hasProperty("window/min")){
-		const double bottom=(img.getValueAs<double>("window/min")-minmax.first->as<double>()) / (minmax.second->as<double>()-minmax.first->as<double>());
-		const double top=img.getValueAs<double>("window/max") / minmax.second->as<double>();
-		
+		const double min=minmax.first->as<double>(),max=minmax.second->as<double>();
+		const double hmin=img.getValueAs<double>("window/min"),hmax=img.getValueAs<double>("window/max");
+		double bottom=(hmin-min) / (max-min);
+		double top= hmax / max;
+
+		if(std::isinf(bottom))bottom=0;
+		if(std::isinf(top))top=1;
+
 		transfer_function->updateScale(bottom,top);
 		
 		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()),bottom,top);
