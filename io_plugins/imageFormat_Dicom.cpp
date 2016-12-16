@@ -38,7 +38,7 @@ class DicomChunk : public data::Chunk
 		return new data::Chunk(dest,width,height);
 	}
 public:
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, DcmFileFormat &dcfile, const util::istring &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, DcmFileFormat &dcfile, const util::istring &dialect ) {
 		std::unique_ptr<data::Chunk> ret;
 		DicomImage img( &dcfile, EXS_Unknown );
 
@@ -132,7 +132,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic 2003";}
+util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
 
@@ -180,13 +180,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	}
 	{
 		// compute acquisitionTime
-		auto o_acTime= (dialect == "2003") ?
-			extractOrTell({"AcquisitionTime","ContentTime"},dicomTree,warning):
-			extractOrTell({"ContentTime","AcquisitionTime"},dicomTree,warning);
+		auto o_acTime= extractOrTell({"AcquisitionTime","ContentTime"},dicomTree,warning);
 		if ( o_acTime ) {
-			auto o_acDate= (dialect == "2003") ?
-				extractOrTell({"AcquisitionDate", "ContentDate", "SeriesDate"},dicomTree,warning):
-				extractOrTell({"ContentDate", "AcquisitionDate", "SeriesDate"},dicomTree,warning);
+			auto o_acDate= extractOrTell({"AcquisitionDate", "ContentDate", "SeriesDate"},dicomTree,warning);
 			if( o_acDate ) {
 				const util::timestamp acTime = o_acTime->as<util::timestamp>()+o_acDate->as<util::date>().time_since_epoch();
 				object.setValueAs<util::timestamp>("acquisitionTime", acTime);
@@ -487,6 +483,10 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// for every slice add acqTime to Multivalue
 
+	auto acqTimeQuery= dest.queryProperty( "acquisitionTime"); 
+	if(acqTimeQuery) 
+		*acqTimeQuery=util::PropertyValue(); //reset the selected ordering property to empty
+
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
@@ -498,10 +498,12 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		if(haveAcqTimeList){
-			util::PropertyValue &ordProp= dest.touchProperty( "acquisitionTime"); 
-			ordProp=util::PropertyValue(); //reset the selected ordering property to empty
-			ordProp.push_back(acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) ));
+		if(acqTimeQuery){
+			auto newtime=acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) );
+			acqTimeQuery->push_back(newtime);
+			LOG(Debug,verbose_info) 
+				<< "Computed acquisitionTime for slice " << slice << " as " << newtime
+				<< "(" << acqTime << "+" <<  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) );
 		}
 	}
 
@@ -516,7 +518,7 @@ std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, c
 
 	if ( loaded.good() ) {
 		std::list< data::Chunk > ret;
-		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
+		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, dialect );
 		const util::slist iType = chunk.getValueAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
