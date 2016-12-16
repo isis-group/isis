@@ -255,9 +255,13 @@ template<typename TImageITK, typename TOutputISIS> data::Image itkAdapter::inter
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
+	
+	util::vector4<size_t> dstsize{1,1,1,1};
+	
+	for(int i =0;i<TImageITK::ImageDimension;i++)
+		dstsize[i]=imageSize[i];
 
-	data::Chunk
-	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3]) ) ;
+	data::Chunk	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), dstsize[0], dstsize[1], dstsize[2], dstsize[3]) ) ;
 	tmpChunk.convertToType( data::ValueArray<ISISRepn>::staticID() );
 	//these are properties that maybe are manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
