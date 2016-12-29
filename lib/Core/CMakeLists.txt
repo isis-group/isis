@@ -80,5 +80,5 @@ install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/DataStorage COMP
 configure_file(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
 
 # install cmake configuration files
-install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
+install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION lib${LIB_SUFFIX}/cmake/ISIS COMPONENT Development)
 

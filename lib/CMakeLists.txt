@@ -25,8 +25,8 @@ macro( build_lib name type sources deps soversion version)
 	# install libraries
 	install (TARGETS ${name}-${type}
 		RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
-		LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
-		ARCHIVE DESTINATION lib COMPONENT Development
+		LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT RuntimeLibraries
+		ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT Development
 	)
 	
 	set(${name}_lib ${name}-${type} CACHE INTERNAL "internal name for ${name}" FORCE)

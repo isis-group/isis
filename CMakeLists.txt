@@ -50,8 +50,8 @@ if(NOT WIN32)
 ############################################################
 # set install infix for plugin installation path
 ############################################################
-set(ISIS_PLUGIN_INFIX lib/isis/plugins)
-set(ISIS_FILTER_INFIX lib/isis/filter)
+set(ISIS_PLUGIN_INFIX lib${LIB_SUFFIX}/isis/plugins)
+set(ISIS_FILTER_INFIX lib${LIB_SUFFIX}/isis/filter)
 endif(NOT WIN32)
 
 ############################################################
