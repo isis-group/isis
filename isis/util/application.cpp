@@ -33,14 +33,14 @@ namespace util
 
 Application::Application( const char name[], const char cfg[]): m_name( name )
 {
-	addLogging<CoreLog>( "Util" );
-	addLogging<CoreDebug>( "Util" );
-	addLogging<DataLog>( "Data" );
-	addLogging<DataDebug>( "Data" );
-	addLogging<ImageIoLog>( "ImageIO" );
-	addLogging<ImageIoDebug>( "ImageIO" );
-	addLogging<MathLog>( "Math" );
-	addLogging<MathDebug>( "Math" );
+	addLogging<CoreLog>();
+	addLogging<CoreDebug>();
+	addLogging<DataLog>();
+	addLogging<DataDebug>();
+	addLogging<ImageIoLog>();
+	addLogging<ImageIoDebug>();
+	addLogging<MathLog>();
+	addLogging<MathDebug>();
 
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
