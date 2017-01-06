@@ -497,6 +497,16 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			saved_qform = true;
 		}
 	}
+	
+	//store voxel size (don't use voxelSize, thats without voxelGap)
+	const isis::util::Matrix4x4< double > nifti2image = util::transpose(getNiftiMatrix( props )); //use the inverse of image2nifti to extract direction vectors easier
+
+	for( int i = 0; i < 3; i++ ) {
+		//vector length of the i'th column (thats ok with vector4, because fourth element is allways 0)
+		assert(nifti2image[i][3]==0); //just to be sure
+		head->pixdim[i + 1] = util::len(nifti2image[i]); 
+	}
+
 
 	// store current orientation (into fields which hasn't been set by now)
 
@@ -589,7 +599,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		util::fvector3 buffer;auto pixdim3=pixdim.begin();std::advance(pixdim3,3);
 		std::copy(pixdim.begin(),pixdim3,std::begin(buffer));
 	
-		LOG_IF(props.getValueAs<util::fvector3>("voxelSize")!=buffer,Runtime,warning) 
+		LOG_IF(!util::fuzzyEqualV(props.getValueAs<util::fvector3>("voxelSize"),buffer),Runtime,warning) 
 			<< "the stored voxel size does not fit the computed voxel size (probably from sform)";
 	}
 	// set space unit factors
@@ -1224,7 +1234,6 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 	for( int i = 0; i < 3; i++ ) {
 		const util::dvector4 buff = nifti2image[i];
 		std::copy(buff.begin(), buff.begin() + 3, std::begin(col[i]) ); //nth column in image2nifti
-		head->pixdim[i + 1] = util::len(col[i]); //store voxel size (don't use voxelSize, thats without voxelGap)
 		util::normalize(col[i]); // normalize the columns
 	}
 
