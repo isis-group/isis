@@ -21,6 +21,7 @@ namespace itk4{
 	}
 	
 	data::Image resample(data::Image source,util::vector4<size_t> newsize);
+	data::Image rotate(data::Image src, std::pair<int,int> rotation_plain, float angle);
 }
 }
 

@@ -2,7 +2,6 @@
 #include <isis/data/io_factory.hpp>
 #include <isis/math/transform.hpp>
 #include <isis/adapter/itk/common.hpp>
-#include <isis/adapter/itk/common.hxx>
 
 #include <map>
 #include <boost/assign.hpp>
@@ -61,9 +60,15 @@ int main( int argc, char **argv )
 	
 	app.parameters["resample"]=util::ivector4{-1,-1,-1,-1};
 	app.parameters["resample"].needed()=false;
+
+	app.parameters["rotate"]=util::fvector3{0,0,0};
+	app.parameters["rotate"].needed()=false;
 	
 	app.addLogging<TransformLog>();
 	app.addLogging<TransformDebug>();
+	
+	app.addLogging<ITKLog>();
+	app.addLogging<ITKDebug>();
 	
 	app.init( argc, argv );
 	
@@ -113,6 +118,10 @@ int main( int argc, char **argv )
 					reqsize[i]:oldsize[i];
 			}
 			refImage=itk4::resample(refImage,newsize);
+		}
+		if(app.parameters["rotate"].isParsed()){
+			util::fvector3 rot=app.parameters["rotate"];
+			refImage=itk4::rotate(refImage,{0,1},M_PI/4);
 		}
 	}
 	app.autowrite( app.images );
