@@ -169,6 +169,13 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 		itkDirection[i][1] = phaseVec[i];
 		itkDirection[i][2] = sliceVec[i];
 	}
+	for ( unsigned short i = 3; i < TOutput::ImageDimension; i++ ) {
+		itkOrigin[i] = 0;
+		itkSpacing[i] = 1;
+		itkDirection[i][0] = 0;
+		itkDirection[i][1] = 0;
+		itkDirection[i][2] = 0;
+	}
 	
 	for(int i=0;i<4;i++){
 		itkSize[i] = m_ImageISIS->getDimSize(i);
