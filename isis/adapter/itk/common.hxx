@@ -77,7 +77,7 @@ template<typename TYPE> data::TypedImage<TYPE> rotate_impl(data::TypedImage<TYPE
 	
 	auto transform = itk::CenteredAffineTransform< double, 4 >::New(); 
 	
-	LOG(Runtime,info) << "rotating image around " << origin << " on the " << char('x'+rotation_plain.first) << "/" << char('x'+rotation_plain.second) << " plane"; 
+	LOG(Runtime,info) << "rotating image by " << util::MSubject(std::to_string(angle)+"rad") << " on the " << char('x'+rotation_plain.first) << "/" << char('x'+rotation_plain.second) << " plane"; 
 
 	transform->Rotate(rotation_plain.first,rotation_plain.second,angle);
 	

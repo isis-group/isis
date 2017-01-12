@@ -61,7 +61,7 @@ int main( int argc, char **argv )
 	app.parameters["resample"]=util::ivector4{-1,-1,-1,-1};
 	app.parameters["resample"].needed()=false;
 
-	app.parameters["rotate"]=util::fvector3{0,0,0};
+	app.parameters["rotate"]=util::slist{"x","y", "90"};
 	app.parameters["rotate"].needed()=false;
 	
 	app.addLogging<TransformLog>();
@@ -75,6 +75,38 @@ int main( int argc, char **argv )
 	util::slist swapdim_list=app.parameters["swapdim"];
 	LOG_IF(swapdim_list.size()>4,TransformLog,warning)	<< "Ignoring all but 4 given parameters for swapdim";
 	swapdim_list.resize(4);
+	
+	float rotate_angle=0;
+	std::pair<int,int> rotate_plane;
+	if(app.parameters["rotate"].isParsed()){
+		util::slist rotate_list=app.parameters["rotate"];
+		LOG_IF(rotate_list.size()>3,TransformLog,warning)	<< "Ignoring all but 3 given parameters for rotate";
+		rotate_list.resize(3);
+		try{
+			rotate_angle = std::stof(rotate_list.back());
+			rotate_list.pop_back();
+			
+			rotate_plane.first =std::tolower(rotate_list.front().front())-'x';
+			rotate_plane.second=std::tolower(rotate_list.back().front())-'x';
+			
+			if(rotate_plane.first<0 || rotate_plane.first>2){
+				LOG(TransformLog,error) << "first parameter for rotate must be x,y or z (was " << rotate_list.front() << ")";
+				throw(std::out_of_range(rotate_list.front()));
+			}
+			if(rotate_plane.second<0 || rotate_plane.second>2){
+				LOG(TransformLog,error) << "second parameter for rotate must be x,y or z (was " << rotate_list.front() << ")";
+				throw(std::out_of_range(rotate_list.front()));
+			}
+			if(rotate_plane.first == rotate_plane.second){
+				LOG(TransformLog,error) << "first and second parameter for rotate must not be equal";
+				throw(std::logic_error("first and second parameter for rotate must not be equal"));
+			}
+		}
+		catch(std::logic_error &err){
+			LOG(TransformLog,error) << "failed to parse rotate parameters (" << err.what() << ")";
+			exit(EXIT_FAILURE);
+		}
+	}
 	
 	//go through every image
 	for( data::Image & refImage :  app.images ) {
@@ -119,9 +151,8 @@ int main( int argc, char **argv )
 			}
 			refImage=itk4::resample(refImage,newsize);
 		}
-		if(app.parameters["rotate"].isParsed()){
-			util::fvector3 rot=app.parameters["rotate"];
-			refImage=itk4::rotate(refImage,{0,1},M_PI/4);
+		if(rotate_angle){
+			refImage=itk4::rotate(refImage,rotate_plane,rotate_angle);
 		}
 	}
 	app.autowrite( app.images );
