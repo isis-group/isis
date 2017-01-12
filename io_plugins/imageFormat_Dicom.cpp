@@ -484,7 +484,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	// for every slice add acqTime to Multivalue
 
 	auto acqTimeQuery= dest.queryProperty( "acquisitionTime"); 
-	if(acqTimeQuery) 
+	if(acqTimeQuery && haveAcqTimeList) 
 		*acqTimeQuery=util::PropertyValue(); //reset the selected ordering property to empty
 
 	for ( size_t slice = 0; slice < images; slice++ ) {
@@ -498,12 +498,13 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		if(acqTimeQuery){
-			auto newtime=acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) );
+		if(acqTimeQuery && haveAcqTimeList){
+			auto newtime=acqTime +  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt ) );
 			acqTimeQuery->push_back(newtime);
 			LOG(Debug,verbose_info) 
 				<< "Computed acquisitionTime for slice " << slice << " as " << newtime
-				<< "(" << acqTime << "+" <<  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt++ ) );
+				<< "(" << acqTime << "+" <<  std::chrono::milliseconds((std::chrono::milliseconds::rep)* ( acqTimeIt ) );
+			++acqTimeIt;
 		}
 	}
 
