@@ -31,6 +31,7 @@ Description: I/O framework for neuroimaging data
 
 Package: libisis-ioplugins-common
 Section: libs
+Conflicts: isisio0-vista, isisio0-tar-proxy, isisio0-png, isisio0-nifti-sa, isisio0-nifti, isisio0-gz-proxy
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: data format plugins for the ISIS framework
@@ -44,6 +45,7 @@ Description: data format plugins for the ISIS framework
 
 Package: libisis-ioplugins-dicom
 Section: science
+Conflicts: isisio0-dicom
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: dicom io plugin for the ISIS framework
@@ -79,10 +81,9 @@ Description: utilities for the ISIS neuroimaging data I/O framework
  includes a multi-format converter and tools to inspect image meta data.
 
 
-Package: libisis-qt5-0
+Package: libisis-adapter-qt5-0
 Section: libs
-Conflicts: isis-qt5
-Replaces: isis-qt5
+Conflicts: libisis-qt5-0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Qt5 bindings for ISIS data I/O framework
@@ -91,12 +92,34 @@ Description: Qt5 bindings for ISIS data I/O framework
  is extensible with plugins to add support for additional data formats.
 
 
-Package: libisis-qt5-dev
+Package: libisis-adapter-qt5-dev
 Section: libdevel
-Conflicts: isis-qt5-dev
+Conflicts: libisis-qt5-dev
 Architecture: any
 Depends: libisis-qt5-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, qtbase5-dev
 Description: Qt5 bindings for ISIS data I/O framework (development headers)
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+
+
+Package: libisis-adapter-itk4-0
+Section: libs
+Conflicts: libisis-itk4-0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: itk4 extensions for ISIS data I/O framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+
+
+Package: libisis-adapter-itk4-dev
+Section: libdevel
+Conflicts: libisis-itk4-dev
+Architecture: any
+Depends: libisis-qt5-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, libinsighttoolkit4-dev
+Description: itk4 extensions for ISIS data I/O framework (development headers)
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.

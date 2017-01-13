@@ -1,10 +1,14 @@
-isis (0.7.11-1ubuntu1) UNRELEASED; urgency=low
+isis (0.7.12) UNRELEASED; urgency=low
 
+  [ ISIS Group ]
   * big api change in progress
   * updated packaging
   * add experimental support for standalone vista
+  * add itk4 adapter
+  * add ImageMagic base io plugin
+  * improve SimpleImageView
 
- -- ISIS Group <gr_isis@cbs.mpg.de>  Fri, 04 Nov 2016 14:29:34 +0100
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Fri, 13 Jan 2017 15:33:23 +0100
 
 isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 

@@ -148,8 +148,8 @@ install(FILES "config.hpp" DESTINATION include/isis COMPONENT Development)
 install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/util COMPONENT Development)
 install(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/isis/data COMPONENT Development)
 
-add_subdirectory(adapter)
 add_subdirectory(math)
+add_subdirectory(adapter)
 
 # write configuration file
 configure_file(isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
