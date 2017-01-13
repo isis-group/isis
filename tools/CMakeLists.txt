@@ -60,7 +60,7 @@ install(TARGETS
 if(ISIS_QT5)
 	find_package(Qt5Widgets)
 	add_executable(isisview isisview.cpp)
-	target_link_libraries(isisview ${isis_core_lib} ${isis_qt5_lib} Qt5::Widgets )
+	target_link_libraries(isisview ${isis_core_lib} ${isis_adapter_qt5_lib} Qt5::Widgets )
 	set_target_properties(isisview PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 	build_manpage(isisview "simple mri data viewer")
 
@@ -73,7 +73,7 @@ if(ISIS_ITK)
 	include(${ITK_USE_FILE})
 
 	add_executable(isistransform isistransform.cpp)
-	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk_lib} ${ITK_LIBRARIES})
+	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk4_lib} ${ITK_LIBRARIES})
 	set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 	
 	install(TARGETS isistransform RUNTIME DESTINATION bin COMPONENT "CLI_Tools")

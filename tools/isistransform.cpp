@@ -1,7 +1,7 @@
 #include <isis/data/io_application.hpp>
 #include <isis/data/io_factory.hpp>
 #include <isis/math/transform.hpp>
-#include <isis/adapter/itk/common.hpp>
+#include <isis/adapter/itk4/common.hpp>
 
 #include <map>
 #include <boost/assign.hpp>

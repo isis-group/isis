@@ -29,7 +29,7 @@ include(CTest)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "9")
+set(ISIS_VERSION_PATCH "12")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -46,6 +46,11 @@ STRING( REGEX MATCH "^[0-9]+" ISIS_CORE_VERSION_SO ${ISIS_CORE_VERSION_API})
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
+############################################################
+# get thread libs
+############################################################
+find_package(Threads)
 
 ############################################################
 # check for byteswap intrinsics

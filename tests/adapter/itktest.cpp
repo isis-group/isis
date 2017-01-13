@@ -2,8 +2,8 @@
 #define NOMINMAX 1
 
 #include <boost/test/unit_test.hpp>
-#include "../../isis/adapter/itk/itkAdapter.hpp"
-#include "../../isis/adapter/itk/common.hpp"
+#include "../../isis/adapter/itk4/itkAdapter.hpp"
+#include "../../isis/adapter/itk4/common.hpp"
 #include "../../isis/data/chunk.hpp"
 #include "../../isis/data/io_factory.hpp"
 

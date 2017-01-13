@@ -103,7 +103,7 @@ endif(ISIS_IOPLUGIN_PNG)
 # PNG plugin
 ############################################################
 if(ISIS_IOPLUGIN_IMAGEMAGIC)
-	find_package(ImageMagick REQUIRED Magick++)
+	find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
 	include_directories(${ImageMagick_INCLUDE_DIRS})
 
 	add_library(isisImageFormat_ImageMagick SHARED imageFormat_ImageMagick.cpp)
