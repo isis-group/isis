@@ -1,5 +1,5 @@
 #include "common.hpp"
-
+#include <thread>
 
 
 QImage isis::qt5::makeQImage(const data::ValueArrayBase &data,size_t line_length,data::scaling_pair scaling)
@@ -20,11 +20,23 @@ QImage isis::qt5::makeQImage(const data::ValueArrayBase& data, size_t line_lengt
 	for(int i=0;i<256;i++)
 		ret.setColor(i,qRgb(i,i,i));
 
-	int line_idx=0;
-	for(auto line:data.splice(line_length)) {
-		uchar *dst=ret.scanLine(line_idx);
-		transfer_function(dst,*line);
-		++line_idx;
+	const auto splices=data.splice(line_length);
+	const size_t thread_size=std::ceil(splices.size()/float(std::thread::hardware_concurrency()));
+	std::vector<std::thread> threads;
+	
+	auto line_copy = [&ret,&splices,&transfer_function](size_t start, size_t end){
+		for(size_t line_idx=start;line_idx<end;line_idx++) {
+			uchar *dst=ret.scanLine(line_idx);
+			transfer_function(dst,*splices[line_idx]);
+		}
+	};
+	
+	for(size_t i=0;i<splices.size();i+=thread_size){
+		const size_t start=i,end=std::min(i+thread_size,splices.size());
+		threads.push_back(std::thread(line_copy,start,end));
+	}
+	for(std::thread &t:threads){
+		t.join();
 	}
 	return ret;
 }

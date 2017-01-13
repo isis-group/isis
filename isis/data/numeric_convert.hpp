@@ -235,6 +235,7 @@ getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autos
 		double minval, maxval;
 		minval = min.as<double>();
 		maxval = max.as<double>();
+		LOG_IF(std::isnan(minval) && std::isnan(maxval), Runtime, error) << "The min as well as the max of the range is NaN, thats not going to end well...";
 		assert( minval <= maxval );
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << static_cast<double>( domain_min ) << "=>" << static_cast<double>( domain_max );

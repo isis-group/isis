@@ -250,18 +250,14 @@ public:
 	/**
 	  * Flips the chunk along a dimension dim in image space.
 	  */
-	void swapAlong( const dimensions dim ) const;
+	void flipAlong( const dimensions dim ) const;
 
 	//http://en.wikipedia.org/wiki/In-place_matrix_transposition#Non-square_matrices%3a_Following_the_cycles
-	void swapDim(unsigned short dim_a,unsigned short dim_b);
+	void swapDim(unsigned short dim_a,unsigned short dim_b,std::shared_ptr<util::ProgressFeedback> feedback=std::shared_ptr<util::ProgressFeedback>());
 };
 
 template<typename TYPE> class TypedChunk : public Chunk{
 protected:
-	/** Create a TypedChunk "Husk" without any data
-	 * \Warning You must set data ValueArray in the drived Class
-	 */
-	TypedChunk(bool fakeValid=false):Chunk(fakeValid){}
 	TypedChunk( const ValueArray<TYPE> &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false ):
 		Chunk(src, nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps, fakeValid){}
 public:
@@ -270,7 +266,12 @@ public:
 	typedef typename iterator::reference reference;
 	typedef typename const_iterator::reference const_reference;
 
-    TypedChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  ): Chunk( ref ) {
+	/** Create a TypedChunk "Husk" without any data
+	 * \Warning You must set data ValueArray in the drived Class
+	 */
+	TypedChunk(bool fakeValid=false):Chunk(fakeValid){}
+
+	TypedChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  ): Chunk( ref ) {
 		convertToType(ValueArray<TYPE>::staticID(),scaling);
 	}
 

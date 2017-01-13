@@ -31,8 +31,7 @@ namespace isis
 namespace data
 {
 	IOApplication::IOApplication( const char name[], bool have_input, bool have_output, const char cfg[] ):
-	Application( name, cfg ),
-	m_input( have_input ), feedback( new util::ConsoleFeedback )
+	Application( name, cfg ), m_input( have_input )
 {
 	if ( have_input )
 		addInput();
@@ -79,13 +78,6 @@ void IOApplication::addInput ( util::ParameterMap &parameters, const std::string
 	parameters[std::string( "rdialect" ) + suffix].needed() = false;
 	parameters[std::string( "rdialect" ) + suffix].setDescription(
 		std::string( "choose dialect for reading" ) + desc + ". The available dialects depend on the capabilities of the used IO plugin" );
-
-	if( parameters.find( "np" ) == parameters.end() ) {
-		parameters["np"] = false;
-		parameters["np"].needed() = false;
-		parameters["np"].setDescription( "suppress progress bar" );
-		parameters["np"].hidden() = true;
-	}
 }
 void IOApplication::addInput(const std::string& desc, const std::string& suffix, bool needed)
 {
@@ -168,10 +160,10 @@ void IOApplication::printHelp( bool withHidden ) const
 
 bool IOApplication::autoload( bool exitOnError,optional< util::slist& > rejected)
 {
-	return autoload( parameters, images, exitOnError, "", feedback,rejected );
+	return autoload( parameters, images, exitOnError, "", feedback(),rejected );
 
 }
-bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ConsoleFeedback> feedback, optional< util::slist& > rejected)
+bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	std::string rf = parameters[std::string( "rf" ) + suffix];
@@ -216,15 +208,14 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 bool IOApplication::autowrite( Image out_image, bool exitOnError ) {return autowrite( std::list<Image>( 1, out_image ), exitOnError );}
 bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 {
-	const bool no_progress = parameters["np"];
-	return autowrite( parameters, out_images, exitOnError, "", no_progress ? std::shared_ptr<util::ConsoleFeedback>() : feedback );
+	return autowrite( parameters, out_images, exitOnError, "");
 }
 
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, Image out_image, bool exitOnError, const std::string &suffix )
 {
-	return autowrite( parameters, std::list<Image>( 1, out_image ), exitOnError, suffix, feedback );
+	return autowrite( parameters, std::list<Image>( 1, out_image ), exitOnError, suffix );
 }
-bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix, std::shared_ptr<util::ConsoleFeedback> feedback )
+bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list< Image > out_images, bool exitOnError, const std::string &suffix)
 {
 	const util::Selection repn = parameters[std::string( "repn" ) + suffix];
 	const util::Selection scale_mode = parameters[std::string( "scale_mode" ) + suffix];
@@ -250,8 +241,8 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 		}
 	}
 
-	if( feedback )
-		data::IOFactory::setProgressFeedback( feedback );
+	if( feedback() )
+		data::IOFactory::setProgressFeedback( feedback() );
 
 	if ( ! IOFactory::write( out_images, output, wf.c_str(), dl.c_str() ) ) {
 		if ( exitOnError ) {

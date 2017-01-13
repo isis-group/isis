@@ -22,6 +22,7 @@
 #include <stack>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
+#include "../util/progressfeedback.hpp"
 
 using boost::optional;
 
@@ -391,7 +392,7 @@ public:
 		return data[index.second];
 	}
 
-	void swapDim( unsigned short dim_a, unsigned short dim_b );
+	void swapDim( unsigned short dim_a, unsigned short dim_b, std::shared_ptr<util::ProgressFeedback> feedback=std::shared_ptr<util::ProgressFeedback>() );
 
 	/**
 	 * Get a const reference to the voxel value at the given coordinates.

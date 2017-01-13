@@ -201,7 +201,7 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") as automatic deletion was disabled for it";
+			LOG( Debug, verbose_info ) << "Not freeing pointer " << ( void * )p << " (" << ValueArray<TYPE>::staticName() << ") as automatic deletion was disabled for it";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).

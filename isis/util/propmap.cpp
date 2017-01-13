@@ -628,7 +628,7 @@ PropertyValue& PropertyMap::setValue( const PropPath &path, const ValueBase &val
 		ret = val;
 	} else if( ret.size() == 1 ) {
 		if( ret[0].apply( val ) ){ // override same type or convert if possible
-			LOG_IF( ret.getTypeID()!=val.getTypeID(), Debug, warning ) << "Storing " << val.toString( true ) << " as " << ret.toString( true ) << " as Property already has that type";
+			LOG_IF( ret.getTypeID()!=val.getTypeID(), Debug, info ) << "Storing " << val.toString( true ) << " as " << ret.toString( true ) << " as Property already has that type";
 		} else {
 			LOG( Runtime, error ) << "Property " << path << " is already set to " << ret.toString( true ) << " won't overwrite with " << val.toString( true );
 		}

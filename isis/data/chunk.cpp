@@ -266,7 +266,7 @@ size_t Chunk::useCount() const
 	return getValueArrayBase().useCount();
 }
 
-void Chunk::swapAlong( const dimensions dim ) const
+void Chunk::flipAlong( const dimensions dim ) const
 {
 	const size_t elSize = getBytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();
@@ -302,9 +302,15 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 }
 
-void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b )
+void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b, std::shared_ptr<util::ProgressFeedback> feedback)
 {
-	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin());
+	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin(),feedback);
+	//swap voxel sizes
+	auto voxel_size_query=queryValueAs<util::fvector3>("voxelSize");
+	if(voxel_size_query && dim_a<data::timeDim && dim_b<data::timeDim){
+		util::fvector3 &voxel_size=*voxel_size_query;
+		std::swap(voxel_size[dim_a],voxel_size[dim_b]);
+	}
 }
 
 Chunk::iterator Chunk::begin()

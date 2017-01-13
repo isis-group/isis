@@ -78,9 +78,9 @@ void WriteOp::applyFlipToData ( data::ValueArrayReference &dat, util::vector4< s
 }
 void WriteOp::applyFlipToData ( data::Chunk &dat )
 {
-	//iterate through all flips within than the block dimensionality
+	//iterate through all flips within the block dimensionality
 	for( std::set<data::dimensions>::const_iterator i = flip_list.begin(); i != flip_list.end() && *i < dat.getRelevantDims(); i++ ) {
-		dat.swapAlong( *i ); // .. so changing its data, will also change the data we just copied
+		dat.flipAlong( *i ); // .. so changing its data, will also change the data we just copied
 	}
 }
 
@@ -497,6 +497,16 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			saved_qform = true;
 		}
 	}
+	
+	//store voxel size (don't use voxelSize, thats without voxelGap)
+	const isis::util::Matrix4x4< double > nifti2image = util::transpose(getNiftiMatrix( props )); //use the inverse of image2nifti to extract direction vectors easier
+
+	for( int i = 0; i < 3; i++ ) {
+		//vector length of the i'th column (thats ok with vector4, because fourth element is allways 0)
+		assert(nifti2image[i][3]==0); //just to be sure
+		head->pixdim[i + 1] = util::len(nifti2image[i]); 
+	}
+
 
 	// store current orientation (into fields which hasn't been set by now)
 
@@ -561,7 +571,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		props.setValueAs( "nifti/quatern_b", head->quatern_b );
 		props.setValueAs( "nifti/quatern_c", head->quatern_c );
 		props.setValueAs( "nifti/quatern_d", head->quatern_d );
-		props.setValueAs( "nifti/qoffset", util::fvector4( {head->qoffset_x, head->qoffset_y, head->qoffset_z, 0} ) );
+		props.setValueAs( "nifti/qoffset", util::fvector4{head->qoffset_x, head->qoffset_y, head->qoffset_z, 0} );
 		props.setValueAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
 		// copy pixdim
@@ -582,7 +592,16 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 		props.setValueAs( "voxelSize",   util::fvector3{head->pixdim[1], head->pixdim[2], head->pixdim[3]} );
 		props.setValueAs( "indexOrigin", util::fvector3{0,0,0} );
 	}
-
+	
+	if(props.hasProperty("nifti/pixdim")){
+		// make a vector3 from the nifti/pixdim-list
+		const auto pixdim=props.getValueAs<util::dlist>("nifti/pixdim");
+		util::fvector3 buffer;auto pixdim3=pixdim.begin();std::advance(pixdim3,3);
+		std::copy(pixdim.begin(),pixdim3,std::begin(buffer));
+	
+		LOG_IF(!util::fuzzyEqualV(props.getValueAs<util::fvector3>("voxelSize"),buffer),Runtime,warning) 
+			<< "the stored voxel size does not fit the computed voxel size (probably from sform)";
+	}
 	// set space unit factors
 	props.refValueAs<util::fvector3>( "voxelSize"   ) *= size_fac;
 	props.refValueAs<util::fvector3>( "indexOrigin" ) *= size_fac;
@@ -1202,7 +1221,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 	util::dlist vsize = props.getValueAs<util::dlist>( "nifti/pixdim" );
 	vsize.resize( 3, 1 );
 	props.setValueAs( "voxelSize", util::Value<util::dlist>( vsize ).as<util::fvector3>() );
-	LOG_IF( props.hasProperty( "voxelSize" ), Debug, info ) << "Computed voxelSize=" << props.queryProperty( "voxelSize" ) << " from pixdim " << props.queryProperty( "nifti/pixdim" );
+	LOG( Debug, info ) << "Computed voxelSize=" << props.property( "voxelSize" ) << " from pixdim " << props.property( "nifti/pixdim" );
 }
 bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
@@ -1215,7 +1234,6 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 	for( int i = 0; i < 3; i++ ) {
 		const util::dvector4 buff = nifti2image[i];
 		std::copy(buff.begin(), buff.begin() + 3, std::begin(col[i]) ); //nth column in image2nifti
-		head->pixdim[i + 1] = util::len(col[i]); //store voxel size (don't use voxelSize, thats without voxelGap)
 		util::normalize(col[i]); // normalize the columns
 	}
 

@@ -120,9 +120,24 @@ bool Image::isClean()const
 	return clean;
 }
 
-void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b )
+void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::shared_ptr<util::ProgressFeedback> feedback )
 {
-	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin() );
+	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback ); // this runs through all chunks as the Iterator does that
+	for(auto pCh:lookup){ //but we still have to reshape the chunks
+		auto shape=pCh->getSizeAsVector();
+		std::swap(shape[dim_a],shape[dim_b]);
+		pCh->init(shape);
+	}
+	
+	//swap voxel sizes
+	auto voxel_size_query=queryValueAs<util::fvector3>("voxelSize");
+	if(voxel_size_query && dim_a<data::timeDim && dim_b<data::timeDim){
+		util::fvector3 &voxel_size=*voxel_size_query;
+		std::swap(voxel_size[dim_a],voxel_size[dim_b]);
+	}
+		
+	//voxelsize is needed to be equal inside Images so there should be no voxelSize in the chunks
+	assert(!getChunkAt(0).hasProperty("voxelSize"));
 }
 
 
@@ -513,6 +528,8 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 
 	if( ID && ( scaling.first.isEmpty() || scaling.second.isEmpty() ) ) // if we have an ID but no scaling, compute it
 		conv_op.scale = getScalingTo( ID );
+	else
+		conv_op.scale = scaling;
 
 	conv_op.ID = ID;
 

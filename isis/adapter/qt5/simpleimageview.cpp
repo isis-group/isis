@@ -47,7 +47,7 @@ std::pair<double,double> TransferFunction::updateScale(qreal bottom, qreal top){
 	const util::Value<double> min = minmax.first->as<double>()+ bottom*(minmax.second->as<double>()-minmax.first->as<double>());
 	const util::Value<double> max= minmax.second->as<double>()*top;
 	scale= c->getScaling(min,max);
-	return std::make_pair(min,max);
+	return std::pair<double,double>(min,max);
 }
 
 class MagnitudeTransfer : public TransferFunction{
@@ -185,6 +185,11 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	if(!title.isEmpty())
 		setWindowTitle(title);
 	
+	const float dpmm_x=physicalDpiX()/25.4, dpmm_y=physicalDpiY()/25.4;
+	
+	auto voxelsize=img.getValueAs<util::fvector3>("voxelSize");
+	graphicsView->scale(voxelsize[0]*dpmm_x,voxelsize[1]*dpmm_y);
+	
 	auto minmax=img.getMinMax();
 
 	if(is_complex){
@@ -216,14 +221,19 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	
 	QWidget *gradient;
 	if(img.hasProperty("window/max") && img.hasProperty("window/min")){
-		const double bottom=(img.getValueAs<double>("window/min")-minmax.first->as<double>()) / (minmax.second->as<double>()-minmax.first->as<double>());
-		const double top=img.getValueAs<double>("window/max") / minmax.second->as<double>();
-		
+		const double min=minmax.first->as<double>(),max=minmax.second->as<double>();
+		const double hmin=img.getValueAs<double>("window/min"),hmax=img.getValueAs<double>("window/max");
+		double bottom=(hmin-min) / (max-min);
+		double top= hmax / max;
+
+		if(std::isinf(bottom))bottom=0;
+		if(std::isinf(top))top=1;
+
 		transfer_function->updateScale(bottom,top);
 		
-		gradient=new GradientWidget(this,bottom,top);
+		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()),bottom,top);
 	} else 
-		gradient=new GradientWidget(this);
+		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()));
 	
 	dynamic_cast<QGridLayout*>(layout())->addWidget(gradient,0,2,1,1);
 	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
@@ -243,6 +253,7 @@ void SimpleImageView::timeChanged(int time)
 void SimpleImageView::updateImage()
 {
 	graphicsView->scene()->clear();
+
 	auto transfer=transfer_function; //lambdas cannot bind members ??
 	graphicsView->scene()->addPixmap(
 		QPixmap::fromImage(

@@ -377,10 +377,10 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 			//store a copy of the original data and the rest in the checker
 			SwapCheck swap_check( ch1, data::rowDim, sizeRange );
 
-			ch1.swapAlong( data::rowDim );//swap ch1
+			ch1.flipAlong( data::rowDim );//swap ch1
 			BOOST_CHECK_EQUAL( ch1.foreachVoxel( swap_check ), 0 ); //run check for swapped ch1 and and original copy in swap_check
 
-			ch1.swapAlong( data::rowDim );//swap it back
+			ch1.flipAlong( data::rowDim );//swap it back
 			BOOST_CHECK( ch1.compare( swap_check.orig ) == 0 ); //check for equality with the original copy in swap_check
 		}
 	}

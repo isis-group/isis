@@ -17,28 +17,4 @@
  * 
  */
 
-#ifndef GRADIENTWIDGET_H
-#define GRADIENTWIDGET_H
-
-#include <QWidget>
-
-class GradientWidget : public QWidget
-{
-    Q_OBJECT
-    QLinearGradient shade;
-	qreal bottom,top;
-	std::pair< double, double > image_rage;
-	const QString min_str,max_str;
-
-	bool adaptWidth(QPainter* p, QString text, int offset);
-protected:
-	QImage generateShade();
-	void paintEvent(QPaintEvent * event) override;
-	void mouseMoveEvent(QMouseEvent * ) override;
-public:
-	GradientWidget(QWidget* parent, std::pair< double, double > in_image_rage, qreal bottom = 0, qreal top = 1);
-signals:
-	void scaleUpdated(qreal bottom, qreal top);
-};
-
-#endif // GRADIENTWIDGET_H
+#include "isisitkimage.hpp"

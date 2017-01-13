@@ -48,7 +48,7 @@ macro( add_lib name sources deps private_deps soversion version)
 	endforeach(_FILE ${${name}-exported-deps})
 	
 	if(${name}-exported-deps)
-		message(STATUS "${name} will have external dependencies (stored in \${${name}-exported-deps})")
+		message(STATUS "${name} (${${name}_lib}) will have external dependencies (stored in \${${name}-exported-deps})")
 		foreach(_FILE ${${name}-exported-deps})
 			message(STATUS "== ${_FILE}")
 		endforeach(_FILE ${${name}-exported-deps})
@@ -107,10 +107,10 @@ else(ISIS_USE_LIBOIL)
 	set(LibOil_LIBRARY "")
 endif(ISIS_USE_LIBOIL)
 
-
 ############################################################
 # build the core library
 ############################################################
+find_package(Threads)
 
 # add source files to this parameter list
 file(GLOB CORE_SRC_FILES "data/*.cpp" "util/*.cpp")
@@ -120,7 +120,8 @@ file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${Boost_LIBRARIES}" "${LibOil_LIBRARY};${CURSES_LIBRARIES};${CMAKE_DL_LIBS};${LIB_JSONCPP}"
+	"${Boost_LIBRARIES}" #deps
+	"${LibOil_LIBRARY};${CURSES_LIBRARIES};${CMAKE_DL_LIBS};${LIB_JSONCPP};Threads::Threads" #private deps
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 

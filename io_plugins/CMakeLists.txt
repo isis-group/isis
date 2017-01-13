@@ -20,6 +20,7 @@ option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
 option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
+option(ISIS_IOPLUGIN_IMAGEMAGIC "Enable plugin for ImageMagic based IO" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (tar, gz, bzip2 and Z)" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
@@ -97,6 +98,21 @@ if(ISIS_IOPLUGIN_PNG)
 
 	set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(ISIS_IOPLUGIN_PNG)
+
+############################################################
+# PNG plugin
+############################################################
+if(ISIS_IOPLUGIN_IMAGEMAGIC)
+	find_package(ImageMagick REQUIRED Magick++)
+	include_directories(${ImageMagick_INCLUDE_DIRS})
+
+	add_library(isisImageFormat_ImageMagick SHARED imageFormat_ImageMagick.cpp)
+	target_link_libraries(isisImageFormat_ImageMagick ${isis_core_lib} ${ImageMagick_LIBRARIES})
+	
+	add_definitions("-DMAGICKCORE_HDRI_ENABLE=0" "-DMAGICKCORE_QUANTUM_DEPTH=16")
+
+	set(TARGETS ${TARGETS} isisImageFormat_ImageMagick)
+endif(ISIS_IOPLUGIN_IMAGEMAGIC)
 
 ############################################################
 # COMP proxy plugin

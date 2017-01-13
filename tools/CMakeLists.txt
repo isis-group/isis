@@ -65,5 +65,17 @@ if(ISIS_QT5)
 	build_manpage(isisview "simple mri data viewer")
 
 	install(TARGETS isisview RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+	build_manpage(isisview "display MRI data")
 endif(ISIS_QT5)
 
+if(ISIS_ITK)
+	find_package(ITK REQUIRED ITKCommon ITKTransform)
+	include(${ITK_USE_FILE})
+
+	add_executable(isistransform isistransform.cpp)
+	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk_lib} ${ITK_LIBRARIES})
+	set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+	
+	install(TARGETS isistransform RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
+	build_manpage(isistransform "geometricaly transform MR images")
+endif(ISIS_ITK)

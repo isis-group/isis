@@ -26,6 +26,7 @@
 
 #include "progparameter.hpp"
 #include "propmap.hpp"
+#include "progressfeedback.hpp"
 
 namespace isis
 {
@@ -94,14 +95,11 @@ public:
 	 * addLogging<MyDebugModule>("MyLog");
 	 * \endcode will control \code LOG(MyLogModule,...) << ... \endcode and \code LOG(MyDebugModule,...) << ... \endcode through the parameter "-dMyLog".
 	 *
-	 * \param name the name used for the program parameters and their description
-	 *
 	 * \note This does not set the logging handler. That is done by reimplementing getLogHandler( std::string module, isis::LogLevel level )const.
-	 * \note If name is an empty string (""), its assumed as the logging for the application.
 	 */
-	template<typename MODULE> void addLogging( std::string name="" ) {
-		addLoggingParameter( name );
-		logs[name].push_back( &Application::setLog<MODULE> );
+	template<typename MODULE> void addLogging() {
+		addLoggingParameter( MODULE::name() );
+		logs[MODULE::name()].push_back( &Application::setLog<MODULE> );
 	}
 	/**
 	 * Removes a logging parameter from the application.
@@ -150,6 +148,8 @@ public:
 	}
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void );
+	
+	static std::shared_ptr<util::ProgressFeedback>& feedback();
 };
 }
 }

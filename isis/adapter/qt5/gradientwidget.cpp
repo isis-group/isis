@@ -21,31 +21,80 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <iostream>
+#include <cmath>
 
-GradientWidget::GradientWidget(QWidget* parent, qreal in_bottom, qreal in_top):QWidget(parent),shade(0, 0, 0, 255),top(in_top),bottom(in_bottom)
+GradientWidget::GradientWidget(QWidget* parent, std::pair< double, double > in_image_rage, qreal in_bottom, qreal in_top):
+bottom(1-in_bottom),top(1-in_top),image_rage(in_image_rage),min_str(QString::number(in_image_rage.first,'g',4)),max_str(QString::number(in_image_rage.second,'g',4))
 {
-	setMinimumWidth(15);
-	setMaximumWidth(15);
+	setMinimumWidth(30);
+	setMaximumWidth(30);
 	setMouseTracking(true);
+	if(bottom>1)bottom=1;
+	if(top<0)top=0;
 }
+
+bool GradientWidget::adaptWidth(QPainter *p,QString text, int offset)
+{
+	const int num_width=p->boundingRect(QRect(),Qt::AlignLeft|Qt::TextSingleLine,text).width();
+	if(num_width+ 30 >= width()){
+		setMinimumWidth(num_width+ offset+1);
+		setMaximumWidth(num_width+ offset+1);
+		return true;
+	} else
+		return false;
+}
+
 
 void GradientWidget::paintEvent(QPaintEvent* event)
 {
 	QPainter p(this);
+	
+	const int text_hight=p.boundingRect(QRect(),Qt::AlignLeft|Qt::TextSingleLine,"0").height();
+	
+	if(adaptWidth(&p,min_str,30) || adaptWidth(&p,max_str,30))
+		return;
+	
+	p.eraseRect(15,0,width()-15,height());
+	
+	for(unsigned int i = 0; i < 10; i++)
+		p.drawLine(15,i*height()/10,25,i*height()/10);
+
+	if(height()>250)
+		for(unsigned int i = 0; i < 50; i++)
+			p.drawLine(15,i*height()/50,20,i*height()/50);
+
+	const int top_pos=top*height();
+	const int bottom_pos=bottom*height();
+
 	p.drawImage(0, 0, generateShade());
 
 	p.setPen(Qt::blue);
-	p.drawRect(0, 0, width() - 1, height() - 1);
+	p.drawRect(0, 0, 15 - 1, height() - 1);
 
 	p.setBrush(QBrush(QColor(0, 0, 191, 50)));
 
 	p.setPen(QPen(QColor(255, 255, 255, 191), 1));
-	p.drawRect(QRect(0,bottom*height()-3,width(),6));
-	
-	
-	
+	p.drawRect(QRect(0,bottom_pos-3,25,6));
+
 	p.setPen(QPen(QColor(0, 0, 0, 191), 1));
-	p.drawRect(QRect(0,top*height()-3,width(),6));
+	p.drawRect(QRect(0,top_pos-3,25,6));
+	
+	if(top_pos>text_hight && top_pos<height()-text_hight){
+		QString number=QString::number(image_rage.first+(1-top)*(image_rage.second-image_rage.first),'g',4);
+		if(adaptWidth(&p,number,30))
+			return;
+		p.drawText(QPoint(30,top_pos+text_hight/2-3),number);
+	}
+	
+	if(bottom_pos<height()-text_hight && bottom_pos>text_hight){
+		QString number=QString::number(image_rage.first+(1-bottom)*(image_rage.second-image_rage.first),'g',4);
+		if(adaptWidth(&p,number,30))
+			return;
+		p.drawText(QPoint(30,bottom_pos+text_hight/2-3),number);
+	}
+	
+	p.drawText(QPoint(30,text_hight-6),max_str);
+	p.drawText(QPoint(30,height()),min_str);
 }
 
 
@@ -55,9 +104,9 @@ QImage GradientWidget::generateShade()
 	shade.setColorAt(bottom, Qt::black);
 	shade.setColorAt(top, Qt::white);
 
-	QImage ret(size(), QImage::Format_Grayscale8);
+	QImage ret(QSize(15,height()), QImage::Format_Grayscale8);
 	QPainter p(&ret);
-	p.fillRect(rect(), shade);
+	p.fillRect(QRect(0,0,15,height()), shade);
 	return ret;
 }
 
@@ -68,8 +117,8 @@ void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 	if(pos<0 || pos > height())
 		return;
 	
-	const int bottom_dist=abs(bottom*height()-pos);
-	const int top_dist=   abs(   top*height()-pos);
+	const int bottom_dist=std::abs(bottom*height()-pos);
+	const int top_dist=   std::abs(   top*height()-pos);
 	
 	if( bottom_dist< 6 ) {
 		setCursor(Qt::PointingHandCursor);
