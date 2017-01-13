@@ -72,7 +72,7 @@ if(ISIS_ITK)
 	include(${ITK_USE_FILE})
 
 	add_executable(isistransform isistransform.cpp)
-	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk_lib} ${ITK_LIBRARIES})
+	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk4_lib} ${ITK_LIBRARIES})
 	set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 	
 	install(TARGETS isistransform RUNTIME DESTINATION bin COMPONENT "CLI_Tools")

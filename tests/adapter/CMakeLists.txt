@@ -11,7 +11,7 @@ if(ISIS_ITK)
 	include(${ITK_USE_FILE})
 
 	add_executable( itktest itktest.cpp )
-	target_link_libraries( itktest ${Boost_LIBRARIES} ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk_lib} ${ITK_LIBRARIES})
+	target_link_libraries( itktest ${Boost_LIBRARIES} ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk4_lib} ${ITK_LIBRARIES})
 	add_test(NAME itktest COMMAND itktest)
 endif(ISIS_ITK)
 

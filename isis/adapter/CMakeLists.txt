@@ -29,7 +29,7 @@ if(ISIS_QT5)
 	
 	add_lib(isis_adapter_qt5
 		"${ISIS_QT5_LIBRARY_FILES};${UI_FILE}"
-		"" "${isis_core_lib};Qt5::Widgets"
+		"" "${isis_core_lib};Qt5::Widgets;Threads::Threads"
 		${ISIS_QT_VERSION_SO} ${ISIS_QT_VERSION_API}
 	)
 
@@ -43,17 +43,17 @@ if(ISIS_ITK)
 	find_package(ITK REQUIRED ITKCommon ITKTransform)
 	include(${ITK_USE_FILE})
 	
-	file(GLOB ISIS_ITK_LIBRARY_FILES "itk/*.cpp")
-	file(GLOB ISIS_ITK_HEADER_FILES "itk/*.hpp")
+	file(GLOB ISIS_ITK_LIBRARY_FILES "itk4/*.cpp")
+	file(GLOB ISIS_ITK_HEADER_FILES "itk4/*.hpp")
 
-	add_lib(isis_adapter_itk
+	add_lib(isis_adapter_itk4
 		"${ISIS_ITK_LIBRARY_FILES}"
 		"" "${isis_core_lib};${isis_math_lib};${ITK_LIBRARIES}"
 		"0.0.0" "0.0.0"
 	)
 
 	# export header files
-	install(FILES ${ISIS_ITK_HEADER_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/adapter/qt5 COMPONENT Development)
+	install(FILES ${ISIS_ITK_HEADER_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/adapter/itk4 COMPONENT Development)
 endif(ISIS_ITK)
 
 ############################################################
