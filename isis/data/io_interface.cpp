@@ -45,7 +45,7 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
+bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -54,7 +54,7 @@ bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util:
 		return false;
 	}
 }
-util::PropertyMap::key_type FileFormat::hasOrTell(const std::initializer_list< util::PropertyMap::key_type > names, const util::PropertyMap& object, LogLevel level)
+util::PropertyMap::key_type hasOrTell(const std::initializer_list< util::PropertyMap::key_type > names, const util::PropertyMap& object, LogLevel level)
 {
 	for(const util::PropertyMap::key_type &key:names){ // iterate through all props
 		if ( object.hasProperty( key ) )
@@ -64,7 +64,7 @@ util::PropertyMap::key_type FileFormat::hasOrTell(const std::initializer_list< u
 	return util::PropertyMap::key_type();
 }
 
-optional< util::PropertyValue > FileFormat::extractOrTell(const util::PropertyMap::key_type &name, util::PropertyMap& object, LogLevel level)
+optional< util::PropertyValue > extractOrTell(const util::PropertyMap::key_type &name, util::PropertyMap& object, LogLevel level)
 {
 	optional< util::PropertyValue > ret;
 	boost::optional< util::PropertyValue& > found=object.queryProperty(name);
@@ -76,7 +76,7 @@ optional< util::PropertyValue > FileFormat::extractOrTell(const util::PropertyMa
 	LOG_IF(!ret, Runtime, level ) << "Missing property " << name;
 	return ret;
 }
-optional< util::PropertyValue > FileFormat::extractOrTell(const std::initializer_list< util::PropertyMap::key_type > names, util::PropertyMap& object, LogLevel level)
+optional< util::PropertyValue > extractOrTell(const std::initializer_list< util::PropertyMap::key_type > names, util::PropertyMap& object, LogLevel level)
 {
 	optional< util::PropertyValue > ret;
 	for(const util::PropertyMap::key_type &key:names){ // iterate through all props

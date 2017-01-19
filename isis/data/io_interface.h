@@ -24,44 +24,38 @@ namespace isis
 {
 namespace image_io
 {
-
-/// Base class for image-io-plugins
-class FileFormat
-{
-public:
-	enum io_modes {read_only = 1, write_only = 2, both = 3};
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns the property's exact path if it exists, boost::none otherwise
 	 */
-	static bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
+	bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * \copydoc hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 	 * \returns the property if it exists, boost::none otherwise
 	 */
-	static boost::optional<util::PropertyValue> extractOrTell( const util::PropertyMap::key_type &name, util::PropertyMap &object, LogLevel level );
+	boost::optional<util::PropertyValue> extractOrTell( const util::PropertyMap::key_type &name, util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * Check if one of the given properties exists in the given PropMap.
 	 * If no property exists, a message will be sent to Log using the given loglevel.
 	 * \returns the first found property's exact path, boost::none otherwise
 	 */
-	static util::PropertyMap::key_type hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level );
+	util::PropertyMap::key_type hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * \copydoc hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level )
 	 * \returns the first found property, boost::none otherwise
 	 */
-	static boost::optional<util::PropertyValue> extractOrTell( const std::initializer_list<util::PropertyMap::key_type> names, util::PropertyMap &object, LogLevel level );
+	boost::optional<util::PropertyValue> extractOrTell( const std::initializer_list<util::PropertyMap::key_type> names, util::PropertyMap &object, LogLevel level );
 	
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
-	template<typename TYPE> static bool
+	template<typename TYPE> bool
 	transformOrTell( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.queryProperty( to );
@@ -70,6 +64,12 @@ public:
 
 		return false;
 	}
+
+/// Base class for image-io-plugins
+class FileFormat
+{
+public:
+	enum io_modes {read_only = 1, write_only = 2, both = 3};
 protected:
 	/// \return the file-suffixes the plugin supports
 	virtual util::istring suffixes( io_modes modes = both )const = 0;
