@@ -3,10 +3,15 @@
 #endif
 
 #include <boost/filesystem.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 
 #include "../util/log.hpp"
+#include "../util/tmpfile.hpp"
+#include "fileptr.hpp"
 #include "common.hpp"
 #include "io_interface.h"
 
@@ -43,6 +48,25 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 					<< "Failed to write image to " << util::MSubject(uniquePath) << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
+}
+
+std::list<data::Chunk> FileFormat::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+	data::FilePtr ptr(filename);
+	return load(ptr.getRawAddress(),ptr.getLength(),dialect,feedback);
+}
+
+std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+	util::TmpFile tmp("isis_streamio_adapter");
+	boost::iostreams::copy(source,boost::iostreams::file_sink(tmp.c_str()));
+	return load(tmp.native(),dialect,feedback);
+}
+
+std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+	util::TmpFile tmp("isis_memio_adapter");
+	std::ofstream stream(tmp.c_str());
+	stream.exceptions ( std::ifstream::badbit );
+	stream.write(std::static_pointer_cast<const char>(source).get(),length);
+	return load(tmp.native(),dialect,feedback);
 }
 
 bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )

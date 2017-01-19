@@ -15,6 +15,8 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <memory>
+#include <streambuf>
 #include "image.hpp"
 #include "common.hpp"
 #include "../util/istring.hpp"
@@ -109,7 +111,7 @@ public:
 	virtual bool tainted()const {return true;}
 
 	/**
-	 * Load data into the given chunk list.
+	 * Load data from file into the given chunk list.
 	 * I case of an error std::runtime_error will be thrown.
 	 * \param chunks the chunk list where the loaded chunks shall be added to
 	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
@@ -117,7 +119,29 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) = 0; //@todo should be locked
+	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
+
+	/**
+	 * Load data from stream into the given chunk list.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param chunks the chunk list where the loaded chunks shall be added to
+	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
+	 * \returns the amount of loaded chunks.
+	 */
+	virtual std::list<data::Chunk> load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
+
+	/**
+	 * Load data from memory into the given chunk list.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param chunks the chunk list where the loaded chunks shall be added to
+	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
+	 * \returns the amount of loaded chunks.
+	 */
+	virtual std::list<data::Chunk> load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
