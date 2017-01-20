@@ -47,11 +47,8 @@ typedef std::basic_string<char, _internal::ichar_traits>    istring;
 
 namespace std
 {
-template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::istring &s )
-{
-	return out << s.c_str();
-}
+// adapter for sending istring to normal ostream
+std::ostream &operator<<( std::ostream &out, const isis::util::istring &s );
 }
 
 namespace boost

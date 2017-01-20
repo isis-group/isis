@@ -852,7 +852,7 @@ namespace std
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap::PropPath &s )
 {
-	isis::util::listToOStream( s.begin(), s.end(), out, std::string( 1, s.pathSeperator ), "", "" );
+	isis::util::listToOStream( s.begin(), s.end(), out, std::string( 1, s.pathSeperator ).c_str(), "", "" );
 	return out;
 }
 /// Streaming output for PropertyMap
