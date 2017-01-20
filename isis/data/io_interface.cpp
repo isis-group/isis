@@ -50,23 +50,23 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-std::list<data::Chunk> FileFormat::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+std::list<data::Chunk> FileFormat::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
 	data::FilePtr ptr(filename);
-	return load(ptr.getRawAddress(),ptr.getLength(),dialect,feedback);
+	return load(ptr.getRawAddress(),ptr.getLength(),dialect,feedback,format);
 }
 
-std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
 	util::TmpFile tmp("isis_streamio_adapter");
 	boost::iostreams::copy(source,boost::iostreams::file_sink(tmp.c_str()));
-	return load(tmp.native(),dialect,feedback);
+	return load(tmp.native(),dialect,feedback,format);
 }
 
-std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ){
+std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
 	util::TmpFile tmp("isis_memio_adapter");
 	std::ofstream stream(tmp.c_str());
 	stream.exceptions ( std::ifstream::badbit );
 	stream.write(std::static_pointer_cast<const char>(source).get(),length);
-	return load(tmp.native(),dialect,feedback);
+	return load(tmp.native(),dialect,feedback,format);
 }
 
 bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )

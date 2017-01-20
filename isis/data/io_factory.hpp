@@ -92,7 +92,9 @@ public:
 	 * \param suffix_override if given, it will override the suffix of the given file (and thus enforce usage of a format)
 	 * \param dialect if given, the plugins supporting the dialect are preferred
 	 */
-	static FileFormatList getFileFormatList( std::string filename, util::istring suffix_override = "", util::istring dialect = "" );
+	static FileFormatList getFileFormatList(std::list<util::istring> format, util::istring dialect);
+	
+	static std::list<util::istring> getFormatStack( std::string filename );
 	/**
 	 *  Make images out of a (unordered) list of chunks.
 	 *  Uses the chunks in the chunklist to fit them together into images.

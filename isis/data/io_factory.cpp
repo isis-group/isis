@@ -184,7 +184,10 @@ IOFactory &IOFactory::get()
 std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, util::istring suffix_override, util::istring dialect )
 {
 	FileFormatList formatReader;
-	formatReader = getFileFormatList( filename.string(), suffix_override, dialect );
+	const std::list<util::istring> formatstack = suffix_override.empty() ?
+		getFormatStack(filename.string()) : util::stringToList<util::istring>(suffix_override,'.');
+
+	formatReader = getFileFormatList(formatstack , dialect );
 	const util::NoSubject with_dialect = dialect.empty() ?
 	                                   util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
 
@@ -204,7 +207,7 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 					<< "plugin to load file" << with_dialect << " " << filename << ": " << it->getName();
 
 			try {
-				std::list<data::Chunk> loaded=it->load( filename.native(), dialect, m_feedback );
+				std::list<data::Chunk> loaded=it->load( filename.native(), dialect, m_feedback, formatstack );
 				for( Chunk & ref :  loaded ) {
 					ref.refValueAsOr( "source", filename.native() ); // set source to filename or leave it if its already set
 				}
@@ -226,43 +229,41 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, u
 	return std::list<Chunk>();//no plugin of proposed list could load file
 }
 
+std::list<util::istring> IOFactory::getFormatStack( std::string filename ){
+	const boost::filesystem::path fname( filename );
+	std::list<util::istring> ret = util::stringToList<util::istring>( fname.filename().string(), '.' ); // get all suffixes (and the basename)
+	if( !ret.empty() )ret.pop_front(); // remove the basename
+	return ret;
+}
 
-IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, util::istring suffix_override, util::istring dialect )
+IOFactory::FileFormatList IOFactory::getFileFormatList( std::list<util::istring> format, util::istring dialect )
 {
-	std::list<std::string> ext;
 	FileFormatList ret;
+	std::list<util::istring> buffer=format;
 
-	if( suffix_override.empty() ) { // detect suffixes from the filename
-		const boost::filesystem::path fname( filename );
-		ext = util::stringToList<std::string>( fname.filename().string(), '.' ); // get all suffixes
-
-		if( !ext.empty() )ext.pop_front(); // remove the first "suffix" - actually the basename
-	} else ext = util::stringToList<std::string>( suffix_override, '.' );
-
-	while( !ext.empty() ) {
-		const util::istring wholeName( util::listToString( ext.begin(), ext.end(), ".", "", "" ).c_str() ); // (re)construct the rest of the suffix
+	while( !buffer.empty() ) {
+		const util::istring wholeName=util::listToString<util::istring>( buffer.begin(), buffer.end(), ".", "", "" ); // (re)construct the rest of the suffix
 		const std::map<util::istring, FileFormatList>::iterator found = get().io_suffix.find( wholeName );
 
 		if( found != get().io_suffix.end() ) {
 			LOG( Debug, verbose_info ) << found->second.size() << " plugins support suffix " << wholeName;
 			ret.insert( ret.end(), found->second.begin(), found->second.end() );
 		}
-
-		ext.pop_front();
+		buffer.pop_front(); // remove one suffix, and try again
 	}
 
 	if( dialect.empty() ) {
 		LOG_IF( ret.size() > 1, Debug, info ) << "No dialect given. Will use all " << ret.size() << " plugins";
 	} else {//remove everything which lacks the dialect if there was some given
-		auto remove_op = [dialect,filename](FileFormatList::reference ref){
-			const util::istring dia = ref->dialects( filename );
+		auto remove_op = [dialect, format](FileFormatList::reference ref){
+			const util::istring dia = ref->dialects( format );
 			std::list<util::istring> splitted = util::stringToList<util::istring>( dia, ' ' );
 			const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 			LOG_IF( ret, image_io::Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
 			return ret;
 		};
 		ret.remove_if( remove_op );
-		LOG( Debug, info ) << "Removed everything which does not support the dialect " << util::MSubject( dialect ) << " on " << filename << "(" << ret.size() << " plugins left)";
+		LOG( Debug, info ) << "Removed everything which does not support the dialect " << util::MSubject( dialect ) << " on the format " << format << "(" << ret.size() << " plugins left)";
 	}
 
 	return ret;
@@ -386,7 +387,10 @@ bool IOFactory::write( const data::Image &image, const std::string &path, util::
 
 bool IOFactory::write( std::list< isis::data::Image > images, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
-	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
+	const std::list<util::istring> formatstack = suffix_override.empty() ?
+		getFormatStack(path) : util::stringToList<util::istring>(suffix_override,'.');
+
+	const FileFormatList formatWriter = get().getFileFormatList( formatstack, dialect );
 
 	for( std::list<data::Image>::reference ref :  images ) {
 		ref.checkMakeClean();

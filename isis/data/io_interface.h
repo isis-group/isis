@@ -17,6 +17,7 @@
 #include <string>
 #include <memory>
 #include <streambuf>
+#include <deque>
 #include "image.hpp"
 #include "common.hpp"
 #include "../util/istring.hpp"
@@ -105,7 +106,7 @@ public:
 
 
 	/// \return a space separated list of the dialects the plugin supports
-	virtual util::istring dialects( const std::string &/*filename*/ )const {return util::istring();};
+	virtual util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const {return util::istring();};
 
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
@@ -119,7 +120,8 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
+	virtual std::list<data::Chunk> 
+	load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
 
 	/**
 	 * Load data from stream into the given chunk list.
@@ -130,7 +132,8 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
+	virtual std::list<data::Chunk> 
+	load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
 
 	/**
 	 * Load data from memory into the given chunk list.
@@ -141,7 +144,8 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
+	virtual std::list<data::Chunk> 
+	load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.

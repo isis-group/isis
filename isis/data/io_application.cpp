@@ -149,8 +149,8 @@ void IOApplication::printHelp( bool withHidden ) const
 			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
-			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects( "" ).c_str() );
-			std::cerr << "\tsupported suffixes: " << util::listToString( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
+			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects( ).c_str() );
+			std::cerr << "\tsupported suffixes: " << util::listToString<util::istring>( suff.begin(), suff.end(), "\", \"", "\"", "\"" ).c_str()  << std::endl;
 
 			if( !dialects.empty() )
 				std::cerr << "\tsupported dialects: " << util::listToString( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
