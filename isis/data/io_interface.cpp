@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/file.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -62,11 +63,8 @@ std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> &source, cons
 }
 
 std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
-	util::TmpFile tmp("isis_memio_adapter");
-	std::ofstream stream(tmp.c_str());
-	stream.exceptions ( std::ifstream::badbit );
-	stream.write(std::static_pointer_cast<const char>(source).get(),length);
-	return load(tmp.native(),dialect,feedback,format);
+	boost::interprocess::ibufferstream buffer(std::static_pointer_cast<const char>(source).get(),length);
+	return load(*buffer.rdbuf(),dialect,feedback,format);
 }
 
 bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
