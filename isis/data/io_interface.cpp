@@ -51,20 +51,27 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-std::list<data::Chunk> FileFormat::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
+std::list<data::Chunk> FileFormat::load( const std::string &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	// set up progress bar if its enabled but don't fiddle with it if its set up already
+	if( feedback && feedback->getMax() == 0 ) {
+		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename );
+	}
 	data::FilePtr ptr(filename);
-	return load(ptr.getRawAddress(),ptr.getLength(),dialect,feedback,format);
+	std::list<data::Chunk> ret=load(ptr.getRawAddress(),ptr.getLength(),formatstack,dialect,feedback);
+	for(data::Chunk &ref:ret)
+		ref.refValueAsOr( "source", filename );// set source to filename or leave it if its already set
+	return ret;
 }
 
-std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
-	util::TmpFile tmp("isis_streamio_adapter");
-	boost::iostreams::copy(source,boost::iostreams::file_sink(tmp.c_str()));
-	return load(tmp.native(),dialect,feedback,format);
-}
-
-std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ){
+std::list<data::Chunk> FileFormat::load( std::shared_ptr<const void> source, size_t length, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	boost::interprocess::ibufferstream buffer(std::static_pointer_cast<const char>(source).get(),length);
-	return load(*buffer.rdbuf(),dialect,feedback,format);
+	return load(buffer.rdbuf(),formatstack,dialect,feedback);
+}
+
+std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	util::TmpFile tmp("isis_streamio_adapter");
+	boost::iostreams::copy(*source,boost::iostreams::file_sink(tmp.c_str()));
+	return load(tmp.native(),formatstack,dialect,feedback);
 }
 
 bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )

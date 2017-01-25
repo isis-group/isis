@@ -69,7 +69,7 @@ void IOApplication::addInput ( util::ParameterMap &parameters, const std::string
 	parameters[std::string( "in" ) + suffix].setDescription( std::string( "input file(s) or directory(s)" ) + desc );
 	parameters[std::string( "in" ) + suffix].needed() = needed;
 
-	parameters[std::string( "rf" ) + suffix] = std::string();
+	parameters[std::string( "rf" ) + suffix] = util::slist();
 	parameters[std::string( "rf" ) + suffix].needed() = false;
 	parameters[std::string( "rf" ) + suffix].hidden() = true;
 
@@ -149,7 +149,7 @@ void IOApplication::printHelp( bool withHidden ) const
 			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
-			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects( ).c_str() );
+			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects({}).c_str() );
 			std::cerr << "\tsupported suffixes: " << util::listToString<util::istring>( suff.begin(), suff.end(), "\", \"", "\"", "\"" ).c_str()  << std::endl;
 
 			if( !dialects.empty() )
@@ -166,11 +166,11 @@ bool IOApplication::autoload( bool exitOnError,optional< util::slist& > rejected
 bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
-	std::string rf = parameters[std::string( "rf" ) + suffix];
+	util::slist rf = parameters[std::string( "rf" ) + suffix];
 	std::string dl = parameters[std::string( "rdialect" ) + suffix];
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
-			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format: " ) + rf )
+			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
 			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
@@ -180,7 +180,11 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	std::list< Image > tImages = data::IOFactory::load( input, rf.c_str(), dl.c_str(),rejected );
+	std::list<util::istring> formatstack;
+	for(const std::string &format:rf)
+		formatstack.push_back(format.c_str());
+		
+	std::list< Image > tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
 	images.splice( images.end(), tImages );
 
 	if ( images.empty() ) {

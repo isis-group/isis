@@ -25,6 +25,7 @@
 //????
 #include "chunk.hpp"
 #include "image.hpp"
+#include <boost/variant.hpp>
 
 using boost::optional;
 
@@ -38,6 +39,7 @@ class IOFactory
 public:
 	typedef std::shared_ptr< image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
+	typedef boost::variant<std::string, std::shared_ptr<const void>, std::basic_streambuf<char> *> LoadSource;
 	friend class util::Singletons;
 
 private:
@@ -54,7 +56,7 @@ public:
 	 * @return list of images created from the loaded data
 	 * @note the images a re created from all loaded files, so loading mutilple files can very well result in only one image
 	 */
-	static std::list<data::Image> load( const util::slist &paths, util::istring suffix_override = "", util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	static std::list<data::Image> load( const util::slist &paths, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
 	/**
 	 * Load a data file or directory with given filename and dialect.
 	 * @param path file or directory to load
@@ -62,10 +64,9 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of images created from the loaded data
 	 */
-	static std::list<data::Image> load( const std::string& path, util::istring suffix_override = "", util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	static std::list<data::Image> load( const std::string& path, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
 	/**
-	 * Load a data file with given filename and dialect into a chunklist.
-	 * @param chunks list to store the loaded chunks in
+	 * Load data from a file with given filename and dialect into a chunklist.
 	 * @param path file or directory to load
 	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
 	 * @param dialect dialect of the fileformat to load
@@ -73,9 +74,34 @@ public:
 	 */
 	static std::list<data::Chunk> loadChunks(
 		const std::string &path,
-		util::istring suffix_override = "",
-		util::istring dialect = "",
-		optional< util::slist&> rejected=optional< util::slist& >()
+		std::list<util::istring> formatstack = {},
+		util::istring dialect = ""
+	);
+	/**
+	 * Load data from stream with given dialect into a chunklist.
+	 * @param source stream to load from
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
+	 * @param dialect dialect of the fileformat to load
+	 * @return list of chunks (part of an image)
+	 */
+	static std::list<data::Chunk> loadChunks(
+		std::basic_streambuf<char> *source,
+		std::list<util::istring> formatstack,
+		util::istring dialect = ""
+	);
+
+	/**
+	 * Load data from stream with given dialect into a chunklist.
+	 * @param source memory pointer to load from
+	 * @param length size of the data in bytes
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
+	 * @param dialect dialect of the fileformat to load
+	 * @return list of chunks (part of an image)
+	 */
+	static std::list<data::Chunk> loadChunks(
+		std::shared_ptr<const void> source, size_t length,
+		std::list<util::istring> formatstack,
+		util::istring dialect = ""
 	);
 
 	static bool write( const data::Image &image, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
@@ -104,8 +130,10 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks, optional< isis::util::slist& > rejected=optional< isis::util::slist& >() );
 protected:
-	std::list<Chunk> loadFile( const boost::filesystem::path &filename, util::istring suffix_override = "", util::istring dialect = "" );
-	std::list<Chunk> loadPath(const boost::filesystem::path& path, util::istring suffix_override, util::istring dialect, optional< util::slist& > rejected=optional< util::slist& >());
+	std::list<Chunk> loadFile( const boost::filesystem::path &filename, std::list<util::istring> formatstack = {}, util::istring dialect = "" )throw( std::runtime_error & );
+	std::list<Chunk> loadStream( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, util::istring dialect = "" )throw( std::runtime_error & );
+	std::list<Chunk> loadMem( std::shared_ptr<const void> source, size_t length, std::list<util::istring> formatstack, util::istring dialect = "" )throw( std::runtime_error & );
+	std::list<Chunk> loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack = {}, util::istring dialect="", optional< util::slist& > rejected=optional< util::slist& >());
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

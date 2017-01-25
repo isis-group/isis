@@ -106,7 +106,7 @@ public:
 
 
 	/// \return a space separated list of the dialects the plugin supports
-	virtual util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const {return util::istring();};
+	virtual util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const {return util::istring();};
 
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
@@ -121,7 +121,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
+	load( const std::string &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Load data from stream into the given chunk list.
@@ -133,7 +133,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(std::basic_streambuf<char> &source, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
+	load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Load data from memory into the given chunk list.
@@ -145,7 +145,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load( std::shared_ptr<const void> source, size_t length, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback, std::list<util::istring> format ); //@todo should be locked
+	load( std::shared_ptr<const void> source, size_t length, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
