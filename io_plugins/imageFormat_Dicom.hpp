@@ -68,13 +68,13 @@ public:
 	static void parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, isis::util::PropertyMap &map );
 	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const util::istring &dialect )const;
 	static void sanitise( util::PropertyMap &object, util::istring dialect );
-	std::string getName()const;
-	util::istring dialects( const std::string &filename )const;
+	std::string getName()const override;
+	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override;
 
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
-	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
+	std::list<data::Chunk> load( const std::string &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw( std::runtime_error & )override;
+	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 
-	bool tainted()const;
+	bool tainted()const override;
 };
 }
 }

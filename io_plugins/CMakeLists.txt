@@ -22,7 +22,8 @@ option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_IMAGEMAGIC "Enable plugin for ImageMagic based IO" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (tar, gz, bzip2 and Z)" ON)
+option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (gz, bzip2 and Z)" ON)
+option(ISIS_IOPLUGIN_TAR "Enable proxy plugin for reading tar archives" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
 option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
 option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
@@ -118,8 +119,6 @@ endif(ISIS_IOPLUGIN_IMAGEMAGIC)
 # COMP proxy plugin
 ############################################################
 if(ISIS_IOPLUGIN_COMP)
-  find_package(Boost REQUIRED COMPONENTS iostreams)
-
   option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
   find_library(LIB_BZ2 "bz2")
@@ -141,6 +140,15 @@ if(ISIS_IOPLUGIN_COMP)
   target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${COMP_LIBS})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
+
+############################################################
+# COMP proxy plugin
+############################################################
+if(ISIS_IOPLUGIN_TAR)
+  add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar.cpp)
+  target_link_libraries(isisImageFormat_tar_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY})
+  set(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
+endif(ISIS_IOPLUGIN_TAR)
 
 ############################################################
 # FLIST proxy plugin

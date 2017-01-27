@@ -132,7 +132,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::list<util::istring> &/*formatstack*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
 
@@ -512,7 +512,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, std::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load( const std::string &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & )
 {
 	DcmFileFormat dcfile;
 	OFCondition loaded = dcfile.loadFile( filename.c_str() );
