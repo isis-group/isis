@@ -134,6 +134,7 @@ template<> GenericValueIterator<false>::reference GenericValueIterator<false>::o
 class ValueArrayBase : public util::_internal::GenericValue
 {
 	friend class util::_internal::GenericReference<ValueArrayBase>;
+	friend class util::_internal::GenericReference<const ValueArrayBase>;
 	static const _internal::ValueArrayConverterMap &converters();
 	scaling_pair getScaling( const scaling_pair &scale, unsigned short ID )const;
 protected:
@@ -182,6 +183,7 @@ public:
 	const_value_iterator endGeneric()const;
 
 	typedef util::_internal::GenericReference<ValueArrayBase> Reference;
+	typedef util::_internal::GenericReference<const ValueArrayBase> ConstReference;
 	typedef _internal::ValueArrayConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
