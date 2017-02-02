@@ -37,7 +37,7 @@ public:
 	DCMStack() {}
 	DCMStack( const util::PropertyMap &src );
 	void writeJson( std::ostream &out );
-	std::ptrdiff_t readJson( data::ValueArray< uint8_t > stream, char extra_token = 0 );
+	std::ptrdiff_t readJson( data::ValueArray<uint8_t > stream, char extra_token = 0 );
 	void translateToISIS( data::Chunk& orig );
 private:
 	static void writeSubtree( const PropertyMap& src, std::ostream &out );

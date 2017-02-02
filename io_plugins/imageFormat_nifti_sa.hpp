@@ -187,19 +187,19 @@ class ImageFormat_NiftiSa: public FileFormat
 	void parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
 	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
-	bool checkSwapEndian ( std::shared_ptr< _internal::nifti_1_header > header );
+	bool checkSwapEndian ( std::shared_ptr<_internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
 
 public:
 	ImageFormat_NiftiSa();
-	std::string getName()const;
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & );
-	bool tainted()const {return false;}//internal plugins are not tainted
-	util::istring dialects( const std::string &/*filename*/ )const {return "fsl spm withExtProtocols";}
+	std::string getName()const override;
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override;
+	bool tainted()const override {return false;}//internal plugins are not tainted
+	util::istring dialects( const std::list<util::istring> & )const override {return "fsl spm withExtProtocols";}
 
 protected:
-	util::istring suffixes( io_modes mode = both )const;
+	util::istring suffixes( io_modes mode = both )const override {return ".nii";};
 	void sanitise( data::Chunk &ch );
 	template <typename T> void transformIfNotSet( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, data::Chunk &object, LogLevel level ) {
 		if( !object.hasProperty( to ) ) {

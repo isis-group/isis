@@ -227,7 +227,6 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 	}
 
 }
-util::istring ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return ".nii";}
 
 void ImageFormat_NiftiSa::flipGeometry( data::Image &image, data::dimensions flipdim )
 {
@@ -636,7 +635,7 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
 
-isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray< uint8_t > src, size_t size )
+isis::data::ValueArray< bool > ImageFormat_NiftiSa::bitRead( data::ValueArray<uint8_t> src, size_t size )
 {
 	assert( size );
 
@@ -712,20 +711,15 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( std::shared_ptr< isis::image_io::_in
 #undef DO_SWAPA
 }
 
-std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename, const isis::util::istring& dialect, std::shared_ptr< isis::util::ProgressFeedback > progress /*progress*/ )  throw( std::runtime_error & )
-{
-	data::FilePtr mfile( filename );
-
-	if( !mfile.good() ) {
-		if( errno ) {
-			throwSystemError( errno, filename + " could not be opened" );
-			errno = 0;
-		} else
-			throwGenericError( filename + " could not be opened" );
-	}
+std::list< data::Chunk > ImageFormat_NiftiSa::load(
+	data::ByteArray source, 
+	std::list<util::istring> /*formatstack*/, 
+	const util::istring &dialect, 
+	std::shared_ptr<util::ProgressFeedback> /*feedback*/ 
+)throw( std::runtime_error & ) {
 
 	//get the header - we use it directly from the file
-	std::shared_ptr< _internal::nifti_1_header > header = std::static_pointer_cast<_internal::nifti_1_header>( mfile.getRawAddress() );
+	std::shared_ptr< _internal::nifti_1_header > header = std::static_pointer_cast<_internal::nifti_1_header>( source.getRawAddress() );
 	const bool swap_endian = checkSwapEndian( header );
 
 	if( header->sizeof_hdr < 348 ) {
@@ -765,12 +759,12 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 	data::ValueArrayReference data_src;
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
-		data_src = bitRead( mfile.at<uint8_t>( header->vox_offset ), util::product(size) );
+		data_src = bitRead( source.at<uint8_t>( header->vox_offset ), util::product(size) );
 	} else if( dialect == "fsl" && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = util::product(size) / 3;
 		data::ValueArray<util::color24> buff( volume );
-		const data::ValueArray<uint8_t> src = mfile.at<uint8_t>( header->vox_offset, volume * 3 );
+		const data::ValueArray<uint8_t> src = source.at<uint8_t>( header->vox_offset, volume * 3 );
 		LOG( Runtime, info ) << "Mapping nifti image as FSL RBG set of 3*" << volume << " elements";
 
 		for( size_t v = 0; v < volume; v++ ) {
@@ -785,7 +779,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
 		const size_t volume = util::product(size) / 3;
 		data::ValueArray<util::fvector3> buff( volume );
-		const data::ValueArray<float> src = mfile.at<float>( header->vox_offset, util::product(size), swap_endian );
+		const data::ValueArray<float> src = source.at<float>( header->vox_offset, util::product(size), swap_endian );
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v][0] = src[v];
@@ -799,7 +793,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 		unsigned int type = nifti_type2isis_type[header->datatype];
 
 		if( type ) {
-			data_src = mfile.atByID( type, header->vox_offset, util::product(size), swap_endian );
+			data_src = source.atByID( type, header->vox_offset, util::product(size), swap_endian );
 
 			if( swap_endian ) {
 				LOG( Runtime, info ) << "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
@@ -822,16 +816,16 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load ( const std::string& filename
 	data::Chunk orig( data_src, size[0], size[1], size[2], size[3] );
 
 	// check for extenstions and parse them
-	data::ValueArray< uint8_t > extID = mfile.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
+	data::ValueArray< uint8_t > extID = source.at<uint8_t>( header->sizeof_hdr, 4, swap_endian );
 	_internal::DCMStack dcmmeta;
 
 	if( extID[0] != 0 ) { // there is an extension http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/extension.html
 		for( size_t pos = header->sizeof_hdr + 4; pos < header->vox_offset; ) {
-			data::ValueArray<uint32_t> ext_hdr = mfile.at<uint32_t>( pos, 2, swap_endian );
+			data::ValueArray<uint32_t> ext_hdr = source.at<uint32_t>( pos, 2, swap_endian );
 
 			switch( ext_hdr[1] ) {
 			case 0: // @todo for now we just assume its DcmMeta https://dcmstack.readthedocs.org/en/v0.6.1/DcmMeta_Extension.html
-				dcmmeta.readJson( mfile.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0] ), '.' );
+				dcmmeta.readJson( source.at<uint8_t>( header->sizeof_hdr + 4 + 8, ext_hdr[0] ), '.' );
 				dcmmeta.print(std::cout,true);
 				break;
 			case 2:

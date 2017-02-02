@@ -39,9 +39,9 @@ DCMStack::DCMStack( const util::PropertyMap &src ): util::PropertyMap( src ) {}
 ////////////////////////////////////////////////////////////////////////////////
 // low level json parser
 ////////////////////////////////////////////////////////////////////////////////
-std::ptrdiff_t  DCMStack::readJson( data::ValueArray< uint8_t > stream, char extra_token )
+std::ptrdiff_t  DCMStack::readJson( data::ValueArray<uint8_t > stream, char extra_token )
 {
-	return PropertyMap::readJson(&stream[0],&stream[stream.getLength()],extra_token,"samples:slices");
+	return PropertyMap::readJson(stream.begin(),stream.end(),extra_token,"samples:slices");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
