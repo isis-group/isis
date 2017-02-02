@@ -52,20 +52,29 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 }
 
 std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	//try open file
+	data::FilePtr ptr(filename);
+	if( !ptr.good() ) {
+		if( errno ) {
+			throwSystemError( errno, filename.native() + " could not be opened" );
+			errno = 0;
+		} else
+			throwGenericError( filename.native() + " could not be opened" );
+	}
+
 	// set up progress bar if its enabled but don't fiddle with it if its set up already
 	bool set_up=false;
 	if( feedback && feedback->getMax() == 0 ) {
 		set_up=true;
 		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename.native() );
 	}
-	data::FilePtr ptr(filename);
 	std::list<data::Chunk> ret=load(ptr,formatstack,dialect,feedback);
-	if(set_up)
+	if(set_up) // close progress bar
 		feedback->close();
 	return ret;
 }
 
-std::list<data::Chunk> FileFormat::load(const data::ValueArray<uint8_t> source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	const void *p=source.getRawAddress().get();
 	boost::interprocess::ibufferstream buffer((char*)p,source.getLength());
 	return load(buffer.rdbuf(),formatstack,dialect,feedback);

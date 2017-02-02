@@ -213,7 +213,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 		} else {
 			LOG_IF(filename, Runtime, error ) << "No plugin found to read " << *filename << with_dialect;
 			LOG_IF(boost::get<std::basic_streambuf<char>*>(&v), Runtime, error ) << "No plugin found to load from stream " << with_dialect;
-			LOG_IF(boost::get<ValueArray<uint8_t>>(&v), Runtime, error ) << "No plugin found to load from memory " << with_dialect;
+			LOG_IF(boost::get<ByteArray>(&v), Runtime, error ) << "No plugin found to load from memory " << with_dialect;
 		}
 	} else {
 		while( !readerList.empty() ) {

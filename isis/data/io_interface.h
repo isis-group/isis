@@ -20,6 +20,7 @@
 #include <deque>
 #include "image.hpp"
 #include "common.hpp"
+#include "bytearray.hpp"
 #include "../util/istring.hpp"
 #include "../util/progressfeedback.hpp"
 
@@ -145,7 +146,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(const data::ValueArray<uint8_t> source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
