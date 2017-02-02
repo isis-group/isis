@@ -71,7 +71,7 @@ public:
 	std::string getName()const override;
 	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override;
 
-	std::list<data::Chunk> load( const std::string &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw( std::runtime_error & )override;
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw( std::runtime_error & )override;
 	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 
 	bool tainted()const override;

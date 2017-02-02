@@ -126,8 +126,8 @@ public:
 					LOG( Runtime, notice ) << "Skipping " << org_file << " inside the tar file because no plugin was found to read it"; // skip if we found none
 					LOG( Runtime, notice ) << "You might want to define it with the \"-rf\" option (e.g. \"-rf dcm tar gz\" for dcm files inside a tar.gz)";
 				} else {
-					std::shared_ptr<char> buffer((char*)malloc(size));
-					size_t red = boost::iostreams::read( in, buffer.get(), size ); // read data from the stream into the mapped memory
+					data::ValueArray<uint8_t> buffer(size);
+					size_t red = boost::iostreams::read( in, std::static_pointer_cast<char>(buffer.getRawAddress()).get(), size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
 
 					if( red != size ) { // read the data from the stream
@@ -136,7 +136,7 @@ public:
 
 					// read the temporary file
 					try {
-						std::list<data::Chunk> loaded=data::IOFactory::loadChunks( std::static_pointer_cast<void>(buffer), size, formatstack, dialect.c_str() );
+						std::list<data::Chunk> loaded=data::IOFactory::loadChunks( buffer, formatstack, dialect.c_str() );
 						for(data::Chunk &ref : loaded ) { // set the source property of the red chunks to something more usefull
 							ref.setValueAs( "source", org_file.native() ); //@todo  add tar filename
 						}

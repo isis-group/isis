@@ -512,7 +512,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const std::string &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & )
 {
 	DcmFileFormat dcfile;
 	OFCondition loaded = dcfile.loadFile( filename.c_str() );

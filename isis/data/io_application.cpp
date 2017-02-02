@@ -168,12 +168,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	util::slist rf = parameters[std::string( "rf" ) + suffix];
 	std::string dl = parameters[std::string( "rdialect" ) + suffix];
-	LOG( Runtime, info )
-			<< "loading " << util::MSubject( input )
-			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
-			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
-			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-
+	
 	bool no_progress = parameters["np"];
 
 	if( !no_progress && feedback ) {
@@ -184,7 +179,23 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 	for(const std::string &format:rf)
 		formatstack.push_back(format.c_str());
 		
-	std::list< Image > tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
+	std::list< Image > tImages;
+	if(input.size()==1 && input.front()=="-"){
+		LOG( Runtime, info )
+			<< "loading from stdin" 
+			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
+			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
+			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+		tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
+	} else {
+		LOG( Runtime, info )
+			<< "loading " << util::MSubject( input )
+			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
+			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
+			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+		tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
+	}
+
 	images.splice( images.end(), tImages );
 
 	if ( images.empty() ) {

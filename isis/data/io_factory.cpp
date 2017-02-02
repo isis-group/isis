@@ -186,23 +186,22 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, std::list<util::istring> formatstack, util::istring dialect )throw( io_error & )
-{
-	bool overridden=false;
-	FileFormatList formatReader;
+std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect)throw( io_error & ){
+	bool overridden=true;
+	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
 	if(formatstack.empty()){
-		overridden=true;
-		formatstack=getFormatStack(filename.string());
+		if(filename){
+			overridden=false;
+			formatstack=getFormatStack(filename->string());
+		}
 	}
-
-	formatReader = getFileFormatList(formatstack , dialect );
+	FileFormatList readerList = getFileFormatList(formatstack , dialect );
 	const util::NoSubject with_dialect = dialect.empty() ?
 	                                   util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
-
-	if ( formatReader.empty() ) {
-		if( !boost::filesystem::exists( filename ) ) {
+	if ( readerList.empty() ) {
+		if(filename && !boost::filesystem::exists( *filename ) ) { // if it actually is a filename, but does not exist
 			LOG( Runtime, error ) 
-				<< util::MSubject( filename )
+				<< util::MSubject( *filename )
 				<< " does not exist as file, and no suitable plugin was found to generate data from "
 				<< ( overridden ? 
 						util::istring( "the requested format stack \"" ) + util::listToString<util::istring>(formatstack.begin(),formatstack.end()) + "\"": 
@@ -212,100 +211,41 @@ std::list<Chunk> IOFactory::loadFile( const boost::filesystem::path &filename, s
 		} else if( overridden ) {
 			LOG( Runtime, error ) << "No plugin supporting the requested format stack " << formatstack << with_dialect << " was found";
 		} else {
-			LOG( Runtime, error ) << "No plugin found to read " << filename << with_dialect;
+			LOG_IF(filename, Runtime, error ) << "No plugin found to read " << *filename << with_dialect;
+			LOG_IF(boost::get<std::basic_streambuf<char>*>(&v), Runtime, error ) << "No plugin found to load from stream " << with_dialect;
+			LOG_IF(boost::get<ValueArray<uint8_t>>(&v), Runtime, error ) << "No plugin found to load from memory " << with_dialect;
 		}
 	} else {
-		while( !formatReader.empty() ) {
-			FileFormatPtr format=formatReader.front();
-			formatReader.pop_front();
-			LOG( ImageIoDebug, info ) << "plugin to load file" << with_dialect << " " << filename << ": " << format->getName();
+		while( !readerList.empty() ) {
+			FileFormatPtr format=readerList.front();
+			readerList.pop_front();
+			LOG_IF(filename, ImageIoDebug, info ) << "plugin to load file" << with_dialect << " " << filename << ": " << format->getName();
 
 			try {
-				std::list<data::Chunk> loaded=format->load( filename.native(), formatstack, dialect, m_feedback );
-				for( Chunk & ref :  loaded ) {
-					ref.refValueAsOr( "source", filename.native() ); // set source to filename or leave it if its already set
+				std::list<data::Chunk> loaded =boost::apply_visitor(
+					[&](auto val) { return format->load( val, formatstack, dialect, m_feedback ); },
+					v
+				);
+				if(filename){
+					for( Chunk & ref :  loaded ) {
+						ref.refValueAsOr( "source", filename->native() ); // set source to filename or leave it if its already set
+					}
 				}
 				return loaded;
 			} catch ( const std::runtime_error& e ) {
-				if(formatReader.empty()) // if it was the last reader drop through the error
+				if(readerList.empty()) // if it was the last reader drop through the error
 					std::throw_with_nested(IOFactory::io_error(e.what(),format));
 				else if( overridden ) {
-					LOG( Runtime, notice )
-						<< "The enforced format " << format->getName()  << " failed to read " << filename << with_dialect
+					LOG_IF(filename, Runtime, notice )
+						<< "The enforced format " << format->getName()  << " failed to read " << *filename << with_dialect
 						<< " with " << e.what() << ", maybe it just wasn't the right format";
 				} else {
 					LOG( Runtime, notice )
-						<< "Failed to load " <<  filename << " using " <<  format->getName() << with_dialect << " ( " << e.what() << " )";
+						<< "Failed to load " <<  *filename << " using " <<  format->getName() << with_dialect << " ( " << e.what() << " )";
 				}
 			}
 		}
 	}
-	
-	return std::list<Chunk>();//no plugin of proposed list could load file
-}
-
-std::list<Chunk> IOFactory::loadStream( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, util::istring dialect )throw( io_error & ){
-
-	FileFormatList formatReader;
-	assert(!formatstack.empty());
-
-	formatReader = getFileFormatList(formatstack , dialect );
-	const util::NoSubject with_dialect = dialect.empty() ?
-	                                   util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
-
-	if ( formatReader.empty() ) {
-		LOG( Runtime, error ) << "No plugin supporting the requested format stack " << formatstack << with_dialect << " was found";
-	} else {
-		while( !formatReader.empty() ) {
-			FileFormatPtr format=formatReader.front();
-			formatReader.pop_front();
-			LOG( ImageIoDebug, info ) << "plugin to load stream" << with_dialect << ": " << format->getName();
-
-			try {
-				return format->load( source, formatstack, dialect, m_feedback );
-			} catch ( const std::runtime_error& e ) {
-				if(formatReader.empty()) // if it was the last reader drop through the error
-					std::throw_with_nested(IOFactory::io_error(e.what(),format));
-				else 
-					LOG( Runtime, notice )
-						<< "The requested format " << format->getName()  << " failed to read the stream" << with_dialect
-						<< " with " << e.what() << ", maybe it just wasn't the right format";
-			}
-		}
-	}
-	
-	return std::list<Chunk>();//no plugin of proposed list could load file
-}
-std::list<Chunk> IOFactory::loadMem( std::shared_ptr<const void> source, size_t length, std::list<util::istring> formatstack, util::istring dialect )throw( io_error & ){
-	FileFormatList formatReader;
-	assert(!formatstack.empty());
-
-	formatReader = getFileFormatList(formatstack , dialect );
-	const util::NoSubject with_dialect = dialect.empty() ?
-	                                   util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
-
-	if ( formatReader.empty() ) {
-		LOG( Runtime, error ) << "No plugin supporting the requested format stack " << formatstack << with_dialect << " was found";
-	} else {
-		while( !formatReader.empty() ) {
-			FileFormatPtr format=formatReader.front();
-			formatReader.pop_front();
-			LOG( ImageIoDebug, info ) << "plugin to load data" << with_dialect << ": " << format->getName();
-
-			try {
-				return format->load( source, length, formatstack, dialect, m_feedback );
-			} catch ( const std::runtime_error& e ) {
-				if(formatReader.empty()) // if it was the last reader drop through the error
-					std::throw_with_nested(IOFactory::io_error(e.what(),format));
-				else 
-					LOG( Runtime, notice )//otherwise just try next
-						<< "The requested format " << format->getName()  << " failed to read the data at" << source << with_dialect
-						<< " with " << e.what() << ", trying " << formatReader.front()->getName();
-			}
-		}
-	}
-	
-	return std::list<Chunk>();//no plugin of proposed list could load file
 }
 
 std::list<util::istring> IOFactory::getFormatStack( std::string filename ){
@@ -388,21 +328,15 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optio
 	return ret;
 }
 
-std::list< Chunk > IOFactory::loadChunks( const std::string& path, std::list<util::istring> formatstack, isis::util::istring dialect)throw( io_error & )
+std::list< Chunk > IOFactory::loadChunks( const load_source &v, std::list<util::istring> formatstack, isis::util::istring dialect)throw( io_error & )
 {
-	assert(!boost::filesystem::is_directory( path ));
-	return get().loadFile( path, formatstack, dialect );
-}
-std::list< Chunk > IOFactory::loadChunks( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, isis::util::istring dialect)throw( io_error & )
-{
-	return get().loadStream( source, formatstack, dialect );
-}
-std::list< Chunk > IOFactory::loadChunks( std::shared_ptr<const void> source, size_t length, std::list<util::istring> formatstack, isis::util::istring dialect)throw( io_error & )
-{
-	return get().loadMem( source, length, formatstack, dialect );
+	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
+	if(filename)
+		assert(!boost::filesystem::is_directory( *filename ));
+	return get().load_impl( v, formatstack, dialect );
 }
 
-std::list< Image > IOFactory::load ( const util::slist &paths, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
+std::list< Image > IOFactory::load( const util::slist &paths, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
 	for( const std::string & path :  paths ) {
@@ -411,7 +345,7 @@ std::list< Image > IOFactory::load ( const util::slist &paths, std::list<util::i
 			loaded=get().loadPath(path,formatstack,dialect,rejected);
 		} else {
 			try {
-				loaded=get().loadFile( path , formatstack, dialect);
+				loaded=get().load_impl( path , formatstack, dialect);
 				if(loaded.empty() && rejected)
 					rejected->push_back(path);
 			} catch(const io_error &e) {
@@ -456,7 +390,7 @@ std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& 
 		if ( boost::filesystem::is_directory( *i ) )continue;
 
 		try {
-			std::list<Chunk> loaded= loadFile( *i, formatstack, dialect );
+			std::list<Chunk> loaded= load_impl( *i, formatstack, dialect );
 
 			if(rejected && loaded.empty()){
 				rejected->push_back(boost::filesystem::path(*i).native());
