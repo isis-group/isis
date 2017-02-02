@@ -161,7 +161,7 @@ public:
 
 	TYPE &operator[]( distance n )const {return *( p + n );}
 
-	explicit operator TYPE*(){return p;}
+	operator TYPE*(){return p;}
 };
 
 }
