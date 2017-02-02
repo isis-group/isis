@@ -37,12 +37,13 @@ protected:
 		}
 	};
 
-	template<typename T, typename DEST> bool extractNumberFromName( std::string name, DEST &property ) {
-		std::string::size_type end = name.find_last_of( "0123456789" );
+	template<typename T, typename DEST> bool extractNumberFromName( const boost::filesystem::path &name, DEST &property ) {
+		std::string filename=name.filename().native();
+		std::string::size_type end = filename.find_last_of( "0123456789" );
 
 		if( end != std::string::npos ) {
-			std::string::size_type start = name.find_last_not_of( "0123456789", end );
-			property = boost::lexical_cast<T>( name.substr( start + 1, end - start ) );
+			std::string::size_type start = filename.find_last_not_of( "0123456789", end );
+			property = boost::lexical_cast<T>( filename.substr( start + 1, end - start ) );
 			return true;
 		} else {
 			return false;
@@ -60,12 +61,10 @@ public:
 		readers[PNG_COLOR_TYPE_RGB_ALPHA]=readers[PNG_COLOR_TYPE_RGB];
 		readers[PNG_COLOR_TYPE_GRAY_ALPHA]=readers[PNG_COLOR_TYPE_GRAY];
 	}
-	std::string getName()const {
+	std::string getName()const override {
 		return "PNG (Portable Network Graphics)";
 	}
-	util::istring dialects( const std::string &/*filename*/ ) const {
-		return "middle stacked";
-	}
+	util::istring dialects( const std::list<util::istring> & ) const override {return "middle stacked";}
 	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
 		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
@@ -159,24 +158,24 @@ public:
 		return true;
 	}
 
-	data::Chunk read_png( const std::string &filename ) {
+	data::Chunk read_png( const boost::filesystem::path &filename ) {
 		png_byte header[8]; // 8 is the maximum size that can be checked
 
 		/* open file and test for it being a png */
 		FILE *fp = fopen( filename.c_str(), "rb" );
 
 		if ( !fp ) {
-			throwSystemError( errno, std::string( "Could not open " ) + filename );
+			throwSystemError( errno, std::string( "Could not open " ) + filename.native() );
 		}
 
 		if( fread( header, 1, 8, fp ) != 8 ) {
-			throwSystemError( errno, std::string( "Could not open " ) + filename );
+			throwSystemError( errno, std::string( "Could not open " ) + filename.native() );
 		}
 
 		;
 
 		if ( png_sig_cmp( header, 0, 8 ) ) {
-			throwGenericError( filename + " is not recognized as a PNG file" );
+			throwGenericError( filename.native() + " is not recognized as a PNG file" );
 		}
 
 		png_structp png_ptr;
@@ -209,7 +208,7 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+	std::list<data::Chunk> load(const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/)  throw( std::runtime_error & ) override
 	{
 		data::Chunk ch = read_png( filename );
 
@@ -243,7 +242,7 @@ public:
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & )override {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
