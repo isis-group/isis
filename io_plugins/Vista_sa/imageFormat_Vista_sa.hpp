@@ -43,7 +43,7 @@ private:
 	
 public:
 	std::string getName()const {return "Vista standalone";}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & );
+	std::list<data::Chunk> load( data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw ( std::runtime_error & ) override;
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); // not used
 	void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & );
 	

@@ -21,6 +21,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <isis/util/matrix.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
 
 #include "VistaParser.h"
 
@@ -253,41 +254,30 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 
 }
 
-std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_VistaSa::load( data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
 {
-	data::FilePtr mfile ( filename );
-	
 	std::list<data::Chunk> chunks;
 
-	if ( !mfile.good() ) {
-		if ( errno ) {
-			throwSystemError ( errno, filename + " could not be opened" );
-			errno = 0;
-		} else
-			throwGenericError ( filename + " could not be opened" );
-	}
-
 	//parse the vista header
-
 	std::list<util::PropertyMap> ch_list;
 	util::PropertyMap root;
-	std::ifstream stream(filename);
+	
+	const void *p=source.getRawAddress().get();
+	boost::interprocess::ibufferstream stream((char*)p,source.getLength());
 	vista_internal::VistaParser parser(stream,root,ch_list);
 	
 	if(parser.parse()!=0)
 	{
-		LOG( Runtime, error ) << "Parsing vista file " << filename << " failed";
-		return chunks;
+		throwGenericError("Parsing vista failed");
 	} else {
-		LOG(Debug,info) << "Parsed global properties " << root << " from " << filename;
+		LOG(Debug,info) << "Parsed global properties " << root << " from vista";
 	}
 	
-	data::ValueArray< uint8_t >::iterator data_start = mfile.begin() + stream.tellg();
+	data::ValueArray< uint8_t >::iterator data_start = source.begin() + stream.tellg();
 	LOG(Debug,info) << "Vista data offset is " << stream.tellg();
-	stream.close();
 
 	std::list<_internal::VistaInputImage> groups;
-	groups.push_back( _internal::VistaInputImage( mfile, data_start ) );
+	groups.push_back( _internal::VistaInputImage( source, data_start ) );
 
 	for( const util::PropertyMap & chMap: ch_list ) {
 		util::PropertyMap root;
@@ -296,7 +286,7 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 		sanitize( root );
 
 		if( !groups.back().add( root ) ) { //if current ProtoImage doesnt like
-			groups.push_back( _internal::VistaInputImage( mfile, data_start ) ); // try a new one
+			groups.push_back( _internal::VistaInputImage( source, data_start ) ); // try a new one
 			assert( groups.back().add( root ) ); //a new one should always work
 		}
 	}
@@ -304,7 +294,7 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 
 	uint16_t sequence = 0;
 	if(feedback && ch_list.size()>10)
-		feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s) from " + filename );
+		feedback->show(ch_list.size(),std::string("Loading ") + boost::lexical_cast<std::string>(groups.size()) + " image(s)" );
 
 	for( _internal::VistaInputImage & group: groups ) {
 		if( group.isFunctional() )
