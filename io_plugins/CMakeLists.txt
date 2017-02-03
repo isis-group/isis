@@ -137,7 +137,7 @@ if(ISIS_IOPLUGIN_COMP)
   endif(ISIS_IOPLUGIN_COMP_LZMA)
   
   add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
-  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${COMP_LIBS})
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 
@@ -146,7 +146,7 @@ endif(ISIS_IOPLUGIN_COMP)
 ############################################################
 if(ISIS_IOPLUGIN_TAR)
   add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar.cpp)
-  target_link_libraries(isisImageFormat_tar_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY})
+  target_link_libraries(isisImageFormat_tar_proxy ${isis_core_lib})
   set(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
 endif(ISIS_IOPLUGIN_TAR)
 
