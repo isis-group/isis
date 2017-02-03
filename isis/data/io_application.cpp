@@ -186,7 +186,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
 			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-		tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
+		tImages = data::IOFactory::load( std::cin.rdbuf(), formatstack, dl.c_str(),rejected );
 	} else {
 		LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )

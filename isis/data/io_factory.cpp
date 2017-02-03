@@ -193,6 +193,9 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 		if(filename){
 			overridden=false;
 			formatstack=getFormatStack(filename->string());
+		} else {
+			LOG(Runtime,error) << "I got no format stack and no filename to deduce it from, won't load anything..";
+			return std::list<Chunk>();
 		}
 	}
 	FileFormatList readerList = getFileFormatList(formatstack , dialect );
@@ -220,6 +223,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 			FileFormatPtr format=readerList.front();
 			readerList.pop_front();
 			LOG_IF(filename, ImageIoDebug, info ) << "plugin to load file" << with_dialect << " " << filename << ": " << format->getName();
+			LOG_IF(!filename, ImageIoDebug, info ) << "plugin to load " << with_dialect << ": " << format->getName();
 
 			try {
 				std::list<data::Chunk> loaded =boost::apply_visitor(
@@ -235,14 +239,10 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 			} catch ( const std::runtime_error& e ) {
 				if(readerList.empty()) // if it was the last reader drop through the error
 					std::throw_with_nested(IOFactory::io_error(e.what(),format));
-				else if( overridden ) {
+				else {
 					LOG_IF(filename, Runtime, notice )
-						<< "The enforced format " << format->getName()  << " failed to read " << *filename << with_dialect
-						<< " with " << e.what() << ", maybe it just wasn't the right format";
-				} else {
-					LOG( Runtime, notice )
-						<< "Failed to load " <<  *filename << " using " <<  format->getName() << with_dialect << " ( " << e.what() << " )";
-				}
+						<< format->getName()  << " failed to read " << *filename << with_dialect << " with " << e.what() << ", trying " << readerList.front();
+				} 
 			}
 		}
 	}
@@ -336,6 +336,7 @@ std::list< Chunk > IOFactory::loadChunks( const load_source &v, std::list<util::
 	return get().load_impl( v, formatstack, dialect );
 }
 
+
 std::list< Image > IOFactory::load( const util::slist &paths, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> chunks;
@@ -344,16 +345,12 @@ std::list< Image > IOFactory::load( const util::slist &paths, std::list<util::is
 		if(boost::filesystem::is_directory( path )){
 			loaded=get().loadPath(path,formatstack,dialect,rejected);
 		} else {
-			try {
+			try{
 				loaded=get().load_impl( path , formatstack, dialect);
 				if(loaded.empty() && rejected)
 					rejected->push_back(path);
-			} catch(const io_error &e) {
-				const util::NoSubject with_dialect = dialect.empty() ?
-					util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
-
-				LOG( Runtime, notice )
-					<< "Failed to load " <<  path << " using " <<  e.which() << with_dialect << " ( " << e.what() << " )";
+			} catch (io_error &e){
+				LOG(Runtime,error) << "Failed to load " << path << ", the last failing plugin was " << e.which()->getName() << " with " << e.what();
 			}
 		}
 		chunks.splice(chunks.end(),loaded);
@@ -372,9 +369,22 @@ std::list< Image > IOFactory::load( const util::slist &paths, std::list<util::is
 	return images;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
+std::list<data::Image> IOFactory::load( const load_source &source, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
 {
-	return load( {path}, formatstack, dialect );
+	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &source );
+	if(filename)
+		return load( util::slist{filename->native()}, formatstack, dialect );
+	else {
+		try{
+			std::list<Chunk> loaded=get().load_impl( source , formatstack, dialect);
+			const std::list<data::Image> images = chunkListToImageList( loaded, rejected );
+			LOG( Runtime, info ) << "Generated " << images.size() << " images";
+			return images;
+		} catch (io_error &e){
+			LOG(Runtime,error) << "Failed to load, the last failing plugin was " << e.which()->getName() << " with " << e.what();
+			return {};
+		}
+	}
 }
 
 std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )

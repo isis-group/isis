@@ -82,6 +82,7 @@ class ImageFormat_Tar: public FileFormat{
 protected:
 	util::istring suffixes( io_modes modes )const override {return "tar";}
 public:
+	bool tainted()const override {return false;}
 	std::string getName()const override {return "tar reading proxy";};
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )override {
 		throwGenericError( "Not implemented (yet)" );

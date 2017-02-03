@@ -63,7 +63,8 @@ public:
 	 * @return list of images created from the loaded data
 	 * @note the images a re created from all loaded files, so loading mutilple files can very well result in only one image
 	 */
-	static std::list<data::Image> load( const util::slist &paths, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	static std::list<data::Image> 
+	load( const util::slist &paths, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
 	/**
 	 * Load a data file or directory with given filename and dialect.
 	 * @param path file or directory to load
@@ -71,7 +72,8 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of images created from the loaded data
 	 */
-	static std::list<data::Image> load( const std::string& path, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	static std::list<data::Image> 
+	load( const load_source &source, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
 
 	/**
 	 * Load data from a given filename/stream/memory and dialect into a chunklist.
@@ -80,7 +82,7 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static std::list<data::Chunk> loadChunks(const load_source &v,std::list<util::istring> formatstack = {},util::istring dialect = "")throw( io_error & );
+	static std::list<data::Chunk> loadChunks(const load_source &source,std::list<util::istring> formatstack = {},util::istring dialect = "")throw( io_error & );
 
 	static bool write( const data::Image &image, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
 	static bool write( std::list<data::Image> images, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
