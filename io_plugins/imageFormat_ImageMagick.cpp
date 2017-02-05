@@ -128,7 +128,7 @@ public:
 				ret.push_back(image2chunk(img));
 				
 				if( dialect == "stacked" ){					
-					ret.back().setValueAs( "indexOrigin", util::fvector3{0, 0, acqNum} );
+					ret.back().setValueAs( "indexOrigin", util::fvector3{0, 0, (float)acqNum} );
 				}
 				ret.back().setValueAs("acquisitionNumber",acqNum++);
 			}
