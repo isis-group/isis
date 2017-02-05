@@ -48,11 +48,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED yes)
 
 ############################################################
-# get thread libs
-############################################################
-find_package(Threads)
-
-############################################################
 # check for byteswap intrinsics
 ############################################################
 CHECK_INCLUDE_FILES(byteswap.h HAVE_BYTESWAP)

@@ -120,8 +120,8 @@ file(GLOB DATASTORAGE_HDR_FILES "data/*.hpp" "data/*.h")
 #add the core library
 add_lib(isis_core
 	"${CORE_SRC_FILES}"
-	"${Boost_LIBRARIES}" #deps
-	"${LibOil_LIBRARY};${CURSES_LIBRARIES};${CMAKE_DL_LIBS};${LIB_JSONCPP};Threads::Threads" #private deps
+	"${Boost_LIBRARIES};${CURSES_LIBRARIES}" #deps
+	"${LibOil_LIBRARY};${CMAKE_DL_LIBS};${LIB_JSONCPP};Threads::Threads" #private deps
 	${ISIS_CORE_VERSION_SO} ${ISIS_CORE_VERSION_API}
 )
 
