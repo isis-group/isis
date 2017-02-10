@@ -172,10 +172,11 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 std::string FileFormat::makeFilename( const util::PropertyMap &props, const std::string namePattern )
 {
 	using namespace std::regex_constants;
-	static const std::regex reg( "\\{[^{}]+\\}", ECMAScript|optimize);
-	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", ECMAScript|optimize );
-	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  ECMAScript|optimize );
-	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", ECMAScript|optimize| icase); 
+	static const std::regex reg( "\\{[^{}]+\\}", optimize);
+	static const std::regex invalid( "[\\/\\s]", optimize);
+	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", optimize );
+	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  optimize );
+	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", optimize| icase); 
 	std::string result=namePattern;
 	enum formatting_type {none,integer,uinteger,floating};
 	ptrdiff_t offset=0;
@@ -223,6 +224,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 				} 
 				pstring=std::string(buffer);
 			}
+			std::regex_replace(pstring,invalid,"_");
 			result.replace(i->position()+offset, i->length(),pstring);
 			offset+=pstring.length()-i->length();
 		} else
