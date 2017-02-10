@@ -160,15 +160,6 @@ if(ISIS_IOPLUGIN_FLIST)
 endif(ISIS_IOPLUGIN_FLIST)
 
 ############################################################
-# PROCESS proxy plugin
-############################################################
-if(ISIS_IOPLUGIN_PROCESS)
-	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
-	target_link_libraries(isisImageFormat_process ${isis_core_lib})
-	set(TARGETS ${TARGETS} isisImageFormat_process)
-endif(ISIS_IOPLUGIN_PROCESS)
-
-############################################################
 # Dicom
 ############################################################
 if(ISIS_IOPLUGIN_DICOM)
