@@ -237,7 +237,7 @@ public:
 	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
 	 * \param labeled if true the typename will be appended to the resulting string in brackets.
 	 */
-	virtual std::string toString(bool labeled = false) const;
+	virtual std::string toString(bool labeled = false, std::string formatting="") const override;
 };
 
 

@@ -283,15 +283,15 @@ public:
 	const_iterator end()const {return begin() + m_len;}
 
 	/// @copydoc util::Value::toString
-	virtual std::string toString( bool labeled = false )const {
+	virtual std::string toString( bool labeled = false, std::string formatting="" )const override {
 		std::string ret;
 
 		if ( m_len ) {
 			for ( const_iterator i = begin(); i < end() - 1; i++ )
-				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
+				ret += util::Value<TYPE>( *i ).toString( false, formatting ) + "|";
 
 
-			ret += util::Value<TYPE>( *( end() - 1 ) ).toString( labeled );
+			ret += util::Value<TYPE>( *( end() - 1 ) ).toString( labeled, formatting );
 		}
 
 		return std::to_string( m_len ) + "#" + ret;
