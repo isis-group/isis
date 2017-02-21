@@ -4,6 +4,7 @@
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <dcmtk/dcmdata/dcdicent.h>
+#include <dcmtk/dcmdata/dcistrmb.h>
 #include <dcmtk/oflog/config.h>
 #include <dcmtk/oflog/tstring.h>
 #include <dcmtk/oflog/spi/logevent.h>
@@ -512,10 +513,13 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 }
 
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
 {
+	DcmInputBufferStream dcstream;
 	DcmFileFormat dcfile;
-	OFCondition loaded = dcfile.loadFile( filename.c_str() );
+	dcstream.setBuffer(source.getRawAddress().get(),source.getLength());
+	dcstream.setEos();
+	OFCondition loaded = dcfile.read( dcstream );
 
 	if ( loaded.good() ) {
 		std::list< data::Chunk > ret;

@@ -128,7 +128,7 @@ public:
 					LOG( Runtime, notice ) << "You might want to define it with the \"-rf\" option (e.g. \"-rf dcm tar gz\" for dcm files inside a tar.gz)";
 				} else {
 					data::ValueArray<uint8_t> buffer(size);
-					size_t red = boost::iostreams::read( in, std::static_pointer_cast<char>(buffer.getRawAddress()).get(), size ); // read data from the stream into the mapped memory
+					size_t red = boost::iostreams::read( in, std::static_pointer_cast<char>(buffer.getRawAddress()).get(), size ); // read data from the stream into the memory
 					next_header_in -= red;
 
 					if( red != size ) { // read the data from the stream
