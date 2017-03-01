@@ -12,6 +12,8 @@
 #include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
 #include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
 
+#include <boost/iostreams/copy.hpp>
+
 namespace isis
 {
 namespace image_io
@@ -512,6 +514,15 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	return dest;
 }
 
+std::list<data::Chunk> ImageFormat_Dicom::load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
+
+	std::basic_stringbuf<char> buff_stream;
+	boost::iostreams::copy(*source,buff_stream);
+	const auto buff = buff_stream.str();
+	
+	data::ValueArray<uint8_t> wrap((uint8_t*)buff.data(),buff.length(),data::ValueArray<uint8_t>::NonDeleter());
+	return load(wrap,formatstack,dialect,progress);
+}
 
 std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
 {

@@ -26,6 +26,8 @@
 
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/config/osconfig.h>
+#include <dcmtk/dcmdata/dcistrma.h>
 
 namespace isis
 {
@@ -71,6 +73,7 @@ public:
 	std::string getName()const override;
 	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override;
 
+	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 
