@@ -170,11 +170,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 
-	if ( ! chunk.isValid() ) {
-		LOG( Runtime, error )
-				<< "Cannot insert invalid chunk. Missing properties: " << chunk.getMissing();
-		return false;
-	}
+	assert(chunk.isValid());
 
 	if( clean ) {
 		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
@@ -1019,6 +1015,7 @@ void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns,
 
 std::string Image::identify ( bool withpath, bool withdate )const
 {
+	LOG_IF(withpath && !(hasProperty("source")||getChunkAt(0).hasProperty("source")),Runtime,warning) << "Asking for the path in an image that has no \"source\"-property";
 	_internal::SortedChunkList::getproplist source("source"),seqNum("sequenceNumber"),seqDesc("sequenceDescription"),seqStart("sequenceStart");
 	seqNum(*this);seqDesc(*this);seqStart(*this),source(*this);
 	return set.identify(withpath,withdate,source, seqNum,seqDesc,seqStart);
