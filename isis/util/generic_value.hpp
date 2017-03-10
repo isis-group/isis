@@ -99,10 +99,10 @@ public:
 	 * This operator creates a copy of the referenced Value-Object.
 	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
 	 */
-	GenericReference( const GenericReference &src ){
+	GenericReference( const GenericReference &src ):std::unique_ptr<TYPE_TYPE>(){
 		operator=( src );
 	}
-	GenericReference( const TYPE_TYPE &src ){
+	GenericReference( const TYPE_TYPE &src ):std::unique_ptr<TYPE_TYPE>(){
 		operator=( src );
 	}
 	/**
