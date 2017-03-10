@@ -93,13 +93,17 @@ public:
 	static void setProgressFeedback( std::shared_ptr<util::ProgressFeedback> feedback );
 
 	/**
-	 * Get all formats which should be able to read/write the given file.
-	 * \param filename the file which should be red/written
-	 * \param suffix_override if given, it will override the suffix of the given file (and thus enforce usage of a format)
+	 * Get all formats which should be able to read/write the given format stack optionally using the given dialect.
+	 * \param format_stack the maximum format stack to look for.
 	 * \param dialect if given, the plugins supporting the dialect are preferred
+	 * 
+	 * \example getFileFormatList({"dcm","tar","gz"}, "") will look for plugins that cat read "*.dcm.tar.gz" files. 
+	 * As this will likely fail it will look for plugins that can handle *.tar.gz files, and if that fails as well, for *.gz files.
+	 * The failed formats will be forwarded to the found plugin to deal with (the gz-reader will have to look for a *.tar reader, which will have to look for *.dcm).
 	 */
-	static FileFormatList getFileFormatList(std::list<util::istring> format, util::istring dialect);
-	
+	static FileFormatList getFileFormatList(std::list<util::istring> format_stack, util::istring dialect);
+
+	/// extract the format stack from a filename
 	static std::list<util::istring> getFormatStack( std::string filename );
 	/**
 	 *  Make images out of a (unordered) list of chunks.
@@ -109,12 +113,6 @@ public:
 	 *  \returns a list of newly created images consisting off chunks out of the given chunk list.
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks, optional< isis::util::slist& > rejected=optional< isis::util::slist& >() );
-protected:
-	std::list<Chunk> loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack = {}, util::istring dialect="", optional< util::slist& > rejected=optional< util::slist& >());
-
-	static IOFactory &get();
-	IOFactory();//shall not be created directly
-	FileFormatList io_formats;
 
 	/*
 	 * each ImageFormat will be registered in a map after plugin has been loaded
@@ -122,7 +120,15 @@ protected:
 	 *
 	 * @return true if registration was successful, false otherwise
 	 * */
-	bool registerFileFormat( const FileFormatPtr plugin );
+	static bool registerFileFormat( const FileFormatPtr plugin, bool front=false );
+protected:
+	std::list<Chunk> loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack = {}, util::istring dialect="", optional< util::slist& > rejected=optional< util::slist& >());
+
+	static IOFactory &get();
+	IOFactory();//shall not be created directly
+	FileFormatList io_formats;
+
+	bool registerFileFormat_impl( const FileFormatPtr plugin, bool front=false );
 	unsigned int findPlugins( const std::string &path );
 private:
 	/**

@@ -195,7 +195,6 @@ public:
 	std::string getName()const override;
 	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override;
-	bool tainted()const override {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::list<util::istring> & )const override {return "fsl spm withExtProtocols";}
 
 protected:

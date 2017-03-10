@@ -81,18 +81,23 @@ IOFactory::IOFactory()
 #endif
 }
 
-bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
+bool IOFactory::registerFileFormat( const FileFormatPtr plugin, bool front ){
+	return get().registerFileFormat_impl( plugin, front );
+}
+
+bool IOFactory::registerFileFormat_impl( const FileFormatPtr plugin, bool front )
 {
 	if ( !plugin )return false;
 
 	io_formats.push_back( plugin );
 	std::list<util::istring> suffixes = plugin->getSuffixes(  );
 	LOG( Runtime, info )
-			<< "Registering " << util::NoSubject( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
-			<< util::MSubject( plugin->getName() )
-			<< " with supported suffixes " << suffixes;
+			<< "Registering io-plugin " << util::MSubject( plugin->getName() ) << " with supported suffixes " << suffixes;
 	for( util::istring & it :  suffixes ) {
-		io_suffix[it].push_back( plugin );
+		if(front)
+			io_suffix[it].push_front( plugin );
+		else
+			io_suffix[it].push_back( plugin );
 	}
 	return true;
 }
@@ -150,7 +155,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), deleter );
 
-					if ( registerFileFormat( io_class ) ) {
+					if ( registerFileFormat_impl( io_class ) ) {
 						io_class->plugin_file = pluginName;
 						ret++;
 					} else {
@@ -427,7 +432,7 @@ std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& 
 
 bool IOFactory::write( const data::Image &image, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
-	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
+	return write( {image}, path, suffix_override, dialect );
 }
 
 

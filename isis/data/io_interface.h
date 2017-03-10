@@ -95,8 +95,6 @@ public:
 
 	/**
 	 * get all file suffixes a plugin suggests to handle
-	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
-	 * The result is returned in a string-list sorted by the length of the suffix (longest first).
 	 * @param mode the io mode you are asking for
 	 * - read_only explicitely ask for reading - the plugin will give all suffixes it can read (maybe none)
 	 * - write_only explicitely ask for writing - the plugin will give all suffixes it can write (maybe none)
@@ -108,9 +106,6 @@ public:
 
 	/// \return a space separated list of the dialects the plugin supports
 	virtual util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const {return util::istring();};
-
-	/// \return if the plugin is not part of the official distribution
-	virtual bool tainted()const {return true;}
 
 	/**
 	 * Load data from file into the given chunk list.

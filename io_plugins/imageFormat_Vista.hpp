@@ -47,7 +47,6 @@ protected:
 	util::istring suffixes( io_modes /*modes=both*/ )const {return ".v";}
 public:
 	std::string getName()const { return std::string( "Vista" );}
-	bool tainted()const {return false;}//internal plugins are not tainted
 
 	/**
 	 * This plugin supports the following dialects:

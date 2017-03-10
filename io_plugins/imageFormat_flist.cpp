@@ -55,7 +55,6 @@ public:
 	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
-	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

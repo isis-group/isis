@@ -201,7 +201,6 @@ public:
 		
 		Magick::writeImages(images.begin(),images.end(),filename);
 	}
-	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

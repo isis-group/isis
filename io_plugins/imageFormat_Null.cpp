@@ -185,7 +185,6 @@ public:
 			}
 		}
 	}
-	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

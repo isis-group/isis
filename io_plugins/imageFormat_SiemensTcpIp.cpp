@@ -445,7 +445,6 @@ namespace isis
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )  throw( std::runtime_error & ) {
                 throwGenericError( "Writing TCP/IP is not supportet" );
             }
-            bool tainted()const {return false;}//internal plugins are not tainted
             
             ~ImageFormat_SiemensTcpIp() {
             }
