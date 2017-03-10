@@ -51,7 +51,8 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param is_needed flag if parameter is a needed one (default: true)
 	 */
-	template<typename T> ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_parsed( false ) {}
+	template<class T, typename = std::enable_if_t<knowType<T>::value> >
+	ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_parsed( false ) {}
 	/**
 	 * Put the given value into this parameter.
 	 * The parsing is done by automatic (!) type-conversion from std::string to the type of the parameter.
