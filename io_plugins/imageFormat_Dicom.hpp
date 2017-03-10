@@ -58,7 +58,7 @@ class ImageFormat_Dicom: public FileFormat
 	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey, util::PropertyMap::PropPath> dictionary;
 protected:
-	util::istring suffixes( io_modes modes = both )const;
+	util::istring suffixes( io_modes modes = both )const override;
 	util::PropertyMap::PropPath tag2Name( const DcmTagKey &tag ) const;
 public:
 	ImageFormat_Dicom();
@@ -76,8 +76,6 @@ public:
 	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
-
-	bool tainted()const override;
 };
 }
 }

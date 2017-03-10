@@ -127,7 +127,7 @@ protected:
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
-util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
+util::istring ImageFormat_Dicom::suffixes( io_modes modes )const 
 {
 	if( modes == write_only )
 		return util::istring();
@@ -402,9 +402,21 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	auto windowCenterQuery=dicomTree.queryProperty("WindowCenter");
 	auto windowWidthQuery=dicomTree.queryProperty("WindowCenter");
 	if( windowCenterQuery && windowWidthQuery){
-		const double windowCenter=windowCenterQuery->as<double>(), windowWidth= windowWidthQuery->as<double>();
-		windowCenterQuery.reset();windowWidthQuery.reset();
-		dicomTree.remove("WindowCenter");dicomTree.remove("WindowWidth");
+		util::ValueReference windowCenterVal=windowCenterQuery->front();
+		util::ValueReference windowWidthVal=windowWidthQuery->front();
+		double windowCenter,windowWidth;
+		if(windowCenterVal->isFloat()){
+			windowCenter=windowCenterVal->as<double>();
+			dicomTree.remove("WindowCenter");
+		} else 
+			windowCenter=windowCenterVal->as<util::dlist>().front(); // sometimes there are actually multiple windows, use the first
+			
+		if(windowWidthVal->isFloat()){
+			windowWidth=windowWidthVal->as<double>();
+			dicomTree.remove("WindowWidth");
+		} else 
+			windowWidth = windowWidthVal->as<util::dlist>().front();
+			
 		object.setValueAs("window/min",windowCenter-windowWidth/2);
 		object.setValueAs("window/max",windowCenter+windowWidth/2);
 	}
@@ -563,8 +575,6 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
-
-bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 
 ImageFormat_Dicom::ImageFormat_Dicom()
 {
