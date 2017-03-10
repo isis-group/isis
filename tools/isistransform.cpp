@@ -64,11 +64,11 @@ int main( int argc, char **argv )
 	app.parameters["rotate"]=util::slist{"x","y", "90"};
 	app.parameters["rotate"].needed()=false;
 	
-	app.addLogging<TransformLog>();
-	app.addLogging<TransformDebug>();
+	app.addLogging<TransformLog>("");
+	app.addLogging<TransformDebug>("");
 	
-	app.addLogging<ITKLog>();
-	app.addLogging<ITKDebug>();
+	app.addLogging<ITKLog>("ITK");
+	app.addLogging<ITKDebug>("ITK");
 	
 	app.init( argc, argv );
 	

@@ -33,14 +33,14 @@ namespace util
 
 Application::Application( const char name[], const char cfg[]): m_name( name )
 {
-	addLogging<CoreLog>();
-	addLogging<CoreDebug>();
-	addLogging<DataLog>();
-	addLogging<DataDebug>();
-	addLogging<ImageIoLog>();
-	addLogging<ImageIoDebug>();
-	addLogging<MathLog>();
-	addLogging<MathDebug>();
+	addLogging<CoreLog>("Core");
+	addLogging<CoreDebug>("Core");
+	addLogging<DataLog>("Data");
+	addLogging<DataDebug>("Data");
+	addLogging<ImageIoLog>("ImageIO");
+	addLogging<ImageIoDebug>("ImageIO");
+	addLogging<MathLog>("Math");
+	addLogging<MathDebug>("Math");
 
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
@@ -182,8 +182,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::resetLogging()
 {
-	typedef const std::pair< const std::string, std::list< setLogFunction > > & logger_ref;
-	for( logger_ref ref: logs ) {
+	for( auto &ref: logs ) {
 		const std::string dname = std::string( "d" ) + ref.first;
 		assert( !parameters[dname].isEmpty() ); // this must have been set by addLoggingParameter (called via addLogging)
 		const LogLevel level = ( LogLevel )( uint16_t )parameters[dname].as<Selection>();
