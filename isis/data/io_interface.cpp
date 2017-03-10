@@ -173,7 +173,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 {
 	using namespace std::regex_constants;
 	static const std::regex reg( "\\{[^{}]+\\}", optimize);
-	static const std::regex invalid( "[\\/\\s]", optimize);
+	static const std::regex invalid( "[/\\\\[:space:]]", optimize);
 	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", optimize );
 	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  optimize );
 	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", optimize| icase); 
@@ -181,9 +181,6 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 	enum formatting_type {none,integer,uinteger,floating};
 	ptrdiff_t offset=0;
 	
-	//NOTE: can also be done for rounding floats, but at the moment not required so not done right now
-
-
 	//iterate through all {whatever} in the pattern
 	for(std::sregex_iterator i=std::sregex_iterator(namePattern.begin(),namePattern.end(), reg); i!=std::sregex_iterator();i++){
 		std::string smatch=i->str().substr(1,i->length()-2); // get the string inside the {}
@@ -224,7 +221,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 				} 
 				pstring=std::string(buffer);
 			}
-			std::regex_replace(pstring,invalid,"_");
+			pstring=std::regex_replace(pstring,invalid,"_");
 			result.replace(i->position()+offset, i->length(),pstring);
 			offset+=pstring.length()-i->length();
 		} else
