@@ -289,19 +289,28 @@ public:
 		}
 
 		tImg.spliceDownTo( data::sliceDim );
-		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
 
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
-			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front().getSizeAsString();
+			std::vector<data::Chunk > chunks;
+			size_t middle= tImg.getDimSize(data::sliceDim) / 2 + 1;
+			LOG( Runtime, info ) 
+				<< "Writing the slice " << middle << " of " << tImg.getDimSize(data::sliceDim) 
+				<< " slices as png-image of size " << tImg.getChunk(0).getSizeAsString();
+				
+			for(int i=0;i<tImg.getDimSize(data::timeDim);i++)
+				chunks.push_back(tImg.getChunk(0,0,middle,i));
+			
+			writeChunks(chunks,filename,color_type,bit_depth,feedback);  // write all slices
 
-			if( !write_png( filename, chunks[chunks.size() / 2], color_type, bit_depth ) ) {
-				throwGenericError( std::string( "Failed to write " ) + filename );
-			}
 		} else { //save all slices
+			writeChunks(tImg.copyChunksToVector( false ),filename,color_type,bit_depth,feedback);  // write all slices
+		}
+
+	}
+	void writeChunks(std::vector<data::Chunk > chunks,std::string filename, png_byte color_type, png_byte bit_depth, std::shared_ptr<util::ProgressFeedback> feedback){
 			if(feedback)
 				feedback->show(chunks.size(),std::string("Writing ")+std::to_string(chunks.size())+" slices as png files");
-			
 			size_t number = 0;
 			unsigned short numLen = std::log10( chunks.size() ) + 1;
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
@@ -319,8 +328,6 @@ public:
 					throwGenericError( std::string( "Failed to write " ) + name );;
 				}
 			}
-		}
-
 	}
 };
 }
