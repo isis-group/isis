@@ -17,7 +17,8 @@ include_directories(${CMAKE_SOURCE_DIR})
 # add global options
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
-option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
+option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_IMAGEMAGIC "Enable plugin for ImageMagic based IO" OFF)
@@ -41,6 +42,14 @@ if(ISIS_IOPLUGIN_NIFTI_SA)
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
+############################################################
+# TIFF plugin
+############################################################
+if(ISIS_IOPLUGIN_TIFF_SA)
+	add_library(isisImageFormat_tiff_sa SHARED imageFormat_tiff_sa.cpp )
+	target_link_libraries(isisImageFormat_tiff_sa ${isis_core_lib})
+	set(TARGETS ${TARGETS} isisImageFormat_tiff_sa)
+endif(ISIS_IOPLUGIN_TIFF_SA)
 
 if(ISIS_IOPLUGIN_VISTA_SA)
 	option(REGEN_PARSER "Regenerate the parser files" OFF)
