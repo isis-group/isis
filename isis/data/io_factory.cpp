@@ -251,6 +251,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 			}
 		}
 	}
+	return std::list<Chunk>();
 }
 
 std::list<util::istring> IOFactory::getFormatStack( std::string filename ){
