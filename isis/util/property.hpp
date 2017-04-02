@@ -216,7 +216,7 @@ public:
 	PropertyValue copyByID( unsigned short ID ) const;
 
 	/// \returns the value(s) represented as text.
-	virtual std::string toString( bool labeled = false )const;
+	virtual std::string toString( bool labeled = false, std::string formatting="" )const;
 
 	/// \returns true if, and only if no value is stored
 	bool isEmpty()const;

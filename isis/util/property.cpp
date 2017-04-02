@@ -53,12 +53,12 @@ PropertyValue PropertyValue::copyByID( short unsigned int ID ) const
 	return ret;
 }
 
-std::string PropertyValue::toString( bool labeled )const
+std::string PropertyValue::toString( bool labeled, std::string formatting )const
 {
 	if(container.empty()){
 		return std::string("\u2205");//utf8 for empty set
 	} else if(size()==1)
-		return front().toString(labeled);
+		return front().toString(labeled, formatting);
 	else{
 		const PropertyValue buff=copyByID(Value<std::string>::staticID());
 		std::string ret=listToString(buff.begin(),buff.end(),",","[","]");
