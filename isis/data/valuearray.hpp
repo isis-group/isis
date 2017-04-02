@@ -218,14 +218,7 @@ public:
 	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
 	 * \param length amount of elements in the new array
 	 */
-	ValueArray( size_t length ): ValueArrayBase( length ) {
-		if( length )
-			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
-
-		LOG_IF( length == 0, Debug, warning )
-				<< "Creating an empty ValueArray of type " << util::MSubject( staticName() )
-				<< " you should overwrite it with a useful pointer before using it";
-	}
+	ValueArray( size_t length ): ValueArray(( TYPE * )calloc( length, sizeof( TYPE ) ),  length ) {}
 
 	/**
 	 * Creates ValueArray from a std::shared_ptr of the same type.
@@ -234,7 +227,13 @@ public:
 	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValueArray( const std::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {}
+	ValueArray( const std::shared_ptr<TYPE> &ptr, size_t length ): ValueArrayBase( length ), m_val( ptr ) {
+		util::checkType<TYPE>();
+		static_assert(!std::is_const<TYPE>::value,"ValueArray type must not be const");
+		LOG_IF( length == 0, Debug, warning )
+			<< "Creating an empty (lenght==0) ValueArray of type " << util::MSubject( staticName() )
+			<< " you should overwrite it with a useful pointer before using it";
+	}
 
 	/**
 	 * Creates ValueArray from a pointer of type TYPE.
@@ -243,7 +242,7 @@ public:
 	 * \param length the length of the used array (ValueArray does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValueArray( TYPE *const ptr, size_t length ): ValueArrayBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValueArray( TYPE *const ptr, size_t length ): ValueArray(std::shared_ptr<TYPE>( ptr, BasicDeleter() ), length ) {}
 
 	/**
 	 * Creates ValueArray from a pointer of type TYPE.
@@ -255,7 +254,10 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValueArray( TYPE *const ptr, size_t length, D d ): ValueArrayBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValueArray( TYPE *const ptr, size_t length, D d ): ValueArrayBase( length ), m_val( ptr, d ) {
+		util::checkType<TYPE>();
+		static_assert(!std::is_const<TYPE>::value,"ValueArray type must not be const");
+	}
 
 	virtual ~ValueArray() {}
 
