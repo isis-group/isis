@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 	util::listToOStream(
 		sample, sample + ch.getVolume(), o,
 		"|",
-		util::Value<int32_t>( ch.getVolume() ).toString( false ) + "#", ""
+		(std::to_string(ch.getVolume() ) + "#").c_str(), ""
 	);
 	BOOST_CHECK_EQUAL( o.str(), ch.getValueArray<float>().toString() );
 }
