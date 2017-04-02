@@ -67,6 +67,7 @@ public:
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
 	template<typename T> ValueArray<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
+		util::checkType<T>();
 		std::shared_ptr<T> ptr = std::static_pointer_cast<T>( getRawAddress( offset ) );
 
 		if( len == 0 ) {
@@ -89,10 +90,6 @@ public:
 			data::endianSwapArray( ptr.get(), ptr.get() + std::min( len, getLength() / sizeof( T ) ), ret.begin() );
 			return ret;
 		}
-
-	}
-	template<typename T> ValueArray<const T> at( size_t offset, size_t len = 0, bool swap_endianess = false )const {
-		return std::static_pointer_cast<const T>(const_cast<ByteArray*>(this)->at<T>(offset,len,swap_endianess));
 	}
 	/**
 	 * Get a ValueArrayReference to a ValueArray of the requested type.
