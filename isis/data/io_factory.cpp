@@ -227,7 +227,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 		while( !readerList.empty() ) {
 			FileFormatPtr format=readerList.front();
 			readerList.pop_front();
-			LOG_IF(filename, ImageIoDebug, info ) << "plugin to load file" << with_dialect << " " << filename << ": " << format->getName();
+			LOG_IF(filename, ImageIoDebug, info ) << "plugin to load file" << with_dialect << " " << *filename << ": " << format->getName();
 			LOG_IF(!filename, ImageIoDebug, info ) << "plugin to load " << with_dialect << ": " << format->getName();
 
 			try {
