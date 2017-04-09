@@ -80,20 +80,20 @@ namespace _internal {
 		logl = 32844,logluv = 32845
 	};
 
-	template<typename T> util::PropertyValue getPropVal_impl(data::ByteArray &source,bool byteswap,size_t offset, size_t number_of_values){
+	template<typename T> util::PropertyValue getPropVal_impl(data::ByteArray &source,bool byteswap,uint64_t offset, uint64_t number_of_values){
 		util::PropertyValue ret;
 		for(auto val:source.at<T>(offset,number_of_values,byteswap))
 			ret.push_back(val);
 		return ret;
 	}
 
-	template<> util::PropertyValue getPropVal_impl<std::string>(data::ByteArray &source,bool byteswap,size_t offset, size_t number_of_values){
+	template<> util::PropertyValue getPropVal_impl<std::string>(data::ByteArray &source,bool byteswap,uint64_t offset, uint64_t number_of_values){
 		const char *str=(char*)source.at<uint8_t>(offset,number_of_values,byteswap).getRawAddress().get();
 		return util::Value<std::string>(str);
 	}
 	
 	//rational (Two LONGs: the first represents the numerator of a fraction; the second, the denominator.)
-	template<> util::PropertyValue getPropVal_impl<double>(data::ByteArray &source,bool byteswap,size_t offset, size_t number_of_values){
+	template<> util::PropertyValue getPropVal_impl<double>(data::ByteArray &source,bool byteswap,uint64_t offset, uint64_t number_of_values){
 		util::PropertyValue ret=getPropVal_impl<uint32_t>(source,byteswap,offset,number_of_values*2);
 		const util::Value<double> frac=ret[0].as<double>()/ret[1].as<double>();
 		LOG(Debug,verbose_info) << "Computed " << frac << " from rational " << ret;
@@ -105,7 +105,7 @@ namespace _internal {
 		uint64_t m_offset=0;
 		
 	public:
-		template<typename T> ValueArray<T> at( size_t offset, size_t len = 0){
+		template<typename T> ValueArray<T> at( uint64_t offset, uint64_t len = 0){
 			return data::ByteArray::at<T>(offset,len,m_byteswap);
 		}
 		void seek(uint64_t _offset){m_offset=_offset;}
@@ -146,7 +146,7 @@ namespace _internal {
 		}
 		template<typename T> util::PropertyValue getPropVal(){
 			const uint64_t number_of_values= readValAuto<uint32_t>();
-			const size_t projected_size=number_of_values*sizeof(T);
+			const uint64_t projected_size=number_of_values*sizeof(T);
 			
 			if((projected_size<=4) || (m_big_tiff && projected_size <= 8)) // inlined data
 				return getPropVal_impl<T>(*this,m_byteswap,m_offset,number_of_values);
@@ -184,9 +184,9 @@ namespace _internal {
 	
 	
 	class IFD{
-		std::array<size_t,2> size,tilesize;
+		std::array<uint64_t,2> size,tilesize;
 		std::array<float,2> pixels_per_unit;
-		std::list<size_t> stripoffsets,stripbytecounts,tileoffsets,tilebytecounts,bitspersample;
+		std::list<uint64_t> stripoffsets,stripbytecounts,tileoffsets,tilebytecounts,bitspersample;
 		std::list<_internal::ValueArrayJPEGSource> tiles;
 		enum unit_types{none=1,inch,centimeter}resolution_unit=inch;
 		util::PropertyMap generic_props;
@@ -195,44 +195,44 @@ namespace _internal {
 		uint16_t 
 			planar_configuration=1, //http://www.awaresystems.be/imaging/tiff/tifftags/planarconfiguration.html
 			samples_per_pixel;
-		size_t rowsperstrip;
+		uint64_t rowsperstrip;
 	public:
-		size_t readTAG(TiffSource &source){
+		void readTAG(TiffSource &source){
 			std::pair<uint16_t,util::PropertyValue> tag=source.readTag();
 			switch(tag.first){
-				case 0x100:size[0]=tag.second.as<size_t>();break;//ImageWidth
-				case 0x101:size[1]=tag.second.as<size_t>();break;//ImageLength
+				case 0x100:size[0]=tag.second.as<uint64_t>();break;//ImageWidth
+				case 0x101:size[1]=tag.second.as<uint64_t>();break;//ImageLength
 				case 0x102://TileOffsets
 					for(const auto &off:tag.second)
-						bitspersample.push_back(off.as<size_t>());
+						bitspersample.push_back(off.as<uint64_t>());
 					break; 
 				case 0x103:compression =(compression_type) tag.second.as<uint16_t>();break;//Compression
 				case 0x106:photometricinterpretation = (photometric_type)tag.second.as<uint16_t>();break;//PhotometricInterpretation
 				
 				case 0x111://StripOffsets
 					for(const auto &off:tag.second)
-						stripoffsets.push_back(off.as<size_t>());
+						stripoffsets.push_back(off.as<uint64_t>());
 					break; 
-				case 0x115:samples_per_pixel=tag.second.as<size_t>();break;
-				case 0x116:rowsperstrip=tag.second.as<size_t>();break;
+				case 0x115:samples_per_pixel=tag.second.as<uint64_t>();break;
+				case 0x116:rowsperstrip=tag.second.as<uint64_t>();break;
 				case 0x117://StripByteCounts
 					for(const auto &off:tag.second)
-						stripbytecounts.push_back(off.as<size_t>());
+						stripbytecounts.push_back(off.as<uint64_t>());
 					break; 
 
 				case 0x128:resolution_unit=(unit_types)tag.second.as<uint16_t>();break;
 				case 0x11A:pixels_per_unit[0]=tag.second.as<float>();break;
 				case 0x11B:pixels_per_unit[1]=tag.second.as<float>();break;
 					
-				case 0x142:tilesize[0]=tag.second.as<size_t>();break;
-				case 0x143:tilesize[1]=tag.second.as<size_t>();break;
+				case 0x142:tilesize[0]=tag.second.as<uint64_t>();break;
+				case 0x143:tilesize[1]=tag.second.as<uint64_t>();break;
 				case 0x144://TileOffsets
 					for(const auto &off:tag.second)
-						tileoffsets.push_back(off.as<size_t>());
+						tileoffsets.push_back(off.as<uint64_t>());
 					break; 
 				case 0x145://TileOffsets
 					for(const auto &off:tag.second)
-						tilebytecounts.push_back(off.as<size_t>());
+						tilebytecounts.push_back(off.as<uint64_t>());
 					break; 
 				default:
 					generic_props.touchProperty(std::to_string(tag.first).c_str()).transfer(tag.second);
@@ -241,7 +241,7 @@ namespace _internal {
 		}
 
 		IFD(TiffSource &source){
-			size_t number_of_tags= source.readValAuto();
+			uint64_t number_of_tags= source.readValAuto();
 			util::DefaultMsgPrint::stopBelow(warning);
 			
 			for(uint16_t i=0;i<number_of_tags;i++){
@@ -263,8 +263,8 @@ namespace _internal {
 			if(!stripoffsets.empty()){
 				std::cout << "stripoffsets" << stripoffsets << std::endl;
 			}
-			for (size_t y = 0; y < size[1]; y += tilesize[1]){
-				for (size_t x = 0; x < size[0]; x += tilesize[0]){
+			for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
+				for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
 					jpeg_decompress_struct cinfo;
 					jpeg_error_mgr jerr;
 
@@ -285,7 +285,7 @@ namespace _internal {
 					assert(cinfo.out_color_components==3);
 					assert(cinfo.image_width==tilesize[0]);
 					assert(cinfo.data_precision==8);
-					for(size_t i=0;i<std::min(tilesize[1],size[1]-y);i++){
+					for(uint64_t i=0;i<std::min(tilesize[1],size[1]-y);i++){
 // 						if(size[0]-x >= tilesize[0]){
 // 							JSAMPARRAY scanline=(JSAMPROW*)&ret.voxel<util::color24>(x,i);
 // 							jpeg_read_scanlines(&cinfo,scanline,1);
@@ -312,7 +312,6 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	const util::istring &dialect, 
 	std::shared_ptr<util::ProgressFeedback> feedback
 )throw( std::runtime_error & ) {
-	bool byteswap=false,big_tiff=false;
 	_internal::TiffSource tiff(source);
 	
 	const uint64_t ifd_start = tiff.readValAuto<uint32_t>();
@@ -321,7 +320,7 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	
 	_internal::IFD first(tiff);
 	first.makeChunk();
-	
+	return std::list<data::Chunk>();
 }
 
 std::string ImageFormat_TiffSa::getName() const{return "tiff";}
