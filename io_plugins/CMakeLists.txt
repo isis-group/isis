@@ -110,7 +110,7 @@ if(ISIS_IOPLUGIN_PNG)
 endif(ISIS_IOPLUGIN_PNG)
 
 ############################################################
-# PNG plugin
+# ImageMagic plugin
 ############################################################
 if(ISIS_IOPLUGIN_IMAGEMAGIC)
 	find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
