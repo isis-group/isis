@@ -120,10 +120,10 @@ namespace _internal {
 		TiffSource(data::ByteArray source):ByteArray(source){
 			switch(readVal<uint16_t>()){
 				case 0x4949://little endian
-					m_byteswap=(__BYTE_ORDER==__BIG_ENDIAN);
+					m_byteswap=(__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);
 					break; 
 				case 0x4D4D: // big endian
-					m_byteswap=(__BYTE_ORDER==__LITTLE_ENDIAN);
+					m_byteswap=(__BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__);
 					break;
 				default: // wrong magic
 					FileFormat::throwGenericError("this is no tiff file");
