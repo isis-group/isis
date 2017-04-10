@@ -68,6 +68,30 @@ protected:
 		else return write+" tgz tbz taz";
 	}
 public:
+	std::unique_ptr<boost::iostreams::filtering_istream> makeIStream(std::list<util::istring> &formatstack){
+		//select filters for input
+		std::unique_ptr<boost::iostreams::filtering_istream> in(new boost::iostreams::filtering_istream);
+
+		util::istring format = formatstack.back();
+		formatstack.back()="tar"; // push in "tar" in case its one of the following
+
+		if( format == "tgz" )in->push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
+		else if( format == "tbz" )in->push( boost::iostreams::bzip2_decompressor() );
+		else if( format == "taz" )in->push( boost::iostreams::zlib_decompressor() );
+		else {
+			formatstack.pop_back(); // ok, its none of the above, so remove the additional "tar"
+			if( format == "gz" )in->push( boost::iostreams::gzip_decompressor() );
+			else if( format == "bz2" )in->push( boost::iostreams::bzip2_decompressor() );
+			else if( format == "Z" )in->push( boost::iostreams::zlib_decompressor() );
+#ifdef HAVE_LZMA
+			else if( format == "xz" )in->push( boost::iostreams::lzma_decompressor() );
+#endif
+			else { // ok, no idea what going on, cry for mamy
+				throwGenericError( "Cannot determine the compression format" );
+			}
+		}
+		return std::move(in);
+	}
 	util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const override{
 
 		std::list<util::istring> suffixes;
@@ -83,40 +107,39 @@ public:
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
 	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
-		//select filters for input
-		boost::iostreams::filtering_istream in;
-
-		util::istring format = formatstack.back();
-		formatstack.back()="tar"; // puch in "tar" in case its one of the following
-
-		if( format == "tgz" )in.push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
-		else if( format == "tbz" )in.push( boost::iostreams::bzip2_decompressor() );
-		else if( format == "taz" )in.push( boost::iostreams::zlib_decompressor() );
-		else {
-			formatstack.pop_back(); // ok, its none of the above, so remove the additional "tar"
-			if( format == "gz" )in.push( boost::iostreams::gzip_decompressor() );
-			else if( format == "bz2" )in.push( boost::iostreams::bzip2_decompressor() );
-			else if( format == "Z" )in.push( boost::iostreams::zlib_decompressor() );
-#ifdef HAVE_LZMA
-			else if( format == "xz" )in.push( boost::iostreams::lzma_decompressor() );
-#endif
-			else { // ok, no idea what going on, cry for mamy
-				throwGenericError( "Cannot determine the compression format" );
-			}
-		}
 		
-		// use progress bar if its set up and enabled 
-		if( progress && progress->getMax() ) {
-			in.push( _internal::progress_filter( *progress ) );
-		}
+		auto in=makeIStream(formatstack);
 
 		//ok, we have a filter, use that with the source stream on top
-		in.push( *source );
+		in->push( *source );
 
-		return data::IOFactory::loadChunks( in.rdbuf(), formatstack, dialect );
+		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+	}
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
+		//try open file
+		std::ifstream file(filename.c_str());
+		file.exceptions(std::ios_base::badbit);
+
+		// set up progress bar if its enabled but don't fiddle with it if its set up already
+		bool set_up=false;
+		if( feedback && feedback->getMax() == 0 ) {
+			set_up=true;
+			feedback->show( boost::filesystem::file_size( filename ), std::string( "decompressing " ) + filename.native() );
+		}
+		auto in=makeIStream(formatstack);
+
+		if(set_up) 
+			in->push( _internal::progress_filter( *feedback ) );
+
+		in->push(file);
+		std::list<data::Chunk> ret=data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+		
+		if(set_up) // close progress bar
+			feedback->close();
+		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) override {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
 
