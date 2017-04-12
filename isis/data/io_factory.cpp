@@ -433,7 +433,7 @@ std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& 
 
 bool IOFactory::write( const data::Image &image, const std::string &path, util::istring suffix_override, util::istring dialect )
 {
-	return write( {image}, path, suffix_override, dialect );
+	return write( std::list< isis::data::Image >(1,image), path, suffix_override, dialect );
 }
 
 
