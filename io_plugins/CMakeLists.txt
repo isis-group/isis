@@ -46,8 +46,12 @@ endif(ISIS_IOPLUGIN_NIFTI_SA)
 # TIFF plugin
 ############################################################
 if(ISIS_IOPLUGIN_TIFF_SA)
+	find_path(TJPEG_INCLUDE_DIR "turbojpeg.h")
+	find_library(TJPEG_LIBRARY "turbojpeg")
+
+	include_directories(${TJPEG_INCLUDE_DIR})
 	add_library(isisImageFormat_tiff_sa SHARED imageFormat_tiff_sa.cpp )
-	target_link_libraries(isisImageFormat_tiff_sa ${isis_core_lib})
+	target_link_libraries(isisImageFormat_tiff_sa ${TJPEG_LIBRARY} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_tiff_sa)
 endif(ISIS_IOPLUGIN_TIFF_SA)
 

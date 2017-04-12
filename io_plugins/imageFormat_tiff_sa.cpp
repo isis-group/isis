@@ -1,6 +1,8 @@
-#include "imageFormat_tiff_sa.hpp"
+#include <isis/data/io_factory.hpp>
 #include <stdint.h>
-#include <jpeglib.h>
+#include <stdio.h>
+#include <turbojpeg.h>
+#include "imageFormat_tiff_sa.hpp"
 
 // https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf
 // http://www.awaresystems.be/imaging/tiff/bigtiff.html
@@ -10,48 +12,6 @@ namespace image_io{
 	
 namespace _internal {
 
-	class ValueArrayJPEGSource : public jpeg_source_mgr{
-		data::ValueArray<uint8_t> array;
-	public:
-		ValueArrayJPEGSource(data::ValueArray<uint8_t> src):array(src){
-			init_source=init_source_p;
-			fill_input_buffer=fill_input_buffer_p;
-			skip_input_data=skip_input_data_p;
-			resync_to_restart=jpeg_resync_to_restart;
-		}
-		static void init_source_p(j_decompress_ptr cinfo){
-			ValueArrayJPEGSource* sp = (ValueArrayJPEGSource*)cinfo->src;
-			sp->next_input_byte = sp->array.begin();
-			sp->bytes_in_buffer = sp->array.getLength();
-		}
-		static boolean fill_input_buffer_p(j_decompress_ptr cinfo){
-// 			Normally the whole strip/tile is read and so we don't need to do
-// 			a fill.  In the case of CHUNKY_STRIP_READ_SUPPORT we might not have
-// 			all the data, but the rawdata is refreshed between scanlines and
-// 			we push this into the io machinery in JPEGDecode(). 	 
-// 			http://trac.osgeo.org/gdal/ticket/3894
-
-			LOG(Runtime,warning) << "the jpeg decoder asked for a refill, it shouldn't. Telling it the stream ended";
-			static const JOCTET dummy_EOI[2] = { 0xFF, JPEG_EOI };
-			/* insert a fake EOI marker */
-			cinfo->src->next_input_byte = dummy_EOI;
-			cinfo->src->bytes_in_buffer = 2;
-			return true;
-		}
-		static void skip_input_data_p(j_decompress_ptr cinfo, long num_bytes){
-			if (num_bytes > 0) {
-				if (num_bytes > cinfo->src->bytes_in_buffer) { // oops, buffer overrun 
-					fill_input_buffer_p(cinfo);
-				} else {
-					cinfo->src->next_input_byte+=num_bytes;
-					cinfo->src->bytes_in_buffer-=num_bytes;
-				}
-			}
-		}
-		static void term_source_p(j_decompress_ptr cinfo){}
-	};
-
-	
 	enum compression_type{ //http://www.awaresystems.be/imaging/tiff/tifftags/compression.html
 		none = 1, 
 		ccittrle = 2, ccittfax3 = 3, ccittfax4 = 4,
@@ -187,7 +147,7 @@ namespace _internal {
 		std::array<uint64_t,2> size,tilesize;
 		std::array<float,2> pixels_per_unit;
 		std::list<uint64_t> stripoffsets,stripbytecounts,tileoffsets,tilebytecounts,bitspersample;
-		std::list<_internal::ValueArrayJPEGSource> tiles;
+		std::list<data::ValueArray<uint8_t>> tiles;
 		enum unit_types{none=1,inch,centimeter}resolution_unit=inch;
 		util::PropertyMap generic_props;
 		compression_type compression;
@@ -258,44 +218,34 @@ namespace _internal {
 		}
 		data::Chunk makeChunk(){
 			data::MemChunk<util::color24> ret(size[0],size[1],1,1,true);
+			data::MemChunk<util::color24> tile_buff(tilesize[0],tilesize[1]);
 			ret.branch("TIFF")=generic_props;
 			
 			if(!stripoffsets.empty()){
 				std::cout << "stripoffsets" << stripoffsets << std::endl;
 			}
+			auto decompressor=tjInitDecompress();
 			for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
 				for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
-					jpeg_decompress_struct cinfo;
-					jpeg_error_mgr jerr;
+					assert(!tiles.empty());
+					data::ValueArray<uint8_t> tile_src = tiles.front();
 
-					cinfo.err = jpeg_std_error(&jerr);
-					cinfo.err->trace_level=5;
-					jpeg_create_decompress(&cinfo);
-
-					cinfo.src = &tiles.front();
-					cinfo.image_width  = tilesize[0];      /* image width and height, in pixels */
-					cinfo.image_height = tilesize[1];
-					
-					if(jpeg_read_header(&cinfo, TRUE)!=JPEG_HEADER_OK)
-						LOG(Debug,warning) << "jpeg_read_header didn't return OK";
-					if(!jpeg_start_decompress(&cinfo))
-						LOG(Debug,warning) << "jpeg_start_decompress didn't return OK";
-					
-					assert(cinfo.out_color_space==JCS_RGB);
-					assert(cinfo.out_color_components==3);
-					assert(cinfo.image_width==tilesize[0]);
-					assert(cinfo.data_precision==8);
-					for(uint64_t i=0;i<std::min(tilesize[1],size[1]-y);i++){
-// 						if(size[0]-x >= tilesize[0]){
-// 							JSAMPARRAY scanline=(JSAMPROW*)&ret.voxel<util::color24>(x,i);
-// 							jpeg_read_scanlines(&cinfo,scanline,1);
-// 						} else {
-							std::unique_ptr<JSAMPROW> scanline((JSAMPROW*)malloc(sizeof(JSAMPROW)*cinfo.out_color_components*tilesize[0]));
-							jpeg_read_scanlines(&cinfo,scanline.get(),1);
-							memcpy(&ret.voxel<util::color24>(x,i),scanline.get(),(size[0]-x)*cinfo.out_color_components);
-// 						}
+					assert(tile_buff.getBytesPerVoxel()==tjPixelSize[TJPF_RGB]);
+					auto *p_tile_buff= std::static_pointer_cast<unsigned char>(tile_buff.asValueArrayBase().getRawAddress()).get();
+					const int err=tjDecompress2(
+						decompressor,
+						tile_src.begin(),tile_src.getLength(),
+						p_tile_buff,
+						tilesize[0],tilesize[0]*tjPixelSize[TJPF_RGB],tilesize[1],
+						TJPF_RGB,
+						0
+					);
+					if(err){
+						LOG(Runtime,error) << "jpeg decompression failed with " << tjGetErrorStr();
+						#warning implement error handling
+					} else {
+						ret.copyFromTile(tile_buff,{x,y}); 
 					}
-					jpeg_finish_decompress(&cinfo);
 					tiles.pop_front();
 				}
 			}
@@ -319,8 +269,7 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	tiff.seek(ifd_start);
 	
 	_internal::IFD first(tiff);
-	first.makeChunk();
-	return std::list<data::Chunk>();
+	return std::list<data::Chunk>(1,first.makeChunk());
 }
 
 std::string ImageFormat_TiffSa::getName() const{return "tiff";}
