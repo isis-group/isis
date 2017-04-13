@@ -71,10 +71,9 @@ public:
 		png_structp png_ptr;
 		png_infop info_ptr;
 
-		//buff has to be swapped along the png-x-axis and y-axis
+		//buff has to be swapped along the png-x-axis
 		data::Chunk buff = src.copyByID(); //make a deep copy to not interfere with the source
 		buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
-		buff.flipAlong( data::columnDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
 
 		util::vector4<size_t> size = buff.getSizeAsVector();
 
