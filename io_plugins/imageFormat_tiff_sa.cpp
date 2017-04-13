@@ -55,9 +55,14 @@ namespace _internal {
 	//rational (Two LONGs: the first represents the numerator of a fraction; the second, the denominator.)
 	template<> util::PropertyValue getPropVal_impl<double>(data::ByteArray &source,bool byteswap,uint64_t offset, uint64_t number_of_values){
 		util::PropertyValue ret=getPropVal_impl<uint32_t>(source,byteswap,offset,number_of_values*2);
-		const util::Value<double> frac=ret[0].as<double>()/ret[1].as<double>();
-		LOG(Debug,verbose_info) << "Computed " << frac << " from rational " << ret;
-		return frac;
+		if(number_of_values==1){
+			return util::Value<double>(ret[0].as<double>()/ret[1].as<double>());
+		} else {
+			util::Value<util::dlist> values;
+			for(int i=0;i<number_of_values*2;i+=2)
+				static_cast<util::dlist&>(values).push_back(ret[i].as<double>()/ret[i+1].as<double>());
+			return values;
+		}
 	}
 
 	class TiffSource:protected data::ByteArray{
@@ -136,7 +141,7 @@ namespace _internal {
 					LOG(Runtime,warning) << "Invalid type " << tag_type << " when reading tag " << ret.first;
 			}
 			seek(next);
-			LOG(Debug,info) << "Red tag " << ret.first << " as " << ret.second;
+			LOG(Debug,verbose_info) << "Red tag " << ret.first << " as " << ret.second;
 			return ret;
 		}
 
@@ -157,6 +162,7 @@ namespace _internal {
 			samples_per_pixel;
 		uint64_t rowsperstrip;
 	public:
+		size_t countProgress()const{return tiles.size();}
 		void readTAG(TiffSource &source){
 			std::pair<uint16_t,util::PropertyValue> tag=source.readTag();
 			switch(tag.first){
@@ -193,7 +199,9 @@ namespace _internal {
 				case 0x145://TileOffsets
 					for(const auto &off:tag.second)
 						tilebytecounts.push_back(off.as<uint64_t>());
-					break; 
+					break;
+				case 0x011C:
+					planar_configuration=tag.second.as<uint16_t>();break;
 				default:
 					generic_props.touchProperty(std::to_string(tag.first).c_str()).transfer(tag.second);
 					break;
@@ -207,7 +215,7 @@ namespace _internal {
 			for(uint16_t i=0;i<number_of_tags;i++){
 				readTAG(source);
 			}
-			std::cout << generic_props << std::endl;
+
 			assert(tilebytecounts.size()==tileoffsets.size());
 			while(!tilebytecounts.empty()){
 				data::ValueArray<uint8_t> tile=source.at<uint8_t>(tileoffsets.front(),tilebytecounts.front());
@@ -216,37 +224,53 @@ namespace _internal {
 				tilebytecounts.pop_front();
 			}
 		}
-		data::Chunk makeChunk(){
-			data::MemChunk<util::color24> ret(size[0],size[1],1,1,true);
+		bool readTile(data::ValueArray<uint8_t> tile_src, data::Chunk &dst, std::array<size_t,4> pos)const{
 			data::MemChunk<util::color24> tile_buff(tilesize[0],tilesize[1]);
-			ret.branch("TIFF")=generic_props;
+			assert(tile_buff.getBytesPerVoxel()==tjPixelSize[TJPF_RGB]);
+			auto decompressor=tjInitDecompress();
+			auto *p_tile_buff= std::static_pointer_cast<unsigned char>(tile_buff.asValueArrayBase().getRawAddress()).get();
+			const int err=tjDecompress2(
+				decompressor,
+				tile_src.begin(),tile_src.getLength(),
+				p_tile_buff,
+				tilesize[0],tilesize[0]*tjPixelSize[TJPF_RGB],tilesize[1],
+				TJPF_RGB,
+				0
+			);
+			if(err){
+				LOG(Runtime,error) << "jpeg decompression failed with " << tjGetErrorStr();
+				#warning implement error handling
+				return false;
+			} else {
+				dst.copyFromTile(tile_buff,pos); 
+			}
+			return true;
+		}
+		data::Chunk makeChunk(std::shared_ptr<util::ProgressFeedback> feedback)const{
+			data::MemChunk<util::color24> ret(size[0],size[1],1,1,true);
+			ret.touchBranch("TIFF")=generic_props;
+			
+			//todo deal with those
+			auto YCbCrSubSampling = extractOrTell("530",ret.touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/ycbcrsubsampling.html
+			auto ReferenceBlackWhite = extractOrTell("532",ret.touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/referenceblackwhite.html
+
 			
 			if(!stripoffsets.empty()){
 				std::cout << "stripoffsets" << stripoffsets << std::endl;
-			}
-			auto decompressor=tjInitDecompress();
-			for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
-				for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
-					assert(!tiles.empty());
-					data::ValueArray<uint8_t> tile_src = tiles.front();
-
-					assert(tile_buff.getBytesPerVoxel()==tjPixelSize[TJPF_RGB]);
-					auto *p_tile_buff= std::static_pointer_cast<unsigned char>(tile_buff.asValueArrayBase().getRawAddress()).get();
-					const int err=tjDecompress2(
-						decompressor,
-						tile_src.begin(),tile_src.getLength(),
-						p_tile_buff,
-						tilesize[0],tilesize[0]*tjPixelSize[TJPF_RGB],tilesize[1],
-						TJPF_RGB,
-						0
-					);
-					if(err){
-						LOG(Runtime,error) << "jpeg decompression failed with " << tjGetErrorStr();
-						#warning implement error handling
-					} else {
-						ret.copyFromTile(tile_buff,{x,y}); 
+			} else if(!tiles.empty()) {
+				LOG(Runtime,info) 
+					<< "Reading " << ret.getSizeAsString() << "-Image from " << tiles.size() << " tiles (" 
+					<< ret.getVolume()*ret.getBytesPerVoxel() / 1024 / 1024 << "MB)";
+					
+				std::list<data::ValueArray<uint8_t>> t_tiles;
+				for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
+					for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
+						assert(!t_tiles.empty());
+						readTile(t_tiles.front(),ret,{x,y});
+						t_tiles.pop_front();
+						if(feedback)
+							feedback->progress();
 					}
-					tiles.pop_front();
 				}
 			}
 			return ret;
@@ -264,12 +288,32 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 )throw( std::runtime_error & ) {
 	_internal::TiffSource tiff(source);
 	
-	const uint64_t ifd_start = tiff.readValAuto<uint32_t>();
 	
-	tiff.seek(ifd_start);
+	uint64_t next_ifd = tiff.readValAuto<uint32_t>();
 	
-	_internal::IFD first(tiff);
-	return std::list<data::Chunk>(1,first.makeChunk());
+	std::list<_internal::IFD> images;
+	
+	do{	
+		tiff.seek(next_ifd);
+		images.push_back(_internal::IFD(tiff));
+	}while((next_ifd = tiff.readValAuto<uint32_t>()));
+	
+	
+	if(feedback){
+		size_t tilecount=0;
+		for(const _internal::IFD& ifd:images)
+			tilecount+= ifd.countProgress();
+
+		feedback->extend(tilecount);
+	}
+	
+	std::list<data::Chunk> ret;
+	for(const _internal::IFD& ifd:images){
+		ret.push_back(ifd.makeChunk(feedback));
+	}
+
+	
+	return ret;
 }
 
 std::string ImageFormat_TiffSa::getName() const{return "tiff";}
