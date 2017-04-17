@@ -262,14 +262,14 @@ namespace _internal {
 					<< "Reading " << ret.getSizeAsString() << "-Image from " << tiles.size() << " tiles (" 
 					<< ret.getVolume()*ret.getBytesPerVoxel() / 1024 / 1024 << "MB)";
 					
-				std::list<data::ValueArray<uint8_t>> t_tiles;
+				std::list<data::ValueArray<uint8_t>> t_tiles(tiles);
 				for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
 					for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
 						assert(!t_tiles.empty());
 						readTile(t_tiles.front(),ret,{x,y});
-						t_tiles.pop_front();
 						if(feedback)
-							feedback->progress();
+							feedback->progress("",t_tiles.front().getLength()*t_tiles.front().bytesPerElem());
+						t_tiles.pop_front();
 					}
 				}
 			}
@@ -298,20 +298,10 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 		images.push_back(_internal::IFD(tiff));
 	}while((next_ifd = tiff.readValAuto<uint32_t>()));
 	
-	
-	if(feedback){
-		size_t tilecount=0;
-		for(const _internal::IFD& ifd:images)
-			tilecount+= ifd.countProgress();
-
-		feedback->extend(tilecount);
-	}
-	
 	std::list<data::Chunk> ret;
 	for(const _internal::IFD& ifd:images){
 		ret.push_back(ifd.makeChunk(feedback));
 	}
-
 	
 	return ret;
 }
