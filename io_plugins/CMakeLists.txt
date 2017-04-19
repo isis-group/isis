@@ -25,6 +25,7 @@ option(ISIS_IOPLUGIN_IMAGEMAGIC "Enable plugin for ImageMagic based IO" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (gz, bzip2 and Z)" ON)
 option(ISIS_IOPLUGIN_TAR "Enable proxy plugin for reading tar archives" ON)
+option(ISIS_IOPLUGIN_FDF "Enable plugin for reading fdf files" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
 option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
 option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
@@ -32,6 +33,15 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 ############################################################
 # the plugins ...
 ############################################################
+
+############################################################
+# fdf plugin
+############################################################
+if(ISIS_IOPLUGIN_FDF)
+	add_library(isisImageFormat_fdf SHARED imageFormat_fdf.cpp )
+	target_link_libraries(isisImageFormat_fdf ${isis_core_lib})
+	set(TARGETS ${TARGETS} isisImageFormat_fdf)
+endif(ISIS_IOPLUGIN_FDF)
 
 ############################################################
 # NIFTI plugin
