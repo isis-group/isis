@@ -207,10 +207,10 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 	} else {
 		for( std::list<data::Image>::const_iterator a = images.begin(); a != images.end(); a++ ) {
 			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != images.end(); ) {
-				const util::PropertyMap &aref = *a, bref = *b;
-				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-						<< aref.getValueAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
-						<< " and " << bref.getValueAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
+				const data::Image &aref = *a, bref = *b;
+				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images "
+						<< aref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
+						<< " and " << bref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
