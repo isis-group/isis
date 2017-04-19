@@ -1,6 +1,5 @@
 #include <isis/util/matrix.hpp>
 #include <isis/data/io_interface.h>
-#include <fstream>
 
 namespace isis
 {
@@ -16,7 +15,7 @@ protected:
 	util::PropertyMap getProps(const char *hdr_start, const char *hdr_end){
 		util::PropertyMap ret;
 
-		auto lines= util::stringToList<std::string>(std::string(hdr_start,hdr_end),std::regex("[\r\n]"));
+		auto lines= util::stringToList<std::string>(std::string(hdr_start,hdr_end),std::regex("[\r\n]+"));
 		if(lines.front().substr(0,2)=="#!")
 			lines.pop_front();
 		
@@ -29,26 +28,20 @@ protected:
 	}
 	std::pair<std::string,util::PropertyValue> getProp(const std::string &prop){
 		static const std::regex r_prop=std::regex( "([^\\s]+)[\\s]+\\*?([^\\s]+)[\\s]*=[\\s]*([^;]+);[\\s]*",std::regex_constants::optimize );
-// 		static const std::map<std::string,unsigned short> id_map={
-// 			{"float",util::Value<float>::staticID()},
-// 			{"char",util::Value<std::string>::staticID()},
-// 			{"int",util::Value<int>::staticID()}
-// 		};
+
 		std::smatch results;
 		if(std::regex_match(prop,results,r_prop,std::regex_constants::match_any)){
-// 			const unsigned short type=id_map.at(results[1]);
 			std::string name=results[2], val=results[3];
 			util::PropertyValue prop_val;
 			if(name.back()==']'){ // its a list
-				prop_val.push_back(util::stringToList<std::string>(val,std::regex("[,]"),std::regex("^\\{"),std::regex("\\}$")));
+				prop_val.push_back(util::stringToList<std::string>(val,std::regex("[,\\s\"]+"),std::regex("^\\{[\\s\"]*"),std::regex("[\\s\"]*\\}$")));
 			} else {
 				if(results[1]=="char")
 					val=val.substr(1,val.length()-2); // remove the '"'
 				
 				prop_val.push_back(val);
 			}
-/*			 else 
-				val.transform(type);*/
+
 			LOG(Debug,info) << "Parsed " << prop << " as " << std::make_pair(name,prop_val);
 			return {name,prop_val};
 		} 
@@ -58,7 +51,7 @@ protected:
 public:
 	std::string getName()const override {return "Vnmrj reconstruction format";}
 
-	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
 		
 		static const std::map<std::string,unsigned short> type_map{
 			{"float",data::ValueArray<float>::staticID()},
@@ -81,7 +74,7 @@ public:
 			throwGenericError(std::string("Unsupported type "+s_type));
 		
 		auto big_endian=extractOrTell("bigendian",fdf_props,warning).get_value_or(util::Value<int>(0)).as<int>();
-		auto orientation_matrix_list=extractOrTell("orientation[]",fdf_props,error)->as<util::dlist>();
+		auto orientation_list=extractOrTell("orientation[]",fdf_props,error)->as<util::dlist>();
 		
 		
 		hdr_end++;
@@ -95,13 +88,13 @@ public:
 		
 		ret.touchBranch("fdf").transfer(fdf_props);
 		
-		assert(orientation_matrix_list.size()==9);
+		assert(orientation_list.size()==9);
 		util::Matrix3x3<float> orientation_matrix;
-		std::copy(orientation_matrix_list.begin(),orientation_matrix_list.end(),std::begin(orientation_matrix));
+		std::copy(orientation_list.begin(),orientation_list.end(),std::begin(orientation_matrix));
 
-		ret.refValueAsOr("rowVec",util::fvector3())=orientation_matrix[0];
-		ret.refValueAsOr("columnVec",util::fvector3())=orientation_matrix[1];
-		ret.refValueAsOr("sliceVec",util::fvector3())=orientation_matrix[2];
+		ret.setValueAs("rowVec",   orientation_matrix[0]);
+		ret.setValueAs("columnVec",orientation_matrix[1]);
+		ret.setValueAs("sliceVec", orientation_matrix[2]);
 
 		transformOrTell<util::fvector3>("fdf/location[]","indexOrigin",ret,info) || transformOrTell<util::fvector3>("fdf/origin[]","indexOrigin",ret,warning);
 		transformOrTell<float>("fdf/TE","echoTime",ret,info);
