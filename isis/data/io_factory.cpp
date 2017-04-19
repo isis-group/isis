@@ -17,6 +17,8 @@
 #else
 	#include <dlfcn.h>
 #endif
+
+#include <sys/resource.h>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <vector>
@@ -191,7 +193,7 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect)throw( io_error & ){
+std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect, std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & ){
 	bool overridden=true;
 	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
 	if(formatstack.empty()){
@@ -232,7 +234,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 
 			try {
 				std::list<data::Chunk> loaded =boost::apply_visitor(
-					[&](auto val) { return format->load( val, formatstack, dialect, m_feedback ); },
+					[&](auto val) { return format->load( val, formatstack, dialect, feedback ); },
 					v
 				);
 				if(filename){
@@ -339,7 +341,7 @@ std::list< Chunk > IOFactory::loadChunks( const load_source &v, std::list<util::
 	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
 	if(filename)
 		assert(!boost::filesystem::is_directory( *filename ));
-	return get().load_impl( v, formatstack, dialect );
+	return get().load_impl( v, formatstack, dialect, get().m_feedback );
 }
 
 
@@ -352,7 +354,7 @@ std::list< Image > IOFactory::load( const util::slist &paths, std::list<util::is
 			loaded=get().loadPath(path,formatstack,dialect,rejected);
 		} else {
 			try{
-				loaded=get().load_impl( path , formatstack, dialect);
+				loaded=get().load_impl( path , formatstack, dialect, get().m_feedback);
 				if(loaded.empty() && rejected)
 					rejected->push_back(path);
 			} catch (io_error &e){
@@ -382,7 +384,7 @@ std::list<data::Image> IOFactory::load( const load_source &source, std::list<uti
 		return load( util::slist{filename->native()}, formatstack, dialect );
 	else {
 		try{
-			std::list<Chunk> loaded=get().load_impl( source , formatstack, dialect);
+			std::list<Chunk> loaded=get().load_impl( source , formatstack, dialect, get().m_feedback);
 			const std::list<data::Image> images = chunkListToImageList( loaded, rejected );
 			LOG( Runtime, info ) << "Generated " << images.size() << " images";
 			return images;
@@ -396,17 +398,34 @@ std::list<data::Image> IOFactory::load( const load_source &source, std::list<uti
 std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack, util::istring dialect, optional< isis::util::slist& > rejected )
 {
 	std::list<Chunk> ret;
-
+	const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
 	if( m_feedback ) {
-		const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
 		m_feedback->show( length, std::string( "Reading " ) + util::Value<std::string>( length ).toString( false ) + " files from " + path.native() );
+	}
+	
+	rlimit rlim;
+	size_t open_files = io_formats.size() + length + 50; //just guessing todo find a way to get the actual amount of open files
+	bool no_mapping=false;
+	getrlimit(RLIMIT_NOFILE, &rlim);
+	if(rlim.rlim_cur<open_files){
+		if(rlim.rlim_max>open_files){
+			rlim.rlim_cur=open_files;
+			setrlimit(RLIMIT_NOFILE, &rlim);
+		} else {
+			LOG(Runtime,warning) << "Can't increase the limit for open files to " << length << ", falling back to remapped mode";
+			no_mapping=true;
+		}
 	}
 
 	for ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
 		if ( boost::filesystem::is_directory( *i ) )continue;
 
 		try {
-			std::list<Chunk> loaded= load_impl( *i, formatstack, dialect );
+			std::list<Chunk> loaded= load_impl( *i, formatstack, dialect, nullptr );//we already do progress feedback, don't let the plugins do it
+			
+			if(no_mapping)
+				for(data::Chunk &c:loaded) // enforce copy, to get data into memory
+					c= c.copyByID(c.getTypeID());
 
 			if(rejected && loaded.empty()){
 				rejected->push_back(boost::filesystem::path(*i).native());
@@ -417,7 +436,7 @@ std::list<Chunk> isis::data::IOFactory::loadPath(const boost::filesystem::path& 
 				util::NoSubject( "" ) : util::NoSubject(util::istring( " with dialect \"" ) + dialect + "\"");
 
 			LOG( Runtime, notice )
-				<< "Failed to load " <<  *i << " using " <<  e.which() << with_dialect << " ( " << e.what() << " )";
+				<< "Failed to load " <<  *i << " using " <<  e.which()->getName() << with_dialect << " ( " << e.what() << " )";
 		}
 
 		if( m_feedback )

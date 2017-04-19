@@ -53,7 +53,7 @@ private:
 	// use ImageIO's logging here instead of the normal data::Runtime/Debug
 	typedef ImageIoLog Runtime;
 	typedef ImageIoDebug Debug;
-	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect)throw( io_error & );
+	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect,std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & );
 public:
 	/**
 	 * Load data from a set of files or directories with given paths and dialect.
