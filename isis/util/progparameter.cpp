@@ -144,9 +144,11 @@ bool ParameterMap::parse( int argc, char **argv )
 			} else if ( matchingStrings.empty() ) { // no match
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
 			} else { //exact one match
-				parsed = at( matchingStrings.front() ).is<util::slist>() ? //dont do tokenizing if the target is an slist (is already done by the shell)
-					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) ) :
-					at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) );
+				//dont do tokenizing if the target is an slist and it is already tojkenized by the shell (eg. more than one token)
+				if(at( matchingStrings.front() ).is<util::slist>() && (i-start)>1)
+					parsed = at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) );
+				else
+					parsed = at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) );
 				LOG_IF(!parsed, Runtime, error )
 							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
 							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
