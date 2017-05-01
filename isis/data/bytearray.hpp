@@ -85,7 +85,7 @@ public:
 		if( writing || !swap_endianess ) { // if not endianess swapping was requested or T is not float (or if we are writing)
 			return data::ValueArray<T>( ptr, len ); // return a cheap copy
 		} else { // flip bytes into a new ValueArray
-			LOG( Debug, info ) << "Byte swapping " <<  ValueArray<T>::staticName() << " for endianess";
+			LOG( Debug, verbose_info ) << "Byte swapping " <<  ValueArray<T>::staticName() << " for endianess";
 			ValueArray<T> ret( len );
 			data::endianSwapArray( ptr.get(), ptr.get() + std::min( len, getLength() / sizeof( T ) ), ret.begin() );
 			return ret;

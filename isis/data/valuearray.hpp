@@ -50,6 +50,9 @@ template<typename T, uint8_t STEPSIZE> std::pair<T, T> calcMinMax( const T *data
 		)
 			continue; // skip this one if its inf
 
+		if(std::isnan(*i))
+			continue; // skip this one if its NaN
+			
 		if ( *i > result.second )result.second = *i; //*i is the new max if its bigger than the current (gets rid of nan as well)
 
 		if ( *i < result.first )result.first = *i; //*i is the new min if its smaller than the current (gets rid of nan as well)
@@ -105,14 +108,23 @@ template<typename T> struct getMinMaxImpl<util::color<T>, false> { // generic mi
 template<typename T> struct getMinMaxImpl<std::complex<T>, false> { // generic min-max for complex values (get min/max of abs(x))
 	std::pair<T, T> operator()( const ValueArray<std::complex<T> > &ref ) const {
 		//use compute min/max of magnitute / phase
-		T ret_min_sqmag=std::norm(ref[0]),ret_max_sqmag=std::norm(ref[0]);
-		
-		for(const std::complex<T> &v:ref){
-			const T &sqmag=std::norm(v);
-			if(ret_min_sqmag>sqmag)ret_min_sqmag=sqmag;
-			if(ret_max_sqmag<sqmag)ret_max_sqmag=sqmag;
+		auto any_nan= [](const std::complex<T> &v){return std::isnan(v.real()) || std::isnan(v.imag());};
+		const auto start=std::find_if_not(std::begin(ref),std::end(ref),any_nan);
+		if(start==std::end(ref)){
+			LOG(Runtime,error) << "Array is all NaN, returning NaN/NaN as minimum/maximum";
+			return std::make_pair(std::numeric_limits<T>::quiet_NaN(),std::numeric_limits<T>::quiet_NaN());
+		} else {
+			T ret_min_sqmag=std::norm(*start),ret_max_sqmag=std::norm(*start);
+			
+			for(auto i=start;i!=std::end(ref);i++){
+				if(!any_nan(*i)){
+					const T &sqmag=std::norm(*i);
+					if(ret_min_sqmag>sqmag)ret_min_sqmag=sqmag;
+					if(ret_max_sqmag<sqmag)ret_max_sqmag=sqmag;
+				}
+			}
+			return std::make_pair(std::sqrt(ret_min_sqmag),std::sqrt(ret_max_sqmag));
 		}
-		return std::make_pair(std::sqrt(ret_min_sqmag),std::sqrt(ret_max_sqmag));
 	}
 };
 /// @endcond
