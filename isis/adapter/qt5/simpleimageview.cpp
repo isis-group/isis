@@ -55,7 +55,7 @@ class MagnitudeTransfer : public TransferFunction{
 		const T t_scale=scale.first->as<T>();
 		const T t_offset=scale.second->as<T>();
 		for(const std::complex<T> &v:line){
-			*(dst++)=std::abs(v)*t_scale+t_offset;
+			*(dst++)=std::min<T>(std::abs(v)*t_scale+t_offset,0xFF);
 		}
 	}
 
