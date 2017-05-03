@@ -49,9 +49,10 @@ protected:
 		return std::pair<std::string,util::PropertyValue>();
 	}
 public:
+	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override {return "org_dwi";};
 	std::string getName()const override {return "Vnmrj reconstruction format";}
 
-	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
 		
 		static const std::map<std::string,unsigned short> type_map{
 			{"float",data::ValueArray<float>::staticID()},
@@ -124,7 +125,27 @@ public:
 			ret.setValueAs<util::fvector3>("voxelSize",{1,1,1});	
 			LOG(Runtime,warning) << "We have no roi, so we set the voxelSize to the default " << ret.property("voxelSize");
 		}
-
+		
+		if(dialect!="org_dwi"){
+			auto dwi_read = extractOrTell("fdf/dro",ret,info);
+			auto dwi_phase = extractOrTell("fdf/dpe",ret,info);
+			auto dwi_slice = extractOrTell("fdf/dsl",ret,info);
+			if(dwi_read && dwi_phase && dwi_phase){
+				float bval = extractOrTell("fdf/bvalue",ret,warning).get_value_or(util::Value<float>(0)).as<float>();
+				util::fvector3 gradient{
+					dwi_read->as<float>(),
+					dwi_phase->as<float>(),
+					dwi_slice->as<float>()
+				};
+				if(util::sqlen(gradient)){
+					util::normalize(gradient);
+					ret.setValueAs("diffusionGradient",gradient*bval);
+				} else {
+					ret.setValueAs<util::fvector3>("diffusionGradient",{0,0,0});
+				}
+				
+			}
+		}
 
 		return std::list<data::Chunk>(1,ret);
 	}
