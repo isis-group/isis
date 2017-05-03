@@ -55,3 +55,14 @@ isis::data::TypedChunk< std::complex< double > > isis::math::fft_double(isis::da
 #endif
 	return data;
 }
+
+isis::data::Image isis::math::fft(isis::data::Image img, bool inverse, double scale)
+{
+	auto chunks=img.copyChunksToVector(true);
+	for(data::Chunk &ch:chunks){
+		ch=fft(ch);
+	}
+	return data::Image(chunks);
+}
+
+
