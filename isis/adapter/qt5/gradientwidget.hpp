@@ -31,10 +31,14 @@ class GradientWidget : public QWidget
 	const QString min_str,max_str;
 
 	bool adaptWidth(QPainter* p, QString text, int offset);
+	enum {none,scale_bottom,scale_top}scaling;
 protected:
 	QImage generateShade();
 	void paintEvent(QPaintEvent * event) override;
 	void mouseMoveEvent(QMouseEvent * ) override;
+	void mousePressEvent(QMouseEvent * ) override;
+	void mouseReleaseEvent(QMouseEvent * ) override;
+
 public:
 	GradientWidget(QWidget* parent, std::pair< double, double > in_image_rage, qreal bottom = 0, qreal top = 1);
 signals:
