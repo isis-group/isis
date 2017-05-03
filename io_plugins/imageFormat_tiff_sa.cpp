@@ -246,6 +246,22 @@ namespace _internal {
 			}
 			return true;
 		}
+		size_t computeSize()const{
+			return util::product(size)*3;
+		}
+		
+		void readTiles(data::Chunk &dst,std::list<data::ValueArray<uint8_t>> tiles,std::shared_ptr<util::ProgressFeedback> feedback)const{
+				for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
+					for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
+						assert(!tiles.empty());
+						readTile(tiles.front(),dst,{x,y});
+						if(feedback)
+							feedback->progress("",tiles.front().getLength()*tiles.front().bytesPerElem());
+						tiles.pop_front();
+					}
+				}
+		}
+		
 		data::Chunk makeChunk(std::shared_ptr<util::ProgressFeedback> feedback)const{
 			data::MemChunk<util::color24> ret(size[0],size[1],1,1,true);
 			ret.touchBranch("TIFF")=generic_props;
@@ -262,16 +278,7 @@ namespace _internal {
 					<< "Reading " << ret.getSizeAsString() << "-Image from " << tiles.size() << " tiles (" 
 					<< ret.getVolume()*ret.getBytesPerVoxel() / 1024 / 1024 << "MB)";
 					
-				std::list<data::ValueArray<uint8_t>> t_tiles(tiles);
-				for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
-					for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
-						assert(!t_tiles.empty());
-						readTile(t_tiles.front(),ret,{x,y});
-						if(feedback)
-							feedback->progress("",t_tiles.front().getLength()*t_tiles.front().bytesPerElem());
-						t_tiles.pop_front();
-					}
-				}
+				readTiles(ret,tiles,feedback);
 			}
 			return ret;
 		}
@@ -299,15 +306,27 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	}while((next_ifd = tiff.readValAuto<uint32_t>()));
 	
 	std::list<data::Chunk> ret;
+	int nr=0;
 	for(const _internal::IFD& ifd:images){
-		ret.push_back(ifd.makeChunk(feedback));
+		size_t mbsize=ifd.computeSize() / 1024 / 1024;
+		if(dialect!="lowmem" || mbsize < 4096){
+			auto ch=ifd.makeChunk(feedback);
+			ch.setValueAs("sequenceNumber",nr++);
+			ret.push_back(ch);
+		} else
+			LOG(Runtime,warning) << "Skipping " << mbsize << "MB image because of lowmem dialect";
 	}
 	
 	return ret;
 }
 
 std::string ImageFormat_TiffSa::getName() const{return "tiff";}
-void ImageFormat_TiffSa::write(const data::Image & image, const std::string & filename, const util::istring & dialect, std::shared_ptr<util::ProgressFeedback> feedback){}
+
+util::istring ImageFormat_TiffSa::dialects(const std::list<util::istring> & ) const {return {"lowmem"};}
+
+void ImageFormat_TiffSa::write(const data::Image & image, const std::string & filename, const util::istring & dialect, std::shared_ptr<util::ProgressFeedback> feedback){
+	throwGenericError("not yet implemented");
+}
 
 
 }}
