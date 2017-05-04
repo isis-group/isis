@@ -590,6 +590,19 @@ void PropertyMap::removeUncommon( PropertyMap &common )const
 	}
 }
 
+bool PropertyMap::insert(const std::pair<std::string,PropertyValue> &p){
+	return insert(std::make_pair(PropPath(p.first.c_str()),p.second));
+}
+
+bool PropertyMap::insert(const std::pair<PropPath,PropertyValue> &p){
+	PropertyValue &entry= touchProperty(p.first);
+	if(entry.isEmpty()){
+		entry=p.second;
+		return true;
+	} else
+		return false;
+}
+
 std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 {
 	FlatMap buff = getFlatMap();

@@ -47,7 +47,6 @@ public:
 	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); // not used
 	void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & );
 	
-	bool tainted()const {return false;}//internal plugins are not tainted
 	util::istring dialects( const std::string &/*filename*/ )const {return "";}
 	static void sanitize( util::PropertyMap &obj );
 	static void unsanitize( util::PropertyMap &obj );

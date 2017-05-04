@@ -24,12 +24,13 @@ protected:
 		return ret;
 	}
 
-	template<typename T, typename DEST> bool extractNumberFromName( std::string name, DEST &property ) {
-		std::string::size_type end = name.find_last_of( "0123456789" );
+	template<typename T, typename DEST> bool extractNumberFromName( const boost::filesystem::path &name, DEST &property ) {
+		std::string filename=name.filename().native();
+		std::string::size_type end = filename.find_last_of( "0123456789" );
 
 		if( end != std::string::npos ) {
-			std::string::size_type start = name.find_last_not_of( "0123456789", end );
-			property = boost::lexical_cast<T>( name.substr( start + 1, end - start ) );
+			std::string::size_type start = filename.find_last_not_of( "0123456789", end );
+			property = boost::lexical_cast<T>( filename.substr( start + 1, end - start ) );
 			return true;
 		} else {
 			return false;
@@ -107,18 +108,14 @@ public:
 		Magick::InitializeMagick(buffer);
 #endif
 	}
-	std::string getName()const {
-		return "ImageMagick";
-	}
-	util::istring dialects( const std::string &/*filename*/ ) const {
-		return "middle stacked";
-	}
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+	std::string getName()const override {return "ImageMagick";}
+	util::istring dialects( const std::list<util::istring> &) const override {return "middle stacked";}
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )  throw( std::runtime_error & ) override
 	{
 		std::list<Magick::Image> imageList; 
 	
 		/* read all the frames from the file */
-		Magick::readImages(  &imageList, filename );
+		Magick::readImages(  &imageList, filename.native() );
 		std::list<data::Chunk> ret;
 	
 		if(imageList.size()>1){ // if multiple images where found (e.g. animated gif)
@@ -128,7 +125,7 @@ public:
 				ret.push_back(image2chunk(img));
 				
 				if( dialect == "stacked" ){					
-					ret.back().setValueAs( "indexOrigin", util::fvector3{0, 0, acqNum} );
+					ret.back().setValueAs( "indexOrigin", util::fvector3{0, 0, (float)acqNum} );
 				}
 				ret.back().setValueAs("acquisitionNumber",acqNum++);
 			}
@@ -204,7 +201,6 @@ public:
 		
 		Magick::writeImages(images.begin(),images.end(),filename);
 	}
-	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

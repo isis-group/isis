@@ -114,7 +114,7 @@ public:
 	}
 
 	/// generates a string representing the size
-	std::string getSizeAsString( std::string delim = "x" )const {
+	std::string getSizeAsString( const char *delim = "x" )const {
 		return util::listToString( std::begin(m_dim), std::end(m_dim), delim, "", "" );
 	}
 

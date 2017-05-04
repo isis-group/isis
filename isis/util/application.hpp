@@ -97,9 +97,9 @@ public:
 	 *
 	 * \note This does not set the logging handler. That is done by reimplementing getLogHandler( std::string module, isis::LogLevel level )const.
 	 */
-	template<typename MODULE> void addLogging() {
-		addLoggingParameter( MODULE::name() );
-		logs[MODULE::name()].push_back( &Application::setLog<MODULE> );
+	template<typename MODULE> void addLogging(std::string parameter_name) {
+		addLoggingParameter( parameter_name );
+		logs[parameter_name].push_back( &Application::setLog<MODULE> );
 	}
 	/**
 	 * Removes a logging parameter from the application.

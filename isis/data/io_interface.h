@@ -15,8 +15,12 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <memory>
+#include <streambuf>
+#include <deque>
 #include "image.hpp"
 #include "common.hpp"
+#include "bytearray.hpp"
 #include "../util/istring.hpp"
 #include "../util/progressfeedback.hpp"
 
@@ -24,44 +28,38 @@ namespace isis
 {
 namespace image_io
 {
-
-/// Base class for image-io-plugins
-class FileFormat
-{
-public:
-	enum io_modes {read_only = 1, write_only = 2, both = 3};
 	/**
 	 * Check if a given property exists in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns the property's exact path if it exists, boost::none otherwise
 	 */
-	static bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
+	bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * \copydoc hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 	 * \returns the property if it exists, boost::none otherwise
 	 */
-	static boost::optional<util::PropertyValue> extractOrTell( const util::PropertyMap::key_type &name, util::PropertyMap &object, LogLevel level );
+	boost::optional<util::PropertyValue> extractOrTell( const util::PropertyMap::key_type &name, util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * Check if one of the given properties exists in the given PropMap.
 	 * If no property exists, a message will be sent to Log using the given loglevel.
 	 * \returns the first found property's exact path, boost::none otherwise
 	 */
-	static util::PropertyMap::key_type hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level );
+	util::PropertyMap::key_type hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level );
 
 	/**
 	 * \copydoc hasOrTell( const std::initializer_list<util::PropertyMap::key_type> names, const util::PropertyMap &object, LogLevel level )
 	 * \returns the first found property, boost::none otherwise
 	 */
-	static boost::optional<util::PropertyValue> extractOrTell( const std::initializer_list<util::PropertyMap::key_type> names, util::PropertyMap &object, LogLevel level );
+	boost::optional<util::PropertyValue> extractOrTell( const std::initializer_list<util::PropertyMap::key_type> names, util::PropertyMap &object, LogLevel level );
 	
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
-	template<typename TYPE> static bool
+	template<typename TYPE> bool
 	transformOrTell( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.queryProperty( to );
@@ -70,6 +68,12 @@ public:
 
 		return false;
 	}
+
+/// Base class for image-io-plugins
+class FileFormat
+{
+public:
+	enum io_modes {read_only = 1, write_only = 2, both = 3};
 protected:
 	/// \return the file-suffixes the plugin supports
 	virtual util::istring suffixes( io_modes modes = both )const = 0;
@@ -91,8 +95,6 @@ public:
 
 	/**
 	 * get all file suffixes a plugin suggests to handle
-	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
-	 * The result is returned in a string-list sorted by the length of the suffix (longest first).
 	 * @param mode the io mode you are asking for
 	 * - read_only explicitely ask for reading - the plugin will give all suffixes it can read (maybe none)
 	 * - write_only explicitely ask for writing - the plugin will give all suffixes it can write (maybe none)
@@ -103,13 +105,10 @@ public:
 
 
 	/// \return a space separated list of the dialects the plugin supports
-	virtual util::istring dialects( const std::string &/*filename*/ )const {return util::istring();};
-
-	/// \return if the plugin is not part of the official distribution
-	virtual bool tainted()const {return true;}
+	virtual util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const {return util::istring();};
 
 	/**
-	 * Load data into the given chunk list.
+	 * Load data from file into the given chunk list.
 	 * I case of an error std::runtime_error will be thrown.
 	 * \param chunks the chunk list where the loaded chunks shall be added to
 	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
@@ -117,7 +116,32 @@ public:
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) = 0; //@todo should be locked
+	virtual std::list<data::Chunk> 
+	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+
+	/**
+	 * Load data from stream into the given chunk list.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param chunks the chunk list where the loaded chunks shall be added to
+	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
+	 * \returns the amount of loaded chunks.
+	 */
+	virtual std::list<data::Chunk> 
+	load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+
+	/**
+	 * Load data from memory into the given chunk list.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param chunks the chunk list where the loaded chunks shall be added to
+	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
+	 * \returns the amount of loaded chunks.
+	 */
+	virtual std::list<data::Chunk> 
+	load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.

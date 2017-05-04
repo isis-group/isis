@@ -26,6 +26,8 @@
 
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/config/osconfig.h>
+#include <dcmtk/dcmdata/dcistrma.h>
 
 namespace isis
 {
@@ -56,7 +58,7 @@ class ImageFormat_Dicom: public FileFormat
 	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey, util::PropertyMap::PropPath> dictionary;
 protected:
-	util::istring suffixes( io_modes modes = both )const;
+	util::istring suffixes( io_modes modes = both )const override;
 	util::PropertyMap::PropPath tag2Name( const DcmTagKey &tag ) const;
 public:
 	ImageFormat_Dicom();
@@ -68,13 +70,12 @@ public:
 	static void parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, isis::util::PropertyMap &map );
 	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const util::istring &dialect )const;
 	static void sanitise( util::PropertyMap &object, util::istring dialect );
-	std::string getName()const;
-	util::istring dialects( const std::string &filename )const;
+	std::string getName()const override;
+	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override;
 
-	std::list<data::Chunk> load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
-	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & );
-
-	bool tainted()const;
+	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 };
 }
 }

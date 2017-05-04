@@ -1,4 +1,4 @@
-isis (0.7.12) UNRELEASED; urgency=low
+isis (0.7.13) UNRELEASED; urgency=low
 
   [ ISIS Group ]
   * big api change in progress
@@ -7,6 +7,7 @@ isis (0.7.12) UNRELEASED; urgency=low
   * add itk4 adapter
   * add ImageMagic base io plugin
   * improve SimpleImageView
+  * add support for fdf files
 
  -- ISIS Group <gr_isis@cbs.mpg.de>  Fri, 13 Jan 2017 15:33:23 +0100
 

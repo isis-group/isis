@@ -54,7 +54,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Runtime, info ) << "using generic convert " << ValueArray<SRC>::staticName() << " => " << ValueArray<DST>::staticName() << " without scaling";
+	LOG( Runtime, verbose_info ) << "using generic convert " << ValueArray<SRC>::staticName() << " => " << ValueArray<DST>::staticName() << " without scaling";
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = round<DST>( src[i] );
@@ -67,12 +67,12 @@ template<typename SRC, typename DST> void numeric_convert_impl( const std::compl
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
-	LOG( Runtime, info )    << "using memcpy-copy of " << ValueArray<T>::staticName() << " without scaling";
+	LOG( Runtime, verbose_info )    << "using memcpy-copy of " << ValueArray<T>::staticName() << " without scaling";
 	memcpy( dst, src, count * sizeof( T ) );
 }
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
-	LOG( Runtime, info )    << "using generic scaling copy of " << ValueArray<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+	LOG( Runtime, verbose_info )    << "using generic scaling copy of " << ValueArray<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
 	numeric_convert_impl<T,T>(src,dst,count,scale,offset);
 }
 

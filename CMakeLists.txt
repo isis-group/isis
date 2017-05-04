@@ -29,7 +29,7 @@ include(CTest)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "12")
+set(ISIS_VERSION_PATCH "13")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -112,9 +112,9 @@ endif(ISIS_DEBUG_LOG)
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
 if(BUILD_TESTING)
-	find_package(Boost REQUIRED COMPONENTS filesystem system unit_test_framework)
+	find_package(Boost REQUIRED COMPONENTS filesystem system iostreams unit_test_framework)
 else(BUILD_TESTING)
-	find_package(Boost REQUIRED COMPONENTS filesystem system)
+	find_package(Boost REQUIRED COMPONENTS filesystem system iostreams)
 endif(BUILD_TESTING)
 
 include_directories(${Boost_INCLUDE_DIR})

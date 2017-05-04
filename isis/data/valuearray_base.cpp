@@ -182,7 +182,7 @@ void ValueArrayBase::copyRange( size_t start, size_t end, ValueArrayBase &dst, s
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
 			<< "Range copy into a ValueArray of different type is not supportet. Its " << dst.getTypeName() << " not " << getTypeName();
 
-	if( end >= getLength() ) {
+	if( end > getLength() ) {
 		LOG( Runtime, error )
 				<< "End of the range (" << end << ") is behind the end of this ValueArray (" << getLength() << ")";
 	} else if( len + dst_start > dst.getLength() ) {

@@ -55,7 +55,7 @@ class MagnitudeTransfer : public TransferFunction{
 		const T t_scale=scale.first->as<T>();
 		const T t_offset=scale.second->as<T>();
 		for(const std::complex<T> &v:line){
-			*(dst++)=std::abs(v)*t_scale+t_offset;
+			*(dst++)=std::min<T>(std::abs(v)*t_scale+t_offset,0xFF);
 		}
 	}
 
@@ -104,7 +104,12 @@ class LinearTransfer : public TransferFunction{
 public:
 	LinearTransfer(std::pair<util::ValueReference,util::ValueReference> minmax):TransferFunction(minmax){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
-		line.copyToMem<uint8_t>(dst,line.getLength(),scale);
+		if(line.is<util::color24>() || line.is<util::color24>()){
+			auto *c_dst=reinterpret_cast<QRgb*>(dst);
+			for(const util::color24 &c:const_cast<data::ValueArrayBase &>(line).as<util::color24>(scale))
+				*(c_dst++)=qRgb(c.r,c.g,c.b);
+		} else 
+			line.copyToMem<uint8_t>(dst,line.getLength(),scale);
 	}
 };
 
@@ -171,11 +176,18 @@ void SimpleImageView::setupUi(bool with_complex){
 
 SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent):QWidget(parent),m_img(img)
 {
-	if(
-		img.getChunkAt(0).getTypeID() == data::ValueArray<std::complex<float>>::staticID() || 
-		img.getChunkAt(0).getTypeID() == data::ValueArray<std::complex<double>>::staticID()
-	)is_complex=true; //img.getChunkAt(0).getTypeID() is cheaper than Image::getMajorTypeID() and its enough for this case
-	else is_complex=false;
+
+	switch(img.getChunkAt(0).getTypeID())
+	{
+		case data::ValueArray<std::complex<float>>::staticID():
+		case data::ValueArray<std::complex<double>>::staticID():
+			is_complex=true;
+			break;
+		case data::ValueArray<util::color24>::staticID():
+		case data::ValueArray<util::color48>::staticID():
+			is_color=true;
+		default:break;
+	}
 	
 	setupUi(is_complex);
 	
@@ -191,6 +203,12 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	graphicsView->scale(voxelsize[0]*dpmm_x,voxelsize[1]*dpmm_y);
 	
 	auto minmax=img.getMinMax();
+	if(is_color){
+		auto first_c= minmax.first->as<util::color48>();
+		auto second_c=minmax.second->as<util::color48>();
+		minmax.first = util::Value<double>((first_c.r+first_c.g+first_c.b)/3.0);
+		minmax.second= util::Value<double>((second_c.r+second_c.g+second_c.b)/3.0);
+	}
 
 	if(is_complex){
 		magnitude_transfer.reset(new _internal::MagnitudeTransfer(minmax));

@@ -110,6 +110,33 @@ QImage GradientWidget::generateShade()
 	return ret;
 }
 
+void GradientWidget::mousePressEvent(QMouseEvent *e)
+{
+	const qreal pos=e->pos().y();
+	
+	if(pos<0 || pos > height())
+		return;
+	
+	const int bottom_dist=std::abs(bottom*height()-pos);
+	const int top_dist=   std::abs(   top*height()-pos);
+	
+	if( bottom_dist< 6 ) {
+		scaling=scale_bottom;
+		e->accept();
+	} else if(top_dist < 6){
+		scaling=scale_top;
+		e->accept();
+	}
+}
+void GradientWidget::mouseReleaseEvent(QMouseEvent*)
+{
+	if(scaling != none){
+		scaling=none;
+		unsetCursor();
+	}
+}
+
+
 void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	const qreal pos=event->pos().y();
@@ -120,23 +147,27 @@ void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 	const int bottom_dist=std::abs(bottom*height()-pos);
 	const int top_dist=   std::abs(   top*height()-pos);
 	
-	if( bottom_dist< 6 ) {
-		setCursor(Qt::PointingHandCursor);
-		if(bottom_dist!=0 && event->buttons()&Qt::LeftButton){
-			bottom= pos/height();
-			if(bottom<top)top=bottom;
-			update();
-			emit scaleUpdated(1.-bottom, 1.-top);
-		}
-	} else if(top_dist < 6){
-		setCursor(Qt::PointingHandCursor);
-		if(top_dist!=0 && event->buttons()&Qt::LeftButton){
-			top= pos/height();
-			if(top>bottom)bottom=top;
-			update();
-			emit scaleUpdated(1.-bottom, 1.-top);
-		}
-	} else
-		unsetCursor();
+	if(scaling==none){ // if we are not scaling, update hand cursor (if we are hand cursor should be set already)
+		if( bottom_dist< 6 ) {
+			setCursor(Qt::PointingHandCursor);
+		} else if(top_dist < 6){
+			setCursor(Qt::PointingHandCursor);
+		} else 
+			unsetCursor();
+	}
+	
+	if(bottom_dist!=0 && scaling==scale_bottom){
+		bottom= pos/height();
+		if(bottom<top)top=bottom;
+		update();
+		emit scaleUpdated(1.-bottom, 1.-top);
+		event->accept();
+	} else if(top_dist!=0 && scaling==scale_top){
+		top= pos/height();
+		if(top>bottom)bottom=top;
+		update();
+		emit scaleUpdated(1.-bottom, 1.-top);
+		event->accept();
+	}
 }
 

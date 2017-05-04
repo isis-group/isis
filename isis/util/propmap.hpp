@@ -336,7 +336,7 @@ protected:
 	 * \param path identifies the property to be added or if already existsing to be flagged as needed
 	 */
 	void addNeeded( const PropPath &path );
-
+	
 	/**
 	 * Remove properties from another tree that are in both, but not equal
 	 * For every entry of the tree this checks if it is also in the given other tree and removes it there if its not equal.
@@ -467,6 +467,9 @@ public:
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
 	bool hasBranch( const PropPath &path )const;
+
+	bool insert(const std::pair<PropPath,PropertyValue> &p);
+	bool insert(const std::pair<std::string,PropertyValue> &p);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -852,7 +855,7 @@ namespace std
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap::PropPath &s )
 {
-	isis::util::listToOStream( s.begin(), s.end(), out, std::string( 1, s.pathSeperator ), "", "" );
+	isis::util::listToOStream( s.begin(), s.end(), out, std::string( 1, s.pathSeperator ).c_str(), "", "" );
 	return out;
 }
 /// Streaming output for PropertyMap

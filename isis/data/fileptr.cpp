@@ -16,7 +16,6 @@
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
-#include <boost/mpl/for_each.hpp>
 #include "../util/singletons.hpp"
 
 #include <sys/time.h>
@@ -76,13 +75,6 @@ void FilePtr::Closer::operator()( void *p )
 	}
 }
 
-FilePtr::GeneratorMap::GeneratorMap()
-{
-	boost::mpl::for_each<util::_internal::types>( proc( this ) );
-	assert( !empty() );
-}
-
-
 bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename )
 {
 	void *ptr = NULL;
@@ -104,7 +96,7 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
 		writing = write;
-		static_cast<ValueArray<uint8_t>&>( *this ) = ValueArray<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
+		static_cast<ByteArray&>( *this ) = ValueArray<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}
 }
@@ -188,17 +180,6 @@ void FilePtr::release()
 {
 	static_cast<std::shared_ptr<uint8_t>&>( *this ).reset();
 	m_good = false;
-}
-
-ValueArrayReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len, bool swap_endianess )
-{
-	LOG_IF( static_cast<std::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
-			<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
-	GeneratorMap &map = util::Singletons::get<GeneratorMap, 0>();
-	assert( !map.empty() );
-	const generator_type gen = map[ID];
-	assert( gen );
-	return gen( *this, offset, len, swap_endianess );
 }
 
 

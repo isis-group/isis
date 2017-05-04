@@ -17,12 +17,15 @@ include_directories(${CMAKE_SOURCE_DIR})
 # add global options
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
-option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" ON)
+option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
 option(ISIS_IOPLUGIN_IMAGEMAGIC "Enable plugin for ImageMagic based IO" OFF)
 option(ISIS_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (tar, gz, bzip2 and Z)" ON)
+option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (gz, bzip2 and Z)" ON)
+option(ISIS_IOPLUGIN_TAR "Enable proxy plugin for reading tar archives" ON)
+option(ISIS_IOPLUGIN_FDF "Enable plugin for reading fdf files" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
 option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
 option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
@@ -30,6 +33,15 @@ option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP 
 ############################################################
 # the plugins ...
 ############################################################
+
+############################################################
+# fdf plugin
+############################################################
+if(ISIS_IOPLUGIN_FDF)
+	add_library(isisImageFormat_fdf SHARED imageFormat_fdf.cpp )
+	target_link_libraries(isisImageFormat_fdf ${isis_core_lib})
+	set(TARGETS ${TARGETS} isisImageFormat_fdf)
+endif(ISIS_IOPLUGIN_FDF)
 
 ############################################################
 # NIFTI plugin
@@ -40,6 +52,18 @@ if(ISIS_IOPLUGIN_NIFTI_SA)
 	set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(ISIS_IOPLUGIN_NIFTI_SA)
 
+############################################################
+# TIFF plugin
+############################################################
+if(ISIS_IOPLUGIN_TIFF_SA)
+	find_path(TJPEG_INCLUDE_DIR "turbojpeg.h")
+	find_library(TJPEG_LIBRARY "turbojpeg")
+
+	include_directories(${TJPEG_INCLUDE_DIR})
+	add_library(isisImageFormat_tiff_sa SHARED imageFormat_tiff_sa.cpp )
+	target_link_libraries(isisImageFormat_tiff_sa ${TJPEG_LIBRARY} ${isis_core_lib})
+	set(TARGETS ${TARGETS} isisImageFormat_tiff_sa)
+endif(ISIS_IOPLUGIN_TIFF_SA)
 
 if(ISIS_IOPLUGIN_VISTA_SA)
 	option(REGEN_PARSER "Regenerate the parser files" OFF)
@@ -100,7 +124,7 @@ if(ISIS_IOPLUGIN_PNG)
 endif(ISIS_IOPLUGIN_PNG)
 
 ############################################################
-# PNG plugin
+# ImageMagic plugin
 ############################################################
 if(ISIS_IOPLUGIN_IMAGEMAGIC)
 	find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
@@ -118,8 +142,6 @@ endif(ISIS_IOPLUGIN_IMAGEMAGIC)
 # COMP proxy plugin
 ############################################################
 if(ISIS_IOPLUGIN_COMP)
-  find_package(Boost REQUIRED COMPONENTS iostreams)
-
   option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
   find_library(LIB_BZ2 "bz2")
@@ -138,9 +160,18 @@ if(ISIS_IOPLUGIN_COMP)
   endif(ISIS_IOPLUGIN_COMP_LZMA)
   
   add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
-  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${Boost_IOSTREAMS_LIBRARY} ${COMP_LIBS})
+  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
   set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
+
+############################################################
+# COMP proxy plugin
+############################################################
+if(ISIS_IOPLUGIN_TAR)
+  add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar.cpp)
+  target_link_libraries(isisImageFormat_tar_proxy ${isis_core_lib})
+  set(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
+endif(ISIS_IOPLUGIN_TAR)
 
 ############################################################
 # FLIST proxy plugin
@@ -150,15 +181,6 @@ if(ISIS_IOPLUGIN_FLIST)
 	target_link_libraries(isisImageFormat_flist ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_flist)
 endif(ISIS_IOPLUGIN_FLIST)
-
-############################################################
-# PROCESS proxy plugin
-############################################################
-if(ISIS_IOPLUGIN_PROCESS)
-	add_library(isisImageFormat_process SHARED imageFormat_process.cpp)
-	target_link_libraries(isisImageFormat_process ${isis_core_lib})
-	set(TARGETS ${TARGETS} isisImageFormat_process)
-endif(ISIS_IOPLUGIN_PROCESS)
 
 ############################################################
 # Dicom

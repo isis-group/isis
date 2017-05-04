@@ -3,10 +3,16 @@
 #endif
 
 #include <boost/filesystem.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 
 #include "../util/log.hpp"
+#include "../util/tmpfile.hpp"
+#include "fileptr.hpp"
 #include "common.hpp"
 #include "io_interface.h"
 
@@ -45,7 +51,42 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
+std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	//try open file
+	data::FilePtr ptr(filename);
+	if( !ptr.good() ) {
+		if( errno ) {
+			throwSystemError( errno, filename.native() + " could not be opened" );
+			errno = 0;
+		} else
+			throwGenericError( filename.native() + " could not be opened" );
+	}
+
+	// set up progress bar if its enabled but don't fiddle with it if its set up already
+	bool set_up=false;
+	if( feedback && feedback->getMax() == 0 ) {
+		set_up=true;
+		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename.native() );
+	}
+	std::list<data::Chunk> ret=load(ptr,formatstack,dialect,feedback);
+	if(set_up) // close progress bar
+		feedback->close();
+	return ret;
+}
+
+std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	const void *p=source.getRawAddress().get();
+	boost::interprocess::ibufferstream buffer((char*)p,source.getLength());
+	return load(buffer.rdbuf(),formatstack,dialect,feedback);
+}
+
+std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	util::TmpFile tmp("isis_streamio_adapter");
+	boost::iostreams::copy(*source,boost::iostreams::file_sink(tmp.c_str()));
+	return load(tmp.native(),formatstack,dialect,feedback);
+}
+
+bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -54,7 +95,7 @@ bool FileFormat::hasOrTell( const util::PropertyMap::key_type &name, const util:
 		return false;
 	}
 }
-util::PropertyMap::key_type FileFormat::hasOrTell(const std::initializer_list< util::PropertyMap::key_type > names, const util::PropertyMap& object, LogLevel level)
+util::PropertyMap::key_type hasOrTell(const std::initializer_list< util::PropertyMap::key_type > names, const util::PropertyMap& object, LogLevel level)
 {
 	for(const util::PropertyMap::key_type &key:names){ // iterate through all props
 		if ( object.hasProperty( key ) )
@@ -64,7 +105,7 @@ util::PropertyMap::key_type FileFormat::hasOrTell(const std::initializer_list< u
 	return util::PropertyMap::key_type();
 }
 
-optional< util::PropertyValue > FileFormat::extractOrTell(const util::PropertyMap::key_type &name, util::PropertyMap& object, LogLevel level)
+optional< util::PropertyValue > extractOrTell(const util::PropertyMap::key_type &name, util::PropertyMap& object, LogLevel level)
 {
 	optional< util::PropertyValue > ret;
 	boost::optional< util::PropertyValue& > found=object.queryProperty(name);
@@ -76,7 +117,7 @@ optional< util::PropertyValue > FileFormat::extractOrTell(const util::PropertyMa
 	LOG_IF(!ret, Runtime, level ) << "Missing property " << name;
 	return ret;
 }
-optional< util::PropertyValue > FileFormat::extractOrTell(const std::initializer_list< util::PropertyMap::key_type > names, util::PropertyMap& object, LogLevel level)
+optional< util::PropertyValue > extractOrTell(const std::initializer_list< util::PropertyMap::key_type > names, util::PropertyMap& object, LogLevel level)
 {
 	optional< util::PropertyValue > ret;
 	for(const util::PropertyMap::key_type &key:names){ // iterate through all props
@@ -131,17 +172,15 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 std::string FileFormat::makeFilename( const util::PropertyMap &props, const std::string namePattern )
 {
 	using namespace std::regex_constants;
-	static const std::regex reg( "\\{[^{}]+\\}", ECMAScript|optimize);
-	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", ECMAScript|optimize );
-	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  ECMAScript|optimize );
-	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", ECMAScript|optimize| icase); 
+	static const std::regex reg( "\\{[^{}]+\\}", optimize);
+	static const std::regex invalid( "[/\\\\[:space:]]", optimize);
+	static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", optimize );
+	static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  optimize );
+	static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", optimize| icase); 
 	std::string result=namePattern;
 	enum formatting_type {none,integer,uinteger,floating};
 	ptrdiff_t offset=0;
 	
-	//NOTE: can also be done for rounding floats, but at the moment not required so not done right now
-
-
 	//iterate through all {whatever} in the pattern
 	for(std::sregex_iterator i=std::sregex_iterator(namePattern.begin(),namePattern.end(), reg); i!=std::sregex_iterator();i++){
 		std::string smatch=i->str().substr(1,i->length()-2); // get the string inside the {}
@@ -182,6 +221,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, const std:
 				} 
 				pstring=std::string(buffer);
 			}
+			pstring=std::regex_replace(pstring,invalid,"_");
 			result.replace(i->position()+offset, i->length(),pstring);
 			offset+=pstring.length()-i->length();
 		} else

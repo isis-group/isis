@@ -41,12 +41,7 @@ public:
 	struct category : boost::iostreams::dual_use_filter_tag, boost::iostreams::multichar_tag { };
 
 	void progress( std::streamsize n ) {
-		remain += n;
-
-		if( remain >= blocksize ) {
-			m_feedback.progress( "", remain / blocksize );
-			remain = remain % blocksize;
-		}
+		m_feedback.progress( "", n );
 	}
 	template<typename Source>
 	std::streamsize read( Source &src, char *s, std::streamsize n ) {
@@ -63,76 +58,41 @@ public:
 
 class ImageFormat_Compressed: public FileFormat
 {
-private:
-	struct {
-		char name[100];
-		char mode[8];
-		char uid[8];
-		char gid[8];
-		char size[12];
-		char mtime[12];
-		char chksum[8];
-		char typeflag;
-		char linkname[100];
-		char magic[6];
-		char version[2];
-		char uname[32];
-		char gname[32];
-		char devmajor[8];
-		char devminor[8];
-		char prefix[155];
-		char padding[12];
-	} tar_header;
-	bool read_header( const boost::iostreams::filtering_istream &src, size_t &size, size_t &next_header_in ) {
-		if( boost::iostreams::read( src, reinterpret_cast<char *>( &tar_header ), 512 ) == 512 ) {
-			if( tar_header.size[0] & 0x80 ) { // its base-256
-				size = 0;
-
-				for( uint_fast8_t i = 4; i < 11; i++ ) {
-					size |= reinterpret_cast<uint8_t *>( tar_header.size )[i];
-					size = size << 8;
-				}
-
-				size |= reinterpret_cast<uint8_t *>( tar_header.size )[11];
-			} else if( tar_header.size[10] != 0 ) { //normal octal
-				//get the size
-				std::stringstream buff( tar_header.size );
-				size = 0, next_header_in = 0;
-
-				buff >> std::oct >> size;
-			} else
-				return false;
-
-			next_header_in = ( size / 512 ) * 512 + ( size % 512 ? 512 : 0 );
-			return true;
-		} else
-			return false;
-	}
-	static size_t tar_readstream( const boost::iostreams::filtering_istream &src, void *dst, size_t size, const std::string &log_title ) {
-		size_t red = boost::iostreams::read( src, ( char * )dst, size ); // read data from the stream into the mapped memory
-
-		if( red != size ) { // read the data from the stream
-			LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << util::MSubject( log_title );
-		}
-
-		return red;
-	}
 protected:
-	util::istring suffixes( io_modes modes = both )const {
+	util::istring suffixes( io_modes modes = both )const override {
+		static util::istring write="gz bz2 Z xz";
 #ifdef HAVE_LZMA
-
-		if( modes == write_only )return "gz bz2 Z xz";
-		else return "tar tar.gz tgz tar.bz2 tbz tar.Z tar.xz taz gz bz2 Z xz";
-
-#else
-
-		if( modes == write_only )return "gz bz2 Z";
-		else return "tar tar.gz tgz tar.bz2 tbz tar.Z taz gz bz2 Z";
-
+		write+=" xz";
 #endif //HAVE_LZMA
+		if( modes == write_only )return write;
+		else return write+" tgz tbz taz";
 	}
 public:
-	util::istring dialects( const std::string &/*filename*/ )const {
+	std::unique_ptr<boost::iostreams::filtering_istream> makeIStream(std::list<util::istring> &formatstack){
+		//select filters for input
+		std::unique_ptr<boost::iostreams::filtering_istream> in(new boost::iostreams::filtering_istream);
+
+		util::istring format = formatstack.back();
+		formatstack.back()="tar"; // push in "tar" in case its one of the following
+
+		if( format == "tgz" )in->push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
+		else if( format == "tbz" )in->push( boost::iostreams::bzip2_decompressor() );
+		else if( format == "taz" )in->push( boost::iostreams::zlib_decompressor() );
+		else {
+			formatstack.pop_back(); // ok, its none of the above, so remove the additional "tar"
+			if( format == "gz" )in->push( boost::iostreams::gzip_decompressor() );
+			else if( format == "bz2" )in->push( boost::iostreams::bzip2_decompressor() );
+			else if( format == "Z" )in->push( boost::iostreams::zlib_decompressor() );
+#ifdef HAVE_LZMA
+			else if( format == "xz" )in->push( boost::iostreams::lzma_decompressor() );
+#endif
+			else { // ok, no idea what going on, cry for mamy
+				throwGenericError( "Cannot determine the compression format" );
+			}
+		}
+		return std::move(in);
+	}
+	util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const override{
 
 		std::list<util::istring> suffixes;
 		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
@@ -144,143 +104,46 @@ public:
 
 		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
 	}
-	std::string getName()const {return "(de)compression proxy for other formats";}
+	std::string getName()const override {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )	{
-		std::list<data::Chunk> ret;
+	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+		
+		auto in=makeIStream(formatstack);
 
-		//select filters for input
-		boost::iostreams::filtering_istream in;
+		//ok, we have a filter, use that with the source stream on top
+		in->push( *source );
 
-		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
-		util::istring suffix = proxyBase.second.c_str();
-		bool isTar = true;
-
-		if( suffix == ".tgz" )in.push( boost::iostreams::gzip_decompressor() ); // if its tgz,tbz or taz it IS tar
-		else if( suffix == ".tbz" )in.push( boost::iostreams::bzip2_decompressor() );
-		else if( suffix == ".taz" )in.push( boost::iostreams::zlib_decompressor() );
-		else {
-			if( suffix.find( ".tar" ) == 0 )suffix = suffix.substr( 4 ); // if there is an .tar*, as well
-			else isTar = false; // else not
-
-			// i case the input is compressed (tar.gz or .gz)
-			if( isTar && suffix.empty() ); //if its tar having not compression is ok
-			else if( suffix == ".gz" )in.push( boost::iostreams::gzip_decompressor() );
-			else if( suffix == ".bz2" )in.push( boost::iostreams::bzip2_decompressor() );
-			else if( suffix == ".Z" )in.push( boost::iostreams::zlib_decompressor() );
-
-#ifdef HAVE_LZMA
-			else if( suffix == ".xz" )in.push( boost::iostreams::lzma_decompressor() );
-
-#endif
-			else { // if its tar having no compression is fine
-				throwGenericError( "Cannot determine the compression format of \"" + filename + "\"" );
-			}
-		}
+		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+	}
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
+		//try open file
+		std::ifstream file(filename.c_str());
+		file.exceptions(std::ios_base::badbit);
 
 		// set up progress bar if its enabled but don't fiddle with it if its set up already
-		if( progress && progress->getMax() == 0 ) {
-			progress->show( boost::filesystem::file_size( filename ) / _internal::progress_filter::blocksize, std::string( "decompressing " ) + filename );
-			in.push( _internal::progress_filter( *progress ) );
+		bool set_up=false;
+		if( feedback && feedback->getMax() == 0 ) {
+			set_up=true;
+			feedback->show( boost::filesystem::file_size( filename ), std::string( "decompressing " ) + filename.native() );
 		}
+		auto in=makeIStream(formatstack);
 
-		// and on the top the source file
-		std::ifstream input( filename.c_str(), std::ios_base::binary );
-		input.exceptions( std::ios::badbit );
-		in.push( input );
+		if(set_up) 
+			in->push( _internal::progress_filter( *feedback ) );
 
-		if( isTar ) { // if it is tar we use out own tar "parser"
-			size_t size, next_header_in;
-
-			while( in.good() && read_header( in, size, next_header_in ) ) { //read the header block
-
-				boost::filesystem::path org_file;
-
-				if( tar_header.typeflag == 'L' ) { // the filename of the next file is to long - so its stored in the next block (following this header)
-					char namebuff[size];
-					next_header_in -= tar_readstream( in, namebuff, size, "overlong filename for next entry" );
-					in.ignore( next_header_in ); // skip the remaining input until the next header
-					org_file = boost::filesystem::path( std::string( namebuff ) );
-					LOG( Debug, verbose_info ) << "Got overlong name " << util::MSubject( org_file ) << " for next file.";
-
-					read_header( in, size, next_header_in ); //continue with the next header
-				} else {
-					//get the original filename (use substr, because these fields are not \0-terminated)
-					org_file = boost::filesystem::path( std::string( tar_header.prefix ).substr( 0, 155 ) + std::string( tar_header.name ).substr( 0, 100 ) );
-				}
-
-				if( size == 0 ) //if there is no content skip this entry (there are allways two "empty" blocks at the end of a tar)
-					continue;
-
-				if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
-
-					data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.string(), dialect ); // and get the reading pluging for that
-
-					if( formats.empty() ) {
-						LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
-					} else {
-						LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
-
-						const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.string() );//ask any of the plugins for the suffix
-						util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-
-						data::FilePtr mfile( tmpfile, size, true );
-
-						if( !mfile.good() ) {
-							throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.native() );
-						}
-
-						size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
-						next_header_in -= red;
-						mfile.release(); //close and unmap the temporary file/mapped memory
-
-						if( red != size ) { // read the data from the stream
-							LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.native();
-						}
-
-						// read the temporary file
-						for( data::Chunk ref :  data::IOFactory::loadChunks( tmpfile.string(), dialect.c_str() )) { // set the source property of the red chunks to something more usefull
-							ref.setValueAs( "source", ( boost::filesystem::path( filename ) / org_file ).native() );
-							ret.push_back(ref);
-						}
-					}
-				} else {
-					LOG( Debug, verbose_info ) << "Skipping " << org_file << " because its no regular file (type is " << tar_header.typeflag << ")" ;
-				}
-
-				in.ignore( next_header_in ); // skip the remaining input until the next header
-			}
-
-		} else { // otherwise just decompress the file and read it
-			const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first, dialect );
-
-			if( formats.empty() ) {
-				throwGenericError( "Cannot determine the uncompressed suffix of \"" + filename + "\" because no io-plugin was found for it" );
-			}
-
-			// set up the input stream
-			util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
-			boost::filesystem::ofstream output( tmpFile, std::ios_base::binary );
-			output.exceptions( std::ios::badbit );
-
-			boost::iostreams::copy( in, output );
-
-			ret= data::IOFactory::loadChunks( tmpFile.native(), dialect );
-
-			 //re-set source of all new chunks
-			for( data::Chunk &ref :  ret) { // set the source property of the red chunks to something more usefull
-				ref.setValueAs( "source", filename  );
-			}
-		}
-
+		in->push(file);
+		std::list<data::Chunk> ret=data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+		
+		if(set_up) // close progress bar
+			feedback->close();
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) {
+	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) override {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
 
-		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first, dialect );
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( data::IOFactory::getFormatStack(proxyBase.first), dialect );
 
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the uncompressed suffix of \"" + filename + "\" because no io-plugin was found for it" );
@@ -316,7 +179,6 @@ public:
 		out.push( output );
 		boost::iostreams::copy( input, out );
 	}
-	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

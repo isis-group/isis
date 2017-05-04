@@ -172,6 +172,7 @@ public:
 	}
 	Value(): m_val() {
 		checkType<TYPE>();
+		static_assert(!std::is_const<TYPE>::value,"Value type must not be const");
 		static_assert( staticID() < 0xFF, "This is not a value type" );
 	}
 	/**
@@ -184,6 +185,7 @@ public:
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
 		checkType<TYPE>();
+		static_assert(!std::is_const<TYPE>::value,"Value type cannot be const");
 		static_assert( staticID() < 0xFF, "This is not a value type" );
 	}
 

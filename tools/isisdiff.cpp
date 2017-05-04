@@ -161,8 +161,8 @@ int main( int argc, char *argv[] )
 	app.parameters["selectwith"].needed() = false;
 	app.parameters["selectwith"].setDescription( "List of properties which should be used to select images for comparison" );
 
-	app.addLogging<DiffLog>();
-	app.addLogging<DiffDebug>();
+	app.addLogging<DiffLog>("");
+	app.addLogging<DiffDebug>("");
 
 	data::IOApplication::addInput( app.parameters, " of the first image", "1" );
 	data::IOApplication::addInput( app.parameters, " of the second image", "2" );

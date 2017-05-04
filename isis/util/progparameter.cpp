@@ -105,7 +105,7 @@ bool ParameterMap::parse( int argc, char **argv )
 	std::string pName;
 
 	for ( int i = 1; i < argc; ) { // scan through the command line, to find next parameter
-		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
+		if ( argv[i][0] == '-' && argv[i][1]!=0 ) { //seems like we found a new parameter here
 			pName = argv[i];
 			pName.erase( 0, pName.find_first_not_of( '-' ) );
 		} else {
@@ -117,7 +117,7 @@ bool ParameterMap::parse( int argc, char **argv )
 		if( !pName.empty() ) { // if we got a parameter before
 			const int start = i;
 
-			while( i < argc && argv[i][0] != '-' ) { //collect its properties, while there are some ..
+			while( i < argc && !(argv[i][0] == '-' && argv[i][1] != 0) ) { //collect its properties, while there are some ..
 				i++;
 			}
 

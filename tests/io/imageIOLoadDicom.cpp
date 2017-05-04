@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE ( imageDicomtest )
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( ImageIoLog, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( ImageIoDebug, util::DefaultMsgPrint, warning );
-	std::list<data::Image> images = data::IOFactory::load( "/SCR/isis_build/testDicom.ima", "" );
+	std::list<data::Image> images = data::IOFactory::load( "/SCR/isis_build/testDicom.ima");
 	BOOST_CHECK( images.size() == 1 );
 }
 }

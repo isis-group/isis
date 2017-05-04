@@ -4,12 +4,15 @@
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <dcmtk/dcmdata/dcdicent.h>
+#include <dcmtk/dcmdata/dcistrmb.h>
 #include <dcmtk/oflog/config.h>
 #include <dcmtk/oflog/tstring.h>
 #include <dcmtk/oflog/spi/logevent.h>
 
 #include <dcmtk/dcmjpeg/djdecode.h>    /* for dcmjpeg decoders */
 #include <dcmtk/dcmjpeg/dipijpeg.h>    /* for dcmimage JPEG plugin */
+
+#include <boost/iostreams/copy.hpp>
 
 namespace isis
 {
@@ -124,7 +127,7 @@ protected:
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
-util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
+util::istring ImageFormat_Dicom::suffixes( io_modes modes )const 
 {
 	if( modes == write_only )
 		return util::istring();
@@ -132,7 +135,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
+util::istring ImageFormat_Dicom::dialects( const std::list<util::istring> &/*formatstack*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
 
 
 
@@ -399,9 +402,21 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 	auto windowCenterQuery=dicomTree.queryProperty("WindowCenter");
 	auto windowWidthQuery=dicomTree.queryProperty("WindowCenter");
 	if( windowCenterQuery && windowWidthQuery){
-		const double windowCenter=windowCenterQuery->as<double>(), windowWidth= windowWidthQuery->as<double>();
-		windowCenterQuery.reset();windowWidthQuery.reset();
-		dicomTree.remove("WindowCenter");dicomTree.remove("WindowWidth");
+		util::ValueReference windowCenterVal=windowCenterQuery->front();
+		util::ValueReference windowWidthVal=windowWidthQuery->front();
+		double windowCenter,windowWidth;
+		if(windowCenterVal->isFloat()){
+			windowCenter=windowCenterVal->as<double>();
+			dicomTree.remove("WindowCenter");
+		} else 
+			windowCenter=windowCenterVal->as<util::dlist>().front(); // sometimes there are actually multiple windows, use the first
+			
+		if(windowWidthVal->isFloat()){
+			windowWidth=windowWidthVal->as<double>();
+			dicomTree.remove("WindowWidth");
+		} else 
+			windowWidth = windowWidthVal->as<util::dlist>().front();
+			
 		object.setValueAs("window/min",windowCenter-windowWidth/2);
 		object.setValueAs("window/max",windowCenter+windowWidth/2);
 	}
@@ -511,11 +526,23 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	return dest;
 }
 
+std::list<data::Chunk> ImageFormat_Dicom::load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
 
-std::list< data::Chunk > ImageFormat_Dicom::load( const std::string& filename, const util::istring& dialect, std::shared_ptr< util::ProgressFeedback > progress /*progress*/ )throw( std::runtime_error & )
+	std::basic_stringbuf<char> buff_stream;
+	boost::iostreams::copy(*source,buff_stream);
+	const auto buff = buff_stream.str();
+	
+	data::ValueArray<uint8_t> wrap((uint8_t*)buff.data(),buff.length(),data::ValueArray<uint8_t>::NonDeleter());
+	return load(wrap,formatstack,dialect,progress);
+}
+
+std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
 {
+	DcmInputBufferStream dcstream;
 	DcmFileFormat dcfile;
-	OFCondition loaded = dcfile.loadFile( filename.c_str() );
+	dcstream.setBuffer(source.getRawAddress().get(),source.getLength());
+	dcstream.setEos();
+	OFCondition loaded = dcfile.read( dcstream );
 
 	if ( loaded.good() ) {
 		std::list< data::Chunk > ret;
@@ -548,8 +575,6 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
-
-bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 
 ImageFormat_Dicom::ImageFormat_Dicom()
 {

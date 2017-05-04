@@ -186,7 +186,6 @@ bool SortedChunkList::insert( const Chunk &ch )
 	if(ch.queryProperty(secondarySort.top().propertyName)->size()>1){ // secondary sort is multi value, we have to splice the chunk and insert separately
 		LOG(Runtime,info) << "Splicing chunk at top dim as secondary sorting property " << secondarySort.top().propertyName << " is a list of size " << ch.queryProperty(secondarySort.top().propertyName)->size();
 		bool ok=true;
-		std::pair<std::shared_ptr<Chunk>, bool> inserted;
 		for(const data::Chunk &c:ch.autoSplice()){
 			ok &=  insert_impl(c);
 		}
@@ -227,17 +226,16 @@ bool SortedChunkList::insert_impl(const Chunk &ch){
 	}
 
 	const std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
-
-	LOG_IF( inserted.first && !inserted.second, Debug, info )
+	if(inserted.first && !inserted.second){
+		LOG(Debug, info )
 		<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.queryProperty( "indexOrigin" ) << ") with the equal property "
 		<< std::make_pair( secondarySort.top().propertyName, ch.queryProperty( secondarySort.top().propertyName ) );
 
-	LOG_IF(
-		inserted.first && !inserted.second &&
-		ch.queryProperty( "source" ) != std::const_pointer_cast<const Chunk>(inserted.first)->queryProperty( "source" ),//empty properties are not unequal
-		Debug, info )
-			<< "The conflicting chunks where from " << ch.getValueAs<std::string>( "source" ) << " and " << inserted.first->getValueAs<std::string>( "source" );
-
+		LOG_IF(
+			ch.queryProperty( "source" ) != std::const_pointer_cast<const Chunk>(inserted.first)->queryProperty( "source" ),//empty properties are not unequal
+			Debug, info )
+				<< "The conflicting chunks where from " << ch.getValueAs<std::string>( "source" ) << " and " << inserted.first->getValueAs<std::string>( "source" );
+	}
 	return inserted.second;
 }
 
@@ -347,7 +345,9 @@ std::string SortedChunkList::identify(bool withpath, bool withdate, getproplist 
 	if(withpath){
 		forall(source);
 		std::list<boost::filesystem::path> sources;
-		std::transform(source.begin(),source.end(),std::back_inserter(sources),[](const util::PropertyValue &v){return v.as<std::string>();});
+		std::transform(source.begin(),source.end(),std::back_inserter(sources),[](const util::PropertyValue &v){
+			return v.as<std::string>();
+		});
 		ret+=
 			(ret.empty() ? std::string():std::string(" "))+( std::string( "from " ) + 
 			util::getRootPath(sources,true).native() );

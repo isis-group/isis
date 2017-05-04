@@ -82,8 +82,8 @@ Write a list of elements to a std::basic_ostream
 template<class InputIterator, typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
 listToOStream( InputIterator start, InputIterator end,
 			   std::basic_ostream<_CharT, _Traits> &o,
-			   const std::string delim = ",",
-			   const std::string prefix = "{", const std::string suffix = "}" )
+			   const _CharT *delim = ",",
+			   const _CharT *prefix = "{", const _CharT *suffix = "}" )
 {
 	o << prefix;
 
@@ -120,15 +120,17 @@ listToOStream( const unsigned char *start, const unsigned char *end,
 }
 
 /// use listToOStream to create a string from a list
-template<class InputIterator> std::string listToString(
+template<class TARGET=std::string, class InputIterator> 
+TARGET listToString(	
 	InputIterator start, InputIterator end,
-	const std::string delim = ",",
-	const std::string prefix = "{", const std::string suffix = "}" )
-{
-	std::ostringstream ret;
+	const typename TARGET::value_type *delim = ",",
+	const typename TARGET::value_type *prefix = "{", const typename TARGET::value_type *suffix = "}" 
+){
+	std::basic_ostringstream<typename TARGET::value_type, typename TARGET::traits_type> ret;
 	listToOStream( start, end, ret, delim, prefix, suffix );
 	return ret.str();
 }
+
 /// do lexical_cast\<T\> on the elements of a list and return them
 template<typename T, typename InputIterator> std::list<T> listToList( InputIterator start, InputIterator end )
 {

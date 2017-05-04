@@ -13,6 +13,8 @@
 #include "value_base.hpp"
 #include "value.hpp"
 #include "singletons.hpp"
+#include <regex.h>
+#include <iomanip>
 
 namespace isis
 {
@@ -114,17 +116,55 @@ bool ValueBase::apply(const ValueBase& val)
 	return convert(val,*this);
 }
 
-std::string ValueBase::toString(bool labeled) const
+std::string ValueBase::toString(bool labeled, std::string formatting ) const
 {
 	std::string ret;
-	Reference ref = copyByID( Value<std::string>::staticID() );
+	if(!formatting.empty()){
+		if(isFloat() || isInteger()) {
+			using namespace std::regex_constants;
+			static const std::regex regFormatInt  ( "%[-+#+]*[\\d]*[di]$", ECMAScript|optimize );
+			static const std::regex regFormatUInt ( "%[-+#+]*[\\d]*[u]$",  ECMAScript|optimize );
+			static const std::regex regFormatFloat( "%[-+#+]*[\\d]*(.\\d+)?[efag]$", ECMAScript|optimize| icase); 
+			enum formatting_type {none,integer,uinteger,floating};
+			std::smatch fwhat;
+			formatting_type type =
+				std::regex_search( formatting, fwhat, regFormatInt ) ? integer:
+				std::regex_search( formatting, fwhat, regFormatUInt ) ? uinteger:
+				std::regex_search( formatting, fwhat, regFormatFloat ) ? floating:
+				none;
+			char buffer[1024];
+			switch(type){
+			case integer:
+				std::snprintf(buffer,1024,formatting.c_str(),as<int64_t>());
+				break;
+			case uinteger:
+				std::snprintf(buffer,1024,formatting.c_str(),as<uint64_t>());
+				break;
+			case  floating:
+				std::snprintf(buffer,1024,formatting.c_str(),as<double>());
+				break;
+			case none:;//should never happen / just to stop compiler from whining about missing 'none'
+			}
+			ret=buffer;
+		} else if(is<date>() || is<timestamp>()){
+			const std::chrono::seconds sec=std::chrono::duration_cast<std::chrono::seconds>(as<timestamp>().time_since_epoch());
+			const time_t tme(sec.count());
+			std::stringstream o;
+			o<<std::put_time(std::localtime(&tme), formatting.c_str()); // write time and date
+			ret=o.str();
+		} else {
+			LOG(Runtime,error) << "Got formatting string, but value is neither a number nor a timepoint/date, ignoring the formatting";
+		}
+	} 
+	if(ret.empty()){
+		Reference ref = copyByID( Value<std::string>::staticID() );
 
-	if ( ref.isEmpty() ) {
-		LOG( Debug, error ) << "Automatic conversion of " << getTypeName() << " to string failed. Returning empty string";
-	} else {
-		ret = ref->castTo<std::string>();
+		if ( ref.isEmpty() ) {
+			LOG( Debug, error ) << "Automatic conversion of " << getTypeName() << " to string failed. Returning empty string";
+		} else {
+			ret = ref->castTo<std::string>();
+		}
 	}
-
 	if ( labeled )ret += "(" + getTypeName() + ")";
 
 	return ret;

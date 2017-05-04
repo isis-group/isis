@@ -79,3 +79,8 @@ namespace boost
 template<> isis::util::istring lexical_cast< isis::util::istring, std::string >( const std::string &arg ) {return isis::util::istring( arg.begin(), arg.end() );}
 template<> std::string lexical_cast< std::string, isis::util::istring >( const isis::util::istring &arg ) {return std::string( arg.begin(), arg.end() );}
 }
+
+std::ostream & std::operator<<(std::ostream& out, const isis::util::istring& s)
+{
+	return out << s.c_str();
+}

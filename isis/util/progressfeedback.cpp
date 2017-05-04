@@ -62,7 +62,13 @@ size_t ConsoleFeedback::getMax()
 size_t ConsoleFeedback::progress( const std::string message, size_t step )
 {
 	LOG_IF( !message.empty(), Debug, warning ) << "ConsoleFeedBack does ignore the message string";
-	return disp ? disp->operator+=( step ):0;
+	if(disp){
+		if(disp->count()+step < disp->expected_count())
+			return disp->operator+=( step );
+		else
+			return disp->operator+=( disp->expected_count()-disp->count() );
+	} else 
+		return 0;
 }
 
 

@@ -200,6 +200,9 @@ public:
 	 * \return a new deep copied Chunk of the same size
 	 */
 	Chunk copyByID( unsigned short ID = 0, scaling_pair scaling = scaling_pair() )const;
+	
+	
+	void copyFromTile(const Chunk &src, std::array<size_t,4> pos, bool allow_capping=true);
 
 	///get the scaling (and offset) which would be used in an conversion to the given type
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;

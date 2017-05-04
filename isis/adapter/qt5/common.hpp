@@ -19,6 +19,9 @@ namespace qt5{
 		ENABLE_LOG( Qt5Debug, HANDLE, level );
 	}
 
+	void fillQImage(QImage &dst, const data::ValueArrayBase &data,size_t line_length, data::scaling_pair scaling = data::scaling_pair() );
+	void fillQImage(QImage &dst, const data::ValueArrayBase &data,size_t line_length, const std::function<void (uchar *, const data::ValueArrayBase &)> &transfer_function );
+
 	QImage makeQImage(const data::ValueArrayBase &data,size_t line_length,data::scaling_pair scaling = data::scaling_pair() );
 	QImage makeQImage(const data::ValueArrayBase& data, size_t line_length, const std::function<void (uchar *, const data::ValueArrayBase &)> &transfer_function);
 }

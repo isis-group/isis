@@ -122,9 +122,10 @@ public:
 	 */
 	void transfer(iterator idx,PropertyValue &ref);
 	/**
-	 * Transfer properties from one PropertyValue to another.
-	 * The transfered data will replace the properties in the target.
+	 * Transfer properties from another PropertyValue to this.
 	 * The source will be empty afterwards.
+	 * \param src the PropertyValue to transfer data from
+	 * \param overwrite if transfered data shall replace existing data
 	 */
 	void transfer(PropertyValue &src, bool overwrite=false);
 
@@ -216,7 +217,7 @@ public:
 	PropertyValue copyByID( unsigned short ID ) const;
 
 	/// \returns the value(s) represented as text.
-	virtual std::string toString( bool labeled = false )const;
+	virtual std::string toString( bool labeled = false, std::string formatting="" )const;
 
 	/// \returns true if, and only if no value is stored
 	bool isEmpty()const;
