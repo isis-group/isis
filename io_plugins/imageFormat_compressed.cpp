@@ -92,18 +92,6 @@ public:
 		}
 		return std::move(in);
 	}
-	util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const override{
-
-		std::list<util::istring> suffixes;
-		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
-			const std::list<util::istring> s = format->getSuffixes();
-			suffixes.insert( suffixes.end(), s.begin(), s.end() );
-		}
-		suffixes.sort();
-		suffixes.unique();
-
-		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
-	}
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
 	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
