@@ -43,7 +43,7 @@ class ImageFormat_Null: public FileFormat
 	}
 protected:
 	util::istring suffixes( io_modes /*modes=both*/ )const {return ".null"; }
-	size_t getSize( const util::istring &dialect ) {
+	size_t getSize( std::list<util::istring> dialects ) {
 		size_t size = 10;
 
 		if( !dialect.empty() )
@@ -60,7 +60,7 @@ public:
 		return "50 500 1000 2000";
 	}
 
-	std::list<data::Chunk> load ( const std::string &/*filename*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> load ( const std::string &/*filename*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
 
 		size_t size = getSize( dialect );
 

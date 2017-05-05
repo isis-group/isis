@@ -11,11 +11,11 @@ using namespace isis;
 // add a faked file format class, so we can generate unique filenames
 class FakedRawFormat: public image_io::FileFormat
 {
-	std::string getName()const {return "";};
-	std::list< data::Chunk > load( const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {return std::list< data::Chunk>();}
-	util::istring suffixes( io_modes /*modes = both*/ ) const {return "";}
-	void write( const data::Image & /*image*/, const std::string & /*filename*/, const util::istring & /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) {}
-	std::pair< std::string, std::string > makeBasename( const std::string &filename )const {
+	std::string getName()const override {return "";};
+	std::list< data::Chunk > load( const boost::filesystem::path &, std::list<util::istring> /*formatstack*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) throw( std::runtime_error & ) override  {return std::list< data::Chunk>();}
+	util::istring suffixes( io_modes /*modes = both*/ ) const override {return "";}
+	void write( const data::Image & /*image*/, const std::string & /*filename*/, std::list<util::istring> /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) override {}
+	std::pair< std::string, std::string > makeBasename( const std::string &filename )const override {
 		return std::make_pair( filename, std::string( "" ) );
 	}
 };

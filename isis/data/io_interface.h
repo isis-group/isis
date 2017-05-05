@@ -104,8 +104,10 @@ public:
 	std::list<util::istring> getSuffixes( io_modes mode = both )const;
 
 
-	/// \return a space separated list of the dialects the plugin supports
-	virtual util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const {return util::istring();};
+	/// \return a list of the dialects the plugin supports
+	virtual std::list<util::istring> dialects()const {return {};};
+	
+	static bool checkDialect(const std::list<util::istring> &dialects,util::istring searched);
 
 	/**
 	 * Load data from file into the given chunk list.
@@ -117,7 +119,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Load data from stream into the given chunk list.
@@ -129,7 +131,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Load data from memory into the given chunk list.
@@ -141,7 +143,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
@@ -151,7 +153,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) = 0;
+	virtual void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) = 0;
 
 	/**
 	 * Write a image list.
@@ -162,7 +164,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )
 	throw( std::runtime_error & );
 
 	virtual ~FileFormat() {}

@@ -110,7 +110,7 @@ public:
 	}
 	std::string getName()const override {return "ImageMagick";}
 	util::istring dialects( const std::list<util::istring> &) const override {return "middle stacked";}
-	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )  throw( std::runtime_error & ) override
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )  throw( std::runtime_error & ) override
 	{
 		std::list<Magick::Image> imageList; 
 	
@@ -157,7 +157,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ) {
 		
 		data::Image img=image;
 		normalize(img); // force all chunks to have same type (and be 0..1 if float)

@@ -53,7 +53,7 @@ private:
 	// use ImageIO's logging here instead of the normal data::Runtime/Debug
 	typedef ImageIoLog Runtime;
 	typedef ImageIoDebug Debug;
-	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, util::istring dialect,std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & );
+	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects,std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & );
 public:
 	/**
 	 * Load data from a set of files or directories with given paths and dialect.
@@ -64,7 +64,7 @@ public:
 	 * @note the images a re created from all loaded files, so loading mutilple files can very well result in only one image
 	 */
 	static std::list<data::Image> 
-	load( const util::slist &paths, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	load( const util::slist &paths, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {}, optional< util::slist& > rejected=optional< util::slist& >() );
 	/**
 	 * Load a data file or directory with given filename and dialect.
 	 * @param path file or directory to load
@@ -73,7 +73,7 @@ public:
 	 * @return list of images created from the loaded data
 	 */
 	static std::list<data::Image> 
-	load( const load_source &source, std::list<util::istring> formatstack = {}, util::istring dialect = "", optional< util::slist& > rejected=optional< util::slist& >() );
+	load( const load_source &source, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {}, optional< util::slist& > rejected=optional< util::slist& >() );
 
 	/**
 	 * Load data from a given filename/stream/memory and dialect into a chunklist.
@@ -82,10 +82,10 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static std::list<data::Chunk> loadChunks(const load_source &source,std::list<util::istring> formatstack = {},util::istring dialect = "")throw( io_error & );
+	static std::list<data::Chunk> loadChunks(const load_source &source, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {})throw( io_error & );
 
-	static bool write( const data::Image &image, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
-	static bool write( std::list<data::Image> images, const std::string &path, util::istring suffix_override = "", util::istring dialect = "" );
+	static bool write( const data::Image &image, const std::string &path, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {} );
+	static bool write( std::list<data::Image> images, const std::string &path, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {} );
 
 	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
@@ -95,13 +95,12 @@ public:
 	/**
 	 * Get all formats which should be able to read/write the given format stack optionally using the given dialect.
 	 * \param format_stack the maximum format stack to look for.
-	 * \param dialect if given, the plugins supporting the dialect are preferred
 	 * 
 	 * \example getFileFormatList({"dcm","tar","gz"}, "") will look for plugins that cat read "*.dcm.tar.gz" files. 
 	 * As this will likely fail it will look for plugins that can handle *.tar.gz files, and if that fails as well, for *.gz files.
 	 * The failed formats will be forwarded to the found plugin to deal with (the gz-reader will have to look for a *.tar reader, which will have to look for *.dcm).
 	 */
-	static FileFormatList getFileFormatList(std::list<util::istring> format_stack, util::istring dialect);
+	static FileFormatList getFileFormatList(std::list<util::istring> formatstack = {});
 
 	/// extract the format stack from a filename
 	static std::list<util::istring> getFormatStack( std::string filename );
@@ -122,7 +121,7 @@ public:
 	 * */
 	static bool registerFileFormat( const FileFormatPtr plugin, bool front=false );
 protected:
-	std::list<Chunk> loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack = {}, util::istring dialect="", optional< util::slist& > rejected=optional< util::slist& >());
+	std::list<Chunk> loadPath(const boost::filesystem::path& path, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {}, optional< util::slist& > rejected=optional< util::slist& >());
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

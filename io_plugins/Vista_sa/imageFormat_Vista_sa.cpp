@@ -253,7 +253,7 @@ void ImageFormat_VistaSa::unsanitize(util::PropertyMap& obj)
 
 }
 
-std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & )
 {
 	data::FilePtr mfile ( filename );
 	
@@ -319,8 +319,8 @@ std::list<data::Chunk> ImageFormat_VistaSa::load( const std::string &filename, c
 }
 
 
-void ImageFormat_VistaSa::write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ){}
-void ImageFormat_VistaSa::write( const std::list<data::Image> &images, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
+void ImageFormat_VistaSa::write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & ){}
+void ImageFormat_VistaSa::write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
 {
 	std::list<_internal::VistaOutputImage> vimages(images.begin(),images.end());
 	std::ofstream out(filename.c_str(),std::ios_base::out|std::ios_base::trunc|std::ios_base::binary);

@@ -29,7 +29,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END;
 
-void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, const util::istring &dialect, std::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -37,13 +37,10 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 		std::string uniquePath = *( inames++ );
 
 		try {
-			write( ref, uniquePath, dialect, progress );
+			write( ref, uniquePath, dialects, progress );
 			LOG( Runtime, notice )
 					<< "Image of size " << util::MSubject(ref.getSizeAsVector()) << " written to " <<  util::MSubject(uniquePath)
-					<< " using " <<  getName() << ( dialect.empty() ?
-													util::istring() :
-													util::istring( " and dialect " ) + dialect
-												  );
+					<< " using " <<  getName();
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
 					<< "Failed to write image to " << util::MSubject(uniquePath) << " using " <<  getName() << " (" << e.what() << ")";
@@ -51,7 +48,7 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	//try open file
 	data::FilePtr ptr(filename);
 	if( !ptr.good() ) {
@@ -68,22 +65,22 @@ std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename
 		set_up=true;
 		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename.native() );
 	}
-	std::list<data::Chunk> ret=load(ptr,formatstack,dialect,feedback);
+	std::list<data::Chunk> ret=load(ptr,formatstack,dialects,feedback);
 	if(set_up) // close progress bar
 		feedback->close();
 	return ret;
 }
 
-std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	const void *p=source.getRawAddress().get();
 	boost::interprocess::ibufferstream buffer((char*)p,source.getLength());
-	return load(buffer.rdbuf(),formatstack,dialect,feedback);
+	return load(buffer.rdbuf(),formatstack,dialects,feedback);
 }
 
-std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	util::TmpFile tmp("isis_streamio_adapter");
 	boost::iostreams::copy(*source,boost::iostreams::file_sink(tmp.c_str()));
-	return load(tmp.native(),formatstack,dialect,feedback);
+	return load(tmp.native(),formatstack,dialects,feedback);
 }
 
 bool hasOrTell( const util::PropertyMap::key_type &name, const util::PropertyMap &object, LogLevel level )
@@ -253,6 +250,10 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Im
 		ret.push_back( name );
 	}
 	return ret;
+}
+
+bool FileFormat::checkDialect(const std::list<util::istring> &dialects,util::istring searched){
+	return std::find(dialects.begin(),dialects.end(),searched)!=dialects.end();
 }
 
 }
