@@ -109,16 +109,16 @@ public:
 	}
 };
 
-class DcmtkLogger : public LOG4CPLUS_NAMESPACE::Appender{
-	std::set<LOG4CPLUS_NAMESPACE::tstring> ignores;
+class DcmtkLogger : public dcmtk::log4cplus::Appender{
+	std::set<dcmtk::log4cplus::tstring> ignores;
 public:
 	DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
 	}
 	virtual void close(){}
 protected:
-	virtual void append(const LOG4CPLUS_NAMESPACE::spi::InternalLoggingEvent& event){
-		const LOG4CPLUS_NAMESPACE::tstring &msg=event.getMessage();
+	virtual void append(const dcmtk::log4cplus::spi::InternalLoggingEvent& event){
+		const dcmtk::log4cplus::tstring &msg=event.getMessage();
 		LOG_IF(ignores.find(msg)==ignores.end(),Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
@@ -619,10 +619,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	
 
 	//hack to steal logging from dcmtk and redirect it to our own
-	LOG4CPLUS_NAMESPACE::Logger logger = LOG4CPLUS_NAMESPACE::Logger::getRoot();
+	dcmtk::log4cplus::Logger logger = dcmtk::log4cplus::Logger::getRoot();
 	// there shall be no logging besides me
 	logger.removeAllAppenders();
-	logger.addAppender(LOG4CPLUS_NAMESPACE::SharedAppenderPtr(new _internal::DcmtkLogger));
+	logger.addAppender(dcmtk::log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const

@@ -117,7 +117,7 @@ public:
 		if(transformOrTell<util::fvector3>("fdf/roi[]","FoV",ret,warning)){
 			util::fvector3 &FoV=ret.refValueAs<util::fvector3>("FoV");
 			FoV*=10;
-			const util::fvector3 vsize= FoV/util::fvector3{size[0],size[1],size[2]};
+			const util::fvector3 vsize= FoV/util::fvector3{float(size[0]),float(size[1]),float(size[2])};
 			LOG(Debug, info) 
 				<< "Computing voxel size from " << FoV << "(FoV)/"  << size << "(size)=" << vsize;
 			ret.setValueAs("voxelSize",vsize);
