@@ -149,15 +149,18 @@ protected:
 				LOG_IF( val.size() > 1, Runtime, warning ) << "Not splicing non scalar property " << MSubject( name ) << " because its length "
 				<< MSubject( val.size() ) << " doesn't fit the amount of targets(" << MSubject( blocks ) << ")"; //tell the user if its no scalar
 			
-				for( ITER i = first; i != last; i++ )
-					_internal::un_shared_ptr(*i).touchProperty( name ) = val;
-				val=PropertyValue();//and clear the source
+				PropertyValue &first_prop = _internal::un_shared_ptr(*first).touchProperty( name );
+				first_prop.transfer(val);
+				ITER i = first;
+				for( ++i; i != last; ++i )
+					_internal::un_shared_ptr(*i).touchProperty( name ) = first_prop;
+
 			} else {
 				LOG_IF( val.size() > 1, Debug, info ) << "Splicing non scalar property " << MSubject( name ) << " into " << blocks << " chunks";
 				ITER i = first;
-				for( const PropertyValue & splint :  val.splice( val.size() / blocks ) ) {
+				for( PropertyValue & splint :  val.splice( val.size() / blocks ) ) {
 					assert( i != last );
-					_internal::un_shared_ptr(*i).touchProperty( name ) = splint;
+					_internal::un_shared_ptr(*i).touchProperty( name ).swap(splint);
 					i++;
 				}
 			}

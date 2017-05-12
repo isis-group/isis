@@ -197,7 +197,7 @@ template<typename TYPE> class ValueArray: public ValueArrayBase
 	}
 protected:
 	ValueArray() {} // should only be used by child classed who initialize the pointer them self
-	ValueArrayBase *clone() const {
+	ValueArrayBase *clone() const override {
 		return new ValueArray( *this );
 	}
 public:
@@ -273,7 +273,7 @@ public:
 
 	virtual ~ValueArray() {}
 
-	std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
+	std::shared_ptr<const void> getRawAddress( size_t offset = 0 )const override {
 		if( offset ) {
 			DelProxy proxy( *this );
 			const uint8_t *const b_ptr = reinterpret_cast<const uint8_t *>( m_val.get() ) + offset;
@@ -281,13 +281,13 @@ public:
 		} else
 			return std::static_pointer_cast<const void>( m_val );
 	}
-	std::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
+	std::shared_ptr<void> getRawAddress( size_t offset = 0 ) override { // use the const version and cast away the const
 		return std::const_pointer_cast<void>( const_cast<const ValueArray *>( this )->getRawAddress( offset ) );
 	}
-	virtual value_iterator beginGeneric() {
+	virtual value_iterator beginGeneric() override {
 		return value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
 	}
-	virtual const_value_iterator beginGeneric()const {
+	virtual const_value_iterator beginGeneric()const override {
 		return const_value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
 	}
 
@@ -311,10 +311,10 @@ public:
 		return std::to_string( m_len ) + "#" + ret;
 	}
 
-	std::string getTypeName()const {return staticName();}
-	unsigned short getTypeID()const {return staticID();}
-	bool isFloat() const {return std::is_floating_point< TYPE >::value;}
-	bool isInteger() const {return std::is_integral< TYPE >::value;}
+	std::string getTypeName()const override {return staticName();}
+	unsigned short getTypeID()const override {return staticID();}
+	bool isFloat() const override {return std::is_floating_point< TYPE >::value;}
+	bool isInteger() const override {return std::is_integral< TYPE >::value;}
 
 	/// @copydoc util::Value::staticName
 	static std::string staticName() {
@@ -341,9 +341,9 @@ public:
 	operator std::shared_ptr<TYPE>&() {return m_val;}
 	operator const std::shared_ptr<TYPE>&()const {return m_val;}
 
-	size_t bytesPerElem()const {return sizeof( TYPE );}
+	size_t bytesPerElem()const override {return sizeof( TYPE );}
 
-	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
+	std::pair<util::ValueReference, util::ValueReference> getMinMax()const override {
 		if ( getLength() == 0 ) {
 			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValueArray";
 			return std::pair<util::ValueReference, util::ValueReference>();
@@ -358,7 +358,7 @@ public:
 		}
 	}
 
-	std::vector<Reference> splice( size_t size )const {
+	std::vector<Reference> splice( size_t size )const override {
 		if ( size >= getLength() ) {
 			LOG( Debug, warning )
 					<< "splicing data of the size " << getLength() << " up into blocks of the size " << size << " is kind of useless ...";
@@ -383,7 +383,7 @@ public:
 		return ret;
 	}
 	//
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const override {
 		if( typeID == staticID() && scaleopt == autoscale ) { // if id is the same and autoscale is requested
 			static const util::Value<uint8_t> one( 1 );
 			static const util::Value<uint8_t> zero( 0 );
@@ -394,7 +394,7 @@ public:
 			return ValueArrayBase::getScalingTo( typeID, minmax, scaleopt );
 		}
 	}
-	void endianSwap() {
+	void endianSwap() override {
 		if(bytesPerElem()>1)
 			data::endianSwapArray( begin(), end(), begin() );
 	}
