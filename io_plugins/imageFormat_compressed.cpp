@@ -92,30 +92,18 @@ public:
 		}
 		return std::move(in);
 	}
-	util::istring dialects( const std::list<util::istring> &format=std::list<util::istring>() )const override{
-
-		std::list<util::istring> suffixes;
-		for( data::IOFactory::FileFormatPtr format :  data::IOFactory::getFormats() ) {
-			const std::list<util::istring> s = format->getSuffixes();
-			suffixes.insert( suffixes.end(), s.begin(), s.end() );
-		}
-		suffixes.sort();
-		suffixes.unique();
-
-		return util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ).c_str();
-	}
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
 		
 		auto in=makeIStream(formatstack);
 
 		//ok, we have a filter, use that with the source stream on top
 		in->push( *source );
 
-		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialects );
 	}
-	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
 		//try open file
 		std::ifstream file(filename.c_str());
 		file.exceptions(std::ios_base::badbit);
@@ -132,18 +120,19 @@ public:
 			in->push( _internal::progress_filter( *feedback ) );
 
 		in->push(file);
-		std::list<data::Chunk> ret=data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialect );
+		std::list<data::Chunk> ret=data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialects );
 		
 		if(set_up) // close progress bar
 			feedback->close();
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) override {
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) override {
 		std::pair< std::string, std::string > proxyBase = makeBasename( filename );
 		const util::istring suffix = proxyBase.second.c_str();
 
-		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( data::IOFactory::getFormatStack(proxyBase.first), dialect );
+		const auto formatstack = data::IOFactory::getFormatStack(proxyBase.first);
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( formatstack );
 
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the uncompressed suffix of \"" + filename + "\" because no io-plugin was found for it" );
@@ -152,7 +141,7 @@ public:
 		// create the intermediate file
 		util::TmpFile tmpFile( "", formats.front()->makeBasename( proxyBase.first ).second );
 
-		if( !data::IOFactory::write( image, tmpFile.native(), dialect ) ) {throwGenericError( tmpFile.native() + " failed to write" );}
+		if( !data::IOFactory::write( image, tmpFile.native(), formatstack, dialects ) ) {throwGenericError( tmpFile.native() + " failed to write" );}
 
 		// set up the compression stream
 		boost::filesystem::ifstream input( tmpFile, std::ios_base::binary );
@@ -163,7 +152,7 @@ public:
 		boost::iostreams::filtering_ostream out;
 
 		if( progress ) {
-			progress->show( boost::filesystem::file_size( tmpFile ) / _internal::progress_filter::blocksize, std::string( "compressing " ) + filename );
+			progress->show( boost::filesystem::file_size( tmpFile ), std::string( "compressing " ) + filename );
 			out.push( _internal::progress_filter( *progress ) );
 		}
 

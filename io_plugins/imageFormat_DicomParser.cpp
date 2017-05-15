@@ -319,17 +319,17 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::Pr
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.property( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const util::istring &dialect )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, std::list<util::istring> dialects )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
 	const size_t len = elem->getLength();
 
 	for ( std::string::size_type pos = 0x10; pos < ( len - sizeof( Sint32 ) ); ) {
-		pos += parseCSAEntry( array + pos, map, dialect );
+		pos += parseCSAEntry( array + pos, map, dialects );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const util::istring &dialect )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, std::list<util::istring> dialects )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -359,7 +359,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 
 			if( (
 					std::string( "MrPhoenixProtocol" ) != name  && std::string( "MrEvaProtocol" ) != name && std::string( "MrProtocol" ) != name
-				) || dialect == "withExtProtocols" ) {
+				) || checkDialect(dialects, "withExtProtocols") ) {
 				const std::string insert( ( char * )at + pos );
 				const std::string::size_type start = insert.find_first_not_of( whitespaces );
 
@@ -374,7 +374,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 						ret.push_back( insert.substr( start, end + 1 - start ) );//store the text if there is some
 				}
 			} else {
-				LOG( Runtime, info ) << "Skipping " << name << " as its not requested by the dialect (use dialect \"withExtProtocols\" to get it)";
+				LOG( Runtime, verbose_info ) << "Skipping " << name << " as its not requested by the dialect (use dialect \"withExtProtocols\" to get it)";
 			}
 
 			pos += (
@@ -450,7 +450,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const util::istring &dialect )const
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, std::list<util::istring> dialects )const
 {
 	const std::string  old_loc=std::setlocale(LC_ALL,"C");
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
@@ -462,11 +462,11 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			boost::optional< util::PropertyValue& > known = map.queryProperty( "Private Code for (0029,1000)-(0029,10ff)" );
 
 			if( known && known->as<std::string>() == "SIEMENS CSA HEADER" ) {
-				if(dialect!="nocsa"){
+				if(!checkDialect(dialects,"nocsa")){
 					const util::PropertyMap::PropPath name = ( tag == DcmTagKey( 0x0029, 0x1010 ) ) ? "CSAImageHeaderInfo" : "CSASeriesHeaderInfo";
 					DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 					try{
-						parseCSA( elem, map.touchBranch( name ), dialect );
+						parseCSA( elem, map.touchBranch( name ), dialects );
 					} catch(std::exception &e){
 						LOG( Runtime, error ) << "Error parsing CSA data ("<< util::MSubject(e.what()) <<"). Deleting " << util::MSubject(name);
 					}
@@ -498,7 +498,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::Property
 			else
 				parseList( elem, tag2Name( tag ), map );
 		} else {
-			dcmObject2PropMap( obj, map.touchBranch( tag2Name( tag ) ), dialect );
+			dcmObject2PropMap( obj, map.touchBranch( tag2Name( tag ) ), dialects );
 		}
 	}
 	std::setlocale(LC_ALL,old_loc.c_str());

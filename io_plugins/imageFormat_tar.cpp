@@ -83,10 +83,10 @@ protected:
 	util::istring suffixes( io_modes modes )const override {return "tar";}
 public:
 	std::string getName()const override {return "tar reading proxy";};
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )override {
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )override {
 		throwGenericError( "Not implemented (yet)" );
 	}
-	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) override {
 		std::list<data::Chunk> ret;
 		size_t size, next_header_in;
 		std::basic_istream<char> in(source);
@@ -115,11 +115,11 @@ public:
 			if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
 
 				
-				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( formatstack, dialect ); // try to get the reading plugin from the formatstack
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( formatstack ); // try to get the reading plugin from the formatstack
 				
 				if(formats.empty()){ // if that fails try again with a formatstack from the filename
 					formatstack=data::IOFactory::getFormatStack(org_file.native());
-					formats= data::IOFactory::getFileFormatList( formatstack, dialect );
+					formats= data::IOFactory::getFileFormatList( formatstack );
 				}
 
 				if( formats.empty() ) {
@@ -136,7 +136,7 @@ public:
 
 					// read the temporary file
 					try {
-						std::list<data::Chunk> loaded=data::IOFactory::loadChunks( buffer, formatstack, dialect.c_str() );
+						std::list<data::Chunk> loaded=data::IOFactory::loadChunks( buffer, formatstack, dialects );
 						for(data::Chunk &ref : loaded ) { // set the source property of the red chunks to something more usefull
 							ref.setValueAs( "source", org_file.native() ); //@todo  add tar filename
 						}

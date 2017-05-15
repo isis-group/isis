@@ -52,7 +52,7 @@ class ImageFormat_Dicom: public FileFormat
 
 		return ret;
 	}
-	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const util::istring &dialect );
+	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, std::list<util::istring> dialects );
 	static bool parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static data::Chunk readMosaic( data::Chunk source );
@@ -65,17 +65,17 @@ public:
 	void addDicomDict( DcmDataDictionary &dict );
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const util::istring &dialect );
+	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, std::list<util::istring> dialects );
 	static void parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map );
 	static void parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, isis::util::PropertyMap &map );
-	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const util::istring &dialect )const;
-	static void sanitise( util::PropertyMap &object, util::istring dialect );
+	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, std::list<util::istring> dialects )const;
+	static void sanitise( util::PropertyMap &object, std::list<util::istring> dialect );
 	std::string getName()const override;
-	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override;
+	std::list<util::istring> dialects()const override;
 
-	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	void write( const data::Image &image,     const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
+	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	void write( const data::Image &image,     const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 };
 }
 }

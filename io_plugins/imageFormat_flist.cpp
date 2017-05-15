@@ -20,7 +20,7 @@ protected:
 public:
 	std::string getName()const override {return "filelist proxy (gets filenames from files or stdin)";}
 
-	std::list<data::Chunk> doLoad( std::istream &in, std::list<util::istring> formatstack ) {
+	std::list<data::Chunk> doLoad( std::istream &in, std::list<util::istring> formatstack, std::list<util::istring> dialects) {
 		static const std::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
 		size_t fcnt = 0;
@@ -33,7 +33,7 @@ public:
 				LOG( Runtime, info ) << "loading " << fname;
 				try{
 					fcnt++;
-					ret.splice(ret.end(), data::IOFactory::loadChunks(fname, formatstack ));
+					ret.splice(ret.end(), data::IOFactory::loadChunks(fname, formatstack, dialects ));
 				} catch(data::IOFactory::io_error &e){
 					LOG(Runtime,error) << "Loading of " << fname << "(#" << fcnt << " in list) failed with " << e.what() << "(the plugin used was:" << e.which() << ")";
 				}
@@ -45,14 +45,14 @@ public:
 		return ret;
 	}
 
-	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
 		std::istream stream(source);
 		assert(formatstack.back()=="flist");
 		formatstack.pop_back();
-		return doLoad( stream, formatstack );
+		return doLoad( stream, formatstack, dialects);
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 };

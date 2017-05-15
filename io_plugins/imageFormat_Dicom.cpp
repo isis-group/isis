@@ -41,7 +41,7 @@ class DicomChunk : public data::Chunk
 		return new data::Chunk(dest,width,height);
 	}
 public:
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, DcmFileFormat &dcfile, const util::istring &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, DcmFileFormat &dcfile, std::list<util::istring> dialects ) {
 		std::unique_ptr<data::Chunk> ret;
 		DicomImage img( &dcfile, EXS_Unknown );
 
@@ -77,7 +77,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialects );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					// if there are 3 planes data is actually an array of 3 pointers
@@ -93,7 +93,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialects );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -109,16 +109,16 @@ public:
 	}
 };
 
-class DcmtkLogger : public LOG4CPLUS_NAMESPACE::Appender{
-	std::set<LOG4CPLUS_NAMESPACE::tstring> ignores;
+class DcmtkLogger : public dcmtk::log4cplus::Appender{
+	std::set<dcmtk::log4cplus::tstring> ignores;
 public:
 	DcmtkLogger(){
 		ignores.insert("no pixel data found in DICOM dataset");
 	}
 	virtual void close(){}
 protected:
-	virtual void append(const LOG4CPLUS_NAMESPACE::spi::InternalLoggingEvent& event){
-		const LOG4CPLUS_NAMESPACE::tstring &msg=event.getMessage();
+	virtual void append(const dcmtk::log4cplus::spi::InternalLoggingEvent& event){
+		const dcmtk::log4cplus::tstring &msg=event.getMessage();
 		LOG_IF(ignores.find(msg)==ignores.end(),Runtime,warning) << "Got an error from dcmtk: \"" << event.getMessage() << "\"";
 	}
 };
@@ -135,7 +135,7 @@ util::istring ImageFormat_Dicom::suffixes( io_modes modes )const
 		return ".ima .dcm";
 }
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-util::istring ImageFormat_Dicom::dialects( const std::list<util::istring> &/*formatstack*/ )const {return "siemens withExtProtocols nocsa keepmosaic forcemosaic";}
+std::list<util::istring> ImageFormat_Dicom::dialects()const {return {"siemens","withExtProtocols","nocsa","keepmosaic","forcemosaic"};}
 
 
 
@@ -154,17 +154,13 @@ void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 }
 
 
-void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring dialect )
+void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::list<util::istring> dialects )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	util::PropertyMap &dicomTree = object.touchBranch( dicomTagTreeName );
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
-
-	if( dicomTree.hasProperty( "SiemensNumberOfImagesInMosaic" ) ) { // if its still there image was no mosaic, so I guess it should be used according to the standard
-		dicomTree.rename( "SiemensNumberOfImagesInMosaic", "SliceOrientation" );
-	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standard)
 	{
@@ -344,7 +340,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, util::istring diale
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0)
 	if( foundDiff ) {
-		if( dialect == "siemens" ) {
+		if( checkDialect(dialects, "siemens") ) {
 			LOG( Runtime, warning ) << "Removing acquisitionTime=" << util::MSubject( object.property( "acquisitionTime" ).toString( false ) ) << " from siemens DWI data as it is probably broken";
 			object.remove( "acquisitionTime" );
 		}
@@ -526,17 +522,17 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	return dest;
 }
 
-std::list<data::Chunk> ImageFormat_Dicom::load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
+std::list<data::Chunk> ImageFormat_Dicom::load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
 
 	std::basic_stringbuf<char> buff_stream;
 	boost::iostreams::copy(*source,buff_stream);
 	const auto buff = buff_stream.str();
 	
 	data::ValueArray<uint8_t> wrap((uint8_t*)buff.data(),buff.length(),data::ValueArray<uint8_t>::NonDeleter());
-	return load(wrap,formatstack,dialect,progress);
+	return load(wrap,formatstack,dialects,progress);
 }
 
-std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
 {
 	DcmInputBufferStream dcstream;
 	DcmFileFormat dcfile;
@@ -546,22 +542,26 @@ std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, s
 
 	if ( loaded.good() ) {
 		std::list< data::Chunk > ret;
-		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, dcfile, dialect );
+		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, dcfile, dialects );
 		//we got a chunk from the file
-		sanitise( chunk, dialect );
+		sanitise( chunk, dialects );
 		const util::slist iType = chunk.getValueAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-			if( dialect == "keepmosaic" ) {
+			if( checkDialect(dialects, "keepmosaic") ) {
 				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"keepmosaic\" was selected";
 				ret.push_back( chunk );
 			} else {
 				ret.push_back( readMosaic( chunk ) );
 			}
-		} else if( dialect == "forcemosaic" ) 
+		} else if(checkDialect(dialects, "forcemosaic") ) 
 			ret.push_back( readMosaic( chunk ) );
 		else 
 			ret.push_back( chunk );
+		
+		if( ret.back().hasProperty( "SiemensNumberOfImagesInMosaic" ) ) { // if its still there image was no mosaic, so I guess it should be used according to the standard
+			ret.back().rename( "SiemensNumberOfImagesInMosaic", "SliceOrientation" );
+		}
 
 		return ret;
 	} else {
@@ -571,7 +571,7 @@ std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, s
 
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
@@ -619,10 +619,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	
 
 	//hack to steal logging from dcmtk and redirect it to our own
-	LOG4CPLUS_NAMESPACE::Logger logger = LOG4CPLUS_NAMESPACE::Logger::getRoot();
+	dcmtk::log4cplus::Logger logger = dcmtk::log4cplus::Logger::getRoot();
 	// there shall be no logging besides me
 	logger.removeAllAppenders();
-	logger.addAppender(LOG4CPLUS_NAMESPACE::SharedAppenderPtr(new _internal::DcmtkLogger));
+	logger.addAppender(dcmtk::log4cplus::SharedAppenderPtr(new _internal::DcmtkLogger));
 }
 
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const

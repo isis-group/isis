@@ -151,9 +151,9 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry( container_type &root, const p
 {
 	PropPath::const_iterator next = at;
 	next++;
-	container_type::iterator found = root.find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (a proposed leaf in the PropMap)
+		const container_type::iterator found = root.find( *at );
 		if ( found != root.end() ) {//and we found the entry
 			return fetchEntry( boost::get<PropertyMap>( found->second ).container, next, pathEnd ); //continue there
 		} else { // if we should create a sub-map

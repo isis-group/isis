@@ -290,7 +290,7 @@ util::istring ImageFormat_TiffSa::suffixes(isis::image_io::FileFormat::io_modes 
 std::list< data::Chunk > ImageFormat_TiffSa::load(
 	data::ByteArray source, 
 	std::list<util::istring> /*formatstack*/, 
-	const util::istring &dialect, 
+	std::list<util::istring> dialects, 
 	std::shared_ptr<util::ProgressFeedback> feedback
 )throw( std::runtime_error & ) {
 	_internal::TiffSource tiff(source);
@@ -309,7 +309,7 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	int nr=0;
 	for(const _internal::IFD& ifd:images){
 		size_t mbsize=ifd.computeSize() / 1024 / 1024;
-		if(dialect!="lowmem" || mbsize < 4096){
+		if(checkDialect(dialects,"lowmem") || mbsize < 4096){
 			auto ch=ifd.makeChunk(feedback);
 			ch.setValueAs("sequenceNumber",nr++);
 			ret.push_back(ch);
@@ -322,9 +322,9 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 
 std::string ImageFormat_TiffSa::getName() const{return "tiff";}
 
-util::istring ImageFormat_TiffSa::dialects(const std::list<util::istring> & ) const {return {"lowmem"};}
+std::list<util::istring> ImageFormat_TiffSa::dialects() const {return {"lowmem"};}
 
-void ImageFormat_TiffSa::write(const data::Image & image, const std::string & filename, const util::istring & dialect, std::shared_ptr<util::ProgressFeedback> feedback){
+void ImageFormat_TiffSa::write(const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/){
 	throwGenericError("not yet implemented");
 }
 

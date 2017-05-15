@@ -173,8 +173,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::map<short, unsigned short> nifti_type2isis_type;
 	std::map<unsigned short, short> isis_type2nifti_type;
 	std::map<unsigned short, demuxer_type> prop_demuxer;
-	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
-		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValueArray<NEW_T>::staticName();
+	template<typename T, typename NEW_T> static unsigned short typeFallBack() {
+		LOG( Runtime, info ) << data::ValueArray<T>::staticName() <<  " is not supported by the dialects fsl and spm falling back to " << data::ValueArray<NEW_T>::staticName();
 		return data::ValueArray<NEW_T>::staticID();
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
@@ -185,7 +185,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
 	void parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
-	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
+	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, std::list<util::istring> dialects );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( std::shared_ptr<_internal::nifti_1_header > header );
 	void flipGeometry( data::Image &image, data::dimensions flipdim );
@@ -193,12 +193,12 @@ class ImageFormat_NiftiSa: public FileFormat
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const override;
-	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override;
-	util::istring dialects( const std::list<util::istring> & )const override {return "fsl spm withExtProtocols";}
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override;
+	std::list<util::istring> dialects()const override {return {"fsl","spm","withExtProtocols"};}
 
 protected:
-	util::istring suffixes( io_modes mode = both )const override {return ".nii";};
+	util::istring suffixes( io_modes /*mode = both*/ )const override {return ".nii";};
 	void sanitise( data::Chunk &ch );
 	template <typename T> void transformIfNotSet( const util::PropertyMap::key_type &from, const util::PropertyMap::key_type &to, data::Chunk &object, LogLevel level ) {
 		if( !object.hasProperty( to ) ) {

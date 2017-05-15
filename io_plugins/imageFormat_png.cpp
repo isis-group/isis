@@ -64,7 +64,7 @@ public:
 	std::string getName()const override {
 		return "PNG (Portable Network Graphics)";
 	}
-	util::istring dialects( const std::list<util::istring> & ) const override {return "middle stacked";}
+	std::list<util::istring> dialects() const override {return {"middle","stacked"};}
 	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
 		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
@@ -208,11 +208,11 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	std::list<data::Chunk> load(const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/)  throw( std::runtime_error & ) override
+	std::list<data::Chunk> load(const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/)  throw( std::runtime_error & ) override
 	{
 		data::Chunk ch = read_png( filename );
 
-		if( dialect == "stacked" ) {
+		if( checkDialect(dialects,"stacked") ) {
 			float slice;
 
 			if( extractNumberFromName<uint32_t>( filename, slice ) ) {
@@ -242,7 +242,7 @@ public:
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & )override {
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & )override {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;
@@ -291,7 +291,7 @@ public:
 		tImg.spliceDownTo( data::sliceDim );
 
 
-		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
+		if( checkDialect(dialects, "middle" ) ) { //save only the middle
 			std::vector<data::Chunk > chunks;
 			size_t middle= tImg.getDimSize(data::sliceDim) / 2 + 1;
 			LOG( Runtime, info ) 

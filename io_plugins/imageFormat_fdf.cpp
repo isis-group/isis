@@ -49,10 +49,10 @@ protected:
 		return std::pair<std::string,util::PropertyValue>();
 	}
 public:
-	util::istring dialects( const std::list<util::istring> &/*formatstack*/ )const override {return "org_dwi";};
+	std::list<util::istring> dialects()const override {return {"org_dwi"};};
 	std::string getName()const override {return "Vnmrj reconstruction format";}
 
-	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
 		
 		static const std::map<std::string,unsigned short> type_map{
 			{"float",data::ValueArray<float>::staticID()},
@@ -117,7 +117,7 @@ public:
 		if(transformOrTell<util::fvector3>("fdf/roi[]","FoV",ret,warning)){
 			util::fvector3 &FoV=ret.refValueAs<util::fvector3>("FoV");
 			FoV*=10;
-			const util::fvector3 vsize= FoV/util::fvector3{size[0],size[1],size[2]};
+			const util::fvector3 vsize= FoV/util::fvector3{float(size[0]),float(size[1]),float(size[2])};
 			LOG(Debug, info) 
 				<< "Computing voxel size from " << FoV << "(FoV)/"  << size << "(size)=" << vsize;
 			ret.setValueAs("voxelSize",vsize);
@@ -126,7 +126,7 @@ public:
 			LOG(Runtime,warning) << "We have no roi, so we set the voxelSize to the default " << ret.property("voxelSize");
 		}
 		
-		if(dialect!="org_dwi"){
+		if(checkDialect(dialects,"org_dwi")){
 			auto dwi_read = extractOrTell("fdf/dro",ret,info);
 			auto dwi_phase = extractOrTell("fdf/dpe",ret,info);
 			auto dwi_slice = extractOrTell("fdf/dsl",ret,info);
@@ -150,7 +150,7 @@ public:
 		return std::list<data::Chunk>(1,ret);
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 };

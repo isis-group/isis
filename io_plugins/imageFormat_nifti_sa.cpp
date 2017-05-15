@@ -714,7 +714,7 @@ bool ImageFormat_NiftiSa::checkSwapEndian ( std::shared_ptr< isis::image_io::_in
 std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	data::ByteArray source, 
 	std::list<util::istring> /*formatstack*/, 
-	const util::istring &dialect, 
+	std::list<util::istring> dialects, 
 	std::shared_ptr<util::ProgressFeedback> /*feedback*/ 
 )throw( std::runtime_error & ) {
 
@@ -760,7 +760,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 
 	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
 		data_src = bitRead( source.at<uint8_t>( header->vox_offset ), util::product(size) );
-	} else if( dialect == "fsl" && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
+	} else if( checkDialect(dialects, "fsl") && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = util::product(size) / 3;
 		data::ValueArray<util::color24> buff( volume );
@@ -775,7 +775,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 
 		data_src = buff;
 		size[data::timeDim] = 1;
-	} else if( dialect == "fsl" && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
+	} else if( checkDialect(dialects, "fsl") && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
 		const size_t volume = util::product(size) / 3;
 		data::ValueArray<util::fvector3> buff( volume );
@@ -843,7 +843,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 		}
 	}
 
-	if( dialect != "withExtProtocols" ) { //find and remove MrPhoenixProtocol if not asked for explicitely
+	if( checkDialect(dialects, "withExtProtocols") ) { //find and remove MrPhoenixProtocol if not asked for explicitely
 		for( util::PropertyMap::PropPath found = dcmmeta.find( "MrPhoenixProtocol", false, true );!found.empty();found = dcmmeta.find( "MrPhoenixProtocol", false, true ) )
 			dcmmeta.remove( found );
 	}
@@ -862,28 +862,28 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	return std::list<data::Chunk>(1,orig);
 }
 
-std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )
+std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, std::list<isis::util::istring> dialects )
 {
 	const size_t bpv = src.getMaxBytesPerVoxel() * 8;
 	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
 
 	//bitmap is not supportet by spm and fsl
 	if( target_id == data::ValueArray<bool>::staticID() ) {
-		if( dialect == "fsl" || dialect == "spm" ) {
-			target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );// fall back to uint8_t and use normal writer for that
+		if( checkDialect(dialects, "fsl") || checkDialect(dialects, "spm" ) ) {
+			target_id = typeFallBack<bool, uint8_t>();// fall back to uint8_t and use normal writer for that
 		} else {
 			return std::unique_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) ); // use special writer for bit
 		}
 	}
 
 	// fsl cannot deal with some types
-	if( dialect == "fsl" ) {
+	if( checkDialect(dialects, "fsl") ) {
 		switch( target_id ) {
 		case data::ValueArray<uint16_t>::staticID():
-			target_id = typeFallBack<uint16_t, int16_t>( "fsl" );
+			target_id = typeFallBack<uint16_t, int16_t>();
 			break;
 		case data::ValueArray<uint32_t>::staticID():
-			target_id = typeFallBack<uint32_t, int32_t>( "fsl" );
+			target_id = typeFallBack<uint32_t, int32_t>();
 			break;
 		case data::ValueArray<util::color24>::staticID():
 
@@ -904,11 +904,11 @@ std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
-	std::unique_ptr<_internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
+	std::unique_ptr<_internal::WriteOp > writer = getWriteOp( image, dialects ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
 
 	if( nifti_id ) { // there is a corresponding nifti datatype
@@ -922,13 +922,14 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 				throwGenericError( filename + " could not be opened" );
 		}
 
-		if( dialect == "spm" ) {
+		if( checkDialect(dialects, "spm" ) ) {
 			writer->addFlip( math::mapScannerAxisToImageDimension(image, data::z ) );
-		} else if( dialect == "fsl" ) {
+		} else if( checkDialect(dialects, "fsl") ) {
 			//dcm2nii flips the slice ordering of a mosaic if the determinant of the orientation is negative
 			//don't ask, dcm2nii does it, fsl seems to expect it, so we do it
-			if( image.hasProperty( "DICOM/ImageType" ) ) {
-				const util::slist tp = image.getValueAs<util::slist>( "DICOM/ImageType" );
+			auto image_type=image.queryProperty( "DICOM/ImageType" );
+			if( image_type ) {
+				const util::slist tp = image_type->as<util::slist>();
 				const bool was_mosaic = ( std::find( tp.begin(), tp.end(), "WAS_MOSAIC" ) != tp.end() );
 				const util::Matrix3x3<float> mat{
 					image.getValueAs<util::fvector3>( "rowVec" ), 
@@ -951,7 +952,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		}
 
 		// if the image seems to have diffusion data, and we are writing for fsl we store the data just as dcm2nii does it
-		if( dialect == "fsl" && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
+		if( checkDialect(dialects, "fsl") && image.getChunkAt( 0 ).hasProperty( "diffusionGradient" ) ) {
 			LOG_IF( image.getNrOfTimesteps() < 2, Runtime, warning ) << "The image seems to have diffusion data, but has only one volume";
 			std::ofstream bvecFile( ( makeBasename( filename ).first + ".bvec" ).c_str() );
 			std::ofstream bvalFile( ( makeBasename( filename ).first + ".bval" ).c_str() );
@@ -1026,7 +1027,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getValueAs<float>( "repetitionTime" );
 
-		if( util::istring( dialect.c_str() ) == "spm" ) { // override "normal" description with the "spm-description"
+		if( checkDialect(dialects, "spm") ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
 		}
 

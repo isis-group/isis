@@ -74,10 +74,10 @@ void IOApplication::addInput ( util::ParameterMap &parameters, const std::string
 	parameters[std::string( "rf" ) + suffix].hidden() = true;
 
 	parameters[std::string( "rf" ) + suffix].setDescription( std::string( "Override automatic detection of file suffix for reading" + desc + " with given value" ) );
-	parameters[std::string( "rdialect" ) + suffix] = std::string();
+	parameters[std::string( "rdialect" ) + suffix] = util::slist();
 	parameters[std::string( "rdialect" ) + suffix].needed() = false;
 	parameters[std::string( "rdialect" ) + suffix].setDescription(
-		std::string( "choose dialect for reading" ) + desc + ". The available dialects depend on the capabilities of the used IO plugin" );
+		std::string( "choose dialect(s) for reading" ) + desc + ". The available dialects depend on the capabilities of the used IO plugin" );
 }
 void IOApplication::addInput(const std::string& desc, const std::string& suffix, bool needed)
 {
@@ -91,14 +91,14 @@ void IOApplication::addOutput( util::ParameterMap &parameters, const std::string
 	parameters[std::string( "out" ) + suffix].setDescription( "output filename" + desc );
 	parameters[std::string( "out" ) + suffix].needed() = needed;
 
-	parameters[std::string( "wf" ) + suffix] = std::string();
+	parameters[std::string( "wf" ) + suffix] = util::slist();
 	parameters[std::string( "wf" ) + suffix].needed() = false;
 	parameters[std::string( "wf" ) + suffix].setDescription( "Override automatic detection of file suffix for writing" + desc + " with given value" );
 	parameters[std::string( "wf" ) + suffix].hidden() = true;
 
-	parameters[std::string( "wdialect" ) + suffix] = std::string();
+	parameters[std::string( "wdialect" ) + suffix] = util::slist();
 	parameters[std::string( "wdialect" ) + suffix].needed() = false;
-	parameters[std::string( "wdialect" ) + suffix].setDescription( "Choose dialect for writing" + desc + ". Use \"--help-io\" for a list of the plugins and their supported dialects" );
+	parameters[std::string( "wdialect" ) + suffix].setDescription( "Choose dialect(s) for writing" + desc + ". Use \"--help-io\" for a list of the plugins and their supported dialects" );
 	std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 	// remove some types which are useless as representation
 	// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
@@ -149,7 +149,7 @@ void IOApplication::printHelp( bool withHidden ) const
 			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
-			const std::list<util::istring> dialects = util::stringToList<util::istring>( pi->dialects({}).c_str() );
+			const std::list<util::istring> dialects = pi->dialects();
 			std::cerr << "\tsupported suffixes: " << util::listToString<util::istring>( suff.begin(), suff.end(), "\", \"", "\"", "\"" ).c_str()  << std::endl;
 
 			if( !dialects.empty() )
@@ -167,7 +167,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	util::slist rf = parameters[std::string( "rf" ) + suffix];
-	std::string dl = parameters[std::string( "rdialect" ) + suffix];
+	util::slist dl = parameters[std::string( "rdialect" ) + suffix];
 	
 	bool no_progress = parameters["np"];
 
@@ -175,9 +175,7 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	std::list<util::istring> formatstack;
-	for(const std::string &format:rf)
-		formatstack.push_back(format.c_str());
+	std::list<util::istring> formatstack=util::listToList<util::istring>(rf.begin(),rf.end());
 		
 	std::list< Image > tImages;
 	if(input.size()==1 && input.front()=="-"){
@@ -185,15 +183,15 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 			<< "loading from stdin" 
 			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
 			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
-			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-		tImages = data::IOFactory::load( std::cin.rdbuf(), formatstack, dl.c_str(),rejected );
+			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + util::listToString(dl.begin(),dl.end()) );
+		tImages = data::IOFactory::load( std::cin.rdbuf(), formatstack, util::listToList<util::istring>(dl.begin(),dl.end()),rejected );
 	} else {
 		LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
 			<< util::NoSubject( rf.empty() ? "" : std::string( " using the format stack: " ) + util::listToString(rf.begin(),rf.end()) )
 			<< util::NoSubject( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
-			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-		tImages = data::IOFactory::load( input, formatstack, dl.c_str(),rejected );
+			<< util::NoSubject( dl.empty() ? "" : std::string( " using the dialect: " ) + util::listToString(dl.begin(),dl.end()) );
+		tImages = data::IOFactory::load( input, formatstack, util::listToList<util::istring>(dl.begin(),dl.end()),rejected );
 	}
 
 	images.splice( images.end(), tImages );
@@ -235,15 +233,15 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 	const util::Selection repn = parameters[std::string( "repn" ) + suffix];
 	const util::Selection scale_mode = parameters[std::string( "scale_mode" ) + suffix];
 	const std::string output = parameters[std::string( "out" ) + suffix];
-	const std::string wf = parameters[std::string( "wf" ) + suffix];
-	const std::string dl = parameters[std::string( "wdialect" ) + suffix];
+	const util::slist wf = parameters[std::string( "wf" ) + suffix];
+	const util::slist dl = parameters[std::string( "wdialect" ) + suffix];
 	LOG( Runtime, info )
 			<< "Writing " << out_images.size() << " images"
 			<< ( repn ? std::string( " as " ) + ( std::string )repn : "" )
 			<< " to " << util::MSubject( output )
-			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
+			<< ( wf.empty() ? "" : std::string( " using the format: " ) + util::listToString(wf.begin(),wf.end()) )
 			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
-			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + util::listToString(dl.begin(),dl.end()) );
 
 
 	LOG_IF( parameters[std::string( "scale_mode" ) + suffix].isParsed() && repn == 0, Runtime, warning )
@@ -259,7 +257,7 @@ bool IOApplication::autowrite ( const util::ParameterMap &parameters, std::list<
 	if( feedback() )
 		data::IOFactory::setProgressFeedback( feedback() );
 
-	if ( ! IOFactory::write( out_images, output, wf.c_str(), dl.c_str() ) ) {
+	if ( ! IOFactory::write( out_images, output, util::listToList<util::istring>(wf.begin(),wf.end()), util::listToList<util::istring>(dl.begin(),dl.end()) ) ) {
 		if ( exitOnError ) {
 			LOG( Runtime, notice ) << "Failed to write, exiting...";
 			exit( 1 );
