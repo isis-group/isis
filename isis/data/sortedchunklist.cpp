@@ -228,8 +228,8 @@ bool SortedChunkList::insert_impl(const Chunk &ch){
 	const std::pair<std::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 	if(inserted.first && !inserted.second){
 		LOG(Debug, info )
-		<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.queryProperty( "indexOrigin" ) << ") with the equal property "
-		<< std::make_pair( secondarySort.top().propertyName, ch.queryProperty( secondarySort.top().propertyName ) );
+			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.property( "indexOrigin" ) 
+			<< ") with the equal property "	<< std::make_pair( secondarySort.top().propertyName, ch.property( secondarySort.top().propertyName ) );
 
 		LOG_IF(
 			ch.queryProperty( "source" ) != std::const_pointer_cast<const Chunk>(inserted.first)->queryProperty( "source" ),//empty properties are not unequal

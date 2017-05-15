@@ -354,7 +354,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 						<< " " << distVecNorm;
 			} else {
 				LOG( Debug, info )
-						<< "used the distance between chunk 0 and " << structure_size[2] - 1
+						<< "used the distance between chunk " << 0 << " and " << structure_size[2] - 1
 						<< " to synthesize the missing sliceVec as " << distVecNorm;
 				setValueAs( "sliceVec", distVecNorm); // this should message if there really is a conflict
 			}
@@ -375,7 +375,7 @@ bool Image::reIndex(optional< util::slist& > rejected)
 				} else {
 					voxelGap[2] = sliceDist;
 					LOG( Debug, info )
-							<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
+							<< "used the distance between chunk " << 0 << " and " << 1 << " to synthesize the missing slice distance (voxelGap[2]) as "
 							<< util::MSubject( sliceDist );
 				}
 			}
