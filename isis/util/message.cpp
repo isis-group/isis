@@ -23,7 +23,9 @@
 
 #include <unistd.h>   // for isatty()
 #include <stdio.h>    // for fileno()
+#ifdef HAVE_CURSES
 #include <term.h>
+#endif
 
 namespace isis
 {
@@ -178,7 +180,12 @@ void DefaultMsgPrint::commit_tty(const Message& mesg)
 	const char *color_code="";
 	
 	static int erret = 0;
-	static bool is_term = (setupterm(NULL, 1, &erret) == 0);
+	static bool is_term = 
+#ifdef HAVE_CURSES
+	(setupterm(NULL, 1, &erret) == 0);
+#else
+	false;
+#endif
 	
 	// terminal color codes
 	static const char 
