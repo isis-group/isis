@@ -84,6 +84,12 @@ int main( int argc, char **argv )
 
 	app.parameters["rotate"]=util::slist{"x","y", "90"};
 	app.parameters["rotate"].needed()=false;
+
+	app.parameters["translate"]=util::fvector3();
+	app.parameters["translate"].needed()=false;
+	
+	app.parameters["pix_center"]=false;
+	app.parameters["pix_center"].needed()=false;
 	
 	app.addLogging<TransformLog>("");
 	app.addLogging<TransformDebug>("");
@@ -92,6 +98,16 @@ int main( int argc, char **argv )
 	app.addLogging<ITKDebug>("ITK");
 	
 	app.init( argc, argv );
+	
+	if(!(app.parameters["swapdim"].isParsed()||app.parameters["resample"].isParsed()||app.parameters["translate"].isParsed()||app.parameters["rotate"].isParsed())){
+		LOG(TransformLog,error) << "No transformation requested, exiting..";
+		LOG(TransformLog,notice) << "have at least on of " 
+			<< util::MSubject("-swapdim") << ", " 
+			<< util::MSubject("-translate") << ", "
+			<< util::MSubject("-resample")  << " or " 
+			<< util::MSubject("-rotate");
+		exit(-1);
+	}
 	
 	float rotate_angle=0;
 	std::pair<int,int> rotate_plane;
@@ -157,6 +173,9 @@ int main( int argc, char **argv )
 				refImage.swapDim(swap.first,swap.second, app.feedback());
 			}
 		}
+		if(app.parameters["translate"].isParsed()){
+			refImage=itk4::translate(refImage,app.parameters["translate"]);
+		}
 		if(app.parameters["resample"].isParsed()){
 			util::vector4<size_t> oldsize=refImage.getSizeAsVector(),newsize;
 			util::ivector4 reqsize=app.parameters["resample"];
@@ -167,7 +186,7 @@ int main( int argc, char **argv )
 			refImage=itk4::resample(refImage,newsize);
 		}
 		if(rotate_angle){
-			refImage=itk4::rotate(refImage,rotate_plane,rotate_angle);
+			refImage=itk4::rotate(refImage,rotate_plane,rotate_angle, app.parameters["pix_center"]);
 		}
 	}
 	app.autowrite( app.images );
