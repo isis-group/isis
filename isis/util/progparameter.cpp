@@ -117,10 +117,6 @@ bool ParameterMap::parse( int argc, char **argv )
 		if( !pName.empty() ) { // if we got a parameter before
 			const int start = i;
 
-			while( i < argc && !(argv[i][0] == '-' && argv[i][1] != 0) ) { //collect its properties, while there are some ..
-				i++;
-			}
-
 			std::list<std::string> matchingStrings;
 			for( ParameterMap::const_reference parameterRef :  *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
@@ -141,17 +137,33 @@ bool ParameterMap::parse( int argc, char **argv )
 						<< "The parameter \"" << pName << "\" is ambiguous. The parameters \""
 						<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
 						<< "\" are possible. Ignoring this parameter!";
+				continue;
 			} else if ( matchingStrings.empty() ) { // no match
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
-			} else { //exact one match
-				parsed = at( matchingStrings.front() ).is<util::slist>() ? //dont do tokenizing if the target is an slist (is already done by the shell)
-					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) ) :
-					at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) );
+				continue;
+			} 
+				
+			// exact one match
+			ProgParameter &match=at(matchingStrings.front() );
+			
+			// check if parameter can be empty (bool only)
+			if(match.is<bool>()){ //no parameters expected
+				match.parse(""); // ok thats it nothing else to do here
+			} else { //go through all parameters 
+				i++;//skip the first one, that should be here (enables us to have parameters like "-20")
+				while( i < argc && !(argv[i][0] == '-' && argv[i][1] != 0) ) {  
+					i++;//collect the remaining parameters, while there are some ..
+				}
+
+				parsed = match.is<util::slist>() ? //dont do tokenizing if the target is an slist (is already done by the shell)
+					match.parse_list( util::slist( argv + start, argv + i ) ) :
+					match.parse( listToString( argv + start, argv + i, ",", "", "" ) );
 				LOG_IF(!parsed, Runtime, error )
-							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
-							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
-							<< " was given, but a " << at( matchingStrings.front() ).getTypeName() << " was expected.";
+					<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
+					<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
+					<< " was given, but a " << match.getTypeName() << " was expected.";
 			}
+
 		}
 	}
 
