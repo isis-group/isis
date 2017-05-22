@@ -101,7 +101,7 @@ int main( int argc, char **argv )
 	
 	if(!(app.parameters["swapdim"].isParsed()||app.parameters["resample"].isParsed()||app.parameters["translate"].isParsed()||app.parameters["rotate"].isParsed())){
 		LOG(TransformLog,error) << "No transformation requested, exiting..";
-		LOG(TransformLog,notice) << "have at least on of " 
+		LOG(TransformLog,notice) << "have at least one of " 
 			<< util::MSubject("-swapdim") << ", " 
 			<< util::MSubject("-translate") << ", "
 			<< util::MSubject("-resample")  << " or " 
@@ -157,7 +157,7 @@ int main( int argc, char **argv )
 
 	//go through every image
 	for( data::Image & refImage :  app.images ) {
-		for(auto swap:swapper){
+		for(auto swap:swapper){ // swapdim
 			if(swap.first<0){
 				swap.first=-swap.first;
 				flipDim(refImage,swap.first);
