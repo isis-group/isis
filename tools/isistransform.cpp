@@ -1,7 +1,10 @@
 #include <isis/data/io_application.hpp>
 #include <isis/data/io_factory.hpp>
 #include <isis/math/transform.hpp>
-#include <isis/util/selection.hpp>
+#include <isis/util/common.hpp>
+#include <regex>
+#include <cctype>
+
 #include <isis/adapter/itk4/common.hpp>
 
 #include <map>
@@ -21,6 +24,11 @@ public:
 		return true;
 	}
 } flifu;
+
+int getDimFromStr(std::string s){
+	const int ret=std::tolower(s[0])-'x';
+	return s[1]=='-'? -ret:ret;
+}
 
 bool swapProperties( data::Image &image, const unsigned short dim )
 {
@@ -49,6 +57,18 @@ bool swapProperties( data::Image &image, const unsigned short dim )
 	return true;
 }
 
+void flipDim(data::Image &refImage, int dim){
+	if(refImage.getChunkAt(0).getRelevantDims() > dim ) {//dimension to flip is inside the chunks (so flip them)
+		LOG(TransformLog,notice) << "flipping voxels along dim " << std::string(1,'x'+dim);
+		flifu.dim = static_cast<data::dimensions>( dim );
+		refImage.foreachChunk( flifu );
+	} else { // otherwhise just flip the Chunks positions
+		LOG(TransformLog,notice) << "flipping chunk order along dim " << std::string(1,'x'+dim);
+		if( !swapProperties( refImage, dim ) ) {
+			exit(EXIT_FAILURE);
+		}
+	}
+}
 
 int main( int argc, char **argv )
 {
@@ -59,14 +79,17 @@ int main( int argc, char **argv )
 	app.parameters["swapdim"] = util::slist{};
 	app.parameters["swapdim"].needed()=false;
 
-	app.parameters["flipdim"] = util::Selection("x,y,z,t");
-	app.parameters["flipdim"].needed()=false;
-	
 	app.parameters["resample"]=util::ivector4{-1,-1,-1,-1};
 	app.parameters["resample"].needed()=false;
 
 	app.parameters["rotate"]=util::slist{"x","y", "90"};
 	app.parameters["rotate"].needed()=false;
+
+	app.parameters["translate"]=util::fvector3();
+	app.parameters["translate"].needed()=false;
+	
+	app.parameters["pix_center"]=false;
+	app.parameters["pix_center"].needed()=false;
 	
 	app.addLogging<TransformLog>("");
 	app.addLogging<TransformDebug>("");
@@ -76,8 +99,15 @@ int main( int argc, char **argv )
 	
 	app.init( argc, argv );
 	
-	util::slist swapdim_list=app.parameters["swapdim"];
-	LOG_IF(swapdim_list.size()>4,TransformLog,warning)	<< "Ignoring all but 4 given parameters for swapdim";
+	if(!(app.parameters["swapdim"].isParsed()||app.parameters["resample"].isParsed()||app.parameters["translate"].isParsed()||app.parameters["rotate"].isParsed())){
+		LOG(TransformLog,error) << "No transformation requested, exiting..";
+		LOG(TransformLog,notice) << "have at least one of " 
+			<< util::MSubject("-swapdim") << ", " 
+			<< util::MSubject("-translate") << ", "
+			<< util::MSubject("-resample")  << " or " 
+			<< util::MSubject("-rotate");
+		exit(-1);
+	}
 	
 	float rotate_angle=0;
 	std::pair<int,int> rotate_plane;
@@ -110,41 +140,41 @@ int main( int argc, char **argv )
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+
+	std::list<std::pair<int,int>> swapper;
+	for(std::string cmd:app.parameters["swapdim"].as<util::slist>()){
+		static const std::regex cmd_regex("([xyzt]-?)(:([xyzt]-?))?",std::regex_constants::icase);
+		std::smatch results;
+		
+		if(std::regex_match(cmd,results,cmd_regex)){
+			swapper.push_back(std::make_pair(getDimFromStr(results[1]),0));
+			if(results.length(3)>0)
+				swapper.back().second=getDimFromStr(results[3]);
+		} else {
+			LOG(TransformLog,error) << "ignoring invalid swapdim parameter " << cmd;
+		}
+	}
+
 	//go through every image
 	for( data::Image & refImage :  app.images ) {
-		
-		if(app.parameters["flipdim"].isParsed()){
-			int dim=app.parameters["flipdim"].as<util::Selection>()-1;
+		for(auto swap:swapper){ // swapdim
+			if(swap.first<0){
+				swap.first=-swap.first;
+				flipDim(refImage,swap.first);
+			}
 
-			if(refImage.getChunkAt(0).getRelevantDims() > dim ) {//dimension to flip is inside the chunks (so flip them)
-				LOG(TransformLog,info) << "flipping voxels along dim " << std::string(1,'x'+dim);
-				flifu.dim = static_cast<data::dimensions>( dim );
-				refImage.foreachChunk( flifu );
-			} else { // otherwhise just flip the Chunks positions
-				LOG(TransformLog,info) << "flipping chunk order along dim " << std::string(1,'x'+dim);
-				if( !swapProperties( refImage, dim ) ) {
-					return EXIT_FAILURE;
-				}
+			if(swap.second<0){
+				swap.second=-swap.second;
+				flipDim(refImage,swap.second);
+			}
+			
+			if(swap.second && swap.first != swap.second){
+				LOG(TransformLog,notice) << "swapping dim " << std::string(1,'x'+swap.first) << " and " << std::string(1,'x'+swap.second);
+				refImage.swapDim(swap.first,swap.second, app.feedback());
 			}
 		}
-		
-		if(app.parameters["swapdim"].isParsed()){
-			int dim=0;
-			for(std::string swap:swapdim_list){
-				int idx=0;bool flip=false;
-				int target=std::tolower(swap[idx])-'x';
-				if(swap[idx]=='t')target=3;
-				if(target<0 || target>3){
-					target=dim;
-					LOG(TransformLog,warning) << "Ignorig unknown swapdim parameter " << swap;
-					continue;
-				}
-
- 				LOG(TransformLog,info) << "swapping dim " << std::string(1,'x'+dim) << " and " << std::string(1,'x'+target);
-				refImage.swapDim(dim,target, app.feedback());
-				dim++;
-			}
+		if(app.parameters["translate"].isParsed()){
+			refImage=itk4::translate(refImage,app.parameters["translate"]);
 		}
 		if(app.parameters["resample"].isParsed()){
 			util::vector4<size_t> oldsize=refImage.getSizeAsVector(),newsize;
@@ -156,7 +186,7 @@ int main( int argc, char **argv )
 			refImage=itk4::resample(refImage,newsize);
 		}
 		if(rotate_angle){
-			refImage=itk4::rotate(refImage,rotate_plane,rotate_angle);
+			refImage=itk4::rotate(refImage,rotate_plane,rotate_angle, app.parameters["pix_center"]);
 		}
 	}
 	app.autowrite( app.images );

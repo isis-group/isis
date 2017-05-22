@@ -61,23 +61,34 @@ template<typename TYPE> data::TypedImage<TYPE> resample_impl(data::TypedImage<TY
 	return adapter.makeIsisImageObject<ImageType>(resampleFilter->GetOutput());
 }
 
-template<typename TYPE> data::TypedImage<TYPE> rotate_impl(data::TypedImage<TYPE> source,std::pair<int,int> rotation_plain, float angle){
+template<typename TYPE> data::TypedImage<TYPE> rotate_impl(data::TypedImage<TYPE> source,std::pair<int,int> rotation_plain, float angle, bool pix_center){
 	typedef itk::Image<TYPE,4> ImageType;
 	itkAdapter adapter;
 	auto image=adapter.makeItkImageObject<ImageType>( source );
 	
 	// the rotation is done in real space, not (as we want it) in image space
 	// so we have to "fake" the image into real space
-	typename ImageType::DirectionType orientation=image->GetDirection(),ident; 
-	typename ImageType::PointType origin = image->GetOrigin();
-	
+	typename ImageType::DirectionType orientation=image->GetInverseDirection(),ident; 
+	const auto origin = image->GetOrigin();
+
 	ident.SetIdentity();
 	image->SetDirection(ident);
-	image->SetOrigin(typename ImageType::DirectionType(orientation.GetInverse())*origin);
 	
-	auto transform = itk::CenteredAffineTransform< double, 4 >::New(); 
+	if(pix_center){
+		const auto size=image->GetLargestPossibleRegion().GetSize();
+		const auto spacing=image->GetSpacing();
+		typename ImageType::PointType orig(0);
+
+		for(int i=0;i<3;i++)
+			orig[i]=size[i]*-spacing[i]*.5;
+
+		image->SetOrigin(orig);
+	} else 
+		image->SetOrigin(typename ImageType::DirectionType(orientation.GetInverse())*origin);
 	
-	LOG(Runtime,info) << "rotating image by " << util::MSubject(std::to_string(angle)+"rad") << " on the " << char('x'+rotation_plain.first) << "/" << char('x'+rotation_plain.second) << " plane"; 
+	auto transform = itk::AffineTransform< double, 4 >::New(); 
+	
+	LOG(Runtime,info) << "rotating image by " << util::MSubject(std::to_string(angle)+"rad") << " on the " << char('x'+rotation_plain.first) << "/" << char('x'+rotation_plain.second) << " plane around " << image->GetOrigin(); 
 
 	transform->Rotate(rotation_plain.first,rotation_plain.second,angle);
 	
@@ -91,6 +102,39 @@ template<typename TYPE> data::TypedImage<TYPE> rotate_impl(data::TypedImage<TYPE
 	
 	return adapter.makeIsisImageObject<ImageType>(image);
 }
+
+template<typename TYPE> data::TypedImage<TYPE> translate_impl(data::TypedImage<TYPE> source,util::fvector3 translation){
+	typedef itk::Image<TYPE,4> ImageType;
+	itkAdapter adapter;
+	auto image=adapter.makeItkImageObject<ImageType>( source );
+	
+	// the rotation is done in real space, not (as we want it) in image space
+	// so we have to "fake" the image into real space
+	typename ImageType::DirectionType orientation=image->GetInverseDirection(),ident; 
+
+	ident.SetIdentity();
+	image->SetDirection(ident);
+	
+	auto transform = itk::AffineTransform< double, 4 >::New(); 
+	itk::AffineTransform< double, 4 >::OutputVectorType transl(0.0);
+	
+	for(int i=0;i<3;i++)
+		transl[i]=translation[i];
+	
+	LOG(Runtime,info) << "translating image by " << translation; 
+
+	transform->Translate(transl);
+	
+	auto resampleFilter = _internal::makeResampleFilter<TYPE>(transform.GetPointer(),image);
+	resampleFilter->Update();
+	
+	//restore old geometry
+	image = resampleFilter->GetOutput();
+	image->SetDirection(orientation);
+	
+	return adapter.makeIsisImageObject<ImageType>(image);
+}
+
 }
 }
 
