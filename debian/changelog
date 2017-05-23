@@ -1,4 +1,4 @@
-isis (0.7.13) UNRELEASED; urgency=low
+isis (0.7.13-2) xenial; urgency=low
 
   [ ISIS Group ]
   * big api change in progress
@@ -9,7 +9,7 @@ isis (0.7.13) UNRELEASED; urgency=low
   * improve SimpleImageView
   * add support for fdf files
 
- -- ISIS Group <gr_isis@cbs.mpg.de>  Fri, 13 Jan 2017 15:33:23 +0100
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Tue, 23 May 2017 15:25:30 +0200
 
 isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 

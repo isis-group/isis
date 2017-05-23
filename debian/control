@@ -71,7 +71,7 @@ Description: I/O framework for neuroimaging data
 Package: isis-utils
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisis-adapter-itk4-0 (<< ${source:Version}.1~), libisis-adapter-qt5-0 (<< ${source:Version}.1~)
 Description: utilities for the ISIS neuroimaging data I/O framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -96,7 +96,7 @@ Package: libisis-adapter-qt5-dev
 Section: libdevel
 Conflicts: libisis-qt5-dev
 Architecture: any
-Depends: libisis-qt5-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, qtbase5-dev
+Depends: libisis-adapter-qt5-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, qtbase5-dev
 Description: Qt5 bindings for ISIS data I/O framework (development headers)
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -118,7 +118,7 @@ Package: libisis-adapter-itk4-dev
 Section: libdevel
 Conflicts: libisis-itk4-dev
 Architecture: any
-Depends: libisis-qt5-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, libinsighttoolkit4-dev
+Depends: libisis-adapter-itk4-0 (<< ${source:Version}.1~), libisis-core-dev  (<< ${source:Version}.1~), ${misc:Depends}, libinsighttoolkit4-dev
 Description: itk4 extensions for ISIS data I/O framework (development headers)
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
