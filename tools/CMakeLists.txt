@@ -1,25 +1,7 @@
-############################################################
-# The ISIS project
-# 
-# Main CMake configuration file of the ISIS tools.
-#
-# Author: Thomas Proeger <thomasproeger@googlemail.com>
-# Date: Thu, 07 Apr 2011 13:47:28 +0200
-# 
-# The ISIS tools are:
-#
-# isisdump    -    Dumps the meta data informations from an image file as seen
-#                  by the ISIS internal data representation.
-# isisiff     -    Shows the  difference between the meta information
-#                  given by two image files A and B.
-# isisconv    -    The ISIS data converter. It converts image data between all
-#                  different formats provided by the imageIO plugins
-# isisflip    -    Flips the image orientation and voxel data along a given axis.
-
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(BEFORE ${CMAKE_SOURCE_DIR})
 
 ############################################################
 # configure the targets
@@ -68,13 +50,33 @@ if(ISIS_QT5)
 endif(ISIS_QT5)
 
 if(ISIS_ITK)
-	find_package(ITK REQUIRED ITKCommon ITKTransform)
-	include(${ITK_USE_FILE})
-
 	add_executable(isistransform isistransform.cpp)
-	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk4_lib} ${ITK_LIBRARIES})
+	target_link_libraries(isistransform ${isis_core_lib} ${isis_math_lib} ${isis_adapter_itk4_lib} )
 	set_target_properties(isistransform PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 	
 	install(TARGETS isistransform RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 	build_manpage(isistransform "geometricaly transform MR images")
 endif(ISIS_ITK)
+
+############################################################
+# optional components
+############################################################
+
+option(ISIS_CALC "Build the ISIS image calculator (needs the muparser library)" OFF)
+
+# isiscalc
+if(ISIS_CALC)
+	find_library(LIB_MUPARSER "muparser" REQUIRED)
+	find_path(INCPATH_MUPARSER "muParser.h" PATH_SUFFIXES "muParser")
+	
+	add_executable(isiscalc isiscalc.cpp)
+	target_link_libraries(isiscalc ${LIB_MUPARSER} ${isis_core_lib})
+	set_target_properties(isiscalc PROPERTIES 
+		INSTALL_RPATH_USE_LINK_PATH TRUE
+		INCLUDE_DIRECTORIES ${INCPATH_MUPARSER}
+	)
+
+	install(TARGETS isiscalc RUNTIME DESTINATION bin COMPONENT "CLI Tools")
+	build_manpage(isiscalc "do math on image voxels (based on muparser)")
+endif(ISIS_CALC)
+

@@ -29,7 +29,7 @@ include(CTest)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
-set(ISIS_VERSION_PATCH "12")
+set(ISIS_VERSION_PATCH "13")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -68,15 +68,6 @@ endif(NOT WIN32)
 ############################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
-############################################################
-# compiler flags 
-############################################################
-
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-  message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
-  add_compile_options("-fPIC")
-endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
 # Logging options are global for all components in the tree
@@ -209,9 +200,6 @@ endif()
 
 # build the ISIS libraries
 add_subdirectory(isis)
-
-# build the ISIS applications
-add_subdirectory(apps)
 
 # configure coding style tools
 add_subdirectory(design)
