@@ -17,9 +17,6 @@ if(ISIS_QT5)
 	find_package(Qt5Widgets)
 
 	set(CMAKE_AUTOMOC ON)
-#	set(CMAKE_AUTOUIC ON) #doesn't work on older cmake
-
-	include_directories(${Qt5Widgets_INCLUDE_DIRS})
 	include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 	add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -40,15 +37,18 @@ endif(ISIS_QT5)
 option(ISIS_ITK "Enable adapter to the ITK library" OFF)
 
 if(ISIS_ITK)
-	find_package(ITK REQUIRED ITKCommon ITKTransform)
-	include(${ITK_USE_FILE})
+	find_package(ITK COMPONENTS ITKCommon ITKTransform CONFIG)
 	
 	file(GLOB ISIS_ITK_LIBRARY_FILES "itk4/*.cpp")
 	file(GLOB ISIS_ITK_HEADER_FILES "itk4/*.hpp")
+	
+	#for some reason ITKConfig.cmake does not set these
+	set_property(TARGET ITKCommon APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ITK_INCLUDE_DIRS})
+	set_property(TARGET ITKTransform APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ITK_INCLUDE_DIRS})
 
 	add_lib(isis_adapter_itk4
 		"${ISIS_ITK_LIBRARY_FILES}"
-		"" "${isis_core_lib};${isis_math_lib};${ITK_LIBRARIES}"
+		"" "${isis_core_lib};${isis_math_lib};ITKCommon;ITKTransform"
 		"0.0.0" "0.0.0"
 	)
 

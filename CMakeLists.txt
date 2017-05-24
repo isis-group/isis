@@ -75,15 +75,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# compiler flags 
-############################################################
-
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-  message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
-  add_compile_options("-fPIC")
-endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
-
-############################################################
 # Logging options are global for all components in the tree
 ############################################################
 option(ISIS_RUNTIME_LOG "Enable runtime logging" ON)
@@ -214,9 +205,6 @@ endif()
 
 # build the ISIS libraries
 add_subdirectory(isis)
-
-# build the ISIS applications
-add_subdirectory(apps)
 
 # configure coding style tools
 add_subdirectory(design)

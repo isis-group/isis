@@ -10,7 +10,11 @@ macro( build_lib name type sources deps private_deps soversion version)
 	#build the library as -shared or as -static
 	add_library( ${name}-${type} ${type} ${sources} )
 	target_link_libraries( ${name}-${type} PUBLIC ${deps} PRIVATE ${private_deps})
-	set_target_properties( ${name}-${type} PROPERTIES SOVERSION ${soversion} VERSION ${version} OUTPUT_NAME ${name} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+	set_target_properties( ${name}-${type} PROPERTIES 
+		SOVERSION ${soversion} VERSION ${version} 
+		OUTPUT_NAME ${name} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+		INTERFACE_POSITION_INDEPENDENT_CODE "ON" #theoreticaly for isis_core and the plugins only (but as all others depend on isis_core it doesn't matter)
+	)
 
 	# install libraries
 	install (TARGETS ${name}-${type}
