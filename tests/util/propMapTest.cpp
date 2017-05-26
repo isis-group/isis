@@ -377,5 +377,40 @@ BOOST_AUTO_TEST_CASE( propMap_read_json_test )
 	BOOST_CHECK_EQUAL(map.property("number/int"),3);
 }
 
+BOOST_AUTO_TEST_CASE( propMap_extract_test )
+{
+	util::PropertyMap map=getFilledMap(),dst;
+	map.extract("sub/Test1",dst);
+	map.extract("Test1",dst);
+	
+	BOOST_CHECK(map.hasProperty("sub/Test1")==false);
+	BOOST_CHECK(map.hasProperty("Test1")==false);
+	BOOST_CHECK(map.hasProperty("sub/Test2")==true);
+	
+	BOOST_CHECK_EQUAL(dst.property( "sub/Test1" ), 1);
+	BOOST_CHECK_EQUAL(dst.property( "Test1" ), M_PI);
+}
+
+BOOST_AUTO_TEST_CASE( propMap_extract_if_test )
+{
+	// should move all int32_t which are >1 to dst
+	auto map=getFilledMap();
+	auto dst=map.extract_if([](const util::PropertyValue &p){
+		return p.is<int32_t>() && p.as<int32_t>()>1;
+	});
+	
+	BOOST_CHECK_EQUAL(dst.property( "sub/Test2" ), 2);
+	BOOST_CHECK_EQUAL(dst.property( "Test2" ), 5);
+	
+	// should move all from map to dst
+	map=getFilledMap();
+	dst=map.extract_if([](const util::PropertyValue &p){
+		return true;
+	});
+	
+	BOOST_CHECK_EQUAL(dst,getFilledMap());
+	BOOST_CHECK_EQUAL(map,util::PropertyMap());
+}
+
 }
 }

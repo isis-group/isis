@@ -42,6 +42,7 @@ struct JoinTreeVisitor;
 struct SwapVisitor;
 struct FlatMapMaker;
 struct TreeInvalidCheck;
+struct Extractor;
 
 template<typename T> T &un_shared_ptr(T &p){return p;}
 template<typename T> T &un_shared_ptr(std::shared_ptr<T> &p){return *p;}
@@ -68,6 +69,7 @@ public:
 	friend struct _internal::JoinTreeVisitor;
 	friend struct _internal::FlatMapMaker;
 	friend struct _internal::TreeInvalidCheck;
+	friend struct _internal::Extractor;
 /// @endcond
 	typedef std::map<util::istring, boost::variant<PropertyValue, PropertyMap> > container_type;
 	/// type of the keys forming a path
@@ -473,6 +475,20 @@ public:
 
 	bool insert(const std::pair<PropPath,PropertyValue> &p);
 	bool insert(const std::pair<std::string,PropertyValue> &p);
+	
+	/**
+	 * extract Property or branch from this PropertyMap and move it into dst.
+	 * Any existing Property or branch in dst will be overwritten
+	 * \param path the path to the Property or branch
+	 * \param dst PropertyMap to move Property or branch into
+	 */
+	void extract(const PropPath &path, PropertyMap &dst);
+
+	/**
+	 * recursively extract Properties for which "condition" returns true into dst.
+	 * \param condition condition determining if a Property should be extracted
+	 */
+	PropertyMap extract_if(std::function<bool(const PropertyValue &p)> condition);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools

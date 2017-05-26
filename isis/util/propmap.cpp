@@ -95,6 +95,46 @@ struct TreeInvalidCheck: boost::static_visitor<bool> {
 	}
 };
 
+/**
+ * Recursive extractor-visitor.
+ * Will return true, if whole tree is extractable, but will not extract.
+ * Otherwise will extract all entries to "out" and return with false;
+ */
+struct Extractor: boost::static_visitor<bool> {
+	std::function<bool(const PropertyValue &prop)> &condition;
+	PropertyMap &out;
+	const PropertyMap::PropPath &name;
+	Extractor( PropertyMap &_out, const PropertyMap::PropPath &_name, std::function<bool(const PropertyValue &prop)> &_condition )
+	: out( _out ), name( _name ), condition(_condition) {}
+	bool operator()( const PropertyValue &value )const {
+		return condition(value);
+	}
+	bool operator()( PropertyMap &map )const {
+		bool extract_me=true; // assume whole tree is "extractable" (condition is true for all downstream properties)
+		std::list<PropertyMap::PropPath> to_extract;
+
+		// check if this whole map can be extracted
+		for ( util::PropertyMap::container_type::iterator i = map.container.begin(); i != map.container.end(); i++ ) {
+			const PropertyMap::PropPath path=name / i->first;
+			if(boost::apply_visitor( Extractor( out, name / i->first, condition ), i->second )==false){ // ..
+				extract_me=false; // ok this must stay, so the tree must stay
+			} else {
+				to_extract.push_back(i->first); // memorize this as to be extracted (in case not the whole tree is to be extracted)
+			}
+		}
+		if(extract_me) // if whole tree can be extracted tell upstream
+			return true;
+		else {
+			for (const PropertyMap::PropPath &p:to_extract) { // extract all memorized entries into branch "name" in out
+				LOG(Debug,verbose_info) << "Extracting " << p << " into " << name;
+				map.extract(p,name.empty()?out:out.touchBranch(name)); 
+			}
+			return false;
+		}
+	}
+};
+
+
 }
 /// @endcond _internal
 API_EXCLUDE_END;
@@ -601,6 +641,20 @@ bool PropertyMap::insert(const std::pair<PropPath,PropertyValue> &p){
 		return true;
 	} else
 		return false;
+}
+
+void PropertyMap::extract(const PropPath &p,PropertyMap &dst){
+	dst.fetchEntry(p).swap(fetchEntry(p));
+	remove(p);
+}
+
+PropertyMap PropertyMap::extract_if(std::function<bool(const PropertyValue &p)> condition){
+	PropertyMap dst;
+	if(_internal::Extractor( dst, PropPath(), condition ).operator()( *this )){
+		std::swap(this->container,dst.container);
+		this->container.clear();
+	}
+	return dst;
 }
 
 std::ostream &PropertyMap::print( std::ostream &out, bool label )const
