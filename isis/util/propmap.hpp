@@ -98,6 +98,19 @@ public:
 	///a flat map, matching complete paths as keys to the corresponding values
 	typedef std::map<PropPath, PropertyValue> FlatMap;
 
+	template<typename T> class NeededsList: public std::list<PropPath>
+	{
+	public:
+		NeededsList() {
+			const std::list< PropertyMap::key_type > buff = util::stringToList<PropertyMap::key_type>( T::neededProperties ); //@todo really bad voodoo
+			assign( buff.begin(), buff.end() );
+		}
+		void applyTo( PropertyMap &props ) {
+			for( const PropPath & ref: *this ) {
+				props.addNeeded( ref );
+			}
+		}
+	};
 
 protected:
 	typedef PropPath::const_iterator propPathIterator;
@@ -217,22 +230,8 @@ API_EXCLUDE_END;
 		return optional<MAPPED &>();
 	}
 
-
 protected:
 /// @cond _internal
-	template<typename T> class NeededsList: public std::list<PropPath>
-	{
-	public:
-		NeededsList() {
-			const std::list< PropertyMap::key_type > buff = util::stringToList<PropertyMap::key_type>( T::neededProperties ); //@todo really bad voodoo
-			assign( buff.begin(), buff.end() );
-		}
-		void applyTo( PropertyMap &props ) {
-			for( const PropPath & ref: *this ) {
-				props.addNeeded( ref );
-			}
-		}
-	};
 	template<typename T> optional<T &> queryValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
 		const optional< PropertyValue & > found = queryProperty( path );
 
