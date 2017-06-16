@@ -412,5 +412,28 @@ BOOST_AUTO_TEST_CASE( propMap_extract_if_test )
 	BOOST_CHECK_EQUAL(map,util::PropertyMap());
 }
 
+BOOST_AUTO_TEST_CASE( deduplicate_test )
+{
+	// should move all int32_t which are >1 to dst
+	std::list<std::shared_ptr<PropertyMap>> maps;
+	
+	for(int i=0;i<3;i++)
+		maps.emplace_back(new PropertyMap(getFilledMap()));
+	
+	int n=0;
+	for(auto &m:maps){
+		m->setValueAs("sub/Test1",++n);
+	}
+
+	PropertyMap comm;
+	comm.deduplicate(maps);
+
+	BOOST_CHECK(!comm.hasProperty("sub/Test1"));
+
+	for(auto &m:maps){
+		BOOST_CHECK(m->hasProperty("sub/Test1"));
+	}
+}
+
 }
 }

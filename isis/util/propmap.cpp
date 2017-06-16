@@ -657,6 +657,25 @@ PropertyMap PropertyMap::extract_if(std::function<bool(const PropertyValue &p)> 
 	return dst;
 }
 
+void PropertyMap::deduplicate(std::list<std::shared_ptr<PropertyMap>> maps){
+	
+	assert(!maps.empty());
+
+	util::PropertyMap common=*maps.front();  //copy all props from the first chunk
+	auto p=maps.begin();
+
+	// common now has all props (from the first chunk)
+	for(++p;p!=maps.end();++p)
+		(*p)->removeUncommon( common );//remove everything which isn't common from common
+		
+	//then remove remaining common props from the chunks
+	for ( auto &p: maps ) 
+		p->remove( common, false ); //this _won't_ keep needed properties - so from here on the "maps" are invalid
+		
+	const PathSet rej = this->transfer(common);
+	LOG_IF(!rej.empty(),Debug,error) << "Some props where rejected when joining the commons into the me (" << rej << ")";
+}
+
 std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 {
 	FlatMap buff = getFlatMap();

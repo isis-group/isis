@@ -564,7 +564,7 @@ public:
 	 * \param other the other tree to transfer from
 	 * \param other_path the entry/subtree that should be transferred
 	 * \param overwrite if existing properties shall be replaced
-	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
+	 * \returns a list of the rejected properties that couldn't be transferred, for success this should be empty
 	 */
 	PropertyMap::PathSet transfer( PropertyMap& other, const PropPath &other_path, bool overwrite = false );
 
@@ -619,6 +619,9 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	bool operator==( const PropertyMap &other )const {return container == other.container;}
 	bool operator!=( const PropertyMap &other )const {return container != other.container;}
+	
+	// move everything which is equal accros maps into this
+	void deduplicate(std::list<std::shared_ptr<PropertyMap>> maps);
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Additional get/set - Functions
