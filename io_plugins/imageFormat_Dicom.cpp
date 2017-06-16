@@ -292,8 +292,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::list<util::ist
 
 	transformOrTell<uint32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
 
-	if( dicomTree.hasProperty( "AcquisitionNumber" ) && object.property( "acquisitionNumber" ) == dicomTree.property( "AcquisitionNumber" ) )
-		dicomTree.remove( "AcquisitionNumber" );
+	if( dicomTree.hasProperty( "AcquisitionNumber" )){
+		if(dicomTree.property("AcquisitionNumber").eq(object.property( "acquisitionNumber" )))
+			dicomTree.remove( "AcquisitionNumber" );
+	}
 
 	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
 		util::Selection isisGender( "male,female,other" );
