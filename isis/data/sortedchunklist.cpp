@@ -182,20 +182,50 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	
-	if(ch.queryProperty(secondarySort.top().propertyName)->size()>1){ // secondary sort is multi value, we have to splice the chunk and insert separately
-		LOG(Runtime,info) << "Splicing chunk at top dim as secondary sorting property " << secondarySort.top().propertyName << " is a list of size " << ch.queryProperty(secondarySort.top().propertyName)->size();
-		bool ok=true;
-		for(const data::Chunk &c:ch.autoSplice()){
-			ok &=  insert_impl(c);
+	size_t sort_prop_size=ch.queryProperty(secondarySort.top().propertyName)->size();
+	if(sort_prop_size>1){ // secondary sort is multi value, we have to splice the chunk and insert separately
+		LOG(Runtime,info) << "Splicing chunk at top dim as secondary sorting property " << secondarySort.top().propertyName << " is a list of size " << sort_prop_size;
+		
+		// get rid of all not-to-be-splices props to save time
+		data::Chunk chs=ch;
+		auto extracted=chs.extract_if(
+			[sort_prop_size](const util::PropertyValue &p){
+					return p.size()!=sort_prop_size;
+			}
+		);
+		
+		//ok, but some are actually needed for the splicing and inserting...
+		for(const auto &need:util::Singletons::get<util::PropertyMap::NeededsList<Chunk>, 0>()){
+			extracted.extract(need,chs);// .. so put them back
 		}
+		if(extracted.hasProperty("source")){ // source might be usefull as well
+			extracted.extract("source",chs);
+		}
+
+		not_spliced.push_back( // store extracted with an (for now) empty list of chunks
+			std::pair< util::PropertyMap, std::list<std::shared_ptr<Chunk>> >(extracted,{})
+		);
+		
+		LOG(Debug,info) << "Removed " << not_spliced.back() << " before splicing";
+		
+		bool ok=true;
+		for(const data::Chunk &c:chs.autoSplice()){
+			std::shared_ptr<Chunk> inserted=insert_impl(c);
+			if(inserted){
+				not_spliced.back().second.push_back(inserted); //list all chunks those extracted props belong into
+			} else {
+				ok=false;
+			}
+		}
+		if(!ok)
+			not_spliced.pop_back();
 		return ok;
 	} else {
-		return insert_impl(ch);
+		return (bool)insert_impl(ch);
 	}
 }
 
-bool SortedChunkList::insert_impl(const Chunk &ch){
+std::shared_ptr<Chunk> SortedChunkList::insert_impl(const Chunk &ch){
 	if( !isEmpty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
 		const Chunk &first = *( chunks.begin()->second.begin()->second );
@@ -203,7 +233,7 @@ bool SortedChunkList::insert_impl(const Chunk &ch){
 		if ( first.getSizeAsVector() != ch.getSizeAsVector() ) { // if they have different size - do not insert
 			LOG( Debug, verbose_info )
 					<< "Ignoring chunk with different size. (" << ch.getSizeAsString() << "!=" << first.getSizeAsString() << ")";
-			return false;
+			return nullptr;
 		}
 
 		for(const util::PropertyMap::PropPath & ref :  equalProps ) { // check all properties which where given to the constructor of the list
@@ -212,7 +242,7 @@ bool SortedChunkList::insert_impl(const Chunk &ch){
 				LOG( Debug, verbose_info )
 						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.queryProperty( ref ) )
 						<< " but chunks already in the list have " << util::MSubject( first.queryProperty( ref ) );
-				return false;
+				return nullptr;
 			}
 		}
 	} else {
@@ -236,7 +266,7 @@ bool SortedChunkList::insert_impl(const Chunk &ch){
 			Debug, info )
 				<< "The conflicting chunks where from " << ch.getValueAs<std::string>( "source" ) << " and " << inserted.first->getValueAs<std::string>( "source" );
 	}
-	return inserted.second;
+	return inserted.second ? inserted.first:nullptr;
 }
 
 void SortedChunkList::addSecondarySort( const util::PropertyMap::key_type &cmp )

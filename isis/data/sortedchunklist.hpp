@@ -79,7 +79,7 @@ private:
 
 	std::list<util::PropertyMap::PropPath> equalProps;
 	
-	bool insert_impl( const Chunk &ch );
+	std::shared_ptr<Chunk> insert_impl( const Chunk &ch );
 
 public:
 
@@ -88,6 +88,7 @@ public:
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
 	SortedChunkList( util::PropertyMap::key_type comma_separated_equal_props );
+	std::list< std::pair< util::PropertyMap, std::list<std::shared_ptr<Chunk>> > > not_spliced;
 
 	/**
 	 * Adds a property for secondary sorting.

@@ -42,6 +42,7 @@ struct JoinTreeVisitor;
 struct SwapVisitor;
 struct FlatMapMaker;
 struct TreeInvalidCheck;
+struct Extractor;
 
 template<typename T> T &un_shared_ptr(T &p){return p;}
 template<typename T> T &un_shared_ptr(std::shared_ptr<T> &p){return *p;}
@@ -68,6 +69,7 @@ public:
 	friend struct _internal::JoinTreeVisitor;
 	friend struct _internal::FlatMapMaker;
 	friend struct _internal::TreeInvalidCheck;
+	friend struct _internal::Extractor;
 /// @endcond
 	typedef std::map<util::istring, boost::variant<PropertyValue, PropertyMap> > container_type;
 	/// type of the keys forming a path
@@ -96,6 +98,19 @@ public:
 	///a flat map, matching complete paths as keys to the corresponding values
 	typedef std::map<PropPath, PropertyValue> FlatMap;
 
+	template<typename T> class NeededsList: public std::list<PropPath>
+	{
+	public:
+		NeededsList() {
+			const std::list< PropertyMap::key_type > buff = util::stringToList<PropertyMap::key_type>( T::neededProperties ); //@todo really bad voodoo
+			assign( buff.begin(), buff.end() );
+		}
+		void applyTo( PropertyMap &props ) {
+			for( const PropPath & ref: *this ) {
+				props.addNeeded( ref );
+			}
+		}
+	};
 
 protected:
 	typedef PropPath::const_iterator propPathIterator;
@@ -215,22 +230,8 @@ API_EXCLUDE_END;
 		return optional<MAPPED &>();
 	}
 
-
 protected:
 /// @cond _internal
-	template<typename T> class NeededsList: public std::list<PropPath>
-	{
-	public:
-		NeededsList() {
-			const std::list< PropertyMap::key_type > buff = util::stringToList<PropertyMap::key_type>( T::neededProperties ); //@todo really bad voodoo
-			assign( buff.begin(), buff.end() );
-		}
-		void applyTo( PropertyMap &props ) {
-			for( const PropPath & ref: *this ) {
-				props.addNeeded( ref );
-			}
-		}
-	};
 	template<typename T> optional<T &> queryValueAsImpl( const PropPath &path, const optional<size_t> &at ) {
 		const optional< PropertyValue & > found = queryProperty( path );
 
@@ -473,6 +474,20 @@ public:
 
 	bool insert(const std::pair<PropPath,PropertyValue> &p);
 	bool insert(const std::pair<std::string,PropertyValue> &p);
+	
+	/**
+	 * extract Property or branch from this PropertyMap and move it into dst.
+	 * Any existing Property or branch in dst will be overwritten
+	 * \param path the path to the Property or branch
+	 * \param dst PropertyMap to move Property or branch into
+	 */
+	void extract(const PropPath &path, PropertyMap &dst);
+
+	/**
+	 * recursively extract Properties for which "condition" returns true into dst.
+	 * \param condition condition determining if a Property should be extracted
+	 */
+	PropertyMap extract_if(std::function<bool(const PropertyValue &p)> condition);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -549,7 +564,7 @@ public:
 	 * \param other the other tree to transfer from
 	 * \param other_path the entry/subtree that should be transferred
 	 * \param overwrite if existing properties shall be replaced
-	 * \returns a list of the rejected properties that couldn't be inserted, for success this should be empty
+	 * \returns a list of the rejected properties that couldn't be transferred, for success this should be empty
 	 */
 	PropertyMap::PathSet transfer( PropertyMap& other, const PropPath &other_path, bool overwrite = false );
 
@@ -604,6 +619,9 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	bool operator==( const PropertyMap &other )const {return container == other.container;}
 	bool operator!=( const PropertyMap &other )const {return container != other.container;}
+	
+	// move everything which is equal accros maps into this
+	void deduplicate(std::list<std::shared_ptr<PropertyMap>> maps);
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Additional get/set - Functions

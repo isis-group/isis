@@ -1,4 +1,4 @@
-isis (0.7.13-2) xenial; urgency=low
+isis (0.7.14-1) xenial; urgency=low
 
   [ ISIS Group ]
   * big api change in progress
@@ -8,6 +8,7 @@ isis (0.7.13-2) xenial; urgency=low
   * add ImageMagic base io plugin
   * improve SimpleImageView
   * add support for fdf files
+  * improve performance with mosaic data
 
  -- ISIS Group <gr_isis@cbs.mpg.de>  Tue, 23 May 2017 15:25:30 +0200
 

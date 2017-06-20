@@ -143,23 +143,48 @@ void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::sh
 
 void Image::deduplicateProperties()
 {
+
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
 	if(lookup.empty())
 		return;
 
-	util::PropertyMap common=*lookup.front();  //copy all props from the first chunk
+	//transform lookup into a "maps-list"
+	std::list<std::shared_ptr<PropertyMap>> maps;
+	std::transform(
+		lookup.begin(),lookup.end(),std::back_inserter(maps),
+		[](const std::shared_ptr<Chunk> &m){
+			return std::static_pointer_cast<PropertyMap>(m);
+		}
+	);
 
-	// common now has all props (from the first chunk)
-	for(size_t i=1;i<lookup.size();i++)
-		lookup[i]->removeUncommon( common );//remove everything which isn't common from common
-	//then remove remaining common props from the chunks
-	for ( const std::shared_ptr<Chunk> &p: lookup ) 
-		p->remove( common, false ); //this _won't_ keep needed properties - so from here on the chunks of the image are invalid
-		
-	const PathSet rej = this->join(common);
-	LOG_IF(!rej.empty(),Debug,error) << "Some props where rejected when joining the chunk's commons into the image (" << rej << ")";
+	PropertyMap::deduplicate(maps); // call PropertyMap's deduplicate
+	maps.clear();
 
-	LOG( Debug, verbose_info ) << "common properties now in the image: " << common;
+	// if there are some non-spliced..
+	std::list<std::list<std::shared_ptr<Chunk>>> chunks;
+	if(!set.not_spliced.empty()){ //deduplicate them as well
+
+		// first get them into the proper container
+		for(auto &pair:set.not_spliced){
+			maps.emplace_back(new util::PropertyMap());
+			maps.back()->transfer(pair.first);
+			chunks.push_back({});
+			chunks.back().swap(pair.second);
+		}
+		set.not_spliced.clear();
+		PropertyMap::deduplicate(maps); // call PropertyMap's deduplicate on the not_spliced
+
+		// and copy into the chunks whats left
+		auto c=chunks.begin();
+		for(auto m=maps.begin();m!=maps.end();m++,c++){
+			LOG(Debug,verbose_info) << "Copying true splices " << **m << " into " << c->size() << " chunks";
+			for(auto &ch:*c){
+				ch->join(**m);
+			}
+		}
+	}
+
+	LOG( Debug, verbose_info ) << "common properties now in the image: " << *this;
 }
 
 bool Image::insertChunk ( const Chunk &chunk )
