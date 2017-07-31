@@ -30,17 +30,17 @@ namespace image_io
 namespace _internal
 {
 	
-template<typename T> data::ValueArrayReference reader( data::FilePtr data, size_t offset, size_t size )
+template<typename T> data::ValueArrayReference reader( data::ByteArray data, size_t offset, size_t size )
 {
 	return data.atByID( data::ValueArray<T>::staticID(), offset, size );
 }
 
-template<> data::ValueArrayReference reader<bool>( data::FilePtr data, size_t offset, size_t size )
+template<> data::ValueArrayReference reader<bool>( data::ByteArray data, size_t offset, size_t size )
 {
 	return reader< uint8_t >( data, offset, size )->as<bool>(); //@todo check if scaling is computed
 }
 
-VistaInputImage::VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start ): m_fileptr( fileptr ), m_data_start( data_start )
+VistaInputImage::VistaInputImage( data::ByteArray data, data::ValueArray< uint8_t >::iterator data_start ): m_data( data ), m_data_start( data_start )
 {
 	big_endian=true;
 	vista2isis["bit"] =   _internal::reader<bool>;
@@ -92,7 +92,7 @@ bool VistaInputImage::add( util::PropertyMap props )
 		<< "Don't know what to do with nframes="<< vistaTree.queryProperty( "nframes" ) 
 		<< " that differs from nbands=" << vistaTree.queryProperty( "nbands" );
 
-	data::ValueArrayReference ch_data = m_reader( m_fileptr, std::distance( m_fileptr.begin(), m_data_start ) + ch_offset, util::product(ch_size) );
+	data::ValueArrayReference ch_data = m_reader( m_data, std::distance( m_data.begin(), m_data_start ) + ch_offset, util::product(ch_size) );
 
 	//those are not needed anymore
 	vistaTree.remove( "ncolumns" );
@@ -119,8 +119,8 @@ bool VistaInputImage::add( util::PropertyMap props )
 	}
 
 	LOG( Runtime, verbose_info ) << "Creating " << ch_data->getTypeName() << "-Chunk of size "
-								 << ch_size << " (offset was " << std::distance( m_fileptr.begin(), m_data_start ) + ch_offset << " / "
-								 << std::distance( m_data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), m_fileptr.end() ) << " bytes are left)";
+								 << ch_size << " (offset was " << std::distance( m_data.begin(), m_data_start ) + ch_offset << " / "
+								 << std::distance( m_data_start + ch_offset + ch_data->getLength()*ch_data->bytesPerElem(), m_data.end() ) << " bytes are left)";
 
 	push_back( data::Chunk( ch_data, ch_size[0], ch_size[1], ch_size[2] ) );
 	static_cast<util::PropertyMap &>( back() ) = props;

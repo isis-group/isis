@@ -17,7 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 # add global options
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
-option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone Nifti-IO plugin" ON)
+option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone TIFF-IO plugin" ON)
 option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
 option(ISIS_IOPLUGIN_NULL "Enable Null-IO plugin" OFF)
 option(ISIS_IOPLUGIN_PNG "Enable PNG-IO plugin" OFF)
@@ -27,7 +27,6 @@ option(ISIS_IOPLUGIN_COMP "Enable proxy plugin for compressed data (gz, bzip2 an
 option(ISIS_IOPLUGIN_TAR "Enable proxy plugin for reading tar archives" ON)
 option(ISIS_IOPLUGIN_FDF "Enable plugin for reading fdf files" ON)
 option(ISIS_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
-option(ISIS_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
 option(ISIS_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 
 ############################################################

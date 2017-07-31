@@ -21,7 +21,7 @@
 
 #include <list>
 #include <isis/data/image.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/data/bytearray.hpp>
 #include <isis/util/progressfeedback.hpp>
 
 
@@ -58,9 +58,9 @@ public:
 class VistaProtoImage: protected std::list<data::Chunk>{};
 
 class VistaInputImage: public VistaProtoImage{
-	typedef data::ValueArrayReference ( *readerPtr )( data::FilePtr data, size_t offset, size_t size );
+	typedef data::ValueArrayReference ( *readerPtr )( data::ByteArray data, size_t offset, size_t size );
 	readerPtr m_reader;
-	data::FilePtr m_fileptr;
+	data::ByteArray m_data;
 	data::ValueArray< uint8_t >::iterator m_data_start;
 	
 	unsigned short last_type;
@@ -94,7 +94,7 @@ class VistaInputImage: public VistaProtoImage{
 	}
 	
 public:
-	VistaInputImage( data::FilePtr fileptr, data::ValueArray< uint8_t >::iterator data_start );
+	VistaInputImage( data::ByteArray data, data::ValueArray< uint8_t >::iterator data_start );
 	/// add a chunk to the protoimage
 	bool add( util::PropertyMap props );
 	bool isFunctional()const;
