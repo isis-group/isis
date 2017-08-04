@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <turbojpeg.h>
 #include "imageFormat_tiff_sa.hpp"
+#include <memory>
 
 // https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf
 // http://www.awaresystems.be/imaging/tiff/bigtiff.html
@@ -11,6 +12,37 @@ namespace isis{
 namespace image_io{
 	
 namespace _internal {
+	
+	typedef std::function<data::Chunk(data::ValueArray<uint8_t> tile,std::array<uint64_t,2> tilesize)> transfer_func;
+	
+	transfer_func jpeg_transfer = [](data::ValueArray<uint8_t> tile_src, std::array<uint64_t,2> tilesize){
+		data::MemChunk<util::color24> tile_buff(tilesize[0],tilesize[1]);
+		assert(tile_buff.getBytesPerVoxel()==tjPixelSize[TJPF_RGB]);
+		auto decompressor=tjInitDecompress();
+		auto *p_tile_buff= std::static_pointer_cast<unsigned char>(tile_buff.asValueArrayBase().getRawAddress()).get();
+		const int err=tjDecompress2(
+			decompressor,
+			tile_src.begin(),tile_src.getLength(),
+			p_tile_buff,
+			tilesize[0],tilesize[0]*tjPixelSize[TJPF_RGB],tilesize[1],
+			TJPF_RGB,
+			0
+		);
+		if(err){
+			LOG(Runtime,error) << "jpeg decompression failed with " << tjGetErrorStr();
+			#warning implement error handling
+		} 
+		return tile_buff;
+	};
+
+	template<typename T> transfer_func make_direct_transfer(){
+		return [](data::ValueArray<uint8_t> tile_src, std::array<uint64_t,2> tilesize){
+			auto dstsize=tilesize[0]*tilesize[1];
+			assert(tile_src.getLength()==dstsize*sizeof(T));
+			data::ValueArray<T> casted_src(std::static_pointer_cast<T>(tile_src.getRawAddress()),dstsize);
+			return data::Chunk(casted_src,tilesize[0],tilesize[1]);;
+		};
+	};
 
 	enum compression_type{ //http://www.awaresystems.be/imaging/tiff/tifftags/compression.html
 		none = 1, 
@@ -38,6 +70,45 @@ namespace _internal {
 		ycbcr = 6,
 		cielab = 8, icclab = 9,itulab = 10,
 		logl = 32844,logluv = 32845
+	};
+	
+	static const std::map<uint16_t,util::istring> tag_registry={
+		{254,"NewSubfileType"},// general indication of the kind of data contained in this subfile.
+		{255,"SubfileType"}, //A general indication of the kind of data contained in this subfile.
+		{256,"ImageWidth"}, //The number of columns in the image, i.e., the number of pixels per row.
+		{257,"ImageLength"}, //The number of rows of pixels in the image.
+		{258,"BitsPerSample"}, //Number of bits per component.
+		{259,"Compression"}, //Compression scheme used on the image data.
+		{262,"PhotometricInterpretation"}, //The color space of the image data.
+		{263,"Threshholding"}, //For black and white TIFF files that represent shades of gray, the technique used to convert from gray to black and white pixels.
+		{264,"CellWidth"}, //The width of the dithering or halftoning matrix used to create a dithered or halftoned bilevel file.
+		{265,"CellLength"}, //The length of the dithering or halftoning matrix used to create a dithered or halftoned bilevel file.
+		{266,"FillOrder"}, //The logical order of bits within a byte.
+		{270,"ImageDescription"}, //A string that describes the subject of the image.
+		{271,"Make"}, //The scanner manufacturer.
+		{272,"Model"}, //The scanner model name or number.
+		{273,"StripOffsets"}, //For each strip, the byte offset of that strip.
+		{274,"Orientation"}, //The orientation of the image with respect to the rows and columns.
+		{277,"SamplesPerPixel"}, //The number of components per pixel.
+		{278,"RowsPerStrip"}, //The number of rows per strip.
+		{279,"StripByteCounts"}, //For each strip, the number of bytes in the strip after compression.
+		{280,"MinSampleValue"}, //The minimum component value used.
+		{281,"MaxSampleValue"}, //The maximum component value used.
+		{282,"XResolution"}, //The number of pixels per ResolutionUnit in the ImageWidth direction.
+		{283,"YResolution"}, //The number of pixels per ResolutionUnit in the ImageLength direction.
+		{284,"PlanarConfiguration"}, //How the components of each pixel are stored.
+		{288,"FreeOffsets"}, //For each string of contiguous unused bytes in a TIFF file, the byte offset of the string.
+		{289,"FreeByteCounts"}, //For each string of contiguous unused bytes in a TIFF file, the number of bytes in the string.
+		{290,"GrayResponseUnit"}, //The precision of the information contained in the GrayResponseCurve.
+		{291,"GrayResponseCurve"}, //For grayscale data, the optical density of each possible pixel value.
+		{296,"ResolutionUnit"}, //The unit of measurement for XResolution and YResolution.
+		{305,"Software"}, //Name and version number of the software package(s) used to create the image.
+		{306,"DateTime"}, //Date and time of image creation.
+		{315,"Artist"}, //Person who created the image.
+		{316,"HostComputer"}, //The computer and/or operating system in use at the time of image creation.
+		{320,"ColorMap"}, //A color map for palette color images.
+		{338,"ExtraSamples"}, //Description of extra components.
+		{33432,"Copyright"} //Copyright notice.
 	};
 
 	template<typename T> util::PropertyValue getPropVal_impl(data::ByteArray &source,bool byteswap,uint64_t offset, uint64_t number_of_values){
@@ -152,7 +223,7 @@ namespace _internal {
 		std::array<uint64_t,2> size,tilesize;
 		std::array<float,2> pixels_per_unit;
 		std::list<uint64_t> stripoffsets,stripbytecounts,tileoffsets,tilebytecounts,bitspersample;
-		std::list<data::ValueArray<uint8_t>> tiles;
+		std::list<data::ValueArray<uint8_t>> tiles,strips;
 		enum unit_types{none=1,inch,centimeter}resolution_unit=inch;
 		util::PropertyMap generic_props;
 		compression_type compression;
@@ -162,7 +233,7 @@ namespace _internal {
 			samples_per_pixel;
 		uint64_t rowsperstrip;
 	public:
-		size_t countProgress()const{return tiles.size();}
+		size_t countProgress()const{return stripoffsets.size()+tiles.size();}
 		void readTAG(TiffSource &source){
 			std::pair<uint16_t,util::PropertyValue> tag=source.readTag();
 			switch(tag.first){
@@ -202,9 +273,13 @@ namespace _internal {
 					break;
 				case 0x011C:
 					planar_configuration=tag.second.as<uint16_t>();break;
-				default:
-					generic_props.touchProperty(std::to_string(tag.first).c_str()).transfer(tag.second);
-					break;
+				default:{
+					auto found =_internal::tag_registry.find(tag.first);
+					if(found!=_internal::tag_registry.end())
+						generic_props.touchProperty(found->second).transfer(tag.second);
+					else
+						generic_props.touchProperty(std::to_string(tag.first).c_str()).transfer(tag.second);
+				}break;
 			}
 		}
 
@@ -223,64 +298,102 @@ namespace _internal {
 				tileoffsets.pop_front();
 				tilebytecounts.pop_front();
 			}
-		}
-		bool readTile(data::ValueArray<uint8_t> tile_src, data::Chunk &dst, std::array<size_t,4> pos)const{
-			data::MemChunk<util::color24> tile_buff(tilesize[0],tilesize[1]);
-			assert(tile_buff.getBytesPerVoxel()==tjPixelSize[TJPF_RGB]);
-			auto decompressor=tjInitDecompress();
-			auto *p_tile_buff= std::static_pointer_cast<unsigned char>(tile_buff.asValueArrayBase().getRawAddress()).get();
-			const int err=tjDecompress2(
-				decompressor,
-				tile_src.begin(),tile_src.getLength(),
-				p_tile_buff,
-				tilesize[0],tilesize[0]*tjPixelSize[TJPF_RGB],tilesize[1],
-				TJPF_RGB,
-				0
-			);
-			if(err){
-				LOG(Runtime,error) << "jpeg decompression failed with " << tjGetErrorStr();
-				#warning implement error handling
-				return false;
-			} else {
-				dst.copyFromTile(tile_buff,pos); 
+			while(!stripbytecounts.empty()){
+				data::ValueArray<uint8_t> tile=source.at<uint8_t>(stripoffsets.front(),stripbytecounts.front());
+				strips.push_back(tile);
+				stripoffsets.pop_front();
+				stripbytecounts.pop_front();
 			}
-			return true;
 		}
 		size_t computeSize()const{
 			return util::product(size)*3;
 		}
 		
-		void readTiles(data::Chunk &dst,std::list<data::ValueArray<uint8_t>> tiles,std::shared_ptr<util::ProgressFeedback> feedback)const{
+		void readTiles(
+			data::Chunk &dst,std::list<data::ValueArray<uint8_t>> tiles,
+			std::array<uint64_t,2> tilesize,
+			transfer_func transfer,
+			std::shared_ptr<util::ProgressFeedback> feedback
+		)const{
 				for (uint64_t y = 0; y < size[1]; y += tilesize[1]){
 					for (uint64_t x = 0; x < size[0]; x += tilesize[0]){
 						assert(!tiles.empty());
-						readTile(tiles.front(),dst,{x,y});
+						
+						data::Chunk tile_buff=transfer(tiles.front(),tilesize);
+						dst.copyFromTile(tile_buff,{x,y}); 
+
 						if(feedback)
-							feedback->progress("",tiles.front().getLength()*tiles.front().bytesPerElem());
+							feedback->progress();
 						tiles.pop_front();
 					}
 				}
 		}
 		
 		data::Chunk makeChunk(std::shared_ptr<util::ProgressFeedback> feedback)const{
-			data::MemChunk<util::color24> ret(size[0],size[1],1,1,true);
-			ret.touchBranch("TIFF")=generic_props;
+			std::unique_ptr<data::Chunk> ret;
+			
+			transfer_func transfer;
+			
+			if(samples_per_pixel==1){ // scalar interpretation
+				switch(bitspersample.front()){
+					case 1:
+						ret.reset(new data::MemChunk<bool>(size[0],size[1],1,1,true));
+						break;
+					case 8:
+						ret.reset(new data::MemChunk<uint8_t>(size[0],size[1],1,1,true));
+						break;
+					case 16:
+						ret.reset(new data::MemChunk<uint16_t>(size[0],size[1],1,1,true));
+						transfer=_internal::make_direct_transfer<uint16_t>();
+						break;
+					default:
+						LOG(Runtime,error) << "Unsupportet bit depth " << bitspersample.front();
+				}
+			} else if(samples_per_pixel==3){ //rgb interpretation
+				ret.reset(new data::MemChunk<util::color24>(size[0],size[1],1,1,true));
+				transfer=_internal::jpeg_transfer;
+			} else {
+				LOG(Runtime,error) << "Unsupported samples per pixel " << samples_per_pixel;
+			}
+			
+			ret->touchBranch("TIFF")=generic_props;
 			
 			//todo deal with those
-			auto YCbCrSubSampling = extractOrTell("530",ret.touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/ycbcrsubsampling.html
-			auto ReferenceBlackWhite = extractOrTell("532",ret.touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/referenceblackwhite.html
+			auto YCbCrSubSampling = extractOrTell("530",ret->touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/ycbcrsubsampling.html
+			auto ReferenceBlackWhite = extractOrTell("532",ret->touchBranch("TIFF"),info);// http://www.awaresystems.be/imaging/tiff/tifftags/referenceblackwhite.html
+
+			if(pixels_per_unit[0] && pixels_per_unit[1]){
+				auto &voxelsize= ret->touchProperty("voxelsize");
+				switch(resolution_unit){
+					case inch:
+						voxelsize = util::fvector3{25.4/pixels_per_unit[0],25.4/pixels_per_unit[1],1};
+						break;
+					case centimeter:
+						voxelsize = util::fvector3{10/pixels_per_unit[0],10/pixels_per_unit[1],1};
+						break;
+					case none:
+					default:
+						LOG(Runtime,warning) << "ignoring resolution "<< pixels_per_unit << " because no resolution type is given";
+						break;
+				}
+			}
 
 			
-			if(!stripoffsets.empty()){
+			if(!strips.empty()){
 				std::cout << "stripoffsets" << stripoffsets << std::endl;
+				LOG(Runtime,info) 
+					<< "Loading " << ret->getSizeAsString() << "-Image from " << stripoffsets.size() << " stripes (" 
+					<< ret->getVolume()*ret->getBytesPerVoxel() / 1024 / 1024 << "MB)";
+					
+				readTiles(*ret,strips,{size[0],rowsperstrip},transfer,feedback); // stripes are essentially tiles as wide as the image
 			} else if(!tiles.empty()) {
 				LOG(Runtime,info) 
-					<< "Reading " << ret.getSizeAsString() << "-Image from " << tiles.size() << " tiles (" 
-					<< ret.getVolume()*ret.getBytesPerVoxel() / 1024 / 1024 << "MB)";
+					<< "Reading " << ret->getSizeAsString() << "-Image from " << tiles.size() << " tiles (" 
+					<< ret->getVolume()*ret->getBytesPerVoxel() / 1024 / 1024 << "MB)";
 					
-				readTiles(ret,tiles,feedback);
+				readTiles(*ret,tiles,tilesize,transfer,feedback);
 			}
-			return ret;
+			return *ret;
 		}
 	};
 }
