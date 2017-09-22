@@ -220,7 +220,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 			LOG( Runtime, error ) << "No plugin supporting the requested format stack " << formatstack << " was found";
 		} else {
 			LOG_IF(filename, Runtime, error ) << "No plugin found to read " << *filename;
-			LOG_IF(boost::get<std::basic_streambuf<char>*>(&v), Runtime, error ) << "No plugin found to load from stream";
+			LOG_IF(boost::get<std::streambuf*>(&v), Runtime, error ) << "No plugin found to load from stream";
 			LOG_IF(boost::get<ByteArray>(&v), Runtime, error ) << "No plugin found to load from memory";
 		}
 	} else {

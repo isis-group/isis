@@ -73,7 +73,7 @@ public:
 	std::string getName()const override;
 	std::list<util::istring> dialects()const override;
 
-	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
+	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	void write( const data::Image &image,     const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
 };

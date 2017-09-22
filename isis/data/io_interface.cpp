@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <boost/interprocess/streams/bufferstream.hpp>
 #include <fstream>
 #include <iomanip>
@@ -72,12 +73,17 @@ std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename
 }
 
 std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
 	const void *p=source.getRawAddress().get();
-	boost::interprocess::ibufferstream buffer((char*)p,source.getLength());
-	return load(buffer.rdbuf(),formatstack,dialects,feedback);
+	const uint8_t *start=source.begin(), *end=source.end();
+	
+	boost::iostreams::stream<my_source_type> stream;
+	stream.open(my_source_type((const std::streambuf::char_type*)start,(const std::streambuf::char_type*)end));
+	std::streambuf *buffer = stream.rdbuf();
+	return load(buffer,formatstack,dialects,feedback);
 }
 
-std::list<data::Chunk> FileFormat::load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
 	util::TmpFile tmp("isis_streamio_adapter");
 	boost::iostreams::copy(*source,boost::iostreams::file_sink(tmp.c_str()));
 	return load(tmp.native(),formatstack,dialects,feedback);

@@ -524,7 +524,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	return dest;
 }
 
-std::list<data::Chunk> ImageFormat_Dicom::load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
+std::list<data::Chunk> ImageFormat_Dicom::load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
 
 	std::basic_stringbuf<char> buff_stream;
 	boost::iostreams::copy(*source,buff_stream);
