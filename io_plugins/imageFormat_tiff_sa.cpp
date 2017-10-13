@@ -422,12 +422,13 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	int nr=0;
 	for(const _internal::IFD& ifd:images){
 		size_t mbsize=ifd.computeSize() / 1024 / 1024;
-		if(checkDialect(dialects,"lowmem") || mbsize < 4096){
+		if(mbsize >= 4096 && checkDialect(dialects,"lowmem"))
+			LOG(Runtime,warning) << "Skipping " << mbsize << "MB image because of lowmem dialect";
+		else {
 			auto ch=ifd.makeChunk(feedback);
 			ch.setValueAs("sequenceNumber",nr++);
 			ret.push_back(ch);
-		} else
-			LOG(Runtime,warning) << "Skipping " << mbsize << "MB image because of lowmem dialect";
+		}
 	}
 	
 	return ret;
