@@ -15,7 +15,7 @@ using namespace isis;
 
 std::pair<std::string, int>  parseFilename( std::string name )
 {
-	static const std::regex reg( "^([^:]*):([\\d]+)$", std::regex_constants::optimize|std::regex_constants::ECMAScript );
+	static const std::regex reg( "^(.*):([\\d]+)$", std::regex_constants::optimize|std::regex_constants::ECMAScript );
 	std::smatch results;
 	std::pair<std::string, int> ret;
 	ret.second = -1;
@@ -160,6 +160,11 @@ int main( int argc, char *argv[] )
 	app.parameters["selectwith"] = util::slist( _props, _props + sizeof( _props ) / sizeof( char * ) );
 	app.parameters["selectwith"].needed() = false;
 	app.parameters["selectwith"].setDescription( "List of properties which should be used to select images for comparison" );
+	
+	app.parameters["np"] = false;
+	app.parameters["np"].needed() = false;
+	app.parameters["np"].setDescription( "suppress progress bar" );
+	app.parameters["np"].hidden() = true;
 
 	app.addLogging<DiffLog>("");
 	app.addLogging<DiffDebug>("");
