@@ -354,9 +354,11 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::list<util::ist
 			foundGrad= object.transform<util::fvector3>(prefix+"SiemensDiffusionGradientOrientation","diffusionGradient");
 		} else {
 			if(bValue)
-			LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
-			else
-				LOG(Runtime, notice ) << "Ignoring DiffusionBValue 0 as there is no diffusionGradient";
+				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
+			else {
+				LOG(Runtime, info ) << "DiffusionBValue is 0, setting (non existing) diffusionGradient to " << util::fvector3{0,0,0};
+				object.setValueAs("diffusionGradient",util::fvector3{0,0,0});
+			}
 		}
 
 		if( bValue && foundGrad ) // if bValue is not zero multiply the diffusionGradient by it
