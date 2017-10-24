@@ -45,7 +45,7 @@ public:
 		return ret;
 	}
 
-	std::list<data::Chunk> load(std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
 		std::istream stream(source);
 		assert(formatstack.back()=="flist");
 		formatstack.pop_back();

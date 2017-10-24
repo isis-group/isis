@@ -39,7 +39,7 @@ class IOFactory
 public:
 	typedef std::shared_ptr< image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
-	typedef boost::variant<boost::filesystem::path,std::basic_streambuf<char>*,ByteArray> load_source;
+	typedef boost::variant<boost::filesystem::path,std::streambuf*,ByteArray> load_source;
 	friend class util::Singletons;
 	class  io_error : public std::runtime_error{
 		FileFormatPtr p_format;

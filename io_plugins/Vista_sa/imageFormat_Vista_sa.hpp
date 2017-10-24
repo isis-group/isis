@@ -42,18 +42,17 @@ private:
 	}
 	
 public:
-	std::string getName()const {return "Vista standalone";}
-	std::list<data::Chunk> load( const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) throw ( std::runtime_error & );
-	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); // not used
-	void write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & );
+	std::string getName()const override {return "Vista standalone";}
+	std::list<data::Chunk> load( data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw ( std::runtime_error & ) override;
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override; // not used
+	void write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
 	
-	util::istring dialects( const std::string &/*filename*/ )const {return "";}
 	static void sanitize( util::PropertyMap &obj );
 	static void unsanitize( util::PropertyMap &obj );
 
 
 protected:
-	util::istring suffixes( io_modes /*mode = both */ )const {return ".v";}
+	util::istring suffixes( io_modes /*mode = both */ )const override {return ".v";}
 };
 
 }

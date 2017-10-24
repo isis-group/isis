@@ -82,6 +82,16 @@ SortedChunkList::SortedChunkList( util::PropertyMap::key_type comma_separated_eq
 {
 	const std::list< isis::util::PropertyMap::key_type > p_list = util::stringToList<util::PropertyMap::key_type>( comma_separated_equal_props, ',' );
 	equalProps.insert( equalProps.end(), p_list.begin(), p_list.end() );
+	
+	//we need a list of protected props
+	//some are actually needed for the splicing and inserting...
+	protected_props.insert( p_list.begin(), p_list.end() );
+	//also those that are explicitly needed by the chunks
+	const auto &chunk_need= util::Singletons::get<util::PropertyMap::NeededsList<Chunk>, 0>();
+	protected_props.insert(chunk_need.begin(),chunk_need.end());
+	// source might be usefull as well
+	protected_props.insert("source");
+
 }
 
 
@@ -195,11 +205,8 @@ bool SortedChunkList::insert( const Chunk &ch )
 		);
 		
 		//ok, but some are actually needed for the splicing and inserting...
-		for(const auto &need:util::Singletons::get<util::PropertyMap::NeededsList<Chunk>, 0>()){
+		for(const auto &need:protected_props){
 			extracted.extract(need,chs);// .. so put them back
-		}
-		if(extracted.hasProperty("source")){ // source might be usefull as well
-			extracted.extract("source",chs);
 		}
 
 		not_spliced.push_back( // store extracted with an (for now) empty list of chunks

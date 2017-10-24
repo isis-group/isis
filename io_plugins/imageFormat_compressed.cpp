@@ -94,7 +94,7 @@ public:
 	}
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( std::basic_streambuf<char> *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
 		
 		auto in=makeIStream(formatstack);
 
