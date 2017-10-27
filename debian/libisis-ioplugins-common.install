@@ -5,3 +5,4 @@ debian/tmp/usr/lib/isis/plugins/libisisImageFormat_comp_proxy.so  usr/lib/isis/p
 debian/tmp/usr/lib/isis/plugins/libisisImageFormat_Vista_sa.so    usr/lib/isis/plugins
 debian/tmp/usr/lib/isis/plugins/libisisImageFormat_fdf.so         usr/lib/isis/plugins
 debian/tmp/usr/lib/isis/plugins/libisisImageFormat_tar_proxy.so   usr/lib/isis/plugins
+debian/tmp/usr/lib/isis/plugins/libisisImageFormat_orthanc.so     usr/lib/isis/plugins
