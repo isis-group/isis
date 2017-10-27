@@ -54,7 +54,7 @@ size_t getConvertSize( const ValueArrayBase &src, const ValueArrayBase &dst )
 }
 static bool checkScale( const scaling_pair &scaling )
 {
-	assert( !scaling.first.isEmpty() && !scaling.first.isEmpty() );
+	assert( !scaling.first.isEmpty() && !scaling.second.isEmpty() );
 	const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
 	return ( scale != 1 || offset );
 }

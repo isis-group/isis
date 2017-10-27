@@ -137,7 +137,7 @@ void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::sh
 	}
 		
 	//voxelsize is needed to be equal inside Images so there should be no voxelSize in the chunks
-	assert(!getChunkAt(0).hasProperty("voxelSize"));
+	assert(!getChunkAt(0,false).hasProperty("voxelSize"));
 }
 
 

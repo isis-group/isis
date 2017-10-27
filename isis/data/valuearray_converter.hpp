@@ -31,7 +31,7 @@ namespace isis
 namespace data
 {
 enum autoscaleOption {noscale, autoscale, noupscale, upscale};
-typedef std::pair<util::ValueReference, util::ValueReference> scaling_pair;
+typedef std::pair<util::ValueReference, util::ValueReference> scaling_pair; //scale / offset
 class ValueArrayBase;
 
 class ValueArrayConverterBase
