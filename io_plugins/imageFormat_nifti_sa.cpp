@@ -521,7 +521,7 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 
 	strcpy( head->magic, "n+1" );
 }
-void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, data::Chunk &props )
+void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, data::Chunk &props, data::scaling_pair &scl)
 {
 	unsigned short dims = head->dim[0];
 	double time_fac = 1;
@@ -616,9 +616,11 @@ void ImageFormat_NiftiSa::parseHeader( const std::shared_ptr< isis::image_io::_i
 	}
 
 	// TODO: at the moment scaling is not supported due to data type changes
-	if ( head->scl_slope != 0 && !( head->scl_slope == 1 || head->scl_inter == 0 ) ) {
-		LOG( Runtime, error ) << "Ignoring scaling "<< std::make_pair(head->scl_slope,head->scl_inter) << " it is not supported at the moment.";
-	}
+	if( ( head->scl_slope !=0 && head->scl_slope != 1) || head->scl_inter != 0)
+		scl=data::scaling_pair(
+			util::Value<float>(head->scl_slope),
+			util::Value<float>(head->scl_inter)
+		);
 
 	if( head->intent_code  ) {
 		props.setValueAs( "nifti/intent_code", head->intent_code ); // use it the usual way
@@ -850,7 +852,13 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 
 
 	//parse the header and add respective properties to the chunk
-	parseHeader( header, orig );
+	data::scaling_pair scl;
+	parseHeader( header, orig, scl );
+	
+	if(!scl.first.isEmpty() || !scl.second.isEmpty() ){
+		LOG(Runtime,info) << "Applying scaling " << scl << " from the nifti header, result will be in double";
+		orig.convertToType(data::ValueArray<double>::staticID(),scl);
+	}
 	dcmmeta.translateToISIS( orig );
 
 	if(orig.hasProperty( "acquisitionNumber") <=1)//if dcmmeta didn't set slice ordering
@@ -858,7 +866,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 
 	if( orig.hasBranch( "DICOM" ) ) // if we got DICOM data clean up some
 		sanitise( orig );
-
+	
 	return std::list<data::Chunk>(1,orig);
 }
 
