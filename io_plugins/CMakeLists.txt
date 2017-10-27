@@ -67,11 +67,12 @@ endif(ISIS_IOPLUGIN_MEAS)
 ############################################################
 if(ISIS_IOPLUGIN_ORTHANC)
 	find_library(LIB_JSONCPP jsoncpp)
+	find_package(Threads)
 	find_path(INC_JSONCPP "json/config.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/config.h can be found")
 	include_directories(${INC_JSONCPP})
 
 	add_library(isisImageFormat_orthanc SHARED imageFormat_orthanc.cpp )
-	target_link_libraries(isisImageFormat_orthanc ${isis_core_lib} ACE ACE_INet jsoncpp)
+	target_link_libraries(isisImageFormat_orthanc ${isis_core_lib} ACE ACE_INet jsoncpp Threads::Threads)
 	set(TARGETS ${TARGETS} isisImageFormat_orthanc)
 endif(ISIS_IOPLUGIN_ORTHANC)
 
