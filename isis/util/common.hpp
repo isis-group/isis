@@ -254,7 +254,7 @@ template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale = 10 )
 	}
 
 	if( smaller == 0 )
-		return bigger < std::numeric_limits<T>::min() * scale;
+		return bigger < (epsilon * scale);
 
 	const T factor = 1 / smaller; // scale smaller to that value
 	return ( bigger * factor ) <= ( 1 + epsilon * scale ); //scaled bigger should be between 1 and the next representable value
