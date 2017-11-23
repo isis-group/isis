@@ -98,11 +98,17 @@ void WriteOp::applyFlipToCoords ( util::vector4< size_t >& coords, data::dimensi
 class CommonWriteOp: public WriteOp
 {
 	const unsigned short m_targetId;
-	const data::scaling_pair m_scale;
+	data::scaling_pair m_scale;
 public:
 	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel ):
 		WriteOp( image, bitsPerVoxel ),
-		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
+		m_targetId( targetId ) {
+			if(image.getMajorTypeID() == targetId){
+				m_scale.first=util::Value<uint8_t>(1);
+				m_scale.second=util::Value<uint8_t>(0);
+			} else
+				m_scale=image.getScalingTo( m_targetId );
+		}
 
 	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
 		applyFlipToCoords( posInImage, ( data::dimensions )ch.getRelevantDims() );
