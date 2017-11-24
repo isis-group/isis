@@ -184,7 +184,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static float determinant( const util::Matrix3x3<float> &m );
-	void parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props );
+	void parseHeader( const std::shared_ptr< isis::image_io::_internal::nifti_1_header >& head, isis::data::Chunk &props, data::scaling_pair &scl );
 	std::unique_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, std::list<util::istring> dialects );
 	data::ValueArray<bool> bitRead( isis::data::ValueArray< uint8_t > src, size_t length );
 	bool checkSwapEndian ( std::shared_ptr<_internal::nifti_1_header > header );
