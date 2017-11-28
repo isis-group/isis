@@ -1,4 +1,4 @@
-isis (0.7.15-1) xenial; urgency=low
+isis (0.7.16-1) xenial; urgency=low
 
   [ ISIS Group ]
   * big api change in progress
@@ -10,7 +10,7 @@ isis (0.7.15-1) xenial; urgency=low
   * add support for fdf files
   * improve performance with mosaic data
 
- -- ISIS Group <gr_isis@cbs.mpg.de>  Tue, 23 May 2017 15:25:30 +0200
+ -- ISIS Group <gr_isis@cbs.mpg.de>  Tue, 28 Nov 2017 11:41:09 +0100
 
 isis (0.7.9-1ubuntu1) UNRELEASED; urgency=low
 
