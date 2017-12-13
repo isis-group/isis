@@ -8,7 +8,7 @@
 struct DiffLog {static const char *name() {return "Diff";}; enum {use = _ENABLE_LOG};};
 struct DiffDebug {static const char *name() {return "DiffDebug";}; enum {use = _ENABLE_DEBUG};};
 
-static const char *_props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart", "indexOrigin"};
+static const char *_props[] = {"sequenceNumber", "sequenceDescription", "sequenceStart", "indexOrigin", "echoTime"};
 static const char *_skips[] = {"sequenceDescription=localizer"};
 
 using namespace isis;
