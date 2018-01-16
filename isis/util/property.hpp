@@ -79,7 +79,7 @@ public:
 	void resize( size_t size, const ValueBase& clone );
 	template<typename T> typename std::enable_if<knowType<T>::value,ValueBase& >::type set(size_t idx,const T& val){
 		if(size()<=idx)
-			resize(idx,Value<T>());
+			resize(idx+1,Value<T>());
 		return *container.replace(idx,new Value<T>(val));
 	}
 
