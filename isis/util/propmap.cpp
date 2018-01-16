@@ -644,8 +644,11 @@ bool PropertyMap::insert(const std::pair<PropPath,PropertyValue> &p){
 }
 
 void PropertyMap::extract(const PropPath &p,PropertyMap &dst){
-	dst.fetchEntry(p).swap(fetchEntry(p));
-	remove(p);
+	auto found=findEntry(p);
+	if(found){
+		dst.fetchEntry(p).swap(*found);
+		remove(p);
+	}
 }
 
 PropertyMap PropertyMap::extract_if(std::function<bool(const PropertyValue &p)> condition){
