@@ -355,35 +355,36 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 		break;
 		case NIFTI_SLICE_SEQ_DEC:{
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
 
 			for(short v=0;v<head->dim[4];v++)
 				for(unsigned short i = 0; i < head->dim[3]; i++ ){
-                                        assert(v*head->dim[3]+head->dim[3]>=i);
+					assert(v*head->dim[3]+head->dim[3]>=i);
 					acqProp.push_back<uint32_t>(v*head->dim[3]+head->dim[3]-i);
-                                }
+				}
 		}
 		break;
 		case NIFTI_SLICE_ALT_INC: { //interlaced increment
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
+			
 			for(short v=0;v<head->dim[4];v++){
-				short cnt=1;
 				for( short i = 0; i < head->dim[3]; i+=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 				for( short i = 1; i < head->dim[3]; i+=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
-				assert(cnt==head->dim[3]);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 			}
 		}
 		break;
 		case NIFTI_SLICE_ALT_DEC: {
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
+
 			for(short v=0;v<head->dim[4];v++){
-				short cnt=1;
 				for( short i = head->dim[3]-1; i>=0; i-=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 				for( short i = head->dim[3]-2; i>=0; i-=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
-				assert(cnt==head->dim[3]);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 			}
 		}
 		break;
