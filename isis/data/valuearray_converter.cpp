@@ -142,11 +142,16 @@ template<typename T> struct NumConvImpl<T, T, true>: NumConvImplBase {
 	}
 };
 
-// specialisation for bool
+// specialisation for bool (anything that is "<=0" after the scaling results in false)
 template<typename SRC> struct NumConvImpl<SRC, bool, false>: NumConvImplBase {
-	static void convert( const SRC *src, bool *dst, const scaling_pair &/*scaling*/, size_t size ) {
-		while( size-- )
-			*( dst++ ) = ( *( src++ ) != 0 );
+	static void convert( const SRC *src, bool *dst, const scaling_pair &scaling, size_t size ) {
+		if( checkScale( scaling ) ) {
+			const double scale = scaling.first->as<double>(), offset = scaling.second->as<double>();
+			while( size-- )
+				*( dst++ ) = ( (*( src++ ) * scale) > -offset);
+		} else
+			while( size-- )
+				*( dst++ ) = ( *( src++ ) != 0 );
 	}
 };
 template<typename DST> struct NumConvImpl<bool, DST, false>: NumConvImplBase {
