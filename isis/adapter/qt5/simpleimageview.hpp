@@ -49,11 +49,11 @@ class SimpleImageView : public QWidget
 	QVector<QVector<QPixmap>> slides;
 	size_t curr_slice=0,curr_time=0;
 	data::Image m_img;
-	bool is_complex=false, is_color=false;
+	enum {normal=0,complex,color,mask}type;
 	QButtonGroup *transfer_function_group;
 	std::shared_ptr<_internal::TransferFunction> transfer_function,magnitude_transfer,phase_transfer;
 	
-	void setupUi(bool with_complex);
+	void setupUi();
 	QSlider *sliceSelect,*timeSelect;
 	_internal::MriGraphicsView *graphicsView;
 protected Q_SLOTS:
