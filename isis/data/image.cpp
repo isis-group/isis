@@ -564,8 +564,7 @@ Image Image::copyByID( short unsigned int ID, scaling_pair scaling ) const
 		ret.reIndex();
 	}
 
-	return *this;
-
+	return ret;
 }
 
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
