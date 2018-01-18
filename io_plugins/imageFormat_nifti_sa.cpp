@@ -183,8 +183,11 @@ public:
 
 	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
 		data::ValueArray<bool> in_data = src.asValueArrayBase().as<bool>();
-		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv ;
+		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 
+		//the length parameter actually expets elements and then computes the bytes internally
+		//but that computing will fail for bool so we ask for 8bit / 1byte type and give the needed bytes instead of elements
+		//also the writing below works with uint8 anyway
 		data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
 		memset( &out_data[0], 0, out_data.getLength() );
 
@@ -1025,7 +1028,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			if(image.hasProperty("window/max") && image.hasProperty("window/min")){
 				header->cal_min = image.getValueAs<float>("window/min");
 				header->cal_max = image.getValueAs<float>("window/max");
-			} else {
+			} else { // todo this will store the min/max of the original image, not of the stored (converted) one
 				const std::pair< float, float > minmax = image.getMinMaxAs<float>();
 				header->cal_min = minmax.first;
 				header->cal_max = minmax.second;
