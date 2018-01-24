@@ -201,8 +201,25 @@ public:
 	 */
 	Chunk copyByID( unsigned short ID = 0, scaling_pair scaling = scaling_pair() )const;
 	
-	
+	/**
+	 * Copy data from a (smaller) chunk and insert it as a tile at a specified position.
+	 * If the data would not fit at the given position (aka would got beyound the images size) it will be clipped and a warning will be sent if enabled.
+	 * \note the size of the copied tile is defined by the size of the source. In other words the whole source is copied as a tile.
+	 * \param src the source for the tile-data
+	 * \param pos the position where to insert the data
+	 * \param allow_capping if clipping is considered ok (aka switch of the warning about the copied tile being to big)
+	 */
 	void copyFromTile(const Chunk &src, std::array<size_t,4> pos, bool allow_capping=true);
+	
+	/**
+	 * Copy a tile data to a (smaller) chunk.
+	 * The size of the copied tile is defined by the size of the destination. In other words the whole destination is filled.
+	 * If the data would not fit at the given position (aka the destination tile would got beyound the images size) it will be clipped and a warning will be sent if enabled.
+	 * \param dst the destination for the tile-data
+	 * \param pos the position where to insert the data
+	 * \param allow_capping if clipping is considered ok (aka switch of the warning about the copied tile being to big)
+	 */
+	void copyTileTo(Chunk &dst, std::array<size_t,4> pos, bool allow_capping=false);
 
 	///get the scaling (and offset) which would be used in an conversion to the given type
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;

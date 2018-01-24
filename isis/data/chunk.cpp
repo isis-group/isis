@@ -94,6 +94,20 @@ void Chunk::copyFromTile(const Chunk &src, std::array<size_t,4> pos, bool allow_
 		src.getValueArrayBase().copyRange(src_scanline_idx,src_scanline_idx+scanline_width-1,asValueArrayBase(),dst_scanline_idx);
 	}
 }
+void Chunk::copyTileTo(Chunk &dst, std::array<size_t,4> pos, bool allow_capping){
+	auto tilesize=dst.getSizeAsVector(), size=getSizeAsVector();
+	size_t scanline_width=std::min(tilesize[rowDim],size[rowDim]-pos[0]);
+
+	LOG_IF(tilesize[rowDim]<scanline_width && !allow_capping, Runtime, warning) 
+		<< "Capping tile of size " << dst.getSizeAsString() << " as putting it at " << pos << " in image of size " << getSizeAsString();
+
+
+	for(size_t l=0;l<std::min(tilesize[1],size[1]-pos[1]);l++){
+		size_t dst_scanline_idx= dst.getLinearIndex({0,l,0,0});
+		size_t src_scanline_idx= getLinearIndex({pos[0],pos[1]+l,0,0});
+		getValueArrayBase().copyRange(src_scanline_idx,src_scanline_idx+scanline_width-1,dst.asValueArrayBase(),dst_scanline_idx);
+	}
+}
 
 size_t Chunk::getBytesPerVoxel()const
 {
