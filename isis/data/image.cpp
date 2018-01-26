@@ -85,7 +85,7 @@ Image &Image::operator=( const data::Image &ref )
 {
 	//deep copy bases
 	static_cast<util::PropertyMap &>( *this ) = static_cast<const util::PropertyMap &>( ref );
-	static_cast<_internal::NDimensional< 4 >&>( *this ) = static_cast<const _internal::NDimensional< 4 >&>( ref );
+	static_cast<NDimensional< 4 >&>( *this ) = static_cast<const NDimensional< 4 >&>( ref );
 	//deep copy members
 	chunkVolume = ref.chunkVolume;
 	clean = ref.clean;
@@ -122,7 +122,7 @@ bool Image::isClean()const
 
 void Image::swapDim( short unsigned int dim_a, short unsigned int dim_b, std::shared_ptr<util::ProgressFeedback> feedback )
 {
-	_internal::NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback ); // this runs through all chunks as the Iterator does that
+	NDimensional<4>::swapDim( dim_a, dim_b, begin(), feedback ); // this runs through all chunks as the Iterator does that
 	for(auto pCh:lookup){ //but we still have to reshape the chunks
 		auto shape=pCh->getSizeAsVector();
 		std::swap(shape[dim_a],shape[dim_b]);
@@ -987,7 +987,7 @@ util::fvector3 Image::getFoV() const
 			}
 	}
 
-	const util::fvector4 ret = _internal::NDimensional<4>::getFoV( getValueAs<util::fvector4>( "voxelSize" ), voxelGap );
+	const util::fvector4 ret = NDimensional<4>::getFoV( getValueAs<util::fvector4>( "voxelSize" ), voxelGap );
 
 	LOG_IF( ret[timeDim], Runtime, warning ) << "Ignoring fourth dim extend of " << ret[timeDim] << " in Image";
 

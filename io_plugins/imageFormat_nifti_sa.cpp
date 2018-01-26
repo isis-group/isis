@@ -13,7 +13,7 @@ namespace image_io
 {
 namespace _internal
 {
-WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
+WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
 
 void WriteOp::addFlip( data::dimensions dim ) {flip_list.insert( dim );}
 

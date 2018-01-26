@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 
 	class setIdx: public data::VoxelOp<uint8_t>
 	{
-		data::_internal::NDimensional<4> chunkGeometry;
+		data::NDimensional<4> chunkGeometry;
 	public:
-		setIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
+		setIdx( data::NDimensional<4> geo ): chunkGeometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			vox = chunkGeometry.getLinearIndex( pos );
 			return true;
@@ -72,9 +72,9 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	};
 	class checkIdx: public data::VoxelOp<uint8_t>
 	{
-		data::_internal::NDimensional<4> chunkGeometry;
+		data::NDimensional<4> chunkGeometry;
 	public:
-		checkIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
+		checkIdx( data::NDimensional<4> geo ): chunkGeometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			return vox == chunkGeometry.getLinearIndex( pos );
 		}

@@ -42,7 +42,7 @@ Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRow
 {
 	ValueArrayReference::operator=(src);
 	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
-	LOG_IF( _internal::NDimensional<4>::getVolume() == 0, Debug, warning )
+	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 	assert( ( *this )->getLength() == getVolume() );
 }
@@ -333,7 +333,7 @@ void Chunk::flipAlong( const dimensions dim ) const
 
 void Chunk::swapDim( unsigned short dim_a,unsigned short dim_b, std::shared_ptr<util::ProgressFeedback> feedback)
 {
-	_internal::NDimensional<4>::swapDim(dim_a,dim_b,begin(),feedback);
+	NDimensional<4>::swapDim(dim_a,dim_b,begin(),feedback);
 	//swap voxel sizes
 	auto voxel_size_query=queryValueAs<util::fvector3>("voxelSize");
 	if(voxel_size_query && dim_a<data::timeDim && dim_b<data::timeDim){

@@ -25,8 +25,6 @@ namespace isis
 {
 namespace data
 {
-namespace _internal
-{
 
 /// Base class for anything that has dimensional size
 template<unsigned short DIMS> class NDimensional
@@ -151,7 +149,7 @@ public:
 	
 	template<typename ITER> void swapDim(size_t dim_a,size_t dim_b,ITER at, std::shared_ptr<util::ProgressFeedback> feedback=std::shared_ptr<util::ProgressFeedback>()){
 		std::vector<bool> visited(getVolume());
-		data::_internal::NDimensional<DIMS> oldshape=*this;
+		data::NDimensional<DIMS> oldshape=*this;
 
 		//reshape myself
 		std::swap(m_dim[dim_a],m_dim[dim_b]);
@@ -176,7 +174,6 @@ public:
 	}
 };
 
-}
 }
 }
 

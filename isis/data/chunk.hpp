@@ -29,12 +29,6 @@ namespace data
 
 class Chunk;
 
-/// @cond _internal
-namespace _internal
-{
-}
-/// @endcond _internal
-
 /// Base class for operators used for foreachVoxel
 template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
 {
@@ -48,7 +42,7 @@ public:
  * Like in ValueArray, the copy of a Chunk will reference the same data. (cheap copy)
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::NDimensional<4>, public util::PropertyMap, protected ValueArrayReference
+class Chunk : public NDimensional<4>, public util::PropertyMap, protected ValueArrayReference
 {
 	friend class Image;
 	friend class std::vector<Chunk>;
@@ -344,7 +338,7 @@ public:
 	 */
 	MemChunk( const Chunk &ref, scaling_pair scaling = scaling_pair()  )
 	{
-		_internal::NDimensional<4>::init(ref.getSizeAsVector()); // initialize the shape
+		NDimensional<4>::init(ref.getSizeAsVector()); // initialize the shape
 		static_cast<util::PropertyMap&>(*this)=ref; // copy properties
 		//get rid of my ValueArray and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValueArrayReference::operator=( ref.getValueArrayBase().copyByID( ValueArray<TYPE>::staticID(), scaling ) );

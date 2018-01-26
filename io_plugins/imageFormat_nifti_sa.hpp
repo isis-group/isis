@@ -132,7 +132,7 @@ struct nifti_1_header {
 
 } ;                   /**** 348 bytes total ****/
 
-class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
+class WriteOp: public data::ChunkOp, protected data::NDimensional<4>
 {
 protected:
 	std::set<data::dimensions> flip_list;

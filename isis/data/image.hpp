@@ -200,7 +200,7 @@ public:
 
 /// Main class for generic 4D-images
 class Image:
-	public _internal::NDimensional<4>,
+	public NDimensional<4>,
 	public util::PropertyMap
 {
 	dimensions minIndexingDim;
