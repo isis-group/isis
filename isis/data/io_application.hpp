@@ -99,7 +99,7 @@ public:
 	 * with the ParameterMap of the application and stores the loaded image in its input list (see fetchImage and fetchImageAs).
 	 * \note usually there is no nedd to explicitely call that function. It is called automatically by init() if the Application is set up for input (see IOApplication()).
 	 */
-	bool autoload( bool exitOnError = false,optional< util::slist& > rejected=optional< util::slist& >() );
+	std::list< Image > autoload( bool exitOnError = false,const std::string &suffix = "",optional< util::slist& > rejected=optional< util::slist& >() );
 
 	/**
 	 * Load images using parameters from the given ParameterMap.
@@ -110,7 +110,7 @@ public:
 	 * \param suffix the same suffix used for addInput()
 	 * \param feedback if given, the util::ConsoleFeedback object will be used to display reading progress if possible
 	 */
-	static bool autoload( 
+	static std::list< Image > autoload( 
 		const util::ParameterMap &parameters, 
 		std::list< Image >& images, 
 		bool exitOnError = false, 
