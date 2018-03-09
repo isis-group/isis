@@ -109,7 +109,7 @@ public:
 #endif
 	}
 	std::string getName()const override {return "ImageMagick";}
-	util::istring dialects( const std::list<util::istring> &) const override {return "middle stacked";}
+	std::list<util::istring> dialects()const override {return {"middle","stacked"};}
 	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )  throw( std::runtime_error & ) override
 	{
 		std::list<Magick::Image> imageList; 
@@ -124,14 +124,14 @@ public:
 			for(Magick::Image &img:imageList){
 				ret.push_back(image2chunk(img));
 				
-				if( dialect == "stacked" ){					
+				if( checkDialect(dialects, "stacked") ){					
 					ret.back().setValueAs( "indexOrigin", util::fvector3{0, 0, (float)acqNum} );
 				}
 				ret.back().setValueAs("acquisitionNumber",acqNum++);
 			}
 		} else { //just one 2D-Image
 			data::Chunk ch=image2chunk(imageList.front());
-			if( dialect == "stacked" ) {
+			if( checkDialect(dialects, "stacked") ) {
 				float slice;
 				if( extractNumberFromName<uint32_t>( filename, slice ) ) {
 					ch.setValueAs<uint32_t>( "acquisitionNumber", slice );
