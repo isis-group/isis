@@ -57,7 +57,7 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 		return false;
 
 	if ( m_input ) {
-		return autoload( exitOnError );
+		images.splice(images.end(),autoload( exitOnError ));
 	}
 
 	return true;
@@ -158,12 +158,12 @@ void IOApplication::printHelp( bool withHidden ) const
 	}
 }
 
-bool IOApplication::autoload( bool exitOnError,optional< util::slist& > rejected)
+std::list< Image > IOApplication::autoload( bool exitOnError,const std::string &suffix,optional< util::slist& > rejected)
 {
-	return autoload( parameters, images, exitOnError, "", feedback(),rejected );
+	return autoload( parameters, images, exitOnError, suffix, feedback(),rejected );
 
 }
-bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
+std::list< Image > IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	util::slist rf = parameters[std::string( "rf" ) + suffix];
@@ -194,27 +194,24 @@ bool IOApplication::autoload ( const util::ParameterMap &parameters, std::list<I
 		tImages = data::IOFactory::load( input, formatstack, util::listToList<util::istring>(dl.begin(),dl.end()),rejected );
 	}
 
-	images.splice( images.end(), tImages );
-
-	if ( images.empty() ) {
+	if ( tImages.empty() ) {
 		if ( exitOnError ) {
 			LOG( Runtime, notice ) << "No data acquired, exiting...";
 			exit( 1 );
-		} else
-			return false;
+		} 
 	} else {
-		for( std::list<data::Image>::const_iterator a = images.begin(); a != images.end(); a++ ) {
-			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != images.end(); ) {
+		for( std::list<data::Image>::const_iterator a = tImages.begin(); a != tImages.end(); a++ ) {
+			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != tImages.end(); ) {
 				const data::Image &aref = *a, bref = *b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images "
-						<< aref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
-						<< " and " << bref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
+						<< aref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( tImages.begin(), a )
+						<< " and " << bref.identify(true,false) << ":" << std::distance<std::list<Image> ::const_iterator>( tImages.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
 	}
 
-	return true;
+	return tImages;
 }
 
 
