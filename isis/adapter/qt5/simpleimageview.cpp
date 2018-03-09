@@ -293,15 +293,29 @@ void SimpleImageView::updateImage()
 	graphicsView->scene()->clear();
 
 	auto transfer=transfer_function; //lambdas cannot bind members ??
-	graphicsView->scene()->addPixmap(
-		QPixmap::fromImage(
-			makeQImage(
-				m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
-				m_img.getDimSize(data::rowDim),
-				[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
-			)
-		)
-	);
+	QImage qimage;
+	
+	const auto ch_dims=m_img.getChunkAt(0,false).getRelevantDims();
+	
+	assert(ch_dims<=data::sliceDim); // we at least should have a sliced image (the constructor should have made sure of that)
+	if(ch_dims==data::sliceDim){ // we have a sliced image
+		qimage = makeQImage(
+			m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
+			m_img.getDimSize(data::rowDim),
+			[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
+		);
+	} else { // if we have a "lines-image"
+		std::vector<data::ValueArrayBase::Reference> lines(m_img.getDimSize(1));
+		for(size_t l=0;l<m_img.getDimSize(1);l++){
+			lines[l]=m_img.getChunk(0,l,curr_slice,curr_time).getValueArrayBase();
+		}
+		qimage = makeQImage(
+			lines,
+			[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
+		);
+	}
+
+	graphicsView->scene()->addPixmap(QPixmap::fromImage(qimage));
 }
 void SimpleImageView::selectTransfer(int id, bool checked)
 {
