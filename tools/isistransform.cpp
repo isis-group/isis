@@ -26,7 +26,12 @@ public:
 } flifu;
 
 int getDimFromStr(std::string s){
-	const int ret=std::tolower(s[0])-'x';
+	int ret;
+	if(std::tolower(s[0])=='t')
+		ret=data::timeDim;
+	else
+		ret=std::tolower(s[0])-'x';
+	
 	return s[1]=='-'? -ret:ret;
 }
 
