@@ -160,10 +160,9 @@ void IOApplication::printHelp( bool withHidden ) const
 
 std::list< Image > IOApplication::autoload( bool exitOnError,const std::string &suffix,optional< util::slist& > rejected)
 {
-	return autoload( parameters, images, exitOnError, suffix, feedback(),rejected );
-
+	return autoload( parameters, exitOnError, suffix, feedback(),rejected );
 }
-std::list< Image > IOApplication::autoload ( const util::ParameterMap &parameters, std::list<Image> &images, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
+std::list< Image > IOApplication::autoload ( const util::ParameterMap &parameters, bool exitOnError, const std::string &suffix,  std::shared_ptr<util::ProgressFeedback> feedback, optional< util::slist& > rejected)
 {
 	util::slist input = parameters[std::string( "in" ) + suffix];
 	util::slist rf = parameters[std::string( "rf" ) + suffix];

@@ -112,7 +112,6 @@ public:
 	 */
 	static std::list< Image > autoload( 
 		const util::ParameterMap &parameters, 
-		std::list< Image >& images, 
 		bool exitOnError = false, 
 		const std::string &suffix = "", 
 		std::shared_ptr< util::ProgressFeedback > feedback = IOApplication::feedback(),
