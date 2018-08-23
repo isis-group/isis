@@ -61,7 +61,7 @@ std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename
 	}
 
 	// set up progress bar if its enabled but don't fiddle with it if its set up already
-	bool set_up=false;
+	bool set_up=false;//TODO should this be here ?
 	if( feedback && feedback->getMax() == 0 ) {
 		set_up=true;
 		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename.native() );

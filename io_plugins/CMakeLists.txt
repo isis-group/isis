@@ -18,6 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
 option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone TIFF-IO plugin" ON)
+option(ISIS_IOPLUGIN_ZISRAW "Enable standalone Zeiss Integrated Software RAW plugin" ON)
 option(ISIS_IOPLUGIN_MEAS "Enable standalone plugin for reading siemens RAW data files" OFF)
 option(ISIS_IOPLUGIN_ORTHANC "Enable standalone plugin for reading siemens RAW data files" OFF)
 option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
@@ -88,6 +89,18 @@ if(ISIS_IOPLUGIN_TIFF_SA)
 	target_link_libraries(isisImageFormat_tiff_sa ${TJPEG_LIBRARY} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_tiff_sa)
 endif(ISIS_IOPLUGIN_TIFF_SA)
+
+if(ISIS_IOPLUGIN_ZISRAW)
+	find_path(JXR_INCLUDE_DIR "JXRGlue.h" PATH_SUFFIXES "jxrlib" DOC "libjxr include path")
+	include_directories(${JXR_INCLUDE_DIR})
+	
+	find_library(JXR_GLUE_LIBRARY "jxrglue")
+	find_library(JXR_LIBRARY "jpegxr")
+	
+	add_library(isisImageFormat_ZISRAW SHARED imageFormat_ZISRAW.cpp imageFormat_ZISRAW_jxr.c)
+	target_link_libraries(isisImageFormat_ZISRAW ${isis_core_lib} ${JXR_GLUE_LIBRARY} ${JXR_LIBRARY})
+	set(TARGETS ${TARGETS} isisImageFormat_ZISRAW)
+endif(ISIS_IOPLUGIN_ZISRAW)
 
 if(ISIS_IOPLUGIN_VISTA_SA)
 	option(REGEN_PARSER "Regenerate the parser files" OFF)
