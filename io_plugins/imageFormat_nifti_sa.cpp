@@ -925,6 +925,7 @@ std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis
 void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
+
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::unique_ptr<_internal::WriteOp > writer = getWriteOp( image, dialects ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
@@ -1041,12 +1042,18 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			props.join( image.getChunkAt( 0, false ) );
 			storeHeader( props, header );
 		}
-
+		
 		if( image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getValueAs<float>( "repetitionTime" );
 
 		if( checkDialect(dialects, "spm") ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
+		} else {
+			if(image.hasProperty("DICOM/RescaleSlope"))
+				header->scl_slope = image.getValueAs<float>("DICOM/RescaleSlope");
+			
+			if(image.hasProperty("DICOM/RescaleIntercept"))
+				header->scl_inter = image.getValueAs<float>("DICOM/RescaleIntercept");
 		}
 
 		// actually copy the data from each chunk of the image
