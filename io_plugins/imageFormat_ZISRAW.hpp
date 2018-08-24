@@ -50,6 +50,7 @@ namespace _internal {
 }
 
 class ImageFormat_ZISRAW : public FileFormat{
+	static const std::map<uint32_t,uint16_t> PixelTypeMap,PixelSizeMap;
 	class Segment{
 		uint64_t allocated_size,used_size;
 	protected:
@@ -92,6 +93,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset);
 		std::list<data::Chunk> makeChunks()const;
+		bool isNormalImage()const;
 	};
 	class Directory:public Segment{
 	public:

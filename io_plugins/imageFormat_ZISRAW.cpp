@@ -107,7 +107,7 @@ ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t off
 	DirectoryEntry=_internal::getDVEntry(data,16);
 	size_t off=std::max(DirectoryEntry.size()+16,(size_t)256);
 	xml_data=_internal::getXML(data,off,MetadataSize);
-	// 			boost::property_tree::write_xml(std::cout,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cout<<std::endl;
+// 	boost::property_tree::write_xml(std::cerr,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cerr<<std::endl;
 
 	image_data = data.at<uint8_t>(off+MetadataSize,DataSize);
 }
@@ -116,20 +116,27 @@ size_t ImageFormat_ZISRAW::SubBlock::writeDimsInfo(util::PropertyMap &map)const{
 	for(auto d:DirectoryEntry.dims){
 		util::PropertyMap &ch_dim=map.touchBranch(d.Dimension.c_str());
 		ch_dim.setValueAs("StartCoordinate",d.StartCoordinate);
-		ch_dim.setValueAs("start",d.StartCoordinate);
-		ch_dim.setValueAs("size",d.StartCoordinate);
-		ch_dim.setValueAs("stored_size",d.StartCoordinate);
+		ch_dim.setValueAs("start",d.start);
+		ch_dim.setValueAs("size",d.size);
+		ch_dim.setValueAs("stored_size",d.StoredSize);
 	}
 	return DirectoryEntry.dims.size();
 }
+bool ImageFormat_ZISRAW::SubBlock::isNormalImage()const{
+	auto got=xml_data.get_optional<std::string>("METADATA.Tags");
+	return got.operator bool();//if there are tags, its a normal image
+}
 
 std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
-	// 			auto x_iter = std::find(DirectoryEntry.dims.begin(),DirectoryEntry.dims.end(),[](const DimensionEntry &d){return d.Dimension=="X";});
-	// 			auto y_iter = std::find(DirectoryEntry.dims.begin(),DirectoryEntry.dims.end(),[](const DimensionEntry &d){return d.Dimension=="Y";});
-	// 			auto z_iter = std::find(DirectoryEntry.dims.begin(),DirectoryEntry.dims.end(),[](const DimensionEntry &d){return d.Dimension=="Z";});
-	// 			auto t_iter = std::find(DirectoryEntry.dims.begin(),DirectoryEntry.dims.end(),[](const DimensionEntry &d){return d.Dimension=="T";});
-	// 			auto mosaic_iter = std::find(DirectoryEntry.dims.begin(),DirectoryEntry.dims.end(),[](const DimensionEntry &d){return d.Dimension=="M";});
+	unsigned short isis_type,pixel_size;
 
+	try{
+		isis_type=PixelTypeMap.at(DirectoryEntry.PixelType);
+		pixel_size=PixelSizeMap.at(DirectoryEntry.PixelType);
+	} catch (std::out_of_range &){
+		throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+")"));
+	}
+	
 	switch(DirectoryEntry.Compression){
 		case 0:{
 			// linear representation of the pixel data reinterpreted as the correct PixelType
@@ -139,14 +146,23 @@ std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
 		case 1:{throwGenericError("implement me jpeg");}break;//jpeg
 		case 2:{throwGenericError("implement me LZW");}break;//LZW
 		case 4:{
+			if(DirectoryEntry.PixelType==10 || DirectoryEntry.PixelType==11)
+				throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+") for compressed data"));
+			
 			static const bool verbose=false;
-			uint8_t *img;size_t size[2];uint16_t type;
-			jxr_decode(image_data.getRawAddress().get(),image_data.getLength(),(void**)&img,size, &type,verbose);
+			uint16_t type;
+			util::PropertyMap dims;
+			writeDimsInfo(dims);
+			const size_t xsize=dims.getValueAs<size_t>("X/stored_size"),ysize=dims.getValueAs<size_t>("Y/stored_size");
 			
-			auto typed=data::ByteArray(img,size[0]*size[1]).atByID(type,0);
+			data::ByteArray buffer(xsize*ysize*pixel_size);
+			jxr_decode(
+				image_data.getRawAddress().get(),image_data.getLength(),
+				buffer.getRawAddress().get(),buffer.getLength(), 
+				isis_type,verbose);
 			
-			data::Chunk decoded(typed,size[0]/typed->bytesPerElem(),size[1],1,1,true);
-			writeDimsInfo(decoded.touchBranch("dims"));
+			data::Chunk decoded(buffer.atByID(isis_type,0),xsize,ysize);
+			decoded.touchBranch("dims").transfer(dims);
 // 			data::IOFactory::write(decoded,"/tmp/test.png");
 			return std::list<data::Chunk>(1,decoded);
 		}
@@ -182,12 +198,69 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 
 	if(header.DirectoryPosition){
 		Directory directory(source,header.DirectoryPosition);
-		std::list<data::Chunk> chunks;
+		std::list<data::Chunk> segments;
+		struct bounds{
+			int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();
+			size_t size()const{return max-min+1;}
+		};
+		std::map<std::string,bounds> boundaries;
+
 		feedback->show(directory.entries.size(),std::string("Loading ")+std::to_string(directory.entries.size())+" data segments");
+
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
 			const SubBlock s(source,e.FilePosition);
-			chunks.splice(chunks.end(),s.makeChunks());
+			if(s.isNormalImage()){
+				
+				// find boundaries (not existing dimsions will not be registered)
+				for(const auto &d:e.dims){
+					bounds &b=boundaries[d.Dimension];//select boundary by name
+					const int end=d.start+d.StoredSize-1;
+					if(b.min>d.start)b.min=d.start;
+					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
+				}
+
+				            segments.splice(segments.end(),s.makeChunks());
+// 				chunks.back().branch("dims").print(std::cerr) << std::endl;
+			} else {
+			}
 			feedback->progress();
+		}
+		LOG(Runtime,info) << "Got " << segments.size() << " Image objects";
+		LOG(Runtime,verbose_info) << "Dimensions from the header are:";
+		for(const auto &b:boundaries){
+			LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
+		}
+		
+		if(boundaries["M"].size()>1){
+			assert(boundaries["M"].size()==segments.size());
+			         segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
+				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
+			);
+			data::Chunk dst=segments.front().cloneToNew(boundaries["X"].size(),boundaries["Y"].size());
+			struct {int32_t x,y;}offset={-boundaries["X"].min,-boundaries["Y"].min};
+			LOG(Runtime,info) << "Creating " << dst.getSizeAsString() << " image from " << segments.size() << " segments";
+			while(!segments.empty()){
+				data::Chunk c=segments.front();
+                segments.pop_front();//get rid of segments we dont need anymore
+				assert(c.getValueAs<int32_t>("dims/X/start")+offset.x>=0);
+				assert(c.getValueAs<int32_t>("dims/Y/start")+offset.y>=0);
+				const std::array<size_t,4> pos={
+					c.getValueAs<int32_t>("dims/X/start")+offset.x,
+					c.getValueAs<int32_t>("dims/Y/start")+offset.y,
+					1,1
+				};
+				dst.copyFromTile(c,pos,false);
+			}
+			
+			//faking valid image
+			dst.setValueAs( "indexOrigin", util::fvector3() );
+			dst.setValueAs( "acquisitionNumber", 0 );
+			dst.setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
+			dst.setValueAs( "rowVec", util::fvector3({1, 0} ));
+			dst.setValueAs( "columnVec", util::fvector3({0, 1}) );
+			dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
+
+			return std::list< data::Chunk >(1,dst);
 		}
 
 	} else {
@@ -195,10 +268,30 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 	}
 
 
-
 	return std::list< data::Chunk >();
 }
 }}
+
+const std::map<uint32_t,uint16_t> isis::image_io::ImageFormat_ZISRAW::PixelTypeMap={
+	 {0,isis::data::ValueArray<uint8_t>::staticID()} //Gray8
+	,{1,isis::data::ValueArray<uint16_t>::staticID()} //Gray16
+	,{2,isis::data::ValueArray<float>::staticID()} //Gray32Float
+	,{3,isis::data::ValueArray<util::color24>::staticID()} //Bgr24
+	,{4,isis::data::ValueArray<util::color48>::staticID()} //Bgr48
+	,{10,isis::data::ValueArray<std::complex<float>>::staticID()} //Gray64ComplexFloat
+	,{11,isis::data::ValueArray<std::complex<double>>::staticID()} //Bgr192ComplexFloat
+	,{12,isis::data::ValueArray<int32_t>::staticID()} //Gray32
+};
+const std::map<uint32_t,uint16_t> isis::image_io::ImageFormat_ZISRAW::PixelSizeMap={
+	 {0,sizeof(uint8_t)} //Gray8
+	,{1,sizeof(uint16_t)} //Gray16
+	,{2,sizeof(float)} //Gray32Float
+	,{3,sizeof(util::color24)} //Bgr24
+	,{4,sizeof(util::color48)} //Bgr48
+	,{10,sizeof(std::complex<float>)} //Gray64ComplexFloat
+	,{11,sizeof(std::complex<double>)} //Bgr192ComplexFloat
+	,{12,sizeof(int32_t)} //Gray32
+};
 
 isis::image_io::FileFormat *factory()
 {

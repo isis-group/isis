@@ -11,50 +11,18 @@ struct isis_type_map isis_types;
 // 	PKCreateCodecFactory(&ret.pCodecFactory, WMP_SDK_VERSION);
 // }
 
-const GUID *selectColorFormat(PKImageDecode* pDecoder,unsigned short *isis_type){
-	if(pDecoder->WMP.wmiI.cfColorFormat==Y_ONLY){ // grayscale
-		switch(pDecoder->WMP.wmiI.bdBitDepth){
-			case BD_16S:
-			case BD_16F:
-			case BD_16: 
-				*isis_type = isis_types.scalar.u16bit;     
-				return &GUID_PKPixelFormat16bppGray;
-				break;
-			case BD_32S:
-			case BD_32: 
-				*isis_type = isis_types.scalar.u32bit;     
-				return &GUID_PKPixelFormat32bppGrayFixedPoint;
-				break;
-			case BD_32F:
-				*isis_type = isis_types.scalar.float32bit; 
-				return &GUID_PKPixelFormat32bppGrayFloat;
-				break;
-			case BD_8:  
-			default: 
-				*isis_type = isis_types.scalar.u8bit;         
-				return &GUID_PKPixelFormat8bppGray;
-				break;
-		}
-	} else { //RGB
-		switch(pDecoder->WMP.wmiI.bdBitDepth){
-			case BD_16S:
-			case BD_16F:
-			case BD_16: 
-			case BD_32S:
-			case BD_32: 
-			case BD_32F:
-				*isis_type = isis_types.color.c48bit; 
-				return &GUID_PKPixelFormat48bppRGB;break;
-			case BD_8:  
-			default: 
-				*isis_type = isis_types.color.c24bit; 
-				return &GUID_PKPixelFormat24bppRGB;
-				break;
-		}
-	}
+const GUID *selectColorFormat(unsigned short isis_type){
+	if(isis_type==     isis_types.scalar.u8bit)     return &GUID_PKPixelFormat8bppGray;
+	else if(isis_type==isis_types.scalar.u16bit)    return &GUID_PKPixelFormat16bppGray;
+	else if(isis_type==isis_types.scalar.u32bit)    return &GUID_PKPixelFormat32bppGrayFixedPoint;
+	else if(isis_type==isis_types.scalar.float32bit)return &GUID_PKPixelFormat32bppGrayFloat;
+	else if(isis_type==isis_types.color.c24bit)     return &GUID_PKPixelFormat24bppRGB;
+	else if(isis_type==isis_types.color.c48bit)     return &GUID_PKPixelFormat48bppRGB;
+	else 
+		assert(0); // we should not get here;
 }
 
-void jxr_decode(const void *in, size_t in_size, void **out, size_t out_size[2], unsigned short *isis_type, int verbose){
+void jxr_decode(const void *in, size_t in_size, void *out, size_t out_size, unsigned short type, int verbose){
 	ERR e;
 	struct WMPStream* inStream;
 	PKImageDecode* pDecoder;
@@ -65,7 +33,7 @@ void jxr_decode(const void *in, size_t in_size, void **out, size_t out_size[2], 
 	e=pDecoder->Initialize(pDecoder, inStream);
 	
 	PKPixelInfo PIto,PIfrom;
-	PIto.pGUIDPixFmt = selectColorFormat(pDecoder,isis_type);
+	PIto.pGUIDPixFmt = selectColorFormat(type);
 	PIfrom.pGUIDPixFmt = &pDecoder->guidPixFormat;
 	
 	if(IsEqualGUID(PIto.pGUIDPixFmt, &GUID_PKPixelFormat8bppGray) || IsEqualGUID(PIto.pGUIDPixFmt, &GUID_PKPixelFormat16bppGray)){ // ** => Y transcoding
@@ -116,11 +84,10 @@ void jxr_decode(const void *in, size_t in_size, void **out, size_t out_size[2], 
 
 	U32 cbStride = max(cbStrideFrom, cbStrideTo);
 
-	out_size[0]=cbStride;
-	out_size[1]=pDecoder->WMP.wmiI.cROIHeight;
-	PKAllocAligned((void **) out, out_size[0]*out_size[1], 128);// todo do proper PKFree instead of isis-default-free
+	assert(cbStride*pDecoder->WMP.wmiI.cROIHeight==out_size);
+// 	PKAllocAligned((void **) out, out_size, 128);// todo do proper PKFree instead of isis-default-free
 
-	pConverter->Copy(pConverter, &rect, *out, cbStride);
+	pConverter->Copy(pConverter, &rect, out, cbStride);
 
 	pDecoder->Release(&pDecoder);
 }

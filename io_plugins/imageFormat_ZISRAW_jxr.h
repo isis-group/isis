@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void jxr_decode(const void *in, size_t in_size, void **out, size_t out_size[2], unsigned short *isis_type, int verbose);
+void jxr_decode(const void *in, size_t in_size, void *out, size_t out_size, unsigned short type, int verbose);
 struct isis_type_map{
 	struct {unsigned short u8bit,u16bit,u32bit,float32bit;}scalar;
 	struct {unsigned short c24bit,c48bit;}color;
