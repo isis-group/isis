@@ -92,7 +92,11 @@ endif(ISIS_IOPLUGIN_TIFF_SA)
 
 if(ISIS_IOPLUGIN_ZISRAW)
 	find_path(JXR_INCLUDE_DIR "JXRGlue.h" PATH_SUFFIXES "jxrlib" DOC "libjxr include path")
-	include_directories(${JXR_INCLUDE_DIR})
+
+        find_path(JXR_WINDOWSMEDIAPHOTO_DIR "windowsmediaphoto.h" PATH_SUFFIXES "image/sys" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find windowsmediaphoto.h")
+        find_path(JXR_WMSPECSTRING_DIR "wmspecstring.h" PATH_SUFFIXES "common/include" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find wmspecstring.h")
+
+        include_directories(${JXR_INCLUDE_DIR} ${JXR_WINDOWSMEDIAPHOTO_DIR} ${JXR_WMSPECSTRING_DIR})
 	
 	find_library(JXR_GLUE_LIBRARY "jxrglue")
 	find_library(JXR_LIBRARY "jpegxr")

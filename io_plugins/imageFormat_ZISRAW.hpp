@@ -27,7 +27,7 @@ namespace _internal {
 	};
 
 	template<typename T> void getScalar(data::ByteArray &data,T &variable,size_t offset){
-		data.at<T>(offset,1,__BYTE_ORDER==__BIG_ENDIAN).copyToMem(&variable,1);
+        data.at<T>(offset,1,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__).copyToMem(&variable,1);
 	}
 	DirectoryEntryDV getDVEntry(data::ByteArray &data,size_t offset);
 	

@@ -144,7 +144,7 @@ void FileFormat::throwGenericError( std::string desc )
 
 void FileFormat::throwSystemError( int err, std::string desc )
 {
-	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
+    throw( boost::system::system_error( err, boost::system::system_category(), desc ) );
 }
 
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const

@@ -50,19 +50,19 @@ data::ValueArrayReference reinterpretData(const data::ByteArray &_data, int32_t 
 	case 0://Gray8 - no reinterpretation needed
 		ret=data;break;
 	case 1: //Gray16
-		ret=data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN);break;
+        ret=data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 12: //Gray32
-		ret=data.at<uint32_t>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN);break;
+        ret=data.at<uint32_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 2://Gray32Float
-		ret=data.at<float>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN);break;
+        ret=data.at<float>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 3://Bgr24
 		ret=color_reshuffle<uint8_t>(data);break;
 	case 4://Bgr48
-		ret=color_reshuffle<uint16_t>(data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN));break;
+        ret=color_reshuffle<uint16_t>(data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__));break;
 	case 10: // Gray64ComplexFloat
-		ret=data.at<std::complex<float>>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN);break;
+        ret=data.at<std::complex<float>>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 11: // Bgr192ComplexFloat
-		ret=data.at<std::complex<double>>(0,data.getLength(),__BYTE_ORDER==__BIG_ENDIAN);break;
+        ret=data.at<std::complex<double>>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	default:
 		LOG(Runtime,error) << "Pixel Type " << PixelType << " not implemented";break;
 	}
@@ -75,7 +75,7 @@ ImageFormat_ZISRAW::Segment::Segment(data::ByteArray &source, const size_t offse
 	// get segment type
 	id=std::string((char*)&source[offset]);
 	// read  size data
-	auto buff=source.at<uint64_t>(offset+16,2,__BYTE_ORDER==__BIG_ENDIAN);
+    auto buff=source.at<uint64_t>(offset+16,2,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);
 	allocated_size=buff[0];
 	used_size=buff[1];
 	data=source.at<uint8_t>(offset+16+16,used_size);
@@ -153,7 +153,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
 			uint16_t type;
 			util::PropertyMap dims;
 			writeDimsInfo(dims);
-			const size_t xsize=dims.getValueAs<size_t>("X/stored_size"),ysize=dims.getValueAs<size_t>("Y/stored_size");
+            const uint32_t xsize=dims.getValueAs<uint32_t>("X/stored_size"),ysize=dims.getValueAs<uint32_t>("Y/stored_size");
 			
 			data::ByteArray buffer(xsize*ysize*pixel_size);
 			jxr_decode(
@@ -245,8 +245,8 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 				assert(c.getValueAs<int32_t>("dims/X/start")+offset.x>=0);
 				assert(c.getValueAs<int32_t>("dims/Y/start")+offset.y>=0);
 				const std::array<size_t,4> pos={
-					c.getValueAs<int32_t>("dims/X/start")+offset.x,
-					c.getValueAs<int32_t>("dims/Y/start")+offset.y,
+                    size_t(c.getValueAs<int32_t>("dims/X/start")+offset.x),
+                    size_t(c.getValueAs<int32_t>("dims/Y/start")+offset.y),
 					1,1
 				};
 				dst.copyFromTile(c,pos,false);
