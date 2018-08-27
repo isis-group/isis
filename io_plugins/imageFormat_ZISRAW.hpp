@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <memory>
+#include <future>
 
 namespace isis{
 namespace image_io{
@@ -90,9 +91,10 @@ class ImageFormat_ZISRAW : public FileFormat{
 		data::ByteArray image_data;
 		_internal::DirectoryEntryDV DirectoryEntry;
 		size_t writeDimsInfo(util::PropertyMap &map)const;
+		static data::Chunk jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset);
-		std::list<data::Chunk> makeChunks()const;
+		std::future<std::list<data::Chunk>> makeChunks()const;
 		bool isNormalImage()const;
 	};
 	class Directory:public Segment{

@@ -1,6 +1,7 @@
 #include "imageFormat_ZISRAW.hpp"
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <functional>
 #include "imageFormat_ZISRAW_jxr.h"
 
 namespace isis{
@@ -127,7 +128,22 @@ bool ImageFormat_ZISRAW::SubBlock::isNormalImage()const{
 	return got.operator bool();//if there are tags, its a normal image
 }
 
-std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
+data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size){
+	static const bool verbose=false;
+	const uint32_t xsize=dims.getValueAs<uint32_t>("X/stored_size"),ysize=dims.getValueAs<uint32_t>("Y/stored_size");
+	
+	data::ByteArray buffer(xsize*ysize*pixel_size);
+	jxr_decode(
+		image_data.getRawAddress().get(),image_data.getLength(),
+		buffer.getRawAddress().get(),buffer.getLength(), 
+		isis_type,verbose);
+	
+	data::Chunk decoded(buffer.atByID(isis_type,0),xsize,ysize);
+	decoded.touchBranch("dims").transfer(dims);
+	return decoded;
+}
+
+std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
 	unsigned short isis_type,pixel_size;
 
 	try{
@@ -136,6 +152,9 @@ std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
 	} catch (std::out_of_range &){
 		throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+")"));
 	}
+	
+	std::function<std::list<data::Chunk>(isis::data::ByteArray image_data)> decoder;
+	std::launch decode_policy;
 	
 	switch(DirectoryEntry.Compression){
 		case 0:{
@@ -148,25 +167,17 @@ std::list<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
 		case 4:{
 			if(DirectoryEntry.PixelType==10 || DirectoryEntry.PixelType==11)
 				throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+") for compressed data"));
-			
-			static const bool verbose=false;
-			uint16_t type;
+
 			util::PropertyMap dims;
 			writeDimsInfo(dims);
-            const uint32_t xsize=dims.getValueAs<uint32_t>("X/stored_size"),ysize=dims.getValueAs<uint32_t>("Y/stored_size");
 			
-			data::ByteArray buffer(xsize*ysize*pixel_size);
-			jxr_decode(
-				image_data.getRawAddress().get(),image_data.getLength(),
-				buffer.getRawAddress().get(),buffer.getLength(), 
-				isis_type,verbose);
-			
-			data::Chunk decoded(buffer.atByID(isis_type,0),xsize,ysize);
-			decoded.touchBranch("dims").transfer(dims);
-// 			data::IOFactory::write(decoded,"/tmp/test.png");
-			return std::list<data::Chunk>(1,decoded);
+			decoder = [dims,isis_type,pixel_size](isis::data::ByteArray image_data){
+				return std::list<data::Chunk>(1,jxrRead(dims,image_data,isis_type,pixel_size));
+			};
+			decode_policy=std::launch::async;
 		}
 	}
+	return std::async(decode_policy, std::bind(decoder,image_data));
 }
 
 ImageFormat_ZISRAW::Directory::Directory(data::ByteArray &source, const size_t offset):Segment(source,offset){
@@ -198,13 +209,12 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 
 	if(header.DirectoryPosition){
 		Directory directory(source,header.DirectoryPosition);
-		std::list<data::Chunk> segments;
+		std::list<std::future<std::list<data::Chunk>>> segments;
 		struct bounds{
 			int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();
 			size_t size()const{return max-min+1;}
 		};
 		std::map<std::string,bounds> boundaries;
-
 		feedback->show(directory.entries.size(),std::string("Loading ")+std::to_string(directory.entries.size())+" data segments");
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
@@ -218,12 +228,11 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					if(b.min>d.start)b.min=d.start;
 					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
 				}
-
-				            segments.splice(segments.end(),s.makeChunks());
+				segments.push_back(s.makeChunks());
+				feedback->progress();
 // 				chunks.back().branch("dims").print(std::cerr) << std::endl;
 			} else {
 			}
-			feedback->progress();
 		}
 		LOG(Runtime,info) << "Got " << segments.size() << " Image objects";
 		LOG(Runtime,verbose_info) << "Dimensions from the header are:";
@@ -233,34 +242,41 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		
 		if(boundaries["M"].size()>1){
 			assert(boundaries["M"].size()==segments.size());
-			         segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
-				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
-			);
-			data::Chunk dst=segments.front().cloneToNew(boundaries["X"].size(),boundaries["Y"].size());
+// 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
+// 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
+// 			);
+
+
+			std::unique_ptr<data::Chunk> dst;
 			struct {int32_t x,y;}offset={-boundaries["X"].min,-boundaries["Y"].min};
-			LOG(Runtime,info) << "Creating " << dst.getSizeAsString() << " image from " << segments.size() << " segments";
 			while(!segments.empty()){
-				data::Chunk c=segments.front();
-                segments.pop_front();//get rid of segments we dont need anymore
-				assert(c.getValueAs<int32_t>("dims/X/start")+offset.x>=0);
-				assert(c.getValueAs<int32_t>("dims/Y/start")+offset.y>=0);
-				const std::array<size_t,4> pos={
-                    size_t(c.getValueAs<int32_t>("dims/X/start")+offset.x),
-                    size_t(c.getValueAs<int32_t>("dims/Y/start")+offset.y),
-					1,1
-				};
-				dst.copyFromTile(c,pos,false);
+				for(const data::Chunk &c:segments.front().get()){
+					if(!dst){ // create dst on first iteration from first segment @todo this is ugly as f**k
+						dst.reset(new data::Chunk(c.cloneToNew(boundaries["X"].size(),boundaries["Y"].size())));
+						LOG(Runtime,info) << "Creating " << dst->getSizeAsString() << " image from " << segments.size() << " segments";
+					}
+					
+					assert(c.getValueAs<int32_t>("dims/X/start")+offset.x>=0);
+					assert(c.getValueAs<int32_t>("dims/Y/start")+offset.y>=0);
+					const std::array<size_t,4> pos={
+						size_t(c.getValueAs<int32_t>("dims/X/start")+offset.x),
+						size_t(c.getValueAs<int32_t>("dims/Y/start")+offset.y),
+						1,1
+					};
+					dst->copyFromTile(c,pos,false);
+				}
+				segments.pop_front();//get rid of segments we dont need anymore
 			}
 			
 			//faking valid image
-			dst.setValueAs( "indexOrigin", util::fvector3() );
-			dst.setValueAs( "acquisitionNumber", 0 );
-			dst.setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
-			dst.setValueAs( "rowVec", util::fvector3({1, 0} ));
-			dst.setValueAs( "columnVec", util::fvector3({0, 1}) );
-			dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
+			dst->setValueAs( "indexOrigin", util::fvector3() );
+			dst->setValueAs( "acquisitionNumber", 0 );
+			dst->setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
+			dst->setValueAs( "rowVec", util::fvector3({1, 0} ));
+			dst->setValueAs( "columnVec", util::fvector3({0, 1}) );
+			dst->setValueAs( "sequenceNumber", ( uint16_t )0 );
 
-			return std::list< data::Chunk >(1,dst);
+			return std::list< data::Chunk >(1,*dst);
 		}
 
 	} else {
