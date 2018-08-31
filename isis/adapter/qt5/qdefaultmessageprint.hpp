@@ -1,7 +1,7 @@
 #ifndef QDEFAULTMESSAGEPRINT_HPP
 #define QDEFAULTMESSAGEPRINT_HPP
 
-#include "../../util/message.hpp"
+#include "../../core/message.hpp"
 #include <QString>
 #include <QObject>
 #include <QDateTime>

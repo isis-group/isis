@@ -22,7 +22,7 @@
 
 #include "valuearray_base.hpp"
 #include "valuearray_converter.hpp"
-#include "../util/value.hpp"
+#include "value.hpp"
 #include "common.hpp"
 #include "endianess.hpp"
 
@@ -227,7 +227,7 @@ public:
 	/**
 	 * Creates a ValueArray pointing to a newly allocated array of elements of the given type.
 	 * The array is zero-initialized.
-	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
+	 * If the requested length is 0 no memory will be allocated and the pointer will be "empty".
 	 * \param length amount of elements in the new array
 	 */
 	ValueArray( size_t length ): ValueArray(( TYPE * )calloc( length, sizeof( TYPE ) ),  length ) {}

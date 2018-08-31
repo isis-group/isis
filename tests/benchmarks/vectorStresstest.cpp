@@ -1,4 +1,4 @@
-#include <isis/util/matrix.hpp>
+#include <isis/core/matrix.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;

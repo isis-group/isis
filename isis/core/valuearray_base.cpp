@@ -4,6 +4,7 @@
 
 #include "valuearray_base.hpp"
 #include "valuearray_converter.hpp"
+#include "value.hpp"
 #include "common.hpp"
 
 namespace isis

@@ -30,7 +30,7 @@
 #define ISIS_QMATRIXCONVERSION_HPP
 
 #include <QMatrix>
-#include "../../util/matrix.hpp"
+#include "../../core/matrix.hpp"
 #include <QMatrix4x4>
 
 

@@ -18,8 +18,8 @@
 #ifndef IMAGEFORMAT_VISTA_SA_HPP
 #define IMAGEFORMAT_VISTA_SA_HPP
 
-#include <isis/data/io_interface.h>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/fileptr.hpp>
 
 namespace isis
 {

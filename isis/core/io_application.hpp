@@ -20,8 +20,8 @@
 #ifndef DATA_IOAPPLICATION_HPP
 #define DATA_IOAPPLICATION_HPP
 
-#include "../util/application.hpp"
-#include "../util/progressfeedback.hpp"
+#include "application.hpp"
+#include "progressfeedback.hpp"
 #include "image.hpp"
 
 namespace isis
@@ -112,7 +112,6 @@ public:
 	 */
 	static std::list< Image > autoload( 
 		const util::ParameterMap &parameters, 
-		std::list< Image >& images, 
 		bool exitOnError = false, 
 		const std::string &suffix = "", 
 		std::shared_ptr< util::ProgressFeedback > feedback = IOApplication::feedback(),

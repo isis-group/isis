@@ -11,8 +11,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include "../util/log.hpp"
-#include "../util/tmpfile.hpp"
+#include "log.hpp"
+#include "tmpfile.hpp"
 #include "fileptr.hpp"
 #include "common.hpp"
 #include "io_interface.h"
@@ -61,7 +61,7 @@ std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename
 	}
 
 	// set up progress bar if its enabled but don't fiddle with it if its set up already
-	bool set_up=false;
+	bool set_up=false;//TODO should this be here ?
 	if( feedback && feedback->getMax() == 0 ) {
 		set_up=true;
 		feedback->show( boost::filesystem::file_size( filename ), std::string( "loading " ) + filename.native() );
@@ -144,7 +144,7 @@ void FileFormat::throwGenericError( std::string desc )
 
 void FileFormat::throwSystemError( int err, std::string desc )
 {
-	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
+    throw( boost::system::system_error( err, boost::system::system_category(), desc ) );
 }
 
 std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const

@@ -22,7 +22,7 @@
 #include <stack>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
-#include "../util/progressfeedback.hpp"
+#include "progressfeedback.hpp"
 
 using boost::optional;
 

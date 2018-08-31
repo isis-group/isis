@@ -23,9 +23,9 @@
 #include <QGuiApplication>
 #include <QMatrix4x4>
 
-#include "../../util/application.hpp"
-#include "../../util/matrix.hpp"
-#include "../../data/io_application.hpp"
+#include "../../core/application.hpp"
+#include "../../core/matrix.hpp"
+#include "../../core/io_application.hpp"
 #include "qdefaultmessageprint.hpp"
 #include <QApplication>
 

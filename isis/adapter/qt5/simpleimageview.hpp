@@ -21,7 +21,7 @@
 #define SIMPLEIMAGEVIEW_HPP
 
 #include <QWidget>
-#include "../../data/image.hpp"
+#include "../../core/image.hpp"
 
 class QSlider;
 class QButtonGroup;

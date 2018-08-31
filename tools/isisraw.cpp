@@ -1,6 +1,6 @@
-#include <isis/data/io_factory.hpp>
-#include <isis/data/io_application.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/fileptr.hpp>
 
 
 struct RawLog {static const char *name() {return "Raw";}; enum {use = _ENABLE_LOG};};

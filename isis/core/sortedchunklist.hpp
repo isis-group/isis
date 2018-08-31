@@ -20,7 +20,7 @@
 #define SORTEDCHUNKLIST_HPP
 
 #include "chunk.hpp"
-#include "../util/vector.hpp"
+#include "vector.hpp"
 #include <stack>
 #include <memory>
 

@@ -13,10 +13,10 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include "../util/vector.hpp"
+#include "vector.hpp"
 #include "valuearray.hpp"
-#include "../util/log.hpp"
-#include "../util/propmap.hpp"
+#include "log.hpp"
+#include "propmap.hpp"
 #include "common.hpp"
 #include <string.h>
 #include <list>

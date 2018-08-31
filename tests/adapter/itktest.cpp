@@ -4,8 +4,8 @@
 #include <boost/test/unit_test.hpp>
 #include "../../isis/adapter/itk4/itkAdapter.hpp"
 #include "../../isis/adapter/itk4/common.hpp"
-#include "../../isis/data/chunk.hpp"
-#include "../../isis/data/io_factory.hpp"
+#include "../../isis/core/chunk.hpp"
+#include "../../isis/core/io_factory.hpp"
 
 #include <itkImage.h>
 #include <itkImageFileWriter.h>

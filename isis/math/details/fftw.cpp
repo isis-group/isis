@@ -2,7 +2,7 @@
 #include <fftw3.h>
 #include <memory>
 #include <type_traits>
-#include "../../data/chunk.hpp"
+#include "../../core/chunk.hpp"
 
 
 class PlanObj{

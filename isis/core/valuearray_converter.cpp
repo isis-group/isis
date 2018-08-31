@@ -26,7 +26,7 @@
 
 #include "valuearray_base.hpp"
 #include "numeric_convert.hpp"
-#include "../util/types.hpp"
+#include "types.hpp"
 #include <boost/mpl/for_each.hpp>
 
 #ifdef ISIS_USE_LIBOIL

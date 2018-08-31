@@ -21,7 +21,7 @@
 #define GUIPROGRESSFEEDBACK_H
 
 #include <QGroupBox>
-#include "../../util/progressfeedback.hpp"
+#include "../../core/progressfeedback.hpp"
 
 class QProgressBar;
 

@@ -19,11 +19,11 @@
 // #define BOOST_SPIRIT_DEBUG_PRINT_SOME 100
 // #define BOOST_SPIRIT_DEBUG_INDENT 5
 
-#include <isis/util/vector.hpp>
+#include <isis/core/vector.hpp>
 #include "imageFormat_nifti_dcmstack.hpp"
 #include "imageFormat_nifti_sa.hpp"
-#include <isis/util/value_base.hpp>
-#include <isis/util/property.hpp>
+#include <isis/core/value_base.hpp>
+#include <isis/core/property.hpp>
 #include <limits.h>
 
 namespace isis

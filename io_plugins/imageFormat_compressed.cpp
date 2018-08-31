@@ -1,8 +1,8 @@
 
-#include <isis/data/io_interface.h>
-#include <isis/data/io_factory.hpp>
-#include <isis/util/tmpfile.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/tmpfile.hpp>
+#include <isis/core/io_factory.hpp>
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <boost/filesystem/fstream.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/fileptr.hpp>
 #include <boost/iostreams/categories.hpp>  // tags
 
 #ifdef HAVE_LZMA

@@ -1,8 +1,8 @@
 #ifndef ENDIANESS_HPP
 #define ENDIANESS_HPP
 
-#include "../util/types.hpp"
-#include "../util/value.hpp"
+#include "types.hpp"
+#include "value.hpp"
 #include "common.hpp"
 #include <type_traits>
 

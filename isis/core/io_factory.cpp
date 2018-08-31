@@ -24,9 +24,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "../util/log.hpp"
+#include "log.hpp"
 #include "common.hpp"
-#include "../util/singletons.hpp"
+#include "singletons.hpp"
 
 
 namespace isis

@@ -49,6 +49,12 @@ public:
 	ByteArray()=default;
 	ByteArray(const ByteArray &src)=default;
 	ByteArray(const ValueArray<uint8_t> &src);
+	/**
+	 * Creates a ByteArray pointing to a newly allocated array of bytes.
+	 * The array is zero-initialized.
+	 * If the requested length is 0 no memory will be allocated and the pointer will be "empty".
+	 * \param length amount of bytes in the new array
+	 */
 	ByteArray( size_t length );
 	ByteArray( const std::shared_ptr<uint8_t> &ptr, size_t length );
 	ByteArray( uint8_t *const ptr, size_t length );

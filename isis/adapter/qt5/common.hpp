@@ -2,7 +2,7 @@
 #define QT5_COMMON_HPP
 
 #include <QImage>
-#include "../../data/image.hpp"
+#include "../../core/image.hpp"
 
 namespace isis{
 	struct Qt5Log {static const char *name() {return "Qt5";}; enum {use = _ENABLE_LOG};};

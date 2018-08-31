@@ -19,7 +19,7 @@
 #ifndef HISTOGRAM_H
 #define HISTOGRAM_H
 
-#include "../data/image.hpp"
+#include "../core/image.hpp"
 #include <type_traits>
 #include <cmath>
 

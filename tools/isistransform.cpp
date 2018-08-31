@@ -1,7 +1,7 @@
-#include <isis/data/io_application.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/io_factory.hpp>
 #include <isis/math/transform.hpp>
-#include <isis/util/common.hpp>
+#include <isis/core/common.hpp>
 #include <regex>
 #include <cctype>
 

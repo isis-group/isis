@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE byteswapTest
 #include <boost/test/unit_test.hpp>
-#include <isis/data/endianess.hpp>
+#include <isis/core/endianess.hpp>
 
 namespace isis
 {
