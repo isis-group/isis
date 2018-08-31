@@ -11,7 +11,7 @@
 ############################################################
 # include the ISIS core header files
 ############################################################
-include_directories(${CMAKE_SOURCE_DIR})
+set_directory_properties(PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR})
 
 ############################################################
 # add global options
@@ -67,12 +67,10 @@ endif(ISIS_IOPLUGIN_MEAS)
 # meas plugin
 ############################################################
 if(ISIS_IOPLUGIN_ORTHANC)
-	find_library(LIB_JSONCPP jsoncpp)
 	find_package(Threads)
-	find_path(INC_JSONCPP "json/config.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/config.h can be found")
-	include_directories(${INC_JSONCPP})
 
 	add_library(isisImageFormat_orthanc SHARED imageFormat_orthanc.cpp )
+	set_target_properties(isisImageFormat_orthanc PROPERTIES INCLUDE_DIRECTORIES ${INC_JSONCPP})
 	target_link_libraries(isisImageFormat_orthanc ${isis_core_lib} ACE ACE_INet jsoncpp Threads::Threads)
 	set(TARGETS ${TARGETS} isisImageFormat_orthanc)
 endif(ISIS_IOPLUGIN_ORTHANC)
@@ -84,8 +82,8 @@ if(ISIS_IOPLUGIN_TIFF_SA)
 	find_path(TJPEG_INCLUDE_DIR "turbojpeg.h")
 	find_library(TJPEG_LIBRARY "turbojpeg")
 
-	include_directories(${TJPEG_INCLUDE_DIR})
 	add_library(isisImageFormat_tiff_sa SHARED imageFormat_tiff_sa.cpp )
+	set_target_properties(isisImageFormat_tiff_sa PROPERTIES INCLUDE_DIRECTORIES ${TJPEG_INCLUDE_DIR})
 	target_link_libraries(isisImageFormat_tiff_sa ${TJPEG_LIBRARY} ${isis_core_lib})
 	set(TARGETS ${TARGETS} isisImageFormat_tiff_sa)
 endif(ISIS_IOPLUGIN_TIFF_SA)
@@ -93,15 +91,15 @@ endif(ISIS_IOPLUGIN_TIFF_SA)
 if(ISIS_IOPLUGIN_ZISRAW)
 	find_path(JXR_INCLUDE_DIR "JXRGlue.h" PATH_SUFFIXES "jxrlib" DOC "libjxr include path")
 
-        find_path(JXR_WINDOWSMEDIAPHOTO_DIR "windowsmediaphoto.h" PATH_SUFFIXES "image/sys" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find windowsmediaphoto.h")
-        find_path(JXR_WMSPECSTRING_DIR "wmspecstring.h" PATH_SUFFIXES "common/include" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find wmspecstring.h")
+	find_path(JXR_WINDOWSMEDIAPHOTO_DIR "windowsmediaphoto.h" PATH_SUFFIXES "image/sys" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find windowsmediaphoto.h")
+	find_path(JXR_WMSPECSTRING_DIR "wmspecstring.h" PATH_SUFFIXES "common/include" HINTS ${JXR_INCLUDE_DIR} DOC "path where to find wmspecstring.h")
 
-        include_directories(${JXR_INCLUDE_DIR} ${JXR_WINDOWSMEDIAPHOTO_DIR} ${JXR_WMSPECSTRING_DIR})
-	
 	find_library(JXR_GLUE_LIBRARY "jxrglue")
 	find_library(JXR_LIBRARY "jpegxr")
 	
 	add_library(isisImageFormat_ZISRAW SHARED imageFormat_ZISRAW.cpp imageFormat_ZISRAW_jxr.c)
+	set_target_properties(isisImageFormat_ZISRAW PROPERTIES INCLUDE_DIRECTORIES ${JXR_INCLUDE_DIR} ${JXR_WINDOWSMEDIAPHOTO_DIR} ${JXR_WMSPECSTRING_DIR})
+	
 	target_link_libraries(isisImageFormat_ZISRAW ${isis_core_lib} ${JXR_GLUE_LIBRARY} ${JXR_LIBRARY})
 	set(TARGETS ${TARGETS} isisImageFormat_ZISRAW)
 endif(ISIS_IOPLUGIN_ZISRAW)
@@ -156,10 +154,9 @@ endif(ISIS_IOPLUGIN_NULL)
 ############################################################
 if(ISIS_IOPLUGIN_PNG)
 	find_package(PNG REQUIRED)
-	include_directories(${PNG_INCLUDE_DIRS})
 
 	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-	target_link_libraries(isisImageFormat_png ${isis_core_lib} ${PNG_LIBRARIES})
+	target_link_libraries(isisImageFormat_png ${isis_core_lib} PNG::PNG)
 
 	set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(ISIS_IOPLUGIN_PNG)
@@ -169,11 +166,11 @@ endif(ISIS_IOPLUGIN_PNG)
 ############################################################
 if(ISIS_IOPLUGIN_IMAGEMAGIC)
 	find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
-	include_directories(${ImageMagick_INCLUDE_DIRS})
 
 	add_library(isisImageFormat_ImageMagick SHARED imageFormat_ImageMagick.cpp)
+	set_target_properties(isisImageFormat_ImageMagick PROPERTIES INCLUDE_DIRECTORIES ${ImageMagick_INCLUDE_DIRS})
 	target_link_libraries(isisImageFormat_ImageMagick ${isis_core_lib} ${ImageMagick_LIBRARIES})
-	
+
 	add_definitions("-DMAGICKCORE_HDRI_ENABLE=0" "-DMAGICKCORE_QUANTUM_DEPTH=16")
 
 	set(TARGETS ${TARGETS} isisImageFormat_ImageMagick)
@@ -183,26 +180,28 @@ endif(ISIS_IOPLUGIN_IMAGEMAGIC)
 # COMP proxy plugin
 ############################################################
 if(ISIS_IOPLUGIN_COMP)
-  option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
+	option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
-  find_library(LIB_BZ2 "bz2")
-  find_package(ZLIB)
+	find_library(LIB_BZ2 "bz2")
+	find_package(ZLIB)
 
-  list(APPEND COMP_LIBS ${ZLIB_LIBRARIES} ${LIB_BZ2})
-  list(APPEND COMP_SRC imageFormat_compressed.cpp)
+	list(APPEND COMP_LIBS ${ZLIB_LIBRARIES} ${LIB_BZ2})
+	list(APPEND COMP_SRC imageFormat_compressed.cpp)
 
-  if(ISIS_IOPLUGIN_COMP_LZMA)
-	find_library(LIB_LZMA "lzma")
-	find_path(INCPATH_LZMA "lzma.h")
-	include_directories(${INCPATH_LZMA})
-	add_definitions("-DHAVE_LZMA")
-	list(APPEND COMP_LIBS ${LIB_LZMA})
-	list(APPEND COMP_SRC imageFormat_compressed_lzma.cpp)
-  endif(ISIS_IOPLUGIN_COMP_LZMA)
-  
-  add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
-  target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
-  set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
+	add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
+
+	if(ISIS_IOPLUGIN_COMP_LZMA)
+		find_library(LIB_LZMA "lzma")
+		find_path(INCPATH_LZMA "lzma.h")
+
+		set_target_properties(isisImageFormat_comp_proxy PROPERTIES INCLUDE_DIRECTORIES ${INCPATH_LZMA} COMPILE_DEFINITIONS "HAVE_LZMA")
+
+		list(APPEND COMP_LIBS ${LIB_LZMA})
+		list(APPEND COMP_SRC imageFormat_compressed_lzma.cpp)
+	endif(ISIS_IOPLUGIN_COMP_LZMA)
+
+	target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
+	set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 
 ############################################################
