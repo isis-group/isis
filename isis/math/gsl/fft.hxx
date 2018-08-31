@@ -20,7 +20,7 @@
 #ifndef FFT_H
 #define FFT_H
 
-#include "../../data/chunk.hpp"
+#include "../../core/chunk.hpp"
 
 namespace isis{
 namespace math{

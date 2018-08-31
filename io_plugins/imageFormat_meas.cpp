@@ -6,7 +6,7 @@
 //  Copyright © 2017 Enrico Reimer. All rights reserved.
 //
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>

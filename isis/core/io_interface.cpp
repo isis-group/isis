@@ -11,8 +11,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include "../util/log.hpp"
-#include "../util/tmpfile.hpp"
+#include "log.hpp"
+#include "tmpfile.hpp"
 #include "fileptr.hpp"
 #include "common.hpp"
 #include "io_interface.h"

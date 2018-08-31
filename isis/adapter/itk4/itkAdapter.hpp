@@ -24,11 +24,11 @@
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
 
-#include "../../data/image.hpp"
-#include "../../util/log.hpp"
-#include "../../util/common.hpp"
-#include "../../util/vector.hpp"
-#include "../../data/numeric_convert.hpp"
+#include "../../core/image.hpp"
+#include "../../core/log.hpp"
+#include "../../core/common.hpp"
+#include "../../core/vector.hpp"
+#include "../../core/numeric_convert.hpp"
 
 //external includes
 #include <memory>

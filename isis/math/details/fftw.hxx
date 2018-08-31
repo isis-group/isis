@@ -1,5 +1,5 @@
 #include "../common.hpp"
-#include "../../data/chunk.hpp"
+#include "../../core/chunk.hpp"
 #include "details_fft.hxx"
 
 namespace isis{

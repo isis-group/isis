@@ -20,7 +20,7 @@
 #ifndef IMAGEFORMAT_DICOM_HPP
 #define IMAGEFORMAT_DICOM_HPP
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 
 #define HAVE_CONFIG_H // this is needed for autoconf configured dcmtk (e.g. the debian package)
 

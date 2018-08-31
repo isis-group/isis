@@ -1,5 +1,5 @@
-#include <isis/data/chunk.hpp>
-#include <isis/data/image.hpp>
+#include <isis/core/chunk.hpp>
+#include <isis/core/image.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;

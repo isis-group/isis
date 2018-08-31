@@ -20,8 +20,8 @@
 #ifndef DATA_IOAPPLICATION_HPP
 #define DATA_IOAPPLICATION_HPP
 
-#include "../util/application.hpp"
-#include "../util/progressfeedback.hpp"
+#include "application.hpp"
+#include "progressfeedback.hpp"
 #include "image.hpp"
 
 namespace isis

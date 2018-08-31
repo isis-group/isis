@@ -20,8 +20,8 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "../data/image.hpp"
-#include "../util/matrix.hpp"
+#include "../core/image.hpp"
+#include "../core/matrix.hpp"
 #include "common.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>

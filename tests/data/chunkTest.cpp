@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE ChunkTest
 #include <boost/test/unit_test.hpp>
-#include <isis/data/chunk.hpp>
+#include <isis/core/chunk.hpp>
 
 namespace isis
 {

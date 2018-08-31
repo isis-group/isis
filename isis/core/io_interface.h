@@ -21,8 +21,8 @@
 #include "image.hpp"
 #include "common.hpp"
 #include "bytearray.hpp"
-#include "../util/istring.hpp"
-#include "../util/progressfeedback.hpp"
+#include "istring.hpp"
+#include "progressfeedback.hpp"
 
 namespace isis
 {

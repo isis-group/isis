@@ -1,5 +1,5 @@
-#include <isis/util/matrix.hpp>
-#include <isis/data/io_interface.h>
+#include <isis/core/matrix.hpp>
+#include <isis/core/io_interface.h>
 
 namespace isis
 {

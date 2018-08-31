@@ -1,4 +1,4 @@
-#include <isis/data/fileptr.hpp>
+#include <isis/core/fileptr.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <isis/math/transform.hpp>

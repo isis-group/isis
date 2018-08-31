@@ -20,7 +20,7 @@
 #include "simpleimageview.hpp"
 #include "gradientwidget.hpp"
 #include "common.hpp"
-#include "../../data/io_factory.hpp"
+#include "../../core/io_factory.hpp"
 #include <QSlider>
 #include <QGridLayout>
 #include <QGraphicsView>

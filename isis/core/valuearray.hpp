@@ -22,7 +22,7 @@
 
 #include "valuearray_base.hpp"
 #include "valuearray_converter.hpp"
-#include "../util/value.hpp"
+#include "value.hpp"
 #include "common.hpp"
 #include "endianess.hpp"
 

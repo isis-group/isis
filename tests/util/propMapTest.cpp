@@ -8,8 +8,8 @@
 // The BOOST_TEST_MODULE is similar to a unit test suite.
 #define BOOST_TEST_MODULE PropMapTests
 #include <boost/test/unit_test.hpp>
-#include <isis/util/propmap.hpp>
-#include <isis/util/vector.hpp>
+#include <isis/core/propmap.hpp>
+#include <isis/core/vector.hpp>
 #include <string>
 
 namespace isis

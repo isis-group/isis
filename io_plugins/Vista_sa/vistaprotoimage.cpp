@@ -19,7 +19,7 @@
 
 #include "vistaprotoimage.hpp"
 #include "imageFormat_Vista_sa.hpp"
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 #include <fstream>
 
 namespace isis

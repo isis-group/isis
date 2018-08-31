@@ -1,8 +1,8 @@
 #ifndef ITK_COMMON_HPP
 #define ITK_COMMON_HPP
 
-#include "../../util/log.hpp"
-#include "../../data/image.hpp"
+#include "../../core/log.hpp"
+#include "../../core/image.hpp"
 
 
 namespace isis{

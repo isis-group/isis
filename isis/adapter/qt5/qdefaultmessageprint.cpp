@@ -1,6 +1,6 @@
 #include "qdefaultmessageprint.hpp"
-#include "../../util/singletons.hpp"
-#include "../../data/image.hpp"
+#include "../../core/singletons.hpp"
+#include "../../core/image.hpp"
 #include <QMessageBox>
 
 isis::qt5::LogEvent::LogEvent(const isis::util::Message& msg)

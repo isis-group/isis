@@ -21,8 +21,8 @@
 #define ISISITKIMAGE_H
 
 #include <itkImage.h>
-#include "../../data/image.hpp"
-#include "../../data/chunk.hpp"
+#include "../../core/image.hpp"
+#include "../../core/chunk.hpp"
 #include <itkImportImageContainer.h>
 #include "common.hpp"
 

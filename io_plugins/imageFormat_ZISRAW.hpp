@@ -1,7 +1,7 @@
 #ifndef ZISRAW_HPP
 #define ZISRAW_HPP
 
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_factory.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <stdint.h>
 #include <stdio.h>

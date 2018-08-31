@@ -57,9 +57,9 @@
 #define NIFTI_UNITS_PPM    40
 #define NIFTI_UNITS_RADS   48
 
-#include <isis/data/io_interface.h>
-#include <isis/util/matrix.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/matrix.hpp>
+#include <isis/core/fileptr.hpp>
 #include <sys/stat.h>
 #include <memory>
 

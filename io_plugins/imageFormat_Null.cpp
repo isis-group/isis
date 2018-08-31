@@ -1,4 +1,4 @@
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 
 #include <time.h>
 

@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <string>
 #include "common.hpp"
-#include "../util/vector.hpp"
-#include "../util/progressfeedback.hpp"
+#include "vector.hpp"
+#include "progressfeedback.hpp"
 
 namespace isis
 {

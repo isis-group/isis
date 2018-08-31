@@ -29,12 +29,12 @@
 #include <ace/Log_Msg_Callback.h>
 #include <ace/Log_Record.h>
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 #include <functional>
 #include <iostream>
 #include <memory>
 
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_factory.hpp>
 
 namespace isis
 {

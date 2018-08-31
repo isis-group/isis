@@ -17,8 +17,8 @@
 #endif
 
 #include "image.hpp"
-#include "../util/vector.hpp"
-#include "../util/property.hpp"
+#include "vector.hpp"
+#include "property.hpp"
 #include <boost/token_iterator.hpp>
 #include <boost/optional/optional_io.hpp>
 

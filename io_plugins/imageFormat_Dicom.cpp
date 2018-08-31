@@ -1,6 +1,6 @@
 #include "imageFormat_Dicom.hpp"
-#include <isis/data/common.hpp>
-#include <isis/util/istring.hpp>
+#include <isis/core/common.hpp>
+#include <isis/core/istring.hpp>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <dcmtk/dcmdata/dcdicent.h>

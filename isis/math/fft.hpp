@@ -1,8 +1,8 @@
 #ifndef FFT_HPP
 #define FFT_HPP
 
-#include "../data/chunk.hpp"
-#include "../data/image.hpp"
+#include "../core/chunk.hpp"
+#include "../core/image.hpp"
 
 
 namespace isis{

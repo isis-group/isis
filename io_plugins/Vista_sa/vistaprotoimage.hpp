@@ -20,9 +20,9 @@
 #define VISTAPROTOIMAGE_HPP
 
 #include <list>
-#include <isis/data/image.hpp>
-#include <isis/data/bytearray.hpp>
-#include <isis/util/progressfeedback.hpp>
+#include <isis/core/image.hpp>
+#include <isis/core/bytearray.hpp>
+#include <isis/core/progressfeedback.hpp>
 
 
 namespace isis{namespace image_io{namespace _internal{

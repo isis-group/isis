@@ -22,7 +22,7 @@
 
 #include <clocale>
 #include "application.hpp"
-#include "../data/fileptr.hpp"
+#include "fileptr.hpp"
 #define STR(s) _xstr_(s)
 #define _xstr_(s) std::string(#s)
 

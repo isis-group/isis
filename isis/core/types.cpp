@@ -17,7 +17,7 @@
 #endif
 
 #include "value.hpp"
-#include "../data/valuearray.hpp"
+#include "valuearray.hpp"
 #include "types.hpp"
 #include <complex>
 #include <boost/mpl/for_each.hpp>

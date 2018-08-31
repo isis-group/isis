@@ -19,7 +19,7 @@
 #ifndef TYPEPTRBASE_HPP
 #define TYPEPTRBASE_HPP
 
-#include "../util/value_base.hpp"
+#include "value_base.hpp"
 #include "valuearray_converter.hpp"
 #include "common.hpp"
 

@@ -127,7 +127,6 @@ macro( build_manpage name desc)
 	endif(MANPAGES)
 endmacro( build_manpage )
 
-
 ############################################################
 # RCS revision number
 ############################################################

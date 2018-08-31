@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE ValueTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <isis/util/istring.hpp>
+#include <isis/core/istring.hpp>
 
 namespace isis
 {

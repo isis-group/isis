@@ -1,5 +1,5 @@
-#include <isis/data/io_application.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/io_factory.hpp>
 #include <muParser.h>
 
 
