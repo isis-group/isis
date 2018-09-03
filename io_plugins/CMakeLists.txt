@@ -70,7 +70,7 @@ if(ISIS_IOPLUGIN_ORTHANC)
 	find_package(Threads)
 
 	add_library(isisImageFormat_orthanc SHARED imageFormat_orthanc.cpp )
-#	set_target_properties(isisImageFormat_orthanc PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR};${INC_JSONCPP}")
+	set_target_properties(isisImageFormat_orthanc PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR};${INC_JSONCPP}")
 	target_link_libraries(isisImageFormat_orthanc ${isis_core_lib} ACE ACE_INet jsoncpp Threads::Threads)
 	set(TARGETS ${TARGETS} isisImageFormat_orthanc)
 endif(ISIS_IOPLUGIN_ORTHANC)
@@ -182,25 +182,23 @@ endif(ISIS_IOPLUGIN_IMAGEMAGIC)
 if(ISIS_IOPLUGIN_COMP)
 	option(ISIS_IOPLUGIN_COMP_LZMA "Add support for lzma in the plugin for compressed data (xz)" OFF)
 
-	find_library(LIB_BZ2 "bz2")
+	find_package(BZip2)
 	find_package(ZLIB)
 
-	list(APPEND COMP_LIBS ${ZLIB_LIBRARIES} ${LIB_BZ2})
-	list(APPEND COMP_SRC imageFormat_compressed.cpp)
-
-	add_library(isisImageFormat_comp_proxy SHARED ${COMP_SRC})
+	add_library(isisImageFormat_comp_proxy SHARED imageFormat_compressed.cpp)
+	target_include_directories(isisImageFormat_comp_proxy PRIVATE ${BZIP2_INCLUDE_DIR})
 
 	if(ISIS_IOPLUGIN_COMP_LZMA)
 		find_library(LIB_LZMA "lzma")
 		find_path(INCPATH_LZMA "lzma.h")
 
-		set_target_properties(isisImageFormat_comp_proxy PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR};${INCPATH_LZMA}" COMPILE_DEFINITIONS "HAVE_LZMA")
-
-		list(APPEND COMP_LIBS ${LIB_LZMA})
-		list(APPEND COMP_SRC imageFormat_compressed_lzma.cpp)
+		target_link_libraries(isisImageFormat_comp_proxy ${LIB_LZMA})
+		target_sources(isisImageFormat_comp_proxy PRIVATE imageFormat_compressed_lzma.cpp)
+		target_compile_definitions(isisImageFormat_comp_proxy PRIVATE "HAVE_LZMA")
+		target_include_directories(isisImageFormat_comp_proxy PRIVATE ${INCPATH_LZMA})
 	endif(ISIS_IOPLUGIN_COMP_LZMA)
 
-	target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ${COMP_LIBS})
+	target_link_libraries(isisImageFormat_comp_proxy ${isis_core_lib} ZLIB::ZLIB ${BZIP2_LIBRARIES})
 	set(TARGETS ${TARGETS} isisImageFormat_comp_proxy)
 endif(ISIS_IOPLUGIN_COMP)
 
