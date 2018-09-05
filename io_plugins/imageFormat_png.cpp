@@ -64,18 +64,14 @@ public:
 	std::string getName()const override {
 		return "PNG (Portable Network Graphics)";
 	}
-	std::list<util::istring> dialects() const override {return {"middle","stacked"};}
+	std::list<util::istring> dialects() const override {return {"middle","stacked", "noflip"};}
 	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
 		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
 
-		//buff has to be swapped along the png-x-axis
-		data::Chunk buff = src.copyByID(); //make a deep copy to not interfere with the source
-		buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
-
-		util::vector4<size_t> size = buff.getSizeAsVector();
+		util::vector4<size_t> size = src.getSizeAsVector();
 
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
@@ -134,10 +130,10 @@ public:
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
-		row_pointers[0] = ( png_byte * )buff.getValueArrayBase().getRawAddress().get();
+		row_pointers[0] = ( png_byte * )src.getValueArrayBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0] + ( buff.getBytesPerVoxel() * buff.getLinearIndex( { 0, r, 0, 0 } ) );
+			row_pointers[r] = row_pointers[0] + ( src.getBytesPerVoxel() * src.getLinearIndex( { 0, r, 0, 0 } ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -301,14 +297,14 @@ public:
 			for(int i=0;i<tImg.getDimSize(data::timeDim);i++)
 				chunks.push_back(tImg.getChunk(0,0,middle,i));
 			
-			writeChunks(chunks,filename,color_type,bit_depth,feedback);  // write all slices
+			writeChunks(chunks,filename,color_type,bit_depth,dialects,feedback);  // write all slices
 
 		} else { //save all slices
-			writeChunks(tImg.copyChunksToVector( false ),filename,color_type,bit_depth,feedback);  // write all slices
+			writeChunks(tImg.copyChunksToVector( false ),filename,color_type,bit_depth,dialects,feedback);  // write all slices
 		}
 
 	}
-	void writeChunks(std::vector<data::Chunk > chunks,std::string filename, png_byte color_type, png_byte bit_depth, std::shared_ptr<util::ProgressFeedback> feedback){
+	void writeChunks(std::vector<data::Chunk > chunks,std::string filename, png_byte color_type, png_byte bit_depth, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback){
 			if(feedback)
 				feedback->show(chunks.size(),std::string("Writing ")+std::to_string(chunks.size())+" slices as png files");
 			size_t number = 0;
@@ -318,13 +314,19 @@ public:
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
-			for( const data::Chunk & ref :  chunks ) {
+			for( data::Chunk buff :  chunks ) {
 				if(feedback)
 					feedback->progress();
 				const std::string num = std::to_string( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
+				
+				if(!checkDialect(dialects,"noflip")){
+					//buff has to be swapped along the png-x-axis
+					buff = buff.copyByID(); //make a deep copy to not interfere with the source
+					buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+				}
 
-				if( !write_png( name, ref, color_type, bit_depth ) ) {
+				if( !write_png( name, buff, color_type, bit_depth ) ) {
 					throwGenericError( std::string( "Failed to write " ) + name );;
 				}
 			}
