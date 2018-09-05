@@ -35,6 +35,8 @@ DirectoryEntryDV getDVEntry(data::ByteArray &data, size_t offset){
 util::PropertyMap getXML(data::ByteArray &data, size_t offset, size_t length){
 	const uint8_t *start=data.begin()+offset;
 	util::PropertyMap ret;
+// 	std::string dump((char*)start,length);
+// 	std::cout << dump << std::endl;
 	ret.readXML(start,start+length,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
 	return ret;
 }
@@ -136,7 +138,7 @@ data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::d
 	return decoded;
 }
 
-std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
+std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const{
 	unsigned short isis_type,pixel_size;
 
 	try{
@@ -164,8 +166,10 @@ std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()co
 			util::PropertyMap dims;
 			writeDimsInfo(dims);
 			
-			decoder = [dims,isis_type,pixel_size](isis::data::ByteArray image_data){
-				return std::list<data::Chunk>(1,jxrRead(dims,image_data,isis_type,pixel_size));
+			decoder = [dims,isis_type,pixel_size,feedback](isis::data::ByteArray image_data){
+				data::Chunk chk=jxrRead(dims,image_data,isis_type,pixel_size);
+				feedback->progress("",image_data.getLength());
+				return std::list<data::Chunk>(1,chk);
 			};
 			decode_policy=std::launch::async;
 		}
@@ -208,8 +212,6 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 			size_t size()const{return max-min+1;}
 		};
 		std::map<std::string,bounds> boundaries;
-		feedback->show(directory.entries.size(),std::string("Loading ")+std::to_string(directory.entries.size())+" data segments");
-		
 		std::list<std::shared_ptr<util::PropertyMap>> segments_xml;
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
@@ -223,9 +225,8 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					if(b.min>d.start)b.min=d.start;
 					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
 				}
-				segments.push_back(s.makeChunks());
+				segments.push_back(s.makeChunks(feedback));
 				segments_xml.emplace_back(new util::PropertyMap(s.xml_data));
-				feedback->progress();
 // 				chunks.back().branch("dims").print(std::cerr) << std::endl;
 			} else {
 			}

@@ -92,7 +92,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		static data::Chunk jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset);
-		std::future<std::list<data::Chunk>> makeChunks()const;
+		std::future<std::list<data::Chunk>> makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const;
 		util::PropertyMap xml_data;
 		bool isNormalImage()const;
 	};
