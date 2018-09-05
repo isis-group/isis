@@ -27,6 +27,7 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 using boost::optional;
 
@@ -125,6 +126,8 @@ protected:
 	/// true when the Property is needed and empty
 	struct InvalidP { bool operator()( const PropertyValue &ref )const;};
 	struct EmptyP { bool operator()( const PropertyValue &ref )const;};
+	
+	void readPtree(const boost::property_tree::ptree &tree, bool skip_empty=true);
 	
 	API_EXCLUDE_BEGIN;
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -318,8 +321,14 @@ protected:
 	template<typename T> optional<T &> tryFetchEntry( const PropPath &path ) {
 		try {
 			mapped_type &n = fetchEntry( path );
-			if(n.type()!=typeid(T) && boost::apply_visitor(IsEmpty(),n)) //if target is empty but of wrong type 
-				boost::get<T>( n = T() ); // reset it to empty with right type
+			if(n.type()!=typeid(T)){
+				if(boost::apply_visitor(IsEmpty(),n)) //if target is empty but of wrong type 
+					boost::get<T>( n = T() ); // reset it to empty with right type
+				else {
+					LOG( Runtime, error ) << "Trying to fetch existing entry " << MSubject( path ) << " as wrong type";
+					LOG( Runtime, error ) << "Content was " << n;
+				}
+			}
 			return boost::get<T>( n );
 		} catch( const boost::bad_get &e ) {
 			LOG( Runtime, error ) << "Got errror " << e.what() << " when accessing " << MSubject( path );
@@ -844,6 +853,15 @@ public:
 
 	/// \returns a flat representation of the whole property tree
 	FlatMap getFlatMap( )const;
+
+	/**
+	 * Try reading an XML tree into the PropertyMap.
+	 * \param streamBegin pointer to the begin of the character stream
+	 * \param streamEnd pointer behind the end of the character stream
+	 * \param flags xml parser flags as in https://www.boost.org/doc/libs/1_68_0/boost/property_tree/detail/xml_parser_flags.hpp
+	 */
+	void readXML(const uint8_t* streamBegin, const uint8_t* streamEnd, int flags=0);
+	void readXML(std::basic_istream<char> &stream, int flags=0);
 
 	/**
 	 * Try reading a JSON tree into the PropertyMap.

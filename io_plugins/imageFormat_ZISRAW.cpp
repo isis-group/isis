@@ -32,15 +32,10 @@ DirectoryEntryDV getDVEntry(data::ByteArray &data, size_t offset){
 	return ret;
 }
 
-boost::property_tree::ptree getXML(data::ByteArray &data, size_t offset, size_t length){
-	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
-	boost::property_tree::ptree ret;
+util::PropertyMap getXML(data::ByteArray &data, size_t offset, size_t length){
 	const uint8_t *start=data.begin()+offset;
-
-	boost::iostreams::stream<my_source_type> stream;
-	stream.open(my_source_type((const std::streambuf::char_type*)start,(const std::streambuf::char_type*)start+length));
-
-	boost::property_tree::read_xml(stream,ret,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
+	util::PropertyMap ret;
+	ret.readXML(start,start+length,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
 	return ret;
 }
 
@@ -98,7 +93,6 @@ ImageFormat_ZISRAW::MetaData::MetaData(data::ByteArray &source, const size_t off
 	getScalar(XMLSize,0);
 	getScalar(AttachmentSize,4);
 	xml_data=_internal::getXML(data,256,XMLSize);
-	// 			boost::property_tree::write_xml(std::cout,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cout<<std::endl;
 }
 
 ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t offset):Segment(source,offset){
@@ -124,8 +118,7 @@ size_t ImageFormat_ZISRAW::SubBlock::writeDimsInfo(util::PropertyMap &map)const{
 	return DirectoryEntry.dims.size();
 }
 bool ImageFormat_ZISRAW::SubBlock::isNormalImage()const{
-	auto got=xml_data.get_optional<std::string>("METADATA.Tags");
-	return got.operator bool();//if there are tags, its a normal image
+	return xml_data.hasBranch("METADATA/Tags");//if there are tags, its a normal image
 }
 
 data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size){
@@ -216,6 +209,8 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		};
 		std::map<std::string,bounds> boundaries;
 		feedback->show(directory.entries.size(),std::string("Loading ")+std::to_string(directory.entries.size())+" data segments");
+		
+		std::list<std::shared_ptr<util::PropertyMap>> segments_xml;
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
 			const SubBlock s(source,e.FilePosition);
@@ -229,6 +224,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
 				}
 				segments.push_back(s.makeChunks());
+				segments_xml.emplace_back(new util::PropertyMap(s.xml_data));
 				feedback->progress();
 // 				chunks.back().branch("dims").print(std::cerr) << std::endl;
 			} else {
@@ -245,7 +241,6 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 // 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
 // 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
 // 			);
-
 
 			std::unique_ptr<data::Chunk> dst;
 			struct {int32_t x,y;}offset={-boundaries["X"].min,-boundaries["Y"].min};
@@ -267,6 +262,8 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 				}
 				segments.pop_front();//get rid of segments we dont need anymore
 			}
+			
+			dst->touchBranch("XML").deduplicate(segments_xml);
 			
 			//faking valid image
 			dst->setValueAs( "indexOrigin", util::fvector3() );

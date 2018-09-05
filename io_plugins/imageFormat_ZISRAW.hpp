@@ -2,7 +2,6 @@
 #define ZISRAW_HPP
 
 #include <isis/core/io_factory.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <stdint.h>
 #include <stdio.h>
 #include <memory>
@@ -32,7 +31,7 @@ namespace _internal {
 	}
 	DirectoryEntryDV getDVEntry(data::ByteArray &data,size_t offset);
 	
-	boost::property_tree::ptree getXML(data::ByteArray &data,size_t offset,size_t length);
+	util::PropertyMap getXML(data::ByteArray &data,size_t offset,size_t length);
 	
 	template<typename D,typename S> data::ValueArray<util::color<D>> color_reshuffle(const data::ValueArray<S> &data){
 		assert(data.getLength()%3==0);
@@ -80,14 +79,13 @@ class ImageFormat_ZISRAW : public FileFormat{
 	};
 	class MetaData:public Segment{
 		int32_t XMLSize,AttachmentSize;
-		boost::property_tree::ptree xml_data;
+		util::PropertyMap xml_data;
 	public:
 		MetaData(data::ByteArray &source, const size_t offset);
 	};
 	class SubBlock:public Segment{
 		int32_t MetadataSize,AttachmentSize;
 		int64_t DataSize;
-		boost::property_tree::ptree xml_data;
 		data::ByteArray image_data;
 		_internal::DirectoryEntryDV DirectoryEntry;
 		size_t writeDimsInfo(util::PropertyMap &map)const;
@@ -95,6 +93,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset);
 		std::future<std::list<data::Chunk>> makeChunks()const;
+		util::PropertyMap xml_data;
 		bool isNormalImage()const;
 	};
 	class Directory:public Segment{
