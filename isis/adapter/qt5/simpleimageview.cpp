@@ -104,7 +104,7 @@ class LinearTransfer : public TransferFunction{
 public:
 	LinearTransfer(std::pair<util::ValueReference,util::ValueReference> minmax):TransferFunction(minmax){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
-		if(line.is<util::color24>() || line.is<util::color24>()){
+		if(line.is<util::color24>() || line.is<util::color48>()){
 			auto *c_dst=reinterpret_cast<QRgb*>(dst);
 			for(const util::color24 &c:const_cast<data::ValueArrayBase &>(line).as<util::color24>(scale))
 				*(c_dst++)=qRgb(c.r,c.g,c.b);
@@ -199,6 +199,7 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 		case data::ValueArray<util::color24>::staticID():
 		case data::ValueArray<util::color48>::staticID():
 			type=color;
+			break;
 		case data::ValueArray<bool>::staticID():
 			type=mask;
 			break;
@@ -226,6 +227,7 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 		auto second_c=minmax.second->as<util::color48>();
 		minmax.first = util::Value<double>((first_c.r+first_c.g+first_c.b)/3.0);
 		minmax.second= util::Value<double>((second_c.r+second_c.g+second_c.b)/3.0);
+		transfer_function.reset(new _internal::LinearTransfer(minmax));
 	} else if(type==complex){
 		magnitude_transfer.reset(new _internal::MagnitudeTransfer(minmax));
 		phase_transfer.reset(new _internal::PhaseTransfer);
@@ -291,7 +293,7 @@ void SimpleImageView::timeChanged(int time)
 void SimpleImageView::updateImage()
 {
 	graphicsView->scene()->clear();
-
+	assert(transfer_function);
 	auto transfer=transfer_function; //lambdas cannot bind members ??
 	QImage qimage;
 	
@@ -302,7 +304,9 @@ void SimpleImageView::updateImage()
 		qimage = makeQImage(
 			m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
 			m_img.getDimSize(data::rowDim),
-			[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
+			[transfer](uchar *dst, const data::ValueArrayBase &line){
+				transfer->operator()(dst,line);
+			}
 		);
 	} else { // if we have a "lines-image"
 		std::vector<data::ValueArrayBase::Reference> lines(m_img.getDimSize(1));
@@ -311,7 +315,9 @@ void SimpleImageView::updateImage()
 		}
 		qimage = makeQImage(
 			lines,
-			[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
+			[transfer](uchar *dst, const data::ValueArrayBase &line){
+				transfer->operator()(dst,line);
+			}
 		);
 	}
 
