@@ -310,15 +310,19 @@ public:
 			size_t number = 0;
 			unsigned short numLen = std::log10( chunks.size() ) + 1;
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
-			LOG( Runtime, info )
+			LOG_IF(chunks.size()>1, Runtime, info )
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
 			for( data::Chunk buff :  chunks ) {
 				if(feedback)
 					feedback->progress();
-				const std::string num = std::to_string( ++number );
-				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
+				std::string name;
+				if(chunks.size()>1){
+					const std::string num = std::to_string( ++number );
+					name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
+				} else 
+					name=fname.first+fname.second;
 				
 				if(!checkDialect(dialects,"noflip")){
 					//buff has to be swapped along the png-x-axis

@@ -31,9 +31,9 @@ namespace _internal {
 	}
 	DirectoryEntryDV getDVEntry(data::ByteArray &data,size_t offset);
 	
-	util::PropertyMap getXML(data::ByteArray &data,size_t offset,size_t length);
+	util::PropertyMap getXML(data::ByteArray &data,size_t offset,size_t length, std::shared_ptr<std::ofstream> dump_stream=nullptr);
 	
-	template<typename D,typename S> data::ValueArray<util::color<D>> color_reshuffle(const data::ValueArray<S> &data){
+	template<typename D> data::ValueArray<util::color<D>> color_reshuffle(const data::ValueArray<D> &data){
 		assert(data.getLength()%3==0);
 		data::ValueArray<util::color<D>> ret(data.getLength()/3);
 		auto src_it=data.begin();
@@ -81,7 +81,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		int32_t XMLSize,AttachmentSize;
 		util::PropertyMap xml_data;
 	public:
-		MetaData(data::ByteArray &source, const size_t offset);
+		MetaData(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
 	};
 	class SubBlock:public Segment{
 		int32_t MetadataSize,AttachmentSize;
@@ -91,16 +91,18 @@ class ImageFormat_ZISRAW : public FileFormat{
 		size_t writeDimsInfo(util::PropertyMap &map)const;
 		static data::Chunk jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
-		SubBlock(data::ByteArray &source, const size_t offset);
-		std::future<std::list<data::Chunk>> makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const;
+		SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
+		std::future<data::Chunk> makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const;
 		util::PropertyMap xml_data;
 		bool isNormalImage()const;
+		std::string getPlaneID()const;
 	};
 	class Directory:public Segment{
 	public:
 		std::vector<_internal::DirectoryEntryDV> entries;
 		Directory(data::ByteArray &source, const size_t offset);
 	};
+	void storeProperties(data::Chunk &dst,std::string plane_id);
 public:
 	util::istring suffixes(isis::image_io::FileFormat::io_modes /*modes*/) const override {return ".czi";}
 
@@ -113,7 +115,7 @@ public:
 
 	std::string getName() const override {return "Zeiss Integrated Software RAW";}
 
-	std::list<util::istring> dialects() const override {return {"lowmem"};}
+	std::list<util::istring> dialects() const override {return {"dump_xml"};}
 
 	void write(const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/) override{
 		throwGenericError("not yet implemented");
