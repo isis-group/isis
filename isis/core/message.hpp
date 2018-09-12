@@ -129,6 +129,7 @@ public:
 		return *this;
 	}
 	bool shouldCommit()const;
+	std::string str()const;
 };
 
 /**
