@@ -53,6 +53,9 @@ size_t ConsoleFeedback::extend( size_t by )
 
 void ConsoleFeedback::close()
 {
+	//force finish so we get a proper newline
+	if(disp)
+		disp->operator+=( disp->expected_count()-disp->count() );
 	disp.reset();
 }
 size_t ConsoleFeedback::getMax()

@@ -3,6 +3,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <functional>
 #include "imageFormat_ZISRAW_jxr.h"
+#include <fstream>
 
 namespace isis{
 namespace image_io{
@@ -32,15 +33,13 @@ DirectoryEntryDV getDVEntry(data::ByteArray &data, size_t offset){
 	return ret;
 }
 
-boost::property_tree::ptree getXML(data::ByteArray &data, size_t offset, size_t length){
-	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
-	boost::property_tree::ptree ret;
+util::PropertyMap getXML(data::ByteArray &data, size_t offset, size_t length, std::shared_ptr<std::ofstream> dump_stream){
 	const uint8_t *start=data.begin()+offset;
-
-	boost::iostreams::stream<my_source_type> stream;
-	stream.open(my_source_type((const std::streambuf::char_type*)start,(const std::streambuf::char_type*)start+length));
-
-	boost::property_tree::read_xml(stream,ret,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
+	util::PropertyMap ret;
+	if(dump_stream){
+		dump_stream->write((char*)start,length) << std::endl;
+	}
+	ret.readXML(start,start+length,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
 	return ret;
 }
 
@@ -51,19 +50,19 @@ data::ValueArrayReference reinterpretData(const data::ByteArray &_data, int32_t 
 	case 0://Gray8 - no reinterpretation needed
 		ret=data;break;
 	case 1: //Gray16
-        ret=data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
+        ret=data.at<uint16_t>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 12: //Gray32
-        ret=data.at<uint32_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
+        ret=data.at<uint32_t>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 2://Gray32Float
-        ret=data.at<float>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
+        ret=data.at<float>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 3://Bgr24
-		ret=color_reshuffle<uint8_t>(data);break;
+		ret=color_reshuffle(data);break;
 	case 4://Bgr48
-        ret=color_reshuffle<uint16_t>(data.at<uint16_t>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__));break;
+        ret=color_reshuffle(data.at<uint16_t>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__));break;
 	case 10: // Gray64ComplexFloat
-        ret=data.at<std::complex<float>>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
+        ret=data.at<std::complex<float>>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	case 11: // Bgr192ComplexFloat
-        ret=data.at<std::complex<double>>(0,data.getLength(),__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
+        ret=data.at<std::complex<double>>(0,0,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);break;
 	default:
 		LOG(Runtime,error) << "Pixel Type " << PixelType << " not implemented";break;
 	}
@@ -94,20 +93,19 @@ ImageFormat_ZISRAW::FileHeader::FileHeader(data::ByteArray &source, const size_t
 	getScalar(AttachmentDirectoryPosition,72);
 }
 
-ImageFormat_ZISRAW::MetaData::MetaData(data::ByteArray &source, const size_t offset):Segment(source,offset){
+ImageFormat_ZISRAW::MetaData::MetaData(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream):Segment(source,offset){
 	getScalar(XMLSize,0);
 	getScalar(AttachmentSize,4);
-	xml_data=_internal::getXML(data,256,XMLSize);
-	// 			boost::property_tree::write_xml(std::cout,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cout<<std::endl;
+	xml_data=_internal::getXML(data,256,XMLSize,dump_stream);
 }
 
-ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t offset):Segment(source,offset){
+ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream):Segment(source,offset){
 	getScalar(MetadataSize,0);
 	getScalar(AttachmentSize,4);
 	getScalar(DataSize,8);
 	DirectoryEntry=_internal::getDVEntry(data,16);
 	size_t off=std::max(DirectoryEntry.size()+16,(size_t)256);
-	xml_data=_internal::getXML(data,off,MetadataSize);
+	xml_data=_internal::getXML(data,off,MetadataSize,dump_stream);
 // 	boost::property_tree::write_xml(std::cerr,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cerr<<std::endl;
 
 	image_data = data.at<uint8_t>(off+MetadataSize,DataSize);
@@ -124,8 +122,24 @@ size_t ImageFormat_ZISRAW::SubBlock::writeDimsInfo(util::PropertyMap &map)const{
 	return DirectoryEntry.dims.size();
 }
 bool ImageFormat_ZISRAW::SubBlock::isNormalImage()const{
-	auto got=xml_data.get_optional<std::string>("METADATA.Tags");
-	return got.operator bool();//if there are tags, its a normal image
+	return !DirectoryEntry.dims.empty();
+	//xml_data.hasBranch("METADATA/Tags");//if there are tags, its a normal image
+}
+std::string ImageFormat_ZISRAW::SubBlock::getPlaneID()const{
+	std::map<std::string,int32_t> dims;
+	for(auto d:DirectoryEntry.dims){
+		dims[d.Dimension]=d.start;
+	}
+	return 
+		std::string("C")+(dims.find("C")!=dims.end() ? std::to_string(dims["C"]):"-")+
+		std::string("Z")+(dims.find("Z")!=dims.end() ? std::to_string(dims["Z"]):"-")+
+		std::string("T")+(dims.find("T")!=dims.end() ? std::to_string(dims["T"]):"-")+
+		std::string("R")+(dims.find("R")!=dims.end() ? std::to_string(dims["R"]):"-")+
+		std::string("S")+(dims.find("S")!=dims.end() ? std::to_string(dims["S"]):"-")+
+		std::string("I")+(dims.find("I")!=dims.end() ? std::to_string(dims["I"]):"-")+
+		std::string("H")+(dims.find("H")!=dims.end() ? std::to_string(dims["H"]):"-")+
+		std::string("V")+(dims.find("V")!=dims.end() ? std::to_string(dims["V"]):"-")+
+		(dims.find("M")!=dims.end() ? "M":"-");
 }
 
 data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size){
@@ -143,7 +157,7 @@ data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::d
 	return decoded;
 }
 
-std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()const{
+std::future<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const{
 	unsigned short isis_type,pixel_size;
 
 	try{
@@ -153,14 +167,23 @@ std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()co
 		throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+")"));
 	}
 	
-	std::function<std::list<data::Chunk>(isis::data::ByteArray image_data)> decoder;
+	std::function<data::Chunk(data::ByteArray image_data)> decoder;
 	std::launch decode_policy;
 	
 	switch(DirectoryEntry.Compression){
 		case 0:{
+			util::ivector4 size{1,1,1,1};
+			for(int i=0;i<DirectoryEntry.dims.size();i++){
+				size[i]=DirectoryEntry.dims[i].size;
+			}
+			auto pixel_type=DirectoryEntry.PixelType;
 			// linear representation of the pixel data reinterpreted as the correct PixelType
-			data::ValueArrayReference pixel_data=_internal::reinterpretData(image_data,DirectoryEntry.PixelType);//todo implement me
-			throwGenericError("implement me ");
+			decoder = [size,pixel_type,feedback](isis::data::ByteArray image_data){
+				data::ValueArrayReference ref=_internal::reinterpretData(image_data, pixel_type);
+				feedback->progress("",image_data.getLength());
+				return data::Chunk(ref,size[0],size[1],size[2],size[3]);
+			};
+			decode_policy=std::launch::deferred;
 		}break;
 		case 1:{throwGenericError("implement me jpeg");}break;//jpeg
 		case 2:{throwGenericError("implement me LZW");}break;//LZW
@@ -171,8 +194,10 @@ std::future<std::list<data::Chunk>> ImageFormat_ZISRAW::SubBlock::makeChunks()co
 			util::PropertyMap dims;
 			writeDimsInfo(dims);
 			
-			decoder = [dims,isis_type,pixel_size](isis::data::ByteArray image_data){
-				return std::list<data::Chunk>(1,jxrRead(dims,image_data,isis_type,pixel_size));
+			decoder = [dims,isis_type,pixel_size,feedback](data::ByteArray image_data){
+				data::Chunk chk=jxrRead(dims,image_data,isis_type,pixel_size);
+				feedback->progress("",image_data.getLength());
+				return chk;
 			};
 			decode_policy=std::launch::async;
 		}
@@ -192,67 +217,99 @@ ImageFormat_ZISRAW::Directory::Directory(data::ByteArray &source, const size_t o
 	LOG(Runtime,info) << "Found dictionary with " << entries.size() << " entries";
 }
 
+void ImageFormat_ZISRAW::storeProperties(data::Chunk &dst,std::string plane_id){
+	//faking valid image
+	dst.setValueAs( "plane",plane_id);
+	dst.setValueAs( "indexOrigin", util::fvector3() );
+	dst.setValueAs( "acquisitionNumber", 0 );
+	dst.setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
+	dst.setValueAs( "rowVec", util::fvector3({1, 0} ));
+	dst.setValueAs( "columnVec", util::fvector3({0, 1}) );
+	dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
+}
+
 std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		data::ByteArray source,
 		std::list<util::istring> /*formatstack*/,
 		std::list<util::istring> dialects,
 		std::shared_ptr<util::ProgressFeedback> feedback
 	)throw( std::runtime_error & ) {
+		
 	FileHeader header(source,0);
 	if(header.id!="ZISRAWFILE")
 		throwGenericError("could not find ZISRAWFILE header");
+	
+	std::list< data::Chunk > ret;
+	std::shared_ptr<std::ofstream> dump_stream;
+	
+	if(checkDialect(dialects,"dump_xml")){
+		LOG(Runtime,notice) << "Storing xml header data in /tmp/ZISRAW_dump.xml";
+		dump_stream.reset(new std::ofstream("/tmp/ZISRAW_dump.xml"));
+	}
 
 	//get MetaData if there are some
 	if(header.MetadataPosition){
-		MetaData(source,header.MetadataPosition);
+		MetaData(source,header.MetadataPosition,dump_stream);
 	}
 
 	if(header.DirectoryPosition){
 		Directory directory(source,header.DirectoryPosition);
-		std::list<std::future<std::list<data::Chunk>>> segments;
+
 		struct bounds{
 			int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();
 			size_t size()const{return max-min+1;}
 		};
-		std::map<std::string,bounds> boundaries;
-		feedback->show(directory.entries.size(),std::string("Loading ")+std::to_string(directory.entries.size())+" data segments");
+		struct plane{
+			std::list<std::future<data::Chunk>> segments;
+			std::map<std::string,bounds> boundaries;
+			std::list<std::shared_ptr<util::PropertyMap>> segments_xml;
+		};
+		std::map<std::string,plane> planes;
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
-			const SubBlock s(source,e.FilePosition);
+			const SubBlock s(source,e.FilePosition,dump_stream);
+			LOG(Runtime,verbose_info) << "Checking entry " << s.id << " for image data";
+			LOG(Runtime,verbose_info) << s.xml_data;
+			for(const auto &d:e.dims){
+				LOG(Runtime,verbose_info) << "Dimension " << d.Dimension << " is " << std::make_pair(d.start,d.StartCoordinate);
+			}
+			
 			if(s.isNormalImage()){
-				
+				plane &p=planes[s.getPlaneID()];
 				// find boundaries (not existing dimsions will not be registered)
 				for(const auto &d:e.dims){
-					bounds &b=boundaries[d.Dimension];//select boundary by name
+					bounds &b=p.boundaries[d.Dimension];//select boundary by name
 					const int end=d.start+d.StoredSize-1;
 					if(b.min>d.start)b.min=d.start;
 					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
 				}
-				segments.push_back(s.makeChunks());
-				feedback->progress();
+				p.segments.push_back(s.makeChunks(feedback));
+				p.segments_xml.emplace_back(new util::PropertyMap(s.xml_data));
 // 				chunks.back().branch("dims").print(std::cerr) << std::endl;
 			} else {
 			}
 		}
-		LOG(Runtime,info) << "Got " << segments.size() << " Image objects";
-		LOG(Runtime,verbose_info) << "Dimensions from the header are:";
-		for(const auto &b:boundaries){
-			LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
-		}
 		
-		if(boundaries["M"].size()>1){
-			assert(boundaries["M"].size()==segments.size());
-// 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
-// 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
-// 			);
+		for(auto &p:planes){
+			auto &segments=p.second.segments;
 
+			LOG(Runtime,info) << "Got " << segments.size() << " Image objects for plane " << p.first;
+			LOG(Runtime,verbose_info) << "Dimensions from the header are:";
+			for(const auto &b:p.second.boundaries){
+				LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
+			}
 
-			std::unique_ptr<data::Chunk> dst;
-			struct {int32_t x,y;}offset={-boundaries["X"].min,-boundaries["Y"].min};
-			while(!segments.empty()){
-				for(const data::Chunk &c:segments.front().get()){
+			if(segments.size()>1 && p.second.boundaries["M"].size()==segments.size()){
+	// 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
+	// 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
+	// 			);
+
+				struct {int32_t x,y;}offset={-p.second.boundaries["X"].min,-p.second.boundaries["Y"].min};
+				std::unique_ptr<data::Chunk> dst;
+				while(!segments.empty()){
+					data::Chunk c=segments.front().get();
 					if(!dst){ // create dst on first iteration from first segment @todo this is ugly as f**k
-						dst.reset(new data::Chunk(c.cloneToNew(boundaries["X"].size(),boundaries["Y"].size())));
+						dst.reset(new data::Chunk(c.cloneToNew(p.second.boundaries["X"].size(),p.second.boundaries["Y"].size())));
 						LOG(Runtime,info) << "Creating " << dst->getSizeAsString() << " image from " << segments.size() << " segments";
 					}
 					
@@ -264,20 +321,24 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 						1,1
 					};
 					dst->copyFromTile(c,pos,false);
+					dst->touchBranch("XML").deduplicate(p.second.segments_xml);
+					storeProperties(*dst,p.first);
+					ret.push_back(*dst);
+					segments.pop_front();//get rid of segments we dont need anymore
 				}
-				segments.pop_front();//get rid of segments we dont need anymore
+				
+			} else {
+				while(!segments.empty()){
+					data::Chunk c=segments.front().get();
+					LOG(Runtime,info) << "Got single segment " << c.getSizeAsString() << "-Image for plane " << p.first;
+					c.touchBranch("XML")=*p.second.segments_xml.front();
+					storeProperties(c,p.first);
+					ret.push_back(c);
+					segments.pop_front();//get rid of segments we dont need anymore
+				}
 			}
-			
-			//faking valid image
-			dst->setValueAs( "indexOrigin", util::fvector3() );
-			dst->setValueAs( "acquisitionNumber", 0 );
-			dst->setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
-			dst->setValueAs( "rowVec", util::fvector3({1, 0} ));
-			dst->setValueAs( "columnVec", util::fvector3({0, 1}) );
-			dst->setValueAs( "sequenceNumber", ( uint16_t )0 );
-
-			return std::list< data::Chunk >(1,*dst);
 		}
+		return ret;
 
 	} else {
 		throwGenericError("could not find segment directory");

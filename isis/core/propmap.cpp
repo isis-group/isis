@@ -12,6 +12,10 @@
 //
 
 #include "propmap.hpp"
+#include <boost/iostreams/stream.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace isis
 {
@@ -735,6 +739,48 @@ PropertyValue& PropertyMap::setValueAs(const PropertyMap::PropPath& path, const 
 	return setValueAs<std::string>(path,val);
 }
 
+void PropertyMap::readPtree(const boost::property_tree::ptree &tree,bool skip_empty){
+	for(const auto &p:tree){
+		const auto &key=p.first;
+		const auto &entry=p.second;
+		if(entry.empty()){
+			if(!entry.data().empty() || !skip_empty){
+				mapped_type &n = fetchEntry( key.c_str() );
+				if(boost::apply_visitor(IsEmpty(),n)){
+					n=PropertyValue(entry.data());
+				} else if(n.type()==typeid(PropertyValue)){ //OK we got a property map all is good
+					boost::get<PropertyValue>(n)=entry.data();
+				} else {
+					LOG(Runtime,warning) << "Will not store " << key << " as PropertyValue as it already exists as branch " << n;
+				} 
+			}
+		} else {
+			mapped_type &n = fetchEntry( key.c_str() );
+			if(boost::apply_visitor(IsEmpty(),n)){
+				n=PropertyMap();
+			}
+			if(n.type()==typeid(PropertyMap)){ //OK we got a property map all is good
+				boost::get<PropertyMap>(n).readPtree(entry);
+			} else  {
+				LOG(Runtime,warning) << "Will not store " << key << " as branch as it already exists as property " << n;
+			} 
+		}
+	}
+}
+
+void PropertyMap::readXML(const uint8_t* streamBegin, const uint8_t* streamEnd, int flags){
+	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
+	
+	boost::iostreams::stream<my_source_type> stream;
+	stream.open(my_source_type((const std::streambuf::char_type*)streamBegin,(const std::streambuf::char_type*)streamEnd));
+	readXML(stream,flags);
+}
+void PropertyMap::readXML(std::basic_istream<char> &stream,int flags){
+	boost::property_tree::ptree pt;
+	boost::property_tree::read_xml(stream,pt,flags);
+// 	boost::property_tree::write_xml(std::cout,pt,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cout<<std::endl;
+	readPtree(pt,true);
+}
 
 /// @cond _internal
 bool PropertyMap::TrueP::operator()( const PropertyValue &/*ref*/ ) const {return true;}
