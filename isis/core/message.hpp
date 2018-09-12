@@ -56,12 +56,12 @@ public:
 class NoSubject : public std::string
 {
 public:
-	template<typename T> NoSubject( const T &cont ) {
+	template<typename T> explicit NoSubject( const T &cont ) {
 		std::ostringstream text;
 		text << cont;
 		assign( text.str() );
 	}
-	NoSubject( const boost::filesystem::path &cont ) {
+	explicit NoSubject( const boost::filesystem::path &cont ) {
 		std::ostringstream text;
 		text << cont.native();
 		assign( text.str() );
@@ -99,7 +99,7 @@ public:
 	bool requestStop( LogLevel _level );
 };
 
-class Message: public std::ostringstream
+class Message: protected std::ostringstream
 {
 	std::weak_ptr<MessageHandlerBase> commitTo;
 public:
