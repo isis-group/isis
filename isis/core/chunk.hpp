@@ -72,6 +72,8 @@ public:
 	typedef ValueArrayBase::const_value_iterator const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
+	
+	static Chunk makeByID(unsigned short typeID, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false);
 
 	Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1, bool fakeValid = false );
 

@@ -78,7 +78,10 @@ ImageFormat_ZISRAW::Segment::Segment(data::ByteArray &source, const size_t offse
     auto buff=source.at<uint64_t>(offset+16,2,__BYTE_ORDER__==__ORDER_BIG_ENDIAN__);
 	allocated_size=buff[0];
 	used_size=buff[1];
-	data=source.at<uint8_t>(offset+16+16,used_size);
+	data=source.at<uint8_t>(offset+16+8+8,used_size);
+}
+size_t ImageFormat_ZISRAW::Segment::getSegmentSize(){
+	return allocated_size+16+8+8;
 }
 
 ImageFormat_ZISRAW::FileHeader::FileHeader(data::ByteArray &source, const size_t offset):Segment(source,offset){
@@ -98,6 +101,9 @@ ImageFormat_ZISRAW::MetaData::MetaData(data::ByteArray &source, const size_t off
 	getScalar(AttachmentSize,4);
 	xml_data=_internal::getXML(data,256,XMLSize,dump_stream);
 }
+util::PropertyMap ImageFormat_ZISRAW::MetaData::get()const{
+	return xml_data;
+}
 
 ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream):Segment(source,offset){
 	getScalar(MetadataSize,0);
@@ -111,15 +117,24 @@ ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t off
 	image_data = data.at<uint8_t>(off+MetadataSize,DataSize);
 }
 
-size_t ImageFormat_ZISRAW::SubBlock::writeDimsInfo(util::PropertyMap &map)const{
-	for(auto d:DirectoryEntry.dims){
-		util::PropertyMap &ch_dim=map.touchBranch(d.Dimension.c_str());
-		ch_dim.setValueAs("StartCoordinate",d.StartCoordinate);
-		ch_dim.setValueAs("start",d.start);
-		ch_dim.setValueAs("size",d.size);
-		ch_dim.setValueAs("stored_size",d.StoredSize);
-	}
-	return DirectoryEntry.dims.size();
+std::map<std::string,_internal::DimensionEntry> ImageFormat_ZISRAW::SubBlock::getDimsInfo()const{
+	std::map<std::string,_internal::DimensionEntry> ret;
+	for(auto d:DirectoryEntry.dims)
+		ret[d.Dimension]=d;
+	
+	return ret;
+}
+std::array<size_t,4> ImageFormat_ZISRAW::SubBlock::getSize()const{
+	std::map<std::string,_internal::DimensionEntry> map=getDimsInfo();
+	std::array<size_t,4> ret={
+		map["X"].size,
+		map["Y"].size,
+		map["Z"].size,
+		1
+	};
+	if(!ret[2])ret[2]=1;
+	
+	return ret;
 }
 bool ImageFormat_ZISRAW::SubBlock::isNormalImage()const{
 	return !DirectoryEntry.dims.empty();
@@ -142,22 +157,21 @@ std::string ImageFormat_ZISRAW::SubBlock::getPlaneID()const{
 		(dims.find("M")!=dims.end() ? "M":"-");
 }
 
-data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size){
+data::Chunk ImageFormat_ZISRAW::SubBlock::jxrRead(size_t xsize,size_t ysize,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size){
 	static const bool verbose=false;
-	const uint32_t xsize=dims.getValueAs<uint32_t>("X/stored_size"),ysize=dims.getValueAs<uint32_t>("Y/stored_size");
 	
 	data::ByteArray buffer(xsize*ysize*pixel_size);
+	
 	jxr_decode(
 		image_data.getRawAddress().get(),image_data.getLength(),
-		buffer.getRawAddress().get(),buffer.getLength(), 
-		isis_type,verbose);
+		buffer.getRawAddress().get(),&xsize,&ysize, 
+		isis_type,verbose
+	);
 	
-	data::Chunk decoded(buffer.atByID(isis_type,0),xsize,ysize);
-	decoded.touchBranch("dims").transfer(dims);
-	return decoded;
+	return data::Chunk(buffer.atByID(isis_type,0,xsize*ysize),xsize,ysize,1,1,true);
 }
 
-std::future<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const{
+std::function<data::Chunk()> ImageFormat_ZISRAW::SubBlock::getChunkGenerator()const{
 	unsigned short isis_type,pixel_size;
 
 	try{
@@ -168,22 +182,19 @@ std::future<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks(std::shared_pt
 	}
 	
 	std::function<data::Chunk(data::ByteArray image_data)> decoder;
-	std::launch decode_policy;
-	
+	auto size=getSize();
+
 	switch(DirectoryEntry.Compression){
 		case 0:{
-			util::ivector4 size{1,1,1,1};
 			for(int i=0;i<DirectoryEntry.dims.size();i++){
 				size[i]=DirectoryEntry.dims[i].size;
 			}
 			auto pixel_type=DirectoryEntry.PixelType;
 			// linear representation of the pixel data reinterpreted as the correct PixelType
-			decoder = [size,pixel_type,feedback](isis::data::ByteArray image_data){
+			decoder = [size,pixel_type](isis::data::ByteArray image_data){
 				data::ValueArrayReference ref=_internal::reinterpretData(image_data, pixel_type);
-				feedback->progress("",image_data.getLength());
-				return data::Chunk(ref,size[0],size[1],size[2],size[3]);
+				return data::Chunk(ref,size[0],size[1],size[2],size[3],true);
 			};
-			decode_policy=std::launch::deferred;
 		}break;
 		case 1:{throwGenericError("implement me jpeg");}break;//jpeg
 		case 2:{throwGenericError("implement me LZW");}break;//LZW
@@ -191,18 +202,13 @@ std::future<data::Chunk> ImageFormat_ZISRAW::SubBlock::makeChunks(std::shared_pt
 			if(DirectoryEntry.PixelType==10 || DirectoryEntry.PixelType==11)
 				throwGenericError(std::string("Unsupportet pixel type ("+std::to_string(DirectoryEntry.PixelType)+") for compressed data"));
 
-			util::PropertyMap dims;
-			writeDimsInfo(dims);
-			
-			decoder = [dims,isis_type,pixel_size,feedback](data::ByteArray image_data){
-				data::Chunk chk=jxrRead(dims,image_data,isis_type,pixel_size);
-				feedback->progress("",image_data.getLength());
+			decoder = [size,isis_type,pixel_size](data::ByteArray image_data){
+				data::Chunk chk=jxrRead(size[0],size[1],image_data,isis_type,pixel_size);
 				return chk;
 			};
-			decode_policy=std::launch::async;
 		}
 	}
-	return std::async(decode_policy, std::bind(decoder,image_data));
+	return std::bind(decoder,image_data);
 }
 
 ImageFormat_ZISRAW::Directory::Directory(data::ByteArray &source, const size_t offset):Segment(source,offset){
@@ -228,6 +234,34 @@ void ImageFormat_ZISRAW::storeProperties(data::Chunk &dst,std::string plane_id){
 	dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
 }
 
+void ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, data::Chunk &dst,int32_t xoffset, int32_t yoffset,std::shared_ptr<util::ProgressFeedback> feedback){
+	std::list<std::thread> jobs;
+	for(auto &s:segments){
+		auto dims=s.getDimsInfo();
+		assert(dims["X"].start+xoffset>=0);
+		assert(dims["Y"].start+yoffset>=0);
+
+		const std::array<size_t,4> pos={
+			size_t(dims["X"].start+xoffset),
+			size_t(dims["Y"].start+yoffset),
+			1,1
+		};
+
+		auto op = [&s,pos,&feedback,&dst](){
+			data::Chunk c= s.getChunkGenerator()();
+			dst.copyFromTile(c,pos,false);
+			feedback->progress("",s.getSegmentSize());
+		};
+		jobs.emplace_back(op);
+	}
+	for(auto &j:jobs)
+		j.join();
+
+// 		dst->touchBranch("XML").deduplicate(p.second.segments_xml);
+// 		storeProperties(*dst,p.first);
+// 		ret.push_back(*dst);
+}
+
 std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		data::ByteArray source,
 		std::list<util::istring> /*formatstack*/,
@@ -246,12 +280,52 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		LOG(Runtime,notice) << "Storing xml header data in /tmp/ZISRAW_dump.xml";
 		dump_stream.reset(new std::ofstream("/tmp/ZISRAW_dump.xml"));
 	}
+	
+	struct { 
+		struct {size_t x,y,z;}size;
+		float pixel_size;
+		struct {size_t layers;float factor;}pyramid;
+		size_t mosaic_tiles;
+		unsigned short type_id;
+	}image_info;
+	memset(&image_info,0,sizeof(image_info));
 
 	//get MetaData if there are some
 	if(header.MetadataPosition){
-		MetaData(source,header.MetadataPosition,dump_stream);
-	}
+		util::PropertyMap meta=MetaData(source,header.MetadataPosition,dump_stream).get();
+// 		meta.print(std::cout)<< std::endl;
+		util::PropertyMap image_props=meta.branch("ImageDocument/Metadata/Information/Image");
+		image_info.size = {
+			image_props.getValueAs<size_t>("SizeX"),
+			image_props.getValueAs<size_t>("SizeY"),
+			image_props.getValueAsOr<size_t>("SizeZ",1)
+		};
+		image_info.type_id = PixelTypeMapStr.at(image_props.getValueAs<std::string>("PixelType"));
+		
+		if(image_props.getValueAs<size_t>("SizeS")>1){
+			throwGenericError("Sorry, multi scene images are not supportet");
+		}
+		
+		auto pyramid=meta.queryBranch("Dimensions/S/Scenes/Scene/PyramidInfo");
+		if(pyramid){
+			image_info.pyramid.layers=pyramid->getValueAs<size_t>("PyramidLayersCount");
+			image_info.pyramid.factor=pyramid->getValueAs<size_t>("MinificationFactor");
+		}
+		if(image_props.hasProperty("SizeM"))
+			image_info.mosaic_tiles=image_props.getValueAs<size_t>("SizeM");
+		
+		image_info.pixel_size = meta.getValueAsOr<float>("ImageDocument/Metadata/Scaling/Items/Distance/Value",1./1000)*1000;
+		
+	} else 
+		throwGenericError("could not find metadata");
+	
+	LOG_IF(image_info.pyramid.layers>0,Runtime,info) 
+		<< "Header says its a " << image_info.size.x << "*" << image_info.size.y 
+		<< " pyramid image with " << image_info.pyramid.layers << " layers";
+	LOG_IF(image_info.pyramid.layers==0,Runtime,info) 
+		<< "Header says its a " << image_info.size.x << "*" << image_info.size.y << " image";
 
+	//generate planes
 	if(header.DirectoryPosition){
 		Directory directory(source,header.DirectoryPosition);
 
@@ -260,21 +334,22 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 			size_t size()const{return max-min+1;}
 		};
 		struct plane{
-			std::list<std::future<data::Chunk>> segments;
+			std::list<SubBlock> segments;
 			std::map<std::string,bounds> boundaries;
-			std::list<std::shared_ptr<util::PropertyMap>> segments_xml;
 		};
 		std::map<std::string,plane> planes;
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
 			const SubBlock s(source,e.FilePosition,dump_stream);
 			LOG(Runtime,verbose_info) << "Checking entry " << s.id << " for image data";
-			LOG(Runtime,verbose_info) << s.xml_data;
-			for(const auto &d:e.dims){
-				LOG(Runtime,verbose_info) << "Dimension " << d.Dimension << " is " << std::make_pair(d.start,d.StartCoordinate);
-			}
+// 			LOG(Runtime,verbose_info) << s.xml_data;
+// 			for(const auto &d:e.dims){
+// 				LOG(Runtime,verbose_info) << "Dimension " << d.Dimension << " is " << std::make_pair(d.start,d.StartCoordinate);
+// 			}
+			LOG(Runtime,verbose_info) << "PyramidType: " << (int)e.PyramidType;
 			
-			if(s.isNormalImage()){
+			
+			if(s.isNormalImage() && !(checkDialect(dialects,"nopyramid") && e.PyramidType)){
 				plane &p=planes[s.getPlaneID()];
 				// find boundaries (not existing dimsions will not be registered)
 				for(const auto &d:e.dims){
@@ -283,57 +358,39 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					if(b.min>d.start)b.min=d.start;
 					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
 				}
-				p.segments.push_back(s.makeChunks(feedback));
-				p.segments_xml.emplace_back(new util::PropertyMap(s.xml_data));
+				p.segments.push_back(s);
 // 				chunks.back().branch("dims").print(std::cerr) << std::endl;
 			} else {
 			}
 		}
 		
+		LOG(Runtime,info) << "Detected " << planes.size() << " different planes";
 		for(auto &p:planes){
 			auto &segments=p.second.segments;
 
-			LOG(Runtime,info) << "Got " << segments.size() << " Image objects for plane " << p.first;
-			LOG(Runtime,verbose_info) << "Dimensions from the header are:";
-			for(const auto &b:p.second.boundaries){
-				LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
-			}
+// 			LOG(Runtime,verbose_info) << "Dimensions from the header are:";
+// 			for(const auto &b:p.second.boundaries){
+// 				LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
+// 			}
 
 			if(segments.size()>1 && p.second.boundaries["M"].size()==segments.size()){
+				ret.push_back(data::Chunk::createByID(image_info.type_id,image_info.size.x,image_info.size.y,image_info.size.z,1,true));
+				LOG(Runtime,info) << "Creating " << ret.back().getSizeAsString() << " Image for plane " << p.first << " from " << segments.size() << " tiles";
+
 	// 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
 	// 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
 	// 			);
-
-				struct {int32_t x,y;}offset={-p.second.boundaries["X"].min,-p.second.boundaries["Y"].min};
-				std::unique_ptr<data::Chunk> dst;
-				while(!segments.empty()){
-					data::Chunk c=segments.front().get();
-					if(!dst){ // create dst on first iteration from first segment @todo this is ugly as f**k
-						dst.reset(new data::Chunk(c.cloneToNew(p.second.boundaries["X"].size(),p.second.boundaries["Y"].size())));
-						LOG(Runtime,info) << "Creating " << dst->getSizeAsString() << " image from " << segments.size() << " segments";
-					}
-					
-					assert(c.getValueAs<int32_t>("dims/X/start")+offset.x>=0);
-					assert(c.getValueAs<int32_t>("dims/Y/start")+offset.y>=0);
-					const std::array<size_t,4> pos={
-						size_t(c.getValueAs<int32_t>("dims/X/start")+offset.x),
-						size_t(c.getValueAs<int32_t>("dims/Y/start")+offset.y),
-						1,1
-					};
-					dst->copyFromTile(c,pos,false);
-					dst->touchBranch("XML").deduplicate(p.second.segments_xml);
-					storeProperties(*dst,p.first);
-					ret.push_back(*dst);
-					segments.pop_front();//get rid of segments we dont need anymore
-				}
-				
+				transferFromMosaic(segments,ret.back(),-p.second.boundaries["X"].min,-p.second.boundaries["Y"].min,feedback);
+				ret.back().setValueAs<util::fvector3>("voxelSize",{image_info.pixel_size,image_info.pixel_size,1});
 			} else {
 				while(!segments.empty()){
-					data::Chunk c=segments.front().get();
-					LOG(Runtime,info) << "Got single segment " << c.getSizeAsString() << "-Image for plane " << p.first;
-					c.touchBranch("XML")=*p.second.segments_xml.front();
-					storeProperties(c,p.first);
+					auto &s=segments.front();
+					data::Chunk c=s.getChunkGenerator()();
+					LOG(Runtime,info) << "Got non-mosaic segment " << c.getSizeAsString() << "-Image for plane " << p.first;
+// 					c.touchBranch("XML")=*p.second.segments_xml.front();
+// 					storeProperties(c,p.first);
 					ret.push_back(c);
+					feedback->progress("",s.getSegmentSize());
 					segments.pop_front();//get rid of segments we dont need anymore
 				}
 			}
@@ -358,6 +415,16 @@ const std::map<uint32_t,uint16_t> isis::image_io::ImageFormat_ZISRAW::PixelTypeM
 	,{10,isis::data::ValueArray<std::complex<float>>::staticID()} //Gray64ComplexFloat
 	,{11,isis::data::ValueArray<std::complex<double>>::staticID()} //Bgr192ComplexFloat
 	,{12,isis::data::ValueArray<int32_t>::staticID()} //Gray32
+};
+const std::map<std::string,uint16_t> isis::image_io::ImageFormat_ZISRAW::PixelTypeMapStr={
+	 {"Gray8",isis::data::ValueArray<uint8_t>::staticID()} //Gray8
+	,{"Gray16",isis::data::ValueArray<uint16_t>::staticID()} //Gray16
+	,{"Gray32Float",isis::data::ValueArray<float>::staticID()} //Gray32Float
+	,{"Bgr24",isis::data::ValueArray<util::color24>::staticID()} //Bgr24
+	,{"Bgr48",isis::data::ValueArray<util::color48>::staticID()} //Bgr48
+	,{"Gray64ComplexFloat",isis::data::ValueArray<std::complex<float>>::staticID()} //Gray64ComplexFloat
+	,{"Bgr192ComplexFloat",isis::data::ValueArray<std::complex<double>>::staticID()} //Bgr192ComplexFloat
+	,{"Gray32",isis::data::ValueArray<int32_t>::staticID()} //Gray32
 };
 const std::map<uint32_t,uint16_t> isis::image_io::ImageFormat_ZISRAW::PixelSizeMap={
 	 {0,sizeof(uint8_t)} //Gray8

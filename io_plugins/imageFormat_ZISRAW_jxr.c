@@ -22,7 +22,7 @@ const GUID *selectColorFormat(unsigned short isis_type){
 		assert(0); // we should not get here;
 }
 
-void jxr_decode(const void *in, size_t in_size, void *out, size_t out_size, unsigned short type, int verbose){
+int jxr_decode(const void *in, size_t in_size, void *out, unsigned long int *height, unsigned long int *width, unsigned short type, int verbose){
 	ERR e;
 	struct WMPStream* inStream;
 	PKImageDecode* pDecoder;
@@ -74,6 +74,17 @@ void jxr_decode(const void *in, size_t in_size, void *out, size_t out_size, unsi
 	e=PKCodecFactory_CreateFormatConverter(&pConverter);
 	e=PKFormatConverter_Initialize(pConverter,pDecoder,NULL,*PIto.pGUIDPixFmt);
 		
+	if((pDecoder->WMP.wmiI.cROIHeight* pDecoder->WMP.wmiI.cROIWidth)>*height * *width){ //if jxr image is bigger than container, we must not decode all of it
+		fprintf(stderr, "JxR image is larger (%d*%d) than reportet by the container, cropping it to %d*%d\n",
+				pDecoder->WMP.wmiI.cROIWidth,pDecoder->WMP.wmiI.cROIHeight, *width,*height
+		);
+		rect.Height=*height;
+		rect.Width=*width;
+	} else { //make sure we "return" the proper size (needed if actual image is smaller, so we can make a fitting Chunk)
+		*height=pDecoder->WMP.wmiI.cROIHeight;
+		*width=pDecoder->WMP.wmiI.cROIWidth;
+	}
+
 	U32 cbStrideFrom = (BD_1 == PIfrom.bdBitDepth ? ((PIfrom.cbitUnit * rect.Width + 7) >> 3) : (((PIfrom.cbitUnit + 7) >> 3) * rect.Width)); ;
 	if (&GUID_PKPixelFormat12bppYUV420 == PIfrom.pGUIDPixFmt || &GUID_PKPixelFormat16bppYUV422 == PIfrom.pGUIDPixFmt) 
 		cbStrideFrom >>= 1;
@@ -83,9 +94,6 @@ void jxr_decode(const void *in, size_t in_size, void *out, size_t out_size, unsi
 		cbStrideTo >>= 1;
 
 	U32 cbStride = max(cbStrideFrom, cbStrideTo);
-
-	assert(cbStride*pDecoder->WMP.wmiI.cROIHeight==out_size);
-// 	PKAllocAligned((void **) out, out_size, 128);// todo do proper PKFree instead of isis-default-free
 
 	pConverter->Copy(pConverter, &rect, out, cbStride);
 
