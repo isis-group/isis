@@ -113,7 +113,7 @@ Message::~Message()
 {
 	if ( shouldCommit() ) {
 		commitTo.lock()->commit( *this );
-		str( "" );
+		std::ostringstream::str( "" );
 		clear();
 		commitTo.lock()->requestStop( m_level );
 	}
@@ -160,6 +160,9 @@ bool Message::shouldCommit()const
 	if ( buff )
 		return ( buff->m_level >= m_level );
 	else return false;
+}
+std::string Message::str()const{
+	return std::ostringstream::str();
 }
 
 LogLevel MessageHandlerBase::m_stop_below = error;
