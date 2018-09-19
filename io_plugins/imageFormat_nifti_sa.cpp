@@ -871,7 +871,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	}
 	dcmmeta.translateToISIS( orig );
 
-	if(orig.hasProperty( "acquisitionNumber") <=1)//if dcmmeta didn't set slice ordering
+	if(!orig.hasProperty( "acquisitionNumber"))//if dcmmeta didn't set slice ordering
 		parseSliceOrdering( header, orig ); //get it from the header
 
 	if( orig.hasBranch( "DICOM" ) ) // if we got DICOM data clean up some
