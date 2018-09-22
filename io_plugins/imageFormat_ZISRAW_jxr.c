@@ -22,7 +22,7 @@ const GUID *selectColorFormat(unsigned short isis_type){
 		assert(0); // we should not get here;
 }
 
-int jxr_decode(const void *in, size_t in_size, void *out, unsigned long int *height, unsigned long int *width, unsigned short type, int verbose){
+int jxr_decode(const void *in, size_t in_size, void *out, unsigned long int *width, unsigned long int *height, unsigned short type, int verbose){
 	ERR e;
 	struct WMPStream* inStream;
 	PKImageDecode* pDecoder;
