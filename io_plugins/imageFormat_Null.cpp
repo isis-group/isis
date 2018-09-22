@@ -42,27 +42,17 @@ class ImageFormat_Null: public FileFormat
 		return ret;
 	}
 protected:
-	util::istring suffixes( io_modes /*modes=both*/ )const {return ".null"; }
-	size_t getSize( std::list<util::istring> dialects ) {
-		size_t size = 10;
-
-		if( !dialect.empty() )
-			size = boost::lexical_cast<unsigned short>( dialect );
-
-		size = pow( size * 1024 * 1024 / timesteps, 1. / 3. ); //get qubic root for size volumes
-		return size;
-	}
+	util::istring suffixes( io_modes /*modes=both*/ )const override {return ".null"; }
 public:
-	std::string getName()const {
+	std::string getName()const override {
 		return "Null";
 	}
-	util::istring dialects( const std::string &/*filename*/ )const {
-		return "50 500 1000 2000";
-	}
 
-	std::list<data::Chunk> load ( const std::string &/*filename*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	std::list<data::Chunk> 
+	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )
+	throw( std::runtime_error & ) override  {
 
-		size_t size = getSize( dialect );
+		size_t size = 50;
 
 		// normal sequencial image
 		std::list<data::Chunk> ret,loaded = makeImage<uint8_t>( size, 0, "normal sequencial Image" );
@@ -111,7 +101,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &img, const std::string &/*filename*/, const util::istring &/*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & ) {
+	void write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )  override {
 		data::Image image = img;
 
 		// set by the core, thus the newChunks cannot have one
