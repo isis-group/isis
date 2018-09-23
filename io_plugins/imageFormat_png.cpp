@@ -1,7 +1,11 @@
 #include <isis/core/io_interface.h>
 #include <png.h>
+#include <zlib.h>
 #include <stdio.h>
 #include <fstream>
+#include <boost/endian/buffers.hpp>
+#include <boost/crc.hpp>
+#include <future>
 
 namespace isis
 {
@@ -11,7 +15,7 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	util::istring suffixes( io_modes /*modes = both */ )const {return ".png";}
+	util::istring suffixes( io_modes /*modes = both */ )const override {return ".png";}
 	struct Reader {
 		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
 		virtual ~Reader() {}
@@ -28,7 +32,6 @@ protected:
 			for ( unsigned short r = 0; r < height; r++ )
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
 
-			png_set_strip_alpha(png_ptr);
 			png_read_image( png_ptr, row_pointers.get() );
 			ret.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space
 #if __BYTE_ORDER == __LITTLE_ENDIAN // png is always big endian, so we swap if we run on little endian
@@ -78,7 +81,7 @@ public:
 	std::string getName()const override {
 		return "PNG (Portable Network Graphics)";
 	}
-	std::list<util::istring> dialects() const override {return {"middle","stacked", "noflip"};}
+	std::list<util::istring> dialects() const override {return {"middle","stacked", "noflip", "parallel"};}
 	bool write_png( const std::string &filename, const data::Chunk &src, int color_type, int bit_depth ) {
 		assert( src.getRelevantDims() == 2 );
 		FILE *fp;
@@ -202,6 +205,8 @@ public:
 		png_set_sig_bytes( png_ptr, 8 );
 		png_read_info( png_ptr, info_ptr );
 		png_set_interlace_handling( png_ptr );
+		png_set_strip_alpha(png_ptr);
+
 		png_read_update_info( png_ptr, info_ptr );
 		const png_byte color_type = png_get_color_type ( png_ptr, info_ptr );
 		const png_byte bit_depth = png_get_bit_depth( png_ptr, info_ptr );
@@ -338,196 +343,178 @@ public:
 				} else 
 					name=fname.first+fname.second;
 				
-				if(!checkDialect(dialects,"noflip")){
-					//buff has to be swapped along the png-x-axis
-					buff = buff.copyByID(); //make a deep copy to not interfere with the source
-					buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+				if(checkDialect(dialects,"parallel")){
+					std::ofstream out(name.c_str());
+					write_sa(out,buff,bit_depth,color_type);
+				} else {
+					if(!checkDialect(dialects,"noflip")){
+						//buff has to be swapped along the png-x-axis
+						buff = buff.copyByID(); //make a deep copy to not interfere with the source
+						buff.flipAlong( data::rowDim ); //the png-"space" is mirrored to the isis space @todo check if we can use exif
+					} 
+					
+					if( !write_png( name, buff, color_type, bit_depth ) ) {
+						throwGenericError( std::string( "Failed to write " ) + name );;
+					}
 				}
+			}
+	}
 
-				if( !write_png( name, buff, color_type, bit_depth ) ) {
-					throwGenericError( std::string( "Failed to write " ) + name );;
+	static png_byte* filterRows(std::vector<data::ValueArrayBase::Reference>::const_iterator row_it, size_t rows) {
+		const size_t bytesPerRow = ((*row_it)->bytesPerElem() * (*row_it)->getLength() + 1);
+
+		png_byte* filteredRows = reinterpret_cast<png_byte*>(malloc(rows * bytesPerRow));
+		
+		for(size_t row=0;row<rows;row++) {
+			png_byte *dst=filteredRows+(row*bytesPerRow);
+			data::ValueArrayBase::Reference current_row_ref=*(row_it++);
+			//Add filter byte 0 to disable actual row filtering
+			dst[0]=0;
+			memcpy(dst+1,current_row_ref->getRawAddress().get(),bytesPerRow-1);
+		}
+		return filteredRows;
+	}
+	
+	struct png_chunk_t
+	{
+		boost::endian::big_int32_buf_t length;
+		const char *name; /* Textual chunk name with '\0' terminator ()terminator woth be written */
+		const uint8_t *data;   /* Data, should not be modified on read! */
+		void write(std::ofstream &outputFile)const{
+			boost::crc_32_type crc;
+			outputFile.write((const char*)&length,sizeof(length));
+			outputFile.write(name,4);//write length and name (without terminator)
+			if(length.value()){
+				outputFile.write((const char*)data,length.value());
+
+				crc.process_bytes(name,4);
+				crc.process_bytes(data,length.value());
+			} else 
+				crc.process_bytes(name,4);
+				
+			boost::endian::big_int32_buf_t checksum(crc.checksum());
+			outputFile.write((const char*)&checksum,sizeof(boost::endian::big_int32_buf_t));
+		}
+	};
+	struct IHDR:png_chunk_t{
+		struct {
+			boost::endian::big_int32_buf_t width,height;
+			uint8_t bit_depth,colour_type,compression_method,filter_method,interlace_method;
+		}ihdr_data;
+		IHDR(int32_t width, int32_t height,uint8_t bit_depth, uint8_t colour_type){
+			name="IHDR";
+			data=((uint8_t*)&ihdr_data);
+			length=13;
+			ihdr_data.width=width;ihdr_data.height=height;
+			ihdr_data.bit_depth=bit_depth;
+			ihdr_data.colour_type=colour_type;
+			ihdr_data.compression_method=PNG_COMPRESSION_TYPE_DEFAULT;
+			ihdr_data.interlace_method=PNG_INTERLACE_NONE;
+			ihdr_data.filter_method=PNG_NO_FILTERS;
+		}
+	};
+	struct IDAT:png_chunk_t{
+		IDAT(const data::ValueArray<uint8_t> &dat){
+			name="IDAT";
+			png_chunk_t::data=&dat[0];
+			png_chunk_t::length=dat.getLength();
+		}
+	};
+	struct IEND:png_chunk_t{
+		IEND(){
+			name="IEND";
+			png_chunk_t::data=nullptr;
+			png_chunk_t::length=0;
+		}
+	};
+	
+	static std::pair<data::ByteArray,uLong> compress_row_set(std::vector<data::ValueArrayBase::Reference>::const_iterator row_it, size_t rows, bool finish){
+		//add filter-byte (0) to all scanlines and re-concatenate them
+		png_byte *filteredRows = filterRows(row_it,rows);
+		
+		//zlib compression
+		const size_t bytesPerRow = ((*row_it)->bytesPerElem() * (*row_it)->getLength() + 1);
+		const size_t deflateOutputSize=bytesPerRow * rows;
+		char *deflateOutput;
+
+		unsigned int have;
+		z_stream zStream;
+		zStream.zalloc = nullptr;
+		zStream.zfree = nullptr;
+		zStream.opaque = nullptr;
+		if (deflateInit(&zStream, 9) != Z_OK) {
+			throwGenericError("Not enough memory for compression");
+		}
+		uint8_t *output_buffer=(uint8_t*)malloc(deflateOutputSize);
+		zStream.avail_in = bytesPerRow * rows;
+		zStream.next_in = filteredRows;
+		zStream.avail_out = deflateOutputSize;
+		zStream.next_out = output_buffer;
+
+		//Compress the image data with deflate
+		deflate(&zStream, finish ? Z_FINISH : Z_FULL_FLUSH);
+		assert(zStream.avail_in==0);
+		assert(zStream.total_in==bytesPerRow * rows);
+		
+		auto ret=std::make_pair(data::ByteArray(output_buffer,deflateOutputSize-zStream.avail_out),zStream.adler);
+		deflateEnd(&zStream);
+		free(filteredRows);
+		
+		return ret;
+	}
+	
+	void write_sa(std::ofstream &outputFile, const data::Chunk &src, png_byte bit_depth, png_byte color_type) {
+		auto size=src.getSizeAsVector();
+		
+		const uint8_t signature[]{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+		outputFile.write((std::ofstream::char_type*)signature,sizeof(signature));
+
+		IHDR ihdr_chunk(// use smart conversion to check for bounds
+			util::Value<uint64_t>(size[0]).as<int32_t>(),
+			util::Value<uint64_t>(size[1]).as<int32_t>(),
+			bit_depth,color_type);
+		ihdr_chunk.write(outputFile);
+		
+		auto rows=src.getValueArrayBase().splice(size[0]);
+		
+		// compute amount of rows that fir into 100MB
+		const size_t bytes_per_row=size[0]*src.getBytesPerVoxel();
+		const size_t rowset_size=(100*1024*1024)/bytes_per_row;
+		uLong adler32Combined=0;
+		
+		std::list<std::future<std::pair<data::ByteArray,uLong>>> generators;
+		
+		//set up asynchronous 
+		for(size_t r=0;r<rows.size();r+=rowset_size){
+			bool last_set=(r+rowset_size >= rows.size());
+			size_t actual_rows = last_set ? rows.size()-r:rowset_size;
+			generators.emplace_back(std::async(compress_row_set,rows.begin()+r,actual_rows,last_set));
+		}
+		
+		// get and write their results
+		for(size_t r=0;r<rows.size();r+=rowset_size){
+			auto dat = generators.front().get();
+			generators.pop_front();
+			
+			bool last_set=(r+rowset_size >= rows.size());
+			size_t actual_rows = last_set ? rows.size()-r:rowset_size;
+			adler32Combined = adler32_combine(adler32Combined, dat.second, bytes_per_row*actual_rows);
+
+			if(r == 0) {
+				IDAT(dat.first).write(outputFile);
+			} else { // for all but the first chunks strip the zlib stream header
+				if(last_set){ //overwrite adler32 checksum in last set 
+					uint8_t *adler_pos = dat.first.end()-sizeof(adler32Combined);
+					memcpy(adler_pos,&adler32Combined,sizeof(adler32Combined));
 				}
+				IDAT(dat.first.at<uint8_t>(2)).write(outputFile);
 			}
+			LOG(Runtime,info) 
+				<< "Scalines " << r << " to " << r+actual_rows-1 
+				<< " written, compression ratio was " << std::to_string(100-(dat.first.getLength()*100 / (bytes_per_row*actual_rows)))+"%"; 
+		}
+		IEND().write(outputFile);
 	}
-	void filterRGBRow(png_byte* pixels, int rowLength) {
-
-		unsigned short colorTmp;
-		char filterByte = 0;
-
-		//Transformations
-		for (int j = 0; j < rowLength; j++) {
-			//swap red and blue in BGRA mode
-			colorTmp = pixels[j*];
-			pixels->red = pixels->blue;
-			pixels->blue = colorTmp;
-
-			//change opacity
-			pixels->opacity = TransparentOpacity;
-			pixels += 1;
-		}
-		pixels -= rowLength;
-
-		//Add filter byte 0 to disable row filtering
-		PixelPacket* filteredRow = reinterpret_cast<PixelPacket*>(malloc(rowLength * COLOR_FORMAT_BPP + 1));
-		memcpy(&(reinterpret_cast<char*>(filteredRow)[0]), &filterByte, 1);
-		memcpy(&(reinterpret_cast<char*>(filteredRow)[1]), pixels, COLOR_FORMAT_BPP * rowLength);
-
-		return filteredRow;
-
-	}
-
-	void compress(std::ofstream &outputFile, const data::Chunk &src) {
-		const int NumThreads=10;
-
-		//Init PNG write struct
-		png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-		if (!pngPtr) {
-			std::cout << "PNG write struct could not be initialized" << endl;
-			return;
-		}
-
-		//Init PNG info struct
-		png_infop infoPtr = png_create_info_struct(pngPtr);
-		if (!infoPtr) {
-			png_destroy_write_struct(&pngPtr, (png_infopp) NULL);
-			std::cout << "PNG info struct could not be initialized" << endl;
-			return;
-		}
-
-		//Tell the pnglib where to save the image
-		png_set_write_fn(pngPtr, &outputFile, pngWrite, pngFlush);
-
-		//For the sake of simplicity we do not apply any filters to a scanline
-		png_set_filter(pngPtr, 0, PNG_FILTER_NONE);
-
-		//Write IHDR chunk
-		util::vector4<size_t> size = src.getSizeAsVector();
-
-		// check the image sizes
-		if( size[data::rowDim] > png_get_user_width_max( pngPtr ) ) {
-			LOG( Runtime, error ) << "Sorry the image is to wide to be written as PNG (maximum is " << png_get_user_width_max( pngPtr ) << ")";
-		}
-
-		if( size[data::columnDim] > png_get_user_height_max( pngPtr ) ) {
-			LOG( Runtime, error ) << "Sorry the image is to high to be written as PNG (maximum is " << png_get_user_height_max( pngPtr ) << ")";
-		}
-
-		png_set_IHDR( pngPtr, infoPtr, ( png_uint_32 )size[0], ( png_uint_32 )size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
-
-		//Write the file header information.
-		png_write_info(pngPtr, infoPtr);
-
-		//Init vars used for compression
-		int totalDeflateOutputSize = 0;
-		unsigned long adler32Combined = 0L;
-		z_stream zStreams[NumThreads];
-		size_t deflateOutputSize[NumThreads];
-		char *deflateOutput[NumThreads];
-
-		#pragma omp parallel for default(shared)
-		for (int threadNum = 0; threadNum < NumThreads; threadNum++) {
-
-			int ret, flush, row, stopAtRow;
-			unsigned int have;
-			const int chunkSize = 16384;
-			unsigned char output_buffer[chunkSize];
-
-			//Calculate which lines have to be handled by this thread
-			row = threadNum * static_cast<int>(ceil(static_cast<double>(size[1]) / static_cast<double>(NumThreads)));
-			stopAtRow = static_cast<int>(ceil(static_cast<double>(size[1]) / static_cast<double>(NumThreads))) * (threadNum + 1);
-			stopAtRow = stopAtRow > size[1] ? size[1] : stopAtRow;
-
-			//Load all pixel data
-			/* png needs a pointer to each row */
-			png_byte **row_pointers = new png_byte*[size[1]];
-			row_pointers[0] = ( png_byte * )src.getValueArrayBase().getRawAddress().get();
-
-			for ( unsigned short r = 1; r < size[1]; r++ )
-				row_pointers[r] = row_pointers[0] + ( src.getBytesPerVoxel() * src.getLinearIndex( { 0, r, 0, 0 } ) );
-			FILE *deflate_stream = open_memstream(&deflateOutput[threadNum], &deflateOutputSize[threadNum]);
-
-			//Allocate deflate state
-			zStreams[threadNum].zalloc = Z_NULL;
-			zStreams[threadNum].zfree = Z_NULL;
-			zStreams[threadNum].opaque = Z_NULL;
-			if (deflateInit(&zStreams[threadNum], 9) != Z_OK) {
-				cout << "Not enough memory for compression" << endl;
-			}
-
-			//Add the filter byte and reorder the RGB values
-			PixelPacket *filteredRows = filterRows(pixels, stopAtRow - row, width);
-
-			//Let's compress line by line so the input buffer is the number of bytes of one pixel row plus the filter byte
-			zStreams[threadNum].avail_in = (COLOR_FORMAT_BPP * width + 1) * (stopAtRow - row);
-			zStreams[threadNum].avail_in += stopAtRow == height ? 1 : 0;
-
-			//Finish the stream if it's the last pixel row
-			flush = stopAtRow == height ? Z_FINISH : Z_SYNC_FLUSH;
-			zStreams[threadNum].next_in = reinterpret_cast<Bytef*>(filteredRows);
-
-			//Compress the image data with deflate
-			do {
-				zStreams[threadNum].avail_out = chunkSize;
-				zStreams[threadNum].next_out = output_buffer;
-				ret = deflate(&zStreams[threadNum], flush);
-				have = chunkSize - zStreams[threadNum].avail_out;
-				fwrite(&output_buffer, 1, have, deflate_stream);
-			} while (zStreams[threadNum].avail_out == 0);
-
-			fclose(deflate_stream);
-			totalDeflateOutputSize += deflateOutputSize[threadNum];
-
-			//Calculate the combined adler32 checksum
-			int input_length = (stopAtRow - (threadNum * (height / NumThreads))) * (COLOR_FORMAT_BPP * width + 1);
-			adler32Combined = adler32_combine(adler32Combined, zStreams[threadNum].adler, input_length);
-
-			//Finish deflate process
-			(void) deflateEnd(&zStreams[threadNum]);
-
-		}
-
-		//Concatenate the zStreams
-		png_byte *idatData = new png_byte[totalDeflateOutputSize];
-		for (int i = 0; i < NumThreads; i++) {
-			if(i == 0) {
-				memcpy(idatData, deflateOutput[i], deflateOutputSize[i]);
-				idatData += deflateOutputSize[i];
-			} else {
-				//strip the zlib stream header
-				memcpy(idatData, deflateOutput[i] + 2, deflateOutputSize[i] - 2);
-				idatData += (deflateOutputSize[i] - 2);
-				totalDeflateOutputSize -= 2;
-			}
-		}
-
-		//Add the combined adler32 checksum
-		idatData -= sizeof(adler32Combined);
-		memcpy(idatData, &adler32Combined, sizeof(adler32Combined));
-		idatData -= (totalDeflateOutputSize - sizeof(adler32Combined));
-
-		//We have to tell libpng that an IDAT was written to the file
-		pngPtr->mode |= PNG_HAVE_IDAT;
-
-		//Create an IDAT chunk
-		png_unknown_chunk idatChunks[1];
-		strcpy((png_charp) idatChunks[0].name, "IDAT");
-		idatChunks[0].data = idatData;
-		idatChunks[0].size = totalDeflateOutputSize;
-		idatChunks[0].location = PNG_AFTER_IDAT;
-		pngPtr->flags |= 0x10000L; //PNG_FLAG_KEEP_UNSAFE_CHUNKS
-		png_set_unknown_chunks(pngPtr, infoPtr, idatChunks, 1);
-		png_set_unknown_chunk_location(pngPtr, infoPtr, 0, PNG_AFTER_IDAT);
-
-		//Write the rest of the file
-		png_write_end(pngPtr, infoPtr);
-
-		//Cleanup
-		png_destroy_write_struct(&pngPtr, &infoPtr);
-		delete(idatData);
-
-
-	}
-
 };
 }
 }
