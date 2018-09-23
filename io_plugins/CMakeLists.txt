@@ -18,7 +18,7 @@ set_directory_properties(PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR})
 ############################################################
 option(ISIS_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" ON)
 option(ISIS_IOPLUGIN_TIFF_SA "Enable standalone TIFF-IO plugin" ON)
-option(ISIS_IOPLUGIN_ZISRAW "Enable standalone Zeiss Integrated Software RAW plugin" ON)
+option(ISIS_IOPLUGIN_ZISRAW "Enable standalone Zeiss Integrated Software RAW plugin" OFF)
 option(ISIS_IOPLUGIN_MEAS "Enable standalone plugin for reading siemens RAW data files" OFF)
 option(ISIS_IOPLUGIN_ORTHANC "Enable standalone plugin for reading siemens RAW data files" OFF)
 option(ISIS_IOPLUGIN_VISTA_SA "Enable standalone Vista-IO plugin" OFF)
@@ -64,11 +64,9 @@ if(ISIS_IOPLUGIN_MEAS)
 endif(ISIS_IOPLUGIN_MEAS)
 
 ############################################################
-# meas plugin
+# orthanc plugin
 ############################################################
 if(ISIS_IOPLUGIN_ORTHANC)
-	find_package(Threads)
-
 	add_library(isisImageFormat_orthanc SHARED imageFormat_orthanc.cpp )
 	set_target_properties(isisImageFormat_orthanc PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR};${INC_JSONCPP}")
 	target_link_libraries(isisImageFormat_orthanc ${isis_core_lib} ACE ACE_INet jsoncpp Threads::Threads)
@@ -100,7 +98,7 @@ if(ISIS_IOPLUGIN_ZISRAW)
 	add_library(isisImageFormat_ZISRAW SHARED imageFormat_ZISRAW.cpp imageFormat_ZISRAW_jxr.c)
 	set_target_properties(isisImageFormat_ZISRAW PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR};${JXR_INCLUDE_DIR};${JXR_WINDOWSMEDIAPHOTO_DIR};${JXR_WMSPECSTRING_DIR}")
 	
-	target_link_libraries(isisImageFormat_ZISRAW ${isis_core_lib} ${JXR_GLUE_LIBRARY} ${JXR_LIBRARY})
+	target_link_libraries(isisImageFormat_ZISRAW ${isis_core_lib} ${JXR_GLUE_LIBRARY} ${JXR_LIBRARY} Threads::Threads)
 	set(TARGETS ${TARGETS} isisImageFormat_ZISRAW)
 endif(ISIS_IOPLUGIN_ZISRAW)
 
@@ -156,7 +154,7 @@ if(ISIS_IOPLUGIN_PNG)
 	find_package(PNG REQUIRED)
 
 	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-	target_link_libraries(isisImageFormat_png ${isis_core_lib} PNG::PNG)
+	target_link_libraries(isisImageFormat_png ${isis_core_lib} PNG::PNG Threads::Threads)
 
 	set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(ISIS_IOPLUGIN_PNG)

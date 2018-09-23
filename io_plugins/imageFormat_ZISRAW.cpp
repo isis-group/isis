@@ -112,7 +112,6 @@ ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t off
 	DirectoryEntry=_internal::getDVEntry(data,16);
 	size_t off=std::max(DirectoryEntry.size()+16,(size_t)256);
 	xml_data=_internal::getXML(data,off,MetadataSize,dump_stream);
-// 	boost::property_tree::write_xml(std::cerr,xml_data,boost::property_tree::xml_writer_settings<std::string>(' ',4));std::cerr<<std::endl;
 
 	image_data = data.at<uint8_t>(off+MetadataSize,DataSize);
 }
@@ -250,7 +249,7 @@ void ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, data::
 		auto op = [&s,pos,&feedback,&dst](){
 			data::Chunk c= s.getChunkGenerator()();
 			dst.copyFromTile(c,pos,false);
-			feedback->progress("",s.getSegmentSize());
+			if(feedback)feedback->progress("",s.getSegmentSize());
 		};
 		jobs.emplace_back(op);
 	}
@@ -282,6 +281,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 	}
 	
 	struct { 
+		std::string name;
 		struct {size_t x,y,z;}size;
 		float pixel_size;
 		struct {size_t layers;float factor;}pyramid;
@@ -292,9 +292,9 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 
 	//get MetaData if there are some
 	if(header.MetadataPosition){
-		util::PropertyMap meta=MetaData(source,header.MetadataPosition,dump_stream).get();
-// 		meta.print(std::cout)<< std::endl;
-		util::PropertyMap image_props=meta.branch("ImageDocument/Metadata/Information/Image");
+		util::PropertyMap meta=MetaData(source,header.MetadataPosition,dump_stream).get().branch("ImageDocument/Metadata");
+		meta.print(std::cout)<< std::endl;
+		util::PropertyMap image_props=meta.branch("Information/Image");
 		image_info.size = {
 			image_props.getValueAs<size_t>("SizeX"),
 			image_props.getValueAs<size_t>("SizeY"),
@@ -306,15 +306,19 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 			throwGenericError("Sorry, multi scene images are not supportet");
 		}
 		
-		auto pyramid=meta.queryBranch("Dimensions/S/Scenes/Scene/PyramidInfo");
-		if(pyramid){
-			image_info.pyramid.layers=pyramid->getValueAs<size_t>("PyramidLayersCount");
-			image_info.pyramid.factor=pyramid->getValueAs<size_t>("MinificationFactor");
+		auto scene=meta.queryBranch("Information/Image/Dimensions/S/Scenes/Scene");
+		if(scene){
+			image_info.name=scene->getValueAs<std::string>("<xmlattr>/Name");
+			auto pyramid=scene->queryBranch("PyramidInfo");
+			if(pyramid){
+				image_info.pyramid.layers=pyramid->getValueAs<size_t>("PyramidLayersCount");
+				image_info.pyramid.factor=pyramid->getValueAs<float>("MinificationFactor");
+			}
 		}
 		if(image_props.hasProperty("SizeM"))
 			image_info.mosaic_tiles=image_props.getValueAs<size_t>("SizeM");
 		
-		image_info.pixel_size = meta.getValueAsOr<float>("ImageDocument/Metadata/Scaling/Items/Distance/Value",1./1000)*1000;
+		image_info.pixel_size = meta.getValueAsOr<float>("Scaling/Items/Distance/Value",1./1000)*1000;
 		
 	} else 
 		throwGenericError("could not find metadata");
@@ -341,13 +345,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
 			const SubBlock s(source,e.FilePosition,dump_stream);
-			LOG(Runtime,verbose_info) << "Checking entry " << s.id << " for image data";
-// 			LOG(Runtime,verbose_info) << s.xml_data;
-// 			for(const auto &d:e.dims){
-// 				LOG(Runtime,verbose_info) << "Dimension " << d.Dimension << " is " << std::make_pair(d.start,d.StartCoordinate);
-// 			}
-			LOG(Runtime,verbose_info) << "PyramidType: " << (int)e.PyramidType;
-			
+			LOG(Runtime,verbose_info) << "Checking entry " << s.id << " for image data PyramidType: " << (int)e.PyramidType;
 			
 			if(s.isNormalImage() && !(checkDialect(dialects,"nopyramid") && e.PyramidType)){
 				plane &p=planes[s.getPlaneID()];
@@ -387,10 +385,11 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					auto &s=segments.front();
 					data::Chunk c=s.getChunkGenerator()();
 					LOG(Runtime,info) << "Got non-mosaic segment " << c.getSizeAsString() << "-Image for plane " << p.first;
-// 					c.touchBranch("XML")=*p.second.segments_xml.front();
+					c.touchBranch("XML").transfer(s.xml_data);
 // 					storeProperties(c,p.first);
+
 					ret.push_back(c);
-					feedback->progress("",s.getSegmentSize());
+					if(feedback)feedback->progress("",s.getSegmentSize());
 					segments.pop_front();//get rid of segments we dont need anymore
 				}
 			}
