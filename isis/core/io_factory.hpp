@@ -53,7 +53,7 @@ private:
 	// use ImageIO's logging here instead of the normal data::Runtime/Debug
 	typedef ImageIoLog Runtime;
 	typedef ImageIoDebug Debug;
-	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects,std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & );
+	std::list<Chunk> load_impl(const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects,std::shared_ptr<util::ProgressFeedback> feedback);
 public:
 	/**
 	 * Load data from a set of files or directories with given paths and dialect.
@@ -82,7 +82,7 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static std::list<data::Chunk> loadChunks(const load_source &source, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {})throw( io_error & );
+	static std::list<data::Chunk> loadChunks(const load_source &source, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {});
 
 	static bool write( const data::Image &image, const std::string &path, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {} );
 	static bool write( std::list<data::Image> images, const std::string &path, std::list<util::istring> formatstack = {}, std::list<util::istring> dialects = {} );

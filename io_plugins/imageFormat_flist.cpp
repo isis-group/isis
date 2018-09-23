@@ -45,14 +45,14 @@ public:
 		return ret;
 	}
 
-	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override {
 		std::istream stream(source);
 		assert(formatstack.back()=="flist");
 		formatstack.pop_back();
 		return doLoad( stream, formatstack, dialects);
 	}
 
-	void write( const data::Image &image, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
+	void write( const data::Image &image, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) override {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 };

@@ -193,7 +193,7 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback)throw( io_error & ){
+std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback){
 	bool overridden=true;
 	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
 	if(formatstack.empty()){
@@ -329,7 +329,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src, optio
 	return ret;
 }
 
-std::list< Chunk > IOFactory::loadChunks( const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects)throw( io_error & )
+std::list< Chunk > IOFactory::loadChunks( const load_source &v, std::list<util::istring> formatstack, std::list<util::istring> dialects)
 {
 	const boost::filesystem::path* filename = boost::get<boost::filesystem::path>( &v );
 	if(filename)

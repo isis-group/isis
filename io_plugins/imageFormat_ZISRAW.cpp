@@ -267,7 +267,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		std::list<util::istring> /*formatstack*/,
 		std::list<util::istring> dialects,
 		std::shared_ptr<util::ProgressFeedback> feedback
-	)throw( std::runtime_error & ) {
+	) {
 		
 	FileHeader header(source,0);
 	if(header.id!="ZISRAWFILE")

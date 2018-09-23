@@ -223,7 +223,7 @@ public:
 		fclose( fp );
 		return ret;
 	}
-	std::list<data::Chunk> load(const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/)  throw( std::runtime_error & ) override
+	std::list<data::Chunk> load(const boost::filesystem::path &filename, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/) override
 	{
 		data::Chunk ch = read_png( filename );
 
@@ -257,7 +257,7 @@ public:
 		return std::list< data::Chunk >(1, ch);
 	}
 
-	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )  throw( std::runtime_error & )override {
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )override {
 		const short unsigned int isis_data_type = image.getMajorTypeID();
 
 		data::Image tImg = image;

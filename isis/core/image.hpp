@@ -171,7 +171,7 @@ public:
 		return operator+= ( -n );
 	}
 
-	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const throw( std::out_of_range ) {
+	typename ThisType::reference operator[] ( typename inner_iterator::difference_type n ) const {
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
 		assert ( (ch_idx + n / ch_len ) >= 0 );
 		const size_t my_ch_idx = static_cast<size_t>(ch_idx + n / ch_len); //if neccesary jump to next chunk

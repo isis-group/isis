@@ -116,7 +116,7 @@ public:
 		std::list<util::istring> /*formatstack*/,
 		std::list<util::istring> dialects,
 		std::shared_ptr<util::ProgressFeedback> feedback
-	)throw( std::runtime_error & ) override;
+	) override;
 
 	std::string getName() const override {return "Zeiss Integrated Software RAW";}
 

@@ -405,7 +405,7 @@ std::list< data::Chunk > ImageFormat_TiffSa::load(
 	std::list<util::istring> /*formatstack*/, 
 	std::list<util::istring> dialects, 
 	std::shared_ptr<util::ProgressFeedback> feedback
-)throw( std::runtime_error & ) {
+) {
 	_internal::TiffSource tiff(source);
 	
 	

@@ -215,7 +215,7 @@ throw( std::runtime_error & )
 }
 
 
-std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress ) throw ( std::runtime_error & )
+std::list<data::Chunk> ImageFormat_Vista::load( const std::string &filename, const util::istring &dialect, std::shared_ptr<util::ProgressFeedback> progress )
 {
 	// open input file
 	FILE *ip;

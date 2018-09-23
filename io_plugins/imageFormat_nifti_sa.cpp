@@ -728,7 +728,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	std::list<util::istring> /*formatstack*/, 
 	std::list<util::istring> dialects, 
 	std::shared_ptr<util::ProgressFeedback> /*feedback*/ 
-)throw( std::runtime_error & ) {
+) {
 
 	//get the header - we use it directly from the file
 	std::shared_ptr< _internal::nifti_1_header > header = std::static_pointer_cast<_internal::nifti_1_header>( source.getRawAddress() );
@@ -922,7 +922,7 @@ std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
 

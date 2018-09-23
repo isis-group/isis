@@ -52,7 +52,7 @@ public:
 	std::list<util::istring> dialects()const override {return {"org_dwi"};};
 	std::string getName()const override {return "Vnmrj reconstruction format";}
 
-	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load(data::ByteArray source, std::list<util::istring> /*formatstack*/, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) override {
 		
 		static const std::map<std::string,unsigned short> type_map{
 			{"float",data::ValueArray<float>::staticID()},
@@ -150,7 +150,7 @@ public:
 		return std::list<data::Chunk>(1,ret);
 	}
 
-	void write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )throw( std::runtime_error & ) override {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) override {
 		throw( std::runtime_error( "not yet implemented" ) );
 	}
 };

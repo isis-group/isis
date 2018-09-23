@@ -126,7 +126,7 @@ namespace util
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
 	 * \returns the changed *this
 	 */
-	template<typename TYPE, size_t N> void normalize(std::array<TYPE,N> &first)throw( std::invalid_argument ) {
+	template<typename TYPE, size_t N> void normalize(std::array<TYPE,N> &first) {
 		const TYPE d = len(first);
 
 		if ( d == 0 )throw( std::invalid_argument( "Trying to normalize a vector of length 0" ) );

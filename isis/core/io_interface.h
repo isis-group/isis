@@ -119,7 +119,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
 
 	/**
 	 * Load data from stream into the given chunk list.
@@ -131,7 +131,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
 
 	/**
 	 * Load data from memory into the given chunk list.
@@ -143,7 +143,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual std::list<data::Chunk> 
-	load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ); //@todo should be locked
+	load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ); //@todo should be locked
 
 	/**
 	 * Write a single image to a file.
@@ -164,8 +164,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \param feedback a shared_ptr to a ProgressFeedback-object to inform about loading progress. Not used if zero.
 	 */
-	virtual void write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )
-	throw( std::runtime_error & );
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback );
 
 	virtual ~FileFormat() {}
 };
