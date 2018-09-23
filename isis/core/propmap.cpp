@@ -186,12 +186,12 @@ PropertyMap::PropertyMap() {}
 ///////////////////////////////////////////////////////////////////
 // The core tree traversal functions
 ///////////////////////////////////////////////////////////////////
-PropertyMap::mapped_type &PropertyMap::fetchEntry( const PropPath &path ) throw( boost::bad_get )
+PropertyMap::mapped_type &PropertyMap::fetchEntry( const PropPath &path )
 {
 	assert(!path.empty());
 	return fetchEntry( container, path.begin(), path.end() );
 }
-PropertyMap::mapped_type &PropertyMap::fetchEntry( container_type &root, const propPathIterator at, const propPathIterator pathEnd ) throw( boost::bad_get )
+PropertyMap::mapped_type &PropertyMap::fetchEntry( container_type &root, const propPathIterator at, const propPathIterator pathEnd )
 {
 	PropPath::const_iterator next = at;
 	next++;
@@ -210,18 +210,18 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry( container_type &root, const p
 	}
 }
 
-optional<const PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )const throw( boost::bad_get )
+optional<const PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )const
 {
 	assert(!path.empty());
 	return findEntryImpl<const mapped_type,const container_type>( container, path.begin(), path.end() );
 }
-optional<PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )throw( boost::bad_get )
+optional<PropertyMap::mapped_type &> PropertyMap::findEntry( const PropPath &path  )
 {
 	assert(!path.empty());
 	return findEntryImpl<mapped_type,container_type>( container, path.begin(), path.end() );
 }
 
-bool PropertyMap::recursiveRemove( container_type &root, const propPathIterator pathIt, const propPathIterator pathEnd )throw( boost::bad_get )
+bool PropertyMap::recursiveRemove( container_type &root, const propPathIterator pathIt, const propPathIterator pathEnd )
 {
 	bool ret = false;
 

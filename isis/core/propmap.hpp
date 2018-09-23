@@ -214,9 +214,9 @@ API_EXCLUDE_END;
 	void diffTree( const container_type &other, DiffMap &ret, const PropPath &prefix ) const;
 
 	/// internal recursion-function for remove
-	static bool recursiveRemove( container_type &root, const propPathIterator pathIt, const propPathIterator pathEnd )throw( boost::bad_get );
+	static bool recursiveRemove( container_type &root, const propPathIterator pathIt, const propPathIterator pathEnd );
 
-	template <typename MAPPED,typename CONTAINER> static optional<MAPPED &> findEntryImpl( CONTAINER &root, const propPathIterator at, const propPathIterator pathEnd )throw( boost::bad_get )
+	template <typename MAPPED,typename CONTAINER> static optional<MAPPED &> findEntryImpl( CONTAINER &root, const propPathIterator at, const propPathIterator pathEnd )
 	{
 		propPathIterator next = at;
 		next++;
@@ -277,20 +277,20 @@ protected:
 	 * Follow a "Path" to a property to get/make it.
 	 * This will create branches and the property on its way if necessary.
 	 */
-	container_type::mapped_type &fetchEntry( const PropPath &path ) throw( boost::bad_get );
+	container_type::mapped_type &fetchEntry( const PropPath &path );
 	/**
 	 * \copydoc fetchEntry( const PropPath &path )
 	 * Will work on the container given as root.
 	 */
-	static container_type::mapped_type &fetchEntry( container_type &root, const propPathIterator at, const propPathIterator pathEnd ) throw( boost::bad_get );
+	static container_type::mapped_type &fetchEntry( container_type &root, const propPathIterator at, const propPathIterator pathEnd );
 
 	/**
 	 * Find property following the given "path".
 	 * If the "path" or the property does not exist NULL is returned.
 	 * \note this is the const version of \link fetchEntry( const PropPath &path ) \endlink, so it won't modify the map.
 	 */
-	optional<const PropertyMap::mapped_type &> findEntry( const PropPath &path )const throw( boost::bad_get );
-	optional<PropertyMap::mapped_type &> findEntry( const PropPath &path  )throw( boost::bad_get );
+	optional<const PropertyMap::mapped_type &> findEntry( const PropPath &path )const;
+	optional<PropertyMap::mapped_type &> findEntry( const PropPath &path  );
 
 	template<typename T> optional<const T &> tryFindEntry( const PropPath &path )const {
 		if(!path.empty()){

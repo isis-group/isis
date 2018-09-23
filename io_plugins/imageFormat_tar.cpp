@@ -86,7 +86,7 @@ public:
 	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )override {
 		throwGenericError( "Not implemented (yet)" );
 	}
-	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) override {
 		std::list<data::Chunk> ret;
 		size_t size, next_header_in;
 		std::basic_istream<char> in(source);

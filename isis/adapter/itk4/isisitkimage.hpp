@@ -66,6 +66,7 @@ public:
 protected:
 	float* 	AllocateElements(size_t size, bool /*UseDefaultConstructor*/) const override{
 		LOG_IF(size,Debug,warning) << "Ignoring command to allocate elements";
+		return 0;
 	}
 	void DeallocateManagedMemory ()override{
 		LOG(Debug,warning) << "Deallocating ValueArray";

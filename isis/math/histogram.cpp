@@ -21,9 +21,9 @@
 namespace isis{
 namespace math{
 
-std::vector<size_t> histogram(const data::Chunk &ch){
+// std::vector<size_t> histogram(const data::Chunk &ch){
 	//@todo use visitor with new type-system
-}
+// }
 }
 }
 

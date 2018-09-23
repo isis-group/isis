@@ -94,7 +94,7 @@ public:
 	}
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) override {
 		
 		auto in=makeIStream(formatstack);
 
@@ -103,7 +103,7 @@ public:
 
 		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialects );
 	}
-	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override{
 		//try open file
 		std::ifstream file(filename.c_str());
 		file.exceptions(std::ios_base::badbit);

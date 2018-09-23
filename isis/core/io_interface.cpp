@@ -30,7 +30,7 @@ bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length(
 /// @endcond _internal
 API_EXCLUDE_END;
 
-void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr< util::ProgressFeedback > progress ) throw( std::runtime_error & )
+void FileFormat::write( const std::list< data::Image >& images, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr< util::ProgressFeedback > progress )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
@@ -49,7 +49,7 @@ void FileFormat::write( const std::list< data::Image >& images, const std::strin
 	}
 }
 
-std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ){
 	//try open file
 	data::FilePtr ptr(filename);
 	if( !ptr.good() ) {
@@ -72,7 +72,7 @@ std::list<data::Chunk> FileFormat::load( const boost::filesystem::path &filename
 	return ret;
 }
 
-std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ){
 	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
 	const void *p=source.getRawAddress().get();
 	const uint8_t *start=source.begin(), *end=source.end();
@@ -83,7 +83,7 @@ std::list<data::Chunk> FileFormat::load(data::ByteArray source, std::list<util::
 	return load(buffer,formatstack,dialects,feedback);
 }
 
-std::list<data::Chunk> FileFormat::load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ){
+std::list<data::Chunk> FileFormat::load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ){
 	util::TmpFile tmp("isis_streamio_adapter");
 	boost::iostreams::copy(*source,boost::iostreams::file_sink(tmp.c_str()));
 	return load(tmp.native(),formatstack,dialects,feedback);

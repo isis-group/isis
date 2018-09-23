@@ -161,6 +161,9 @@ bool Message::shouldCommit()const
 		return ( buff->m_level >= m_level );
 	else return false;
 }
+std::string Message::str()const{
+	return std::ostringstream::str();
+}
 
 std::string Message::str() const{
 	return std::ostringstream::str();

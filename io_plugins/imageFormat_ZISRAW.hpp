@@ -51,6 +51,7 @@ namespace _internal {
 
 class ImageFormat_ZISRAW : public FileFormat{
 	static const std::map<uint32_t,uint16_t> PixelTypeMap,PixelSizeMap;
+	static const std::map<std::string,uint16_t> PixelTypeMapStr;
 	class Segment{
 		uint64_t allocated_size,used_size;
 	protected:
@@ -60,6 +61,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		}
 	public:
 		std::string id;
+		size_t getSegmentSize();
 		/**
 		 * Create a segment from the source
 		 * \param source the ByteArray from the container (file)
@@ -82,20 +84,22 @@ class ImageFormat_ZISRAW : public FileFormat{
 		util::PropertyMap xml_data;
 	public:
 		MetaData(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
+		util::PropertyMap get()const;
 	};
 	class SubBlock:public Segment{
 		int32_t MetadataSize,AttachmentSize;
 		int64_t DataSize;
 		data::ByteArray image_data;
 		_internal::DirectoryEntryDV DirectoryEntry;
-		size_t writeDimsInfo(util::PropertyMap &map)const;
-		static data::Chunk jxrRead(util::PropertyMap dims,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
+		static data::Chunk jxrRead(size_t xsize,size_t ysize,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
-		std::future<data::Chunk> makeChunks(std::shared_ptr<util::ProgressFeedback> feedback)const;
+		std::function<data::Chunk()> getChunkGenerator()const;
 		util::PropertyMap xml_data;
 		bool isNormalImage()const;
 		std::string getPlaneID()const;
+		std::map<std::string,_internal::DimensionEntry> getDimsInfo()const;
+		std::array<size_t,4> getSize()const;
 	};
 	class Directory:public Segment{
 	public:
@@ -103,6 +107,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		Directory(data::ByteArray &source, const size_t offset);
 	};
 	void storeProperties(data::Chunk &dst,std::string plane_id);
+	void transferFromMosaic(std::list<SubBlock> segments,data::Chunk &dst, int32_t xoffset, int32_t yoffset,std::shared_ptr<util::ProgressFeedback> feedback);
 public:
 	util::istring suffixes(isis::image_io::FileFormat::io_modes /*modes*/) const override {return ".czi";}
 
@@ -111,11 +116,11 @@ public:
 		std::list<util::istring> /*formatstack*/,
 		std::list<util::istring> dialects,
 		std::shared_ptr<util::ProgressFeedback> feedback
-	)throw( std::runtime_error & ) override;
+	) override;
 
 	std::string getName() const override {return "Zeiss Integrated Software RAW";}
 
-	std::list<util::istring> dialects() const override {return {"dump_xml"};}
+	std::list<util::istring> dialects() const override {return {"dump_xml","nopyramid"};}
 
 	void write(const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/) override{
 		throwGenericError("not yet implemented");

@@ -105,7 +105,7 @@ public:
 		std::list<util::istring> formatstack, 
 		std::list<util::istring> dialects, 
 		std::shared_ptr<util::ProgressFeedback> feedback 
-	)throw( std::runtime_error & ) override{
+	) override{
 		std::list< data::Chunk > ret;
 		_internal::ByteStream hdr_stream(source);
 
