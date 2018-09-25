@@ -126,9 +126,9 @@ std::map<std::string,_internal::DimensionEntry> ImageFormat_ZISRAW::SubBlock::ge
 std::array<size_t,4> ImageFormat_ZISRAW::SubBlock::getSize()const{
 	std::map<std::string,_internal::DimensionEntry> map=getDimsInfo();
 	std::array<size_t,4> ret={
-		map["X"].size,
-		map["Y"].size,
-		map["Z"].size,
+		map["X"].StoredSize?:map["X"].size,
+		map["Y"].StoredSize?:map["Y"].size,
+		map["Z"].StoredSize?:map["Z"].size,
 		1
 	};
 	if(!ret[2])ret[2]=1;
@@ -185,9 +185,6 @@ std::function<data::Chunk()> ImageFormat_ZISRAW::SubBlock::getChunkGenerator()co
 
 	switch(DirectoryEntry.Compression){
 		case 0:{
-			for(int i=0;i<DirectoryEntry.dims.size();i++){
-				size[i]=DirectoryEntry.dims[i].size;
-			}
 			auto pixel_type=DirectoryEntry.PixelType;
 			// linear representation of the pixel data reinterpreted as the correct PixelType
 			decoder = [size,pixel_type](isis::data::ByteArray image_data){
@@ -233,17 +230,43 @@ void ImageFormat_ZISRAW::storeProperties(data::Chunk &dst,std::string plane_id){
 	dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
 }
 
-void ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, data::Chunk &dst,int32_t xoffset, int32_t yoffset,std::shared_ptr<util::ProgressFeedback> feedback){
+data::Chunk ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, unsigned short type_id,std::shared_ptr<util::ProgressFeedback> feedback){
+	struct bounds{
+		int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();
+		size_t size()const{return max-min+1;}
+	};
+	struct {bounds x,y;} boundaries;
+	
+	for(auto &s:segments){
+		for(const auto &d:s.DirectoryEntry.dims){
+			if(d.Dimension[0]<'X' || d.Dimension[0]>'Y')continue; // we're only interested in X and Y here
+			bounds &b=d.Dimension[0]=='X'?boundaries.x:boundaries.y;//select boundary by name
+			const int scale = d.StoredSize?d.size/d.StoredSize:1;
+			const int start = d.start/scale;
+			const int end=start+d.StoredSize-1;
+			if(b.min>start)b.min=start;
+			if(b.max<end)b.max=end;
+		}
+	}
+
+	auto dst=data::Chunk::createByID(type_id, boundaries.x.size(),boundaries.y.size(),1,1,true);
+	assert(dst.getVolume());
+	
+	int32_t xoffset=-boundaries.x.min, yoffset=-boundaries.y.min;
+	
 	std::list<std::thread> jobs;
 	for(auto &s:segments){
 		auto dims=s.getDimsInfo();
-		assert(dims["X"].start+xoffset>=0);
-		assert(dims["Y"].start+yoffset>=0);
+		auto &X=dims["X"],&Y=dims["Y"];;
+		const int xscale = X.StoredSize?X.size/X.StoredSize:1;
+		const int yscale = Y.StoredSize?Y.size/Y.StoredSize:1;
+		assert(X.start/xscale+xoffset>=0);
+		assert(Y.start/yscale+yoffset>=0);
 
 		const std::array<size_t,4> pos={
-			size_t(dims["X"].start+xoffset),
-			size_t(dims["Y"].start+yoffset),
-			1,1
+			size_t(X.start/xscale+xoffset),
+			size_t(Y.start/yscale+yoffset),
+			0,0
 		};
 
 		auto op = [&s,pos,&feedback,&dst](){
@@ -255,10 +278,7 @@ void ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, data::
 	}
 	for(auto &j:jobs)
 		j.join();
-
-// 		dst->touchBranch("XML").deduplicate(p.second.segments_xml);
-// 		storeProperties(*dst,p.first);
-// 		ret.push_back(*dst);
+	return dst;
 }
 
 std::list<data::Chunk> ImageFormat_ZISRAW::load(
@@ -293,7 +313,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 	//get MetaData if there are some
 	if(header.MetadataPosition){
 		util::PropertyMap meta=MetaData(source,header.MetadataPosition,dump_stream).get().branch("ImageDocument/Metadata");
-		meta.print(std::cout)<< std::endl;
+// 		meta.print(std::cout)<< std::endl;
 		util::PropertyMap image_props=meta.branch("Information/Image");
 		image_info.size = {
 			image_props.getValueAs<size_t>("SizeX"),
@@ -325,9 +345,11 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 	
 	LOG_IF(image_info.pyramid.layers>0,Runtime,info) 
 		<< "Header says its a " << image_info.size.x << "*" << image_info.size.y 
-		<< " pyramid image with " << image_info.pyramid.layers << " layers";
+		<< " pyramid image with " << image_info.pyramid.layers << " subsampled layers";
 	LOG_IF(image_info.pyramid.layers==0,Runtime,info) 
 		<< "Header says its a " << image_info.size.x << "*" << image_info.size.y << " image";
+
+	std::vector<std::list<SubBlock>> pyramid(image_info.pyramid.layers+1);
 
 	//generate planes
 	if(header.DirectoryPosition){
@@ -344,55 +366,50 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		std::map<std::string,plane> planes;
 
 		for(const _internal::DirectoryEntryDV &e:directory.entries){
-			const SubBlock s(source,e.FilePosition,dump_stream);
-			LOG(Runtime,verbose_info) << "Checking entry " << s.id << " for image data PyramidType: " << (int)e.PyramidType;
-			
-			if(s.isNormalImage() && !(checkDialect(dialects,"nopyramid") && e.PyramidType)){
-				plane &p=planes[s.getPlaneID()];
-				// find boundaries (not existing dimsions will not be registered)
-				for(const auto &d:e.dims){
-					bounds &b=p.boundaries[d.Dimension];//select boundary by name
-					const int end=d.start+d.StoredSize-1;
-					if(b.min>d.start)b.min=d.start;
-					if(b.max<end)b.max=end;//TODO shouldn't that be size and how do we deal with this
-				}
-				p.segments.push_back(s);
-// 				chunks.back().branch("dims").print(std::cerr) << std::endl;
+			if(e.PyramidType){
+				int scale = e.dims[0].size / e.dims[0].StoredSize;
+				int scaleFactor= image_info.pyramid.factor;
+				assert(scaleFactor>1);
+				int level = std::log10(scale)/std::log10(scaleFactor);
+				LOG(Runtime,verbose_info) 
+					<< "Got Pyramid segment " << std::make_pair(e.dims[0].StoredSize,e.dims[1].StoredSize) 
+					<< "-Image at level " << level << " (scale: " << scale << ")";
+						
+				pyramid[level].emplace_back(source,e.FilePosition,dump_stream);
+				assert(pyramid[level].back().isNormalImage());
 			} else {
+				LOG(Runtime,verbose_info) 
+					<< "Got base segment " << std::make_pair(e.dims[0].StoredSize,e.dims[1].StoredSize) << "-Image";
+				pyramid[0].emplace_back(source,e.FilePosition,dump_stream);
+				assert(pyramid[0].back().isNormalImage());
 			}
 		}
 		
-		LOG(Runtime,info) << "Detected " << planes.size() << " different planes";
-		for(auto &p:planes){
-			auto &segments=p.second.segments;
-
-// 			LOG(Runtime,verbose_info) << "Dimensions from the header are:";
-// 			for(const auto &b:p.second.boundaries){
-// 				LOG(Runtime,verbose_info) << b.first << ":" << std::make_pair(b.second.min,b.second.max) << " size: " << b.second.size();
-// 			}
-
-			if(segments.size()>1 && p.second.boundaries["M"].size()==segments.size()){
-				ret.push_back(data::Chunk::createByID(image_info.type_id,image_info.size.x,image_info.size.y,image_info.size.z,1,true));
-				LOG(Runtime,info) << "Creating " << ret.back().getSizeAsString() << " Image for plane " << p.first << " from " << segments.size() << " tiles";
-
-	// 			segments.sort([](const data::Chunk &c1,const data::Chunk &c2){//sorting the segments by index M
-	// 				return c1.property("dims/M/start").lt(c2.property("dims/M/start"));}
-	// 			);
-				transferFromMosaic(segments,ret.back(),-p.second.boundaries["X"].min,-p.second.boundaries["Y"].min,feedback);
-				ret.back().setValueAs<util::fvector3>("voxelSize",{image_info.pixel_size,image_info.pixel_size,1});
+		LOG(Runtime,info) << "Found " << pyramid.size() << " level Pyramid";
+		std::array<size_t, 2> size{image_info.size.x,image_info.size.y};
+		for(size_t i=0;i<pyramid.size();i++){
+			assert(!pyramid[i].empty());
+			const size_t estimated_size=util::product(size)*PixelSizeMap.at(pyramid[i].front().DirectoryEntry.PixelType)/(1024*1024);
+			if(checkDialect(dialects,"max16G") && estimated_size> 16*1024){
+				LOG(Runtime,notice) << "Skipping " << size << " image as its resulting in-memory size " << std::to_string(estimated_size)+"MB" << " would exceed the limit of 16G";
+			}else if(checkDialect(dialects,"max8G") && estimated_size> 8*1024){
+				LOG(Runtime,notice) << "Skipping " << size << " image as its resulting in-memory size " << std::to_string(estimated_size)+"MB" << " would exceed the limit of 8G";
+			} else if(checkDialect(dialects,"max4G") && estimated_size> 4*1024){
+				LOG(Runtime,notice) << "Skipping " << size << " image as its resulting in-memory size " << std::to_string(estimated_size)+"MB" << " would exceed the limit of 4G";
 			} else {
-				while(!segments.empty()){
-					auto &s=segments.front();
-					data::Chunk c=s.getChunkGenerator()();
-					LOG(Runtime,info) << "Got non-mosaic segment " << c.getSizeAsString() << "-Image for plane " << p.first;
-					c.touchBranch("XML").transfer(s.xml_data);
-// 					storeProperties(c,p.first);
+				ret.push_back(transferFromMosaic(pyramid[i],image_info.type_id,feedback));
+				LOG(Runtime,info) <<  ret.back().getSizeAsString() << " Image created for pyramid level " << i << " from " << pyramid[i].size() << " tiles";
 
-					ret.push_back(c);
-					if(feedback)feedback->progress("",s.getSegmentSize());
-					segments.pop_front();//get rid of segments we dont need anymore
-				}
+				ret.back().touchBranch("XML").transfer(pyramid[i].front().xml_data);
+				
+				const float pixel_size=image_info.pixel_size*std::pow(image_info.pyramid.factor,i);
+				ret.back().setValueAs<util::fvector3>("voxelSize",{pixel_size,pixel_size,1});
+				ret.back().setValueAs("pyramidLevel",i);
+				ret.back().setValueAs("sequenceNumber",i);
 			}
+
+			for(size_t &s:size)
+				s=std::ceil(double(s)/image_info.pyramid.factor);
 		}
 		return ret;
 
