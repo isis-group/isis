@@ -23,6 +23,7 @@ set(ISIS_VERSION
 project(ISIS VERSION ${ISIS_VERSION})
 
 find_package(Git)
+find_package(Threads)
 
 include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 include(CheckIncludeFiles)

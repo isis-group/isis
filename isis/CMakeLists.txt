@@ -1,7 +1,5 @@
 set(ISIS_BUILD_STATIC_LIBS OFF CACHE BOOL "build all libraries static. If OFF a dynamic build will be done." )
 
-find_package(Threads)
-
 ############################################################
 # macros to generate libs
 ############################################################
