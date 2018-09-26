@@ -1,7 +1,7 @@
-#include <isis/data/io_application.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/io_factory.hpp>
 #include <isis/math/transform.hpp>
-#include <isis/util/common.hpp>
+#include <isis/core/common.hpp>
 #include <regex>
 #include <cctype>
 
@@ -26,7 +26,12 @@ public:
 } flifu;
 
 int getDimFromStr(std::string s){
-	const int ret=std::tolower(s[0])-'x';
+	int ret;
+	if(std::tolower(s[0])=='t')
+		ret=data::timeDim;
+	else
+		ret=std::tolower(s[0])-'x';
+	
 	return s[1]=='-'? -ret:ret;
 }
 
@@ -59,11 +64,11 @@ bool swapProperties( data::Image &image, const unsigned short dim )
 
 void flipDim(data::Image &refImage, int dim){
 	if(refImage.getChunkAt(0).getRelevantDims() > dim ) {//dimension to flip is inside the chunks (so flip them)
-		LOG(TransformLog,notice) << "flipping voxels along dim " << std::string(1,'x'+dim);
+		LOG(TransformLog,notice) << "flipping voxels along dim " << std::string(1,'x'+dim)  << " in " << refImage.identify();
 		flifu.dim = static_cast<data::dimensions>( dim );
 		refImage.foreachChunk( flifu );
 	} else { // otherwhise just flip the Chunks positions
-		LOG(TransformLog,notice) << "flipping chunk order along dim " << std::string(1,'x'+dim);
+		LOG(TransformLog,notice) << "flipping chunk order along dim " << std::string(1,'x'+dim)  << " in " << refImage.identify();
 		if( !swapProperties( refImage, dim ) ) {
 			exit(EXIT_FAILURE);
 		}
@@ -141,15 +146,15 @@ int main( int argc, char **argv )
 		}
 	}
 
-	std::list<std::pair<int,int>> swapper;
+	std::list<std::pair<std::string,std::string>> swapper;
 	for(std::string cmd:app.parameters["swapdim"].as<util::slist>()){
 		static const std::regex cmd_regex("([xyzt]-?)(:([xyzt]-?))?",std::regex_constants::icase);
 		std::smatch results;
 		
 		if(std::regex_match(cmd,results,cmd_regex)){
-			swapper.push_back(std::make_pair(getDimFromStr(results[1]),0));
+			swapper.push_back(std::make_pair(results[1],""));
 			if(results.length(3)>0)
-				swapper.back().second=getDimFromStr(results[3]);
+				swapper.back().second=results[3];
 		} else {
 			LOG(TransformLog,error) << "ignoring invalid swapdim parameter " << cmd;
 		}
@@ -158,19 +163,19 @@ int main( int argc, char **argv )
 	//go through every image
 	for( data::Image & refImage :  app.images ) {
 		for(auto swap:swapper){ // swapdim
-			if(swap.first<0){
-				swap.first=-swap.first;
-				flipDim(refImage,swap.first);
+			if(swap.first[1]=='-'){
+				swap.first.pop_back();
+				flipDim(refImage,getDimFromStr(swap.first));
 			}
 
-			if(swap.second<0){
-				swap.second=-swap.second;
-				flipDim(refImage,swap.second);
+			if(swap.second[1]=='-'){
+				swap.second.pop_back();
+				flipDim(refImage,getDimFromStr(swap.second));
 			}
 			
-			if(swap.second && swap.first != swap.second){
-				LOG(TransformLog,notice) << "swapping dim " << std::string(1,'x'+swap.first) << " and " << std::string(1,'x'+swap.second);
-				refImage.swapDim(swap.first,swap.second, app.feedback());
+			if(!swap.second.empty() && swap.first != swap.second){
+				LOG(TransformLog,notice) << "swapping dim " << swap.first << " and " << swap.second << " in " << refImage.identify();
+				refImage.swapDim(getDimFromStr(swap.first),getDimFromStr(swap.second), app.feedback());
 			}
 		}
 		if(app.parameters["translate"].isParsed()){

@@ -20,7 +20,7 @@
 #ifndef IMAGEFORMAT_DICOM_HPP
 #define IMAGEFORMAT_DICOM_HPP
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 
 #define HAVE_CONFIG_H // this is needed for autoconf configured dcmtk (e.g. the debian package)
 
@@ -73,9 +73,9 @@ public:
 	std::string getName()const override;
 	std::list<util::istring> dialects()const override;
 
-	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	void write( const data::Image &image,     const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) throw( std::runtime_error & )override;
+	std::list<data::Chunk> load(std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override;
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override;
+	void write( const data::Image &image,     const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )override;
 };
 }
 }

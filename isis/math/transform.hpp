@@ -20,8 +20,8 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "../data/image.hpp"
-#include "../util/matrix.hpp"
+#include "../core/image.hpp"
+#include "../core/matrix.hpp"
 #include "common.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
@@ -89,7 +89,7 @@ boost::numeric::ublas::matrix<TYPE> toBoostMatrix(const util::Matrix<TYPE,COLS,R
 }
 
 template<typename TYPE,size_t COLS,size_t ROWS>
-util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & )
+util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix )
 {
 	util::Matrix<TYPE,COLS,ROWS> ret;
 	if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
@@ -107,7 +107,7 @@ util::Matrix<TYPE,COLS,ROWS> fromBoostMatrix( const boost::numeric::ublas::matri
 
 
 template<typename TYPE, size_t SIZE> util::Matrix<TYPE, SIZE, SIZE> 
-inverseMatrix(const util::Matrix<TYPE,SIZE,SIZE> &mat, bool &invertible ) throw ( std::logic_error & )
+inverseMatrix(const util::Matrix<TYPE,SIZE,SIZE> &mat, bool &invertible )
 {
 	using namespace boost::numeric::ublas;
 	util::Matrix<TYPE, SIZE, SIZE> ret;

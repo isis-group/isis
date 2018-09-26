@@ -1,8 +1,8 @@
 
-#include <isis/data/io_interface.h>
-#include <isis/data/io_factory.hpp>
-#include <isis/util/tmpfile.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/tmpfile.hpp>
+#include <isis/core/io_factory.hpp>
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <boost/filesystem/fstream.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/fileptr.hpp>
 #include <boost/iostreams/categories.hpp>  // tags
 
 
@@ -86,7 +86,7 @@ public:
 	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )override {
 		throwGenericError( "Not implemented (yet)" );
 	}
-	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) override {
 		std::list<data::Chunk> ret;
 		size_t size, next_header_in;
 		std::basic_istream<char> in(source);

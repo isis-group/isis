@@ -8,21 +8,6 @@
 #
 ############################################################
 cmake_minimum_required(VERSION 3.5.1)
-find_package(Git)
-
-if(CMAKE_MAJOR_VERSION EQUAL 3)
-cmake_policy(SET CMP0042 NEW)
-cmake_policy(SET CMP0048 OLD)
-endif(CMAKE_MAJOR_VERSION EQUAL 3)
-
-include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
-include(CheckIncludeFiles)
-find_package(PkgConfig)
-
-project(ISIS)
-
-option(BUILD_TESTING OFF)
-include(CTest)
 
 ############################################################
 # set isis version number
@@ -31,13 +16,27 @@ set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "7")
 set(ISIS_VERSION_PATCH "16")
 
+set(ISIS_VERSION
+  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
+  CACHE INTERNAL "The current Version of the ISIS project")
+
+project(ISIS VERSION ${ISIS_VERSION})
+
+find_package(Git)
+find_package(Threads)
+
+include(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
+include(CheckIncludeFiles)
+find_package(PkgConfig)
+
+
+option(BUILD_TESTING OFF)
+include(CTest)
+
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
 add_definitions(-D_ISIS_VERSION_PATCH=${ISIS_VERSION_PATCH})
 
-set(ISIS_VERSION
-  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
-  CACHE INTERNAL "The current Version of the ISIS project")
 
 set(ISIS_CORE_VERSION_API "4.0.0")
 set(ISIS_QT_VERSION_API "0.0.0")
@@ -131,7 +130,6 @@ macro( build_manpage name desc)
 		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI_Tools")
 	endif(MANPAGES)
 endmacro( build_manpage )
-
 
 ############################################################
 # RCS revision number

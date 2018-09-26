@@ -6,7 +6,7 @@
 //  Copyright © 2017 Enrico Reimer. All rights reserved.
 //
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -105,7 +105,7 @@ public:
 		std::list<util::istring> formatstack, 
 		std::list<util::istring> dialects, 
 		std::shared_ptr<util::ProgressFeedback> feedback 
-	)throw( std::runtime_error & ) override{
+	) override{
 		std::list< data::Chunk > ret;
 		_internal::ByteStream hdr_stream(source);
 

@@ -18,9 +18,13 @@ void isis::qt5::display(data::Chunk chk, std::string title)
 
 void isis::qt5::display(data::Image img, std::string title)
 {
-	if(qApp)
+	if(img.getDimSize(0)>32768){
+		LOG(Runtime,warning) << "Will not display " << img.getSizeAsString() << "-image as it is to wide (max: 32768)";
+	} else if(img.getDimSize(1)>32768){
+		LOG(Runtime,warning) << "Will not display " << img.getSizeAsString() << "-image as it is to tall (max: 32768)";
+	} else if(qApp)
 		(new SimpleImageView(img,QString::fromStdString(title)))->show(); // create image and show it
-	else { // if there is no qApp
+	else { // if there is no qApp @todo pretty dirty hack only working on linux
 		QFile cmdline_file("/proc/self/cmdline");
 
 		if(!cmdline_file.open(QIODevice::ReadOnly)){

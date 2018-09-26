@@ -2,8 +2,8 @@
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
 
-#include <isis/data/image.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/image.hpp>
+#include <isis/core/io_factory.hpp>
 
 namespace isis
 {

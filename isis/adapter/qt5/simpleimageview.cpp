@@ -20,7 +20,7 @@
 #include "simpleimageview.hpp"
 #include "gradientwidget.hpp"
 #include "common.hpp"
-#include "../../data/io_factory.hpp"
+#include "../../core/io_factory.hpp"
 #include <QSlider>
 #include <QGridLayout>
 #include <QGraphicsView>
@@ -104,12 +104,25 @@ class LinearTransfer : public TransferFunction{
 public:
 	LinearTransfer(std::pair<util::ValueReference,util::ValueReference> minmax):TransferFunction(minmax){}
 	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
-		if(line.is<util::color24>() || line.is<util::color24>()){
+		if(line.is<util::color24>() || line.is<util::color48>()){
 			auto *c_dst=reinterpret_cast<QRgb*>(dst);
 			for(const util::color24 &c:const_cast<data::ValueArrayBase &>(line).as<util::color24>(scale))
 				*(c_dst++)=qRgb(c.r,c.g,c.b);
 		} else 
 			line.copyToMem<uint8_t>(dst,line.getLength(),scale);
+	}
+};
+
+class MaskTransfer : public TransferFunction{
+public:
+	MaskTransfer():TransferFunction(std::pair<util::ValueReference,util::ValueReference>(util::Value<int>(0),util::Value<int>(1))){}
+	void operator()(uchar * dst, const data::ValueArrayBase & line) const override{
+		for(const bool &c:const_cast<data::ValueArrayBase &>(line).as<bool>()){
+			if(c)
+				*(dst++)=255;
+			else 
+				*(dst++)=0;
+		}
 	}
 };
 
@@ -130,7 +143,7 @@ public:
 
 } //namespace _internal
 
-void SimpleImageView::setupUi(bool with_complex){
+void SimpleImageView::setupUi(){
 
 	QGridLayout *gridLayout = new QGridLayout(this);
 
@@ -157,7 +170,7 @@ void SimpleImageView::setupUi(bool with_complex){
 	connect(timeSelect, SIGNAL(valueChanged(int)), SLOT(timeChanged(int)));
 	connect(sliceSelect, SIGNAL(valueChanged(int)), SLOT(sliceChanged(int)));
 	
-	if(with_complex){
+	if(type==complex){
 		QGroupBox *groupBox = new QGroupBox("complex representation");
 		transfer_function_group = new QButtonGroup(groupBox);
 		QHBoxLayout *vbox = new QHBoxLayout;
@@ -181,15 +194,21 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	{
 		case data::ValueArray<std::complex<float>>::staticID():
 		case data::ValueArray<std::complex<double>>::staticID():
-			is_complex=true;
+			type=complex;
 			break;
 		case data::ValueArray<util::color24>::staticID():
 		case data::ValueArray<util::color48>::staticID():
-			is_color=true;
-		default:break;
+			type=color;
+			break;
+		case data::ValueArray<bool>::staticID():
+			type=mask;
+			break;
+		default:
+			type=normal;
+			break;
 	}
 	
-	setupUi(is_complex);
+	setupUi();
 	
 	if(title.isEmpty())
 		title= QString::fromStdString(img.identify(true,false));
@@ -203,21 +222,22 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	graphicsView->scale(voxelsize[0]*dpmm_x,voxelsize[1]*dpmm_y);
 	
 	auto minmax=img.getMinMax();
-	if(is_color){
+	if(type==color){
 		auto first_c= minmax.first->as<util::color48>();
 		auto second_c=minmax.second->as<util::color48>();
 		minmax.first = util::Value<double>((first_c.r+first_c.g+first_c.b)/3.0);
 		minmax.second= util::Value<double>((second_c.r+second_c.g+second_c.b)/3.0);
-	}
-
-	if(is_complex){
+		transfer_function.reset(new _internal::LinearTransfer(minmax));
+	} else if(type==complex){
 		magnitude_transfer.reset(new _internal::MagnitudeTransfer(minmax));
 		phase_transfer.reset(new _internal::PhaseTransfer);
 		
 		transfer_function=magnitude_transfer;
 		connect(transfer_function_group, SIGNAL(buttonToggled(int, bool)),SLOT(selectTransfer(int,bool)));
+	} else if(type==mask){
+		transfer_function.reset(new _internal::MaskTransfer());
 	} else {
-		transfer_function.reset(new _internal::LinearTransfer(minmax));;
+		transfer_function.reset(new _internal::LinearTransfer(minmax));
 	}
 	
 	const std::array<size_t,4> img_size= img.getSizeAsVector();
@@ -237,24 +257,26 @@ SimpleImageView::SimpleImageView(data::Image img, QString title, QWidget *parent
 	if(img_size[data::sliceDim]>1)
 		sliceSelect->setValue(img_size[data::sliceDim]/2);
 	
-	QWidget *gradient;
-	if(img.hasProperty("window/max") && img.hasProperty("window/min")){
-		const double min=minmax.first->as<double>(),max=minmax.second->as<double>();
-		const double hmin=img.getValueAs<double>("window/min"),hmax=img.getValueAs<double>("window/max");
-		double bottom=(hmin-min) / (max-min);
-		double top= hmax / max;
+	if(type!=mask){
+		QWidget *gradient;
+		if(img.hasProperty("window/max") && img.hasProperty("window/min")){
+			const double min=minmax.first->as<double>(),max=minmax.second->as<double>();
+			const double hmin=img.getValueAs<double>("window/min"),hmax=img.getValueAs<double>("window/max");
+			double bottom=(hmin-min) / (max-min);
+			double top= hmax / max;
 
-		if(std::isinf(bottom))bottom=0;
-		if(std::isinf(top))top=1;
+			if(std::isinf(bottom))bottom=0;
+			if(std::isinf(top))top=1;
 
-		transfer_function->updateScale(bottom,top);
+			transfer_function->updateScale(bottom,top);
+			
+			gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()),bottom,top);
+		} else 
+			gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()));
 		
-		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()),bottom,top);
-	} else 
-		gradient=new GradientWidget(this,std::make_pair(minmax.first->as<double>(),minmax.second->as<double>()));
-	
-	dynamic_cast<QGridLayout*>(layout())->addWidget(gradient,0,2,1,1);
-	connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
+		dynamic_cast<QGridLayout*>(layout())->addWidget(gradient,0,2,1,1);
+		connect(gradient,SIGNAL(scaleUpdated(qreal, qreal)),SLOT(reScale(qreal,qreal)));
+	}
 
 	updateImage();
 }
@@ -271,17 +293,35 @@ void SimpleImageView::timeChanged(int time)
 void SimpleImageView::updateImage()
 {
 	graphicsView->scene()->clear();
-
+	assert(transfer_function);
 	auto transfer=transfer_function; //lambdas cannot bind members ??
-	graphicsView->scene()->addPixmap(
-		QPixmap::fromImage(
-			makeQImage(
-				m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
-				m_img.getDimSize(data::rowDim),
-				[transfer](uchar *dst, const data::ValueArrayBase &line){transfer->operator()(dst,line);}
-			)
-		)
-	);
+	QImage qimage;
+	
+	const auto ch_dims=m_img.getChunkAt(0,false).getRelevantDims();
+	
+	assert(ch_dims<=data::sliceDim); // we at least should have a sliced image (the constructor should have made sure of that)
+	if(ch_dims==data::sliceDim){ // we have a sliced image
+		qimage = makeQImage(
+			m_img.getChunk(0,0,curr_slice,curr_time).getValueArrayBase(),
+			m_img.getDimSize(data::rowDim),
+			[transfer](uchar *dst, const data::ValueArrayBase &line){
+				transfer->operator()(dst,line);
+			}
+		);
+	} else { // if we have a "lines-image"
+		std::vector<data::ValueArrayBase::Reference> lines(m_img.getDimSize(1));
+		for(size_t l=0;l<m_img.getDimSize(1);l++){
+			lines[l]=m_img.getChunk(0,l,curr_slice,curr_time).getValueArrayBase();
+		}
+		qimage = makeQImage(
+			lines,
+			[transfer](uchar *dst, const data::ValueArrayBase &line){
+				transfer->operator()(dst,line);
+			}
+		);
+	}
+
+	graphicsView->scene()->addPixmap(QPixmap::fromImage(qimage));
 }
 void SimpleImageView::selectTransfer(int id, bool checked)
 {

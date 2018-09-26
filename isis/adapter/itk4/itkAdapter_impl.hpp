@@ -21,8 +21,8 @@
  *****************************************************************/
 
 #include "itkAdapter.hpp"
-#include "../../data/chunk.hpp"
-#include "../../data/io_factory.hpp"
+#include "../../core/chunk.hpp"
+#include "../../core/io_factory.hpp"
 #include "../../math/transform.hpp"
 
 namespace isis

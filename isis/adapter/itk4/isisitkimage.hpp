@@ -21,8 +21,8 @@
 #define ISISITKIMAGE_H
 
 #include <itkImage.h>
-#include "../../data/image.hpp"
-#include "../../data/chunk.hpp"
+#include "../../core/image.hpp"
+#include "../../core/chunk.hpp"
 #include <itkImportImageContainer.h>
 #include "common.hpp"
 
@@ -66,6 +66,7 @@ public:
 protected:
 	float* 	AllocateElements(size_t size, bool /*UseDefaultConstructor*/) const override{
 		LOG_IF(size,Debug,warning) << "Ignoring command to allocate elements";
+		return 0;
 	}
 	void DeallocateManagedMemory ()override{
 		LOG(Debug,warning) << "Deallocating ValueArray";

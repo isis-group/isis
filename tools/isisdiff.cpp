@@ -1,6 +1,6 @@
-#include <isis/data/io_factory.hpp>
-#include <isis/data/io_application.hpp>
-#include <isis/util/application.hpp>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/application.hpp>
 #include <algorithm>
 #include <regex>
 
@@ -200,15 +200,13 @@ int main( int argc, char *argv[] )
 
 	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
 		app.parameters["in1"] = util::slist( 1, in1.first );
-		std::list<data::Image> images;
-		data::IOApplication::autoload( app.parameters, images, true, "1", feedback );
+		std::list<data::Image> images=data::IOApplication::autoload( app.parameters, true, "1", feedback );
 
 		const data::Image first = pickImg( in1.second, images );
 
 		if( !in2.first.empty() ) {
-			images.clear();
 			app.parameters["in2"] = util::slist( 1, in2.first );
-			data::IOApplication::autoload( app.parameters, images, true, "2", feedback );
+			images=data::IOApplication::autoload( app.parameters, true, "2", feedback );
 		}
 
 		const data::Image second = pickImg( in2.second, images );
@@ -219,8 +217,8 @@ int main( int argc, char *argv[] )
 			ret = 1;
 
 	} else if( in1.second <= 0 && in2.second <= 0 ) {
-		data::IOApplication::autoload( app.parameters, images1, false, "1", feedback );
-		data::IOApplication::autoload( app.parameters, images2, false, "2", feedback );
+		images1=data::IOApplication::autoload( app.parameters, false, "1", feedback );
+		images2=data::IOApplication::autoload( app.parameters, false, "2", feedback );
 		dropWith( app.parameters["skipwith"], images1 );
 		dropWith( app.parameters["skipwith"], images2 );
 

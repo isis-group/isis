@@ -1,6 +1,6 @@
 #include "imageFormat_Dicom.hpp"
-#include <isis/data/common.hpp>
-#include <isis/util/istring.hpp>
+#include <isis/core/common.hpp>
+#include <isis/core/istring.hpp>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <dcmtk/dcmdata/dcdicent.h>
@@ -526,7 +526,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	return dest;
 }
 
-std::list<data::Chunk> ImageFormat_Dicom::load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) {
+std::list<data::Chunk> ImageFormat_Dicom::load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) {
 
 	std::basic_stringbuf<char> buff_stream;
 	boost::iostreams::copy(*source,buff_stream);
@@ -536,7 +536,7 @@ std::list<data::Chunk> ImageFormat_Dicom::load ( std::streambuf *source, std::li
 	return load(wrap,formatstack,dialects,progress);
 }
 
-std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & )
+std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )
 {
 	DcmInputBufferStream dcstream;
 	DcmFileFormat dcfile;
@@ -575,7 +575,7 @@ std::list< data::Chunk > ImageFormat_Dicom::load(const data::ByteArray source, s
 
 }
 
-void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }

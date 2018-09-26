@@ -1,8 +1,8 @@
 #ifndef MATH_COMMON_HPP
 #define MATH_COMMON_HPP
 
-#include "../util/log.hpp"
-#include "../util/log_modules.hpp"
+#include "../core/log.hpp"
+#include "../core/log_modules.hpp"
 
 namespace isis{
 namespace math{

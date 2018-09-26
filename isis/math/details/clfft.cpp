@@ -31,7 +31,7 @@ public:
 		}
 		return "Unknown OpenCL error";
 	}
-	CLFFTPlan(OpenCLPlatform &dev, data::_internal::NDimensional<4> shape, float scale):device(dev){
+	CLFFTPlan(OpenCLPlatform &dev, data::NDimensional<4> shape, float scale):device(dev){
 		clfftSetupData fftSetup;
 		const clfftDim dim = (clfftDim)shape.getRelevantDims();
 		queue = dev.clCreateCommandQueue( );

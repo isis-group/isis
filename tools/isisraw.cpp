@@ -1,6 +1,6 @@
-#include <isis/data/io_factory.hpp>
-#include <isis/data/io_application.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/io_application.hpp>
+#include <isis/core/fileptr.hpp>
 
 
 struct RawLog {static const char *name() {return "Raw";}; enum {use = _ENABLE_LOG};};
@@ -12,9 +12,9 @@ using namespace isis;
 class FakedRawFormat: public image_io::FileFormat
 {
 	std::string getName()const override {return "";};
-	std::list< data::Chunk > load( const boost::filesystem::path &, std::list<util::istring> /*formatstack*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) throw( std::runtime_error & ) override  {return std::list< data::Chunk>();}
+	std::list< data::Chunk > load( const boost::filesystem::path &, std::list<util::istring> /*formatstack*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/ ) override  {return std::list< data::Chunk>();}
 	util::istring suffixes( io_modes /*modes = both*/ ) const override {return "";}
-	void write( const data::Image & /*image*/, const std::string & /*filename*/, std::list<util::istring> /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) throw( std::runtime_error & ) override {}
+	void write( const data::Image & /*image*/, const std::string & /*filename*/, std::list<util::istring> /*dialect*/, std::shared_ptr<util::ProgressFeedback> /*progress*/ ) override {}
 	std::pair< std::string, std::string > makeBasename( const std::string &filename )const override {
 		return std::make_pair( filename, std::string( "" ) );
 	}

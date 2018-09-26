@@ -57,9 +57,9 @@
 #define NIFTI_UNITS_PPM    40
 #define NIFTI_UNITS_RADS   48
 
-#include <isis/data/io_interface.h>
-#include <isis/util/matrix.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/matrix.hpp>
+#include <isis/core/fileptr.hpp>
 #include <sys/stat.h>
 #include <memory>
 
@@ -132,7 +132,7 @@ struct nifti_1_header {
 
 } ;                   /**** 348 bytes total ****/
 
-class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
+class WriteOp: public data::ChunkOp, protected data::NDimensional<4>
 {
 protected:
 	std::set<data::dimensions> flip_list;
@@ -193,8 +193,8 @@ class ImageFormat_NiftiSa: public FileFormat
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const override;
-	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override;
-	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override;
+	std::list<data::Chunk> load(const data::ByteArray source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override;
+	void write( const data::Image &image, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) override;
 	std::list<util::istring> dialects()const override {return {"fsl","spm","withExtProtocols"};}
 
 protected:

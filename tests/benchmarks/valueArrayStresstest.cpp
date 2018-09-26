@@ -1,4 +1,4 @@
-#include <isis/data/valuearray.hpp>
+#include <isis/core/valuearray.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;

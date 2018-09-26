@@ -1,4 +1,4 @@
-#include <isis/util/singletons.hpp>
+#include <isis/core/singletons.hpp>
 #include <iostream>
 
 

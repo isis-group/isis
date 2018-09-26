@@ -1,8 +1,8 @@
 
-#include <isis/data/io_interface.h>
-#include <isis/data/io_factory.hpp>
-#include <isis/util/tmpfile.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_interface.h>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/tmpfile.hpp>
+#include <isis/core/io_factory.hpp>
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <boost/filesystem/fstream.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/fileptr.hpp>
 #include <boost/iostreams/categories.hpp>  // tags
 
 #ifdef HAVE_LZMA
@@ -94,7 +94,7 @@ public:
 	}
 	std::string getName()const override {return "(de)compression proxy for other formats";}
 
-	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress )throw( std::runtime_error & ) override {
+	std::list<data::Chunk> load ( std::streambuf *source, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> progress ) override {
 		
 		auto in=makeIStream(formatstack);
 
@@ -103,7 +103,7 @@ public:
 
 		return data::IOFactory::loadChunks( in->rdbuf(), formatstack, dialects );
 	}
-	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback )throw( std::runtime_error & ) override{
+	std::list<data::Chunk> load( const boost::filesystem::path &filename, std::list<util::istring> formatstack, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback ) override{
 		//try open file
 		std::ifstream file(filename.c_str());
 		file.exceptions(std::ios_base::badbit);

@@ -1,7 +1,7 @@
-#include <isis/data/image.hpp>
-#include <isis/data/io_factory.hpp>
-#include <isis/util/log.hpp>
-#include <isis/util/tmpfile.hpp>
+#include <isis/core/image.hpp>
+#include <isis/core/io_factory.hpp>
+#include <isis/core/log.hpp>
+#include <isis/core/tmpfile.hpp>
 
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/unit_test.hpp>

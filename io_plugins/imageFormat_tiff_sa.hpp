@@ -1,4 +1,4 @@
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 
 namespace isis{
 namespace image_io{
@@ -11,7 +11,7 @@ public:
 		std::list<util::istring> /*formatstack*/, 
 		std::list<util::istring> dialects, 
 		std::shared_ptr<util::ProgressFeedback> feedback
-	)throw( std::runtime_error & ) override;
+	) override;
 	std::string getName() const override;
 	std::list<util::istring> dialects() const override;
 	void write(const data::Image & image, const std::string & filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> feedback) override;

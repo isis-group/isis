@@ -1,4 +1,4 @@
-#include <isis/data/fileptr.hpp>
+#include <isis/core/fileptr.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include "imageFormat_nifti_dcmstack.hpp"
 #include <isis/math/transform.hpp>
@@ -13,7 +13,7 @@ namespace image_io
 {
 namespace _internal
 {
-WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::_internal::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
+WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel ): data::NDimensional<4>( image ), m_bpv( bitsPerVoxel ) {}
 
 void WriteOp::addFlip( data::dimensions dim ) {flip_list.insert( dim );}
 
@@ -183,8 +183,11 @@ public:
 
 	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
 		data::ValueArray<bool> in_data = src.asValueArrayBase().as<bool>();
-		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv ;
+		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 
+		//the length parameter actually expets elements and then computes the bytes internally
+		//but that computing will fail for bool so we ask for 8bit / 1byte type and give the needed bytes instead of elements
+		//also the writing below works with uint8 anyway
 		data::ValueArray<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
 		memset( &out_data[0], 0, out_data.getLength() );
 
@@ -355,35 +358,36 @@ void ImageFormat_NiftiSa::parseSliceOrdering( const std::shared_ptr< isis::image
 		break;
 		case NIFTI_SLICE_SEQ_DEC:{
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
 
 			for(short v=0;v<head->dim[4];v++)
 				for(unsigned short i = 0; i < head->dim[3]; i++ ){
-                                        assert(v*head->dim[3]+head->dim[3]>=i);
+					assert(v*head->dim[3]+head->dim[3]>=i);
 					acqProp.push_back<uint32_t>(v*head->dim[3]+head->dim[3]-i);
-                                }
+				}
 		}
 		break;
 		case NIFTI_SLICE_ALT_INC: { //interlaced increment
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
+			
 			for(short v=0;v<head->dim[4];v++){
-				short cnt=1;
 				for( short i = 0; i < head->dim[3]; i+=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 				for( short i = 1; i < head->dim[3]; i+=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
-				assert(cnt==head->dim[3]);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 			}
 		}
 		break;
 		case NIFTI_SLICE_ALT_DEC: {
 			acqProp.reserve(head->dim[3]*head->dim[4]);
+			acqProp.resize(0,util::Value<uint32_t>(0));
+
 			for(short v=0;v<head->dim[4];v++){
-				short cnt=1;
 				for( short i = head->dim[3]-1; i>=0; i-=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 				for( short i = head->dim[3]-2; i>=0; i-=2)
-					acqProp.set<uint32_t>(v*head->dim[3]+i,cnt++);
-				assert(cnt==head->dim[3]);
+					acqProp.push_back<uint32_t>(v*head->dim[3]+i);
 			}
 		}
 		break;
@@ -724,7 +728,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	std::list<util::istring> /*formatstack*/, 
 	std::list<util::istring> dialects, 
 	std::shared_ptr<util::ProgressFeedback> /*feedback*/ 
-)throw( std::runtime_error & ) {
+) {
 
 	//get the header - we use it directly from the file
 	std::shared_ptr< _internal::nifti_1_header > header = std::static_pointer_cast<_internal::nifti_1_header>( source.getRawAddress() );
@@ -867,7 +871,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::load(
 	}
 	dcmmeta.translateToISIS( orig );
 
-	if(orig.hasProperty( "acquisitionNumber") <=1)//if dcmmeta didn't set slice ordering
+	if(!orig.hasProperty( "acquisitionNumber"))//if dcmmeta didn't set slice ordering
 		parseSliceOrdering( header, orig ); //get it from the header
 
 	if( orig.hasBranch( "DICOM" ) ) // if we got DICOM data clean up some
@@ -918,9 +922,10 @@ std::unique_ptr<_internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis
 }
 
 
-void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )  throw( std::runtime_error & )
+void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &filename, std::list<util::istring> dialects, std::shared_ptr<util::ProgressFeedback> /*progress*/ )
 {
 	data::Image image = img; //have a cheap copy, we're ging to do a lot of nasty things to the metadata
+
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::unique_ptr<_internal::WriteOp > writer = getWriteOp( image, dialects ); // get a fitting writer for the datatype
 	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
@@ -1024,7 +1029,7 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			if(image.hasProperty("window/max") && image.hasProperty("window/min")){
 				header->cal_min = image.getValueAs<float>("window/min");
 				header->cal_max = image.getValueAs<float>("window/max");
-			} else {
+			} else { // todo this will store the min/max of the original image, not of the stored (converted) one
 				const std::pair< float, float > minmax = image.getMinMaxAs<float>();
 				header->cal_min = minmax.first;
 				header->cal_max = minmax.second;
@@ -1037,12 +1042,18 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			props.join( image.getChunkAt( 0, false ) );
 			storeHeader( props, header );
 		}
-
+		
 		if( image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim + 1] = image.getValueAs<float>( "repetitionTime" );
 
 		if( checkDialect(dialects, "spm") ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
+		} else {
+			if(image.hasProperty("DICOM/RescaleSlope"))
+				header->scl_slope = image.getValueAs<float>("DICOM/RescaleSlope");
+			
+			if(image.hasProperty("DICOM/RescaleIntercept"))
+				header->scl_inter = image.getValueAs<float>("DICOM/RescaleIntercept");
 		}
 
 		// actually copy the data from each chunk of the image

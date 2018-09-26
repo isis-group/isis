@@ -1,6 +1,6 @@
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_factory.hpp>
 #include <fstream>
-#include <isis/data/io_application.hpp>
+#include <isis/core/io_application.hpp>
 #include <iomanip>
 
 using namespace isis;

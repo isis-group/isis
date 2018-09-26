@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE ValueArrayTest
 #include <boost/test/unit_test.hpp>
 
-#include <isis/util/tmpfile.hpp>
-#include <isis/data/fileptr.hpp>
+#include <isis/core/tmpfile.hpp>
+#include <isis/core/fileptr.hpp>
 #define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

@@ -1,4 +1,4 @@
-#include "../../data/chunk.hpp"
+#include "../../core/chunk.hpp"
 
 namespace isis{
 namespace math{

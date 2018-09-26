@@ -8,8 +8,8 @@
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
 #include <boost/test/unit_test.hpp>
-#include <isis/data/image.hpp>
-#include <isis/data/io_factory.hpp>
+#include <isis/core/image.hpp>
+#include <isis/core/io_factory.hpp>
 #include <isis/math/transform.hpp>
 
 #define _USE_MATH_DEFINES
@@ -425,9 +425,9 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 
 	class setIdx: public data::VoxelOp<uint8_t>
 	{
-		data::_internal::NDimensional<4> geometry;
+		data::NDimensional<4> geometry;
 	public:
-		setIdx( data::_internal::NDimensional<4> geo ): geometry( geo ) {}
+		setIdx( data::NDimensional<4> geo ): geometry( geo ) {}
 		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			vox = geometry.getLinearIndex( pos );
 			return true;
@@ -1304,7 +1304,7 @@ BOOST_AUTO_TEST_CASE ( image_swapdim_test )
 	}
 	
 	data::Image img( chunks );
-	data::_internal::NDimensional<4> oldshape=img;
+	data::NDimensional<4> oldshape=img;
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 

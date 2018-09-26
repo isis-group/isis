@@ -29,12 +29,12 @@
 #include <ace/Log_Msg_Callback.h>
 #include <ace/Log_Record.h>
 
-#include <isis/data/io_interface.h>
+#include <isis/core/io_interface.h>
 #include <functional>
 #include <iostream>
 #include <memory>
 
-#include <isis/data/io_factory.hpp>
+#include <isis/core/io_factory.hpp>
 
 namespace isis
 {
@@ -207,7 +207,7 @@ public:
 	  std::list<util::istring> /*formatstack*/,
 	  std::list<util::istring> dialects,
 	  std::shared_ptr<util::ProgressFeedback> feedback
-	)throw( std::runtime_error & ) override{
+	) override{
 		
 		_internal::AceSession session;
 		ACE::HTTP::URL url(filename.c_str());

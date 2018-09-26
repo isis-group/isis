@@ -1,7 +1,7 @@
 #include "imageFormat_Dicom.hpp"
 #include <clocale>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <isis/data/common.hpp>
+#include <isis/core/common.hpp>
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmdata/dcdicent.h>
 

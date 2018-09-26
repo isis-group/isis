@@ -1,7 +1,7 @@
 #ifndef DISPLAY_HPP
 #define DISPLAY_HPP
 
-#include "../../data/image.hpp"
+#include "../../core/image.hpp"
 
 namespace isis{
 namespace qt5{

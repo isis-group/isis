@@ -1,7 +1,7 @@
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-include_directories(BEFORE ${CMAKE_SOURCE_DIR})
+set_directory_properties(PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR})
 
 ############################################################
 # configure the targets
@@ -74,7 +74,7 @@ if(ISIS_CALC)
 	target_link_libraries(isiscalc ${LIB_MUPARSER} ${isis_core_lib})
 	set_target_properties(isiscalc PROPERTIES 
 		INSTALL_RPATH_USE_LINK_PATH TRUE
-		INCLUDE_DIRECTORIES ${INCPATH_MUPARSER}
+		INCLUDE_DIRECTORIES "${INCPATH_MUPARSER};${CMAKE_SOURCE_DIR}"
 	)
 
 	install(TARGETS isiscalc RUNTIME DESTINATION bin COMPONENT "CLI Tools")
