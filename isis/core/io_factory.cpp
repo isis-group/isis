@@ -229,6 +229,7 @@ std::list<Chunk> IOFactory::load_impl(const load_source &v, std::list<util::istr
 			readerList.pop_front();
 
 			std::list<util::istring> use_dialects,format_dialects=format->dialects();
+			format_dialects.sort();dialects.sort();
 			std::set_intersection(dialects.begin(),dialects.end(),format_dialects.begin(),format_dialects.end(),std::back_inserter(use_dialects));
 
 			const util::NoSubject with_dialect = use_dialects.empty() ?
