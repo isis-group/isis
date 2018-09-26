@@ -488,7 +488,7 @@ public:
 		for(size_t r=0;r<rows.size();r+=rowset_size){
 			bool last_set=(r+rowset_size >= rows.size());
 			size_t actual_rows = last_set ? rows.size()-r:rowset_size;
-			generators.emplace_back(std::async(compress_row_set,rows.begin()+r,actual_rows,last_set));
+			generators.emplace_back(std::async(std::launch::async,compress_row_set,rows.begin()+r,actual_rows,last_set));
 		}
 		
 		// get and write their results
