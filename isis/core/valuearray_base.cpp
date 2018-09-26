@@ -147,6 +147,7 @@ ValueArrayBase::Reference ValueArrayBase::createByID( unsigned short ID, size_t 
 		const ValueArrayConverterBase &conv = *( f2->second );
 		std::unique_ptr<ValueArrayBase> ret;
 		conv.create( ret, len );
+		LOG_IF(!ret && len==0,Runtime,error) << "No memmory was allocated for " << len << " elements, this is not going to end well..";
 		return *ret;
 	} else {
 		LOG( Debug, error ) << "There is no known creator for " << util::getTypeMap()[ID];
