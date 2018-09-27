@@ -51,6 +51,16 @@ size_t ConsoleFeedback::extend( size_t by )
 	}
 }
 
+void ConsoleFeedback::restart( size_t newmax )
+{
+	if( disp ) {
+		disp->restart(newmax);
+	} else {
+		LOG( Debug, warning ) << "You should not use restart, if there is no progress bar shown already. (use show instead)";
+		show( newmax, "" );
+	}
+}
+
 void ConsoleFeedback::close()
 {
 	//force finish so we get a proper newline

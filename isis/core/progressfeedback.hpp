@@ -52,6 +52,8 @@ public:
 	virtual size_t getMax() = 0;
 	/// extend the progress bars maximum by the given value
 	virtual size_t extend( size_t by ) = 0;
+	/// reset the progress bars maximum to the given value and reset the progress to 0
+	virtual void restart( size_t new_max ) = 0;
 	/// Increment the "progress" by one
 	ProgressFeedback &operator++();
 	virtual ~ProgressFeedback();
@@ -69,6 +71,7 @@ public:
 	size_t progress( const std::string message = "", size_t step = 1 );
 	void show( size_t max, std::string header );
 	size_t extend( size_t by );
+	void restart( size_t newmax);
 };
 }
 }
