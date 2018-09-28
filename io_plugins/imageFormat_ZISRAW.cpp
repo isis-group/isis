@@ -219,17 +219,6 @@ ImageFormat_ZISRAW::Directory::Directory(data::ByteArray &source, const size_t o
 	LOG(Runtime,info) << "Found dictionary with " << entries.size() << " entries";
 }
 
-void ImageFormat_ZISRAW::storeProperties(data::Chunk &dst,std::string plane_id){
-	//faking valid image
-	dst.setValueAs( "plane",plane_id);
-	dst.setValueAs( "indexOrigin", util::fvector3() );
-	dst.setValueAs( "acquisitionNumber", 0 );
-	dst.setValueAs( "voxelSize", util::fvector3({ 1, 1, 1 }) );
-	dst.setValueAs( "rowVec", util::fvector3({1, 0} ));
-	dst.setValueAs( "columnVec", util::fvector3({0, 1}) );
-	dst.setValueAs( "sequenceNumber", ( uint16_t )0 );
-}
-
 data::Chunk ImageFormat_ZISRAW::transferFromMosaic(std::list<SubBlock> segments, unsigned short type_id,std::shared_ptr<util::ProgressFeedback> feedback){
 	struct bounds{
 		int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();

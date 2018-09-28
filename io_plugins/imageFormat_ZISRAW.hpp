@@ -106,7 +106,6 @@ class ImageFormat_ZISRAW : public FileFormat{
 		std::vector<_internal::DirectoryEntryDV> entries;
 		Directory(data::ByteArray &source, const size_t offset);
 	};
-	void storeProperties(data::Chunk &dst,std::string plane_id);
 	data::Chunk transferFromMosaic(std::list<SubBlock> segments,unsigned short,std::shared_ptr<util::ProgressFeedback> feedback);
 public:
 	util::istring suffixes(isis::image_io::FileFormat::io_modes /*modes*/) const override {return ".czi";}
