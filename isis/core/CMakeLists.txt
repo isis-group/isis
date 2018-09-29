@@ -1,8 +1,6 @@
 ############################################################
 # build the core library
 ############################################################
-find_package(Threads)
-
 find_library(LIB_JSONCPP jsoncpp)
 find_path(INC_JSONCPP "json/config.h" PATH_SUFFIXES "jsoncpp" DOC "path where json/config.h can be found")
 include_directories(${INC_JSONCPP})

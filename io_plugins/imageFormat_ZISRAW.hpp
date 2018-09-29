@@ -90,10 +90,10 @@ class ImageFormat_ZISRAW : public FileFormat{
 		int32_t MetadataSize,AttachmentSize;
 		int64_t DataSize;
 		data::ByteArray image_data;
-		_internal::DirectoryEntryDV DirectoryEntry;
 		static data::Chunk jxrRead(size_t xsize,size_t ysize,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
+		_internal::DirectoryEntryDV DirectoryEntry;
 		std::function<data::Chunk()> getChunkGenerator()const;
 		util::PropertyMap xml_data;
 		bool isNormalImage()const;
@@ -106,8 +106,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		std::vector<_internal::DirectoryEntryDV> entries;
 		Directory(data::ByteArray &source, const size_t offset);
 	};
-	void storeProperties(data::Chunk &dst,std::string plane_id);
-	void transferFromMosaic(std::list<SubBlock> segments,data::Chunk &dst, int32_t xoffset, int32_t yoffset,std::shared_ptr<util::ProgressFeedback> feedback);
+	data::Chunk transferFromMosaic(std::list<SubBlock> segments,unsigned short,std::shared_ptr<util::ProgressFeedback> feedback);
 public:
 	util::istring suffixes(isis::image_io::FileFormat::io_modes /*modes*/) const override {return ".czi";}
 
@@ -120,7 +119,7 @@ public:
 
 	std::string getName() const override {return "Zeiss Integrated Software RAW";}
 
-	std::list<util::istring> dialects() const override {return {"dump_xml","nopyramid"};}
+	std::list<util::istring> dialects() const override {return {"dump_xml","nopyramid", "max16G", "max8G", "max4G"};}
 
 	void write(const data::Image &/*image*/, const std::string &/*filename*/, std::list<util::istring> /*dialects*/, std::shared_ptr<util::ProgressFeedback> /*feedback*/) override{
 		throwGenericError("not yet implemented");

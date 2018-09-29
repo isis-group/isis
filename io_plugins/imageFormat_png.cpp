@@ -319,7 +319,7 @@ public:
 			writeChunks(chunks,filename,color_type,bit_depth,dialects,feedback);  // write all slices
 
 		} else { //save all slices
-			writeChunks(tImg.copyChunksToVector( false ),filename,color_type,bit_depth,dialects,feedback);  // write all slices
+			writeChunks(tImg.copyChunksToVector(),filename,color_type,bit_depth,dialects,feedback);  // write all slices
 		}
 
 	}
@@ -333,9 +333,15 @@ public:
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
+			std::shared_ptr<util::ProgressFeedback> inchunk_feedback;
+			if(chunks.size()==1){
+				inchunk_feedback.swap(feedback); //if we want feedback per scanline
+				if(inchunk_feedback)
+					inchunk_feedback->restart(chunks.front().getDimSize(1));
+			}
+
 			for( data::Chunk buff :  chunks ) {
-				if(feedback)
-					feedback->progress();
+				if(feedback)feedback->progress();
 				std::string name;
 				if(chunks.size()>1){
 					const std::string num = std::to_string( ++number );
@@ -345,7 +351,8 @@ public:
 				
 				if(checkDialect(dialects,"parallel")){
 					std::ofstream out(name.c_str());
-					write_sa(out,buff,bit_depth,color_type);
+					out.exceptions(std::ios_base::badbit|std::ios_base::failbit);
+					write_sa(out,buff,bit_depth,color_type,inchunk_feedback);
 				} else {
 					if(!checkDialect(dialects,"noflip")){
 						//buff has to be swapped along the png-x-axis
@@ -420,6 +427,18 @@ public:
 			png_chunk_t::length=dat.getLength();
 		}
 	};
+	struct pHYs:png_chunk_t{
+		struct {boost::endian::big_uint32_buf_t x_pixel_per_unit,y_pixel_per_unit;uint8_t unit;}phy;
+		pHYs(uint32_t _x_pixel_per_unit,uint32_t _y_pixel_per_unit)
+		{
+			name="pHYs";
+			phy.x_pixel_per_unit=_x_pixel_per_unit;
+			phy.y_pixel_per_unit=_x_pixel_per_unit;
+			phy.unit=1;
+			png_chunk_t::data=(uint8_t*)&phy;
+			png_chunk_t::length=sizeof(phy);
+		}
+	};
 	struct IEND:png_chunk_t{
 		IEND(){
 			name="IEND";
@@ -463,7 +482,7 @@ public:
 		return ret;
 	}
 	
-	void write_sa(std::ofstream &outputFile, const data::Chunk &src, png_byte bit_depth, png_byte color_type) {
+	void write_sa(std::ofstream &outputFile, const data::Chunk &src, png_byte bit_depth, png_byte color_type,std::shared_ptr<util::ProgressFeedback> feedback) {
 		auto size=src.getSizeAsVector();
 		
 		const uint8_t signature[]{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
@@ -474,6 +493,9 @@ public:
 			util::Value<uint64_t>(size[1]).as<int32_t>(),
 			bit_depth,color_type);
 		ihdr_chunk.write(outputFile);
+		
+		auto vsize=src.getValueAs<util::fvector3>("voxelSize"); //this is the size of each voxel in mm
+		pHYs(1000/vsize[0],1000/vsize[1]).write(outputFile); //how many voxels fit into 1 meter (1000mm)
 		
 		auto rows=src.getValueArrayBase().splice(size[0]);
 		
@@ -488,7 +510,7 @@ public:
 		for(size_t r=0;r<rows.size();r+=rowset_size){
 			bool last_set=(r+rowset_size >= rows.size());
 			size_t actual_rows = last_set ? rows.size()-r:rowset_size;
-			generators.emplace_back(std::async(compress_row_set,rows.begin()+r,actual_rows,last_set));
+			generators.emplace_back(std::async(std::launch::async,compress_row_set,rows.begin()+r,actual_rows,last_set));
 		}
 		
 		// get and write their results
@@ -512,6 +534,7 @@ public:
 			LOG(Runtime,info) 
 				<< "Scalines " << r << " to " << r+actual_rows-1 
 				<< " written, compression ratio was " << std::to_string(100-(dat.first.getLength()*100 / (bytes_per_row*actual_rows)))+"%"; 
+			if(feedback)feedback->progress("",rowset_size);
 		}
 		IEND().write(outputFile);
 	}

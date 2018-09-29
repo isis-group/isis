@@ -43,6 +43,14 @@ class DicomChunk : public data::Chunk
 public:
 	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, DcmFileFormat &dcfile, std::list<util::istring> dialects ) {
 		std::unique_ptr<data::Chunk> ret;
+		
+		util::PropertyMap props;
+		loader.dcmObject2PropMap( &dcfile, props, dialects );
+		if(props.getValueAs<std::string>("Item/TransferSyntaxUID")=="1.2.840.10008.1.2.4.90"){
+			LOG(Runtime,error) << "Sorry, transfer syntax 1.2.840.10008.1.2.4.90 (JPEG 2K) is not yet supportet";
+			ImageFormat_Dicom::throwGenericError("Unsupported format");
+		}
+			
 		DicomImage img( &dcfile, EXS_Unknown );
 
 		if ( img.getStatus() == EIS_Normal ) {
@@ -77,7 +85,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialects );
+						ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ).transfer(props,"Item");
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					// if there are 3 planes data is actually an array of 3 pointers
@@ -93,7 +101,7 @@ public:
 					}
 
 					if ( ret ) {
-						loader.dcmObject2PropMap( dcdata, ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ), dialects );
+						ret->touchBranch( ImageFormat_Dicom::dicomTagTreeName ).transfer(props,"Item");
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -104,7 +112,6 @@ public:
 		} else {
 			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img.getStatus() ));
 		}
-
 		return *ret;
 	}
 };

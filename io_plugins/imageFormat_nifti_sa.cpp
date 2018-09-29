@@ -1018,6 +1018,15 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		header->datatype = nifti_id;
 
 		guessSliceOrdering( image, header->slice_code, header->slice_duration );
+		
+		struct {float cal_min,cal_max,scl_slope,scl_inter;}scaling;
+		
+		scaling={
+			image.getValueAsOr<float>("window/min",0),
+			image.getValueAsOr<float>("window/max",0),
+			image.getValueAsOr<float>("DICOM/RescaleSlope",1),
+			image.getValueAsOr<float>("DICOM/RescaleIntercept",0)
+		};
 
 		if( image.getMajorTypeID() == data::ValueArray<util::color24>::staticID() ) {
 			header->cal_min = 0;
@@ -1027,8 +1036,8 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 			header->cal_max = 0;
 		} else {
 			if(image.hasProperty("window/max") && image.hasProperty("window/min")){
-				header->cal_min = image.getValueAs<float>("window/min");
-				header->cal_max = image.getValueAs<float>("window/max");
+				header->cal_min = scaling.cal_min;
+				header->cal_max = scaling.cal_min+(scaling.cal_max-scaling.cal_min)*scaling.scl_slope;
 			} else { // todo this will store the min/max of the original image, not of the stored (converted) one
 				const std::pair< float, float > minmax = image.getMinMaxAs<float>();
 				header->cal_min = minmax.first;
@@ -1049,11 +1058,8 @@ void ImageFormat_NiftiSa::write( const data::Image &img, const std::string &file
 		if( checkDialect(dialects, "spm") ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
 		} else {
-			if(image.hasProperty("DICOM/RescaleSlope"))
-				header->scl_slope = image.getValueAs<float>("DICOM/RescaleSlope");
-			
-			if(image.hasProperty("DICOM/RescaleIntercept"))
-				header->scl_inter = image.getValueAs<float>("DICOM/RescaleIntercept");
+			header->scl_slope = scaling.scl_slope;
+			header->scl_inter = scaling.scl_inter;
 		}
 
 		// actually copy the data from each chunk of the image

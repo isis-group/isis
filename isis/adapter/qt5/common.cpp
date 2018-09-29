@@ -5,16 +5,19 @@ QImage isis::qt5::makeQImage(const std::vector<data::ValueArrayBase::Reference> 
 {
 	QImage ret;
 	size_t line_length = lines.front()->getLength();
-	if(lines.front()->is<util::color24>()){
-		ret = QImage(line_length,lines.size(), QImage::Format_RGB32);
-	} else {
-		ret = QImage(line_length,lines.size(), QImage::Format_Indexed8);
+	if(lines.size()<=32768 && line_length<=32768){
+		if(lines.front()->is<util::color24>()){
+			ret = QImage(line_length,lines.size(), QImage::Format_RGB32);
+		} else {
+			ret = QImage(line_length,lines.size(), QImage::Format_Indexed8);
 
-		ret.setColorCount(256);
-		for(int i=0;i<256;i++)
-			ret.setColor(i,qRgb(i,i,i));
-	}
-	fillQImage(ret,lines,scaling);
+			ret.setColorCount(256);
+			for(int i=0;i<256;i++)
+				ret.setColor(i,qRgb(i,i,i));
+		}
+		fillQImage(ret,lines,scaling);
+	} else 
+		LOG(Runtime,error) << "Sorry Images larger than 32768x32768 pixels are not supportet, returnung an empty QImage";
 	return ret;
 }
 
@@ -28,17 +31,20 @@ QImage isis::qt5::makeQImage(const std::vector<data::ValueArrayBase::Reference> 
 {
 	QImage ret;
 	size_t line_length = lines.front()->getLength();
-	if(lines.front()->is<util::color24>() || lines.front()->is<util::color48>()){
-		ret = QImage(line_length,lines.size(), QImage::Format_RGB32);
-	} else {
-		ret=QImage(line_length,lines.size(), QImage::Format_Indexed8);
+	if(lines.size()<=32768 && line_length<=32768){
+		if(lines.front()->is<util::color24>() || lines.front()->is<util::color48>()){
+			ret = QImage(line_length,lines.size(), QImage::Format_RGB32);
+		} else {
+			ret=QImage(line_length,lines.size(), QImage::Format_Indexed8);
 
-		ret.setColorCount(256);
-		for(int i=0;i<256;i++)
-			ret.setColor(i,qRgb(i,i,i));
-	}
-	fillQImage(ret,lines,transfer_function);
-	return ret;
+			ret.setColorCount(256);
+			for(int i=0;i<256;i++)
+				ret.setColor(i,qRgb(i,i,i));
+		}
+		fillQImage(ret,lines,transfer_function);
+		return ret;
+	} else 
+		LOG(Runtime,error) << "Sorry Images larger than 32768x32768 pixels are not supportet, returnung an empty QImage";
 }
 QImage isis::qt5::makeQImage(const data::ValueArrayBase& slice, size_t line_length, const std::function<void (uchar *, const data::ValueArrayBase &)>& transfer_function)
 {
