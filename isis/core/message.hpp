@@ -128,7 +128,6 @@ public:
 		*( ( std::ostringstream * )this ) << subj;
 		return *this;
 	}
-	std::string str()const;
 	bool shouldCommit()const;
 	std::string str()const;
 };
