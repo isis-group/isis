@@ -1,6 +1,7 @@
 #ifndef ZISRAW_HPP
 #define ZISRAW_HPP
 
+#include <boost/property_tree/ptree.hpp>
 #include <isis/core/io_factory.hpp>
 #include <stdint.h>
 #include <stdio.h>
@@ -31,7 +32,7 @@ namespace _internal {
 	}
 	DirectoryEntryDV getDVEntry(data::ByteArray &data,size_t offset);
 	
-	util::PropertyMap getXML(data::ByteArray &data,size_t offset,size_t length, std::shared_ptr<std::ofstream> dump_stream=nullptr);
+	boost::property_tree::ptree getXML(data::ByteArray &data,size_t offset,size_t length, std::shared_ptr<std::ofstream> dump_stream=nullptr);
 	
 	template<typename D> data::ValueArray<util::color<D>> color_reshuffle(const data::ValueArray<D> &data){
 		assert(data.getLength()%3==0);
@@ -81,10 +82,10 @@ class ImageFormat_ZISRAW : public FileFormat{
 	};
 	class MetaData:public Segment{
 		int32_t XMLSize,AttachmentSize;
-		util::PropertyMap xml_data;
+		boost::property_tree::ptree xml_data;
 	public:
 		MetaData(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
-		util::PropertyMap get()const;
+		boost::property_tree::ptree get(std::string subtree="")const;
 	};
 	class SubBlock:public Segment{
 		int32_t MetadataSize,AttachmentSize;
@@ -95,7 +96,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 		SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
 		_internal::DirectoryEntryDV DirectoryEntry;
 		std::function<data::Chunk()> getChunkGenerator()const;
-		util::PropertyMap xml_data;
+		boost::property_tree::ptree xml_data;
 		bool isNormalImage()const;
 		std::string getPlaneID()const;
 		std::map<std::string,_internal::DimensionEntry> getDimsInfo()const;

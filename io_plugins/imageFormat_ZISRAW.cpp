@@ -33,13 +33,19 @@ DirectoryEntryDV getDVEntry(data::ByteArray &data, size_t offset){
 	return ret;
 }
 
-util::PropertyMap getXML(data::ByteArray &data, size_t offset, size_t length, std::shared_ptr<std::ofstream> dump_stream){
+boost::property_tree::ptree getXML(data::ByteArray &data, size_t offset, size_t length, std::shared_ptr<std::ofstream> dump_stream){
 	const uint8_t *start=data.begin()+offset;
-	util::PropertyMap ret;
+	boost::property_tree::ptree ret;
 	if(dump_stream){
 		dump_stream->write((char*)start,length) << std::endl;
 	}
-	ret.readXML(start,start+length,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
+	
+	typedef  boost::iostreams::basic_array_source<std::streambuf::char_type> my_source_type; // must be compatible to std::streambuf
+	
+	boost::iostreams::stream<my_source_type> stream;
+	stream.open(my_source_type((const std::streambuf::char_type*)start,(const std::streambuf::char_type*)start+length));
+	boost::property_tree::read_xml(stream,ret,boost::property_tree::xml_parser::no_comments|boost::property_tree::xml_parser::trim_whitespace);
+	
 	return ret;
 }
 
@@ -101,8 +107,8 @@ ImageFormat_ZISRAW::MetaData::MetaData(data::ByteArray &source, const size_t off
 	getScalar(AttachmentSize,4);
 	xml_data=_internal::getXML(data,256,XMLSize,dump_stream);
 }
-util::PropertyMap ImageFormat_ZISRAW::MetaData::get()const{
-	return xml_data;
+boost::property_tree::ptree ImageFormat_ZISRAW::MetaData::get(std::string subtree)const{
+	return xml_data.get_child(subtree);
 }
 
 ImageFormat_ZISRAW::SubBlock::SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream):Segment(source,offset){
@@ -301,33 +307,32 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 
 	//get MetaData if there are some
 	if(header.MetadataPosition){
-		util::PropertyMap meta=MetaData(source,header.MetadataPosition,dump_stream).get().branch("ImageDocument/Metadata");
+		boost::property_tree::ptree meta=MetaData(source,header.MetadataPosition,dump_stream).get("ImageDocument.Metadata");
 // 		meta.print(std::cout)<< std::endl;
-		util::PropertyMap image_props=meta.branch("Information/Image");
+		boost::property_tree::ptree image_props=meta.get_child("Information.Image");
 		image_info.size = {
-			image_props.getValueAs<size_t>("SizeX"),
-			image_props.getValueAs<size_t>("SizeY"),
-			image_props.getValueAsOr<size_t>("SizeZ",1)
+			image_props.get<size_t>("SizeX",0),
+			image_props.get<size_t>("SizeY",0),
+			image_props.get<size_t>("SizeZ",1)
 		};
-		image_info.type_id = PixelTypeMapStr.at(image_props.getValueAs<std::string>("PixelType"));
+		image_info.type_id = PixelTypeMapStr.at(image_props.get<std::string>("PixelType"));
 		
-		if(image_props.getValueAs<size_t>("SizeS")>1){
+		if(image_props.get<size_t>("SizeS")>1){
 			throwGenericError("Sorry, multi scene images are not supportet");
 		}
 		
-		auto scene=meta.queryBranch("Information/Image/Dimensions/S/Scenes/Scene");
+		auto scene=meta.get_child_optional("Information.Image.Dimensions.S.Scenes.Scene");
 		if(scene){
-			image_info.name=scene->getValueAs<std::string>("<xmlattr>/Name");
-			auto pyramid=scene->queryBranch("PyramidInfo");
+			image_info.name=scene->get<std::string>("<xmlattr>.Name");
+			auto pyramid=scene->get_child_optional("PyramidInfo");
 			if(pyramid){
-				image_info.pyramid.layers=pyramid->getValueAs<size_t>("PyramidLayersCount");
-				image_info.pyramid.factor=pyramid->getValueAs<float>("MinificationFactor");
+				image_info.pyramid.layers=pyramid->get<size_t>("PyramidLayersCount");
+				image_info.pyramid.factor=pyramid->get<float>("MinificationFactor");
 			}
 		}
-		if(image_props.hasProperty("SizeM"))
-			image_info.mosaic_tiles=image_props.getValueAs<size_t>("SizeM");
+		image_info.mosaic_tiles=image_props.get<size_t>("SizeM",image_info.mosaic_tiles);
 		
-		image_info.pixel_size = meta.getValueAsOr<float>("Scaling/Items/Distance/Value",1./1000)*1000;
+		image_info.pixel_size = meta.get<float>("Scaling.Items.Distance.Value",1./1000)*1000;
 		
 	} else 
 		throwGenericError("could not find metadata");
@@ -389,7 +394,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 				ret.push_back(transferFromMosaic(pyramid[i],image_info.type_id,feedback));
 				LOG(Runtime,info) <<  ret.back().getSizeAsString() << " Image created for pyramid level " << i << " from " << pyramid[i].size() << " tiles";
 
-				ret.back().touchBranch("XML").transfer(pyramid[i].front().xml_data);
+// 				ret.back().touchBranch("XML").transfer(pyramid[i].front().xml_data);
 				
 				const float pixel_size=image_info.pixel_size*std::pow(image_info.pyramid.factor,i);
 				ret.back().setValueAs<util::fvector3>("voxelSize",{pixel_size,pixel_size,1});
