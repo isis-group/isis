@@ -40,6 +40,7 @@ Chunk::Chunk(bool fakeValid )
 
 Chunk::Chunk( const ValueArrayReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps,bool fakeValid): Chunk(fakeValid)
 {
+	LOG_IF(!src->isValid(),Runtime,error) << "Creating a chunk from an invalid ValueArray, thats not going to end well ...";
 	ValueArrayReference::operator=(src);
 	init( {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps} );
 	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )

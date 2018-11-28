@@ -245,6 +245,7 @@ public:
 		LOG_IF( length == 0, Debug, warning )
 			<< "Creating an empty (lenght==0) ValueArray of type " << util::MSubject( staticName() )
 			<< " you should overwrite it with a useful pointer before using it";
+		LOG_IF(length != 0 && !ptr,Debug,error) << "Creating invalid ValueArray from null pointer";
 	}
 
 	/**

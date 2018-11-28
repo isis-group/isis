@@ -383,6 +383,8 @@ public:
 	size_t compare( size_t start, size_t end, const ValueArrayBase &dst, size_t dst_start )const;
 
 	virtual void endianSwap() = 0;
+	bool isValid(){return getRawAddress().get();}
+
 };
 
 
