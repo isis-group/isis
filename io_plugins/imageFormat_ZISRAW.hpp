@@ -25,6 +25,7 @@ namespace _internal {
 		int32_t DimensionCount;
 		std::vector<DimensionEntry> dims;
 		size_t size()const{return 32+DimensionCount*20;}
+		std::map<std::string,DimensionEntry> getDimsMap()const;
 	};
 
 	template<typename T> void getScalar(data::ByteArray &data,T &variable,size_t offset){
@@ -48,6 +49,11 @@ namespace _internal {
 	}
 	
 	data::ValueArrayReference reinterpretData(const data::ByteArray &data,int32_t PixelType);
+	
+	struct bounds{
+		int32_t min=std::numeric_limits<int32_t>::max(),max=std::numeric_limits<int32_t>::min();
+		size_t size()const{return max-min+1;}
+	};
 }
 
 class ImageFormat_ZISRAW : public FileFormat{
@@ -94,6 +100,8 @@ class ImageFormat_ZISRAW : public FileFormat{
 		static data::Chunk jxrRead(size_t xsize,size_t ysize,isis::data::ByteArray image_data,unsigned short isis_type,unsigned short pixel_size);
 	public:
 		SubBlock(data::ByteArray &source, const size_t offset, std::shared_ptr<std::ofstream> dump_stream);
+		static std::map<std::string,_internal::bounds> getBoundaries(const std::list<SubBlock> &segments);
+	
 		_internal::DirectoryEntryDV DirectoryEntry;
 		std::function<data::Chunk()> getChunkGenerator()const;
 		boost::property_tree::ptree xml_data;
@@ -127,7 +135,6 @@ public:
 	}
 };
 
-	
 }}
 
 #endif //ZISRAW_HPP
