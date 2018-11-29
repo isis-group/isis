@@ -25,7 +25,7 @@ namespace _internal {
 		int32_t DimensionCount;
 		std::vector<DimensionEntry> dims;
 		size_t size()const{return 32+DimensionCount*20;}
-		std::map<std::string,DimensionEntry> getDimsMap()const;
+		std::map< char, DimensionEntry > getDimsMap()const;
 	};
 
 	template<typename T> void getScalar(data::ByteArray &data,T &variable,size_t offset){
@@ -107,8 +107,8 @@ class ImageFormat_ZISRAW : public FileFormat{
 		boost::property_tree::ptree xml_data;
 		bool isNormalImage()const;
 		std::string getPlaneID()const;
-		std::map<std::string,_internal::DimensionEntry> getDimsInfo()const;
-		std::array<size_t,4> getSize()const;
+		std::map< char, _internal::DimensionEntry > getDimsInfo()const;
+		std::array<int32_t,4> getSize()const;
 	};
 	class Directory:public Segment{
 	public:
@@ -117,7 +117,7 @@ class ImageFormat_ZISRAW : public FileFormat{
 	};
 	data::Chunk transferFromMosaic(std::list<SubBlock> segments,unsigned short,std::shared_ptr<util::ProgressFeedback> feedback);
 public:
-	util::istring suffixes(isis::image_io::FileFormat::io_modes /*modes*/) const override {return ".czi";}
+	util::istring suffixes(FileFormat::io_modes /*modes*/) const override {return ".czi";}
 
 	std::list< data::Chunk > load(
 		data::ByteArray source,
