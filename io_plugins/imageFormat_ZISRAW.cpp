@@ -308,9 +308,13 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 	
 	struct Pyramid{
 		Pyramid(const boost::property_tree::ptree &_xml_data):xml_data(_xml_data){}
+		Pyramid()=default;
 		std::vector<std::list<SubBlock>> tiles;
 		boost::property_tree::ptree xml_data;
 		float pyramid_factor;
+		std::string getName()const{
+			return xml_data.empty() ? std::string("_unknown_") : xml_data.get<std::string>("<xmlattr>.Name");
+		}
 		std::array<int32_t,2> getSize(){
 			std::array<int32_t,2> ret{};
 		}
@@ -326,22 +330,29 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 		image_info.type_id = PixelTypeMapStr.at(image_props.get<std::string>("PixelType"));
 		image_info.pixel_size = meta.get<float>("Scaling.Items.Distance.Value",1./1000)*1000;
 		
-		//and prepare a pyramid for each Scene
-		for(auto scene:meta.get_child("Information.Image.Dimensions.S.Scenes")){
-			pyramids.emplace_back(scene.second);
-			auto pyramid=scene.second.get_child_optional("PyramidInfo");
-			if(pyramid){
-				pyramids.back().tiles.resize(pyramid->get<size_t>("PyramidLayersCount")+1);
-				pyramids.back().pyramid_factor=pyramid->get<float>("MinificationFactor");
+		auto scenes= meta.get_child_optional("Information.Image.Dimensions.S.Scenes");
+		
+		if(scenes){
+			//and prepare a pyramid for each Scene
+			for(auto scene:*scenes){
+				pyramids.emplace_back(scene.second);
+				auto pyramid=scene.second.get_child_optional("PyramidInfo");
+				if(pyramid){
+					pyramids.back().tiles.resize(pyramid->get<size_t>("PyramidLayersCount")+1);
+					pyramids.back().pyramid_factor=pyramid->get<float>("MinificationFactor");
+				}
 			}
+		} else {
+			LOG(Runtime,info)<< "No pyramid header found, assuming flat image";
+			pyramids.emplace_back();
+			pyramids.back().tiles.resize(1);
 		}
 		
 	} else 
 		throwGenericError("could not find metadata");
 	
 	for(const auto &p:pyramids)
-		LOG(Runtime,info)
-			<< p.xml_data.get<std::string>("<xmlattr>.Name") <<  " has " << p.tiles.size() << " layers";
+		LOG(Runtime,info) << p.getName() <<  " has " << p.tiles.size() << " layers";
 			
 	//generate planes
 	if(header.DirectoryPosition){
@@ -366,7 +377,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 				int level = std::log10(scale)/std::log10(scaleFactor);
 				LOG(Runtime,verbose_info) 
 					<< "Got Pyramid segment " << std::make_pair(e.dims[0].StoredSize,e.dims[1].StoredSize) 
-					<< "-Image for " <<  pyramids[scene].xml_data.get<std::string>("<xmlattr>.Name")
+					<< "-Image for " <<  pyramids[scene].getName()
 					<< " at level " << level << " (scale: " << scale << ")";
 						
 				pyramids[scene].tiles[level].emplace_back(source,e.FilePosition,dump_stream);
@@ -374,7 +385,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 			} else {
 				LOG(Runtime,verbose_info) 
 					<< "Got base segment " << std::make_pair(e.dims[0].StoredSize,e.dims[1].StoredSize) 
-					<< "-Image for " <<  pyramids[scene].xml_data.get<std::string>("<xmlattr>.Name");
+					<< "-Image for " <<  pyramids[scene].getName();
 				pyramids[scene].tiles[0].emplace_back(source,e.FilePosition,dump_stream);
 				assert(pyramids[scene].tiles[0].back().isNormalImage());
 			}
@@ -399,7 +410,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 					ret.push_back(transferFromMosaic(pyramid.tiles[i],image_info.type_id,feedback));
 					LOG(Runtime,info) 
 						<<  ret.back().getSizeAsString() << " Image created for pyramid level " << i 
-						<< " of " << pyramid.xml_data.get<std::string>("<xmlattr>.Name")  
+						<< " of " << pyramid.getName()  
 						<< " from " << pyramid.tiles[i].size() << " tiles";
 
 	// 				ret.back().touchBranch("XML").transfer(pyramid[i].front().xml_data);
@@ -421,7 +432,7 @@ std::list<data::Chunk> ImageFormat_ZISRAW::load(
 						ret.back().setValueAs("indexOrigin",origin);
 					}
 					
-					ret.back().setValueAs("region",pyramid.xml_data.get<std::string>("<xmlattr>.Name"));
+					ret.back().setValueAs("region",pyramid.getName());
 				}
 
 			}
