@@ -19,6 +19,7 @@
 #include "singletons.hpp"
 
 #include <sys/time.h>
+#include <sys/resource.h>
 
 namespace isis
 {
@@ -79,6 +80,18 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 {
 	void *ptr = NULL;
 	FILE_HANDLE mmaph = 0;
+	rlimit rlim;
+	getrlimit(RLIMIT_DATA,&rlim);
+	
+	if(rlim.rlim_cur<len){
+		if(rlim.rlim_max>len){
+			rlim.rlim_cur=len;
+			setrlimit(RLIMIT_NOFILE, &rlim);
+		} else {
+			LOG(Runtime,warning) << "Can't increase the limit for for mapped file size to " << len << ", this will crash..";
+		}
+	}
+
 #ifdef WIN32 //mmap is broken on windows - workaround stolen from http://crupp.de/2007/11/14/howto-port-unix-mmap-to-win32/
 	mmaph = CreateFileMapping( file, 0, write ? PAGE_READWRITE : PAGE_WRITECOPY, 0, 0, NULL );
 
@@ -90,8 +103,13 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 	ptr = mmap( 0, len, PROT_WRITE | PROT_READ, write ? MAP_SHARED : MAP_PRIVATE , file, 0 ); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
 #endif
 
-	if( ptr == NULL ) {
-		LOG( Debug, error ) << "Failed to map " << util::MSubject( filename ) << ", error was " << util::getLastSystemError();
+	if( ptr == nullptr || ptr == reinterpret_cast<void*>(-1) ) {
+		switch(errno){
+			case ENOMEM:
+				LOG( Runtime, error ) << "Excedet limit of mapping size or amount of mapped files";break;
+			default:
+				LOG( Runtime, error ) << "Failed to map " << util::MSubject( filename ) << ", error was " << util::getLastSystemError();
+		}
 		return false;
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
