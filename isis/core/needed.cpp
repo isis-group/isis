@@ -19,6 +19,6 @@ const char *isis::data::Chunk::neededProperties = "indexOrigin,acquisitionNumber
 // Stuff needed for any Image
 const char *isis::data::Image::neededProperties = "voxelSize,rowVec,columnVec,sliceVec,sequenceNumber";
 
-const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/CSAImageHeaderInfo/ImaCoilString";
+const char *isis::data::Image::defaultChunkEqualitySet = "sequenceNumber,voxelSize,rowVec,columnVec,sliceVec,coilChannelMask,echoTime,DICOM/EchoNumbers,DICOM/SIEMENS CSA HEADER/ImaCoilString";
 
 /// @endcond _internal
