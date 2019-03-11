@@ -208,7 +208,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::list<util::ist
 			dicomTree.remove("StudyDate");
 	}
 	
-	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
+	transformOrTell<int32_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
 	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
 	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
