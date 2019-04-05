@@ -308,7 +308,7 @@ public:
 
 		if( checkDialect(dialects, "middle" ) ) { //save only the middle
 			std::vector<data::Chunk > chunks;
-			size_t middle= tImg.getDimSize(data::sliceDim) / 2 + 1;
+			size_t middle= tImg.getDimSize(data::sliceDim) / 2;
 			LOG( Runtime, info ) 
 				<< "Writing the slice " << middle << " of " << tImg.getDimSize(data::sliceDim) 
 				<< " slices as png-image of size " << tImg.getChunk(0).getSizeAsString();
