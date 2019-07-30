@@ -33,9 +33,6 @@
 #include <liboil/liboil.h>
 #endif
 
-// @todo we need to know this for lexical_cast (toString)
-#include <boost/date_time/gregorian/gregorian.hpp>
-
 /// @cond _internal
 namespace isis
 {
