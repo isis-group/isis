@@ -423,7 +423,7 @@ public:
 	 * \returns the requested branch or an empty PropertyMap
 	 * \warning as this creates a deep copy of the branch it can be an expensive call. Its usually better to use queryBranch( const PropPath &path )const.
 	 */
-	PropertyMap branch( const PropPath &path )const;
+	const PropertyMap branch( const PropPath &path )const;
 
 	/**
 	 * Remove the property adressed by the path.
