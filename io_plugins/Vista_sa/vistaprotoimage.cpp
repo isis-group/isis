@@ -427,7 +427,7 @@ void VistaOutputImage::storeHeader(const util::PropertyMap &ch, const util::vect
 	store.queryProperty("rowVec")->swap(*store.queryProperty("columnVec"));
 	
 	if(store.hasBranch("vista")){
-		util::PropertyMap vista;vista.branch("vista")=store.branch("vista"); //workaround for #66
+		util::PropertyMap vista;vista.touchBranch("vista")=store.branch("vista"); //workaround for #66
 		store.remove(vista);
 		util::PropertyMap::PathSet rejected= store.join(vista.branch("vista"));
 		LOG_IF(!rejected.empty(),Runtime,warning) << "Failed to store properties from the vista branch because there are already some with the same name: " << rejected;

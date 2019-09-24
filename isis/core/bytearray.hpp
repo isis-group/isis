@@ -21,7 +21,6 @@
 #define BYTEARRAY_H
 
 #include "valuearray.hpp"
-#include <boost/detail/endian.hpp>
 
 namespace isis{
 namespace data{
@@ -86,7 +85,7 @@ public:
 		LOG_IF( len * sizeof( T ) > ( getLength() - offset ), Debug, error )
 				<< "The requested length will be " << len * sizeof( T ) - ( getLength() - offset ) << " bytes behind the end of the file.";
 		LOG_IF( writing && swap_endianess, Debug, warning )
-				<< "Ignoring request to swap byte order for writing (the systems byte order is " << BOOST_BYTE_ORDER << " and that will be used)";
+				<< "Ignoring request to swap byte order for writing (the systems byte order is " << __BYTE_ORDER__ << " and that will be used)";
 
 		if( writing || !swap_endianess ) { // if not endianess swapping was requested or T is not float (or if we are writing)
 			return data::ValueArray<T>( ptr, len ); // return a cheap copy

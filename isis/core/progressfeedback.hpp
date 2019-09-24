@@ -21,6 +21,7 @@
 #include <stddef.h>
 #include <string>
 #include <boost/progress.hpp>
+#include <boost/core/noncopyable.hpp>
 #include <memory>
 
 namespace isis
