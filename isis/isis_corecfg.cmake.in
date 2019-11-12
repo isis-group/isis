@@ -1,0 +1,39 @@
+# -*- mode: cmake -*-
+# ISIS cmake configuration file
+#
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
+SET(ISIS_INSTALL_PREFIX @CMAKE_INSTALL_PREFIX@)
+SET(ISIS_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include/ @Boost_INCLUDE_DIR@ )
+SET(ISIS_RUNTIME_LOG  @ISIS_RUNTIME_LOG@)
+SET(ISIS_DEBUG_LOG    @ISIS_DEBUG_LOG@)
+SET(ISIS_CORE_REV_STRING @ISIS_CORE_REV_STRING@)
+SET(ISIS_CORE_VERSION_API @ISIS_CORE_VERSION_API@)
+
+SET(isis_core-exported-deps        @isis_core-exported-deps@)
+
+# only needed for plugins
+SET(ISIS_PLUGIN_INFIX @ISIS_PLUGIN_INFIX@)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED yes)
+
+# search isis core library
+SET(CMAKE_PREFIX_PATH @CMAKE_INSTALL_PREFIX@ ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core
+FIND_LIBRARY(ISIS_LIB "isis_core")
+
+MESSAGE(STATUS "isis core library: ${ISIS_LIB} (API ${ISIS_CORE_VERSION_API})")
+list(APPEND ISIS_LIBS ${ISIS_LIB} ${isis_core-exported-deps})
+
+MESSAGE(STATUS "isis core library dependencies: ${isis_core-exported-deps}")
+MESSAGE(STATUS "isis include dirs: ${ISIS_INCLUDE_DIRS}")
+
+if(NOT ISIS_FIND_COMPONENTS)
+	list(APPEND ISIS_FIND_COMPONENTS ISISMath ISISAdapter)
+endif(NOT ISIS_FIND_COMPONENTS)
+
+foreach(_COMP ${ISIS_FIND_COMPONENTS})
+	include("@CMAKE_INSTALL_PREFIX@/share/isis/cmake/${_COMP}Config.cmake")
+endforeach(_COMP ${ISIS_FIND_COMPONENTS})

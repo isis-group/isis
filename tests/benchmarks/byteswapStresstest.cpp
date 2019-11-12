@@ -1,5 +1,5 @@
-#include "DataStorage/endianess.hpp"
-#include "DataStorage/valuearray.hpp"
+#include <isis/core/endianess.hpp>
+#include <isis/core/valuearray.hpp>
 #include <boost/timer.hpp>
 
 using namespace isis;

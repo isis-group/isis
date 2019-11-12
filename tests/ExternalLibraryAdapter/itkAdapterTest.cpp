@@ -2,9 +2,9 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "CoreUtils/log.hpp"
-#include "DataStorage/image.hpp"
-#include "DataStorage/io_factory.hpp"
+#include "util/log.hpp"
+#include "data/image.hpp"
+#include "data/io_factory.hpp"
 #include "Adapter/itkAdapter.hpp"
 
 #include <itkImage.h>
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE ( ISIS_to_ITK )
 	adapter::itkAdapter *adapter = new adapter::itkAdapter;
 	itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
 	// data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
+	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/core/isis/data_fmrt.nii", "" );
 	BOOST_CHECK( not imgList.isEmpty() );
 	MyImageType::Pointer itkImage = MyImageType::New();
 	itkImage = adapter->makeItkImageObject<MyImageType>( imgList.front() );
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE ( ITK_to_ISIS )
 	adapter::itkAdapter *adapter = new adapter::itkAdapter;
 	typedef itk::Image<short, 4> MyImageType;
 	itk::ImageFileReader<MyImageType>::Pointer reader = itk::ImageFileReader<MyImageType>::New();
-	reader->SetFileName( "/scr/kastanie1/DATA/isis/data_fmrt.nii" );
+	reader->SetFileName( "/scr/kastanie1/core/isis/data_fmrt.nii" );
 	reader->Update();
 	data::ImageList isisImageList;
 	isisImageList = adapter->makeIsisImageObject<MyImageType>( reader->GetOutput() , false );
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE ( ISIS_to_ITK_to_ISIS )
 	adapter::itkAdapter *adapter = new adapter::itkAdapter;
 	typedef itk::Image<short, 4> MyImageType;
 	MyImageType::Pointer itkImage = MyImageType::New();
-	data::ImageList isisImageList1 = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
+	data::ImageList isisImageList1 = isis::data::IOFactory::load( "/scr/kastanie1/core/isis/data_fmrt.nii", "" );
 	itkImage = adapter->makeItkImageObject<MyImageType>( isisImageList1.front() );
 	data::ImageList isisImageList2 = adapter->makeIsisImageObject<MyImageType>( itkImage );
 	data::IOFactory::write( isisImageList2, "", "ISIS_to_ITK_to_ISIS.nii", "" );
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE ( ITK_to_ISIS_to_ITK )
 	MyImageType::Pointer itkImage = MyImageType::New();
 	itk::ImageFileReader<MyImageType>::Pointer reader = itk::ImageFileReader<MyImageType>::New();
 	itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
-	reader->SetFileName( "/scr/kastanie1/DATA/isis/data_fmrt.nii" );
+	reader->SetFileName( "/scr/kastanie1/core/isis/data_fmrt.nii" );
 	reader->Update();
 	data::ImageList isisImageList;
 	isisImageList = adapter->makeIsisImageObject<MyImageType>( reader->GetOutput() );

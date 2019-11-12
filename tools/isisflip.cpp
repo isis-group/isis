@@ -1,16 +1,15 @@
-#include "DataStorage/io_application.hpp"
-#include "DataStorage/io_factory.hpp"
+#include <isis/core/io_application.hpp>
+#include <isis/core/io_factory.hpp>
+#include <isis/math/transform.hpp>
 
 #include <map>
 #include <boost/assign.hpp>
-#include <boost/foreach.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 using namespace isis;
 
 bool swapProperties( data::Image &image, const unsigned short dim )
 {
-	const util::ivector4 size = image.getSizeAsVector();
+	const util::vector4<size_t> size = image.getSizeAsVector();
 	std::vector<data::Chunk> chunks = image.copyChunksToVector( true );
 
 	if( chunks.front().getRelevantDims() < 2 && dim >= chunks.front().getRelevantDims() ) {
@@ -43,7 +42,7 @@ int main( int argc, char **argv )
 	public:
 		data::dimensions dim;
 		bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
-			ch.swapAlong( dim );
+			ch.flipAlong( dim );
 			return true;
 		}
 	} flifu;
@@ -69,20 +68,20 @@ int main( int argc, char **argv )
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
-	BOOST_FOREACH( data::Image & refImage, app.images ) {
+	for( data::Image & refImage :  app.images ) {
 		std::vector< data::Chunk > delme = refImage.copyChunksToVector( true );
 		isis::data::Image dummy( delme );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {
-			dim = refImage.mapScannerAxisToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
+			dim = math::mapScannerAxisToImageDimension(refImage, static_cast<data::scannerAxis>( dim - 3 ) );
 		}
 
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			if( refImage.copyChunksToVector( false ).front().getRelevantDims() > dim ) {
+			if( refImage.getChunkAt(0).getRelevantDims() > dim ) {
 				flifu.dim = static_cast<data::dimensions>( dim );
 				refImage.foreachChunk( flifu );
 			} else {
@@ -93,7 +92,7 @@ int main( int argc, char **argv )
 		}
 
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
-			refImage.transformCoords( T, app.parameters["center"] );
+			math::transformCoords(refImage, T, app.parameters["center"] );
 		}
 
 		finImageList.push_back( refImage );

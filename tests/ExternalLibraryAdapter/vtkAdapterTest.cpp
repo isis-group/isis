@@ -1,11 +1,10 @@
 #define BOOST_TEST_MODULE VTKAdapterTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <boost/foreach.hpp>
 
-#include "CoreUtils/log.hpp"
-#include "DataStorage/image.hpp"
-#include "DataStorage/io_factory.hpp"
+#include "util/log.hpp"
+#include "data/image.hpp"
+#include "data/io_factory.hpp"
 #include "ExternalLibraryAdapter/vtkAdapter.hpp"
 
 #include <vtkImageViewer.h>
@@ -29,7 +28,7 @@ BOOST_AUTO_TEST_CASE ( VTKAdapterTest3D )
 	vtkImageViewer *viewer = vtkImageViewer::New();
 	//load an image and store it into the vtkAdapter
 	//      data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data.nii", "" );
+	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/core/isis/data.nii", "" );
 	BOOST_CHECK( not imgList.isEmpty() );
 	vtkImageData *vtkImage = adapter::vtkAdapter::makeVtkImageObject( imgList.front() );
 	BOOST_CHECK( not vtkImage );

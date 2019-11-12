@@ -1,0 +1,13 @@
+# -*- mode: cmake -*-
+# ISIS cmake configuration file
+#
+SET(isis_adapter_qt5-exported-deps @isis_adapter_qt5-exported-deps@)
+
+# search isis core library
+FIND_LIBRARY(ISIS_QT5_LIB "isis_adapter_qt5")
+list(APPEND ISIS_QT5_LIBS ${ISIS_QT5_LIB} ${isis_adapter_qt5-exported-deps})
+#where is this needed
+#list(APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath-link=@_qt5Core_install_prefix@/lib/")
+
+MESSAGE(STATUS "isis qt5 adapter library: ${ISIS_QT5_LIB} (API ${ISIS_CORE_VERSION_API})")
+MESSAGE(STATUS "isis qt5 adapter library dependencies: ${isis_adapter_qt5-exported-deps}")
