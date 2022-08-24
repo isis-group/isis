@@ -21,6 +21,7 @@
 #include <string>
 #define BOOST_FILESYSTEM_VERSION 3 
 #include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace isis
 {

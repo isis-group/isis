@@ -20,6 +20,7 @@
 #define PROGRESSFEEDBACK_HPP
 #include <stddef.h>
 #include <string>
+#include <boost/noncopyable.hpp>
 #include <boost/progress.hpp>
 #include <boost/scoped_ptr.hpp>
 
